@@ -146,6 +146,7 @@ public class ImageChoiceDialog extends JDialog {
                 categoryModel.addElement(name);
                 if (category.equals(name)) {
                     match = name;
+                    break;
                 }
             }
         }
@@ -219,9 +220,7 @@ public class ImageChoiceDialog extends JDialog {
                 panel.add(scrollPane, gbc);
                 tableModel.reset();
                 tableModel.setCategory(layeredForceIcons[i].getLayerPath());
-                if (layeredForceIcons[i] != LayeredForceIcon.FRAME) {
-                    tableModel.addImage(Force.ICON_NONE);
-                }
+                tableModel.addImage(Force.ICON_NONE);
                 Iterator<String> imageIterator = (imageItems != null)
                         ? imageItems.getItemNames(layeredForceIcons[i].getLayerPath())
                         : Collections.emptyIterator();
@@ -238,6 +237,8 @@ public class ImageChoiceDialog extends JDialog {
                             String selected = iconMap.get(layeredForceIcons[i].getLayerPath()).get(0);
                             for (int k = 0; k < tableModel.getRowCount(); k++) {
                                 if (tableModel.getValueAt(k, 0).equals(selected)) {
+                                    // This adds k as a selected row, with the backend considering it
+                                    // as selecting the interval between k and k, inclusively
                                     layeredTables[i].setRowSelectionInterval(k, k);
                                     break;
                                 }
@@ -246,6 +247,8 @@ public class ImageChoiceDialog extends JDialog {
                             Vector<String> mapVector = iconMap.get(layeredForceIcons[i].getLayerPath());
                             for (int k = 0; k < tableModel.getRowCount(); k++) {
                                 if (mapVector.contains((String) tableModel.getValueAt(k, 0))) {
+                                    // This adds k as a selected row, with the backend considering it
+                                    // as selecting the interval between k and k, inclusively
                                     layeredTables[i].addRowSelectionInterval(k, k);
                                 }
                             }
@@ -394,6 +397,8 @@ public class ImageChoiceDialog extends JDialog {
         Vector<String> temp;
         LayeredForceIcon[] layeredForceIcons = LayeredForceIcon.values();
         for (int i = 0; i < layeredTables.length; i++) {
+            // If we are in the first row, we have the None option selected. Therefore, we need to
+            // Ignore the selected index.
             if (layeredTables[i].getSelectedRow() <= 0) {
                 iconMap.remove(layeredForceIcons[i].getLayerPath());
             } else {
