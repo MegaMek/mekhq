@@ -110,8 +110,7 @@ public class ImageChoiceDialog extends JDialog {
         if ((iconMap != null) && !iconMap.isEmpty()) {
             for (Map.Entry<String, Vector<String>> entry : iconMap.entrySet()) {
                 if ((entry.getValue() != null) && !entry.getValue().isEmpty()) {
-                    Vector<String> temp = new Vector<>(entry.getValue());
-                    this.iconMap.put(entry.getKey(), temp);
+                    this.iconMap.put(entry.getKey(), new Vector<>(entry.getValue()));
                 }
             }
         }
