@@ -51,6 +51,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
+import mekhq.gui.enums.LayeredForceIcon;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.preferences.PreferencesNode;
@@ -75,7 +76,6 @@ public class ImageChoiceDialog extends JDialog {
     private LinkedHashMap<String, Vector<String>> iconMap; // Key = Image Category, Value = Vector of Image Filenames
     private ImageTableMouseAdapter imagesMouseAdapter;
     private boolean force;
-    private JComboBox<String> comboCategories;
     private JTable tableImages;
     private boolean changed = false;
 
@@ -84,41 +84,9 @@ public class ImageChoiceDialog extends JDialog {
     private JTabbedPane tabbedPane = new JTabbedPane();
     private JTabbedPane layerTabs = new JTabbedPane();
     private JPanel layerPanel = new JPanel();
-    // Types
-    private JScrollPane scrTypes = new JScrollPane();
-    private JTable tableTypes = new JTable();
-    private JPanel panelTypes = new JPanel();
-    private ImageTableModel typesModel = new ImageTableModel();
-    // Formations
-    private JScrollPane scrFormations = new JScrollPane();
-    private JTable tableFormations = new JTable();
-    private JPanel panelFormations = new JPanel();
-    private ImageTableModel formationsModel = new ImageTableModel();
-    // Adjustments
-    private JScrollPane scrAdjustments = new JScrollPane();
-    private JTable tableAdjustments = new JTable();
-    private JPanel panelAdjustments = new JPanel();
-    private ImageTableModel adjustmentsModel = new ImageTableModel();
-    // Alphanumerics
-    private JScrollPane scrAlphanumerics = new JScrollPane();
-    private JTable tableAlphanumerics = new JTable();
-    private JPanel panelAlphanumerics = new JPanel();
-    private ImageTableModel alphanumericsModel = new ImageTableModel();
-    // Special Modifiers
-    private JScrollPane scrSpecialModifiers = new JScrollPane();
-    private JTable tableSpecialModifiers = new JTable();
-    private JPanel panelSpecialModifiers = new JPanel();
-    private ImageTableModel specialModel = new ImageTableModel();
-    // Backgrounds
-    private JScrollPane scrBackgrounds = new JScrollPane();
-    private JTable tableBackgrounds = new JTable();
-    private JPanel panelBackgrounds = new JPanel();
-    private ImageTableModel backgroundsModel = new ImageTableModel();
-    // Logos
-    private JScrollPane scrLogos = new JScrollPane();
-    private JTable tableLogos = new JTable();
-    private JPanel panelLogos = new JPanel();
-    private ImageTableModel logosModel = new ImageTableModel();
+
+    // Combined array format
+    private JTable[] layeredTables;
     //endregion Layered Images Support
     //endregion Variable Declarations
 
@@ -133,8 +101,11 @@ public class ImageChoiceDialog extends JDialog {
         super(parent, modal);
         this.category = category;
         this.filename = filename;
+        imagesMouseAdapter = new ImageTableMouseAdapter();
+        this.imageItems = items;
+        this.force = force;
 
-        // Clone the iconMap
+        // Clone the input iconMap
         this.iconMap = new LinkedHashMap<>();
         if ((iconMap != null) && !iconMap.isEmpty()) {
             for (Map.Entry<String, Vector<String>> entry : iconMap.entrySet()) {
@@ -145,11 +116,7 @@ public class ImageChoiceDialog extends JDialog {
             }
         }
 
-        imagesMouseAdapter = new ImageTableMouseAdapter();
-        this.imageItems = items;
-        this.force = force;
         initComponents();
-        initValues();
 
         setLocationRelativeTo(parent);
         setUserPreferences();
@@ -168,6 +135,32 @@ public class ImageChoiceDialog extends JDialog {
         JPanel imagesPanel = new JPanel();
         imagesPanel.setLayout(new GridBagLayout());
         imagesPanel.setName(PANEL_IMAGES);
+
+        DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<>();
+        String match = null;
+        categoryModel.addElement(Crew.ROOT_PORTRAIT);
+        Iterator<String> names = (imageItems != null)
+                ? imageItems.getCategoryNames() : Collections.emptyIterator();
+        while (names.hasNext()) {
+            String name = names.next();
+            if (!"".equals(name)) {
+                categoryModel.addElement(name);
+                if (category.equals(name)) {
+                    match = name;
+                }
+            }
+        }
+        categoryModel.setSelectedItem((match != null) ? match : Crew.ROOT_PORTRAIT);
+        JComboBox<String> comboCategories = new JComboBox<>(categoryModel);
+        comboCategories.setName("comboCategories"); // NOI18N
+        comboCategories.addItemListener(this::comboCategoriesItemStateChanged);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 1.0;
+        imagesPanel.add(comboCategories, gbc);
 
         tableImages = new JTable(imageTableModel);
         tableImages.setName("tableImages"); // NOI18N
@@ -188,35 +181,15 @@ public class ImageChoiceDialog extends JDialog {
         gbc.weighty = 1.0;
         imagesPanel.add(scrImages, gbc);
 
-        DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<>();
-        String match = null;
-        categoryModel.addElement(Crew.ROOT_PORTRAIT);
-        Iterator<String> names = (imageItems != null)
-                ? imageItems.getCategoryNames() : Collections.emptyIterator();
-        while (names.hasNext()) {
-            String name = names.next();
-            if (!"".equals(name)) { //$NON-NLS-1$
-                categoryModel.addElement(name);
-                if (category.equals(name)) {
-                    match = name;
-                }
+        // Initialize the imageTableModel
+        fillTable((String) comboCategories.getSelectedItem());
+        // Determine the initial value for the selected image, if any
+        for (int i = 0; i < imageTableModel.getRowCount(); i++) {
+            if (imageTableModel.getValueAt(i, 0).equals(filename)) {
+                tableImages.setRowSelectionInterval(i, i);
+                break;
             }
         }
-        if (null != match) {
-            categoryModel.setSelectedItem(match);
-        } else {
-            categoryModel.setSelectedItem(Crew.ROOT_PORTRAIT);
-        }
-        comboCategories = new JComboBox<>(categoryModel);
-        comboCategories.setName("comboCategories"); // NOI18N
-        comboCategories.addItemListener(this::comboCategoriesItemStateChanged);
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.weightx = 1.0;
-        imagesPanel.add(comboCategories, gbc);
 
         if (force) {
             // Background setup for the layered options
@@ -228,138 +201,67 @@ public class ImageChoiceDialog extends JDialog {
             gbc.weightx = 1.0;
             gbc.weighty = 1.0;
 
-            // Panel for Types
-            tableTypes.setModel(typesModel);
-            tableTypes.setName("tableTypes"); // NOI18N
-            tableTypes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            tableTypes.setRowHeight(76);
-            tableTypes.getColumnModel().getColumn(0).setCellRenderer(typesModel.getRenderer());
-            tableTypes.addMouseListener(new ImageTableMouseAdapter());
-            scrTypes.setViewportView(tableTypes);
-            panelTypes.add(scrTypes, gbc);
-            typesModel.reset();
-            typesModel.setCategory(IconPackage.FORCE_TYPE);
-            typesModel.addImage(Force.ICON_NONE);
-            Iterator<String> imageNames = (imageItems != null)
-                    ? imageItems.getItemNames(IconPackage.FORCE_TYPE) : Collections.emptyIterator();
-            while (imageNames.hasNext()) {
-                typesModel.addImage(imageNames.next());
-            }
-            layerTabs.addTab(resourceMap.getString("Force.types"), panelTypes);
+            LayeredForceIcon[] layeredForceIcons = LayeredForceIcon.values();
+            layeredTables = new JTable[layeredForceIcons.length];
 
-            // Panel for Formations
-            tableFormations.setModel(formationsModel);
-            tableFormations.setName("tableFormations"); // NOI18N
-            tableFormations.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            tableFormations.setRowHeight(76);
-            tableFormations.getColumnModel().getColumn(0).setCellRenderer(formationsModel.getRenderer());
-            tableFormations.addMouseListener(new ImageTableMouseAdapter());
-            scrFormations.setViewportView(tableFormations);
-            panelFormations.add(scrFormations, gbc);
-            formationsModel.reset();
-            formationsModel.setCategory(IconPackage.FORCE_FORMATIONS);
-            formationsModel.addImage(Force.ICON_NONE);
-            Iterator<String> imageNamesTypes = (imageItems != null)
-                    ? imageItems.getItemNames(IconPackage.FORCE_FORMATIONS) : Collections.emptyIterator();
-            while (imageNamesTypes.hasNext()) {
-                formationsModel.addImage(imageNamesTypes.next());
-            }
-            layerTabs.addTab(resourceMap.getString("Force.formations"), panelFormations);
+            for (int i = 0; i < layeredForceIcons.length; i++) {
+                JScrollPane scrollPane = new JScrollPane();
+                layeredTables[i] = new JTable();
+                ImageTableModel tableModel = new ImageTableModel();
+                JPanel panel = new JPanel();
 
-            // Panel for Adjustments
-            tableAdjustments.setModel(adjustmentsModel);
-            tableAdjustments.setName("tableAdjustments"); // NOI18N
-            tableAdjustments.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            tableAdjustments.setRowHeight(76);
-            tableAdjustments.getColumnModel().getColumn(0).setCellRenderer(adjustmentsModel.getRenderer());
-            tableAdjustments.addMouseListener(new ImageTableMouseAdapter());
-            scrAdjustments.setViewportView(tableAdjustments);
-            panelAdjustments.add(scrAdjustments, gbc);
-            adjustmentsModel.reset();
-            adjustmentsModel.setCategory(IconPackage.FORCE_ADJUSTMENTS);
-            adjustmentsModel.addImage(Force.ICON_NONE);
-            Iterator<String> imageNamesAdjustments = (imageItems != null)
-                    ? imageItems.getItemNames(IconPackage.FORCE_ADJUSTMENTS) : Collections.emptyIterator();
-            while (imageNamesAdjustments.hasNext()) {
-                adjustmentsModel.addImage(imageNamesAdjustments.next());
-            }
-            layerTabs.addTab(resourceMap.getString("Force.adjustments"), panelAdjustments);
+                layeredTables[i].setModel(tableModel);
+                layeredTables[i].setName(layeredForceIcons[i].getTableName());
+                layeredTables[i].setSelectionMode(layeredForceIcons[i].getListSelectionModel());
+                layeredTables[i].setRowHeight(76);
+                layeredTables[i].getColumnModel().getColumn(0).setCellRenderer(tableModel.getRenderer());
+                layeredTables[i].addMouseListener(new ImageTableMouseAdapter());
+                scrollPane.setViewportView(layeredTables[i]);
+                panel.add(scrollPane, gbc);
+                tableModel.reset();
+                tableModel.setCategory(layeredForceIcons[i].getLayerPath());
+                if (layeredForceIcons[i] != LayeredForceIcon.FRAME) {
+                    tableModel.addImage(Force.ICON_NONE);
+                }
+                Iterator<String> imageIterator = (imageItems != null)
+                        ? imageItems.getItemNames(layeredForceIcons[i].getLayerPath())
+                        : Collections.emptyIterator();
+                while (imageIterator.hasNext()) {
+                    tableModel.addImage(imageIterator.next());
+                }
+                layerTabs.addTab(layeredForceIcons[i].toString(), panel);
 
-            // Panel for Alphanumerics
-            tableAlphanumerics.setModel(alphanumericsModel);
-            tableAlphanumerics.setName("tableAalphanumerics"); // NOI18N
-            tableAlphanumerics.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            tableAlphanumerics.setRowHeight(76);
-            tableAlphanumerics.getColumnModel().getColumn(0).setCellRenderer(alphanumericsModel.getRenderer());
-            tableAlphanumerics.addMouseListener(new ImageTableMouseAdapter());
-            scrAlphanumerics.setViewportView(tableAlphanumerics);
-            panelAlphanumerics.add(scrAlphanumerics, gbc);
-            alphanumericsModel.reset();
-            alphanumericsModel.setCategory(IconPackage.FORCE_ALPHANUMERICS);
-            alphanumericsModel.addImage(Force.ICON_NONE);
-            Iterator<String> imageNamesAlphanumerics = (imageItems != null)
-                    ? imageItems.getItemNames(IconPackage.FORCE_ALPHANUMERICS) : Collections.emptyIterator();
-            while (imageNamesAlphanumerics.hasNext()) {
-                alphanumericsModel.addImage(imageNamesAlphanumerics.next());
+                // Initialize Initial Values, provided the Icon Map is not empty
+                if (!iconMap.isEmpty()) {
+                    if (iconMap.containsKey(layeredForceIcons[i].getLayerPath())) {
+                        if (layeredForceIcons[i].getListSelectionModel() == ListSelectionModel.SINGLE_SELECTION) {
+                            // Determine the current selected value
+                            String selected = iconMap.get(layeredForceIcons[i].getLayerPath()).get(0);
+                            for (int k = 0; k < tableModel.getRowCount(); k++) {
+                                if (tableModel.getValueAt(k, 0).equals(selected)) {
+                                    layeredTables[i].setRowSelectionInterval(k, k);
+                                    break;
+                                }
+                            }
+                        } else {
+                            Vector<String> mapVector = iconMap.get(layeredForceIcons[i].getLayerPath());
+                            for (int k = 0; k < tableModel.getRowCount(); k++) {
+                                if (mapVector.contains((String) tableModel.getValueAt(k, 0))) {
+                                    layeredTables[i].addRowSelectionInterval(k, k);
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            layerTabs.addTab(resourceMap.getString("Force.alphanumerics"), panelAlphanumerics);
 
-            // Panel for SpecialModifiers
-            tableSpecialModifiers.setModel(specialModel);
-            tableSpecialModifiers.setName("tableSpecialModifiers"); // NOI18N
-            tableSpecialModifiers.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            tableSpecialModifiers.setRowHeight(76);
-            tableSpecialModifiers.getColumnModel().getColumn(0).setCellRenderer(specialModel.getRenderer());
-            tableSpecialModifiers.addMouseListener(new ImageTableMouseAdapter());
-            scrSpecialModifiers.setViewportView(tableSpecialModifiers);
-            panelSpecialModifiers.add(scrSpecialModifiers, gbc);
-            specialModel.reset();
-            specialModel.setCategory(IconPackage.FORCE_SPECIAL_MODIFIERS);
-            specialModel.addImage(Force.ICON_NONE);
-            Iterator<String> imageNamesSpecial = (imageItems != null)
-                    ? imageItems.getItemNames(IconPackage.FORCE_SPECIAL_MODIFIERS) : Collections.emptyIterator();
-            while (imageNamesSpecial.hasNext()) {
-                specialModel.addImage(imageNamesSpecial.next());
-            }
-            layerTabs.addTab(resourceMap.getString("Force.special"), panelSpecialModifiers);
+            // Then trigger the initial refresh
+            refreshLayeredPreview();
 
-            // Panel for Backgrounds
-            tableBackgrounds.setModel(backgroundsModel);
-            tableBackgrounds.setName("tableBackgrounds"); // NOI18N
-            tableBackgrounds.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            tableBackgrounds.setRowHeight(76);
-            tableBackgrounds.getColumnModel().getColumn(0).setCellRenderer(backgroundsModel.getRenderer());
-            tableBackgrounds.addMouseListener(new ImageTableMouseAdapter());
-            scrBackgrounds.setViewportView(tableBackgrounds);
-            panelBackgrounds.add(scrBackgrounds, gbc);
-            backgroundsModel.reset();
-            backgroundsModel.setCategory(IconPackage.FORCE_BACKGROUNDS);
-            backgroundsModel.addImage(Force.ICON_NONE);
-            Iterator<String> imageNamesBackgrounds = (imageItems != null)
-                    ? imageItems.getItemNames(IconPackage.FORCE_BACKGROUNDS) : Collections.emptyIterator();
-            while (imageNamesBackgrounds.hasNext()) {
-                backgroundsModel.addImage(imageNamesBackgrounds.next());
+            // And add the missing ListSelectionListeners, which must be done after the initial refresh
+            for (JTable table : layeredTables) {
+                table.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
             }
-            layerTabs.addTab(resourceMap.getString("Force.backgrounds"), panelBackgrounds);
-
-            // Panel for Logos
-            tableLogos.setModel(logosModel);
-            tableLogos.setName("tableLogos"); // NOI18N
-            tableLogos.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            tableLogos.setRowHeight(76);
-            tableLogos.getColumnModel().getColumn(0).setCellRenderer(logosModel.getRenderer());
-            tableLogos.addMouseListener(new ImageTableMouseAdapter());
-            scrLogos.setViewportView(tableLogos);
-            panelLogos.add(scrLogos, gbc);
-            logosModel.reset();
-            logosModel.setCategory(IconPackage.FORCE_LOGOS);
-            logosModel.addImage(Force.ICON_NONE);
-            Iterator<String> imageNamesLogos = (imageItems != null)
-                    ? imageItems.getItemNames(IconPackage.FORCE_LOGOS) : Collections.emptyIterator();
-            while (imageNamesLogos.hasNext()) {
-                logosModel.addImage(imageNamesLogos.next());
-            }
-            layerTabs.addTab(resourceMap.getString("Force.logos"), panelLogos);
 
             // Put it all together nice and pretty on the layerPanel
             layerPanel.setLayout(new GridBagLayout());
@@ -406,6 +308,15 @@ public class ImageChoiceDialog extends JDialog {
             getContentPane().add(imagesPanel, gbc);
         }
 
+        // Add the tableImages List Selection Listener now that the values have been
+        // initialized for Layered Icons, if applicable.
+        tableImages.getSelectionModel().addListSelectionListener(event -> {
+            // Clear selections on the layered tables
+            for (JTable table : layeredTables) {
+                table.clearSelection();
+            }
+        });
+
         JButton btnSelect = new JButton(resourceMap.getString("btnSelect.text")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N
         btnSelect.addActionListener(this::btnSelectActionPerformed);
@@ -425,134 +336,6 @@ public class ImageChoiceDialog extends JDialog {
         getContentPane().add(btnCancel, gbc);
 
         pack();
-    }
-
-    /**
-     * This is separated from the above because we want to initialize after creating the tables
-     */
-    private void initValues() {
-        // Create rowIndex variable to track the assigned row
-        int rowIndex = 0;
-
-        fillTable((String) comboCategories.getSelectedItem());
-
-        // Determine the initial selection dependent on the initial icon map
-        if (iconMap.isEmpty()) {
-            // Determine the initial value for the selected image, if any
-            for (int i = 0; i < imageTableModel.getRowCount(); i++) {
-                if (imageTableModel.getValueAt(i, 0).equals(filename)) {
-                    rowIndex = i;
-                    break;
-                }
-            }
-            tableImages.setRowSelectionInterval(rowIndex, rowIndex);
-        } else {
-            // Determine the initial values for the Layered Icons
-            if (iconMap.containsKey(IconPackage.FORCE_TYPE)) {
-                String name = iconMap.get(IconPackage.FORCE_TYPE).get(0);
-                for (int i = 0; i < typesModel.getRowCount(); i++) {
-                    if (typesModel.getValueAt(i, 0).equals(name)) {
-                        rowIndex = i;
-                        break;
-                    }
-                }
-            }
-            tableTypes.setRowSelectionInterval(rowIndex, rowIndex);
-
-            rowIndex = 0;
-            if (iconMap.containsKey(IconPackage.FORCE_FORMATIONS)) {
-                String name = iconMap.get(IconPackage.FORCE_FORMATIONS).get(0);
-                for (int i = 0; i < formationsModel.getRowCount(); i++) {
-                    if (formationsModel.getValueAt(i, 0).equals(name)) {
-                        rowIndex = i;
-                        break;
-                    }
-                }
-            }
-            tableFormations.setRowSelectionInterval(rowIndex, rowIndex);
-
-            rowIndex = 0;
-            if (iconMap.containsKey(IconPackage.FORCE_ADJUSTMENTS)) {
-                String name = iconMap.get(IconPackage.FORCE_ADJUSTMENTS).get(0);
-                for (int i = 0; i < adjustmentsModel.getRowCount(); i++) {
-                    if (adjustmentsModel.getValueAt(i, 0).equals(name)) {
-                        rowIndex = i;
-                        break;
-                    }
-                }
-            }
-            tableAdjustments.setRowSelectionInterval(rowIndex, rowIndex);
-
-            rowIndex = 0;
-            if (iconMap.containsKey(IconPackage.FORCE_ALPHANUMERICS)) {
-                String name = iconMap.get(IconPackage.FORCE_ALPHANUMERICS).get(0);
-                for (int i = 0; i < alphanumericsModel.getRowCount(); i++) {
-                    if (alphanumericsModel.getValueAt(i, 0).equals(name)) {
-                        rowIndex = i;
-                        break;
-                    }
-                }
-            }
-            tableAlphanumerics.setRowSelectionInterval(rowIndex, rowIndex);
-
-            rowIndex = 0;
-            if (iconMap.containsKey(IconPackage.FORCE_SPECIAL_MODIFIERS)) {
-                String name = iconMap.get(IconPackage.FORCE_SPECIAL_MODIFIERS).get(0);
-                for (int i = 0; i < specialModel.getRowCount(); i++) {
-                    if (specialModel.getValueAt(i, 0).equals(name)) {
-                        rowIndex = i;
-                        break;
-                    }
-                }
-            }
-            tableSpecialModifiers.setRowSelectionInterval(rowIndex, rowIndex);
-
-            rowIndex = 0;
-            if (iconMap.containsKey(IconPackage.FORCE_BACKGROUNDS)) {
-                String name = iconMap.get(IconPackage.FORCE_BACKGROUNDS).get(0);
-                for (int i = 0; i < backgroundsModel.getRowCount(); i++) {
-                    if (backgroundsModel.getValueAt(i, 0).equals(name)) {
-                        rowIndex = i;
-                        break;
-                    }
-                }
-            }
-            tableBackgrounds.setRowSelectionInterval(rowIndex, rowIndex);
-
-            rowIndex = 0;
-            if (iconMap.containsKey(IconPackage.FORCE_LOGOS)) {
-                String name = iconMap.get(IconPackage.FORCE_LOGOS).get(0);
-                for (int i = 0; i < logosModel.getRowCount(); i++) {
-                    if (logosModel.getValueAt(i, 0).equals(name)) {
-                        rowIndex = i;
-                        break;
-                    }
-                }
-            }
-            tableLogos.setRowSelectionInterval(rowIndex, rowIndex);
-        }
-
-        // Then trigger the initial refresh
-        refreshLayeredPreview();
-
-        // Finally, Add List Selection Listeners now that the values have been initialized
-        tableImages.getSelectionModel().addListSelectionListener(event -> {
-            // Clear selections on the layered tables
-            tableAdjustments.clearSelection();
-            tableAlphanumerics.clearSelection();
-            tableFormations.clearSelection();
-            tableSpecialModifiers.clearSelection();
-            tableBackgrounds.clearSelection();
-            tableLogos.clearSelection();
-            tableTypes.clearSelection();
-        });
-        tableTypes.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
-        tableFormations.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
-        tableAdjustments.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
-        tableAlphanumerics.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
-        tableSpecialModifiers.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
-        tableBackgrounds.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
-        tableLogos.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
     }
 
     private void setUserPreferences() {
@@ -607,74 +390,20 @@ public class ImageChoiceDialog extends JDialog {
     private void refreshLayeredPreview() {
         // Add the image frame
         iconMap.clear();
-        Vector<String> frameVector = new Vector<>();
-        frameVector.add("Frame.png");
-        iconMap.put(IconPackage.FORCE_FRAME, frameVector);
 
         // Check each table for what is, or is not, selected
-        Vector<String> tmp;
-        if (tableTypes.getSelectedRow() <= 0) {
-            iconMap.remove(IconPackage.FORCE_TYPE, iconMap.get(IconPackage.FORCE_TYPE));
-        } else {
-            tmp = new Vector<>();
-            for (int index : tableTypes.getSelectedRows()) {
-                tmp.add((String) tableTypes.getValueAt(index, 0));
+        Vector<String> temp;
+        LayeredForceIcon[] layeredForceIcons = LayeredForceIcon.values();
+        for (int i = 0; i < layeredTables.length; i++) {
+            if (layeredTables[i].getSelectedRow() <= 0) {
+                iconMap.remove(layeredForceIcons[i].getLayerPath());
+            } else {
+                temp = new Vector<>();
+                for (int index : layeredTables[i].getSelectedRows()) {
+                    temp.add((String) layeredTables[i].getValueAt(index, 0));
+                }
+                iconMap.put(layeredForceIcons[i].getLayerPath(), temp);
             }
-            iconMap.put(IconPackage.FORCE_TYPE, tmp);
-        }
-        if (tableFormations.getSelectedRow() <= 0) {
-            iconMap.remove(IconPackage.FORCE_FORMATIONS, iconMap.get(IconPackage.FORCE_FORMATIONS));
-        } else {
-            tmp = new Vector<>();
-            for (int index : tableFormations.getSelectedRows()) {
-                tmp.add((String) tableFormations.getValueAt(index, 0));
-            }
-            iconMap.put(IconPackage.FORCE_FORMATIONS, tmp);
-        }
-        if (tableAdjustments.getSelectedRow() <= 0) {
-            iconMap.remove(IconPackage.FORCE_ADJUSTMENTS, iconMap.get(IconPackage.FORCE_ADJUSTMENTS));
-        } else {
-            tmp = new Vector<>();
-            for (int index : tableAdjustments.getSelectedRows()) {
-                tmp.add((String) tableAdjustments.getValueAt(index, 0));
-            }
-            iconMap.put(IconPackage.FORCE_ADJUSTMENTS, tmp);
-        }
-        if (tableAlphanumerics.getSelectedRow() <= 0) {
-            iconMap.remove(IconPackage.FORCE_ALPHANUMERICS, iconMap.get(IconPackage.FORCE_ALPHANUMERICS));
-        } else {
-            tmp = new Vector<>();
-            for (int index : tableAlphanumerics.getSelectedRows()) {
-                tmp.add((String) tableAlphanumerics.getValueAt(index, 0));
-            }
-            iconMap.put(IconPackage.FORCE_ALPHANUMERICS, tmp);
-        }
-        if (tableSpecialModifiers.getSelectedRow() <= 0) {
-            iconMap.remove(IconPackage.FORCE_SPECIAL_MODIFIERS, iconMap.get(IconPackage.FORCE_SPECIAL_MODIFIERS));
-        } else {
-            tmp = new Vector<>();
-            for (int index : tableSpecialModifiers.getSelectedRows()) {
-                tmp.add((String) tableSpecialModifiers.getValueAt(index, 0));
-            }
-            iconMap.put(IconPackage.FORCE_SPECIAL_MODIFIERS, tmp);
-        }
-        if (tableBackgrounds.getSelectedRow() <= 0) {
-            iconMap.remove(IconPackage.FORCE_BACKGROUNDS, iconMap.get(IconPackage.FORCE_BACKGROUNDS));
-        } else {
-            tmp = new Vector<>();
-            for (int index : tableBackgrounds.getSelectedRows()) {
-                tmp.add((String) tableBackgrounds.getValueAt(index, 0));
-            }
-            iconMap.put(IconPackage.FORCE_BACKGROUNDS, tmp);
-        }
-        if (tableLogos.getSelectedRow() <= 0) {
-            iconMap.remove(IconPackage.FORCE_LOGOS, iconMap.get(IconPackage.FORCE_LOGOS));
-        } else {
-            tmp = new Vector<>();
-            for (int index : tableLogos.getSelectedRows()) {
-                tmp.add((String) tableLogos.getValueAt(index, 0));
-            }
-            iconMap.put(IconPackage.FORCE_LOGOS, tmp);
         }
 
         category = Force.ROOT_LAYERED;
