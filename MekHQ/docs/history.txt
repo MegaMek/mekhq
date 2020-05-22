@@ -14,6 +14,7 @@ VERSION HISTORY:
 + Issues #1735, #1736, #1737: Fixing how units are edited in Scenario Resolution Wizard
 + Issue #1753: Fixed advance day NPE related to contract start date extension when player is in-system but still in transit
 + Issue #1733: Adding Scenario Resolution Wizard and MUL Selection Dialog Mnemonics
++ PR #1762: Advance Days: Increasing Day Count Limit and Adding Advance to Next Year
 
 0.47.6 (2020-5-03 1715 UTC)
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
