@@ -314,8 +314,10 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
                 siblingsAndSpouses.remove(sibling);
                 siblingsAndSpouses.add(sibling);
                 UUID spouse = campaign.getPerson(sibling).getGenealogy().getSpouseId();
-                siblingsAndSpouses.remove(spouse);
-                siblingsAndSpouses.add(spouse);
+                if (spouse != null) {
+                    siblingsAndSpouses.remove(spouse);
+                    siblingsAndSpouses.add(spouse);
+                }
             }
         }
 

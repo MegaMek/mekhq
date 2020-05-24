@@ -789,10 +789,6 @@ public class PersonViewPanel extends ScrollablePanel {
         JLabel lblChildren2;
         JLabel lblGrandchildren1 = new JLabel();
         JLabel lblGrandchildren2;
-        JLabel lblFather1 = new JLabel();
-        JLabel lblFather2 = new JLabel();
-        JLabel lblMother1 = new JLabel();
-        JLabel lblMother2 = new JLabel();
         JLabel lblSiblings1 = new JLabel();
         JLabel lblSiblings2;
         JLabel lblGrandparents1 = new JLabel();
@@ -956,8 +952,8 @@ public class PersonViewPanel extends ScrollablePanel {
 
                     JLabel labelParentName = new JLabel(String.format("<html>%s</html>", parent.getHyperlinkedName()));
                     labelParentName.setName("lblParentName");
-                    lblFather2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblFather2.addMouseListener(new MouseAdapter() {
+                    labelParentName.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    labelParentName.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
                             gui.getPersonnelTab().focusOnPerson(parentId);
@@ -966,7 +962,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     gridBagConstraints.gridx = 1;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                    pnlFamily.add(lblFather2, gridBagConstraints);
+                    pnlFamily.add(labelParentName, gridBagConstraints);
                     firsty++;
                 }
             }
