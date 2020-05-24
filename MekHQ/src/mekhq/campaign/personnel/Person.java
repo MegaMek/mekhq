@@ -40,8 +40,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.personnel.enums.ModifierValue;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
