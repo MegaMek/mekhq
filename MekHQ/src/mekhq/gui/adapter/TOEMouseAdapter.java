@@ -321,7 +321,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
 
-            if(scenario instanceof AtBDynamicScenario) {
+            if (scenario instanceof AtBDynamicScenario) {
                 ForceTemplateAssignmentDialog ftad = new ForceTemplateAssignmentDialog(gui, forces, null, (AtBDynamicScenario) scenario);
             } else {
                 for (Force force : forces) {
@@ -342,10 +342,9 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         } else if (command.contains(TOEMouseAdapter.CHANGE_ICON)) {
             if (null != singleForce) {
-                ImageChoiceDialog pcd = new ImageChoiceDialog(
-                        gui.getFrame(), true, singleForce.getIconCategory(),
-                        singleForce.getIconFileName(), gui.getIconPackage()
-                        .getForceIcons(), true);
+                ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(), true,
+                        singleForce.getIconCategory(), singleForce.getIconFileName(),
+                        singleForce.getIconMap(), gui.getIconPackage().getForceIcons(), true);
                 pcd.setVisible(true);
                 if (pcd.isChanged()) {
                     singleForce.setIconCategory(pcd.getCategory());
@@ -768,7 +767,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         menuItem.addActionListener(this);
                         popup.add(menuItem);
                     }
-                    
+
                     menu = new JMenu("Add Unit");
                     menu.setEnabled(false);
                     HashMap<String, JMenu> unitTypeMenus = new HashMap<>();

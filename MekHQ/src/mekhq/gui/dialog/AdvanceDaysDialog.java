@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2014, 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,17 +10,15 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Frame;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -53,13 +51,10 @@ import mekhq.preferences.PreferencesNode;
 public class AdvanceDaysDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;
 
-    private ResourceBundle resourceMap;
-
     private JSpinner spnDays;
     private JButton btnStart;
     private JButton btnNextMonth;
-    private JLabel lblDays;
-    private JPanel pnlNumDays;
+    private JButton btnNextYear;
     private DailyReportLogPanel logPanel;
     private CampaignGUI gui;
     private ReportHyperlinkListener listener;
@@ -69,7 +64,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
         this.gui = gui;
         this.listener = listener;
         setName("formADD"); // NOI18N
-        getContentPane().setLayout(new java.awt.GridBagLayout());
+        getContentPane().setLayout(new GridBagLayout());
         this.setPreferredSize(new Dimension(500,500));
         initComponents();
         setLocationRelativeTo(owner);
@@ -79,21 +74,31 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
     public void initComponents() {
         setLayout(new BorderLayout());
 
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.AdvanceDaysDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AdvanceDaysDialog", new EncodeControl()); //$NON-NLS-1$
 
         this.setTitle(resourceMap.getString("dlgTitle.text"));
-        lblDays = new JLabel(resourceMap.getString("dlgDays.text"));
-        pnlNumDays = new JPanel();
-        spnDays = new JSpinner(new SpinnerNumberModel(7, 1, 365, 1));
-        ((JSpinner.DefaultEditor)spnDays.getEditor()).getTextField().setEditable(true);
+        JPanel pnlNumDays = new JPanel();
+
+        // Maxing out at 10 years for dev testing reasons
+        spnDays = new JSpinner(new SpinnerNumberModel(7, 1, 3650, 1));
+        ((JSpinner.DefaultEditor) spnDays.getEditor()).getTextField().setEditable(true);
         pnlNumDays.add(spnDays);
+
+        JLabel lblDays = new JLabel(resourceMap.getString("dlgDays.text"));
         pnlNumDays.add(lblDays);
+
         btnStart = new JButton(resourceMap.getString("dlgStartAdvancement.text"));
         btnStart.addActionListener(this);
+        pnlNumDays.add(btnStart);
+
         btnNextMonth = new JButton(resourceMap.getString("dlgAdvanceNextMonth.text"));
         btnNextMonth.addActionListener(this);
-        pnlNumDays.add(btnStart);
         pnlNumDays.add(btnNextMonth);
+
+        btnNextYear = new JButton(resourceMap.getString("dlgAdvanceNextYear.text"));
+        btnNextYear.addActionListener(this);
+        pnlNumDays.add(btnNextYear);
+
         getContentPane().add(pnlNumDays, BorderLayout.NORTH);
 
         logPanel = new DailyReportLogPanel(listener);
@@ -124,7 +129,8 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent event) {
-        if (event.getSource().equals(btnStart) || event.getSource().equals(btnNextMonth)) {
+        if (event.getSource().equals(btnStart) || event.getSource().equals(btnNextMonth)
+                || event.getSource().equals(btnNextYear)) {
             int days = (int) spnDays.getValue();
             boolean firstDay = true;
             MekHQ.registerHandler(this);
@@ -134,10 +140,15 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                 // the current day, with the one added because otherwise we get the last day of the same
                 // month
                 days = today.lengthOfMonth() + 1 - today.getDayOfMonth();
+            } else if (event.getSource().equals(btnNextYear)) {
+                LocalDate today = gui.getCampaign().getLocalDate();
+                // The number of days till the next year is the length of the year plus one minus
+                // the current day, with the one added because otherwise we get the last day of the same
+                // year
+                days = today.lengthOfYear() + 1 - today.getDayOfYear();
             }
 
-            int numDays;
-            for (numDays = days; numDays > 0; numDays--) {
+            for (; days > 0; days--) {
                 if (gui.getCampaign().checkOverDueLoans()
                         || gui.nagShortMaintenance()
                         || (gui.getCampaign().getCampaignOptions().getUseAtB())
@@ -165,8 +176,8 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
 
             // We couldn't advance all days for some reason,
             // set the spinner to the number of remaining days
-            if (numDays > 0) {
-                this.spnDays.setValue(numDays);
+            if (days > 0) {
+                this.spnDays.setValue(days);
             }
 
             gui.refreshCalendar();
