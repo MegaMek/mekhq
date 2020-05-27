@@ -478,6 +478,10 @@ public final class BriefingTab extends CampaignGuiTab {
             CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, null, m, getCampaign());
             csd.setVisible(true);
         }
+        //need to update the scenario table and refresh the scroll view
+        refreshScenarioTableData();
+        scrollMissionView.revalidate();
+        scrollMissionView.repaint();
     }
 
     protected void clearAssignedUnits() {
