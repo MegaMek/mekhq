@@ -88,33 +88,34 @@ public class MissionViewPanel extends ScrollablePanel {
 
 
     public MissionViewPanel(Mission m, JTable scenarioTable, CampaignGUI gui) {
-		this.mission = m;
-		this.scenarioTable = scenarioTable;
-		this.gui = gui;
-		initComponents();
-	}
+        this.mission = m;
+        this.scenarioTable = scenarioTable;
+        this.gui = gui;
+        initComponents();
+    }
 
-	private void initComponents() {
+    private void initComponents() {
 
         GridBagConstraints gridBagConstraints;
 
-		pnlStats = new JPanel();
-		txtDesc = new JTextPane();
+        pnlStats = new JPanel();
+        txtDesc = new JTextPane();
 
-		setLayout(new GridBagLayout());
+        setLayout(new GridBagLayout());
 
-		pnlStats.setName("pnlStats");
-		pnlStats.setBorder(BorderFactory.createTitledBorder(mission.getName()));
-		fillStats();
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-		gridBagConstraints.fill = GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-		add(pnlStats, gridBagConstraints);
+        pnlStats.setName("pnlStats");
+        pnlStats.setBorder(BorderFactory.createTitledBorder(mission.getName()));
+        fillStats();
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        add(pnlStats, gridBagConstraints);
 
         JScrollPane scrollScenarioTable = new JScrollPane(scenarioTable);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -125,10 +126,9 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(scrollScenarioTable, gridBagConstraints);
+    }
 
-	}
-
-	private void fillStats() {
+    private void fillStats() {
         if(mission instanceof AtBContract) {
             fillStatsAtBContract();
         } else if(mission instanceof Contract) {
@@ -142,38 +142,38 @@ public class MissionViewPanel extends ScrollablePanel {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl()); //$NON-NLS-1$
 
         lblStatus = new JLabel();
-    	lblLocation = new JLabel();
-    	txtLocation = new JLabel();
-    	lblType = new JLabel();
-    	txtType = new JLabel();
+        lblLocation = new JLabel();
+        txtLocation = new JLabel();
+        lblType = new JLabel();
+        txtType = new JLabel();
 
-    	GridBagConstraints gridBagConstraints;
-		pnlStats.setLayout(new GridBagLayout());
+        GridBagConstraints gridBagConstraints;
+        pnlStats.setLayout(new GridBagLayout());
 
-		lblStatus.setName("lblOwner"); // NOI18N
-		lblStatus.setText("<html><b>" + mission.getStatusName() + "</b></html>");
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-		gridBagConstraints.fill = GridBagConstraints.NONE;
-		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblStatus, gridBagConstraints);
+        lblStatus.setName("lblOwner"); // NOI18N
+        lblStatus.setText("<html><b>" + mission.getStatusName() + "</b></html>");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblStatus, gridBagConstraints);
 
-		if(null != mission.getSystemName(null) && !mission.getSystemName(null).isEmpty()) {
-    		lblLocation.setName("lblLocation"); // NOI18N
-    		lblLocation.setText(resourceMap.getString("lblLocation.text"));
-    		gridBagConstraints = new GridBagConstraints();
-    		gridBagConstraints.gridx = 0;
-    		gridBagConstraints.gridy = 1;
-    		gridBagConstraints.fill = GridBagConstraints.NONE;
-    		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-    		pnlStats.add(lblLocation, gridBagConstraints);
+        if(null != mission.getSystemName(null) && !mission.getSystemName(null).isEmpty()) {
+            lblLocation.setName("lblLocation"); // NOI18N
+            lblLocation.setText(resourceMap.getString("lblLocation.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 1;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblLocation, gridBagConstraints);
 
-    		txtLocation.setName("txtLocation"); // NOI18N
+            txtLocation.setName("txtLocation"); // NOI18N
             String systemName = mission.getSystemName(null);
             txtLocation.setText(String.format("<html><a href='#'>%s</a></html>", systemName));
             txtLocation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -185,53 +185,52 @@ public class MissionViewPanel extends ScrollablePanel {
                     gui.setSelectedTab(GuiTabType.MAP);
                 }
             });
-    		gridBagConstraints = new GridBagConstraints();
-    		gridBagConstraints.gridx = 1;
-    		gridBagConstraints.gridy = 1;
-    		gridBagConstraints.weightx = 0.5;
-    		gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-    		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-    		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-    		pnlStats.add(txtLocation, gridBagConstraints);
-		}
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 1;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtLocation, gridBagConstraints);
+        }
 
-		if(null != mission.getType() && !mission.getType().isEmpty()) {
-    		lblType.setName("lblType"); // NOI18N
-    		lblType.setText(resourceMap.getString("lblType.text"));
-    		gridBagConstraints = new GridBagConstraints();
-    		gridBagConstraints.gridx = 0;
-    		gridBagConstraints.gridy = 2;
-    		gridBagConstraints.fill = GridBagConstraints.NONE;
-    		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-    		pnlStats.add(lblType, gridBagConstraints);
+        if(null != mission.getType() && !mission.getType().isEmpty()) {
+            lblType.setName("lblType"); // NOI18N
+            lblType.setText(resourceMap.getString("lblType.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblType, gridBagConstraints);
 
-    		txtType.setName("txtType"); // NOI18N
-    		txtType.setText(mission.getType());
-    		gridBagConstraints = new GridBagConstraints();
-    		gridBagConstraints.gridx = 1;
-    		gridBagConstraints.gridy = 2;
-    		gridBagConstraints.weightx = 0.5;
-    		gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-    		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-    		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-    		pnlStats.add(txtType, gridBagConstraints);
-		}
+            txtType.setName("txtType"); // NOI18N
+            txtType.setText(mission.getType());
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtType, gridBagConstraints);
+        }
 
-		txtDesc.setName("txtDesc");
-		txtDesc.setEditable(false);
-		txtDesc.setContentType("text/html");
-		txtDesc.setText(MarkdownRenderer.getRenderedHtml(mission.getDescription()));
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 3;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
-		gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-		gridBagConstraints.fill = GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-		pnlStats.add(txtDesc, gridBagConstraints);
-
+        txtDesc.setName("txtDesc");
+        txtDesc.setEditable(false);
+        txtDesc.setContentType("text/html");
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(mission.getDescription()));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(txtDesc, gridBagConstraints);
     }
 
     private void fillStatsContract() {
