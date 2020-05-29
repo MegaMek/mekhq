@@ -441,6 +441,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handleNewDay(NewDayEvent evt) {
+        procurementListScheduler.schedule();
+        overviewScheduler.schedule();
         initReport();
     }
 
