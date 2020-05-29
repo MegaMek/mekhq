@@ -300,6 +300,7 @@ public class CampaignGUI extends JPanel {
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
+        addStandardTab(GuiTabType.COMMAND);
         addStandardTab(GuiTabType.TOE);
         addStandardTab(GuiTabType.BRIEFING);
         addStandardTab(GuiTabType.MAP);
