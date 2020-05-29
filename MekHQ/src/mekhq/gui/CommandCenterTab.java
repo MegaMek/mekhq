@@ -27,12 +27,13 @@ import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.report.*;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
-import mekhq.gui.dialog.PopupValueChoiceDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
+import mekhq.service.PartsAcquisitionService;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -41,6 +42,8 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -60,6 +63,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JPanel panProcurement;
     private JTable procurementTable;
     private ProcurementTableModel procurementModel;
+    private JButton btnGetUnit;
+    private JButton btnGetParts;
+    private JButton btnNeededParts;
+    private JButton btnPartsReport;
 
     /* Overview reports */
     private JTabbedPane tabOverview;
@@ -70,13 +77,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
     // Overview Personnel
     private JScrollPane scrollOverviewCombatPersonnel;
     private JScrollPane scrollOverviewSupportPersonnel;
-    private PartsInUseTableModel overviewPartsModel;
     // Overview Hangar
     private JScrollPane scrollOverviewHangar;
     private JTextArea overviewHangarArea;
-    // Overview Parts In Use
-    private JPanel overviewPartsPanel;
-    private JTable overviewPartsInUseTable;
     // Overview Rating
     private JScrollPane scrollOverviewUnitRating;
 
@@ -134,6 +137,37 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     private void initProcurementPanel() {
+
+        /* shopping buttons */
+        JPanel panProcurementButtons = new JPanel(new GridLayout(4, 1));
+        btnGetUnit = new JButton(resourceMap.getString("btnGetUnit.text")); // NOI18N
+        btnGetUnit.setToolTipText(resourceMap.getString("btnGetUnit.toolTipText")); // NOI18N
+        btnGetUnit.addActionListener(ev -> getUnit());
+        btnGetUnit.setEnabled(true);
+        panProcurementButtons.add(btnGetUnit);
+        btnGetParts = new JButton(resourceMap.getString("btnGetParts.text")); // NOI18N
+        btnGetParts.setToolTipText(resourceMap.getString("btnGetParts.toolTipText")); // NOI18N
+        btnGetParts.addActionListener(ev -> getParts());
+        btnGetParts.setEnabled(true);
+        panProcurementButtons.add(btnGetParts);
+        btnNeededParts = new JButton();
+        btnNeededParts.setText(resourceMap.getString("btnNeededParts.text")); // NOI18N
+        btnNeededParts.setToolTipText(resourceMap.getString("btnNeededParts.toolTipText"));
+        btnNeededParts.addActionListener(ev -> {
+            AcquisitionsDialog dlg = new AcquisitionsDialog(getFrame(), true, getCampaignGui());
+            dlg.setVisible(true);
+        });
+        panProcurementButtons.add(btnNeededParts);
+        btnPartsReport = new JButton();
+        btnPartsReport.setText(resourceMap.getString("btnPartsReport.text")); // NOI18N
+        btnPartsReport.setToolTipText(resourceMap.getString("btnPartsReport.toolTipText"));
+        btnPartsReport.addActionListener(ev -> {
+            PartsReportDialog dlg = new PartsReportDialog(getCampaignGui(), true);
+            dlg.setVisible(true);
+        });
+        panProcurementButtons.add(btnPartsReport);
+
+        /* shopping table */
         procurementModel = new ProcurementTableModel(getCampaign());
         procurementTable = new JTable(procurementModel);
         TableRowSorter<ProcurementTableModel> shoppingSorter = new TableRowSorter<>(
@@ -196,17 +230,18 @@ public final class CommandCenterTab extends CampaignGuiTab {
             }
         });
 
-        tabOverview = new JTabbedPane();
         JScrollPane scrollProcurement = new JScrollPane(procurementTable);
-        panProcurement = new JPanel(new GridLayout(0, 1));
-        panProcurement.setBorder(BorderFactory.createTitledBorder("Active Procurement List"));
-        panProcurement.add(scrollProcurement);
-        panProcurement.setMinimumSize(new Dimension(200, 200));
-        panProcurement.setPreferredSize(new Dimension(200, 200));
+        panProcurement = new JPanel(new BorderLayout());
+        //panProcurement.setBorder(BorderFactory.createTitledBorder("Active Procurement List"));
+        panProcurement.add(panProcurementButtons, BorderLayout.WEST);
+        panProcurement.add(scrollProcurement, BorderLayout.CENTER);
+        //panProcurement.setMinimumSize(new Dimension(200, 200));
+        //panProcurement.setPreferredSize(new Dimension(200, 200));
     }
 
     private void initOverviewPanel() {
-        initOverviewPartsInUse();
+        tabOverview = new JTabbedPane();
+
         JScrollPane scrollOverviewParts = new JScrollPane();
         scrollOverviewTransport = new JScrollPane();
         scrollOverviewCombatPersonnel = new JScrollPane();
@@ -249,120 +284,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         tabOverview.addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"),
                 splitOverviewHangar);
 
-        scrollOverviewParts.setViewportView(overviewPartsPanel);
-        tabOverview.addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"),
-                scrollOverviewParts);
-
         scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
         tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"),
                 scrollOverviewUnitRating);
-    }
-
-    private void initOverviewPartsInUse() {
-        overviewPartsPanel = new JPanel(new BorderLayout());
-
-        overviewPartsModel = new PartsInUseTableModel();
-        overviewPartsInUseTable = new JTable(overviewPartsModel);
-        overviewPartsInUseTable.setRowSelectionAllowed(false);
-        overviewPartsInUseTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableColumn column;
-        for (int i = 0; i < overviewPartsModel.getColumnCount(); ++i) {
-            column = overviewPartsInUseTable.getColumnModel().getColumn(i);
-            column.setCellRenderer(overviewPartsModel.getRenderer());
-            if (overviewPartsModel.hasConstantWidth(i)) {
-                column.setMinWidth(overviewPartsModel.getWidth(i));
-                column.setMaxWidth(overviewPartsModel.getWidth(i));
-            } else {
-                column.setPreferredWidth(overviewPartsModel.getPreferredWidth(i));
-            }
-        }
-        overviewPartsInUseTable.setIntercellSpacing(new Dimension(0, 0));
-        overviewPartsInUseTable.setShowGrid(false);
-        TableRowSorter<PartsInUseTableModel> partsInUseSorter = new TableRowSorter<>(overviewPartsModel);
-        partsInUseSorter.setSortsOnUpdates(true);
-        // Don't sort the buttons
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY_BULK, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD_BULK, false);
-        // Numeric columns
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_USE, new FormattedNumberSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_STORED, new FormattedNumberSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_TONNAGE, new FormattedNumberSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_TRANSFER, new TwoNumbersSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_COST, new FormattedNumberSorter());
-        // Default starting sort
-        partsInUseSorter.setSortKeys(Collections.singletonList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
-        overviewPartsInUseTable.setRowSorter(partsInUseSorter);
-
-        // Add buttons and actions. TODO: Only refresh the row we are working
-        // on, not the whole table
-        @SuppressWarnings("serial")
-        Action buy = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                getCampaign().getShoppingList().addShoppingItem(partToBuy, 1, getCampaign());
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-        @SuppressWarnings("serial")
-        Action buyInBulk = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
-                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                getCampaign().getShoppingList().addShoppingItem(partToBuy, quantity, getCampaign());
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-        @SuppressWarnings("serial")
-        Action add = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-        @SuppressWarnings("serial")
-        Action addInBulk = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
-                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                while (quantity > 0) {
-                    getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
-                    --quantity;
-                }
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, buy, PartsInUseTableModel.COL_BUTTON_BUY);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, buyInBulk,
-                PartsInUseTableModel.COL_BUTTON_BUY_BULK);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, add, PartsInUseTableModel.COL_BUTTON_GMADD);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, addInBulk,
-                PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
-
-        overviewPartsPanel.add(new JScrollPane(overviewPartsInUseTable), BorderLayout.CENTER);
     }
 
     @Override
@@ -397,29 +321,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             HangarReport hr = new HangarReport(getCampaign());
             scrollOverviewHangar.setViewportView(hr.getHangarTree());
             overviewHangarArea.setText(hr.getHangarTotals());
-            refreshOverviewPartsInUse();
         });
-    }
-
-    private void refreshOverviewSpecificPart(int row, PartInUse piu, IAcquisitionWork newPart) {
-        if (piu.equals(new PartInUse((Part) newPart))) {
-            // Simple update
-            getCampaign().updatePartInUse(piu);
-            overviewPartsModel.fireTableRowsUpdated(row, row);
-        } else {
-            // Some other part changed; fire a full refresh to be sure
-            refreshOverviewPartsInUse();
-        }
-    }
-
-    public void refreshOverviewPartsInUse() {
-        overviewPartsModel.setData(getCampaign().getPartsInUse());
-        TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
-        PartsInUseTableModel.ButtonColumn column = (PartsInUseTableModel.ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD)
-                .getCellRenderer();
-        column.setEnabled(getCampaign().isGM());
-        column = (PartsInUseTableModel.ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK).getCellRenderer();
-        column.setEnabled(getCampaign().isGM());
     }
 
     private void refreshProcurementList() {
@@ -435,6 +337,16 @@ public final class CommandCenterTab extends CampaignGuiTab {
     synchronized private void refreshReport() {
         List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
         panLog.appendLog(newLogEntries);
+    }
+
+    private void getUnit() {
+        UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), getCampaign(), true);
+        usd.setVisible(true);
+    }
+
+    private void getParts() {
+        PartsStoreDialog psd = new PartsStoreDialog(true, getCampaignGui());
+        psd.setVisible(true);
     }
 
     private ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);
