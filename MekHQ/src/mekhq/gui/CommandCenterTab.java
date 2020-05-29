@@ -99,11 +99,32 @@ public final class CommandCenterTab extends CampaignGuiTab {
         initOverviewPanel();
 
         /* Set overall layout */
-        setLayout(new BorderLayout());
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.insets = new Insets(5,5,5,5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 1.0;
+        panCommand.add(panLog, gridBagConstraints);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 1;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        panCommand.add(panProcurement, gridBagConstraints);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        panCommand.add(tabOverview, gridBagConstraints);
 
-        add(panLog, BorderLayout.WEST);
-        add(tabOverview, BorderLayout.CENTER);
-        add(panProcurement, BorderLayout.SOUTH);
+        setLayout(new BorderLayout());
+        add(panCommand, BorderLayout.CENTER);
+
     }
 
     private void initReportPanel() {
@@ -238,7 +259,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     private void initOverviewPartsInUse() {
-        overviewPartsPanel = new JPanel(new GridBagLayout());
+        overviewPartsPanel = new JPanel(new BorderLayout());
 
         overviewPartsModel = new PartsInUseTableModel();
         overviewPartsInUseTable = new JTable(overviewPartsModel);
@@ -341,16 +362,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, addInBulk,
                 PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
 
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-
-        overviewPartsPanel.add(new JScrollPane(overviewPartsInUseTable), gridBagConstraints);
+        overviewPartsPanel.add(new JScrollPane(overviewPartsInUseTable), BorderLayout.CENTER);
     }
 
     @Override
