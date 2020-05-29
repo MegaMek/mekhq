@@ -112,8 +112,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     private void initLogPanel() {
         panLog = new DailyReportLogPanel(getCampaignGui().getReportHLL());
-        panLog.setMinimumSize(new java.awt.Dimension(300, 100));
-        panLog.setPreferredSize(new java.awt.Dimension(300, 100));
+        panLog.setMinimumSize(new java.awt.Dimension(400, 100));
+        panLog.setPreferredSize(new java.awt.Dimension(400, 100));
     }
 
     private void initProcurementPanel() {
@@ -211,40 +211,54 @@ public final class CommandCenterTab extends CampaignGuiTab {
         });
 
         JScrollPane scrollProcurement = new JScrollPane(procurementTable);
-        panProcurement = new JPanel(new BorderLayout());
+        panProcurement = new JPanel(new GridBagLayout());
         panProcurement.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panProcurement.title")));
-        panProcurement.add(panProcurementButtons, BorderLayout.WEST);
-        panProcurement.add(scrollProcurement, BorderLayout.CENTER);
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5,5,5,5);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        panProcurement.add(panProcurementButtons, gridBagConstraints);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new Insets(5,5,5,5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        panProcurement.add(scrollProcurement, gridBagConstraints);
     }
 
     private void initReportsPanel() {
         panReports = new JPanel(new GridLayout(3, 2));
-        JButton btnTransportReport = new JButton("Transport Capacity");
+        JButton btnTransportReport = new JButton(resourceMap.getString("btnTransportReport.text"));
         btnTransportReport.addActionListener(ev -> {
             getCampaignGui().showReport(new TransportReport(getCampaign()));
         });
         panReports.add(btnTransportReport);
-        JButton btnHangarOverview = new JButton("Hangar Summary");
+        JButton btnHangarOverview = new JButton(resourceMap.getString("btnHangarOverview.text"));
         btnHangarOverview.addActionListener(evt -> {
             getCampaignGui().showReport(new HangarReport(getCampaign()));
         });
         panReports.add(btnHangarOverview);
-        JButton btnPersonnelOverview = new JButton("Personnel Summary");
+        JButton btnPersonnelOverview = new JButton(resourceMap.getString("btnPersonnelOverview.text"));
         btnPersonnelOverview.addActionListener(evt -> {
             getCampaignGui().showReport(new PersonnelReport(getCampaign()));
         });
         panReports.add(btnPersonnelOverview);
-        JButton btnCargoCapacity = new JButton("Cargo Capacity");
+        JButton btnCargoCapacity = new JButton(resourceMap.getString("btnCargoCapacity.text"));
         btnCargoCapacity.addActionListener(evt -> {
             getCampaignGui().showReport(new CargoReport(getCampaign()));
         });
         panReports.add(btnCargoCapacity);
-        JButton btnUnitRating = new JButton("Unit Rating Details");
+        JButton btnUnitRating = new JButton(resourceMap.getString("btnUnitRating.text"));
         btnUnitRating.addActionListener(evt -> {
             getCampaignGui().showReport(new RatingReport(getCampaign()));
         });
         panReports.add(btnUnitRating);
-        panReports.setBorder(BorderFactory.createTitledBorder("Available Reports"));
+        panReports.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panReports.title")));
     }
 
     @Override
