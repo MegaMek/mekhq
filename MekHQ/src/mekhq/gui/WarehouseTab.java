@@ -132,7 +132,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private JPanel panSupplies;
     private JSplitPane splitWarehouse;
     private JTable partsTable;
-    private JTable acquirePartsTable;
     private JTable techTable;
     private JButton btnDoTask;
     private JToggleButton btnShowAllTechsWarehouse;
@@ -143,11 +142,9 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private JComboBox<String> choicePartsView;
 
     private PartsTableModel partsModel;
-    private ProcurementTableModel acquirePartsModel;
     private TechTableModel techsModel;
 
     private TableRowSorter<PartsTableModel> partsSorter;
-    private TableRowSorter<ProcurementTableModel> acquirePartsSorter;
     private TableRowSorter<TechTableModel> techSorter;
 
     //remember current selections so they can be restored after refresh
@@ -257,83 +254,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSupplies.add(scrollPartsTable, gridBagConstraints);
 
-        acquirePartsModel = new ProcurementTableModel(getCampaign());
-        acquirePartsTable = new JTable(acquirePartsModel);
-        acquirePartsSorter = new TableRowSorter<ProcurementTableModel>(acquirePartsModel);
-        acquirePartsSorter.setComparator(ProcurementTableModel.COL_COST, new FormattedNumberSorter());
-        acquirePartsSorter.setComparator(ProcurementTableModel.COL_TARGET, new TargetSorter());
-        acquirePartsTable.setRowSorter(acquirePartsSorter);
-        column = null;
-        for (int i = 0; i < ProcurementTableModel.N_COL; i++) {
-            column = acquirePartsTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(acquirePartsModel.getColumnWidth(i));
-            column.setCellRenderer(acquirePartsModel.getRenderer());
-        }
-        acquirePartsTable.setIntercellSpacing(new Dimension(0, 0));
-        acquirePartsTable.setShowGrid(false);
-        acquirePartsTable.addMouseListener(new ProcurementTableMouseAdapter(getCampaignGui()));
-        acquirePartsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
-        acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "ADD");
-        acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0),
-                "ADD");
-        acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),
-                "REMOVE");
-        acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0),
-                "REMOVE");
-
-        acquirePartsTable.getActionMap().put("ADD", new AbstractAction() {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (acquirePartsTable.getSelectedRow() < 0) {
-                    return;
-                }
-                acquirePartsModel
-                        .incrementItem(acquirePartsTable.convertRowIndexToModel(acquirePartsTable.getSelectedRow()));
-            }
-        });
-
-        acquirePartsTable.getActionMap().put("REMOVE", new AbstractAction() {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (acquirePartsTable.getSelectedRow() < 0) {
-                    return;
-                }
-                if (acquirePartsModel
-                        .getAcquisition(acquirePartsTable.convertRowIndexToModel(acquirePartsTable.getSelectedRow()))
-                        .getQuantity() > 0) {
-                    acquirePartsModel.decrementItem(
-                            acquirePartsTable.convertRowIndexToModel(acquirePartsTable.getSelectedRow()));
-                }
-            }
-        });
-
-        JScrollPane scrollPartsAcquireTable = new JScrollPane(acquirePartsTable);
-
-        JPanel acquirePartsPanel = new JPanel(new GridBagLayout());
-        acquirePartsPanel.setBorder(BorderFactory.createTitledBorder("Procurement List"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        acquirePartsPanel.add(scrollPartsAcquireTable, gridBagConstraints);
-        acquirePartsPanel.setMinimumSize(new Dimension(200, 200));
-        acquirePartsPanel.setPreferredSize(new Dimension(200, 200));
-
         JPanel panelDoTask = new JPanel(new GridBagLayout());
 
         btnDoTask = new JButton(resourceMap.getString("btnDoTask.text")); // NOI18N
@@ -431,10 +351,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelDoTask.add(astechPoolLabel, gridBagConstraints);
 
-        JSplitPane splitLeft = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panSupplies, acquirePartsPanel);
-        splitLeft.setOneTouchExpandable(true);
-        splitLeft.setResizeWeight(1.0);
-        splitWarehouse = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeft, panelDoTask);
+        splitWarehouse = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panSupplies, panelDoTask);
         splitWarehouse.setOneTouchExpandable(true);
         splitWarehouse.setResizeWeight(1.0);
 
@@ -473,7 +390,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     public void refreshAll() {
         refreshTechsList();
         refreshPartsList();
-        refreshProcurementList();
     }
 
     /*
@@ -728,10 +644,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         }
     }
 
-    public void refreshProcurementList() {
-        acquirePartsModel.setData(getCampaign().getShoppingList().getPartList());
-    }
-
     private void doTask() {
         selectedTech = getSelectedTech();
         selectedRow = partsTable.getSelectedRow();
@@ -778,7 +690,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     private ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
     private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
-    private ActionScheduler procurementScheduler = new ActionScheduler(this::refreshProcurementList);
 
     @Subscribe
     public void handle(UnitRemovedEvent ev) {
@@ -793,7 +704,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     @Subscribe
     public void handle(UnitRefitEvent ev) {
         partsScheduler.schedule();
-        procurementScheduler.schedule();
     }
 
     @Subscribe
@@ -819,12 +729,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     @Subscribe
     public void handle(AcquisitionEvent ev) {
         partsScheduler.schedule();
-        procurementScheduler.schedule();
-    }
-
-    @Subscribe
-    public void handle(ProcurementEvent ev) {
-        procurementScheduler.schedule();
     }
 
     @Subscribe

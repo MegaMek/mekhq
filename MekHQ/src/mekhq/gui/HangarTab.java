@@ -97,13 +97,11 @@ public final class HangarTab extends CampaignGuiTab {
 
     private JSplitPane splitUnit;
     private JTable unitTable;
-    private JTable acquireUnitsTable;
     private JComboBox<String> choiceUnit;
     private JComboBox<String> choiceUnitView;
     private JScrollPane scrollUnitView;
 
     private UnitTableModel unitModel;
-    private ProcurementTableModel acquireUnitsModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
     HangarTab(CampaignGUI gui, String name) {
@@ -226,79 +224,7 @@ public final class HangarTab extends CampaignGuiTab {
         changeUnitView();
         unitTable.getSelectionModel().addListSelectionListener(ev -> refreshUnitView());
 
-        acquireUnitsModel = new ProcurementTableModel(getCampaign());
-        acquireUnitsTable = new JTable(acquireUnitsModel);
-        TableRowSorter<ProcurementTableModel> acquireUnitsSorter = new TableRowSorter<>(
-                acquireUnitsModel);
-        acquireUnitsSorter.setComparator(ProcurementTableModel.COL_COST, new FormattedNumberSorter());
-        acquireUnitsSorter.setComparator(ProcurementTableModel.COL_TARGET, new TargetSorter());
-        acquireUnitsTable.setRowSorter(acquireUnitsSorter);
-        for (int i = 0; i < ProcurementTableModel.N_COL; i++) {
-            column = acquireUnitsTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(acquireUnitsModel.getColumnWidth(i));
-            column.setCellRenderer(acquireUnitsModel.getRenderer());
-        }
-        acquireUnitsTable.setIntercellSpacing(new Dimension(0, 0));
-        acquireUnitsTable.setShowGrid(false);
-        acquireUnitsTable.addMouseListener(new ProcurementTableMouseAdapter(getCampaignGui()));
-        acquireUnitsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "ADD");
-        acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0),
-                "ADD");
-        acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),
-                "REMOVE");
-        acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0),
-                "REMOVE");
-
-        acquireUnitsTable.getActionMap().put("ADD", new AbstractAction() {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 4958203340754214211L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (acquireUnitsTable.getSelectedRow() < 0) {
-                    return;
-                }
-                acquireUnitsModel
-                        .incrementItem(acquireUnitsTable.convertRowIndexToModel(acquireUnitsTable.getSelectedRow()));
-            }
-        });
-
-        acquireUnitsTable.getActionMap().put("REMOVE", new AbstractAction() {
-            /**
-             *
-             */
-            private static final long serialVersionUID = -8377486575329708963L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (acquireUnitsTable.getSelectedRow() < 0) {
-                    return;
-                }
-                if (acquireUnitsModel
-                        .getAcquisition(acquireUnitsTable.convertRowIndexToModel(acquireUnitsTable.getSelectedRow()))
-                        .getQuantity() > 0) {
-                    acquireUnitsModel.decrementItem(
-                            acquireUnitsTable.convertRowIndexToModel(acquireUnitsTable.getSelectedRow()));
-                }
-            }
-        });
-
-        JScrollPane scrollAcquireUnitTable = new JScrollPane(acquireUnitsTable);
-        JPanel panAcquireUnit = new JPanel(new GridLayout(0, 1));
-        panAcquireUnit.setBorder(BorderFactory.createTitledBorder("Procurement List"));
-        panAcquireUnit.add(scrollAcquireUnitTable);
-        panAcquireUnit.setMinimumSize(new Dimension(200, 200));
-        panAcquireUnit.setPreferredSize(new Dimension(200, 200));
-
         JScrollPane scrollUnitTable = new JScrollPane(unitTable);
-        JSplitPane splitLeftUnit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollUnitTable,
-                panAcquireUnit);
-        splitLeftUnit.setOneTouchExpandable(true);
-        splitLeftUnit.setResizeWeight(1.0);
 
         scrollUnitView = new JScrollPane();
         scrollUnitView.setMinimumSize(new java.awt.Dimension(UNIT_VIEW_WIDTH, 600));
@@ -306,7 +232,7 @@ public final class HangarTab extends CampaignGuiTab {
         scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollUnitView.setViewportView(null);
 
-        splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeftUnit, scrollUnitView);
+        splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollUnitTable, scrollUnitView);
         splitUnit.setOneTouchExpandable(true);
         splitUnit.setResizeWeight(1.0);
         splitUnit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, pce -> refreshUnitView());
@@ -345,7 +271,6 @@ public final class HangarTab extends CampaignGuiTab {
     @Override
     public void refreshAll() {
         refreshUnitList();
-        refreshAcquisitionList();
     }
 
     public void filterUnits() {
@@ -553,13 +478,8 @@ public final class HangarTab extends CampaignGuiTab {
         getCampaignGui().refreshLab();
     }
 
-    private void refreshAcquisitionList() {
-        acquireUnitsModel.setData(getCampaign().getShoppingList().getUnitList());
-    }
-
     private ActionScheduler unitListScheduler = new ActionScheduler(this::refreshUnitList);
     private ActionScheduler filterUnitScheduler = new ActionScheduler(this::filterUnits);
-    private ActionScheduler acquisitionListScheduler = new ActionScheduler(this::refreshAcquisitionList);
 
     @Subscribe
     public void handle(DeploymentChangedEvent ev) {
@@ -600,14 +520,6 @@ public final class HangarTab extends CampaignGuiTab {
     public void handle(AcquisitionEvent ev) {
         if (ev.getAcquisition() instanceof UnitOrder) {
             unitListScheduler.schedule();
-            acquisitionListScheduler.schedule();
-        }
-    }
-
-    @Subscribe
-    public void handle(ProcurementEvent ev) {
-        if (ev.getAcquisition() instanceof UnitOrder) {
-            acquisitionListScheduler.schedule();
         }
     }
 

@@ -20,7 +20,9 @@ package mekhq.gui;
 
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.campaign.event.AcquisitionEvent;
 import mekhq.campaign.event.ProcurementEvent;
+import mekhq.campaign.event.UnitRefitEvent;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.model.ProcurementTableModel;
@@ -147,6 +149,16 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     private ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);
+
+    @Subscribe
+    public void handle(UnitRefitEvent ev) {
+        procurementListScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(AcquisitionEvent ev) {
+        procurementListScheduler.schedule();
+    }
 
     @Subscribe
     public void handle(ProcurementEvent ev) {
