@@ -7825,6 +7825,43 @@ public class Campaign implements Serializable, ITechManager {
         return new String(sb);
     }
 
+    public int getActiveCombatPersonnelN() {
+        int countTotal = 0;
+        for (Person p : getPersonnel()) {
+            // Add them to the total count
+            if (p.hasPrimaryCombatRole() && p.isFree() && p.isActive()) {
+                countTotal++;
+            }
+        }
+        return countTotal;
+    }
+
+    public String getMissionSuccessString() {
+        int[] countMissionByStatus = new int[Mission.S_NUM];
+        for(Mission m : getMissions()) {
+            countMissionByStatus[m.getStatus()]++;
+        }
+        int completedN = countMissionByStatus[Mission.S_SUCCESS]+
+                countMissionByStatus[Mission.S_FAILED]+
+                countMissionByStatus[Mission.S_BREACH];
+        if(completedN<=0) {
+            return "NA (no completed missions)";
+        }
+        double successRate = 100 * countMissionByStatus[Mission.S_SUCCESS]/completedN;
+        return Double.toString(successRate) + "%";
+    }
+
+    public int getActiveSupportPersonnelN() {
+        int countTotal = 0;
+        for (Person p : getPersonnel()) {
+            // Add them to the total count
+            if (p.hasPrimarySupportRole(false) && p.isFree() && p.isActive()) {
+                countTotal++;
+            }
+        }
+        return countTotal;
+    }
+
     public String getCombatPersonnelDetails() {
         int[] countPersonByType = new int[Person.T_NUM];
         int countTotal = 0;

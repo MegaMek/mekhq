@@ -32,6 +32,7 @@ import mekhq.gui.sorter.TargetSorter;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.html.Option;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -46,6 +47,15 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     private JPanel panCommand;
 
+    // basic info panel
+    private JPanel panInfo;
+    private JLabel lblRating;
+    private JLabel lblExperience;
+    private JLabel lblCombatPersonnel;
+    private JLabel lblSupportPersonnel;
+    private JLabel lblMissionSuccess;
+
+
     // daily report
     private DailyReportLogPanel panLog;
 
@@ -58,7 +68,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JButton btnNeededParts;
     private JButton btnPartsReport;
 
-    /* Overview reports */
+    // available reports
     private JPanel panReports;
 
     ResourceBundle resourceMap;
@@ -75,6 +85,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         panCommand = new JPanel(new GridBagLayout());
 
+        initInfoPanel();
         initLogPanel();
         initReportsPanel();
         initProcurementPanel();
@@ -100,13 +111,99 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weighty = 0.0;
         panCommand.add(panReports, gridBagConstraints);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        panCommand.add(panInfo, gridBagConstraints);
 
         setLayout(new BorderLayout());
         add(panCommand, BorderLayout.CENTER);
+
+    }
+
+    private void initInfoPanel() {
+        panInfo = new JPanel(new GridBagLayout());
+        GridBagConstraints gridBagConstraints;
+        int y = 0;
+
+        /* Unit Rating */
+        if (getCampaign().getCampaignOptions().useDragoonRating()) {
+            JLabel lblRatingHead = new JLabel(resourceMap.getString("lblRating.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            panInfo.add(lblRatingHead, gridBagConstraints);
+            lblRating = new JLabel(getCampaign().getUnitRatingText());
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            panInfo.add(lblRating, gridBagConstraints);
+            y++;
+        }
+        JLabel lblExperienceHead = new JLabel(resourceMap.getString("lblExperience.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panInfo.add(lblExperienceHead, gridBagConstraints);
+        lblExperience = new JLabel(getCampaign().getUnitRating().getAverageExperience());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        panInfo.add(lblExperience, gridBagConstraints);
+        y++;
+        JLabel lblMissionSuccessHead = new JLabel(resourceMap.getString("lblMissionSuccess.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panInfo.add(lblMissionSuccessHead, gridBagConstraints);
+        lblMissionSuccess = new JLabel(getCampaign().getMissionSuccessString());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        panInfo.add(lblMissionSuccess, gridBagConstraints);
+        y++;
+        JLabel lblCombatPersonnelHead = new JLabel(resourceMap.getString("lblCombatPersonnel.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panInfo.add(lblCombatPersonnelHead, gridBagConstraints);
+        lblCombatPersonnel = new JLabel(Integer.toString(getCampaign().getActiveCombatPersonnelN()));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        panInfo.add(lblCombatPersonnel, gridBagConstraints);
+        y++;
+        JLabel lblSupportPersonnelHead = new JLabel(resourceMap.getString("lblSupportPersonnel.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panInfo.add(lblSupportPersonnelHead, gridBagConstraints);
+        lblSupportPersonnel = new JLabel(Integer.toString(getCampaign().getActiveSupportPersonnelN()));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        panInfo.add(lblSupportPersonnel, gridBagConstraints);
+        y++;
+
+        panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panInfo.title")));
+
 
     }
 
@@ -268,8 +365,18 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Override
     public void refreshAll() {
+        refreshBasicInfo();
         refreshProcurementList();
         refreshLog();
+    }
+
+    private void refreshBasicInfo() {
+        getCampaign().getUnitRating().reInitialize();
+        lblRating.setText(getCampaign().getUnitRatingText());
+        lblCombatPersonnel.setText(Integer.toString(getCampaign().getActiveCombatPersonnelN()));
+        lblSupportPersonnel.setText(Integer.toString(getCampaign().getActiveSupportPersonnelN()));
+        lblMissionSuccess.setText(getCampaign().getMissionSuccessString());
+        lblExperience.setText(getCampaign().getUnitRating().getAverageExperience());
     }
 
     private void refreshProcurementList() {
@@ -298,6 +405,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     private ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);
+    private ActionScheduler basicInfoScheduler = new ActionScheduler(this::refreshBasicInfo);
 
     @Subscribe
     public void handle(UnitRefitEvent ev) {
@@ -307,6 +415,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     @Subscribe
     public void handle(AcquisitionEvent ev) {
         procurementListScheduler.schedule();
+        basicInfoScheduler.schedule();
     }
 
     @Subscribe
@@ -322,6 +431,28 @@ public final class CommandCenterTab extends CampaignGuiTab {
     @Subscribe
     public void handleNewDay(NewDayEvent evt) {
         procurementListScheduler.schedule();
+        basicInfoScheduler.schedule();
         initLog();
+    }
+
+    @Subscribe
+    public void handle(MissionEvent evt) {
+        basicInfoScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(PersonEvent evt) {
+        basicInfoScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(UnitEvent evt) {
+        basicInfoScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(OptionsChangedEvent evt) {
+        basicInfoScheduler.schedule();
+        procurementListScheduler.schedule();
     }
 }
