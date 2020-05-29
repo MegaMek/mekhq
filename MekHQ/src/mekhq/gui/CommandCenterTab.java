@@ -20,11 +20,10 @@ package mekhq.gui;
 
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
-import mekhq.campaign.event.AcquisitionEvent;
-import mekhq.campaign.event.ProcurementEvent;
-import mekhq.campaign.event.UnitRefitEvent;
+import mekhq.campaign.event.*;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
+import mekhq.gui.dialog.DailyReportLogDialog;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
@@ -35,6 +34,7 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 /**
  * Collates important information about the campaign and displays it
@@ -43,6 +43,9 @@ import java.awt.event.KeyEvent;
 public final class CommandCenterTab extends CampaignGuiTab {
 
     private JPanel panCommand;
+
+    // daily report
+    private DailyReportLogPanel panLog;
 
     // procurement table
     private JTable procurementTable;
@@ -58,6 +61,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
     @Override
     public void initTab() {
         panCommand = new JPanel(new GridBagLayout());
+
+        panLog = new DailyReportLogPanel(getCampaignGui().getReportHLL());
+        panLog.setMinimumSize(new java.awt.Dimension(300, 100));
+        panLog.setPreferredSize(new java.awt.Dimension(300, 100));
 
         /* Shopping Table */
         procurementModel = new ProcurementTableModel(getCampaign());
@@ -130,13 +137,15 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panProcurement.setPreferredSize(new Dimension(200, 200));
 
         setLayout(new BorderLayout());
-        //add(panCommand, BorderLayout.CENTER);
+
+        add(panLog, BorderLayout.WEST);
         add(panProcurement, BorderLayout.CENTER);
     }
 
     @Override
     public void refreshAll() {
         refreshProcurementList();
+        refreshReport();
     }
 
     @Override
@@ -146,6 +155,17 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     private void refreshProcurementList() {
         procurementModel.setData(getCampaign().getShoppingList().getAllShoppingItems());
+    }
+
+    private void initReport() {
+        String report = getCampaign().getCurrentReportHTML();
+        panLog.refreshLog(report);
+        getCampaign().fetchAndClearNewReports();
+    }
+
+    synchronized private void refreshReport() {
+        List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
+        panLog.appendLog(newLogEntries);
     }
 
     private ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);
@@ -163,6 +183,16 @@ public final class CommandCenterTab extends CampaignGuiTab {
     @Subscribe
     public void handle(ProcurementEvent ev) {
         procurementListScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(ReportEvent ev) {
+        refreshReport();
+    }
+
+    @Subscribe
+    public void handleNewDay(NewDayEvent evt) {
+        initReport();
     }
 
 }
