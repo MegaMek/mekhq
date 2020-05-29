@@ -182,7 +182,6 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
 
             gui.refreshCalendar();
             gui.refreshLocation();
-            gui.initReport();
 
             gui.refreshAllTabs();
         }

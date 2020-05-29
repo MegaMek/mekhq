@@ -129,7 +129,6 @@ public class CampaignGUI extends JPanel {
     /* for the main panel */
     private JSplitPane mainPanel;
     private JTabbedPane tabMain;
-    private DailyReportLogPanel panLog;
 
     /* For the menu bar */
     private JMenuBar menuBar;
@@ -163,8 +162,6 @@ public class CampaignGUI extends JPanel {
 
     ReportHyperlinkListener reportHLL;
 
-    private DailyReportLogDialog logDialog;
-
     public CampaignGUI(MekHQ app) {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
@@ -189,27 +186,6 @@ public class CampaignGUI extends JPanel {
         histDailyReportDialog.dispose();
     }
 
-    private void showDailyReportDialog() {
-        mainPanel.remove(panLog);
-        mainPanel.setOneTouchExpandable(false);
-        logDialog.setVisible(true);
-        miAttachLog.setVisible(logDialog.isVisible());
-        miDetachLog.setVisible(!logDialog.isVisible());
-        refreshReport();
-        this.revalidate();
-        this.repaint();
-    }
-
-    public void hideDailyReportDialog() {
-        logDialog.setVisible(false);
-        mainPanel.setRightComponent(panLog);
-        mainPanel.setOneTouchExpandable(true);
-        miAttachLog.setVisible(logDialog.isVisible());
-        miDetachLog.setVisible(!logDialog.isVisible());
-        this.revalidate();
-        this.repaint();
-    }
-
     public void showRetirementDefectionDialog() {
         /*
          * if there are unresolved personnel, show the results view; otherwise,
@@ -224,6 +200,15 @@ public class CampaignGUI extends JPanel {
             getCampaign().applyRetirement(rdd.totalPayout(),
                     rdd.getUnitAssignments());
         }
+    }
+
+    public void showOverdueLoansDialog() {
+        /*
+         * Need something for overdue loans, not just rely on report
+         */
+        JOptionPane.showMessageDialog(null, "You must resolve overdue loans before advancing the day",
+                "Overdue loans", JOptionPane.WARNING_MESSAGE);
+
     }
 
     public void toggleOverviewTab() {
@@ -274,10 +259,6 @@ public class CampaignGUI extends JPanel {
     public void spendBatchXP() {
         BatchXPDialog batchXPDialog = new BatchXPDialog(getFrame(), getCampaign());
         batchXPDialog.setVisible(true);
-
-        if(batchXPDialog.hasDataChanged()) {
-            refreshReport();
-        }
     }
 
     public void showBloodnameDialog() {
@@ -313,20 +294,18 @@ public class CampaignGUI extends JPanel {
         addStandardTab(GuiTabType.FINANCES);
         addStandardTab(GuiTabType.OVERVIEW);
 
-        initMain();
         initTopButtons();
         initStatusBar();
 
         setLayout(new BorderLayout());
 
-        add(mainPanel, BorderLayout.CENTER);
+        add(tabMain, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.PAGE_START);
         add(statusPanel, BorderLayout.PAGE_END);
 
         standardTabs.values().forEach(CampaignGuiTab::refreshAll);
 
         refreshCalendar();
-        initReport();
         refreshFunds();
         refreshRating();
         refreshLocation();
@@ -586,7 +565,7 @@ public class CampaignGUI extends JPanel {
     public void removeTab(String tabName) {
         int index = tabMain.indexOfTab(tabName);
         if (index >= 0) {
-            CampaignGuiTab tab = (CampaignGuiTab)tabMain.getComponentAt(index);
+            CampaignGuiTab tab = (CampaignGuiTab) tabMain.getComponentAt(index);
             standardTabs.remove(tab.tabType());
             tabMain.removeTabAt(index);
         }
@@ -968,18 +947,6 @@ public class CampaignGUI extends JPanel {
         miHistoricalDailyReportDialog.addActionListener(evt -> showHistoricalDailyReportDialog());
         menuView.add(miHistoricalDailyReportDialog);
 
-        miAttachLog = new JMenuItem(resourceMap.getString("miAttachLog.text")); // NOI18N
-        miAttachLog.setMnemonic(KeyEvent.VK_A);
-        miAttachLog.addActionListener(evt -> hideDailyReportDialog());
-        miAttachLog.setVisible(logDialog.isVisible());
-        menuView.add(miAttachLog);
-
-        miDetachLog = new JMenuItem(resourceMap.getString("miDetachLog.text")); // NOI18N
-        miDetachLog.setMnemonic(KeyEvent.VK_D);
-        miDetachLog.addActionListener(evt -> showDailyReportDialog());
-        miDetachLog.setVisible(!logDialog.isVisible());
-        menuView.add(miDetachLog);
-
         JMenuItem miBloodnameDialog = new JMenuItem(resourceMap.getString("miBloodnameDialog.text"));
         miBloodnameDialog.setMnemonic(KeyEvent.VK_B);
         miBloodnameDialog.addActionListener(evt -> showBloodnameDialog());
@@ -1054,16 +1021,6 @@ public class CampaignGUI extends JPanel {
 
         menuBar.add(menuHelp);
         //endregion Help Menu
-    }
-
-    private void initMain() {
-        panLog = new DailyReportLogPanel(reportHLL);
-        panLog.setMinimumSize(new java.awt.Dimension(150, 100));
-        logDialog = new DailyReportLogDialog(getFrame(), this, reportHLL);
-
-        mainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabMain, panLog);
-        mainPanel.setOneTouchExpandable(true);
-        mainPanel.setResizeWeight(1.0);
     }
 
     private void initStatusBar() {
@@ -2610,19 +2567,6 @@ public class CampaignGUI extends JPanel {
         getFrame().setTitle(getCampaign().getTitle());
     }
 
-    synchronized private void refreshReport() {
-        List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
-        panLog.appendLog(newLogEntries);
-        logDialog.appendLog(newLogEntries);
-    }
-
-    public void initReport() {
-        String report = getCampaign().getCurrentReportHTML();
-        panLog.refreshLog(report);
-        logDialog.refreshLog(report);
-        getCampaign().fetchAndClearNewReports();
-    }
-
     private void refreshFunds() {
         Money funds = getCampaign().getFunds();
         String inDebt = "";
@@ -2675,7 +2619,7 @@ public class CampaignGUI extends JPanel {
         // these are addressed
         if (getCampaign().checkOverDueLoans()) {
             refreshFunds();
-            refreshReport();
+            showOverdueLoansDialog();
             ev.cancel();
         }
         if (getCampaign().checkRetirementDefections()) {
@@ -2703,15 +2647,9 @@ public class CampaignGUI extends JPanel {
     public void handleNewDay(NewDayEvent evt) {
         refreshCalendar();
         refreshLocation();
-        initReport();
         refreshFunds();
 
         refreshAllTabs();
-    }
-
-    @Subscribe
-    public void handle(ReportEvent ev) {
-        refreshReport();
     }
 
     @Subscribe
@@ -2775,6 +2713,10 @@ public class CampaignGUI extends JPanel {
 
     protected MekHQ getApplication() {
         return app;
+    }
+
+    public ReportHyperlinkListener getReportHLL() {
+        return reportHLL;
     }
 
     public Campaign getCampaign() {
