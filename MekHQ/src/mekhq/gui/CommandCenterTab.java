@@ -22,29 +22,19 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.report.*;
-import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.dialog.*;
-import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
-import mekhq.gui.sorter.TwoNumbersSorter;
-import mekhq.service.PartsAcquisitionService;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -69,19 +59,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JButton btnPartsReport;
 
     /* Overview reports */
-    private JTabbedPane tabOverview;
-    // Overview Transport
-    private JScrollPane scrollOverviewTransport;
-    // Overview Cargo
-    private JScrollPane scrollOverviewCargo;
-    // Overview Personnel
-    private JScrollPane scrollOverviewCombatPersonnel;
-    private JScrollPane scrollOverviewSupportPersonnel;
-    // Overview Hangar
-    private JScrollPane scrollOverviewHangar;
-    private JTextArea overviewHangarArea;
-    // Overview Rating
-    private JScrollPane scrollOverviewUnitRating;
+    private JPanel panReports;
 
     ResourceBundle resourceMap;
 
@@ -97,9 +75,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         panCommand = new JPanel(new GridBagLayout());
 
-        initReportPanel();
+        initLogPanel();
+        initReportsPanel();
         initProcurementPanel();
-        initOverviewPanel();
 
         /* Set overall layout */
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -112,25 +90,27 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         panCommand.add(panLog, gridBagConstraints);
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panCommand.add(panProcurement, gridBagConstraints);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        panCommand.add(tabOverview, gridBagConstraints);
+        panCommand.add(panReports, gridBagConstraints);
 
         setLayout(new BorderLayout());
         add(panCommand, BorderLayout.CENTER);
 
     }
 
-    private void initReportPanel() {
+    private void initLogPanel() {
         panLog = new DailyReportLogPanel(getCampaignGui().getReportHLL());
         panLog.setMinimumSize(new java.awt.Dimension(300, 100));
         panLog.setPreferredSize(new java.awt.Dimension(300, 100));
@@ -232,61 +212,39 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         JScrollPane scrollProcurement = new JScrollPane(procurementTable);
         panProcurement = new JPanel(new BorderLayout());
-        //panProcurement.setBorder(BorderFactory.createTitledBorder("Active Procurement List"));
+        panProcurement.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panProcurement.title")));
         panProcurement.add(panProcurementButtons, BorderLayout.WEST);
         panProcurement.add(scrollProcurement, BorderLayout.CENTER);
-        //panProcurement.setMinimumSize(new Dimension(200, 200));
-        //panProcurement.setPreferredSize(new Dimension(200, 200));
     }
 
-    private void initOverviewPanel() {
-        tabOverview = new JTabbedPane();
-
-        JScrollPane scrollOverviewParts = new JScrollPane();
-        scrollOverviewTransport = new JScrollPane();
-        scrollOverviewCombatPersonnel = new JScrollPane();
-        scrollOverviewSupportPersonnel = new JScrollPane();
-        scrollOverviewHangar = new JScrollPane();
-        overviewHangarArea = new JTextArea();
-        JSplitPane splitOverviewHangar;
-        scrollOverviewUnitRating = new JScrollPane();
-        scrollOverviewCargo = new JScrollPane();
-
-        scrollOverviewTransport
-                .setToolTipText(resourceMap.getString("scrollOverviewTransport.TabConstraints.toolTipText")); // NOI18N
-        scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
-        tabOverview.addTab(resourceMap.getString("scrollOverviewTransport.TabConstraints.tabTitle"),
-                scrollOverviewTransport);
-
-        scrollOverviewCargo.setToolTipText(resourceMap.getString("scrollOverviewCargo.TabConstraints.toolTipText")); // NOI18N
-        scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
-        tabOverview.addTab(resourceMap.getString("scrollOverviewCargo.TabConstraints.tabTitle"),
-                scrollOverviewCargo);
-
-        scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
-        scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
-        JSplitPane splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewCombatPersonnel,
-                scrollOverviewSupportPersonnel);
-        splitOverviewPersonnel.setOneTouchExpandable(true);
-        splitOverviewPersonnel.setResizeWeight(0.5);
-        tabOverview.addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"),
-                splitOverviewPersonnel);
-
-        scrollOverviewHangar.setViewportView(new HangarReport(getCampaign()).getHangarTree());
-        overviewHangarArea.setLineWrap(false);
-        overviewHangarArea.setFont(new Font("Courier New", Font.PLAIN, 18));
-        overviewHangarArea.setText("");
-        overviewHangarArea.setEditable(false);
-        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
-        splitOverviewHangar = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewHangar, overviewHangarArea);
-        splitOverviewHangar.setOneTouchExpandable(true);
-        splitOverviewHangar.setResizeWeight(0.5);
-        tabOverview.addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"),
-                splitOverviewHangar);
-
-        scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
-        tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"),
-                scrollOverviewUnitRating);
+    private void initReportsPanel() {
+        panReports = new JPanel(new GridLayout(3, 2));
+        JButton btnTransportReport = new JButton("Transport Capacity");
+        btnTransportReport.addActionListener(ev -> {
+            getCampaignGui().showReport(new TransportReport(getCampaign()));
+        });
+        panReports.add(btnTransportReport);
+        JButton btnHangarOverview = new JButton("Hangar Summary");
+        btnHangarOverview.addActionListener(evt -> {
+            getCampaignGui().showReport(new HangarReport(getCampaign()));
+        });
+        panReports.add(btnHangarOverview);
+        JButton btnPersonnelOverview = new JButton("Personnel Summary");
+        btnPersonnelOverview.addActionListener(evt -> {
+            getCampaignGui().showReport(new PersonnelReport(getCampaign()));
+        });
+        panReports.add(btnPersonnelOverview);
+        JButton btnCargoCapacity = new JButton("Cargo Capacity");
+        btnCargoCapacity.addActionListener(evt -> {
+            getCampaignGui().showReport(new CargoReport(getCampaign()));
+        });
+        panReports.add(btnCargoCapacity);
+        JButton btnUnitRating = new JButton("Unit Rating Details");
+        btnUnitRating.addActionListener(evt -> {
+            getCampaignGui().showReport(new RatingReport(getCampaign()));
+        });
+        panReports.add(btnUnitRating);
+        panReports.setBorder(BorderFactory.createTitledBorder("Available Reports"));
     }
 
     @Override
@@ -297,44 +255,20 @@ public final class CommandCenterTab extends CampaignGuiTab {
     @Override
     public void refreshAll() {
         refreshProcurementList();
-        refreshReport();
-        refreshOverview();
-    }
-
-    public void refreshOverview() {
-        SwingUtilities.invokeLater(() -> {
-            int drIndex = tabOverview.indexOfComponent(scrollOverviewUnitRating);
-            if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
-                tabOverview.removeTabAt(drIndex);
-            } else {
-                if (drIndex == -1) {
-                    tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"),
-                            scrollOverviewUnitRating);
-                }
-            }
-
-            scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
-            scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
-            scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
-            scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
-            scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
-            HangarReport hr = new HangarReport(getCampaign());
-            scrollOverviewHangar.setViewportView(hr.getHangarTree());
-            overviewHangarArea.setText(hr.getHangarTotals());
-        });
+        refreshLog();
     }
 
     private void refreshProcurementList() {
         procurementModel.setData(getCampaign().getShoppingList().getAllShoppingItems());
     }
 
-    private void initReport() {
+    private void initLog() {
         String report = getCampaign().getCurrentReportHTML();
         panLog.refreshLog(report);
         getCampaign().fetchAndClearNewReports();
     }
 
-    synchronized private void refreshReport() {
+    synchronized private void refreshLog() {
         List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
         panLog.appendLog(newLogEntries);
     }
@@ -350,7 +284,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     private ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);
-    private ActionScheduler overviewScheduler = new ActionScheduler(this::refreshOverview);
 
     @Subscribe
     public void handle(UnitRefitEvent ev) {
@@ -369,54 +302,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(ReportEvent ev) {
-        refreshReport();
+        refreshLog();
     }
 
     @Subscribe
     public void handleNewDay(NewDayEvent evt) {
         procurementListScheduler.schedule();
-        overviewScheduler.schedule();
-        initReport();
+        initLog();
     }
-
-    @Subscribe
-    public void handle(OptionsChangedEvent ev) {
-        overviewScheduler.schedule();
-    }
-
-    @Subscribe
-    public void handle(DeploymentChangedEvent ev) {
-        overviewScheduler.schedule();
-    }
-
-    @Subscribe
-    public void handle(ScenarioResolvedEvent ev) {
-        overviewScheduler.schedule();
-    }
-
-    @Subscribe
-    public void handle(UnitEvent ev) {
-        overviewScheduler.schedule();
-    }
-
-    @Subscribe
-    public void handle(PersonEvent ev) {
-        overviewScheduler.schedule();
-    }
-
-    @Subscribe
-    public void handle(PartEvent ev) {
-        overviewScheduler.schedule();
-    }
-
-    @Subscribe
-    public void handle(PartWorkEvent ev) {
-        overviewScheduler.schedule();
-    }
-
-    @Subscribe
-    public void handle(LoanEvent ev) {
-        overviewScheduler.schedule();
-    }
-
 }

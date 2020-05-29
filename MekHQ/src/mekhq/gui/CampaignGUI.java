@@ -133,13 +133,10 @@ public class CampaignGUI extends JPanel {
     /* For the menu bar */
     private JMenuBar menuBar;
     private JMenu menuThemes;
-    private JMenuItem miDetachLog;
-    private JMenuItem miAttachLog;
     private JMenuItem miContractMarket;
     private JMenuItem miUnitMarket;
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
-    private JCheckBoxMenuItem miShowOverview;
     private JMenuItem miAdvanceMultipleDays;
 
     private EnumMap<GuiTabType, CampaignGuiTab> standardTabs;
@@ -1702,7 +1699,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private void showReport(Report report) {
+    public void showReport(Report report) {
         ReportDialog rd = new ReportDialog(getFrame(), report);
         rd.setVisible(true);
     }
