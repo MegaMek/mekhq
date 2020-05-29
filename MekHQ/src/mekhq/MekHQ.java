@@ -656,7 +656,6 @@ public class MekHQ implements GameListener {
                 RandomNameGenerator.getInstance();
             }
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
-            campaigngui.initReport();
 
         }// end try
         catch (Exception ex) {
