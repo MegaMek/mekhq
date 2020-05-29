@@ -4659,8 +4659,6 @@ public class Campaign implements Serializable, ITechManager {
                 RandomGenderGenerator.getPercentFemale());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "gmMode", gmMode);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "showOverview", app.getCampaigngui()
-                .hasTab(GuiTabType.OVERVIEW));
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPool", astechPool);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPoolMinutes",
                 astechPoolMinutes);

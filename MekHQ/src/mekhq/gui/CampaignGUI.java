@@ -211,20 +211,6 @@ public class CampaignGUI extends JPanel {
 
     }
 
-    public void toggleOverviewTab() {
-        boolean show = !hasTab(GuiTabType.OVERVIEW);
-        miShowOverview.setSelected(show);
-        showOverviewTab(show);
-    }
-
-    public void showOverviewTab(boolean show) {
-        if (show) {
-            addStandardTab(GuiTabType.OVERVIEW);
-        } else {
-            removeStandardTab(GuiTabType.OVERVIEW);
-        }
-    }
-
     public void showAdvanceMultipleDays(boolean isHost) {
         miAdvanceMultipleDays.setVisible(isHost);
     }
@@ -292,7 +278,6 @@ public class CampaignGUI extends JPanel {
         addStandardTab(GuiTabType.INFIRMARY);
         addStandardTab(GuiTabType.MEKLAB);
         addStandardTab(GuiTabType.FINANCES);
-        addStandardTab(GuiTabType.OVERVIEW);
 
         initTopButtons();
         initStatusBar();
@@ -957,12 +942,6 @@ public class CampaignGUI extends JPanel {
         miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
         miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
         menuView.add(miRetirementDefectionDialog);
-
-        miShowOverview = new JCheckBoxMenuItem(resourceMap.getString("miShowOverview.text"));
-        miShowOverview.setMnemonic(KeyEvent.VK_O);
-        miShowOverview.setSelected(hasTab(GuiTabType.OVERVIEW));
-        miShowOverview.addActionListener(evt -> toggleOverviewTab());
-        menuView.add(miShowOverview);
 
         menuBar.add(menuView);
         //endregion View Menu

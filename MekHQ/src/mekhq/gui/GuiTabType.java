@@ -44,8 +44,7 @@ public enum GuiTabType {
     INFIRMARY(8, "panInfirmary.TabConstraints.tabTitle", KeyEvent.VK_I),
     MEKLAB(9, "panMekLab.TabConstraints.tabTitle", KeyEvent.VK_L),
     FINANCES(10, "panFinances.TabConstraints.tabTitle", KeyEvent.VK_N),
-    OVERVIEW(11, "panOverview.TabConstraints.tabTitle", KeyEvent.VK_O),
-    CUSTOM(12, "panCustom.TabConstraints.tabTitle", KeyEvent.VK_UNDEFINED);
+    CUSTOM(11, "panCustom.TabConstraints.tabTitle", KeyEvent.VK_UNDEFINED);
     //endregion Enum Declaration
 
     //region Variable Declarations
@@ -101,8 +100,6 @@ public enum GuiTabType {
                 return new MekLabTab(gui, name);
             case FINANCES:
                 return new FinancesTab(gui, name);
-            case OVERVIEW:
-                return new OverviewTab(gui, name);
             default:
                 return null;
         }

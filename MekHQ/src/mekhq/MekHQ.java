@@ -358,8 +358,7 @@ public class MekHQ implements GameListener {
     }
 
     public void showNewView() {
-    	campaigngui = new CampaignGUI(this);
-    	campaigngui.showOverviewTab(getCampaign().isOverviewLoadingValue());
+        campaigngui = new CampaignGUI(this);
     }
 
     /**
