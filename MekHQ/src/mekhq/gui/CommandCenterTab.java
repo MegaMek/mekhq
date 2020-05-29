@@ -57,6 +57,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private DailyReportLogPanel panLog;
 
     // procurement table
+    private JPanel panProcurement;
     private JTable procurementTable;
     private ProcurementTableModel procurementModel;
 
@@ -93,12 +94,25 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         panCommand = new JPanel(new GridBagLayout());
 
-        /* Report Log Panel */
+        initReportPanel();
+        initProcurementPanel();
+        initOverviewPanel();
+
+        /* Set overall layout */
+        setLayout(new BorderLayout());
+
+        add(panLog, BorderLayout.WEST);
+        add(tabOverview, BorderLayout.CENTER);
+        add(panProcurement, BorderLayout.SOUTH);
+    }
+
+    private void initReportPanel() {
         panLog = new DailyReportLogPanel(getCampaignGui().getReportHLL());
         panLog.setMinimumSize(new java.awt.Dimension(300, 100));
         panLog.setPreferredSize(new java.awt.Dimension(300, 100));
+    }
 
-        /* Shopping Table */
+    private void initProcurementPanel() {
         procurementModel = new ProcurementTableModel(getCampaign());
         procurementTable = new JTable(procurementModel);
         TableRowSorter<ProcurementTableModel> shoppingSorter = new TableRowSorter<>(
@@ -163,13 +177,14 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         tabOverview = new JTabbedPane();
         JScrollPane scrollProcurement = new JScrollPane(procurementTable);
-        JPanel panProcurement = new JPanel(new GridLayout(0, 1));
+        panProcurement = new JPanel(new GridLayout(0, 1));
         panProcurement.setBorder(BorderFactory.createTitledBorder("Active Procurement List"));
         panProcurement.add(scrollProcurement);
         panProcurement.setMinimumSize(new Dimension(200, 200));
         panProcurement.setPreferredSize(new Dimension(200, 200));
+    }
 
-        /* Overview Reports */
+    private void initOverviewPanel() {
         initOverviewPartsInUse();
         JScrollPane scrollOverviewParts = new JScrollPane();
         scrollOverviewTransport = new JScrollPane();
@@ -220,12 +235,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
         tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"),
                 scrollOverviewUnitRating);
-
-        setLayout(new BorderLayout());
-
-        add(panLog, BorderLayout.WEST);
-        add(tabOverview, BorderLayout.CENTER);
-        add(panProcurement, BorderLayout.SOUTH);
     }
 
     private void initOverviewPartsInUse() {
