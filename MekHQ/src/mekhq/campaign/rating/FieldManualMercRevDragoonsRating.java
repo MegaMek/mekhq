@@ -96,7 +96,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         setCountIS2(0);
 
         for (Unit u : getCampaign().getCopyOfUnits()) {
-            if (null == u) {
+            if ((null == u) || !u.isPresent()) {
                 continue;
             }
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
@@ -655,56 +655,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private int getYearsInDebt() {
-        int yearsInDebt = getCampaign().getFinances()
-                                       .getFullYearsInDebt(getCampaign().getCalendar());
-        yearsInDebt += getCampaign().getFinances()
-                                    .getPartialYearsInDebt(getCampaign().getCalendar());
+        int yearsInDebt = getCampaign().getFinances().getFullYearsInDebt(getCampaign().getCalendar());
+        yearsInDebt += getCampaign().getFinances().getPartialYearsInDebt(getCampaign().getCalendar());
         return yearsInDebt;
     }
-
-    /*
-    public int getYearsInDebt(boolean recalculate) {
-        if (!recalculate) {
-            return yearsInDebt;
-        }
-
-        //If we're not in debt, no penalty.
-        if (!campaign.getFinances().isInDebt()) {
-            return 0;
-        }
-
-        //Sort the transactions in reverse date order.
-        List<Transaction> transactions = campaign.getFinances().getAllTransactions();
-        Comparator<Transaction> transactionDateCompare = new Comparator<Transaction>() {
-            @Override
-            public int compare(Transaction t1, Transaction t2) {
-                return (t2.getDate()).compareTo(t1.getDate());
-            }
-        };
-        Collections.sort(transactions, Collections.reverseOrder(transactionDateCompare));
-
-        //Loop through the transaction list, counting all consecutive years in debt.
-        int years = 1;
-        for (Transaction t : transactions) {
-
-            //Only count yearly carryovers.
-            if (!"Carryover from previous year".equalsIgnoreCase(t.getDescription())) {
-                continue;
-            }
-
-            //If the carryover was negative, count it.  If not, end the cycle.  We only care about the number
-            //of years since we were last in the black.
-            if (t.getAmount() < 0) {
-                years++;
-            } else {
-                break;
-            }
-        }
-
-        yearsInDebt = years;
-        return years;
-    }
-    */
 
     public int getFinancialValue() {
         int score = getYearsInDebt() * -10;

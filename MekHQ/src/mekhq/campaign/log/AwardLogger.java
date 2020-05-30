@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
@@ -35,14 +34,14 @@ import java.util.regex.Pattern;
  */
 public class AwardLogger {
 
-    private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());;
+    private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
 
-    public static void award(Person person, Date date, Award award){
+    public static void award(Person person, Date date, Award award) {
         String message = logEntriesResourceMap.getString("awarded.text");
         person.addLogEntry(new AwardLogEntry(date, MessageFormat.format(message, award.getName(), award.getSet(), award.getDescription())));
     }
 
-    public static void removedAward(Person person, Date date, Award award){
+    public static void removedAward(Person person, Date date, Award award) {
         String message = logEntriesResourceMap.getString("removedAward.text");
         person.addLogEntry(new AwardLogEntry(date, MessageFormat.format(message, award.getName(), award.getSet())));
     }
@@ -53,22 +52,22 @@ public class AwardLogger {
      * @param logEntryText text of the log entry
      * @return award of the owner corresponding to the log entry text
      */
-    public static Award getAwardFromLogEntry(Person person, String logEntryText){
+    public static Award getAwardFromLogEntry(Person person, String logEntryText) {
         String message = logEntriesResourceMap.getString("awarded.text");
         Pattern pattern = Pattern.compile(MessageFormat.format(message, "(.*)", "(.*)", "(.*)"));
         Matcher matcher = pattern.matcher(logEntryText);
 
         Award award = null;
 
-        if(matcher.matches()){
+        if (matcher.matches()) {
             award = person.getAwardController().getAward(matcher.group(2), matcher.group(1));
         }
         // In a first implementation, the award Set was not included in the log, so it is impossible to distinguish
         //  awards with same name but in different set. So it assumes it is the first it finds, using the old message format.
-        else{
+        else {
             pattern = Pattern.compile("Awarded (.*): (.*)");
             matcher = pattern.matcher(logEntryText);
-            if(matcher.matches()){
+            if (matcher.matches()) {
                 award = person.getAwardController().getFirstAwardIgnoringSet(matcher.group(1));
             }
         }

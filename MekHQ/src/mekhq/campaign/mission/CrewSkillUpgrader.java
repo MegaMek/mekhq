@@ -23,10 +23,12 @@ import java.util.Map;
 import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.Entity;
+import megamek.common.Mounted;
 import megamek.common.UnitType;
 import megamek.common.WeaponType;
 import megamek.common.options.OptionsConstants;
 import mekhq.Utilities;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SpecialAbility;
 
 /**
@@ -112,6 +114,10 @@ public class CrewSkillUpgrader {
         // that cost less XP than the remaining cap
         for(int x = 0; (x < spaCap) && (xpCap > minAbilityCost); x++) {
             int spaCost = addSingleSPA(entity, xpCap);
+            // if we didn't assign an SPA, let's reroll it.
+            if (spaCost == 0) {
+                x--;
+            }
             xpCap -= spaCost;
         }
     }
@@ -166,11 +172,19 @@ public class CrewSkillUpgrader {
             spaValue = pickRandomGunnerySpecialization(entity);
             break;
         case OptionsConstants.GUNNERY_WEAPON_SPECIALIST:
-            spaValue = pickRandomWeapon(entity);
+            spaValue = pickRandomWeapon(entity, false);
+            break;
+        case OptionsConstants.GUNNERY_SANDBLASTER:
+            spaValue = pickRandomWeapon(entity, true);
             break;
         default:
             entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
             return spa.getCost();
+        }
+        
+        // if we fail to pick a random weapon/specialization for whatever reason, don't assign the SPA
+        if (spaValue.equals(Crew.SPECIAL_NONE)) {
+            return 0;
         }
         
         entity.getCrew().getOptions().getOption(spa.getName()).setValue(spaValue);
@@ -216,9 +230,22 @@ public class CrewSkillUpgrader {
      * @param entity The entity being manipulated
      * @return Weapon name
      */
-    private String pickRandomWeapon(Entity entity) {
-        int weaponIndex = Compute.randomInt(entity.getIndividualWeaponList().size());
-        return entity.getIndividualWeaponList().get(weaponIndex).getName();
+    private String pickRandomWeapon(Entity entity, boolean clusterOnly) {
+        List<Mounted> weapons = entity.getIndividualWeaponList();
+        List<Mounted> eligibleWeapons = new ArrayList<>();
+        
+        for(Mounted weapon : weapons) {
+            if(SpecialAbility.isWeaponEligibleForSPA(weapon.getType(), Person.T_NONE, clusterOnly)) {
+                eligibleWeapons.add(weapon);
+            }
+        }
+        
+        if(eligibleWeapons.size() == 0) {
+            return Crew.SPECIAL_NONE;
+        }
+        
+        int weaponIndex = Compute.randomInt(eligibleWeapons.size());
+        return eligibleWeapons.get(weaponIndex).getName();
     }
     
     /**

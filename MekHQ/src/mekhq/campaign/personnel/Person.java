@@ -1328,18 +1328,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 ? Utilities.nonNull(getSpouseId(), fatherId) : fatherId;
 
         Ancestors anc = campaign.getAncestors(fatherId, id);
-        if (null == anc) {
+        if (anc == null) {
             anc = campaign.createAncestors(fatherId, id);
         }
         final UUID ancId = anc.getId();
-
-        final String surname = generateBabySurname(fatherId);
 
         // Cleanup
         removePregnancy();
 
         for (int i = 0; i < size; i++) {
             Person baby = campaign.newDependent(T_NONE, true);
+            String surname = getCampaign().getCampaignOptions().getBabySurnameStyle()
+                    .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
             baby.setSurname(surname);
             baby.setBirthday(campaign.getLocalDate());
 
@@ -1357,15 +1357,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             }
         }
-    }
-
-    private String generateBabySurname(UUID fatherId) {
-        if (campaign.getCampaignOptions().getBabySurnameStyle() == CampaignOptions.BABY_SURNAME_SPOUSE) {
-            if (fatherId != null) {
-                return campaign.getPerson(fatherId).getSurname();
-            }
-        }
-        return surname = getSurname();
     }
     //endregion Pregnancy
 
@@ -2136,7 +2127,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                         retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("awards")){
+                } else if (wn2.getNodeName().equalsIgnoreCase("awards")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
 

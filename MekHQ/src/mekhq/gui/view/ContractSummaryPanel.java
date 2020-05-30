@@ -121,7 +121,7 @@ public class ContractSummaryPanel extends JPanel {
 
     private void fillStats() {
         //region Variable Initialization
-        // TODO : Remove Inline date
+        // TODO : LocalDate : Remove Inline date
         SimpleDateFormat shortDateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
         // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
