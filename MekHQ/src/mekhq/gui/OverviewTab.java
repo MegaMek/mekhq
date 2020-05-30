@@ -387,6 +387,7 @@ public final class OverviewTab extends CampaignGuiTab {
             scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
             HangarReport hr = new HangarReport(getCampaign());
             scrollOverviewHangar.setViewportView(hr.getHangarTree());
+            overviewHangarArea.setFont(new Font("Courier New", Font.PLAIN, 14));
             overviewHangarArea.setText(hr.getHangarTotals());
             refreshOverviewPartsInUse();
         });
