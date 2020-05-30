@@ -39,6 +39,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.finances.Money;
@@ -222,9 +223,7 @@ public class CampaignOptions implements Serializable {
     private double chanceProcreationNoRelationship;
     private boolean displayTrueDueDate;
     private boolean logConception;
-    private int babySurnameStyle;
-    public static final int BABY_SURNAME_MINE = 0; //baby uses mother's surname
-    public static final int BABY_SURNAME_SPOUSE = 1; //baby uses father's surname
+    private BabySurnameStyle babySurnameStyle;
     private boolean determineFatherAtBirth;
     private boolean displayParentage;
     private int displayFamilyLevel;
@@ -562,7 +561,7 @@ public class CampaignOptions implements Serializable {
         chanceProcreationNoRelationship = 0.00005;
         displayTrueDueDate = false;
         logConception = false;
-        babySurnameStyle = BABY_SURNAME_MINE;
+        babySurnameStyle = BabySurnameStyle.MOTHERS;
         determineFatherAtBirth = false;
         displayParentage = false;
         displayFamilyLevel = PARENTS_CHILDREN_SIBLINGS;
@@ -1409,14 +1408,14 @@ public class CampaignOptions implements Serializable {
     /**
      * @return what style of surname to use for a baby
      */
-    public int getBabySurnameStyle() {
+    public BabySurnameStyle getBabySurnameStyle() {
         return babySurnameStyle;
     }
 
     /**
      * @param b the style of surname to use for a baby
      */
-    public void setBabySurnameStyle(int b) {
+    public void setBabySurnameStyle(BabySurnameStyle b) {
         babySurnameStyle = b;
     }
 
@@ -3099,7 +3098,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreationNoRelationship", chanceProcreationNoRelationship);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayTrueDueDate", displayTrueDueDate);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "determineFatherAtBirth", determineFatherAtBirth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", displayParentage);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel);
@@ -3572,7 +3571,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
                 retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
-                retVal.babySurnameStyle = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.setBabySurnameStyle(BabySurnameStyle.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
                 retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {

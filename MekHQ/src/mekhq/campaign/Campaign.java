@@ -1654,9 +1654,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Person getPerson(UUID id) {
-        if (id == null) {
-            return null;
-        }
         return personnel.get(id);
     }
 
