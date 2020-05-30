@@ -294,7 +294,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             btnViewUnit = new JButton("View Unit");
             btnViewUnit.setActionCommand(unit.getId().toString());
-            btnViewUnit.addActionListener(new ViewUnitListener());
+            btnViewUnit.addActionListener(new ViewUnitListener(false));
 
             btnEditUnit = new JButton("Edit Unit");
             btnEditUnit.setEnabled(!status.isTotalLoss());
@@ -401,8 +401,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
             kiaCheck.setSelected(status.isDead());
             kiaBtns.add(kiaCheck);
             gridBagConstraints.gridx = gridx++;
-            gridBagConstraints.weightx = 1.0;
             pnlPilotStatus.add(kiaCheck, gridBagConstraints);
+
+            JButton btnViewPilot = new JButton("View Personnel");
+            btnViewPilot.addActionListener(evt -> showPerson(status, false));
+            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.weightx = 1.0;
+            pnlPilotStatus.add(btnViewPilot, gridBagConstraints);
         }
         pnlMain.add(pnlPilotStatus, PILOTPANEL);
         //endregion Pilot Status Panel
@@ -472,7 +477,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlPrisonerStatus.add(kiaCheck, gridBagConstraints);
 
             JButton btnViewPrisoner = new JButton("View Personnel");
-            btnViewPrisoner.addActionListener(evt -> showPrisoner(status.getId()));
+            btnViewPrisoner.addActionListener(evt -> showPerson(status, true));
             gridBagConstraints.gridx = gridx++;
             gridBagConstraints.weightx = 1.0;
             pnlPrisonerStatus.add(btnViewPrisoner, gridBagConstraints);
@@ -1533,11 +1538,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtRewards.setText(claimed.toString());
     }
 
-    @SuppressWarnings("unused") // FIXME
-    private void showUnit(UUID id) {
-        showUnit(id, false);
-    }
-
     private void showUnit(UUID id, boolean salvage) {
         //TODO: I am not sure I like the pop up dialog, might just make this a view on this
         //dialog
@@ -1601,19 +1601,23 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
     }
 
-    private void showPrisoner(UUID id) {
-        //dialog
-        OppositionPersonnelStatus pstatus = tracker.getOppositionPersonnel().get(id);
-
-        if ((pstatus == null) || (pstatus.getPerson() == null)) {
+    private void showPerson(PersonStatus status, boolean isPrisoner) {
+        if (status == null) {
             return;
         }
 
-        showPerson(pstatus.getPerson(), true);
-    }
-
-    private void showPerson(Person person, boolean isPrisoner) {
-        final JDialog dialog = new JDialog(frame, "Prisoner View", true); //$NON-NLS-1$
+        Person person = isPrisoner ? ((OppositionPersonnelStatus) status).getPerson()
+                : tracker.getCampaign().getPerson(status.getId());
+        if (person == null) {
+            MekHQ.getLogger().error(getClass(), "showPerson",
+                    "Failed to show person after selecting view personnel for a "
+                            + (isPrisoner ? "Prisoner" : "member of the force") +
+                            " because the person could not be found.");
+            return;
+        }
+        PersonViewPanel personViewPanel = new PersonViewPanel(person, tracker.getCampaign(),
+                tracker.getCampaign().getApp().getCampaigngui());
+        final JDialog dialog = new JDialog(frame, isPrisoner ? "Prisoner View" : "Personnel View", true);
         dialog.getContentPane().setLayout(new GridBagLayout());
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -1627,8 +1631,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         //scroll panel
         JScrollPane scrollPersonnelView = new JScrollPane();
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPersonnelView.setViewportView(new PersonViewPanel(person, tracker.getCampaign(),
-                tracker.getCampaign().getApp().getCampaigngui()));
+        scrollPersonnelView.setViewportView(personViewPanel);
         dialog.getContentPane().add(scrollPersonnelView, gridBagConstraints);
 
         //Okay button
@@ -1636,6 +1639,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         btn.addActionListener(e -> dialog.setVisible(false));
         dialog.getRootPane().setDefaultButton(btn);
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         dialog.getContentPane().add(btn, gridBagConstraints);
 
@@ -1660,12 +1664,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        boolean objectiveMet = objectiveProcessor.objectiveMet(objective, qualifyingUnitCount);
-        if (objectiveMet) {
-            label.setForeground(Color.green.darker());
-        } else {
-            label.setForeground(Color.RED);
-        }
+        label.setForeground(objectiveProcessor.objectiveMet(objective, qualifyingUnitCount)
+                ? Color.green.darker() : Color.RED);
     }
 
     private class CheckTotalListener implements ItemListener {
@@ -1706,14 +1706,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     private class ViewUnitListener implements ActionListener {
-        boolean salvage = false;
+        boolean salvage;
 
         public ViewUnitListener(boolean b) {
             salvage = b;
         }
 
-        public ViewUnitListener() {
-        }
 
         @Override
         public void actionPerformed(ActionEvent evt) {
