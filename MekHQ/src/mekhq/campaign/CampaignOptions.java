@@ -184,7 +184,7 @@ public class CampaignOptions implements Serializable {
     private boolean useImplants;
     private boolean capturePrisoners; // TODO : Merge me with the AtB option useAtBCapture
     private PrisonerStatus defaultPrisonerStatus;
-	private boolean altQualityAveraging;
+    private boolean altQualityAveraging;
     private boolean useAdvancedMedical; // Unofficial
     private boolean useDylansRandomXp; // Unofficial
     private int healWaitingPeriod;
