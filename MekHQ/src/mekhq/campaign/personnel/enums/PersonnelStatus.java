@@ -48,4 +48,33 @@ public enum PersonnelStatus {
     public String getStatusName() {
         return statusName;
     }
+
+    /**
+     * @param text containing the PersonnelStatus
+     * @return the saved PersonnelStatus
+     */
+    public static PersonnelStatus parseFromString(String text) {
+        try {
+            return valueOf(text);
+        } catch (Exception ignored) {
+
+        }
+
+        try {
+            switch (Integer.parseInt(text)) {
+                case 1:
+                    return RETIRED;
+                case 2:
+                    return KIA;
+                case 3:
+                    return MIA;
+                default:
+                    return ACTIVE;
+            }
+        } catch (Exception ignored) {
+
+        }
+
+        return ACTIVE;
+    }
 }
