@@ -186,6 +186,7 @@ public class CampaignOptions implements Serializable {
     private boolean useImplants;
     private boolean capturePrisoners; // TODO : Merge me with the AtB option useAtBCapture
     private PrisonerStatus defaultPrisonerStatus;
+    private boolean prisonerBabyStatus;
     private boolean altQualityAveraging;
     private boolean useAdvancedMedical; // Unofficial
     private boolean useDylansRandomXp; // Unofficial
@@ -515,6 +516,7 @@ public class CampaignOptions implements Serializable {
         useImplants = false;
         capturePrisoners = true;
         defaultPrisonerStatus = PrisonerStatus.PRISONER;
+        prisonerBabyStatus = true;
         altQualityAveraging = false;
         useAdvancedMedical = false;
         useDylansRandomXp = false;
@@ -932,6 +934,14 @@ public class CampaignOptions implements Serializable {
 
     public void setDefaultPrisonerStatus(PrisonerStatus d) {
         defaultPrisonerStatus = d;
+    }
+
+    public boolean getPrisonerBabyStatus() {
+        return prisonerBabyStatus;
+    }
+
+    public void setPrisonerBabyStatus(boolean prisonerBabyStatus) {
+        this.prisonerBabyStatus = prisonerBabyStatus;
     }
 
     public boolean useAltQualityAveraging() {
@@ -3155,6 +3165,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackTotalEarnings", trackTotalEarnings);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerBabyStatus", prisonerBabyStatus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketName", personnelMarketName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
                                        personnelMarketRandomEliteRemoval);
@@ -3688,6 +3699,8 @@ public class CampaignOptions implements Serializable {
                             break;
                     }
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("prisonerBabyStatus")) {
+                retVal.prisonerBabyStatus = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
                 retVal.useRandomHitsForVees = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
