@@ -36,8 +36,8 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.client.RandomSkillsGenerator;
-import megamek.client.RandomUnitGenerator;
+import megamek.client.generator.RandomSkillsGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.MechFileParser;

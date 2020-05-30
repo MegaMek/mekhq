@@ -31,7 +31,9 @@ import java.util.*;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.*;
+import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.*;
@@ -180,7 +182,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private String honorific;
     private String maidenName;
     private String callsign;
-    private int gender;
+    private Gender gender;
 
     private int primaryRole;
     private int secondaryRole;
@@ -324,11 +326,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region Constructors
     //default constructor
     public Person(Campaign campaign) {
-        this(Crew.UNNAMED, Crew.UNNAMED_SURNAME, campaign);
+        this(RandomNameGenerator.UNNAMED, RandomNameGenerator.UNNAMED_SURNAME, campaign);
     }
 
     public Person(Campaign campaign, String factionCode) {
-        this(Crew.UNNAMED, Crew.UNNAMED_SURNAME, campaign, factionCode);
+        this(RandomNameGenerator.UNNAMED, RandomNameGenerator.UNNAMED_SURNAME, campaign, factionCode);
     }
 
     public Person(String givenName, String surname, Campaign campaign) {
@@ -384,7 +386,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         portraitFile = Crew.PORTRAIT_NONE;
         xp = 0;
         daysToWaitForHealing = 0;
-        gender = Crew.G_MALE;
+        gender = Gender.MALE;
         rank = 0;
         rankLevel = 0;
         rankSystem = -1;
@@ -727,7 +729,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
 
-        if ((surname == null) || (surname.equals(Crew.UNNAMED_SURNAME))) {
+        if ((surname == null) || (surname.equals(RandomNameGenerator.UNNAMED_SURNAME))) {
             surname = "";
         }
 
@@ -1135,11 +1137,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public void setGender(int g) {
-        this.gender = g;
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 
-    public int getGender() {
+    public Gender getGender() {
         return gender;
     }
 
@@ -1283,7 +1285,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if they can, otherwise false
      */
     public boolean canProcreate() {
-        return isFemale() && tryingToConceive && !isPregnant() && !isDeployed()
+        return getGender().isFemale() && isTryingToConceive() && !isPregnant() && !isDeployed()
                 && !isChild() && (getAge(getCampaign().getLocalDate()) < 51);
     }
 
@@ -1357,7 +1359,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         for (int i = 0; i < size; i++) {
             Person baby = campaign.newDependent(T_NONE, true);
-            String surname = getCampaign().getCampaignOptions().getBabySurnameStyle()
+            String surname = campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
             baby.setSurname(surname);
             baby.setBirthday(campaign.getLocalDate());
@@ -1440,7 +1442,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void addRandomSpouse(boolean sameSex, Campaign campaign) {
         List<Person> potentials = new ArrayList<>();
-        int gender = sameSex ? getGender() : (isMale() ? Crew.G_FEMALE : Crew.G_MALE);
+        Gender gender = sameSex ? getGender() : (getGender().isMale() ? Gender.FEMALE : Gender.MALE);
         for (Person p : campaign.getActivePersonnel()) {
             if (isPotentialRandomSpouse(p, gender, campaign)) {
                 potentials.add(p);
@@ -1453,7 +1455,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public boolean isPotentialRandomSpouse(Person p, int gender, Campaign campaign) {
+    public boolean isPotentialRandomSpouse(Person p, Gender gender, Campaign campaign) {
         if ((p.getGender() != gender) || !safeSpouse(p, campaign)
                 || !(getPrisonerStatus().isFree()
                     || (getPrisonerStatus().isPrisoner() && p.getPrisonerStatus().isPrisoner()))) {
@@ -1530,14 +1532,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
     }
     //endregion Divorce
-
-    public boolean isFemale() {
-        return gender == Crew.G_FEMALE;
-    }
-
-    public boolean isMale() {
-        return gender == Crew.G_MALE;
-    }
 
     public int getXp() {
         return xp;
@@ -1710,7 +1704,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWaitForHealing", daysToWaitForHealing);
             }
             // Always save the person's gender, as it would otherwise get confusing fast
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", gender);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", gender.name());
             // Always save a person's rank
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rank", rank);
             if (rankLevel != 0) {
@@ -1971,7 +1965,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
                     retVal.hits = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
-                    retVal.gender = Integer.parseInt(wn2.getTextContent());
+                    retVal.gender = Gender.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                     if (version.isLowerThan("0.3.4-r1782")) {
                         RankTranslator rt = new RankTranslator(c);

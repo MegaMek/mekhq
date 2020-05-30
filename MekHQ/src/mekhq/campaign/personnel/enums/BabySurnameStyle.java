@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.Crew;
+import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
@@ -62,7 +63,7 @@ public enum BabySurnameStyle {
         return styleToolTip;
     }
 
-    public String generateBabySurname(Person mother, Person father, int babyGender) {
+    public String generateBabySurname(Person mother, Person father, Gender babyGender) {
         final boolean hasFather = (father != null);
         switch (this) {
             case WELSH_PATRONYMICS:
@@ -114,11 +115,11 @@ public enum BabySurnameStyle {
      * @param babyGender the baby's gender
      * @return The Welsh-style surname
      */
-    private String getWelshNymic(String givenName, int babyGender) {
+    private String getWelshNymic(String givenName, Gender babyGender) {
         switch (babyGender) {
-            case Crew.G_FEMALE:
+            case FEMALE:
                 return "ferch " + givenName;
-            case Crew.G_MALE:
+            case MALE:
             default:
                 MekHQ.getLogger().error(getClass(), "getWelshNymic", String.valueOf(givenName.charAt(0)));
                 switch (givenName.charAt(0)) {
@@ -149,11 +150,11 @@ public enum BabySurnameStyle {
      * @param babyGender the baby's gender
      * @return The Icelandic-style surname
      */
-    private String getIcelandicNymic(String givenName, int babyGender) {
+    private String getIcelandicNymic(String givenName, Gender babyGender) {
         switch (babyGender) {
-            case Crew.G_MALE:
+            case MALE:
                 return givenName + "sson";
-            case Crew.G_FEMALE:
+            case FEMALE:
                 return givenName + "sd\u00F3ttir";
             default:
                 return givenName + "bur";

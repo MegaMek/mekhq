@@ -599,7 +599,6 @@ public class StaticChecks {
     }
 
     /**
-     *
      * @param people an array of people
      * @return true if they are either all dependents or all not dependents, otherwise false
      */
@@ -616,13 +615,12 @@ public class StaticChecks {
     }
 
     /**
-     *
      * @param people an array of people
      * @return true if all of the people are female, otherwise false
      */
     public static boolean areAllFemale(Person[] people) {
         for (Person person : people) {
-            if (person.isMale()) {
+            if (person.getGender().isMale()) {
                return false;
             }
         }
@@ -630,7 +628,6 @@ public class StaticChecks {
     }
 
     /**
-     *
      * @param people an array of people
      * @return true if they are either all trying to conceive or all not, otherwise false
      */
@@ -647,7 +644,6 @@ public class StaticChecks {
     }
 
     /**
-     *
      * @param people an array of people
      * @return true if they are either all trying to marry or all not, otherwise false
      */
@@ -664,7 +660,6 @@ public class StaticChecks {
     }
 
     /**
-     *
      * @param people an array of people
      * @return true if they are either all founders or all not, otherwise false
      */

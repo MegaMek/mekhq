@@ -176,14 +176,14 @@ public enum Marriage {
                 }
                 break;
             case MALE:
-                if (origin.isMale()) {
+                if (origin.getGender().isMale()) {
                     spouse.setSurname(surname);
                 } else {
                     origin.setSurname(spouseSurname);
                 }
                 break;
             case FEMALE:
-                if (origin.isMale()) {
+                if (origin.getGender().isMale()) {
                     origin.setSurname(spouseSurname);
                 } else {
                     spouse.setSurname(surname);

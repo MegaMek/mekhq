@@ -478,7 +478,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_ADD_PREGNANCY: {
-                if (selectedPerson.isFemale()) {
+                if (selectedPerson.getGender().isFemale()) {
                     selectedPerson.addPregnancy();
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
@@ -1833,7 +1833,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                                         makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), style.name())));
                             }
 
-                            if (ps.isMale()) {
+                            if (ps.getGender().isMale()) {
                                 maleMenu.add(spouseMenu);
                             } else {
                                 femaleMenu.add(spouseMenu);
@@ -1841,7 +1841,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         }
                     }
 
-                    if (person.isMale()) {
+                    if (person.getGender().isMale()) {
                         JMenuHelpers.addMenuIfNonEmpty(menu, femaleMenu, MAX_POPUP_ITEMS);
                         JMenuHelpers.addMenuIfNonEmpty(menu, maleMenu, MAX_POPUP_ITEMS);
                     } else {
@@ -2376,7 +2376,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
-                if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation() && person.isFemale()) {
+
+                if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation() && person.getGender().isFemale()) {
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
                     cbMenuItem.setToolTipText(resourceMap.getString("tryingToConceive.toolTipText"));
                     cbMenuItem.setSelected(person.isTryingToConceive());
@@ -2384,6 +2385,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                 }
+
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("founder.text"));
                 cbMenuItem.setSelected(person.isFounder());
                 cbMenuItem.setActionCommand(CMD_FOUNDER);

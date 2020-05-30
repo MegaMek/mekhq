@@ -37,6 +37,8 @@ import javax.swing.text.DefaultEditorKit;
 
 import megamek.MegaMek;
 import megamek.client.Client;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.event.EventBus;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
@@ -650,8 +652,8 @@ public class MekHQ implements GameListener {
         	gameThread.requestStop();
             /*Megamek dumps these in the deployment phase to free memory*/
             if (getCampaign().getCampaignOptions().getUseAtB()) {
-                megamek.client.RandomUnitGenerator.getInstance();
-                megamek.client.RandomNameGenerator.getInstance();
+                RandomUnitGenerator.getInstance();
+                RandomNameGenerator.getInstance();
             }
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
             campaigngui.initReport();
