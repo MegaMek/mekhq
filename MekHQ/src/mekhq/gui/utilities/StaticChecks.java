@@ -27,6 +27,7 @@ import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
@@ -550,8 +551,7 @@ public class StaticChecks {
     public static boolean areAllEligible(Person[] people) {
         int profession = people[0].getProfession();
         for (Person person : people) {
-            if (person.isPrisoner() || person.isBondsman()
-                    || person.getProfession() != profession) {
+            if (!person.getPrisonerStatus().isFree() || person.getProfession() != profession) {
                 return false;
             }
         }
@@ -563,7 +563,6 @@ public class StaticChecks {
         }
         return true;
     }
-
     /**
      * Checks if there is at least one award in the selected group of people
      * @param people the selected group of people
@@ -575,12 +574,23 @@ public class StaticChecks {
                 return true;
             }
         }
+
+        return false;
+    }
+
+    public static boolean areAnyFree(Person[] people) {
+        for (Person person : people) {
+            if (person.getPrisonerStatus().isFree()) {
+                return true;
+            }
+        }
+
         return false;
     }
 
     public static boolean areAllPrisoners(Person[] people) {
-        for(Person person : people) {
-            if(!person.isPrisoner()) {
+        for (Person person : people) {
+            if (!person.getPrisonerStatus().isPrisoner()) {
                 return false;
             }
         }
@@ -665,13 +675,9 @@ public class StaticChecks {
         return true;
     }
 
-    public static boolean isWillingToDefect(Person person) {
-        return person.isBondsman() || person.isWillingToDefect();
-    }
-
     public static boolean areAnyWillingToDefect(Person[] people) {
         for (Person person : people) {
-            if (isWillingToDefect((person))) {
+            if (person.getPrisonerStatus().isWillingToDefect()) {
                 return true;
             }
         }

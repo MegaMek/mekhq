@@ -39,6 +39,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.personnel.enums.Marriage;
@@ -184,9 +185,7 @@ public class CampaignOptions implements Serializable {
     private boolean useSupportEdge;
     private boolean useImplants;
     private boolean capturePrisoners; // TODO : Merge me with the AtB option useAtBCapture
-    private int defaultPrisonerStatus;
-    public static final int PRISONER_RANK = 0;
-    public static final int BONDSMAN_RANK = 1;
+    private PrisonerStatus defaultPrisonerStatus;
     private boolean altQualityAveraging;
     private boolean useAdvancedMedical; // Unofficial
     private boolean useDylansRandomXp; // Unofficial
@@ -515,7 +514,7 @@ public class CampaignOptions implements Serializable {
         useSupportEdge = false;
         useImplants = false;
         capturePrisoners = true;
-        defaultPrisonerStatus = PRISONER_RANK;
+        defaultPrisonerStatus = PrisonerStatus.PRISONER;
         altQualityAveraging = false;
         useAdvancedMedical = false;
         useDylansRandomXp = false;
@@ -927,11 +926,11 @@ public class CampaignOptions implements Serializable {
         capturePrisoners = b;
     }
 
-    public int getDefaultPrisonerStatus() {
+    public PrisonerStatus getDefaultPrisonerStatus() {
         return defaultPrisonerStatus;
     }
 
-    public void setDefaultPrisonerStatus(int d) {
+    public void setDefaultPrisonerStatus(PrisonerStatus d) {
         defaultPrisonerStatus = d;
     }
 
@@ -3155,7 +3154,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "timeInRankDisplayFormat", timeInRankDisplayFormat.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackTotalEarnings", trackTotalEarnings);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketName", personnelMarketName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
                                        personnelMarketRandomEliteRemoval);
@@ -3675,11 +3674,23 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
                 retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
-                retVal.defaultPrisonerStatus = Integer.parseInt(wn2.getTextContent().trim());
+                // This cannot use PrisonerStatus::parseFromString due to former save format differences
+                try {
+                    retVal.defaultPrisonerStatus = PrisonerStatus.valueOf(wn2.getTextContent().trim());
+                } catch (Exception ignored) {
+                    switch (wn2.getTextContent().trim()) {
+                        case "1":
+                            retVal.defaultPrisonerStatus = PrisonerStatus.BONDSMAN;
+                            break;
+                        case "0":
+                        default:
+                            retVal.defaultPrisonerStatus = PrisonerStatus.PRISONER;
+                            break;
+                    }
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
                 retVal.useRandomHitsForVees = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) {
-                // Legacy
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                 retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
                 retVal.personnelMarketName = wn2.getTextContent().trim();

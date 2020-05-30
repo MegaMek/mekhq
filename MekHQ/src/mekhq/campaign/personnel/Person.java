@@ -105,11 +105,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // This value should always be +1 of the last defined role
     public static final int T_NUM = 28;
 
-    // Prisoners, Bondsmen, and Normal Personnel
-    public static final int PRISONER_NOT = 0;
-    public static final int PRISONER_YES = 1;
-    public static final int PRISONER_BONDSMAN = 2;
-
     // Phenotypes
     public static final int PHENOTYPE_NONE = 0;
     public static final int PHENOTYPE_MW = 1;
@@ -214,9 +209,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected Money salary;
     private Money totalEarnings;
     private int hits;
-    private int prisonerStatus;
-    // Is this person willing to defect? Only for prisoners ...
-    private boolean willingToDefect;
+    private PrisonerStatus prisonerStatus;
 
     boolean dependent;
     boolean commander;
@@ -405,8 +398,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         salary = Money.of(-1);
         totalEarnings = Money.of(0);
         status = PersonnelStatus.ACTIVE;
-        prisonerStatus = PRISONER_NOT;
-        willingToDefect = false;
+        prisonerStatus = PrisonerStatus.FREE;
         hits = 0;
         toughness = 0;
         resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
@@ -502,44 +494,84 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public boolean isPrisoner() {
-        return prisonerStatus == PRISONER_YES;
-    }
-
-    public void setPrisoner() {
-        prisonerStatus = PRISONER_YES;
-        setRankNumeric(Ranks.RANK_PRISONER);
-    }
-
-    public boolean isBondsman() {
-        return prisonerStatus == PRISONER_BONDSMAN;
-    }
-
-    public void setBondsman() {
-        prisonerStatus = PRISONER_BONDSMAN;
-        willingToDefect = false;
-        setRankNumeric(Ranks.RANK_BONDSMAN);
-    }
-
-    public boolean isFree() {
-        return (!isPrisoner() && !isBondsman());
-    }
-
-    public void setFreeMan() {
-        prisonerStatus = PRISONER_NOT;
-        willingToDefect = false;
-    }
-
-    public int getPrisonerStatus() {
+    public PrisonerStatus getPrisonerStatus() {
         return prisonerStatus;
     }
 
-    public boolean isWillingToDefect() {
-        return willingToDefect;
+    public void setPrisonerStatus(PrisonerStatus prisonerStatus) {
+        setPrisonerStatus(prisonerStatus, true);
     }
 
-    public void setWillingToDefect(boolean willingToDefect) {
-        this.willingToDefect = willingToDefect && (prisonerStatus == PRISONER_YES);
+    /**
+     * This requires expanded checks because a number of functionalities are strictly dependant on
+     * the current person's prisoner status.
+     * @param prisonerStatus The new prisoner status for the person in question
+     * @param log whether to log the change or not
+     */
+    public void setPrisonerStatus(PrisonerStatus prisonerStatus, boolean log) {
+        if (getPrisonerStatus() == prisonerStatus) {
+            return;
+        }
+
+        final boolean freed = !getPrisonerStatus().isFree();
+        final boolean isPrisoner = prisonerStatus.isPrisoner();
+        this.prisonerStatus = prisonerStatus;
+
+        // Now, we need to fix values and ranks based on the Person's status
+        switch (prisonerStatus) {
+            case PRISONER:
+            case PRISONER_DEFECTOR:
+            case BONDSMAN:
+                // They don't get to have a rank. Their rank is Prisoner or Bondsman
+                // TODO : Remove this as part of permitting ranked prisoners
+                getCampaign().changeRank(this,
+                        isPrisoner ? Ranks.RANK_PRISONER : Ranks.RANK_BONDSMAN, true);
+                setRecruitment(null);
+                setLastRankChangeDate(null);
+                if (log) {
+                    if (isPrisoner) {
+                        ServiceLogger.madePrisoner(this, getCampaign().getDate(),
+                                getCampaign().getName(), "");
+                    } else {
+                        ServiceLogger.madeBondsman(this, getCampaign().getDate(),
+                                getCampaign().getName(), "");
+                    }
+                }
+                break;
+            case FREE:
+                if (!isDependent()) {
+                    if (getCampaign().getCampaignOptions().getUseTimeInService()) {
+                        setRecruitment(getCampaign().getLocalDate());
+                    }
+                    if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
+                        setLastRankChangeDate(getCampaign().getLocalDate());
+                    }
+                }
+                if (getRankNumeric() < 0) {
+                    getCampaign().changeRank(this, 0, false);
+                }
+                if (log) {
+                    if (freed) {
+                        ServiceLogger.freed(this, getCampaign().getDate(),
+                                getCampaign().getName(), "");
+                    } else {
+                        ServiceLogger.joined(this, getCampaign().getDate(),
+                                getCampaign().getName(), "");
+                    }
+                }
+                break;
+        }
+
+        if (!prisonerStatus.isFree()) {
+            Unit u = getCampaign().getUnit(getUnitId());
+            if (u != null) {
+                u.remove(this, true);
+            } else {
+                setUnitId(null);
+            }
+        }
+
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     //region Text Getters
@@ -581,19 +613,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case PHENOTYPE_VEE:
             case PHENOTYPE_BA:
                 return "Trueborn";
-            default:
-                return "?";
-        }
-    }
-
-    public static String getPrisonerStatusName(int status) {
-        switch (status) {
-            case PRISONER_NOT:
-                return "Free";
-            case PRISONER_YES:
-                return "Prisoner";
-            case PRISONER_BONDSMAN:
-                return "Bondsman";
             default:
                 return "?";
         }
@@ -1348,7 +1367,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             baby.setId(UUID.randomUUID());
             baby.setAncestorsId(ancId);
 
-            campaign.recruitPerson(baby, false, true, true, false);
+            campaign.recruitPerson(baby, baby.getPrisonerStatus(), baby.isDependent(), true, false);
 
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
@@ -1391,7 +1410,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 && !p.hasSpouse()
                 && p.isTryingToMarry()
                 && p.oldEnoughToMarry(campaign)
-                && (!p.isPrisoner() || isPrisoner())
+                && (!p.getPrisonerStatus().isPrisoner() || getPrisonerStatus().isPrisoner())
                 && !p.isDeadOrMIA()
                 && p.isActive()
                 && ((getAncestorsId() == null)
@@ -1438,7 +1457,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public boolean isPotentialRandomSpouse(Person p, Gender gender, Campaign campaign) {
         if ((p.getGender() != gender) || !safeSpouse(p, campaign)
-                || !(isFree() || (isPrisoner() && p.isPrisoner()))) {
+                || !(getPrisonerStatus().isFree()
+                    || (getPrisonerStatus().isPrisoner() && p.getPrisonerStatus().isPrisoner()))) {
             return false;
         }
 
@@ -1716,11 +1736,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             // Always save a person's status, to make it easy to parse the personnel saved data
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "status", status.name());
-            if (prisonerStatus != PRISONER_NOT) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerStatus", prisonerStatus);
-            }
-            if (willingToDefect) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "willingToDefect", true);
+            if (prisonerStatus != PrisonerStatus.FREE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerStatus", prisonerStatus.name());
             }
             if (hits > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "hits", hits);
@@ -2006,9 +2023,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.status = PersonnelStatus.valueOf(wn2.getTextContent());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerStatus")) {
-                    retVal.prisonerStatus = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) {
-                    retVal.willingToDefect = Boolean.parseBoolean(wn2.getTextContent());
+                    retVal.prisonerStatus = PrisonerStatus.parseFromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) { // Legacy
+                    if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
+                        retVal.prisonerStatus = PrisonerStatus.PRISONER_DEFECTOR;
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
                     retVal.salary = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("totalEarnings")) {
@@ -2304,8 +2323,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
 
             // Prisoner and Bondsman updating
-            if (retVal.prisonerStatus != PRISONER_NOT && retVal.rank == 0) {
-                if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
+            if ((retVal.prisonerStatus != PrisonerStatus.FREE) && (retVal.rank == 0)) {
+                if (retVal.prisonerStatus == PrisonerStatus.BONDSMAN) {
                     retVal.setRankNumeric(Ranks.RANK_BONDSMAN);
                 } else {
                     retVal.setRankNumeric(Ranks.RANK_PRISONER);
@@ -2325,7 +2344,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public Money getSalary() {
-        if (!isFree() || isDependent()) {
+        if (!getPrisonerStatus().isFree() || isDependent()) {
             return Money.zero();
         }
 
@@ -2811,10 +2830,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         // Do prisoner checks
         if (rank.equalsIgnoreCase("None")) {
-            if (isPrisoner()) {
+            if (getPrisonerStatus().isPrisoner()) {
                 return "Prisoner " + getFullName();
             }
-            if (isBondsman()) {
+            if (getPrisonerStatus().isBondsman()) {
                 return "Bondsman " + getFullName();
             }
             return getFullName();
@@ -2836,7 +2855,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public String makeHTMLRankDiv() {
-        return String.format("<div id=\"%s\">%s%s</div>", getId().toString(), getRankName(), (isPrisoner() && isWillingToDefect() ? "*" : ""));
+        return String.format("<div id=\"%s\">%s%s</div>", getId().toString(), getRankName(),
+                getPrisonerStatus().isWillingToDefect() ? "*" : "");
     }
 
     public String getHyperlinkedFullTitle() {
@@ -3606,7 +3626,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region injuries
     /**
-     * All methods below are for the Advanced Medical option **
+     * All methods below are for the Advanced Medical option
      */
 
     public List<Injury> getInjuries() {
@@ -3849,7 +3869,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return the number of shares the person has
      */
     public int getNumShares(boolean sharesForAll) {
-        if (!isActive() || !isFree() || (!sharesForAll && !hasRole(T_MECHWARRIOR))) {
+        if (!isActive() || !getPrisonerStatus().isFree() || (!sharesForAll && !hasRole(T_MECHWARRIOR))) {
             return 0;
         }
         int shares = 1;

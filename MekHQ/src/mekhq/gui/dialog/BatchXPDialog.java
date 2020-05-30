@@ -376,21 +376,21 @@ public final class BatchXPDialog extends JDialog {
         @Override
         public boolean include(RowFilter.Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
             Person p = entry.getModel().getPerson(entry.getIdentifier().intValue());
-            if(!p.isActive()) {
+            if (!p.isActive()) {
                 return false;
             }
-            if(!prisoners && (p.isPrisoner() || p.isBondsman())) {
+            if (!prisoners && !p.getPrisonerStatus().isFree()) {
                 return false;
             }
-            if((null != primaryRole) && (p.getPrimaryRole() != primaryRole)) {
+            if ((null != primaryRole) && (p.getPrimaryRole() != primaryRole)) {
                 return false;
             }
-            if((null != expLevel) && (p.getExperienceLevel(false) != expLevel)) {
+            if ((null != expLevel) && (p.getExperienceLevel(false) != expLevel)) {
                 return false;
             }
-            if((null != skill)) {
+            if ((null != skill)) {
                 Skill s = p.getSkill(skill);
-                if(null == s) {
+                if (null == s) {
                     int cost = SkillType.getType(skill).getCost(0);
                     return (cost >= 0) && (cost <= p.getXp());
                 } else {

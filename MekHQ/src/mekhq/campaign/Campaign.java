@@ -42,6 +42,7 @@ import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.service.AutosaveService;
@@ -1325,16 +1326,14 @@ public class Campaign implements Serializable, ITechManager {
 
     //region Personnel Recruitment
     /**
-     *
      * @param p         the person being added
      * @return          true if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p) {
-        return recruitPerson(p, false, false, false, true);
+        return recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), false, true);
     }
 
     /**
-     *
      * @param p         the person being added
      * @param gmAdd     false means that they need to pay to hire this person, provided that
      *                  the campaign option to pay for new hires is set, while
@@ -1342,24 +1341,34 @@ public class Campaign implements Serializable, ITechManager {
      * @return          true if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p, boolean gmAdd) {
-        return recruitPerson(p, false,  false, gmAdd, true);
+        return recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), gmAdd, true);
     }
 
     /**
      *
-     * @param p         the person being added
-     * @param prisoner  if the person is a prisoner or not. True means they are a prisoner
-     * @param dependent if the person is a dependent or not. True means they are a dependent
-     * @param gmAdd     false means that they need to pay to hire this person, true means it is added without paying
-     * @param log       whether or not to write to logs
-     * @return          true if the person is hired successfully, otherwise false
+     * @param p              the person being added
+     * @param prisonerStatus the person's prisoner status upon recruitment
+     * @return               true if the person is hired successfully, otherwise false
      */
-    public boolean recruitPerson(Person p, boolean prisoner, boolean dependent, boolean gmAdd, boolean log) {
+    public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus) {
+        return recruitPerson(p, prisonerStatus, p.isDependent(), false, true);
+    }
+
+    /**
+     * @param p              the person being added
+     * @param prisonerStatus the person's prisoner status upon recruitment
+     * @param dependent      if the person is a dependent or not. True means they are a dependent
+     * @param gmAdd          false means that they need to pay to hire this person, true means it is added without paying
+     * @param log            whether or not to write to logs
+     * @return               true if the person is hired successfully, otherwise false
+     */
+    public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus, boolean dependent,
+                                 boolean gmAdd, boolean log) {
         if (p == null) {
             return false;
         }
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
-        if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && !prisoner) {
+        if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && prisonerStatus.isFree()) {
             if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
                     "recruitment of " + p.getFullName(), getCalendar().getTime())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
@@ -1372,49 +1381,20 @@ public class Campaign implements Serializable, ITechManager {
         p.setId(id);
         personnel.put(id, p);
 
-        boolean bondsman = campaignOptions.getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK;
-        String add = prisoner ? (bondsman ? " as a bondsman" : " as a prisoner") : "";
         if (log) {
+            String add = !prisonerStatus.isFree() ? (prisonerStatus.isBondsman() ? " as a bondsman" : " as a prisoner") : "";
             addReport(String.format("%s has been added to the personnel roster%s.", p.getHyperlinkedName(), add));
         }
+
         if (p.getPrimaryRole() == Person.T_ASTECH) {
             astechPoolMinutes += 480;
             astechPoolOvertime += 240;
-        }
-        if (p.getSecondaryRole() == Person.T_ASTECH) {
+        } else if (p.getSecondaryRole() == Person.T_ASTECH) {
             astechPoolMinutes += 240;
             astechPoolOvertime += 120;
         }
-        String rankEntry = LogEntryController.generateRankEntryString(p);
 
-        if (prisoner) {
-            if (getCampaignOptions().getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK) {
-                p.setBondsman();
-                if (log) {
-                    ServiceLogger.madeBondsman(p, getDate(), getName(), rankEntry);
-                }
-            } else {
-                p.setPrisoner();
-                if (log) {
-                    ServiceLogger.madePrisoner(p, getDate(), getName(), rankEntry);
-                }
-            }
-        } else {
-            p.setFreeMan();
-            if (log) {
-                ServiceLogger.joined(p, getDate(), getName(), rankEntry);
-            }
-        }
-
-        // Add their recruitment date if using track time in service
-        if (!prisoner && !dependent) {
-            if (getCampaignOptions().getUseTimeInService()) {
-                p.setRecruitment(getLocalDate());
-            }
-            if (getCampaignOptions().getUseTimeInRank()) {
-                p.setLastRankChangeDate(getLocalDate());
-            }
-        }
+        p.setPrisonerStatus(prisonerStatus, log);
 
         MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
@@ -3508,7 +3488,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (getCampaignOptions().canAtBAddDependents()) {
                     for (int i = 0; i < change; i++) {
                         Person p = newDependent(Person.T_ASTECH, false);
-                        recruitPerson(p, false, true, false, true);
+                        recruitPerson(p);
                     }
                 }
             }
@@ -3587,7 +3567,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             if ((getCampaignOptions().getIdleXP() > 0) && (calendar.get(Calendar.DAY_OF_MONTH) == 1)
-                    && p.isActive() && !p.isPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
+                    && p.isActive() && !p.getPrisonerStatus().isPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
                 p.setIdleMonths(p.getIdleMonths() + 1);
                 if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
@@ -6017,48 +5997,6 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
     }
 
-    public void changePrisonerStatus(Person p, int status) {
-        switch (status) {
-            case Person.PRISONER_NOT:
-                p.setFreeMan();
-                if (p.getRankNumeric() < 0) {
-                    changeRank(p, 0, false);
-                }
-                ServiceLogger.freed(p, getDate());
-                if (getCampaignOptions().getUseTimeInService()) {
-                    p.setRecruitment(getLocalDate());
-                }
-                break;
-            case Person.PRISONER_YES:
-                if (p.getRankNumeric() != Ranks.RANK_PRISONER) {
-                    changeRank(p, Ranks.RANK_PRISONER, true); // They don't get to have a rank. Their
-                    // rank is Prisoner or Bondsman.
-                }
-                p.setPrisoner();
-                ServiceLogger.madePrisoner(p, getDate());
-                p.setRecruitment(null); //more efficient to just set it to null instead of checking if the setting is enabled
-                break;
-            case Person.PRISONER_BONDSMAN:
-                if (p.getRankNumeric() != Ranks.RANK_BONDSMAN) {
-                    changeRank(p, Ranks.RANK_BONDSMAN, true); // They don't get to have a rank. Their
-                    // rank is Prisoner or Bondsman.
-                }
-                p.setBondsman();
-                ServiceLogger.madeBondsman(p, getDate());
-                p.setRecruitment(null); //more efficient to just set it to null instead of checking if the setting is enabled
-                break;
-            default:
-                break;
-        }
-        if (p.isBondsman() || p.isPrisoner()) {
-            Unit u = getUnit(p.getUnitId());
-            if (u != null) {
-                u.remove(p, true);
-            }
-        }
-        MekHQ.triggerEvent(new PersonChangedEvent(p));
-    }
-
     public void changeStatus(Person person, PersonnelStatus status) {
         Unit u = getUnit(person.getUnitId());
         if (status == PersonnelStatus.KIA) {
@@ -6119,7 +6057,7 @@ public class Campaign implements Serializable, ITechManager {
         person.setRankLevel(rankLevel);
 
         if (getCampaignOptions().getUseTimeInRank()) {
-            if (person.isFree() && !person.isDependent()) {
+            if (person.getPrisonerStatus().isFree() && !person.isDependent()) {
                 person.setLastRankChangeDate(getLocalDate());
             } else {
                 person.setLastRankChangeDate(null);
@@ -7894,7 +7832,7 @@ public class Campaign implements Serializable, ITechManager {
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (p.hasPrimaryCombatRole() && p.isFree() && p.isActive()) {
+            if (p.hasPrimaryCombatRole() && p.getPrisonerStatus().isFree() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
                 if (getCampaignOptions().useAdvancedMedical() && p.getInjuries().size() > 0) {
@@ -7957,19 +7895,19 @@ public class Campaign implements Serializable, ITechManager {
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (p.hasPrimarySupportRole(false) && p.isFree() && p.isActive()) {
+            if (p.hasPrimarySupportRole(false) && p.getPrisonerStatus().isFree() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary());
-            } else if (p.isPrisoner() && p.isActive()) {
+            } else if (p.getPrisonerStatus().isPrisoner() && p.isActive()) {
                 prisoners++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
-            } else if (p.isBondsman() && p.isActive()) {
+            } else if (p.getPrisonerStatus().isBondsman() && p.isActive()) {
                 bondsmen++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
@@ -8260,7 +8198,7 @@ public class Campaign implements Serializable, ITechManager {
                     break;
                 }
             }
-            if (!p.isDependent() && p.isFree()) {
+            if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {
@@ -8286,7 +8224,7 @@ public class Campaign implements Serializable, ITechManager {
                     join = e.getDate();
                 }
             }
-            if (!p.isDependent() && p.isFree()) {
+            if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {

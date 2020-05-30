@@ -91,6 +91,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.Marriage;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
@@ -227,7 +228,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox useSupportEdgeBox;
     private JCheckBox useImplantsBox;
     private JCheckBox chkCapturePrisoners;
-    private JComboBox<String> comboPrisonerStatus;
+    private JComboBox<PrisonerStatus> comboPrisonerStatus;
     private JCheckBox altQualityAveragingCheckBox;
     private JCheckBox useAdvancedMedicalBox;
     private JCheckBox useDylansRandomXpBox;
@@ -1629,11 +1630,10 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkCapturePrisoners, gridBagConstraints);
 
-        DefaultComboBoxModel<String> prisonerStatusModel = new DefaultComboBoxModel<>();
-        prisonerStatusModel.addElement(resourceMap.getString("prisonerStatus.Prisoner"));
-        prisonerStatusModel.addElement(resourceMap.getString("prisonerStatus.Bondsman"));
+        DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
+        prisonerStatusModel.removeElement(PrisonerStatus.FREE); // we don't want this as a standard use case for prisoners
         comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
-        comboPrisonerStatus.setSelectedIndex(options.getDefaultPrisonerStatus());
+        comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
         JPanel pnlPrisonerStatus = new JPanel();
         pnlPrisonerStatus.add(comboPrisonerStatus);
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisonerStatus.text")));
@@ -4895,7 +4895,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setImplants(useImplantsBox.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
         options.setCapturePrisoners(chkCapturePrisoners.isSelected());
-        options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
+        options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
         options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
         options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
