@@ -1362,10 +1362,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         final UUID ancId = anc.getId();
 
         // Determine Prisoner Status
-        PrisonerStatus prisonerStatus = getPrisonerStatus();
-        if (!prisonerStatus.isFree() && !campaign.getCampaignOptions().getPrisonerBabyStatus()) {
-            prisonerStatus = PrisonerStatus.FREE;
-        }
+        PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
+                ? PrisonerStatus.FREE : getPrisonerStatus();
 
         // Output a specific report to the campaign if they are giving birth to multiple children
         if (PREGNANCY_MULTIPLE_NAMES[size] != null) {
