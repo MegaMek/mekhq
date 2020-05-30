@@ -52,6 +52,7 @@ import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.preferences.JWindowPreference;
@@ -332,6 +333,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         //region Pilot Status Panel
         pnlPilotStatus = new JPanel();
         pnlPilotStatus.setLayout(new GridBagLayout());
+
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -340,26 +342,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlPilotStatus.add(new JLabel(resourceMap.getString("hits")), gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlPilotStatus.add(new JLabel(resourceMap.getString("mia")), gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlPilotStatus.add(new JLabel(resourceMap.getString("kia")), gridBagConstraints);
 
-        i = 2;
-        JCheckBox miaCheck;
-        JCheckBox kiaCheck;
-        JSlider hitSlider;
+        j = 0;
+        gridy = 2;
+
         Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
         labelTable.put(0, new JLabel("0") );
         labelTable.put(1, new JLabel("1") );
@@ -367,51 +359,50 @@ public class ResolveScenarioWizardDialog extends JDialog {
         labelTable.put(3, new JLabel("3") );
         labelTable.put(4, new JLabel("4") );
         labelTable.put(5, new JLabel("5") );
-        j = 0;
-        for (PersonStatus status : tracker.getSortedPeople()) {
-            j++;
-            pstatuses.add(status);
-            nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
-            miaCheck = new JCheckBox("");
-            miaBtns.add(miaCheck);
-            kiaCheck = new JCheckBox("");
-            kiaBtns.add(kiaCheck);
 
-            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
+        for (PersonStatus status : tracker.getSortedPeople()) {
+            pstatuses.add(status);
+
+            gridx = 0;
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridy = gridy++;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+            gridBagConstraints.weightx = 0.0;
+            if (++j == tracker.getPeopleStatus().keySet().size()) {
+                gridBagConstraints.weighty = 1.0;
+            }
+
+            nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
+            pnlPilotStatus.add(nameLbl, gridBagConstraints);
+
+            JSlider hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(), 5));
+            hitSlider.setName(Integer.toString(j - 1));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
             hitSlider.setPaintLabels(true);
             hitSlider.setSnapToTicks(true);
             hitSliders.add(hitSlider);
-            if (status.isMissing()) {
-                miaCheck.setSelected(true);
-            }
-
-            kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, miaCheck, null));
-            if (status.isDead()) {
-                kiaCheck.setSelected(true);
-            }
-
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-            gridBagConstraints.weightx = 0.0;
-            if (j == tracker.getPeopleStatus().keySet().size()) {
-                gridBagConstraints.weighty = 1.0;
-            }
-            pnlPilotStatus.add(nameLbl, gridBagConstraints);
-            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridx = gridx++;
             pnlPilotStatus.add(hitSlider, gridBagConstraints);
-            gridBagConstraints.gridx = 2;
+
+            JCheckBox miaCheck = new JCheckBox("");
+            miaCheck.setSelected(status.isMissing());
+            miaBtns.add(miaCheck);
+            gridBagConstraints.gridx = gridx++;
             pnlPilotStatus.add(miaCheck, gridBagConstraints);
-            gridBagConstraints.gridx = 3;
+
+            JCheckBox kiaCheck = new JCheckBox("");
+            kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, miaCheck));
+            kiaCheck.setSelected(status.isDead());
+            kiaBtns.add(kiaCheck);
+            gridBagConstraints.gridx = gridx++;
             gridBagConstraints.weightx = 1.0;
             pnlPilotStatus.add(kiaCheck, gridBagConstraints);
-            i++;
         }
         pnlMain.add(pnlPilotStatus, PILOTPANEL);
         //endregion Pilot Status Panel
@@ -419,6 +410,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         //region Prisoner Status Panel
         pnlPrisonerStatus = new JPanel();
         pnlPrisonerStatus.setLayout(new GridBagLayout());
+
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -426,79 +418,69 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("hits")), gridBagConstraints);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisoner")), gridBagConstraints);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("kia")), gridBagConstraints);
-        i = 2;
-        JCheckBox prisonerCheck;
-        j = 0;
 
-        JButton btnViewPrisoner;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisoner")), gridBagConstraints);
+
+        gridBagConstraints.gridx = 3;
+        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("kia")), gridBagConstraints);
+
+        j = 0;
+        gridy = 2;
 
         for (OppositionPersonnelStatus status : tracker.getSortedPrisoners()) {
-            j++;
             prstatuses.add(status);
-            nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
 
-            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
+            gridx = 0;
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridy = gridy++;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+            gridBagConstraints.weightx = 0.0;
+            if (++j == tracker.getOppositionPersonnel().keySet().size()) {
+                gridBagConstraints.weighty = 1.0;
+            }
+
+            nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
+            pnlPrisonerStatus.add(nameLbl, gridBagConstraints);
+
+            JSlider hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(), 5));
+            hitSlider.setName(Integer.toString(j - 1));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
             hitSlider.setPaintLabels(true);
             hitSlider.setSnapToTicks(true);
-            hitSlider.setName(Integer.toString(j-1));
-            if (status.getHits() > 5 || status.isDead()) {
-                hitSlider.setEnabled(false);
-            }
             pr_hitSliders.add(hitSlider);
-
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-            gridBagConstraints.weightx = 0.0;
-            if (j == tracker.getOppositionPersonnel().keySet().size()) {
-                gridBagConstraints.weighty = 1.0;
-            }
-            pnlPrisonerStatus.add(nameLbl, gridBagConstraints);
-            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridx = gridx++;
             pnlPrisonerStatus.add(hitSlider, gridBagConstraints);
-            gridBagConstraints.gridx = 2;
 
-            prisonerCheck = new JCheckBox("");
-            prisonerBtns.add(prisonerCheck);
+
+            JCheckBox prisonerCheck = new JCheckBox("");
             prisonerCheck.setSelected(status.isCaptured());
+            prisonerBtns.add(prisonerCheck);
+            gridBagConstraints.gridx = gridx++;
             pnlPrisonerStatus.add(prisonerCheck, gridBagConstraints);
 
-            kiaCheck = new JCheckBox("");
+            JCheckBox kiaCheck = new JCheckBox("");
             prisonerKiaBtns.add(kiaCheck);
-            gridBagConstraints.gridx = 3;
+            gridBagConstraints.gridx = gridx++;
             pnlPrisonerStatus.add(kiaCheck, gridBagConstraints);
 
-            btnViewPrisoner = new JButton("View Personnel");
+            JButton btnViewPrisoner = new JButton("View Personnel");
             btnViewPrisoner.addActionListener(evt -> showPrisoner(status.getId()));
-            gridBagConstraints.gridx = 4;
+            gridBagConstraints.gridx = gridx++;
             gridBagConstraints.weightx = 1.0;
             pnlPrisonerStatus.add(btnViewPrisoner, gridBagConstraints);
-            i++;
 
-            kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, prisonerCheck, btnViewPrisoner));
+            kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, prisonerCheck));
 
             // if the person is dead, set the checkbox and skip all this captured stuff
-            if (status.getHits() > 5 || status.isDead()) {
+            if ((status.getHits() > 5) || status.isDead()) {
                 kiaCheck.setSelected(true);
             } else if (status.isCaptured() &&
                     tracker.getCampaign().getCampaignOptions().getUseAtB() &&
@@ -800,7 +782,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtRewards.setWrapStyleWord(true);
         txtRewards.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtRewards.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -813,8 +795,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlPreview.add(new JScrollPane(txtRewards), gridBagConstraints);
 
         txtReport.setText("");
-        txtReport.setPreferredSize(new Dimension(500,300));
-        txtReport.setMinimumSize(new Dimension(500,300));
+        txtReport.setPreferredSize(new Dimension(500, 300));
+        txtReport.setMinimumSize(new Dimension(500, 300));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -833,7 +815,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtRecoveredUnits.setWrapStyleWord(true);
         txtRecoveredUnits.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtRecoveredUnits.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         scrRecoveredUnits.setViewportView(txtRecoveredUnits);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -853,7 +835,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtRecoveredPilots.setWrapStyleWord(true);
         txtRecoveredPilots.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtRecoveredPilots.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         scrRecoveredPilots.setViewportView(txtRecoveredPilots);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -873,7 +855,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtMissingUnits.setWrapStyleWord(true);
         txtMissingUnits.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtMissingUnits.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         scrMissingUnits.setViewportView(txtMissingUnits);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -933,7 +915,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtDeadPilots.setWrapStyleWord(true);
         txtDeadPilots.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtDeadPilots.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         scrDeadPilots.setViewportView(txtDeadPilots);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -949,8 +931,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
 
         scrMain = new JScrollPane(pnlMain);
-        scrMain.setMinimumSize(new Dimension(600,500));
-        scrMain.setPreferredSize(new Dimension(600,500));
+        scrMain.setMinimumSize(new Dimension(600, 500));
+        scrMain.setPreferredSize(new Dimension(600, 500));
         getContentPane().add(scrMain, BorderLayout.CENTER);
 
 
@@ -1052,11 +1034,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
                     chkObjective.addItemListener(e -> {
                         JCheckBox source = (JCheckBox) e.getSource();
-                        if (source.isSelected()) {
-                            source.setForeground(Color.green.darker());
-                        } else {
-                            source.setForeground(Color.RED);
-                        }
+                        source.setForeground(source.isSelected() ? Color.green.darker() : Color.RED);
                     });
 
                     continue;
@@ -1172,9 +1150,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtInstructions.setWrapStyleWord(true);
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
-        txtInstructions.setMinimumSize(new Dimension(590,150));
-        txtInstructions.setPreferredSize(new Dimension(590,150));
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtInstructions.setMinimumSize(new Dimension(590, 150));
+        txtInstructions.setPreferredSize(new Dimension(590, 150));
         getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
     }
 
@@ -1244,7 +1222,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         btnFinish.setEnabled(false);
         boolean passedCurrent = false;
         boolean switchMade = false;
-        for (int i = (panelOrder.length-1); i >= 0; i--) {
+        for (int i = (panelOrder.length - 1); i >= 0; i--) {
             String name = panelOrder[i];
             if (passedCurrent) {
                 if (usePanel(name)) {
@@ -1309,7 +1287,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             if (killChoices.get(killName).getSelectedIndex() == 0) {
                 tracker.getKillCredits().put(killName, "None");
             } else {
-                Unit u = tracker.getUnits().get(killChoices.get(killName).getSelectedIndex()-1);
+                Unit u = tracker.getUnits().get(killChoices.get(killName).getSelectedIndex() - 1);
                 if (null != u) {
                     tracker.getKillCredits().put(killName, u.getId().toString());
                 }
@@ -1326,7 +1304,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         //now process
-        tracker.resolveScenario(choiceStatus.getSelectedIndex()+1,txtReport.getText());
+        tracker.resolveScenario(choiceStatus.getSelectedIndex() + 1, txtReport.getText());
 
         if (tracker.getScenario().hasObjectives()) {
             // process objectives here
@@ -1475,7 +1453,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 new HashMap<>(), getObjectiveUnitCounts());
         choiceStatus.setSelectedIndex(scenarioStatus - 1);
 
-         // do a "dry run" of the scenario objectives to output a report
+        // do a "dry run" of the scenario objectives to output a report
         StringBuilder sb = new StringBuilder();
 
         if (tracker.getScenario().hasObjectives()) {
@@ -1627,40 +1605,38 @@ public class ResolveScenarioWizardDialog extends JDialog {
         //dialog
         OppositionPersonnelStatus pstatus = tracker.getOppositionPersonnel().get(id);
 
-        if (null == pstatus || null == pstatus.getPerson()) {
+        if ((pstatus == null) || (pstatus.getPerson() == null)) {
             return;
         }
 
-        PersonViewPanel pvp = new PersonViewPanel(
-                pstatus.getPerson(),tracker.getCampaign(),tracker.getCampaign().getApp().getCampaigngui());
+        showPerson(pstatus.getPerson(), true);
+    }
 
+    private void showPerson(Person person, boolean isPrisoner) {
         final JDialog dialog = new JDialog(frame, "Prisoner View", true); //$NON-NLS-1$
         dialog.getContentPane().setLayout(new GridBagLayout());
-        JButton btn = new JButton(Messages.getString("Okay")); //$NON-NLS-1$
-        btn.addActionListener(e -> dialog.setVisible(false));
-        dialog.getRootPane().setDefaultButton(btn);
 
-        JScrollPane scrollPersonnelView = new JScrollPane();
-        scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPersonnelView.setViewportView(pvp);
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-
-        //scroll panel
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+
+        //scroll panel
+        JScrollPane scrollPersonnelView = new JScrollPane();
+        scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPersonnelView.setViewportView(new PersonViewPanel(person, tracker.getCampaign(),
+                tracker.getCampaign().getApp().getCampaigngui()));
         dialog.getContentPane().add(scrollPersonnelView, gridBagConstraints);
 
         //Okay button
-        gridBagConstraints.gridx = 0;
+        JButton btn = new JButton(Messages.getString("Okay")); //$NON-NLS-1$
+        btn.addActionListener(e -> dialog.setVisible(false));
+        dialog.getRootPane().setDefaultButton(btn);
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
         dialog.getContentPane().add(btn, gridBagConstraints);
 
         dialog.setMinimumSize(new Dimension(600, 300));
@@ -1708,12 +1684,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private static class CheckBoxKIAListener implements ItemListener {
         private JSlider slider;
         private JCheckBox checkbox;
-        private JButton button;
 
-        public CheckBoxKIAListener(JSlider slider, JCheckBox checkBox, JButton button) {
+        public CheckBoxKIAListener(JSlider slider, JCheckBox checkBox) {
             this.slider = slider;
             this.checkbox = checkBox;
-            this.button = button;
         }
 
         @Override
@@ -1727,10 +1701,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             if (checkbox != null) {
                 checkbox.setEnabled(enable);
-            }
-
-            if (button != null) {
-                button.setEnabled(enable);
             }
         }
     }
