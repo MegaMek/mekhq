@@ -17,6 +17,10 @@ VERSION HISTORY:
 + PR #1762: Advance Days: Increasing Day Count Limit and Adding Advance to Next Year
 + Issue #1662 and 2/3rds of Issue #347: Remember Layered Force Icon Setup
 + PR #1764: Fixing Elemental Portrait Folder
++ PR #1655: Implementing Welsh and Icelandic Patronymic/Matronymics for Baby Surnames
++ PR #1713: Adding Spaced Marriage Surname formats and renaming formats to improve end-user readability
++ PR #1715: Varied Prisoner Status Bugfixes
++ PR #1714: Random Names and Gender Rework
 
 0.47.6 (2020-5-03 1715 UTC)
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
