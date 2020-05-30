@@ -2267,7 +2267,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                         retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("awards")){
+                } else if (wn2.getNodeName().equalsIgnoreCase("awards")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
 

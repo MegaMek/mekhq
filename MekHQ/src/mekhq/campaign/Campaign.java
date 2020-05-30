@@ -3727,7 +3727,7 @@ public class Campaign implements Serializable, ITechManager {
         // Autosave based on the previous day's information
         this.autosaveService.requestDayAdvanceAutosave(this);
 
-        // Advance the day by one - TODO : Swap me to LocalDate tracking instead
+        // Advance the day by one - TODO : LocalDate : Swap me to LocalDate tracking instead
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentDateTime = new DateTime(calendar);
 

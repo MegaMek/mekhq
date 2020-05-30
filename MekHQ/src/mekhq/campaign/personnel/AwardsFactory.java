@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 MegaMek team
+ * Copyright (C) 2018 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -10,18 +10,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +41,6 @@ import mekhq.campaign.AwardSet;
  * This class is responsible to control the awards. It loads one instance of each awards, then it creates a copy of it
  * once it needs to be awarded to someone.
  * @author Miguel Azevedo
- *
  */
 public class AwardsFactory {
     private static final String AWARDS_XML_ROOT_PATH = "data/universe/awards/";
@@ -52,16 +50,16 @@ public class AwardsFactory {
     /**
      * Here is where the blueprints are stored, mapped by set and name.
      */
-    private Map<String, Map<String,Award>> awardsMap;
+    private Map<String, Map<String, Award>> awardsMap;
 
-    private AwardsFactory(){
+    private AwardsFactory() {
         awardsMap = new HashMap<>();
 
         loadAwards();
     }
 
-    public static AwardsFactory getInstance(){
-        if(instance == null){
+    public static AwardsFactory getInstance() {
+        if (instance == null) {
             instance = new AwardsFactory();
         }
 
@@ -71,7 +69,7 @@ public class AwardsFactory {
     /**
      * @return the names of the all the award sets loaded.
      */
-    public List<String> getAllSetNames(){
+    public List<String> getAllSetNames() {
         return new ArrayList<>(awardsMap.keySet());
     }
 
@@ -80,7 +78,7 @@ public class AwardsFactory {
      * @param setName is the name of the set
      * @return list with the awards belonging to that set
      */
-    public List<Award> getAllAwardsForSet(String setName){
+    public List<Award> getAllAwardsForSet(String setName) {
         return new ArrayList<>(awardsMap.get(setName).values());
     }
 
@@ -91,7 +89,7 @@ public class AwardsFactory {
      * @param awardName the name of the award
      * @return list with the awards belonging to that set
      */
-    public Award generateNew(String setName, String awardName){
+    public Award generateNew(String setName, String awardName) {
         Map<String, Award> awardSet = awardsMap.get(setName);
         Award blueprintAward = awardSet.get(awardName);
         return blueprintAward.createCopy();
@@ -102,25 +100,24 @@ public class AwardsFactory {
      * @param node xml node
      * @return an award
      */
-    public Award generateNewFromXML(Node node){
+    public Award generateNewFromXML(Node node) {
         final String METHOD_NAME = "generateNewFromXML(Node)"; //$NON-NLS-1$
-        final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
         String name = null;
         String set = null;
-        ArrayList<Date> dates = new ArrayList<>();
+        List<LocalDate> dates = new ArrayList<>();
 
         try {
             NodeList nl = node.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    dates.add(DATE_FORMAT.parse(wn2.getTextContent().trim()));
+                    dates.add(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     name = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("set")){
+                } else if (wn2.getNodeName().equalsIgnoreCase("set")) {
                     set = wn2.getTextContent();
                 }
             }
@@ -139,7 +136,7 @@ public class AwardsFactory {
      */
     private void loadAwards() {
         File dir = new File(AWARDS_XML_ROOT_PATH);
-        File[] files =  dir.listFiles((dir1, filename) -> filename.endsWith(".xml"));
+        File[] files = dir.listFiles((dir1, filename) -> filename.endsWith(".xml"));
 
         if (files == null) {
             return;
@@ -148,13 +145,13 @@ public class AwardsFactory {
         for (File file : files) {
             try (InputStream inputStream = new FileInputStream(file)) {
                 loadAwardsFromStream(inputStream, file.getName());
-            } catch (IOException e){
+            } catch (IOException e) {
                 MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
             }
         }
     }
 
-    public void loadAwardsFromStream(InputStream inputStream, String fileName){
+    public void loadAwardsFromStream(InputStream inputStream, String fileName) {
         AwardSet awardSet;
 
         try {
@@ -166,7 +163,7 @@ public class AwardsFactory {
             Map<String, Award> tempAwardMap = new HashMap<>();
             String currentSetName = fileName.replaceFirst("[.][^.]+$", "");
             int i = 0;
-            for (Award award : awardSet.getAwards()){
+            for (Award award : awardSet.getAwards()) {
                 award.setId(i);
                 i++;
                 award.setSet(currentSetName);

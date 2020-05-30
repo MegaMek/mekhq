@@ -22,6 +22,7 @@ package mekhq.campaign.log;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 
+import java.time.ZoneId;
 import java.util.Date;
 
 /**
@@ -37,6 +38,8 @@ public class AwardLogEntry extends LogEntry {
     @Override
     public void onLogEntryEdited(Date originalDate, Date newDate, String originalDesc, String newDesc, Person person) {
         Award award = AwardLogger.getAwardFromLogEntry(person, originalDesc);
-        award.replaceDate(originalDate, newDate);
+        // TODO : LocalDate : Replace me with direct LocalDate usage
+        award.replaceDate(originalDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+                newDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
     }
 }

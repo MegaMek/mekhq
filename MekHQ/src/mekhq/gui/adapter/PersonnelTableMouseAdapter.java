@@ -22,7 +22,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
@@ -38,6 +37,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Award;
@@ -59,8 +59,7 @@ import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
 
-public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
-        ActionListener {
+public class PersonnelTableMouseAdapter extends MouseInputAdapter implements ActionListener {
     private static final String CMD_RANKSYSTEM = "RANKSYSTEM"; //$NON-NLS-1$
     private static final String CMD_RANK = "RANK"; //$NON-NLS-1$
     private static final String CMD_MANEI_DOMINI_RANK = "MD_RANK"; //$NON-NLS-1$
@@ -151,14 +150,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter", new EncodeControl()); //$NON-NLS-1$
     }
 
-    //Mechwarrior Edge Options
+    // MechWarrior Edge Options
     private static final String OPT_EDGE_MASC_FAILURE = "edge_when_masc_fails"; //$NON-NLS-1$
     private static final String OPT_EDGE_EXPLOSION = "edge_when_explosion"; //$NON-NLS-1$
     private static final String OPT_EDGE_KO = "edge_when_ko"; //$NON-NLS-1$
     private static final String OPT_EDGE_TAC = "edge_when_tac"; //$NON-NLS-1$
     private static final String OPT_EDGE_HEADHIT = "edge_when_headhit"; //$NON-NLS-1$
 
-    //Aero Edge Options
+    // Aero Edge Options
     private static final String OPT_EDGE_WHEN_AERO_ALT_LOSS= "edge_when_aero_alt_loss"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_EXPLOSION= "edge_when_aero_explosion"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_KO= "edge_when_aero_ko"; //$NON-NLS-1$
@@ -511,17 +510,18 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_ADD_AWARD: {
                 for (Person person : people) {
-                    person.getAwardController().addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+                    person.getAwardController().addAndLogAward(data[1], data[2],
+                            gui.getCampaign().getLocalDate());
                 }
                 break;
             }
             case CMD_RMV_AWARD: {
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 for (Person person : people) {
                     try {
                         if (person.getAwardController().hasAward(data[1], data[2])) {
                             person.getAwardController().removeAward(data[1], data[2],
-                                    (data.length > 3) ? df.parse(data[3]) : null, gui.getCampaign().getDate());
+                                    (data.length > 3) ? LocalDate.parse(data[3]) : null,
+                                    gui.getCampaign().getLocalDate());
                         }
                     } catch (Exception e) {
                         MekHQ.getLogger().error(getClass(), "actionPerformed", "Could not remove award.", e);
@@ -2009,7 +2009,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 if (oneSelected) {
                     for (Award award : person.getAwardController().getAwards()) {
                         JMenu singleAwardMenu = new JMenu(award.getName());
-                        for (String date : award.getFormatedDates()) {
+                        for (String date : award.getFormattedDates(gui.getCampaign())) {
                             JMenuItem specificAwardMenu = new JMenuItem(date);
                             specificAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), date));
                             specificAwardMenu.addActionListener(this);
