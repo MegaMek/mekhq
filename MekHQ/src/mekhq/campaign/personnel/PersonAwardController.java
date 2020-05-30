@@ -18,13 +18,12 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.AwardLogger;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -102,7 +101,7 @@ public class PersonAwardController {
      * @param awardName is the name of the award
      * @param date is the date it was awarded
      */
-    public void addAndLogAward(String setName, String awardName, Date date) {
+    public void addAndLogAward(String setName, String awardName, LocalDate date) {
         Award award;
         if (hasAward(setName, awardName)) {
             award = getAward(setName, awardName);
@@ -141,7 +140,7 @@ public class PersonAwardController {
      * @param awardedDate is the date it was awarded, or null if it is to be bulk removed
      * @param currentDate is the current date
      */
-    public void removeAward(String setName, String awardName, Date awardedDate, Date currentDate) {
+    public void removeAward(String setName, String awardName, LocalDate awardedDate, LocalDate currentDate) {
         for (Award award : awards) {
             if (award.equals(setName, awardName)) {
                 if ((awardedDate != null) && award.hasDates()) {
@@ -149,7 +148,8 @@ public class PersonAwardController {
                 } else {
                     awards.remove(award);
                 }
-                AwardLogger.removedAward(person, currentDate, award);
+                // TODO : LocalDate : Replace me with direct LocalDate usage
+                AwardLogger.removedAward(person, Date.from(currentDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()), award);
                 MekHQ.triggerEvent(new PersonChangedEvent(person));
                 return;
             }
@@ -160,8 +160,9 @@ public class PersonAwardController {
      * Adds an entry log for a given award.
      * @param award that was given.
      */
-    public void logAward(Award award, Date date) {
-        AwardLogger.award(person, date, award);
+    public void logAward(Award award, LocalDate date) {
+        // TODO : LocalDate : Replace me with direct LocalDate usage
+        AwardLogger.award(person, Date.from(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()), award);
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 

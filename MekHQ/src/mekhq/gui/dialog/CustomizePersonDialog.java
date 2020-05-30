@@ -21,6 +21,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.common.enums.Gender;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
+import megamek.common.AmmoType;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
 import megamek.common.WeaponType;
@@ -1132,11 +1133,21 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         DialogOptionComponent optionComp = new DialogOptionComponent(this, option, editable);
 
         if (OptionsConstants.GUNNERY_WEAPON_SPECIALIST.equals(option.getName())) { //$NON-NLS-1$
-            optionComp.addValue("None"); //$NON-NLS-1$
+            optionComp.addValue(Crew.SPECIAL_NONE);
             //holy crap, do we really need to add every weapon?
             for (Enumeration<EquipmentType> i = EquipmentType.getAllTypes(); i.hasMoreElements();) {
                 EquipmentType etype = i.nextElement();
-                if (etype instanceof WeaponType) {
+                if (SpecialAbility.isWeaponEligibleForSPA(etype, person.getPrimaryRole(), false)) {
+                    optionComp.addValue(etype.getName());
+                }
+            }
+            optionComp.setSelected(option.stringValue());
+        } else if (OptionsConstants.GUNNERY_SANDBLASTER.equals(option.getName())) { //$NON-NLS-1$
+            optionComp.addValue(Crew.SPECIAL_NONE);
+            //holy crap, do we really need to add every weapon?
+            for (Enumeration<EquipmentType> i = EquipmentType.getAllTypes(); i.hasMoreElements();) {
+                EquipmentType etype = i.nextElement();
+                if (SpecialAbility.isWeaponEligibleForSPA(etype, person.getPrimaryRole(), true)) {
                     optionComp.addValue(etype.getName());
                 }
             }

@@ -2102,7 +2102,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        resetDaysToWait();
         return "<font color='red'> refit kit not found.</font>";
 
     }

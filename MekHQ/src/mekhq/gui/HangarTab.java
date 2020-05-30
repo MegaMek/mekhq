@@ -345,6 +345,7 @@ public final class HangarTab extends CampaignGuiTab {
     @Override
     public void refreshAll() {
         refreshUnitList();
+        refreshAcquisitionList();
     }
 
     public void filterUnits() {
