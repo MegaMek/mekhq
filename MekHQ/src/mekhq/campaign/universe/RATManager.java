@@ -43,7 +43,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.client.RandomUnitGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.Compute;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;

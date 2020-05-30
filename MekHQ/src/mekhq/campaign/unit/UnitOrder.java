@@ -215,7 +215,6 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public String failToFind() {
-        resetDaysToWait();
         return "<font color='red'><b> unit not found</b>.</font>";
     }
 

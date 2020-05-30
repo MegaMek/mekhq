@@ -59,7 +59,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     public AmmoStorage(int tonnage, EquipmentType et, int shots, Campaign c) {
-        super(tonnage, et, -1, c);
+        super(tonnage, et, -1, 1.0, c);
         this.shots = shots;
         if(null != type && type instanceof AmmoType) {
         	this.munition = ((AmmoType)type).getMunitionType();
@@ -283,7 +283,6 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        resetDaysToWait();
         return "<font color='red'><b> part not found</b>.</font>";
     }
 

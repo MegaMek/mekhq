@@ -108,7 +108,12 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             person.getOptions()
                 .acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     SpecialAbility.chooseWeaponSpecialization(person.getPrimaryRole(), person.getOriginFaction().isClan(),
-                            getCampaignOptions(person).getTechLevel(), person.getCampaign().getGameYear()));
+                            getCampaignOptions(person).getTechLevel(), person.getCampaign().getGameYear(), false));
+        } else if (name.equals(OptionsConstants.GUNNERY_SANDBLASTER)) {
+            person.getOptions()
+                .acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
+                    SpecialAbility.chooseWeaponSpecialization(person.getPrimaryRole(), person.getOriginFaction().isClan(),
+                            getCampaignOptions(person).getTechLevel(), person.getCampaign().getGameYear(), true));
         } else {
             person.getOptions()
                 .acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, true);

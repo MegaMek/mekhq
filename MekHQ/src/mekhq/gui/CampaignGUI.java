@@ -49,7 +49,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import chat.ChatClient;
-import megamek.client.RandomUnitGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.common.Dropship;
 import megamek.common.Entity;
@@ -1271,13 +1271,11 @@ public class CampaignGUI extends JPanel {
         Vector<Unit> notMaintained = new Vector<>();
         int totalAstechMinutesNeeded = 0;
         for (Unit u : getCampaign().getUnits()) {
-            if (u.requiresMaintenance() && null == u.getTech()) {
+            if (u.requiresMaintenance() && (u.getTech() == null)) {
                 notMaintained.add(u);
-            } else {
-                // only add astech minutes for non-crewed units
-                if (null == u.getEngineer()) {
-                    totalAstechMinutesNeeded += (u.getMaintenanceTime() * 6);
-                }
+            } else if (u.isPresent() && (u.getEngineer() == null)) {
+                // only add astech minutes for non-crewed units who are present
+                totalAstechMinutesNeeded += (u.getMaintenanceTime() * 6);
             }
         }
 
@@ -2096,7 +2094,7 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (p != null) {
-                    getCampaign().recruitPerson(p, p.isPrisoner(), p.isDependent(), true, true);
+                    getCampaign().recruitPerson(p, true);
 
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have

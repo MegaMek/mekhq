@@ -32,11 +32,12 @@ import java.util.GregorianCalendar;
 import java.util.UUID;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.client.RandomSkillsGenerator;
-import megamek.client.RandomUnitGenerator;
+import megamek.client.generator.RandomSkillsGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.MechFileParser;
@@ -677,7 +678,7 @@ public class AtBContract extends Contract implements Serializable {
                 c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
                 for (int i = 0; i < number; i++) {
                     Person p = c.newDependent(Person.T_ASTECH, false);
-                    c.recruitPerson(p, false, true, false, true);
+                    c.recruitPerson(p);
                 }
             }
             break;

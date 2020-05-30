@@ -1660,7 +1660,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             crew.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<crewMember slot=\"")
                     .append(pos).append("\" name=\"").append(MekHqXmlUtil.escape(tgtEnt.getCrew().getName(pos)))
                     .append("\" nick=\"").append(MekHqXmlUtil.escape(tgtEnt.getCrew().getNickname(pos)))
-                    .append("\" gender=\"").append(tgtEnt.getCrew().getGender(pos))
+                    .append("\" gender=\"").append(tgtEnt.getCrew().getGender(pos).name())
                     .append("\" gunnery=\"").append(tgtEnt.getCrew().getGunnery(pos))
                     .append("\" piloting=\"").append(tgtEnt.getCrew().getPiloting(pos));
 

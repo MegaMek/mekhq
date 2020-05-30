@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.generator;
 
 import java.util.Objects;
 
+import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.universe.AbstractFactionSelector;
@@ -75,7 +76,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
     }
 
     @Override
-    public Person generate(Campaign campaign, int primaryRole, int secondaryRole, int gender) {
+    public Person generate(Campaign campaign, int primaryRole, int secondaryRole, Gender gender) {
         Person person = createPerson(campaign);
 
         person.setPrimaryRole(primaryRole);
@@ -98,7 +99,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         specialAbilityGenerator.generateSpecialAbilities(person, expLvl);
 
         // Do naming at the end, to ensure the keys are set
-        generateName(person, gender);
+        generateName(campaign, person, gender);
 
         //check for Bloodname
         if (person.isClanner()) {

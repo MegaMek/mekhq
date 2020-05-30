@@ -287,7 +287,7 @@ public class MedicalViewDialog extends JDialog {
         if(null != doll) {
             doll.removeActionListener(dollActionListener);
         }
-        doll = person.isMale() ? defaultMaleDoll : defaultFemaleDoll;
+        doll = person.getGender().isMale() ? defaultMaleDoll : defaultFemaleDoll;
         doll.clearLocColors();
         doll.clearLocTags();
         doll.setHighlightColor(new Color(170, 170, 255));
@@ -369,7 +369,7 @@ public class MedicalViewDialog extends JDialog {
         panel.add(genWrittenPanel(String.format(resourceMap.getString("age.format"), age.getYears(), age.getMonths()))); //$NON-NLS-1$
         panel.add(genLabel(resourceMap.getString("gender.text"))); //$NON-NLS-1$
         panel.add(genLabel(resourceMap.getString("phenotype.text"))); //$NON-NLS-1$
-        panel.add(genWrittenPanel(p.isMale() ? resourceMap.getString("genderMale.text") : resourceMap.getString("genderFemale.text"))); //$NON-NLS-1$ //$NON-NLS-2$
+        panel.add(genWrittenPanel(p.getGender().isMale() ? resourceMap.getString("genderMale.text") : resourceMap.getString("genderFemale.text"))); //$NON-NLS-1$ //$NON-NLS-2$
         panel.add(genWrittenPanel(phenotype));
         panel.add(genLabel(resourceMap.getString("assignedTo.text"))); //$NON-NLS-1$
         panel.add(genLabel("")); //$NON-NLS-1$

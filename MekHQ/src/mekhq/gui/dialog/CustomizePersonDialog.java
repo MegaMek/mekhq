@@ -10,7 +10,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -18,10 +17,11 @@ import java.util.stream.Collectors;
 
 import javax.swing.*;
 
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-
+import megamek.client.generator.RandomNameGenerator;
+import megamek.common.enums.Gender;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
+import megamek.common.AmmoType;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
 import megamek.common.WeaponType;
@@ -73,7 +73,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private JButton btnDate;
     private JButton btnServiceDate;
     private JButton btnRankDate;
-    private javax.swing.JComboBox<String> choiceGender;
+    private JComboBox<Gender> choiceGender;
     private javax.swing.JLabel lblAge;
     private javax.swing.JPanel panSkills;
     private javax.swing.JPanel panOptions;
@@ -123,7 +123,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         initComponents();
     }
 
-    @SuppressWarnings("serial")
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
@@ -144,7 +143,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         textBloodname = new javax.swing.JTextField();
         textToughness = new javax.swing.JTextField();
         JLabel lblToughness = new JLabel();
-        choiceGender = new javax.swing.JComboBox<>();
         JScrollPane scrOptions = new JScrollPane();
         panOptions = new javax.swing.JPanel();
         JScrollPane scrSkills = new JScrollPane();
@@ -286,12 +284,14 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblGender, gridBagConstraints);
 
-        DefaultComboBoxModel<String> genderModel = new DefaultComboBoxModel<>();
-        genderModel.addElement(GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(Crew.G_MALE));
-        genderModel.addElement(GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(Crew.G_FEMALE));
-        choiceGender.setModel(genderModel);
+        DefaultComboBoxModel<Gender> genderModel = new DefaultComboBoxModel<>();
+        for (Gender gender : Gender.getExternalOptions()) {
+            genderModel.addElement(gender);
+        }
+        choiceGender = new JComboBox<>(genderModel);
         choiceGender.setName("choiceGender"); // NOI18N
-        choiceGender.setSelectedIndex(person.getGender());
+        choiceGender.setSelectedItem(person.getGender().isExternal() ? person.getGender()
+                : person.getGender().getExternalVariant());
         choiceGender.addActionListener(evt -> randomName());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -896,7 +896,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         person.setCallsign(textNickname.getText());
         person.setBloodname(textBloodname.getText());
         person.setBiography(txtBio.getText());
-        person.setGender(choiceGender.getSelectedIndex());
+        if (choiceGender.getSelectedItem() != null) {
+            person.setGender(person.getGender().isInternal()
+                    ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant()
+                    : (Gender) choiceGender.getSelectedItem());
+        }
         person.setBirthday(birthdate);
         person.setRecruitment(recruitment);
         person.setLastRankChangeDate(lastRankChangeDate);
@@ -924,9 +928,12 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }//GEN-LAST:event_btnOkActionPerformed
 
     private void randomName() {
-        String[] name = campaign.getRNG().generateGivenNameSurnameSplit(
-                choiceGender.getSelectedIndex() == Crew.G_FEMALE,
-                person.isClanner(), person.getOriginFaction().getShortName());
+        String factionCode = campaign.getCampaignOptions().useOriginFactionForNames()
+                ? person.getOriginFaction().getShortName()
+                : RandomNameGenerator.getInstance().getChosenFaction();
+
+        String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
+                (Gender) choiceGender.getSelectedItem(), person.isClanner(), factionCode);
         textGivenName.setText(name[0]);
         textSurname.setText(name[1]);
     }
@@ -1126,11 +1133,21 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         DialogOptionComponent optionComp = new DialogOptionComponent(this, option, editable);
 
         if (OptionsConstants.GUNNERY_WEAPON_SPECIALIST.equals(option.getName())) { //$NON-NLS-1$
-            optionComp.addValue("None"); //$NON-NLS-1$
+            optionComp.addValue(Crew.SPECIAL_NONE);
             //holy crap, do we really need to add every weapon?
             for (Enumeration<EquipmentType> i = EquipmentType.getAllTypes(); i.hasMoreElements();) {
                 EquipmentType etype = i.nextElement();
-                if (etype instanceof WeaponType) {
+                if (SpecialAbility.isWeaponEligibleForSPA(etype, person.getPrimaryRole(), false)) {
+                    optionComp.addValue(etype.getName());
+                }
+            }
+            optionComp.setSelected(option.stringValue());
+        } else if (OptionsConstants.GUNNERY_SANDBLASTER.equals(option.getName())) { //$NON-NLS-1$
+            optionComp.addValue(Crew.SPECIAL_NONE);
+            //holy crap, do we really need to add every weapon?
+            for (Enumeration<EquipmentType> i = EquipmentType.getAllTypes(); i.hasMoreElements();) {
+                EquipmentType etype = i.nextElement();
+                if (SpecialAbility.isWeaponEligibleForSPA(etype, person.getPrimaryRole(), true)) {
                     optionComp.addValue(etype.getName());
                 }
             }

@@ -529,7 +529,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * moment because I have made so many other changes in this version.
      */
     public void runDiagnostic(boolean checkForDestruction) {
-
         //need to set up an array of part ids to avoid concurrent modification
         //problems because some updateCondition methods will remove the part and put
         //in a new one
@@ -1083,7 +1082,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //We need to adjust this for equipment that doesn't show up as parts
         //Docking collars, Grav decks, KF Drive - Now parts
         //Drive unit - see SpacecraftEngine
-        if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             if (entity instanceof SmallCraft) {
                 //JS/SS/WS Bridge, Computer - see CombatInformationCenter
                 //bridge
@@ -1151,7 +1150,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
 
         //protomeks: heat sinks can't be hit
-        if(entity instanceof Protomech) {
+        if (entity instanceof Protomech) {
             int sinks = 0;
             for (Mounted mount : entity.getWeaponList()) {
                 if (mount.getType().hasFlag(WeaponType.F_ENERGY)) {
@@ -2720,7 +2719,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     Part[] eparts = baEquipParts.get(eqnum);
                     for(int i = 0; i < ((BattleArmor)entity).getSquadSize(); i++) {
                         if(null == eparts || null == eparts[i]) {
-                            Part epart = new BattleArmorEquipmentPart((int)entity.getWeight(), type, eqnum, i+BattleArmor.LOC_TROOPER_1, getCampaign());
+                            Part epart = new BattleArmorEquipmentPart((int) entity.getWeight(), type, eqnum,
+                                    m.getSize(), i+BattleArmor.LOC_TROOPER_1, getCampaign());
                             addPart(epart);
                             partsToAdd.add(epart);
                         }
@@ -2740,10 +2740,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                             //weapon bays aren't real parts
                             continue;
                         }
-                        epart = new EquipmentPart((int)entity.getWeight(), type, eqnum,
+                        epart = new EquipmentPart((int) entity.getWeight(), type, eqnum, m.getSize(),
                                 m.isOmniPodMounted(), getCampaign());
                         if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
-                            epart = new MASC((int)entity.getWeight(), type, eqnum, getCampaign(),
+                            epart = new MASC((int) entity.getWeight(), type, eqnum, getCampaign(),
                                     erating, m.isOmniPodMounted());
                         }
                         addPart(epart);
@@ -3168,7 +3168,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if(null == infantryArmor) {
                 EquipmentType eq = ((Infantry)entity).getArmorKit();
                 if (null != eq) {
-                    infantryArmor = new EquipmentPart(0, eq, 0, false, getCampaign());
+                    infantryArmor = new EquipmentPart(0, eq, 0, 1.0, false, getCampaign());
                 } else {
                     infantryArmor = new InfantryArmorPart(0, getCampaign(), ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
                 }
@@ -4314,7 +4314,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private void ensurePersonIsRegistered(Person p) {
         Objects.requireNonNull(p);
         if (null == getCampaign().getPerson(p.getId())) {
-            getCampaign().recruitPerson(p, p.isPrisoner(), p.isDependent(), true,  false);
+            getCampaign().recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), true,  false);
             MekHQ.getLogger().log(Unit.class, "ensurePersonIsRegistered(Person)", LogLevel.WARNING,
                 String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
         }

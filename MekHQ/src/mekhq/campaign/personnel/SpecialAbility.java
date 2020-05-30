@@ -47,6 +47,9 @@ import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import megamek.common.weapons.InfantryAttack;
+import megamek.common.weapons.autocannons.ACWeapon;
+import megamek.common.weapons.autocannons.LBXACWeapon;
+import megamek.common.weapons.autocannons.UACWeapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
@@ -577,58 +580,39 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return implants.get(name);
     }
 
-    public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year) {
+    public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year, boolean clusterOnly) {
         ArrayList<String> candidates = new ArrayList<>();
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
-            if(!(et instanceof WeaponType)) {
+            
+            if(!isWeaponEligibleForSPA(et, type, clusterOnly)) {
                 continue;
             }
-            if(et instanceof InfantryWeapon
-                    || et instanceof BayWeapon
-                    || et instanceof InfantryAttack) {
-                continue;
-            }
-            WeaponType wt = (WeaponType)et;
-            if(wt.isCapital()
-                    || wt.isSubCapital()
-                    || wt.hasFlag(WeaponType.F_INFANTRY)
-                    || wt.hasFlag(WeaponType.F_ONESHOT)
-                    || wt.hasFlag(WeaponType.F_PROTOTYPE)) {
-                continue;
-            }
-            if(!((wt.hasFlag(WeaponType.F_MECH_WEAPON) && type == Person.T_MECHWARRIOR)
-                    || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && type != Person.T_AERO_PILOT)
-                    || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !(type == Person.T_VEE_GUNNER
-                            || type == Person.T_NVEE_DRIVER
-                            || type == Person.T_GVEE_DRIVER
-                            || type == Person.T_VTOL_PILOT))
-                    || (wt.hasFlag(WeaponType.F_BA_WEAPON) && type != Person.T_BA)
-                    || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && type != Person.T_PROTO_PILOT))) {
-                continue;
-            }
-            if(wt.getAtClass() == WeaponType.CLASS_NONE ||
-                    wt.getAtClass() == WeaponType.CLASS_POINT_DEFENSE ||
-                    wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER) {
-                continue;
-            }
+            
+            WeaponType wt = (WeaponType) et;
+            
             if(TechConstants.isClan(wt.getTechLevel(year)) != isClan) {
                 continue;
             }
+            
             int lvl = wt.getTechLevel(year);
             if(lvl < 0) {
                 continue;
             }
+            
             if(techLvl < Utilities.getSimpleTechLevel(lvl)) {
                 continue;
             }
+            
             if(techLvl == TechConstants.T_IS_UNOFFICIAL) {
                 continue;
             }
+            
             int ntimes = 10;
             if(techLvl >= TechConstants.T_IS_ADVANCED) {
                 ntimes = 1;
             }
+            
             while(ntimes > 0) {
                 candidates.add(et.getName());
                 ntimes--;
@@ -638,6 +622,60 @@ public class SpecialAbility implements MekHqXmlSerializable {
             return "??";
         }
         return Utilities.getRandomItem(candidates);
+    }
+    
+    /**
+     * Worker function that determines if a piece of equipment is eligible 
+     * for being selected for an SPA.
+     * @param et Equipment type to check
+     * @param type Person role, e.g. Person.T_MECHWARRIOR. This check is ignored if Person.T_NONE is passed in.
+     * @param clusterOnly All weapon types or just ones that do rolls on the cluster table
+     */
+    public static boolean isWeaponEligibleForSPA(EquipmentType et, int type, boolean clusterOnly) {
+        if(!(et instanceof WeaponType)) {
+            return false;
+        }
+        if(et instanceof InfantryWeapon
+                || et instanceof BayWeapon
+                || et instanceof InfantryAttack) {
+            return false;
+        }
+        WeaponType wt = (WeaponType)et;
+        if(wt.isCapital()
+                || wt.isSubCapital()
+                || wt.hasFlag(WeaponType.F_INFANTRY)
+                || wt.hasFlag(WeaponType.F_ONESHOT)
+                || wt.hasFlag(WeaponType.F_PROTOTYPE)) {
+            return false;
+        }
+        
+        if(type > Person.T_NONE && 
+                !((wt.hasFlag(WeaponType.F_MECH_WEAPON) && type == Person.T_MECHWARRIOR)
+                || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && type != Person.T_AERO_PILOT)
+                || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !(type == Person.T_VEE_GUNNER
+                        || type == Person.T_NVEE_DRIVER
+                        || type == Person.T_GVEE_DRIVER
+                        || type == Person.T_VTOL_PILOT))
+                || (wt.hasFlag(WeaponType.F_BA_WEAPON) && type != Person.T_BA)
+                || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && type != Person.T_PROTO_PILOT))) {
+            return false;
+        }
+        
+        if(wt.getAtClass() == WeaponType.CLASS_NONE ||
+                wt.getAtClass() == WeaponType.CLASS_POINT_DEFENSE ||
+                wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER) {
+            return false;
+        }
+        
+        if(clusterOnly && !(
+                (wt.getDamage() == WeaponType.DAMAGE_BY_CLUSTERTABLE) ||
+                (wt instanceof ACWeapon) ||
+                (wt instanceof UACWeapon) ||
+                (wt instanceof LBXACWeapon))) {
+            return false;
+        }
+        
+        return true;
     }
 
     public String getAllPrereqDesc() {
