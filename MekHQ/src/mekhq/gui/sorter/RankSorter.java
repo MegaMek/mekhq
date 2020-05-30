@@ -10,8 +10,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 
- /**
+/**
      * A comparator for ranks written as strings with "-" sorted to the bottom always
      * @author Jay Lawson
      *
@@ -43,12 +44,13 @@ import mekhq.campaign.personnel.Ranks;
 	        	// the rank orders match, try comparing the levels
 	        	if (p0.getRankNumeric() == p1.getRankNumeric()) {
 	        	    // For prisoners: Sort those willing to defect "above" those who don't
-	        	    if(p0.getRankNumeric() == Ranks.RANK_PRISONER) {
-	        	        return Boolean.compare(p0.isWillingToDefect(), p1.isWillingToDefect());
+	        	    if (p0.getRankNumeric() == Ranks.RANK_PRISONER) {
+	        	        return Boolean.compare(p0.getPrisonerStatus().isWillingToDefect(),
+                                p1.getPrisonerStatus().isWillingToDefect());
 	        	    }
 	        		// the levels match too, try comparing MD rank
 	        		if (p0.getRankLevel() == p1.getRankLevel()) {
-	        		    if(p0.getManeiDominiRank() == p1.getManeiDominiRank()) {
+	        		    if (p0.getManeiDominiRank() == p1.getManeiDominiRank()) {
 	        		        return s0.compareTo(s1);
 	        		    }
 	        		    return Integer.compare(p0.getManeiDominiRank(), p1.getManeiDominiRank());

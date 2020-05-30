@@ -37,7 +37,6 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Award;
@@ -162,11 +161,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
     private static final String OPT_EDGE_WHEN_AERO_LUCKY_CRIT= "edge_when_aero_lucky_crit"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_NUKE_CRIT= "edge_when_aero_nuke_crit"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST= "edge_when_aero_unit_cargo_lost"; //$NON-NLS-1$
-
-    private static final String OPT_PRISONER_FREE = "free"; //$NON-NLS-1$
-    private static final String OPT_PRISONER_IMPRISONED = "imprisoned"; //$NON-NLS-1$
-    private static final String OPT_PRISONER_IMPRISONED_DEFECTING = "imprisoned_defecting"; //$NON-NLS-1$
-    private static final String OPT_PRISONER_BONDSMAN = "bondsman"; //$NON-NLS-1$
 
     private static final int MAX_POPUP_ITEMS = 20;
 
@@ -638,31 +632,23 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_CHANGE_PRISONER_STATUS: {
-                String selected = data[1];
-                for (Person person : people) {
-                    switch (selected) {
-                        case OPT_PRISONER_FREE:
-                            gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_NOT);
-                            break;
-                        case OPT_PRISONER_IMPRISONED:
-                            gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_YES);
-                            break;
-                        case OPT_PRISONER_IMPRISONED_DEFECTING:
-                            gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_YES);
-                            person.setWillingToDefect(true);
-                            break;
-                        case OPT_PRISONER_BONDSMAN:
-                            gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_BONDSMAN);
-                            break;
-                        default:
-                            // U WOT M8?
-                            break;
+                try {
+                    PrisonerStatus status = PrisonerStatus.valueOf(data[1]);
+                    for (Person person : people) {
+                        person.setPrisonerStatus(status);
                     }
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(getClass(), "actionPerformed",
+                            "Unknown PrisonerStatus Option. No changes will be made.", e);
                 }
                 break;
             }
             case CMD_IMPRISON: {
-                gui.getCampaign().changePrisonerStatus(selectedPerson, Person.PRISONER_YES);
+                for (Person person : people) {
+                    if (!person.getPrisonerStatus().isPrisoner()) {
+                        person.setPrisonerStatus(PrisonerStatus.PRISONER);
+                    }
+                }
                 break;
             }
             case CMD_FREE: {
@@ -679,8 +665,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
             case CMD_RECRUIT: {
                 for (Person person : people) {
-                    if (StaticChecks.isWillingToDefect(person)) {
-                        gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_NOT);
+                    if (person.getPrisonerStatus().isWillingToDefect()) {
+                        person.setPrisonerStatus(PrisonerStatus.FREE);
                     }
                 }
                 break;
@@ -1357,9 +1343,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
             popup.add(menu);
 
-            if (oneSelected) {
-                popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON, person.isFree())); //$NON-NLS-1$
-                popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE, !person.isFree())); //$NON-NLS-1$
+            if (StaticChecks.areAnyFree(selected)) {
+                popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON));
+            }
+
+            if (oneSelected && !person.getPrisonerStatus().isFree()) {
+                popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE));
             }
 
             if (gui.getCampaign().getCampaignOptions().getUseAtB()
@@ -1472,7 +1461,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 int unitType = -1;
                 int weightClass = -1;
 
-                if (oneSelected && person.isActive() && person.isFree()) {
+                if (oneSelected && person.isActive() && person.getPrisonerStatus().isFree()) {
                     for (Unit unit : gui.getCampaign().getUnits(true, true, true)) {
                         if (!unit.isAvailable()) {
                             continue;
@@ -1825,10 +1814,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     for (Person ps : personnel) {
                         if (person.safeSpouse(ps, gui.getCampaign())) {
                             String pStatus;
-                            if (ps.isBondsman()) {
+
+                            if (ps.getPrisonerStatus().isBondsman()) {
                                 pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"),
                                         ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
-                            } else if (ps.isPrisoner()) {
+                            } else if (ps.getPrisonerStatus().isPrisoner()) {
                                 pStatus = String.format(resourceMap.getString("marriagePrisonerDesc.format"),
                                         ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             } else {
@@ -2654,21 +2644,21 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
 
                 menuItem = new JMenu(resourceMap.getString("changePrisonerStatus.text")); //$NON-NLS-1$
                 menuItem.add(newCheckboxMenu(
-                        Person.getPrisonerStatusName(Person.PRISONER_NOT),
-                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_FREE),
-                        person.getPrisonerStatus() == Person.PRISONER_NOT));
+                        PrisonerStatus.FREE.toString(),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.FREE.name()),
+                        (person.getPrisonerStatus() == PrisonerStatus.FREE)));
                 menuItem.add(newCheckboxMenu(
-                        Person.getPrisonerStatusName(Person.PRISONER_YES),
-                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED),
-                        (person.getPrisonerStatus() == Person.PRISONER_YES) && !person.isWillingToDefect()));
+                        PrisonerStatus.PRISONER.toString(),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.PRISONER.name()),
+                        (person.getPrisonerStatus() == PrisonerStatus.PRISONER)));
                 menuItem.add(newCheckboxMenu(
-                        resourceMap.getString("prisonerWillingToDefect.text"), //$NON-NLS-1$
-                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED_DEFECTING),
-                        (person.getPrisonerStatus() == Person.PRISONER_YES) && person.isWillingToDefect()));
+                        PrisonerStatus.PRISONER_DEFECTOR.toString(),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.PRISONER_DEFECTOR.name()),
+                        (person.getPrisonerStatus() == PrisonerStatus.PRISONER_DEFECTOR)));
                 menuItem.add(newCheckboxMenu(
-                        Person.getPrisonerStatusName(Person.PRISONER_BONDSMAN),
-                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_BONDSMAN),
-                        person.getPrisonerStatus() == Person.PRISONER_BONDSMAN));
+                        PrisonerStatus.BONDSMAN.toString(),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.BONDSMAN.name()),
+                        (person.getPrisonerStatus() == PrisonerStatus.BONDSMAN)));
                 menu.add(menuItem);
 
                 menuItem = new JMenuItem(resourceMap.getString("removePerson.text")); //$NON-NLS-1$
