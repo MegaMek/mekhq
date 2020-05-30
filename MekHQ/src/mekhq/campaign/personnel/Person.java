@@ -2003,25 +2003,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    // TODO : remove inline migration
-                    if (version.isLowerThan("0.47.6")) {
-                        switch (Integer.parseInt(wn2.getTextContent())) {
-                            case 1:
-                                retVal.status = PersonnelStatus.RETIRED;
-                                break;
-                            case 2:
-                                retVal.status = PersonnelStatus.KIA;
-                                break;
-                            case 3:
-                                retVal.status = PersonnelStatus.MIA;
-                                break;
-                            default:
-                                retVal.status = PersonnelStatus.ACTIVE;
-                                break;
-                        }
-                    } else {
-                        retVal.status = PersonnelStatus.valueOf(wn2.getTextContent());
-                    }
+                    retVal.status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerStatus")) {
                     retVal.prisonerStatus = PrisonerStatus.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) { // Legacy
