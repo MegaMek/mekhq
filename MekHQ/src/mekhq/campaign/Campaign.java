@@ -1634,9 +1634,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Person getPerson(UUID id) {
-        if (id == null) {
-            return null;
-        }
         return personnel.get(id);
     }
 
@@ -2709,9 +2706,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return true if your target roll succeeded.
      */
     public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, PlanetarySystem system) {
-        if (person.getAcquisitions() >= getCampaignOptions().getMaxAcquisitions()) {
-            return false;
-        }
+
         DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
         TargetRoll target = getTargetForAcquisition(acquisition, person, false);
         target = system.getPrimaryPlanet().getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
@@ -3536,7 +3531,7 @@ public class Campaign implements Serializable, ITechManager {
 
             // Random Marriages
             if (getCampaignOptions().useRandomMarriages()) {
-                p.randomMarriage();
+                p.randomMarriage(this);
             }
 
             p.resetMinutesLeft();
@@ -3712,7 +3707,7 @@ public class Campaign implements Serializable, ITechManager {
         // Autosave based on the previous day's information
         this.autosaveService.requestDayAdvanceAutosave(this);
 
-        // Advance the day by one - TODO : Swap me to LocalDate tracking instead
+        // Advance the day by one - TODO : LocalDate : Swap me to LocalDate tracking instead
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentDateTime = new DateTime(calendar);
 
@@ -6375,8 +6370,8 @@ public class Campaign implements Serializable, ITechManager {
         p.addLogEntry(entry);
     }
 
-    private ArrayList<String> getPossibleRandomPortraits (DirectoryItems portraits, ArrayList<String> existingPortraits, String subDir ) {
-        ArrayList<String> possiblePortraits = new ArrayList<>();
+    private List<String> getPossibleRandomPortraits (DirectoryItems portraits, List<String> existingPortraits, String subDir ) {
+        List<String> possiblePortraits = new ArrayList<>();
         Iterator<String> categories = portraits.getCategoryNames();
         while (categories.hasNext()) {
             String category = categories.next();
@@ -6398,7 +6393,7 @@ public class Campaign implements Serializable, ITechManager {
     public void assignRandomPortraitFor(Person p) {
         // first create a list of existing portrait strings, so we can check for
         // duplicates
-        ArrayList<String> existingPortraits = new ArrayList<>();
+        List<String> existingPortraits = new ArrayList<>();
         for (Person existingPerson : this.getPersonnel()) {
             existingPortraits.add(existingPerson.getPortraitCategory() + ":"
                     + existingPerson.getPortraitFileName());
@@ -6414,7 +6409,7 @@ public class Campaign implements Serializable, ITechManager {
             MekHQ.getLogger().error(getClass(), "assignRandomPortraitFor", e);
             return;
         }
-        ArrayList<String> possiblePortraits;
+        List<String> possiblePortraits;
 
         // Will search for portraits in the /gender/primaryrole folder first,
         // and if none are found then /gender/rolegroup, then /gender/combat or
@@ -6425,7 +6420,7 @@ public class Campaign implements Serializable, ITechManager {
         } else {
             searchCat_Gender += "Male/";
         }
-        String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
+        String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), true) + "/";
         String searchCat_RoleGroup = "";
         String searchCat_CombatSupport = "";
         if (p.getPrimaryRole() == Person.T_ADMIN_COM

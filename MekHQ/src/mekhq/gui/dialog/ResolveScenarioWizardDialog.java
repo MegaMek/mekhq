@@ -22,10 +22,7 @@
 package mekhq.gui.dialog;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -210,6 +207,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pack();
     }
 
+    /**
+     * This initializes the dialog's components
+     * It currently uses the following Mnemonics:
+     * B, C, F, N, ESCAPE
+     */
     private void initComponents() {
         // Initialize Local Variables
         GridBagConstraints gridBagConstraints;
@@ -222,6 +224,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         cardLayout = new CardLayout();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+        // Adding Escape Mnemonic
+        getRootPane().registerKeyboardAction(e -> dispose(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
+
         setName("Form"); // NOI18N
 
         getContentPane().setLayout(new BorderLayout());
@@ -955,6 +963,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnClose"); // NOI18N
+        btnCancel.setMnemonic(KeyEvent.VK_C);
         btnCancel.addActionListener(evt -> cancel());
 
         gridBagConstraints = new GridBagConstraints();
@@ -968,38 +977,24 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         btnBack = new JButton(resourceMap.getString("btnBack.text")); // NOI18N
         btnBack.setName("btnBack"); // NOI18N
+        btnBack.setMnemonic(KeyEvent.VK_B);
         btnBack.addActionListener(evt -> back());
-        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panButtons.add(btnBack, gridBagConstraints);
 
         btnNext = new JButton(resourceMap.getString("btnNext.text")); // NOI18N
         btnNext.setName("btnNext"); // NOI18N
+        btnNext.setMnemonic(KeyEvent.VK_N);
         btnNext.addActionListener(evt -> next());
-        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panButtons.add(btnNext, gridBagConstraints);
 
         btnFinish = new JButton(resourceMap.getString("btnFinish.text")); // NOI18N
         btnFinish.setName("btnFinish"); // NOI18N
+        btnFinish.setMnemonic(KeyEvent.VK_F);
         btnFinish.addActionListener(evt -> finish());
-        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panButtons.add(btnFinish, gridBagConstraints);
 
         getContentPane().add(panButtons, BorderLayout.PAGE_END);

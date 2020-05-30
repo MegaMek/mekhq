@@ -91,6 +91,8 @@ import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.Marriage;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
@@ -260,7 +262,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner spnChanceProcreationNoRelationship;
     private JCheckBox chkDisplayTrueDueDate;
     private JCheckBox chkLogConception;
-    private JComboBox<String> comboBabySurnameStyle;
+    private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
     private JCheckBox chkDetermineFatherAtBirth;
     private JCheckBox chkDisplayParentage;
     private JComboBox<String> comboDisplayFamilyLevel;
@@ -1810,19 +1812,26 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panMarriageAgeRange, gridBagConstraints);
 
-        JPanel panRandomMarriageSurnameWeights = new JPanel(new GridLayout((int) Math.ceil(Person.NUM_SURNAME / 3.0), 3));
+        Marriage[] marriageStyles = Marriage.values();
+        int surnameWeightLength = marriageStyles.length - 1;
+        JPanel panRandomMarriageSurnameWeights = new JPanel(new GridLayout((int)
+                Math.ceil(((double) surnameWeightLength) / 3.0), 3));
         panRandomMarriageSurnameWeights.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("randomMarriageSurnameWeights.text")));
         panRandomMarriageSurnameWeights.setToolTipText(resourceMap.getString("randomMarriageSurnameWeights.toolTipText"));
-        spnRandomMarriageSurnameWeights = new JSpinner[Person.NUM_SURNAME];
-        JSpinner spnRandomMarriageSurnameWeight;
-        JPanel panRandomMarriageSurnameWeight;
-        for (int i = 0; i < Person.NUM_SURNAME; i++) {
-            spnRandomMarriageSurnameWeight = new JSpinner(new SpinnerNumberModel((options.getRandomMarriageSurnameWeights(i) / 10.0), 0, 100, 0.1));
-            panRandomMarriageSurnameWeight = new JPanel();
-            panRandomMarriageSurnameWeight.add(spnRandomMarriageSurnameWeight);
-            panRandomMarriageSurnameWeight.add(new JLabel(Person.SURNAME_TYPE_NAMES[i]));
-            panRandomMarriageSurnameWeights.add(panRandomMarriageSurnameWeight);
+        spnRandomMarriageSurnameWeights = new JSpinner[surnameWeightLength];
+        for (int i = 0; i < surnameWeightLength; i++) {
+            JSpinner spnRandomMarriageSurnameWeight = new JSpinner(new SpinnerNumberModel(
+                    (options.getRandomMarriageSurnameWeights(i) / 10.0), 0, 100, 0.1));
             spnRandomMarriageSurnameWeights[i] = spnRandomMarriageSurnameWeight;
+
+            JPanel panRandomMarriageSurnameWeight = new JPanel();
+            panRandomMarriageSurnameWeight.add(spnRandomMarriageSurnameWeight);
+
+            JLabel lblRandomMarriageSurnameWeight = new JLabel(marriageStyles[i].toString());
+            lblRandomMarriageSurnameWeight.setToolTipText(marriageStyles[i].getToolTipText());
+            panRandomMarriageSurnameWeight.add(lblRandomMarriageSurnameWeight);
+
+            panRandomMarriageSurnameWeights.add(panRandomMarriageSurnameWeight);
         }
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panRandomMarriageSurnameWeights, gridBagConstraints);
@@ -1880,11 +1889,24 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(chkLogConception, gridBagConstraints);
 
-        DefaultComboBoxModel<String> babySurnameStyleModel = new DefaultComboBoxModel<>();
-        babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Mother"));
-        babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Father"));
+        DefaultComboBoxModel<BabySurnameStyle> babySurnameStyleModel = new DefaultComboBoxModel<>(BabySurnameStyle.values());
         comboBabySurnameStyle = new JComboBox<>(babySurnameStyleModel);
-        comboBabySurnameStyle.setSelectedIndex(options.getBabySurnameStyle());
+        comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
+            private static final long serialVersionUID = -543354619818226314L;
+
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (isSelected && (index > -1)) {
+                    list.setToolTipText((list.getSelectedValue() instanceof BabySurnameStyle)
+                            ? ((BabySurnameStyle) list.getSelectedValue()).getStyleToolTip() : "");
+                }
+
+                return this;
+            }
+        });
+        comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
         JPanel pnlBabySurnameStyle = new JPanel();
         pnlBabySurnameStyle.add(comboBabySurnameStyle);
         pnlBabySurnameStyle.add(new JLabel(resourceMap.getString("babySurnameStyle.text")));
@@ -4935,7 +4957,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
         options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue() / 100.0);
         options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());
-        for (int i = 0; i < Person.NUM_SURNAME; i++) {
+        for (int i = 0; i < spnRandomMarriageSurnameWeights.length; i++) {
             int val = (int) Math.round(((Double) spnRandomMarriageSurnameWeights[i].getModel().getValue()) * 10);
             options.setRandomMarriageSurnameWeight(i, val);
         }
@@ -4947,7 +4969,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getModel().getValue() / 100.0);
         options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
         options.setLogConception(chkLogConception.isSelected());
-        options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedIndex());
+        options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
         options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
         options.setDisplayParentage(chkDisplayParentage.isSelected());
         options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());

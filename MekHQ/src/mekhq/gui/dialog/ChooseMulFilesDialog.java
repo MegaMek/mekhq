@@ -18,14 +18,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 
-import javax.swing.BorderFactory;
+import javax.swing.*;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -34,24 +33,17 @@ import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
 /**
- *
  * @author  Taharqa
  */
-public class ChooseMulFilesDialog extends javax.swing.JDialog {
-	private static final long serialVersionUID = -8038099101234445018L;
+public class ChooseMulFilesDialog extends JDialog {
+    private static final long serialVersionUID = -8038099101234445018L;
 
-	private ResolveScenarioTracker tracker;
+    private ResolveScenarioTracker tracker;
 
-	private javax.swing.JPanel panButtons;
-	private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnNext;
-    private javax.swing.JButton btnUnitFile;
-    private javax.swing.JTextField txtUnitFile;
-    private javax.swing.JTextArea txtInstructions;
+    private JTextField txtUnitFile;
     private boolean cancelled;
 
-    /** Creates new form NewTeamDialog */
-    public ChooseMulFilesDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ChooseMulFilesDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.tracker = t;
         cancelled = false;
@@ -60,123 +52,118 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
         setUserPreferences();
     }
 
+    /**
+     * This initializes the dialog's components
+     * It currently uses the following Mnemonics:
+     * B, C, O, ESCAPE
+     */
     private void initComponents() {
-    	 java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
 
-    	 panButtons = new javax.swing.JPanel();
-    	 btnNext = new javax.swing.JButton();
-    	 btnCancel = new javax.swing.JButton();
-    	 btnUnitFile = new javax.swing.JButton();
-    	 txtUnitFile = new javax.swing.JTextField();
-    	 new javax.swing.JButton();
-    	 new javax.swing.JTextField();
-    	 txtInstructions = new javax.swing.JTextArea();
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseMulFilesDialog", new EncodeControl()); //$NON-NLS-1$
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-    	 ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseMulFilesDialog", new EncodeControl()); //$NON-NLS-1$
-    	 setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-    	 setName("Form"); // NOI18N
+        // Adding Escape Mnemonic
+        getRootPane().registerKeyboardAction(e -> btnCancelActionPerformed(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-    	 getContentPane().setLayout(new java.awt.GridBagLayout());
-    	 setTitle(resourceMap.getString("title"));
+        setName("Form"); // NOI18N
 
-    	 txtInstructions.setText(resourceMap.getString("txtInstructions.text"));
-    	 txtInstructions.setName("txtInstructions");
-    	 txtInstructions.setEditable(false);
-    	 txtInstructions.setEditable(false);
-    	 txtInstructions.setLineWrap(true);
-    	 txtInstructions.setWrapStyleWord(true);
-    	 txtInstructions.setBorder(BorderFactory.createCompoundBorder(
-    			 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
-    			 BorderFactory.createEmptyBorder(5,5,5,5)));
-    	 txtInstructions.setPreferredSize(new Dimension(400,200));
-    	 gridBagConstraints = new java.awt.GridBagConstraints();
-    	 gridBagConstraints.gridx = 0;
-    	 gridBagConstraints.gridy = 0;
-    	 gridBagConstraints.gridwidth = 2;
-    	 gridBagConstraints.weightx = 1.0;
-    	 gridBagConstraints.weighty = 0.0;
-    	 gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    	 gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-    	 getContentPane().add(txtInstructions, gridBagConstraints);
+        getContentPane().setLayout(new GridBagLayout());
+        setTitle(resourceMap.getString("title"));
 
-    	 btnUnitFile.setText(resourceMap.getString("btnUnitFile.text")); // NOI18N
-    	 btnUnitFile.setName("btnUnitFile"); // NOI18N
-    	 btnUnitFile.addActionListener(new java.awt.event.ActionListener() {
-    		 public void actionPerformed(java.awt.event.ActionEvent evt) {
-    			 tracker.findUnitFile();
-    			 txtUnitFile.setText(tracker.getUnitFilePath());
-    		 }
-    	 });
-    	 gridBagConstraints = new java.awt.GridBagConstraints();
-    	 gridBagConstraints.gridx = 0;
-    	 gridBagConstraints.gridy = 1;
-    	 gridBagConstraints.gridwidth = 1;
-    	 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    	 gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-    	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-    	 getContentPane().add(btnUnitFile, gridBagConstraints);
+        JTextArea txtInstructions = new JTextArea(resourceMap.getString("txtInstructions.text"));
+        txtInstructions.setName("txtInstructions");
+        txtInstructions.setEditable(false);
+        txtInstructions.setLineWrap(true);
+        txtInstructions.setWrapStyleWord(true);
+        txtInstructions.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
+        txtInstructions.setPreferredSize(new Dimension(400,200));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        getContentPane().add(txtInstructions, gridBagConstraints);
 
-    	 txtUnitFile.setText(tracker.getUnitFilePath());
-    	 txtUnitFile.setName("txtUnitFile");
-    	 txtUnitFile.setEditable(false);
-    	 txtUnitFile.setOpaque(false);
-    	 gridBagConstraints = new java.awt.GridBagConstraints();
-    	 gridBagConstraints.gridx = 1;
-    	 gridBagConstraints.gridy = 1;
-    	 gridBagConstraints.gridwidth = 1;
-    	 gridBagConstraints.weightx = 1.0;
-    	 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    	 gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-    	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-    	 getContentPane().add(txtUnitFile, gridBagConstraints);
+        JButton btnUnitFile = new JButton(resourceMap.getString("btnUnitFile.text")); // NOI18N
+        btnUnitFile.setName("btnUnitFile"); // NOI18N
+        btnUnitFile.setMnemonic(KeyEvent.VK_B);
+        btnUnitFile.addActionListener(e -> {
+            tracker.findUnitFile();
+            txtUnitFile.setText(tracker.getUnitFilePath());
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        getContentPane().add(btnUnitFile, gridBagConstraints);
 
-    	 panButtons.setName("panButtons");
-    	 panButtons.setLayout(new GridBagLayout());
+        txtUnitFile = new JTextField(tracker.getUnitFilePath());
+        txtUnitFile.setName("txtUnitFile");
+        txtUnitFile.setEditable(false);
+        txtUnitFile.setOpaque(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        getContentPane().add(txtUnitFile, gridBagConstraints);
 
-    	 btnNext.setText(resourceMap.getString("btnNext.text")); // NOI18N
-    	 btnNext.setName("btnNext"); // NOI18N
-    	 btnNext.addActionListener(new java.awt.event.ActionListener() {
-    		 public void actionPerformed(java.awt.event.ActionEvent evt) {
-    			 btnNextActionPerformed(evt);
-    		 }
-    	 });
-    	 gridBagConstraints = new java.awt.GridBagConstraints();
-    	 gridBagConstraints.gridx = 0;
-    	 gridBagConstraints.gridy = 0;
-    	 gridBagConstraints.gridwidth = 1;
-    	 gridBagConstraints.weightx = 1.0;
-    	 gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-    	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-    	 panButtons.add(btnCancel, gridBagConstraints);
+        JPanel panButtons = new JPanel();
+        panButtons.setName("panButtons");
+        panButtons.setLayout(new GridBagLayout());
 
-    	 btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-    	 btnCancel.setName("btnClose"); // NOI18N
-    	 btnCancel.addActionListener(new java.awt.event.ActionListener() {
-    		 public void actionPerformed(java.awt.event.ActionEvent evt) {
-    			 btnCancelActionPerformed(evt);
-    		 }
-    	 });
-    	 gridBagConstraints = new java.awt.GridBagConstraints();
-    	 gridBagConstraints.gridx = 1;
-    	 gridBagConstraints.gridy = 0;
-    	 gridBagConstraints.gridwidth = 1;
-    	 gridBagConstraints.weightx = 0.0;
-    	 gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-    	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-    	 panButtons.add(btnNext, gridBagConstraints);
+        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
+        btnCancel.setName("btnClose"); // NOI18N
+        btnCancel.setMnemonic(KeyEvent.VK_C);
+        btnCancel.addActionListener(e -> btnCancelActionPerformed());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        panButtons.add(btnCancel, gridBagConstraints);
 
-    	 gridBagConstraints = new java.awt.GridBagConstraints();
-    	 gridBagConstraints.gridx = 0;
-    	 gridBagConstraints.gridy = 2;
-    	 gridBagConstraints.gridwidth = 2;
-    	 gridBagConstraints.weightx = 1.0;
-    	 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    	 gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-    	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-    	 getContentPane().add(panButtons, gridBagConstraints);
+        JButton btnNext = new JButton(resourceMap.getString("btnNext.text")); // NOI18N
+        btnNext.setName("btnNext"); // NOI18N
+        btnNext.setMnemonic(KeyEvent.VK_O);
+        btnNext.addActionListener(e -> btnNextActionPerformed());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        panButtons.add(btnNext, gridBagConstraints);
 
-    	 pack();
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        getContentPane().add(panButtons, gridBagConstraints);
+
+        pack();
     }
 
     private void setUserPreferences() {
@@ -186,17 +173,17 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-    private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-    	tracker.processMulFiles();
-    	this.setVisible(false);
+    private void btnNextActionPerformed() {
+        tracker.processMulFiles();
+        this.setVisible(false);
     }
 
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-    	cancelled = true;
-    	this.setVisible(false);
+    private void btnCancelActionPerformed() {
+        cancelled = true;
+        this.setVisible(false);
     }
 
     public boolean wasCancelled() {
-    	return cancelled;
+        return cancelled;
     }
 }
