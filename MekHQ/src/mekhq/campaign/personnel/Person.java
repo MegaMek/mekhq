@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 import megamek.common.*;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
-import megamek.common.util.WeightedMap;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
@@ -167,25 +166,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // this is a flag used in determine whether or not a person is a potential marriage candidate
     // provided that they are not married, are old enough, etc.
     private boolean tryingToMarry;
-    // Marriage Surnames
-    public static final int SURNAME_NO_CHANGE = 0;
-    public static final int SURNAME_YOURS = 1;
-    public static final int SURNAME_SPOUSE = 2;
-    public static final int SURNAME_HYP_YOURS = 3;
-    public static final int SURNAME_BOTH_HYP_YOURS = 4;
-    public static final int SURNAME_HYP_SPOUSE = 5;
-    public static final int SURNAME_BOTH_HYP_SPOUSE = 6;
-    public static final int SURNAME_MALE = 7;
-    public static final int SURNAME_FEMALE = 8;
-    public static final int SURNAME_WEIGHTED = 9; //should be equal to NUM_SURNAME at all times
-    public static final int NUM_SURNAME = 9; //number of surname options not counting the SURNAME_WEIGHTED OPTION
-
-    public static final String[] SURNAME_TYPE_NAMES = new String[] {
-        "No Change", "Yours", "Spouse",
-        "Yours-Spouse", "Both Yours-Spouse", "Spouse-Yours",
-        "Both Spouse-Yours", "Male", "Female"
-    };
-    //endregion Marriage Variables
+    //endregion Marriage
 
     //region Divorce Variables
     public static final String OPT_SELECTED_CHANGE_SURNAME = "selected_change_surname";
@@ -305,6 +286,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private ExtraData extraData;
 
     //lets just go ahead and pass in the campaign - to hell with OOP
+    @Deprecated // May 1st, 2020 - As part of moving Person to be a fully OOP class
     private Campaign campaign;
 
     // For upgrading personnel entries to missing log entries
@@ -450,7 +432,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
     //endregion Constructors
 
-    public Campaign getCampaign(){return campaign;}
+    @Deprecated // May 1st, 2020 - as part of turning Person into a fully OOP class
+    public Campaign getCampaign() {
+        return campaign;
+    }
 
     public int getPhenotype() {
         return phenotype;
@@ -1387,8 +1372,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     /**
      * Determines if another person is a safe spouse for the current person
      * @param p the person to determine if they are a safe spouse
+     * @param campaign the campaign to use to determine if they are a safe spouse
      */
-    public boolean safeSpouse(Person p) {
+    public boolean safeSpouse(Person p, Campaign campaign) {
         // Huge convoluted return statement, with the following restrictions
         // can't marry yourself
         // can't marry someone who is already married
@@ -1402,186 +1388,60 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 !this.equals(p)
                 && !p.hasSpouse()
                 && p.isTryingToMarry()
-                && p.oldEnoughToMarry()
+                && p.oldEnoughToMarry(campaign)
                 && (!p.isPrisoner() || isPrisoner())
                 && !p.isDeadOrMIA()
                 && p.isActive()
                 && ((getAncestorsId() == null)
-                    || !getCampaign().getAncestors(getAncestorsId()).checkMutualAncestors(
-                            getCampaign().getAncestors(p.getAncestorsId())))
+                    || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(
+                            campaign.getAncestors(p.getAncestorsId())))
         );
     }
 
-    public boolean oldEnoughToMarry() {
-        return (getAge(getCampaign().getLocalDate()) >= getCampaign().getCampaignOptions().getMinimumMarriageAge());
+    public boolean oldEnoughToMarry(Campaign campaign) {
+        return (getAge(campaign.getLocalDate()) >= campaign.getCampaignOptions().getMinimumMarriageAge());
     }
 
-    public void randomMarriage() {
+    public void randomMarriage(Campaign campaign) {
         // Don't attempt to generate is someone isn't trying to marry, has a spouse,
         // isn't old enough to marry, or is actively deployed
-        if (!tryingToMarry || hasSpouse() || !oldEnoughToMarry() || isDeployed()) {
+        if (!isTryingToMarry() || hasSpouse() || !oldEnoughToMarry(campaign) || isDeployed()) {
             return;
         }
 
         // setting is the fractional chance that this attempt at finding a marriage will result in one
-        if (Compute.randomFloat() < (getCampaign().getCampaignOptions().getChanceRandomMarriages())) {
-            addRandomSpouse(false);
-        } else if (getCampaign().getCampaignOptions().useRandomSameSexMarriages()) {
-            if (Compute.randomFloat() < (getCampaign().getCampaignOptions().getChanceRandomSameSexMarriages())) {
-                addRandomSpouse(true);
+        if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomMarriages())) {
+            addRandomSpouse(false, campaign);
+        } else if (campaign.getCampaignOptions().useRandomSameSexMarriages()) {
+            if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomSameSexMarriages())) {
+                addRandomSpouse(true, campaign);
             }
         }
     }
 
-    public void addRandomSpouse(boolean sameSex) {
+    public void addRandomSpouse(boolean sameSex, Campaign campaign) {
         List<Person> potentials = new ArrayList<>();
         int gender = sameSex ? getGender() : (isMale() ? Crew.G_FEMALE : Crew.G_MALE);
-        for (Person p : getCampaign().getActivePersonnel()) {
-            if (isPotentialRandomSpouse(p, gender)) {
+        for (Person p : campaign.getActivePersonnel()) {
+            if (isPotentialRandomSpouse(p, gender, campaign)) {
                 potentials.add(p);
             }
         }
 
         int n = potentials.size();
         if (n > 0) {
-            marry(potentials.get(Compute.randomInt(n)), SURNAME_WEIGHTED);
+            Marriage.WEIGHTED.marry(this, potentials.get(Compute.randomInt(n)), campaign);
         }
     }
 
-    public boolean isPotentialRandomSpouse(Person p, int gender) {
-        if ((p.getGender() != gender) || !safeSpouse(p) || !(isFree() || (isPrisoner() && p.isPrisoner()))) {
+    public boolean isPotentialRandomSpouse(Person p, int gender, Campaign campaign) {
+        if ((p.getGender() != gender) || !safeSpouse(p, campaign) || !(isFree() || (isPrisoner() && p.isPrisoner()))) {
             return false;
         }
 
-        int ageDifference = Math.abs(p.getAge(getCampaign().getLocalDate()) - getAge(getCampaign().getLocalDate()));
+        int ageDifference = Math.abs(p.getAge(campaign.getLocalDate()) - getAge(campaign.getLocalDate()));
 
-        return (ageDifference <= getCampaign().getCampaignOptions().getMarriageAgeRange());
-    }
-
-    public void marry(Person spouse, int surnameOption) {
-        String surname = getSurname();
-        String spouseSurname = spouse.getSurname();
-
-        if (surnameOption == SURNAME_WEIGHTED) {
-            WeightedMap<Integer> map = createWeightedSurnameMap();
-            surnameOption = map.randomItem();
-        }
-
-        switch(surnameOption) {
-            case SURNAME_NO_CHANGE:
-                break;
-            case SURNAME_SPOUSE:
-                setSurname(spouseSurname);
-                setMaidenName(surname); //"" is handled in the divorce code
-                break;
-            case SURNAME_YOURS:
-                spouse.setSurname(surname);
-                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                break;
-            case SURNAME_HYP_YOURS:
-                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(surname + "-" + spouseSurname);
-                } else {
-                    setSurname(spouseSurname);
-                }
-
-                setMaidenName(surname); //"" is handled in the divorce code
-                break;
-            case SURNAME_BOTH_HYP_YOURS:
-                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(surname + "-" + spouseSurname);
-                    spouse.setSurname(surname + "-" + spouseSurname);
-                } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(spouseSurname);
-                } else if (!StringUtil.isNullOrEmpty(surname)) {
-                    spouse.setSurname(surname);
-                }
-                //both null or "" is ignored as a case, as it would lead to no changes
-
-                setMaidenName(surname); //"" is handled in the divorce code
-                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                break;
-            case SURNAME_HYP_SPOUSE:
-                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                    spouse.setSurname(spouseSurname + "-" + surname);
-                } else {
-                    spouse.setSurname(surname);
-                }
-
-                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                break;
-            case SURNAME_BOTH_HYP_SPOUSE:
-                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(spouseSurname + "-" + surname);
-                    spouse.setSurname(spouseSurname + "-" + surname);
-                } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(spouseSurname);
-                } else if (!StringUtil.isNullOrEmpty(surname)) {
-                    spouse.setSurname(surname);
-                }
-                //both null or "" is ignored as a case, as it would lead to no changes
-
-                setMaidenName(surname); //"" is handled in the divorce code
-                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                break;
-            case SURNAME_MALE:
-                if (isMale()) {
-                    spouse.setSurname(surname);
-                    spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                } else {
-                    setSurname(spouseSurname);
-                    setMaidenName(surname); //"" is handled in the divorce code
-                }
-                break;
-            case SURNAME_FEMALE:
-                if (isMale()) {
-                    setSurname(spouseSurname);
-                    setMaidenName(surname); //"" is handled in the divorce code
-                } else {
-                    spouse.setSurname(surname);
-                    spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                }
-                break;
-            default:
-                MekHQ.getLogger().log(getClass(), "marry", LogLevel.ERROR,
-                        String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"",
-                        getFullName(), spouse.getFullName()));
-                break;
-        }
-
-        if (getCampaign().getCampaignOptions().logMarriageNameChange()) {
-            if (!spouse.getSurname().equals(spouseSurname)) {
-                PersonalLogger.marriageNameChange(spouse, this, getCampaign().getDate());
-
-            }
-            if (!getSurname().equals(surname)) {
-                PersonalLogger.marriageNameChange(this, spouse, getCampaign().getDate());
-            }
-        }
-
-        setSpouseId(spouse.getId());
-        spouse.setSpouseId(getId());
-
-        PersonalLogger.marriage(this, spouse, getCampaign().getDate());
-        PersonalLogger.marriage(spouse, this, getCampaign().getDate());
-
-        campaign.addReport(String.format("%s has married %s!", getHyperlinkedName(),
-                spouse.getHyperlinkedName()));
-
-        MekHQ.triggerEvent(new PersonChangedEvent(this));
-        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
-    }
-
-    private WeightedMap<Integer> createWeightedSurnameMap() {
-        WeightedMap<Integer> map = new WeightedMap<>();
-
-        int[] weights = campaign.getCampaignOptions().getRandomMarriageSurnameWeights();
-
-        for (int i = 0; i < NUM_SURNAME; i++) {
-            map.add(weights[i], i);
-        }
-
-        return map;
+        return (ageDifference <= campaign.getCampaignOptions().getMarriageAgeRange());
     }
     //endregion Marriage
 

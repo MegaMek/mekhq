@@ -47,9 +47,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
-import mekhq.campaign.personnel.enums.ManeiDominiClass;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -505,7 +503,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
             case CMD_ADD_SPOUSE: {
                 Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
-                selectedPerson.marry(spouse, Integer.parseInt(data[2]));
+                Marriage.valueOf(data[2]).marry(selectedPerson, spouse, gui.getCampaign());
                 break;
             }
             case CMD_ADD_AWARD: {
@@ -1813,13 +1811,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
 
             if (oneSelected && person.isActive()) {
-                if (person.oldEnoughToMarry() && (!person.hasSpouse())) {
+                if (person.oldEnoughToMarry(gui.getCampaign()) && (!person.hasSpouse())) {
                     menu = new JMenu(resourceMap.getString("chooseSpouse.text")); //$NON-NLS-1$
                     JMenu maleMenu = new JMenu(resourceMap.getString("spouseMenuMale.text"));
                     JMenu femaleMenu = new JMenu(resourceMap.getString("spouseMenuFemale.text"));
                     JMenu spouseMenu;
-                    JMenuItem surnameMenu;
-                    String type;
 
                     LocalDate today = gui.getCampaign().getLocalDate();
 
@@ -1827,7 +1823,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     personnel.sort(Comparator.comparing((Person p) -> p.getAge(today)).thenComparing(Person::getSurname));
 
                     for (Person ps : personnel) {
-                        if (person.safeSpouse(ps)) {
+                        if (person.safeSpouse(ps, gui.getCampaign())) {
                             String pStatus;
                             if (ps.isBondsman()) {
                                 pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"),
@@ -1839,67 +1835,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                                 pStatus = String.format(resourceMap.getString("marriagePartnerDesc.format"),
                                         ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             }
+
                             spouseMenu = new JMenu(pStatus);
-                            type = resourceMap.getString("marriageNoNameChange.text");
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_NO_CHANGE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageRenameSpouse.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_YOURS)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageRenameYourself.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_SPOUSE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageHyphenateYourself.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_HYP_YOURS)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageBothHyphenateYourself.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_BOTH_HYP_YOURS)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageHyphenateSpouse.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_HYP_SPOUSE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageBothHyphenateSpouse.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_BOTH_HYP_SPOUSE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageMale.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_MALE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageFemale.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_FEMALE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageRandomWeighted.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_WEIGHTED)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
+
+                            for (Marriage style : Marriage.values()) {
+                                spouseMenu.add(newMenuItem(style.getDropDownText(),
+                                        makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), style.name())));
+                            }
 
                             if (ps.isMale()) {
                                 maleMenu.add(spouseMenu);

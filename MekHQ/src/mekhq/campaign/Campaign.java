@@ -3551,7 +3551,7 @@ public class Campaign implements Serializable, ITechManager {
 
             // Random Marriages
             if (getCampaignOptions().useRandomMarriages()) {
-                p.randomMarriage();
+                p.randomMarriage(this);
             }
 
             p.resetMinutesLeft();
