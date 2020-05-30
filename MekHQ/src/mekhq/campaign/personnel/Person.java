@@ -1359,7 +1359,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         for (int i = 0; i < size; i++) {
             Person baby = campaign.newDependent(T_NONE, true);
-            String surname = getCampaign().getCampaignOptions().getBabySurnameStyle()
+            String surname = campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
             baby.setSurname(surname);
             baby.setBirthday(campaign.getLocalDate());
@@ -1443,7 +1443,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void addRandomSpouse(boolean sameSex, Campaign campaign) {
         List<Person> potentials = new ArrayList<>();
         Gender gender = sameSex ? getGender() : (getGender().isMale() ? Gender.FEMALE : Gender.MALE);
-        for (Person p : getCampaign().getActivePersonnel()) {
+        for (Person p : campaign.getActivePersonnel()) {
             if (isPotentialRandomSpouse(p, gender, campaign)) {
                 potentials.add(p);
             }
