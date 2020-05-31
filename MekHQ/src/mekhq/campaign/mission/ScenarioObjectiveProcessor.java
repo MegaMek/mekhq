@@ -47,7 +47,6 @@ public class ScenarioObjectiveProcessor {
      * Given a ResolveScenarioTracker, evaluate the units contained therein
      * in an effort to determine the units associated and units that meet each objective in the scenario played.
      * @param tracker Tracker to process
-     * @return Map containing all units that are eligible for the objective
      */
     public void evaluateScenarioObjectives(ResolveScenarioTracker tracker) {
         for (ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
@@ -98,7 +97,6 @@ public class ScenarioObjectiveProcessor {
                         for (Entity entity : botForce.getEntityList()) {
                             objectiveUnitIDs.add(entity.getExternalIdAsString());
                         }
-                        forceFound = true;
                         break;
                     }
                 }
@@ -118,13 +116,9 @@ public class ScenarioObjectiveProcessor {
 
         for (Entity unit : units) {
             // the "opponent" depends on whether the given unit was opposed to the player or not
-            boolean isFriendlyUnit =
-                    tracker.getScenario().isFriendlyUnit(unit, tracker.getCampaign());
+            boolean isFriendlyUnit = tracker.getScenario().isFriendlyUnit(unit, tracker.getCampaign());
 
-            boolean opponentHasBattlefieldControl =
-                    isFriendlyUnit ?
-                            !tracker.playerHasBattlefieldControl() :
-                            tracker.playerHasBattlefieldControl();
+            boolean opponentHasBattlefieldControl = isFriendlyUnit != tracker.playerHasBattlefieldControl();
 
             if (entityMeetsObjective(unit, objective, objectiveUnitIDs, opponentHasBattlefieldControl)) {
                 qualifyingUnits.add(unit.getExternalIdAsString());
@@ -313,12 +307,11 @@ public class ScenarioObjectiveProcessor {
      */
     public String processObjective(ScenarioObjective objective, int qualifyingUnitCount, Boolean completionOverride,
             ResolveScenarioTracker tracker, boolean dryRun) {
-        // if we've overriden the objective completion flag, great, otherwise, calculate it here
+        // if we've overridden the objective completion flag, great, otherwise, calculate it here
         boolean objectiveMet = completionOverride == null ? objectiveMet(objective, qualifyingUnitCount) : completionOverride;
 
         List<ObjectiveEffect> objectiveEffects = objectiveMet ? objective.getSuccessEffects() : objective.getFailureEffects();
 
-        int numUnitsMetObjective = qualifyingUnitCount;
         int numUnitsFailedObjective = potentialObjectiveUnits.get(objective).size() - qualifyingUnitCount;
 
         StringBuilder sb = new StringBuilder();
@@ -331,7 +324,7 @@ public class ScenarioObjectiveProcessor {
 
         for (ObjectiveEffect effect : objectiveEffects) {
             sb.append(processObjectiveEffect(effect,
-                    effect.effectScaling == EffectScalingType.Inverted ? numUnitsFailedObjective : numUnitsMetObjective,
+                    effect.effectScaling == EffectScalingType.Inverted ? numUnitsFailedObjective : qualifyingUnitCount,
                     tracker, dryRun));
             sb.append("\n\t");
         }
@@ -345,7 +338,8 @@ public class ScenarioObjectiveProcessor {
      * @param scaleFactor If it's scaled, how much to scale it by
      * @param tracker
      */
-    private String processObjectiveEffect(ObjectiveEffect effect, int scaleFactor, ResolveScenarioTracker tracker, boolean dryRun) {
+    private String processObjectiveEffect(ObjectiveEffect effect, int scaleFactor,
+                                          ResolveScenarioTracker tracker, boolean dryRun) {
         switch (effect.effectType) {
             case ScenarioVictory:
                 if (dryRun) {
@@ -425,7 +419,7 @@ public class ScenarioObjectiveProcessor {
             return false;
         }
 
-        double potentialObjectiveUnitCount = (double) getPotentialObjectiveUnits().get(objective).size();
+        double potentialObjectiveUnitCount = getPotentialObjectiveUnits().get(objective).size();
 
         return qualifyingUnitCount / potentialObjectiveUnitCount >= (double) objective.getPercentage() / 100;
     }
