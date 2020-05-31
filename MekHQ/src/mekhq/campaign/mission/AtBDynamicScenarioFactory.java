@@ -179,6 +179,7 @@ public class AtBDynamicScenarioFactory {
         // Now we can clear the other related lists
         scenario.getAlliesPlayer().clear();
         scenario.getExternalIDLookup().clear();
+        scenario.getBotUnitTemplates().clear();
 
         // fix the player force weight class and unit count at the current time.
         int playerForceWeightClass = calculatePlayerForceWeightClass(scenario, campaign);
