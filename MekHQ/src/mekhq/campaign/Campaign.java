@@ -7829,7 +7829,7 @@ public class Campaign implements Serializable, ITechManager {
         int countTotal = 0;
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (p.hasPrimaryCombatRole() && p.isFree() && p.isActive()) {
+            if (p.hasPrimaryCombatRole() && p.getPrisonerStatus().isFree() && p.isActive()) {
                 countTotal++;
             }
         }
@@ -7855,7 +7855,7 @@ public class Campaign implements Serializable, ITechManager {
         int countTotal = 0;
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (p.hasPrimarySupportRole(false) && p.isFree() && p.isActive()) {
+            if (p.hasPrimarySupportRole(false) && p.getPrisonerStatus().isFree() && p.isActive()) {
                 countTotal++;
             }
         }
