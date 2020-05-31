@@ -19,7 +19,6 @@
 package mekhq.campaign.mission;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -92,20 +91,20 @@ public class AtBDynamicScenarioFactory {
     /**
      * Unspecified weight class for units, used when the unit type doesn't support weight classes
      */
-    public static int UNIT_WEIGHT_UNSPECIFIED = -1;
+    public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
-    private static int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE };
-    private static int[] validBotAABombs = { BombType.B_RL };
+    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE };
+    private static final int[] validBotAABombs = { BombType.B_RL };
 
-    private static int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
+    private static final int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
     // target number for 2d6 roll of infantry being upgraded to battle armor, indexed by dragoons rating
-    private static int[] infantryToBAUpgradeTNs = { 12, 10, 8, 6, 4, 2 };
+    private static final int[] infantryToBAUpgradeTNs = { 12, 10, 8, 6, 4, 2 };
 
-    private static int IS_LANCE_SIZE = 4;
-    private static int CLAN_MH_LANCE_SIZE = 5;
-    private static int COMSTAR_LANCE_SIZE = 6;
+    private static final int IS_LANCE_SIZE = 4;
+    private static final int CLAN_MH_LANCE_SIZE = 5;
+    private static final int COMSTAR_LANCE_SIZE = 6;
 
-    private static int REINFORCEMENT_ARRIVAL_SCALE = 30;
+    private static final int REINFORCEMENT_ARRIVAL_SCALE = 30;
 
 
     /**
@@ -287,7 +286,7 @@ public class AtBDynamicScenarioFactory {
             forceTemplate.setForceAlignment(forceAlignment.ordinal());
         }
 
-        switch(forceAlignment) {
+        switch (forceAlignment) {
             case Allied:
             case Player:
                 factionCode = contract.getEmployerCode();
@@ -707,7 +706,7 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario to work on.
      */
     public static void setTerrain(AtBDynamicScenario scenario) {
-        int terrainIndex = 0;
+        int terrainIndex;
 
         // if we are allowing all terrain types, then pick one from the list
         // otherwise, pick one from the allowed ones
@@ -879,7 +878,7 @@ public class AtBDynamicScenarioFactory {
      * @return                A new Entity with crew.
      */
     public static Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, boolean artillery, Campaign campaign) {
-        MechSummary ms = null;
+        MechSummary ms;
 
         UnitGeneratorParameters params = new UnitGeneratorParameters();
         params.setFaction(faction);
@@ -912,7 +911,7 @@ public class AtBDynamicScenarioFactory {
      * @return Entity or null if unable to generate.
      */
     public static Entity getTankEntity(UnitGeneratorParameters params, int skill, boolean artillery, Campaign campaign) {
-        MechSummary ms = null;
+        MechSummary ms;
 
         // useful debugging statement that forces generation of specific units rather than random ones
         //return getEntityByName("Badger (C) Tracked Transport B", params.getFaction(), skill, campaign);
@@ -923,11 +922,10 @@ public class AtBDynamicScenarioFactory {
 
         if (campaign.getCampaignOptions().getOpforUsesVTOLs()) {
             params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
-            ms = campaign.getUnitGenerator().generate(params);
         } else {
             params.setFilter(v -> !v.getUnitType().equals("VTOL"));
-            ms = campaign.getUnitGenerator().generate(params);
         }
+        ms = campaign.getUnitGenerator().generate(params);
 
         if (ms == null) {
             return null;
@@ -983,7 +981,7 @@ public class AtBDynamicScenarioFactory {
 
         for (Transporter bay : transport.getTransports()) {
             if (bay instanceof TroopSpace) {
-                double bayCapacity = ((TroopSpace) bay).getUnused();
+                double bayCapacity = bay.getUnused();
 
                 UnitGeneratorParameters newParams = params.clone();
                 newParams.clearMovementModes();
@@ -991,7 +989,7 @@ public class AtBDynamicScenarioFactory {
 
                 Entity transportedUnit = null;
 
-                // for now, we'll assign BA units with greater likelyhood to units with higher-rated equipment
+                // for now, we'll assign BA units with greater likelihood to units with higher-rated equipment
                 int baRoll = Compute.d6(2);
                 if (baRoll >= infantryToBAUpgradeTNs[params.getQuality()]) {
                     transportedUnit = generateTransportedBAUnit(newParams, bayCapacity, skill, campaign);
@@ -1990,7 +1988,7 @@ public class AtBDynamicScenarioFactory {
                     entity.setDeployRound(deployRound);
                 }
             } else {
-                setDeploymentTurnsForReinforcements(Arrays.asList(entity), strategy);
+                setDeploymentTurnsForReinforcements(Collections.singletonList(entity), strategy);
             }
         }
     }
@@ -2210,8 +2208,7 @@ public class AtBDynamicScenarioFactory {
         Faction faction = Faction.getFaction(factionCode);
         if (faction != null) {
             // clans and marian hegemony use a fundamental unit size of 5.
-            if (faction.isClan() ||
-                    factionCode.equals("MH")) {
+            if (faction.isClan() || factionCode.equals("MH")) {
                 return CLAN_MH_LANCE_SIZE;
             // comstar and wobbies use a fundamental unit size of 6.
             } else if (faction.isComstar()) {
