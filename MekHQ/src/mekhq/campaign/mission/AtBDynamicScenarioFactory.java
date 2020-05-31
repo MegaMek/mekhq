@@ -176,18 +176,6 @@ public class AtBDynamicScenarioFactory {
             scenario.removeBotForce(x);
         }
 
-        // Clear the Associated Unit Ids for any units allied to the current player, as these will
-        // be regenerated. However, we need to keep the player's units assigned to the individual
-        // objectives, which requires first getting a list of all of the entities ids from
-        // AlliesPlayer, then removing those ids only from the associated unit ids
-        List<String> entityIdStrings = new ArrayList<>();
-        for (Entity entity : scenario.getAlliesPlayer()) {
-            entityIdStrings.add(entity.getExternalIdAsString());
-        }
-        for (ScenarioObjective scenarioObjective : scenario.getScenarioObjectives()) {
-            scenarioObjective.getAssociatedUnitIDs().removeAll(entityIdStrings);
-        }
-
         // Now we can clear the other related lists
         scenario.getAlliesPlayer().clear();
         scenario.getExternalIDLookup().clear();
