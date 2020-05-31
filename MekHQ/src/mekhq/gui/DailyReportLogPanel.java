@@ -72,16 +72,13 @@ public class DailyReportLogPanel extends JPanel {
 
     private void initComponents() {
         setLayout(new BorderLayout());
-        JLabel title = new JLabel("<html><b><nobr>Daily Log</nobr></b></html>");
         txtLog.setContentType("text/html"); // NOI18N
         txtLog.setEditable(false);
         DefaultCaret caret = (DefaultCaret)txtLog.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane scrLog = new JScrollPane(txtLog);
         scrLog.setBorder(new EmptyBorder(2,5,2,2));
-        title.setBorder(new EmptyBorder(2,5,2,2));
         add(scrLog, BorderLayout.CENTER);
-        add(title, BorderLayout.PAGE_START);
     }
 
     public void clearLogPanel() {
