@@ -32,7 +32,6 @@ import mekhq.gui.sorter.TargetSorter;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
-import javax.swing.text.html.Option;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -51,8 +50,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JPanel panInfo;
     private JLabel lblRating;
     private JLabel lblExperience;
-    private JLabel lblCombatPersonnel;
-    private JLabel lblSupportPersonnel;
+    private JLabel lblPersonnel;
     private JLabel lblMissionSuccess;
 
 
@@ -175,31 +173,18 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panInfo.add(lblMissionSuccess, gridBagConstraints);
         y++;
-        JLabel lblCombatPersonnelHead = new JLabel(resourceMap.getString("lblCombatPersonnel.text"));
+        JLabel lblPersonnelHead = new JLabel(resourceMap.getString("lblPersonnel.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panInfo.add(lblCombatPersonnelHead, gridBagConstraints);
-        lblCombatPersonnel = new JLabel(Integer.toString(getCampaign().getActiveCombatPersonnelN()));
+        panInfo.add(lblPersonnelHead, gridBagConstraints);
+        lblPersonnel = new JLabel(getCampaign().getPersonnelSummary());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        panInfo.add(lblCombatPersonnel, gridBagConstraints);
-        y++;
-        JLabel lblSupportPersonnelHead = new JLabel(resourceMap.getString("lblSupportPersonnel.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panInfo.add(lblSupportPersonnelHead, gridBagConstraints);
-        lblSupportPersonnel = new JLabel(Integer.toString(getCampaign().getActiveSupportPersonnelN()));
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        panInfo.add(lblSupportPersonnel, gridBagConstraints);
+        panInfo.add(lblPersonnel, gridBagConstraints);
         y++;
 
         panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panInfo.title")));
@@ -374,8 +359,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private void refreshBasicInfo() {
         getCampaign().getUnitRating().reInitialize();
         lblRating.setText(getCampaign().getUnitRatingText());
-        lblCombatPersonnel.setText(Integer.toString(getCampaign().getActiveCombatPersonnelN()));
-        lblSupportPersonnel.setText(Integer.toString(getCampaign().getActiveSupportPersonnelN()));
+        lblPersonnel.setText(getCampaign().getPersonnelSummary());
         lblMissionSuccess.setText(getCampaign().getMissionSuccessString());
         lblExperience.setText(getCampaign().getUnitRating().getAverageExperience());
     }

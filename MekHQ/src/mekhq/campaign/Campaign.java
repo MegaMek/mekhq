@@ -7825,7 +7825,28 @@ public class Campaign implements Serializable, ITechManager {
         return new String(sb);
     }
 
-    public int getActiveCombatPersonnelN() {
+    /**
+     * Get the number of active support personnel, for summary information in Command Center tab
+     * @return integer of the number of support personnel
+     */
+    public String getPersonnelSummary() {
+        int totalCombat = 0;
+        int totalSupport = 0;
+        for (Person p : getPersonnel()) {
+            // Add them to the total count
+            if(!p.getPrisonerStatus().isFree() || !p.isActive()) {
+                continue;
+            }
+            if (p.hasPrimaryCombatRole()) {
+                totalCombat++;
+            } else if(p.hasPrimarySupportRole(false)) {
+                totalSupport++;
+            }
+        }
+        return Integer.toString(totalCombat) + " Combat, " + Integer.toString(totalSupport) + " Support";
+    }
+
+    public int getForceComposition() {
         int countTotal = 0;
         for (Person p : getPersonnel()) {
             // Add them to the total count
@@ -7849,17 +7870,6 @@ public class Campaign implements Serializable, ITechManager {
         }
         double successRate = 100 * countMissionByStatus[Mission.S_SUCCESS]/completedN;
         return Double.toString(successRate) + "%";
-    }
-
-    public int getActiveSupportPersonnelN() {
-        int countTotal = 0;
-        for (Person p : getPersonnel()) {
-            // Add them to the total count
-            if (p.hasPrimarySupportRole(false) && p.getPrisonerStatus().isFree() && p.isActive()) {
-                countTotal++;
-            }
-        }
-        return countTotal;
     }
 
     public String getCombatPersonnelDetails() {
