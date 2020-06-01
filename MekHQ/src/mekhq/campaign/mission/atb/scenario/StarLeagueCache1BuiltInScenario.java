@@ -40,6 +40,7 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.rating.IUnitRating;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @AtBScenarioEnabled
 public class StarLeagueCache1BuiltInScenario extends AtBScenario {
@@ -116,7 +117,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)));
 
-        ArrayList<Entity> otherForce = new ArrayList<Entity>();
+        List<Entity> otherForce = new ArrayList<>();
         MechSummary ms = null;
 
         if (roll == 1) {
