@@ -7832,19 +7832,23 @@ public class Campaign implements Serializable, ITechManager {
     public String getPersonnelSummary() {
         int totalCombat = 0;
         int totalSupport = 0;
+        int totalInjured = 0;
         for (Person p : getPersonnel()) {
             // Add them to the total count
             if(!p.getPrisonerStatus().isFree() || !p.isActive()) {
                 continue;
             }
-            p.
+            if(p.getHits() > 0) {
+                totalInjured++;
+            }
             if (p.hasPrimaryCombatRole()) {
                 totalCombat++;
             } else if(p.hasPrimarySupportRole(false)) {
                 totalSupport++;
             }
         }
-        return Integer.toString(totalCombat) + " Combat, " + Integer.toString(totalSupport) + " Support";
+        return Integer.toString(totalCombat) + " Combat, " + Integer.toString(totalSupport) + " Support (" +
+                Integer.toString(totalInjured) + " injured)";
     }
 
     public String getForceComposition() {
