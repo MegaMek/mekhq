@@ -7847,7 +7847,7 @@ public class Campaign implements Serializable, ITechManager {
                 totalSupport++;
             }
         }
-        return Integer.toString(totalCombat) + " Combat, " + Integer.toString(totalSupport) + " Support (" +
+        return Integer.toString(totalCombat) + " combat, " + Integer.toString(totalSupport) + " support (" +
                 Integer.toString(totalInjured) + " injured)";
     }
 
@@ -7917,6 +7917,64 @@ public class Campaign implements Serializable, ITechManager {
         }
         int successRate = (int)Math.round(100 * countMissionByStatus[Mission.S_SUCCESS]/completedN);
         return Integer.toString(successRate) + "%";
+    }
+
+    public String getCargoCapacity() {
+        double ccc = this.getTotalCombinedCargoCapacity();
+        double tonnage = this.getCargoTonnage(false);
+        double mothballedTonnage = this.getCargoTonnage(false, true);
+        double combined = (tonnage + mothballedTonnage);
+
+        return Integer.toString((int)Math.round(combined)) + " tons (" +
+                Integer.toString((int)Math.round(ccc)) + " capacity)";
+    }
+
+    public String getTransportCapacity() {
+        int noMech = Math.max(getNumberOfUnitsByType(Entity.ETYPE_MECH) - getOccupiedBays(Entity.ETYPE_MECH), 0);
+        int noSC = Math.max(getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
+                int noCF = Math
+                .max(getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
+        int noASF = Math.max(getNumberOfUnitsByType(Entity.ETYPE_AERO) - getOccupiedBays(Entity.ETYPE_AERO), 0);
+        int nolv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) - getOccupiedBays(Entity.ETYPE_TANK, true), 0);
+        int nohv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK) - getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int noinf = Math.max(getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int noBA = Math.max(getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        @SuppressWarnings("unused") // FIXME: This should be used somewhere...
+                int noProto = Math.max(getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - getOccupiedBays(Entity.ETYPE_PROTOMECH),
+                0);
+        int freehv = Math.max(getTotalHeavyVehicleBays() - getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int freeinf = Math.max(getTotalInfantryBays() - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int freeba = Math.max(getTotalBattleArmorBays() - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        int freeSC = Math.max(getTotalSmallCraftBays() - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+
+        //check for free bays elsewhere
+        noASF = Math.max(noASF - freeSC, 0);
+        nolv = Math.max(nolv - freehv, 0);
+
+        int unitsOver = noMech+noSC+noASF+nolv+nohv+noinf+noBA+noProto;
+        int unitsTransported = getOccupiedBays(Entity.ETYPE_MECH)+
+                getOccupiedBays(Entity.ETYPE_CONV_FIGHTER)+
+                getOccupiedBays(Entity.ETYPE_SMALL_CRAFT)+
+                getOccupiedBays(Entity.ETYPE_AERO)+
+                getOccupiedBays(Entity.ETYPE_TANK, true)+
+                getOccupiedBays(Entity.ETYPE_TANK)+
+                getOccupiedBays(Entity.ETYPE_INFANTRY)+
+                getOccupiedBays(Entity.ETYPE_BATTLEARMOR)+
+                getOccupiedBays(Entity.ETYPE_PROTOMECH);
+
+
+        int noDS = Math.max(getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP) - getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
+        int percentTransported = 100-(int)Math.round(100*unitsOver/(double)(unitsOver+unitsTransported));
+
+        String dropshipAppend = "";
+        int nDS = getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
+        int dockingCollars = this.getTotalDockingCollars();
+        if(nDS > 0) {
+            dropshipAppend = ", " + Integer.toString(nDS) + " dropships/" + Integer.toString(dockingCollars) + " docking collars";
+        }
+
+        return Integer.toString(percentTransported) + "% bay capacity" + dropshipAppend;
     }
 
     public String getCombatPersonnelDetails() {

@@ -53,6 +53,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblPersonnel;
     private JLabel lblMissionSuccess;
     private JLabel lblComposition;
+    private JLabel lblTransportCapacity;
+    private JLabel lblCargoSummary;
+
 
 
     // daily report
@@ -199,6 +202,32 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panInfo.add(lblComposition, gridBagConstraints);
+        y++;
+        JLabel lblTransportCapacityHead = new JLabel(resourceMap.getString("lblTransportCapacity.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panInfo.add(lblTransportCapacityHead, gridBagConstraints);
+        lblTransportCapacity = new JLabel(getCampaign().getTransportCapacity());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        panInfo.add(lblTransportCapacity, gridBagConstraints);
+        y++;
+        JLabel lblCargoSummaryHead = new JLabel(resourceMap.getString("lblCargoSummary.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panInfo.add(lblCargoSummaryHead, gridBagConstraints);
+        lblCargoSummary = new JLabel(getCampaign().getCargoCapacity());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        panInfo.add(lblCargoSummary, gridBagConstraints);
 
         panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panInfo.title")));
 
@@ -376,6 +405,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblMissionSuccess.setText(getCampaign().getMissionSuccessString());
         lblExperience.setText(getCampaign().getUnitRating().getAverageExperience());
         lblComposition.setText(getCampaign().getForceComposition());
+        lblCargoSummary.setText(getCampaign().getCargoCapacity());
     }
 
     private void refreshProcurementList() {
