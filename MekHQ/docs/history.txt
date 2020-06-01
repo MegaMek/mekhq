@@ -22,6 +22,7 @@ VERSION HISTORY:
 + PR #1715: Varied Prisoner Status Bugfixes
 + PR #1714: Random Names and Gender Rework
 + Issue #1631: Regenerating Forces for AtB Dynamic Scenarios now Resets Attached Bot Forces
++ Issue #1706: Techs now display as part of the force in the personnel tab
 
 0.47.6 (2020-5-03 1715 UTC)
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
