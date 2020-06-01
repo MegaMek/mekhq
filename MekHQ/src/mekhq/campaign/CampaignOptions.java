@@ -381,6 +381,7 @@ public class CampaignOptions implements Serializable {
     private int opforLocalUnitChance;
     private boolean adjustPlayerVehicles;
     private boolean regionalMechVariations;
+    private boolean attachedPlayerCamouflage;
     private boolean useDropShips;
     private boolean useWeatherConditions;
     private boolean useLightConditions;
@@ -763,6 +764,7 @@ public class CampaignOptions implements Serializable {
         opforLocalUnitChance = 5;
         adjustPlayerVehicles = false;
         regionalMechVariations = false;
+        attachedPlayerCamouflage = false;
         useDropShips = false;
         useWeatherConditions = true;
         useLightConditions = true;
@@ -2685,6 +2687,14 @@ public class CampaignOptions implements Serializable {
         this.regionalMechVariations = regionalMechVariations;
     }
 
+    public boolean getAttachedPlayerCamouflage() {
+        return attachedPlayerCamouflage;
+    }
+
+    public void setAttachedPlayerCamouflage(boolean attachedPlayerCamouflage) {
+        this.attachedPlayerCamouflage = attachedPlayerCamouflage;
+    }
+
     public String[] getRATs() {
         return rats;
     }
@@ -3201,6 +3211,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mercSizeLimited", mercSizeLimited);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackOriginalUnit", trackOriginalUnit);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "regionalMechVariations", regionalMechVariations);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "attachedPlayerCamouflage", attachedPlayerCamouflage);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "searchRadius", searchRadius);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "intensity", intensity);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "generateChases", generateChases);
@@ -3781,6 +3792,8 @@ public class CampaignOptions implements Serializable {
                 retVal.mercSizeLimited = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("regionalMechVariations")) {
                 retVal.regionalMechVariations = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("attachedPlayerCamouflage")) {
+                retVal.attachedPlayerCamouflage = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("searchRadius")) {
                 retVal.searchRadius = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) {
