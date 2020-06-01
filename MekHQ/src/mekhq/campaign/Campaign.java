@@ -4161,11 +4161,17 @@ public class Campaign implements Serializable, ITechManager {
 
     public Force getForceFor(Person p) {
         Unit u = getUnit(p.getUnitId());
-        if (null == u) {
-            return null;
-        } else {
+        if (u != null) {
             return getForceFor(u);
+        } else if (p.isTech()) {
+            for (Force force : forceIds.values()) {
+                if (p.getId().equals(force.getTechID())) {
+                    return force;
+                }
+            }
         }
+
+        return null;
     }
 
     public String getDateAsString() {
