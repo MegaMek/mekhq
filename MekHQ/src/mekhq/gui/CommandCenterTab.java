@@ -52,6 +52,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblExperience;
     private JLabel lblPersonnel;
     private JLabel lblMissionSuccess;
+    private JLabel lblComposition;
 
 
     // daily report
@@ -186,6 +187,18 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panInfo.add(lblPersonnel, gridBagConstraints);
         y++;
+        JLabel lblCompositionHead = new JLabel(resourceMap.getString("lblComposition.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panInfo.add(lblCompositionHead, gridBagConstraints);
+        lblComposition = new JLabel(getCampaign().getForceComposition());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        panInfo.add(lblComposition, gridBagConstraints);
 
         panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panInfo.title")));
 
@@ -362,6 +375,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblPersonnel.setText(getCampaign().getPersonnelSummary());
         lblMissionSuccess.setText(getCampaign().getMissionSuccessString());
         lblExperience.setText(getCampaign().getUnitRating().getAverageExperience());
+        lblComposition.setText(getCampaign().getForceComposition());
     }
 
     private void refreshProcurementList() {

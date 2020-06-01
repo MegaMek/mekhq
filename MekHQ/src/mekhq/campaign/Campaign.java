@@ -7837,6 +7837,7 @@ public class Campaign implements Serializable, ITechManager {
             if(!p.getPrisonerStatus().isFree() || !p.isActive()) {
                 continue;
             }
+            p.
             if (p.hasPrimaryCombatRole()) {
                 totalCombat++;
             } else if(p.hasPrimarySupportRole(false)) {
@@ -7846,15 +7847,57 @@ public class Campaign implements Serializable, ITechManager {
         return Integer.toString(totalCombat) + " Combat, " + Integer.toString(totalSupport) + " Support";
     }
 
-    public int getForceComposition() {
-        int countTotal = 0;
-        for (Person p : getPersonnel()) {
-            // Add them to the total count
-            if (p.hasPrimaryCombatRole() && p.getPrisonerStatus().isFree() && p.isActive()) {
-                countTotal++;
+    public String getForceComposition() {
+        int mechCount = 0;
+        int veeCount = 0;
+        int aeroCount = 0;
+        int infantryCount = 0;
+        int squadCount = 0;
+        for(Unit u : getUnits()) {
+            Entity e = u.getEntity();
+            if(!u.hasPilot() || u.isSalvage() || u.isMothballed() || u.isMothballing() ||
+                    null == e) {
+                continue;
+            }
+            switch (e.getUnitType()) {
+                case UnitType.MEK:
+                case UnitType.PROTOMEK:
+                    mechCount++;
+                    break;
+                case UnitType.VTOL:
+                case UnitType.TANK:
+                    veeCount++;
+                    break;
+                case UnitType.AERO:
+                case UnitType.CONV_FIGHTER:
+                    aeroCount++;
+                    break;
+                case UnitType.BATTLE_ARMOR:
+                    infantryCount++;
+                    break;
+                case UnitType.INFANTRY:
+                    Infantry i = (Infantry) e;
+                    infantryCount += i.getSquadN();
+                    break;
             }
         }
-        return countTotal;
+        infantryCount += (int)Math.ceil(squadCount/4.0);
+
+        double totalUnits = mechCount+veeCount+infantryCount+aeroCount;
+        List<String> composition = new ArrayList<String>();
+        if(mechCount > 0) {
+            composition.add(Integer.toString((int) Math.round(100 * mechCount / totalUnits)) + "% mech");
+        }
+        if(veeCount > 0) {
+            composition.add(Integer.toString((int) Math.round(100 * veeCount / totalUnits)) + "% armor");
+        }
+        if(infantryCount > 0) {
+            composition.add(Integer.toString((int) Math.round(100 * infantryCount / totalUnits)) + "% infantry");
+        }
+        if(aeroCount > 0) {
+            composition.add(Integer.toString((int) Math.round(100 * aeroCount / totalUnits)) + "% aero");
+        }
+        return String.join(", ", composition);
     }
 
     public String getMissionSuccessString() {
@@ -7862,14 +7905,14 @@ public class Campaign implements Serializable, ITechManager {
         for(Mission m : getMissions()) {
             countMissionByStatus[m.getStatus()]++;
         }
-        int completedN = countMissionByStatus[Mission.S_SUCCESS]+
+        double completedN = countMissionByStatus[Mission.S_SUCCESS]+
                 countMissionByStatus[Mission.S_FAILED]+
                 countMissionByStatus[Mission.S_BREACH];
         if(completedN<=0) {
             return "NA (no completed missions)";
         }
-        double successRate = 100 * countMissionByStatus[Mission.S_SUCCESS]/completedN;
-        return Double.toString(successRate) + "%";
+        int successRate = (int)Math.round(100 * countMissionByStatus[Mission.S_SUCCESS]/completedN);
+        return Integer.toString(successRate) + "%";
     }
 
     public String getCombatPersonnelDetails() {
