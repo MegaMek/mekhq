@@ -100,8 +100,13 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities));
         }
 
-        addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT,
-                isAttacker() ? 2 : 0, 0, campaign);
+        if (isAttacker()) {
+            addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign),
+                    EntityWeightClass.WEIGHT_ASSAULT, 2, 0, campaign);
+        } else {
+            addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign),
+                    EntityWeightClass.WEIGHT_HEAVY, 0, 0, campaign);
+        }
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities));
     }
@@ -110,10 +115,12 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
+        // Attacker must destroy 50% and keep 66% alive
+        // Defender must destroy 33% and keep 50% alive
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract,
                 isAttacker() ? 50 : 33);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(
-                campaign, contract, this, isAttacker() ? 50 : 66, false);
+                campaign, contract, this, isAttacker() ? 66 : 50, false);
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
                 this);
 

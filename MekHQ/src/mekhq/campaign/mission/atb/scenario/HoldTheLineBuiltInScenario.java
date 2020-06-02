@@ -96,9 +96,12 @@ public class HoldTheLineBuiltInScenario extends AtBScenario {
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, isAttacker() ? 50 : 33);
+        // Attacker must destroy 50% and keep 66% alive
+        // Defender must destroy 33% and keep 50% alive
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract,
+                isAttacker() ? 50 : 33);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(
-                campaign, contract, this, isAttacker() ? 50 : 66, false);
+                campaign, contract, this, isAttacker() ? 66 : 50, false);
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
                 this);
 
