@@ -2495,7 +2495,7 @@ public class CampaignGUI extends JPanel {
      * in order to draw attention to it
      */
     public void checkDailyLogNag() {
-        if(!logNagActive) {
+        if (!logNagActive) {
             if (tabMain.getSelectedIndex() != 0) {
                 tabMain.setBackgroundAt(0, Color.RED);
                 logNagActive = true;
