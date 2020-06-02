@@ -161,11 +161,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
             gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(5, 5, 1, 5);
             panInfo.add(lblRatingHead, gridBagConstraints);
             lblRating = new JLabel(getCampaign().getUnitRatingText());
             gridBagConstraints.gridx = 1;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             panInfo.add(lblRating, gridBagConstraints);
             y++;
         }
@@ -175,11 +175,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblExperienceHead, gridBagConstraints);
         lblExperience = new JLabel(getCampaign().getUnitRating().getAverageExperience());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panInfo.add(lblExperience, gridBagConstraints);
         y++;
         JLabel lblMissionSuccessHead = new JLabel(resourceMap.getString("lblMissionSuccess.text"));
@@ -188,11 +188,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblMissionSuccessHead, gridBagConstraints);
         lblMissionSuccess = new JLabel(getCampaign().getCampaignSummary().getMissionSuccessReport());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panInfo.add(lblMissionSuccess, gridBagConstraints);
         y++;
         JLabel lblPersonnelHead = new JLabel(resourceMap.getString("lblPersonnel.text"));
@@ -201,11 +201,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblPersonnelHead, gridBagConstraints);
         lblPersonnel = new JLabel(getCampaign().getCampaignSummary().getPersonnelReport());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panInfo.add(lblPersonnel, gridBagConstraints);
         y++;
         JLabel lblCompositionHead = new JLabel(resourceMap.getString("lblComposition.text"));
@@ -214,11 +214,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblCompositionHead, gridBagConstraints);
         lblComposition = new JLabel(getCampaign().getCampaignSummary().getForceCompositionReport());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panInfo.add(lblComposition, gridBagConstraints);
         y++;
         JLabel lblRepairStatusHead = new JLabel(resourceMap.getString("lblRepairStatus.text"));
@@ -227,11 +227,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblRepairStatusHead, gridBagConstraints);
         lblRepairStatus = new JLabel(getCampaign().getCampaignSummary().getForceRepairReport());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panInfo.add(lblRepairStatus, gridBagConstraints);
         y++;
         JLabel lblTransportCapacityHead = new JLabel(resourceMap.getString("lblTransportCapacity.text"));
@@ -240,11 +240,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblTransportCapacityHead, gridBagConstraints);
         lblTransportCapacity = new JLabel(getCampaign().getCampaignSummary().getTransportCapacity());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panInfo.add(lblTransportCapacity, gridBagConstraints);
         y++;
         JLabel lblCargoSummaryHead = new JLabel(resourceMap.getString("lblCargoSummary.text"));
@@ -253,11 +253,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(1, 5, 5, 5);
         panInfo.add(lblCargoSummaryHead, gridBagConstraints);
         lblCargoSummary = new JLabel(getCampaign().getCampaignSummary().getCargoCapacityReport());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         panInfo.add(lblCargoSummary, gridBagConstraints);
 
         panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panInfo.title")));
