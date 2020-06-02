@@ -201,6 +201,17 @@ public class ImageChoiceDialog extends JDialog {
             gbc.weightx = 1.0;
             gbc.weighty = 1.0;
 
+            // We need to ensure that the state that it comes into is saved, as we need to add the
+            // default frame icon otherwise
+            final boolean emptyInitialIconMap = iconMap.isEmpty();
+
+            // Add the default frame icon
+            if (emptyInitialIconMap) {
+                Vector<String> initFrame = new Vector<>();
+                initFrame.add("Frame.png");
+                iconMap.put(LayeredForceIcon.FRAME.getLayerPath(), initFrame);
+            }
+
             LayeredForceIcon[] layeredForceIcons = LayeredForceIcon.values();
             layeredTables = new JTable[layeredForceIcons.length];
 
@@ -229,8 +240,9 @@ public class ImageChoiceDialog extends JDialog {
                 }
                 layerTabs.addTab(layeredForceIcons[i].toString(), panel);
 
-                // Initialize Initial Values, provided the Icon Map is not empty
-                if (!iconMap.isEmpty()) {
+                // Initialize Initial Values, provided the Icon Map is not empty on input or it
+                // is the frame (as we set that value otherwise)
+                if (!emptyInitialIconMap || (layeredForceIcons[i] == LayeredForceIcon.FRAME)) {
                     if (iconMap.containsKey(layeredForceIcons[i].getLayerPath())) {
                         if (layeredForceIcons[i].getListSelectionModel() == ListSelectionModel.SINGLE_SELECTION) {
                             // Determine the current selected value
@@ -257,14 +269,6 @@ public class ImageChoiceDialog extends JDialog {
                 }
             }
 
-            // Then trigger the initial refresh
-            refreshLayeredPreview();
-
-            // And add the missing ListSelectionListeners, which must be done after the initial refresh
-            for (JTable table : layeredTables) {
-                table.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
-            }
-
             // Put it all together nice and pretty on the layerPanel
             layerPanel.setLayout(new GridBagLayout());
             layerPanel.add(layerTabs, gbc);
@@ -283,7 +287,7 @@ public class ImageChoiceDialog extends JDialog {
             tabbedPane.addTab(resourceMap.getString("Force.layered"), layerPanel);
 
             // Set currently selected tab based on the initial category
-            if (!iconMap.isEmpty()) {
+            if (!emptyInitialIconMap) {
                 tabbedPane.setSelectedComponent(layerPanel);
             }
 
@@ -298,14 +302,13 @@ public class ImageChoiceDialog extends JDialog {
             gbc.anchor = GridBagConstraints.NORTHWEST;
             getContentPane().add(tabbedPane, gbc);
 
-            // Add the tableImages List Selection Listener now that the values have been
-            // initialized for Layered Icons
-            tableImages.getSelectionModel().addListSelectionListener(event -> {
-                // Clear selections on the layered tables
-                for (JTable table : layeredTables) {
-                    table.clearSelection();
-                }
-            });
+            // Then trigger the initial refresh
+            refreshLayeredPreview();
+
+            // And add the missing ListSelectionListeners, which must be done after the initial refresh
+            for (JTable table : layeredTables) {
+                table.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
+            }
         } else {
             // Add the image panel to the content pane
             gbc = new GridBagConstraints();
@@ -390,7 +393,7 @@ public class ImageChoiceDialog extends JDialog {
     }
 
     private void refreshLayeredPreview() {
-        // Add the image frame
+        // Clear the icon map
         iconMap.clear();
 
         // Check each table for what is, or is not, selected
