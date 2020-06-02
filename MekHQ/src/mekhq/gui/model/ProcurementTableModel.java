@@ -170,7 +170,7 @@ public class ProcurementTableModel extends DataTableModel {
                 return SwingConstants.RIGHT;
         case COL_TARGET:
         case COL_NEXT:
-            case COL_TYPE:
+        case COL_TYPE:
             return SwingConstants.CENTER;
         default:
             return SwingConstants.LEFT;
