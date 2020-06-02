@@ -433,7 +433,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     public void setIcon() {
 
-        if(null == icons) {
+        if (null == icons) {
             icons = getCampaignGui().getIconPackage().getForceIcons();
         }
 
