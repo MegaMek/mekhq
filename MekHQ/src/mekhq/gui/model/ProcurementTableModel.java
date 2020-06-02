@@ -93,7 +93,7 @@ public class ProcurementTableModel extends DataTableModel {
         if(col == COL_NAME) {
             return shoppingItem.getAcquisitionName();
         }
-        if(col == COL_TYPE) {
+        if (col == COL_TYPE) {
             if (shoppingItem instanceof UnitOrder) {
                 return "Unit";
             } else if (shoppingItem instanceof Part) {
