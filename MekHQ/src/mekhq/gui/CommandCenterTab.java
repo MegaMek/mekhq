@@ -388,7 +388,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panProcurement.add(panProcurementButtons, gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(5,5,5,5);
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
