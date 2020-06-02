@@ -166,9 +166,8 @@ public class CampaignSummary {
         noASF = Math.max(noASF - freeSC, 0);
         nolv = Math.max(nolv - freehv, 0);
 
-        unitsOver = noMech+noSC+noASF+nolv+nohv+noinf+noBA+noProto;
+        unitsOver = noMech+noASF+nolv+nohv+noinf+noBA+noProto;
         unitsTransported = campaign.getOccupiedBays(Entity.ETYPE_MECH)+
-                campaign.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER)+
                 campaign.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT)+
                 campaign.getOccupiedBays(Entity.ETYPE_AERO)+
                 campaign.getOccupiedBays(Entity.ETYPE_TANK, true)+
@@ -218,11 +217,14 @@ public class CampaignSummary {
 
     public String getCargoCapacityReport() {
         return Integer.toString((int)Math.round(cargoTons)) + " tons (" +
-                Integer.toString((int)Math.round(cargoCapacity)) + " capacity)";
+                Integer.toString((int)Math.round(cargoCapacity)) + " tons capacity)";
     }
 
     public String getTransportCapacity() {
-        int percentTransported = 100-(int)Math.round(100*unitsOver/(double)(unitsOver+unitsTransported));
+        int percentTransported = 0;
+        if((unitsOver+unitsTransported)>0) {
+            percentTransported = 100-(int)Math.round(100*unitsOver/(double)(unitsOver+unitsTransported));
+        }
         String dropshipAppend = "";
         int dockingCollars = campaign.getTotalDockingCollars();
         if(nDS > 0) {
