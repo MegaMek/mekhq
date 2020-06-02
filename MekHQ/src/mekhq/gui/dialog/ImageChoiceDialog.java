@@ -299,7 +299,7 @@ public class ImageChoiceDialog extends JDialog {
             getContentPane().add(tabbedPane, gbc);
 
             // Add the tableImages List Selection Listener now that the values have been
-            // initialized for Layered Icons, if applicable.
+            // initialized for Layered Icons
             tableImages.getSelectionModel().addListSelectionListener(event -> {
                 // Clear selections on the layered tables
                 for (JTable table : layeredTables) {
