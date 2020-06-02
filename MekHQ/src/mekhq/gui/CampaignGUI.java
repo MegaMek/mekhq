@@ -1679,6 +1679,7 @@ public class CampaignGUI extends JPanel {
 
     public void showReport(Report report) {
         ReportDialog rd = new ReportDialog(getFrame(), report);
+        rd.pack();
         rd.setVisible(true);
     }
 
