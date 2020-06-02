@@ -123,8 +123,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
-
-
     }
 
     /*
