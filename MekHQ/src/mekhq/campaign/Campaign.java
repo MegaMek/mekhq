@@ -3057,7 +3057,7 @@ public class Campaign implements Serializable, ITechManager {
         return repairable;
     }
 
-    public void fixPart(IPartWork partWork, Person tech) {
+    public String fixPart(IPartWork partWork, Person tech) {
         TargetRoll target = getTargetFor(partWork, tech);
         String report = "";
         String action = " fix ";
@@ -3083,21 +3083,21 @@ public class Campaign implements Serializable, ITechManager {
             if (!((Armor) partWork).isInSupply()) {
                 report += "<b>Not enough armor remaining.  Task suspended.</b>";
                 addReport(report);
-                return;
+                return report;
             }
         }
         if ((partWork instanceof ProtomekArmor) && !partWork.isSalvaging()) {
             if (!((ProtomekArmor) partWork).isInSupply()) {
                 report += "<b>Not enough Protomech armor remaining.  Task suspended.</b>";
                 addReport(report);
-                return;
+                return report;
             }
         }
         if ((partWork instanceof BaArmor) && !partWork.isSalvaging()) {
             if (!((BaArmor) partWork).isInSupply()) {
                 report += "<b>Not enough BA armor remaining.  Task suspended.</b>";
                 addReport(report);
-                return;
+                return report;
             }
         }
         if (partWork instanceof SpacecraftCoolingSystem) {
@@ -3164,7 +3164,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
-                return;
+                return report;
             }
         } else {
             tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
@@ -3268,6 +3268,7 @@ public class Campaign implements Serializable, ITechManager {
         partWork.cancelReservation();
         MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(report);
+        return report;
     }
 
     /**
