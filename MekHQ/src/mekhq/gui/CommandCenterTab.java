@@ -355,9 +355,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         });
 
         procurementTable.getActionMap().put("REMOVE", new AbstractAction() {
-            /**
-             *
-             */
             private static final long serialVersionUID = -8377486575329708963L;
 
             @Override
