@@ -143,7 +143,6 @@ public class CampaignGUI extends JPanel {
     /* Components for the status panel */
     private JPanel statusPanel;
     private JLabel lblLocation;
-    private JLabel lblRating;
     private JLabel lblFunds;
     private JLabel lblTempAstechs;
     private JLabel lblTempMedics;
@@ -288,7 +287,6 @@ public class CampaignGUI extends JPanel {
 
         refreshCalendar();
         refreshFunds();
-        refreshRating();
         refreshLocation();
         refreshTempAstechs();
         refreshTempMedics();
@@ -1000,12 +998,10 @@ public class CampaignGUI extends JPanel {
     private void initStatusBar() {
         statusPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 20, 4));
 
-        lblRating = new JLabel();
         lblFunds = new JLabel();
         lblTempAstechs = new JLabel();
         lblTempMedics = new JLabel();
 
-        statusPanel.add(lblRating);
         statusPanel.add(lblFunds);
         statusPanel.add(lblTempAstechs);
         statusPanel.add(lblTempMedics);
@@ -2533,26 +2529,6 @@ public class CampaignGUI extends JPanel {
         lblFunds.setText(text);
     }
 
-    private void refreshRating() {
-        if (getCampaign().getCampaignOptions().useDragoonRating()) {
-            // this is the one situation where we do want to refresh the rating,
-            // as it means something has happened to influence it
-            getCampaign().getUnitRating().reInitialize();
-
-            String text;
-            if (UnitRatingMethod.FLD_MAN_MERCS_REV.equals(getCampaign().getCampaignOptions().getUnitRatingMethod())) {
-                text = String.format(resourceMap.getString("bottomRating.DragoonsRating"), getCampaign().getUnitRatingText());
-            }
-            else {
-                text = String.format(resourceMap.getString("bottomRating.CampaignOpsRating"), getCampaign().getUnitRatingText());
-            }
-
-            lblRating.setText(text);
-        } else {
-            lblRating.setText("");
-        }
-    }
-
     private void refreshTempAstechs() {
         String text = "<html><b>Temp Astechs:</b> " + getCampaign().getAstechPool() + "</html>";
         lblTempAstechs.setText(text);
@@ -2564,7 +2540,6 @@ public class CampaignGUI extends JPanel {
     }
 
     private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
-    private ActionScheduler ratingScheduler = new ActionScheduler(this::refreshRating);
 
     @Subscribe
     public void handleDayEnding(DayEndingEvent ev) {
@@ -2608,40 +2583,21 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
         fundsScheduler.schedule();
-        ratingScheduler.schedule();
     }
 
     @Subscribe
     public void handle(TransactionEvent ev) {
         fundsScheduler.schedule();
-        ratingScheduler.schedule();
     }
 
     @Subscribe
     public void handle(LoanEvent ev) {
         fundsScheduler.schedule();
-        ratingScheduler.schedule();
     }
 
     @Subscribe
     public void handle(AssetEvent ev) {
         fundsScheduler.schedule();
-        ratingScheduler.schedule();
-    }
-
-    @Subscribe
-    public void handle(MissionEvent ev) {
-        ratingScheduler.schedule();
-    }
-
-    @Subscribe
-    public void handle(PersonEvent ev) {
-        ratingScheduler.schedule();
-    }
-
-    @Subscribe
-    public void handle(UnitEvent ev) {
-        ratingScheduler.schedule();
     }
 
     @Subscribe

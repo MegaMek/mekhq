@@ -559,4 +559,20 @@ public final class CommandCenterTab extends CampaignGuiTab {
         procurementListScheduler.schedule();
         setIcon();
     }
+
+    @Subscribe
+    public void handle(TransactionEvent ev) {
+        basicInfoScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(LoanEvent ev) {
+        basicInfoScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(AssetEvent ev) {
+        basicInfoScheduler.schedule();
+    }
+
 }
