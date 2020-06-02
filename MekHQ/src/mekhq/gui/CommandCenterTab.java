@@ -172,7 +172,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panInfo.add(lblMissionSuccessHead, gridBagConstraints);
-        lblMissionSuccess = new JLabel(getCampaign().getMissionSuccessString());
+        lblMissionSuccess = new JLabel(getCampaign().getCampaignSummary().getMissionSuccessReport());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
@@ -185,7 +185,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panInfo.add(lblPersonnelHead, gridBagConstraints);
-        lblPersonnel = new JLabel(getCampaign().getPersonnelSummary());
+        lblPersonnel = new JLabel(getCampaign().getCampaignSummary().getPersonnelReport());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
@@ -198,7 +198,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panInfo.add(lblCompositionHead, gridBagConstraints);
-        lblComposition = new JLabel(getCampaign().getForceComposition());
+        lblComposition = new JLabel(getCampaign().getCampaignSummary().getForceCompositionReport());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
@@ -211,7 +211,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panInfo.add(lblRepairStatusHead, gridBagConstraints);
-        lblRepairStatus = new JLabel(getCampaign().getForceRepairStatus());
+        lblRepairStatus = new JLabel(getCampaign().getCampaignSummary().getForceRepairReport());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
@@ -224,7 +224,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panInfo.add(lblTransportCapacityHead, gridBagConstraints);
-        lblTransportCapacity = new JLabel(getCampaign().getTransportCapacity());
+        lblTransportCapacity = new JLabel(getCampaign().getCampaignSummary().getTransportCapacity());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
@@ -237,7 +237,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panInfo.add(lblCargoSummaryHead, gridBagConstraints);
-        lblCargoSummary = new JLabel(getCampaign().getCargoCapacity());
+        lblCargoSummary = new JLabel(getCampaign().getCampaignSummary().getCargoCapacityReport());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
@@ -414,13 +414,15 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     private void refreshBasicInfo() {
         getCampaign().getUnitRating().reInitialize();
+        getCampaign().getCampaignSummary().updateInformation();
         lblRating.setText(getCampaign().getUnitRatingText());
-        lblPersonnel.setText(getCampaign().getPersonnelSummary());
-        lblMissionSuccess.setText(getCampaign().getMissionSuccessString());
+        lblPersonnel.setText(getCampaign().getCampaignSummary().getPersonnelReport());
+        lblMissionSuccess.setText(getCampaign().getCampaignSummary().getMissionSuccessReport());
         lblExperience.setText(getCampaign().getUnitRating().getAverageExperience());
-        lblComposition.setText(getCampaign().getForceComposition());
-        lblCargoSummary.setText(getCampaign().getCargoCapacity());
-        lblRepairStatus.setText(getCampaign().getForceRepairStatus());
+        lblComposition.setText(getCampaign().getCampaignSummary().getForceCompositionReport());
+        lblCargoSummary.setText(getCampaign().getCampaignSummary().getCargoCapacityReport());
+        lblRepairStatus.setText(getCampaign().getCampaignSummary().getForceRepairReport());
+        lblTransportCapacity.setText(getCampaign().getCampaignSummary().getTransportCapacity());
     }
 
     private void refreshProcurementList() {

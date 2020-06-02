@@ -268,6 +268,7 @@ public class Campaign implements Serializable, ITechManager {
     private Calendar shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
+    private CampaignSummary campaignSummary;
 
     /** This is used to determine if the player has an active AtB Contract, and is recalculated on load */
     private transient boolean hasActiveContract;
@@ -322,6 +323,7 @@ public class Campaign implements Serializable, ITechManager {
         atbConfig = null;
         autosaveService = new AutosaveService();
         hasActiveContract = false;
+        campaignSummary = new CampaignSummary(this);
     }
 
     /**
@@ -779,6 +781,10 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         return true;
+    }
+
+    public CampaignSummary getCampaignSummary() {
+        return campaignSummary;
     }
 
     public News getNews() {
@@ -7823,173 +7829,6 @@ public class Campaign implements Serializable, ITechManager {
         sb.append(String.format("%-35s      %4d\n", "Mothballed Units (see Cargo report)", mothballedAsCargo));
 
         return new String(sb);
-    }
-
-    /**
-     * Get the number of active support personnel, for summary information in Command Center tab
-     * @return integer of the number of support personnel
-     */
-    public String getPersonnelSummary() {
-        int totalCombat = 0;
-        int totalSupport = 0;
-        int totalInjured = 0;
-        for (Person p : getPersonnel()) {
-            // Add them to the total count
-            if(!p.getPrisonerStatus().isFree() || !p.isActive()) {
-                continue;
-            }
-            if(p.getHits() > 0) {
-                totalInjured++;
-            }
-            if (p.hasPrimaryCombatRole()) {
-                totalCombat++;
-            } else if(p.hasPrimarySupportRole(false)) {
-                totalSupport++;
-            }
-        }
-        return Integer.toString(totalCombat) + " combat, " + Integer.toString(totalSupport) + " support (" +
-                Integer.toString(totalInjured) + " injured)";
-    }
-
-    public String getForceRepairStatus() {
-        int[] countDamageStatus = new int[Entity.DMG_CRIPPLED+1];
-        for(Unit u : getUnits()) {
-            if(u.isUnmanned() || u.isSalvage() || u.isMothballed() || u.isMothballing() || !u.isPresent()) {
-                continue;
-            }
-            countDamageStatus[u.getDamageState()]++;
-        }
-        return countDamageStatus[Entity.DMG_LIGHT] + " light, " +
-                countDamageStatus[Entity.DMG_MODERATE] + " moderate, " +
-                countDamageStatus[Entity.DMG_HEAVY] + " heavy, " +
-                countDamageStatus[Entity.DMG_CRIPPLED] + " crippled";
-
-    }
-
-    public String getForceComposition() {
-        int mechCount = 0;
-        int veeCount = 0;
-        int aeroCount = 0;
-        int infantryCount = 0;
-        int squadCount = 0;
-        for(Unit u : getUnits()) {
-            Entity e = u.getEntity();
-            if(u.isUnmanned() || u.isSalvage() || u.isMothballed() || u.isMothballing() || !u.isPresent() || null == e) {
-                continue;
-            }
-            switch (e.getUnitType()) {
-                case UnitType.MEK:
-                case UnitType.PROTOMEK:
-                    mechCount++;
-                    break;
-                case UnitType.VTOL:
-                case UnitType.TANK:
-                    veeCount++;
-                    break;
-                case UnitType.AERO:
-                case UnitType.CONV_FIGHTER:
-                    aeroCount++;
-                    break;
-                case UnitType.BATTLE_ARMOR:
-                    infantryCount++;
-                    break;
-                case UnitType.INFANTRY:
-                    Infantry i = (Infantry) e;
-                    squadCount += i.getSquadN();
-                    break;
-            }
-        }
-        //squad should count as 1/4 of a unit for force composition
-        infantryCount += (int)Math.ceil(squadCount/4.0);
-
-        double totalUnits = mechCount+veeCount+infantryCount+aeroCount;
-        List<String> composition = new ArrayList<String>();
-        if(mechCount > 0) {
-            composition.add(Integer.toString((int) Math.round(100 * mechCount / totalUnits)) + "% mech");
-        }
-        if(veeCount > 0) {
-            composition.add(Integer.toString((int) Math.round(100 * veeCount / totalUnits)) + "% armor");
-        }
-        if(infantryCount > 0) {
-            composition.add(Integer.toString((int) Math.round(100 * infantryCount / totalUnits)) + "% infantry");
-        }
-        if(aeroCount > 0) {
-            composition.add(Integer.toString((int) Math.round(100 * aeroCount / totalUnits)) + "% aero");
-        }
-        return String.join(", ", composition);
-    }
-
-    public String getMissionSuccessString() {
-        int[] countMissionByStatus = new int[Mission.S_NUM];
-        for(Mission m : getMissions()) {
-            countMissionByStatus[m.getStatus()]++;
-        }
-        double completedN = countMissionByStatus[Mission.S_SUCCESS]+
-                countMissionByStatus[Mission.S_FAILED]+
-                countMissionByStatus[Mission.S_BREACH];
-        if(completedN<=0) {
-            return "NA (no completed missions)";
-        }
-        int successRate = (int)Math.round(100 * countMissionByStatus[Mission.S_SUCCESS]/completedN);
-        return Integer.toString(successRate) + "%";
-    }
-
-    public String getCargoCapacity() {
-        double ccc = this.getTotalCombinedCargoCapacity();
-        double tonnage = this.getCargoTonnage(false);
-        double mothballedTonnage = this.getCargoTonnage(false, true);
-        double combined = (tonnage + mothballedTonnage);
-
-        return Integer.toString((int)Math.round(combined)) + " tons (" +
-                Integer.toString((int)Math.round(ccc)) + " capacity)";
-    }
-
-    public String getTransportCapacity() {
-        int noMech = Math.max(getNumberOfUnitsByType(Entity.ETYPE_MECH) - getOccupiedBays(Entity.ETYPE_MECH), 0);
-        int noSC = Math.max(getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
-                int noCF = Math
-                .max(getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(getNumberOfUnitsByType(Entity.ETYPE_AERO) - getOccupiedBays(Entity.ETYPE_AERO), 0);
-        int nolv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) - getOccupiedBays(Entity.ETYPE_TANK, true), 0);
-        int nohv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK) - getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int noinf = Math.max(getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int noBA = Math.max(getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        @SuppressWarnings("unused") // FIXME: This should be used somewhere...
-                int noProto = Math.max(getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - getOccupiedBays(Entity.ETYPE_PROTOMECH),
-                0);
-        int freehv = Math.max(getTotalHeavyVehicleBays() - getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int freeinf = Math.max(getTotalInfantryBays() - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int freeba = Math.max(getTotalBattleArmorBays() - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int freeSC = Math.max(getTotalSmallCraftBays() - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-
-        //check for free bays elsewhere
-        noASF = Math.max(noASF - freeSC, 0);
-        nolv = Math.max(nolv - freehv, 0);
-
-        int unitsOver = noMech+noSC+noASF+nolv+nohv+noinf+noBA+noProto;
-        int unitsTransported = getOccupiedBays(Entity.ETYPE_MECH)+
-                getOccupiedBays(Entity.ETYPE_CONV_FIGHTER)+
-                getOccupiedBays(Entity.ETYPE_SMALL_CRAFT)+
-                getOccupiedBays(Entity.ETYPE_AERO)+
-                getOccupiedBays(Entity.ETYPE_TANK, true)+
-                getOccupiedBays(Entity.ETYPE_TANK)+
-                getOccupiedBays(Entity.ETYPE_INFANTRY)+
-                getOccupiedBays(Entity.ETYPE_BATTLEARMOR)+
-                getOccupiedBays(Entity.ETYPE_PROTOMECH);
-
-
-        int noDS = Math.max(getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP) - getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
-        int percentTransported = 100-(int)Math.round(100*unitsOver/(double)(unitsOver+unitsTransported));
-
-        String dropshipAppend = "";
-        int nDS = getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
-        int dockingCollars = this.getTotalDockingCollars();
-        if(nDS > 0) {
-            dropshipAppend = ", " + Integer.toString(nDS) + " dropships/" + Integer.toString(dockingCollars) + " docking collars";
-        }
-
-        return Integer.toString(percentTransported) + "% bay capacity" + dropshipAppend;
     }
 
     public String getCombatPersonnelDetails() {
