@@ -20,13 +20,7 @@
  */
 package mekhq.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Toolkit;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.lang.reflect.Method;
@@ -37,6 +31,8 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.xml.parsers.DocumentBuilder;
 
 import mekhq.campaign.finances.Money;
@@ -157,6 +153,8 @@ public class CampaignGUI extends JPanel {
 
     ReportHyperlinkListener reportHLL;
 
+    private boolean logNagActive = false;
+
     public CampaignGUI(MekHQ app) {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
@@ -221,7 +219,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showAdvanceDaysDialog() {
-        AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(getFrame(), this, reportHLL);
+        AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(getFrame(), this);
         advanceDaysDialog.setModal(true);
         advanceDaysDialog.setVisible(true);
         advanceDaysDialog.dispose();
@@ -273,6 +271,17 @@ public class CampaignGUI extends JPanel {
         addStandardTab(GuiTabType.INFIRMARY);
         addStandardTab(GuiTabType.MEKLAB);
         addStandardTab(GuiTabType.FINANCES);
+
+        //check to see if we just selected the command center tab
+        //and if so change its color to standard
+        tabMain.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if(tabMain.getSelectedIndex() == 0) {
+                    tabMain.setBackgroundAt(0, null);
+                    logNagActive = false;
+                }
+            }
+        });
 
         initTopButtons();
         initStatusBar();
@@ -2479,6 +2488,20 @@ public class CampaignGUI extends JPanel {
                     Utilities.copyfile(backupFile, file);
                     backupFile.delete();
                 }
+            }
+        }
+    }
+
+    /**
+     * Check to see if the command center tab is currently active and if not, color the tab. Should be
+     * called when items are added to daily report log panel and user is not on the command center tab
+     * in order to draw attention to it
+     */
+    public void checkDailyLogNag() {
+        if(!logNagActive) {
+            if (tabMain.getSelectedIndex() != 0) {
+                tabMain.setBackgroundAt(0, Color.RED);
+                logNagActive = true;
             }
         }
     }

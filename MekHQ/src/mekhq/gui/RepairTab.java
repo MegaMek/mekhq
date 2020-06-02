@@ -22,6 +22,8 @@ package mekhq.gui;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -32,6 +34,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
 import megamek.common.MechView;
 import megamek.common.TargetRoll;
@@ -654,7 +658,18 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             }
         }
         String r = getCampaign().fixPart(part, selectedTech);
-        txtResult.setText(r);
+
+        Reader stringReader = new StringReader(r);
+        HTMLEditorKit htmlKit = new HTMLEditorKit();
+        HTMLDocument blank = (HTMLDocument) htmlKit.createDefaultDocument();
+        try {
+            htmlKit.read(stringReader, blank, 0);
+        } catch (Exception e) {
+            // Ignore
+        }
+        txtResult.setDocument(blank);
+        txtResult.setCaretPosition(blank.getLength());
+
         if (null != u) {
             if (!u.isRepairable() && !u.hasSalvageableParts()) {
                 selectedRow = -1;

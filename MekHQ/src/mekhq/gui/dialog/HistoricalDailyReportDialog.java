@@ -89,7 +89,7 @@ public class HistoricalDailyReportDialog extends JDialog {
             pickTimeLabel = new JLabel(resourceMap.getString("pickTime.text"));
             Integer[] days = new Integer[] {7, 30, 60, 90, MAX_DAYS_HISTORY};
             pickTime = new JComboBox<>(days);
-            logPanel = new DailyReportLogPanel(null);
+            logPanel = new DailyReportLogPanel(gui);
             daysLabel = new JLabel(resourceMap.getString("days.text"));
             filterPanel = new JPanel();
             closeBtn = new JButton(resourceMap.getString("closeBtn.text"));

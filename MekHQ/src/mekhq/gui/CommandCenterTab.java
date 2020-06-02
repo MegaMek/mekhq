@@ -266,7 +266,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     private void initLogPanel() {
-        panLog = new DailyReportLogPanel(getCampaignGui().getReportHLL());
+        panLog = new DailyReportLogPanel(getCampaignGui());
         panLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panLog.title")));
         panLog.setMinimumSize(new java.awt.Dimension(400, 100));
         panLog.setPreferredSize(new java.awt.Dimension(400, 100));

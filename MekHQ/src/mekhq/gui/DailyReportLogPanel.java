@@ -52,10 +52,12 @@ public class DailyReportLogPanel extends JPanel {
 
     private static final long serialVersionUID = -6512675362473724385L;
 
+    CampaignGUI gui;
     JTextPane txtLog;
     String logText = "";
 
-    public DailyReportLogPanel(ReportHyperlinkListener listener) {
+    public DailyReportLogPanel(CampaignGUI gui) {
+        this.gui = gui;
         txtLog = new JTextPane() {
             /**
              *
@@ -66,7 +68,7 @@ public class DailyReportLogPanel extends JPanel {
                 return true;
             }
         };
-        txtLog.addHyperlinkListener(listener);
+        txtLog.addHyperlinkListener(gui.getReportHLL());
         initComponents();
     }
 
@@ -102,6 +104,8 @@ public class DailyReportLogPanel extends JPanel {
 		}
         txtLog.setDocument(blank);
 		txtLog.setCaretPosition(blank.getLength());
+		//possibly nag user about new reports in command center
+		gui.checkDailyLogNag();
     }
 
 	public void appendLog(List<String> newReports) {
@@ -117,6 +121,7 @@ public class DailyReportLogPanel extends JPanel {
     				// Shouldn't happen
     			}
     			txtLog.setCaretPosition(doc.getLength());
+    			gui.checkDailyLogNag();
 		    } else {
 		        refreshLog(addedText);
 		    }
