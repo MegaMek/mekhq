@@ -220,7 +220,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private Map<String, Entity> externalIDLookup;
 
     protected static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
-    //region Variable Declarations
+    //endregion Variable Declarations
 
     public AtBScenario () {
         super();
