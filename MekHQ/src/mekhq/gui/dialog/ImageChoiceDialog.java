@@ -18,16 +18,13 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -45,6 +42,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
@@ -585,7 +583,23 @@ public class ImageChoiceDialog extends JDialog {
         }
 
         public void setImage(String category, String name) {
-            if ((null == category) || name.equals(Crew.PORTRAIT_NONE)) {
+            if ((null == category) || name.equals(Force.ICON_NONE)) {
+                int width = 110;
+                int height = 76;
+
+                /*
+                if ((category != null) && category.startsWith("Pieces/")) {
+                    width = 110;
+                    height = 76;
+                }
+                 */
+
+                BufferedImage noImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D graphics = noImage.createGraphics();
+                graphics.setColor(Color.DARK_GRAY);
+                graphics.setComposite(AlphaComposite.Clear);
+                graphics.fillRect(0, 0, width, height);
+                lblImage.setIcon(new ImageIcon(noImage));
                 return;
             }
 
