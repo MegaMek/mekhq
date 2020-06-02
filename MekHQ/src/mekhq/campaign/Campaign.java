@@ -7851,6 +7851,21 @@ public class Campaign implements Serializable, ITechManager {
                 Integer.toString(totalInjured) + " injured)";
     }
 
+    public String getForceRepairStatus() {
+        int[] countDamageStatus = new int[Entity.DMG_CRIPPLED+1];
+        for(Unit u : getUnits()) {
+            if(u.isUnmanned() || u.isSalvage() || u.isMothballed() || u.isMothballing() || !u.isPresent()) {
+                continue;
+            }
+            countDamageStatus[u.getDamageState()]++;
+        }
+        return countDamageStatus[Entity.DMG_LIGHT] + " light, " +
+                countDamageStatus[Entity.DMG_MODERATE] + " moderate, " +
+                countDamageStatus[Entity.DMG_HEAVY] + " heavy, " +
+                countDamageStatus[Entity.DMG_CRIPPLED] + " crippled";
+
+    }
+
     public String getForceComposition() {
         int mechCount = 0;
         int veeCount = 0;
@@ -7859,8 +7874,7 @@ public class Campaign implements Serializable, ITechManager {
         int squadCount = 0;
         for(Unit u : getUnits()) {
             Entity e = u.getEntity();
-            if(!u.hasPilot() || u.isSalvage() || u.isMothballed() || u.isMothballing() ||
-                    null == e) {
+            if(u.isUnmanned() || u.isSalvage() || u.isMothballed() || u.isMothballing() || !u.isPresent() || null == e) {
                 continue;
             }
             switch (e.getUnitType()) {
@@ -7881,10 +7895,11 @@ public class Campaign implements Serializable, ITechManager {
                     break;
                 case UnitType.INFANTRY:
                     Infantry i = (Infantry) e;
-                    infantryCount += i.getSquadN();
+                    squadCount += i.getSquadN();
                     break;
             }
         }
+        //squad should count as 1/4 of a unit for force composition
         infantryCount += (int)Math.ceil(squadCount/4.0);
 
         double totalUnits = mechCount+veeCount+infantryCount+aeroCount;
