@@ -371,7 +371,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         txtResult.addHyperlinkListener(getCampaignGui().getReportHLL());
         txtResult.setContentType("text/html"); // NOI18N
         txtResult.setEditable(false);
-        DefaultCaret caret = (DefaultCaret)txtResult.getCaret();
+        DefaultCaret caret = (DefaultCaret) txtResult.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         txtResult.setBorder(new EmptyBorder(2,5,2,2));
         JPanel panResult = new JPanel(new BorderLayout());
