@@ -373,7 +373,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         txtResult.setEditable(false);
         DefaultCaret caret = (DefaultCaret) txtResult.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        txtResult.setBorder(new EmptyBorder(2,5,2,2));
+        txtResult.setBorder(new EmptyBorder(2, 5, 2, 2));
         JPanel panResult = new JPanel(new BorderLayout());
         panResult.add(txtResult, BorderLayout.CENTER);
         panResult.setBorder(BorderFactory.createTitledBorder("Last repair check"));
