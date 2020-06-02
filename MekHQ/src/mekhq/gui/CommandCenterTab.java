@@ -18,11 +18,9 @@
  */
 package mekhq.gui;
 
-import megamek.common.Crew;
 import megamek.common.event.Subscribe;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
-import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.*;
@@ -43,8 +41,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Collates important information about the campaign and displays it
- *
+ * Collates important information about the campaign and displays it, along with some actionable buttons
  */
 public final class CommandCenterTab extends CampaignGuiTab {
 
@@ -83,11 +80,19 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     ResourceBundle resourceMap;
 
+    /**
+     *
+     * @param gui a {@link CampaignGUI} object that this tab is a component of
+     * @param name a <code>String</code> giving the name of this tab
+     */
     CommandCenterTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
     }
 
+    /**
+     * initialize the contents and layout of the tab
+     */
     @Override
     public void initTab() {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$ ;
@@ -265,6 +270,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     }
 
+    /**
+     * Initialize the panel for displaying the daily report log
+     */
     private void initLogPanel() {
         panLog = new DailyReportLogPanel(getCampaignGui());
         panLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panLog.title")));
@@ -272,6 +280,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panLog.setPreferredSize(new java.awt.Dimension(400, 100));
     }
 
+    /**
+     * Initialize the panel for displaying procurement information
+     */
     private void initProcurementPanel() {
 
         /* shopping buttons */
@@ -387,6 +398,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panProcurement.add(scrollProcurement, gridBagConstraints);
     }
 
+    /**
+     * Initialize the panel for displaying available reports
+     */
     private void initReportsPanel() {
         panReports = new JPanel(new GridLayout(5, 1));
         JButton btnTransportReport = new JButton(resourceMap.getString("btnTransportReport.text"));
@@ -418,11 +432,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     /**
-     * set the icon for the unit if it exits.
-     *
-     * @return The <code>Image</code> of the unit's icon. This value will be
-     *         <code>null</code> if no icon was selected or if there was an
-     *         error loading it.
+     * set the icon for the unit if it exits in the icon panel
      */
     public void setIcon() {
 
@@ -462,6 +472,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         return GuiTabType.COMMAND;
     }
 
+    /**
+     * refresh all components
+     */
     @Override
     public void refreshAll() {
         refreshBasicInfo();
@@ -469,6 +482,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         refreshLog();
     }
 
+    /**
+     * refresh the basic info panel with campaign information
+     */
     private void refreshBasicInfo() {
         getCampaign().getUnitRating().reInitialize();
         getCampaign().getCampaignSummary().updateInformation();
@@ -482,26 +498,41 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblTransportCapacity.setText(getCampaign().getCampaignSummary().getTransportCapacity());
     }
 
+    /**
+     * refresh the procurement list
+     */
     private void refreshProcurementList() {
         procurementModel.setData(getCampaign().getShoppingList().getAllShoppingItems());
     }
 
+    /**
+     * Initialize a new daily log report
+     */
     private void initLog() {
         String report = getCampaign().getCurrentReportHTML();
         panLog.refreshLog(report);
         getCampaign().fetchAndClearNewReports();
     }
 
+    /**
+     * append new reports to the daily log report
+     */
     synchronized private void refreshLog() {
         List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
         panLog.appendLog(newLogEntries);
     }
 
+    /**
+     * brings up the {@link UnitSelectorDialog}
+     */
     private void getUnit() {
         UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), getCampaign(), true);
         usd.setVisible(true);
     }
 
+    /**
+     * brings up the {@link PartsStoreDialog}
+     */
     private void getParts() {
         PartsStoreDialog psd = new PartsStoreDialog(true, getCampaignGui());
         psd.setVisible(true);

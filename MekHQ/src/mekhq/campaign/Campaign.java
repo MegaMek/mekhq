@@ -152,7 +152,6 @@ import mekhq.campaign.universe.RangedPlanetSelector;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.gui.GuiTabType;
 import mekhq.gui.dialog.HistoricalDailyReportDialog;
 import mekhq.gui.utilities.PortraitFileFactory;
 import mekhq.module.atb.AtBEventProcessor;
@@ -3057,6 +3056,12 @@ public class Campaign implements Serializable, ITechManager {
         return repairable;
     }
 
+    /**
+     * Attempt to fix a part, which may have all kinds of effect depending on part type.
+     * @param partWork - the {@link IPartWork} to be fixed
+     * @param tech - the {@link Person} who will attempt to fix the part
+     * @return a <code>String</code> of the report that summarizes the outcome of the attempt to fix the part
+     */
     public String fixPart(IPartWork partWork, Person tech) {
         TargetRoll target = getTargetFor(partWork, tech);
         String report = "";

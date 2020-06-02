@@ -83,7 +83,6 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.AtBContract;

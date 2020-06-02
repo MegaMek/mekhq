@@ -74,14 +74,10 @@ import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.LoanEvent;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.MedicPoolChangedEvent;
-import mekhq.campaign.event.MissionEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.PersonEvent;
-import mekhq.campaign.event.ReportEvent;
 import mekhq.campaign.event.TransactionEvent;
-import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -92,7 +88,6 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -195,10 +190,11 @@ public class CampaignGUI extends JPanel {
         }
     }
 
+    /**
+     * Show a dialog indicating that the user must resolve overdue loans before advanching the day
+     */
     public void showOverdueLoansDialog() {
-        /*
-         * Need something for overdue loans, not just rely on report
-         */
+
         JOptionPane.showMessageDialog(null, "You must resolve overdue loans before advancing the day",
                 "Overdue loans", JOptionPane.WARNING_MESSAGE);
 

@@ -63,11 +63,19 @@ public class CampaignSummary {
     private int unitsTransported;
     private int nDS;
 
+    /**
+     *
+     * @param c a {@link Campaign} for which a summary is desired
+     */
     public CampaignSummary(Campaign c) {
         this.campaign = c;
         updateInformation();
     }
 
+    /**
+     * This will update all of the values in CampaignSummary to the latest from the campaign. It should
+     * be run before pulling out any reports
+     */
     public void updateInformation() {
 
         //personnel
@@ -158,8 +166,6 @@ public class CampaignSummary {
                 int noProto = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - campaign.getOccupiedBays(Entity.ETYPE_PROTOMECH),
                 0);
         int freehv = Math.max(campaign.getTotalHeavyVehicleBays() - campaign.getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int freeinf = Math.max(campaign.getTotalInfantryBays() - campaign.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int freeba = Math.max(campaign.getTotalBattleArmorBays() - campaign.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         int freeSC = Math.max(campaign.getTotalSmallCraftBays() - campaign.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
 
         //check for free bays elsewhere
@@ -179,12 +185,20 @@ public class CampaignSummary {
         nDS = campaign.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
     }
 
+    /**
+     * A report that gives numbers of combat and support personnel as well as injuries
+     * @return a <code>String</code> of the report
+     */
     public String getPersonnelReport() {
         return Integer.toString(totalCombatPersonnel) + " combat, " +
                 Integer.toString(totalSupportPersonnel) + " support (" +
                 Integer.toString(totalInjuries) + " injured)";
     }
 
+    /**
+     * A report that gives the number of units in different damage states
+     * @return a <code>String</code> of the report
+     */
     public String getForceRepairReport() {
         return countDamageStatus[Entity.DMG_LIGHT] + " light, " +
                 countDamageStatus[Entity.DMG_MODERATE] + " moderate, " +
@@ -193,6 +207,10 @@ public class CampaignSummary {
 
     }
 
+    /**
+     * A report that gives the percentage composition of the force in mech, armor, infantry, and aero units.
+     * @return a <code>String</code> of the report
+     */
     public String getForceCompositionReport() {
         List<String> composition = new ArrayList<String>();
         if(mechCount > 0) {
@@ -210,16 +228,28 @@ public class CampaignSummary {
         return String.join(", ", composition);
     }
 
+    /**
+     * A report that gives the percentage of successful missions
+     * @return a <code>String</code> of the report
+     */
     public String getMissionSuccessReport() {
         int successRate = (int)Math.round((100 * countMissionByStatus[Mission.S_SUCCESS]) / (double) completedMissions);
         return Integer.toString(successRate) + "%";
     }
 
+    /**
+     * A report that gives capacity and existing tonnage of all cargo
+     * @return a <code>String</code> of the report
+     */
     public String getCargoCapacityReport() {
         return Integer.toString((int)Math.round(cargoTons)) + " tons (" +
                 Integer.toString((int)Math.round(cargoCapacity)) + " tons capacity)";
     }
 
+    /**
+     * A report that gives information about the transportation capacity
+     * @return a <code>String</code> of the report
+     */
     public String getTransportCapacity() {
         int percentTransported = 0;
         if((unitsOver+unitsTransported)>0) {
