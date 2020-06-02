@@ -166,7 +166,7 @@ public class ProcurementTableModel extends DataTableModel {
         switch(col) {
             case COL_COST:
                 case COL_TOTAL_COST:
-                    case COL_QUEUE:
+                case COL_QUEUE:
                 return SwingConstants.RIGHT;
         case COL_TARGET:
         case COL_NEXT:
