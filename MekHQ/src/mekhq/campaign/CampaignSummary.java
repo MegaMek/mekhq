@@ -82,9 +82,9 @@ public class CampaignSummary {
         totalCombatPersonnel = 0;
         totalSupportPersonnel = 0;
         totalInjuries = 0;
-        for (Person p : campaign.getPersonnel()) {
+        for (Person p : campaign.getActivePersonnel()) {
             // Add them to the total count
-            if(!p.getPrisonerStatus().isFree() || !p.isActive()) {
+            if (!p.getPrisonerStatus().isFree()) {
                 continue;
             }
             if(p.getHits() > 0) {
