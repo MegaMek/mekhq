@@ -662,8 +662,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         HTMLDocument blank = (HTMLDocument) htmlKit.createDefaultDocument();
         try {
             htmlKit.read(stringReader, blank, 0);
-        } catch (Exception e) {
-            // Ignore
+        } catch (Exception ignored) {
+
         }
         txtResult.setDocument(blank);
         txtResult.setCaretPosition(blank.getLength());
