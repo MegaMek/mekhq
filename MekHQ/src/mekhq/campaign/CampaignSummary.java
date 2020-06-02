@@ -104,9 +104,9 @@ public class CampaignSummary {
         aeroCount = 0;
         infantryCount = 0;
         int squadCount = 0;
-        for(Unit u : campaign.getUnits()) {
+        for (Unit u : campaign.getUnits()) {
             Entity e = u.getEntity();
-            if(u.isUnmanned() || u.isSalvage() || u.isMothballed() || u.isMothballing() || !u.isPresent() || null == e) {
+            if (u.isUnmanned() || u.isSalvage() || u.isMothballed() || u.isMothballing() || !u.isPresent() || (null == e)) {
                 continue;
             }
             countDamageStatus[u.getDamageState()]++;
