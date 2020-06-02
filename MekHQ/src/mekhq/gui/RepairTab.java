@@ -119,6 +119,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
+
+
     }
 
     /*
@@ -364,6 +366,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         panTasks.add(panDoTaskText, gridBagConstraints);
 
         txtResult = new JTextPane();
+        txtResult.addHyperlinkListener(getCampaignGui().getReportHLL());
         txtResult.setContentType("text/html"); // NOI18N
         txtResult.setEditable(false);
         DefaultCaret caret = (DefaultCaret)txtResult.getCaret();
