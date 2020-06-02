@@ -154,6 +154,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         int y = 0;
 
         /* Unit Rating */
+        lblRating = new JLabel(getCampaign().getUnitRatingText());
         if (getCampaign().getCampaignOptions().useDragoonRating()) {
             JLabel lblRatingHead = new JLabel(resourceMap.getString("lblRating.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -163,7 +164,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 1, 5);
             panInfo.add(lblRatingHead, gridBagConstraints);
-            lblRating = new JLabel(getCampaign().getUnitRatingText());
             gridBagConstraints.gridx = 1;
             gridBagConstraints.weightx = 1.0;
             panInfo.add(lblRating, gridBagConstraints);
