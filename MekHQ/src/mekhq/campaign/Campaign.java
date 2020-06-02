@@ -239,6 +239,12 @@ public class Campaign implements Serializable, ITechManager {
     private String camoFileName = null;
     private int colorIndex = 0;
 
+    //unit icon
+    public static final String ROOT_ICON = "-- General --";
+    public static final String ICON_NONE = "None";
+    private String iconCategory = ROOT_ICON;
+    private String iconFileName = ICON_NONE;
+
     private Finances finances;
 
     private CurrentLocation location;
@@ -4416,6 +4422,23 @@ public class Campaign implements Serializable, ITechManager {
         colorIndex = index;
     }
 
+    public String getIconCategory() {
+        return iconCategory;
+    }
+
+    public void setIconCategory(String s) {
+        this.iconCategory = s;
+    }
+
+    public String getIconFileName() {
+        return iconFileName;
+    }
+
+    public void setIconFileName(String s) {
+        this.iconFileName = s;
+    }
+
+
     public ArrayList<Part> getSpareParts() {
         ArrayList<Part> spares = new ArrayList<>();
         for (Part part : getParts()) {
@@ -4673,6 +4696,8 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "medicPool", medicPool);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoCategory", camoCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoFileName", camoFileName);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "iconCategory", iconCategory);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPartId", lastPartId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastForceId", lastForceId);

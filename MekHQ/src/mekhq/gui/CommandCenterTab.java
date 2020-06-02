@@ -18,9 +18,13 @@
  */
 package mekhq.gui;
 
+import megamek.common.Crew;
 import megamek.common.event.Subscribe;
+import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import mekhq.IconPackage;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.event.*;
 import mekhq.campaign.report.*;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
@@ -57,8 +61,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblTransportCapacity;
     private JLabel lblCargoSummary;
 
-
-
     // daily report
     private DailyReportLogPanel panLog;
 
@@ -73,6 +75,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     // available reports
     private JPanel panReports;
+
+    //icon panel
+    JPanel panIcon;
+    JLabel lblIcon;
+    private DirectoryItems icons;
 
     ResourceBundle resourceMap;
 
@@ -92,6 +99,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
         initLogPanel();
         initReportsPanel();
         initProcurementPanel();
+        panIcon = new JPanel(new BorderLayout());
+        lblIcon = new JLabel();
+        panIcon.add(lblIcon, BorderLayout.CENTER);
+        setIcon();
 
         /* Set overall layout */
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -106,12 +117,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 1;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panCommand.add(panProcurement, gridBagConstraints);
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -119,12 +130,18 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         panCommand.add(panReports, gridBagConstraints);
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         panCommand.add(panInfo, gridBagConstraints);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        panCommand.add(panIcon, gridBagConstraints);
 
         setLayout(new BorderLayout());
         add(panCommand, BorderLayout.CENTER);
@@ -371,7 +388,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     private void initReportsPanel() {
-        panReports = new JPanel(new GridLayout(3, 2));
+        panReports = new JPanel(new GridLayout(5, 1));
         JButton btnTransportReport = new JButton(resourceMap.getString("btnTransportReport.text"));
         btnTransportReport.addActionListener(ev -> {
             getCampaignGui().showReport(new TransportReport(getCampaign()));
@@ -398,6 +415,46 @@ public final class CommandCenterTab extends CampaignGuiTab {
         });
         panReports.add(btnUnitRating);
         panReports.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panReports.title")));
+    }
+
+    /**
+     * set the icon for the unit if it exits.
+     *
+     * @return The <code>Image</code> of the unit's icon. This value will be
+     *         <code>null</code> if no icon was selected or if there was an
+     *         error loading it.
+     */
+    public void setIcon() {
+
+        if(null == icons) {
+            icons = getCampaignGui().getIconPackage().getForceIcons();
+        }
+
+        lblIcon.setIcon(null);
+
+        String category = getCampaign().getIconCategory();
+        String filename = getCampaign().getIconFileName();
+
+        if (Campaign.ROOT_ICON.equals(category)) {
+            category = ""; //$NON-NLS-1$
+        }
+
+        // Return a null if the player has selected no icon file.
+        if ((null != category) && (null != filename) && !Campaign.ICON_NONE.equals(filename)) {
+            // Try to get the icon file.
+            Image icon;
+            try {
+                icon = (Image) icons.getItem(category, filename);
+                if (null != icon) {
+                    icon = icon.getScaledInstance(150, -1, Image.SCALE_DEFAULT);
+                } else {
+                    return;
+                }
+                lblIcon.setIcon(new ImageIcon(icon));
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "setIcon", e);
+            }
+        }
     }
 
     @Override
@@ -500,5 +557,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
     public void handle(OptionsChangedEvent evt) {
         basicInfoScheduler.schedule();
         procurementListScheduler.schedule();
+        setIcon();
     }
 }
