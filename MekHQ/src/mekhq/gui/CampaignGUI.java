@@ -127,7 +127,6 @@ public class CampaignGUI extends JPanel {
     private ResourceBundle resourceMap;
 
     /* for the main panel */
-    private JSplitPane mainPanel;
     private JTabbedPane tabMain;
 
     /* For the menu bar */
@@ -326,7 +325,6 @@ public class CampaignGUI extends JPanel {
             }
         });
 
-        mainPanel.setDividerLocation(0.75);
     }
 
     private void setUserPreferences() {
@@ -1142,13 +1140,6 @@ public class CampaignGUI extends JPanel {
         if (null == id || null == ht) {
             return;
         }
-        if (mainPanel.getDividerLocation() < 700) {
-            if (mainPanel.getLastDividerLocation() > 700) {
-                mainPanel.setDividerLocation(mainPanel.getLastDividerLocation());
-            } else {
-                mainPanel.resetToPreferredSizes();
-            }
-        }
         ht.focusOnUnit(id);
         tabMain.setSelectedIndex(getTabIndexByName(resourceMap
                 .getString("panHangar.TabConstraints.tabTitle")));
@@ -1159,13 +1150,6 @@ public class CampaignGUI extends JPanel {
             return;
         }
         if (getTab(GuiTabType.REPAIR) != null) {
-            if (mainPanel.getDividerLocation() < 700) {
-                if (mainPanel.getLastDividerLocation() > 700) {
-                    mainPanel.setDividerLocation(mainPanel.getLastDividerLocation());
-                } else {
-                    mainPanel.resetToPreferredSizes();
-                }
-            }
             ((RepairTab)getTab(GuiTabType.REPAIR)).focusOnUnit(id);
             tabMain.setSelectedComponent(getTab(GuiTabType.REPAIR));
         }
@@ -1178,13 +1162,6 @@ public class CampaignGUI extends JPanel {
         PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
         if (pt == null) {
             return;
-        }
-        if (mainPanel.getDividerLocation() < 700) {
-            if (mainPanel.getLastDividerLocation() > 700) {
-                mainPanel.setDividerLocation(mainPanel.getLastDividerLocation());
-            } else {
-                mainPanel.resetToPreferredSizes();
-            }
         }
         pt.focusOnPerson(id);
         tabMain.setSelectedComponent(pt);
@@ -1827,10 +1804,10 @@ public class CampaignGUI extends JPanel {
                         } else {
                             report = "Unsupported FileType in Export Personnel";
                         }
-                        JOptionPane.showMessageDialog(mainPanel, report);
+                        JOptionPane.showMessageDialog(tabMain, report);
                     });
         } else {
-            JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoPersonnel.text"));
+            JOptionPane.showMessageDialog(tabMain, resourceMap.getString("dlgNoPersonnel.text"));
         }
     }
 
@@ -1859,10 +1836,10 @@ public class CampaignGUI extends JPanel {
                         } else {
                             report = "Unsupported FileType in Export Units";
                         }
-                        JOptionPane.showMessageDialog(mainPanel, report);
+                        JOptionPane.showMessageDialog(tabMain, report);
                     });
         } else {
-            JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoUnits"));
+            JOptionPane.showMessageDialog(tabMain, resourceMap.getString("dlgNoUnits"));
         }
     }
 
@@ -1891,10 +1868,10 @@ public class CampaignGUI extends JPanel {
                         } else {
                             report = "Unsupported FileType in Export Finances";
                         }
-                        JOptionPane.showMessageDialog(mainPanel, report);
+                        JOptionPane.showMessageDialog(tabMain, report);
                     });
         } else {
-            JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoFinances.text"));
+            JOptionPane.showMessageDialog(tabMain, resourceMap.getString("dlgNoFinances.text"));
         }
     }
 
@@ -2204,7 +2181,7 @@ public class CampaignGUI extends JPanel {
             // Okay, we're done.
             pw.flush();
 
-            JOptionPane.showMessageDialog(mainPanel, getResourceMap().getString("dlgCampaignSettingsSaved.text"));
+            JOptionPane.showMessageDialog(tabMain, getResourceMap().getString("dlgCampaignSettingsSaved.text"));
 
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Campaign Options saved saved to " + file); //$NON-NLS-1$
