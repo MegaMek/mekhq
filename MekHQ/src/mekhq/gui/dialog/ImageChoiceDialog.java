@@ -549,7 +549,7 @@ public class ImageChoiceDialog extends JDialog {
         }
     }
 
-    public static class ImagePanel extends JPanel {
+    public class ImagePanel extends JPanel {
         private static final long serialVersionUID = -3724175393116586310L;
         private DirectoryItems items;
         private JLabel lblImage;
@@ -584,19 +584,11 @@ public class ImageChoiceDialog extends JDialog {
 
         public void setImage(String category, String name) {
             if ((null == category) || name.equals(Force.ICON_NONE)) {
-                int width = 110;
+                int width = force ? 110 : 76;
                 int height = 76;
-
-                /*
-                if ((category != null) && category.startsWith("Pieces/")) {
-                    width = 110;
-                    height = 76;
-                }
-                 */
 
                 BufferedImage noImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D graphics = noImage.createGraphics();
-                graphics.setColor(Color.DARK_GRAY);
                 graphics.setComposite(AlphaComposite.Clear);
                 graphics.fillRect(0, 0, width, height);
                 lblImage.setIcon(new ImageIcon(noImage));
