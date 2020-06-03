@@ -531,8 +531,10 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if (scenario == null) {
+            return;
+        }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
         if (uids.size() == 0) {
             return;
         }
@@ -584,8 +586,10 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if (scenario == null) {
+            return;
+        }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
         if (uids.size() == 0) {
             return;
         }
@@ -672,8 +676,10 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if (scenario == null) {
+            return;
+        }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
         if (uids.size() == 0) {
             return;
         }
@@ -720,8 +726,10 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if (scenario == null) {
+            return;
+        }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
         if (uids.size() == 0) {
             return;
         }
@@ -826,6 +834,9 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if (scenario == null) {
+            return;
+        }
         selectedScenario = scenario.getId();
         if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
             scrollScenarioView.setViewportView(
@@ -849,7 +860,6 @@ public final class BriefingTab extends CampaignGuiTab {
         btnClearAssignedUnits.setEnabled(scenario.isCurrent() && unitsAssigned);
         btnResolveScenario.setEnabled(canStartGame);
         btnPrintRS.setEnabled(scenario.isCurrent() && unitsAssigned);
-
     }
 
     public void refreshLanceAssignments() {
