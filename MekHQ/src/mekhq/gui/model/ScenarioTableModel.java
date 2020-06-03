@@ -38,59 +38,11 @@ public class ScenarioTableModel extends DataTableModel {
     public final static int COL_STATUS     = 1;
     public final static int COL_DATE       = 2;
     public final static int COL_ASSIGN     = 3;
-    public final static int N_COL          = 4;
 
     public ScenarioTableModel(Campaign c) {
+        columnNames = new String[] { "Scenario Name", "Resolution", "Date", "# Units" };
         data = new ArrayList<Scenario>();
         campaign = c;
-    }
-
-    @Override
-    public int getRowCount() {
-        return data.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return N_COL;
-    }
-
-    @Override
-    public String getColumnName(int column) {
-        switch (column) {
-            case COL_NAME:
-                return "Scenario Name";
-            case COL_STATUS:
-                return "Resolution";
-            case COL_DATE:
-                return "Date";
-            case COL_ASSIGN:
-                return "# Units";
-            default:
-                return "?";
-        }
-    }
-
-    @Override
-    public Object getValueAt(int row, int col) {
-        Scenario scenario = getScenario(row);
-        if (col == COL_NAME) {
-            return scenario.getName();
-        } else if (col == COL_STATUS) {
-            return scenario.getStatusName();
-        } else if (col == COL_DATE) {
-            if (null == scenario.getDate()) {
-                return "-";
-            } else {
-                SimpleDateFormat shortDateFormat = new SimpleDateFormat(
-                        getCampaign().getCampaignOptions().getDisplayDateFormat());
-                return shortDateFormat.format(scenario.getDate());
-            }
-        } else if (col == COL_ASSIGN) {
-            return scenario.getForces(getCampaign()).getAllUnits().size();
-        } else {
-            return "?";
-        }
     }
 
     public int getColumnWidth(int c) {
@@ -105,27 +57,47 @@ public class ScenarioTableModel extends DataTableModel {
     }
 
     public int getAlignment(int col) {
-        switch (col) {
-            default:
-                return SwingConstants.LEFT;
-        }
-    }
-
-    @Override
-    public Class<?> getColumnClass(int c) {
-        return getValueAt(0, c).getClass();
-    }
-
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-
-    public Scenario getScenario(int row) {
-        return (Scenario) data.get(row);
+        return SwingConstants.LEFT;
     }
 
     private Campaign getCampaign() {
         return campaign;
+    }
+
+    public Scenario getScenario(int row) {
+        if (row >= getRowCount()) {
+            return null;
+        } else {
+            return (Scenario) data.get(row);
+        }
+    }
+
+    @Override
+    public Object getValueAt(int row, int col) {
+        if (data.isEmpty()) {
+            return "";
+        }
+        Scenario scenario = getScenario(row);
+        if (scenario == null) {
+            return "?";
+        }
+
+        if (col == COL_NAME) {
+            return scenario.getName();
+        } else if (col == COL_STATUS) {
+            return scenario.getStatusName();
+        } else if (col == COL_DATE) {
+            if (scenario.getDate() == null) {
+                return "-";
+            } else {
+                SimpleDateFormat shortDateFormat = new SimpleDateFormat(
+                        getCampaign().getCampaignOptions().getDisplayDateFormat());
+                return shortDateFormat.format(scenario.getDate());
+            }
+        } else if (col == COL_ASSIGN) {
+            return scenario.getForces(getCampaign()).getAllUnits().size();
+        } else {
+            return "?";
+        }
     }
 }
