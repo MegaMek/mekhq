@@ -21,6 +21,7 @@ package mekhq.campaign.mod.am;
 import java.util.*;
 
 import megamek.common.Compute;
+import megamek.common.enums.Gender;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -111,7 +112,7 @@ public final class InjuryTypes {
         }
 
         @Override
-        public String getFluffText(BodyLocation loc, int severity, int gender) {
+        public String getFluffText(BodyLocation loc, int severity, Gender gender) {
             return "A severed spine in " + ((loc == BodyLocation.CHEST) ? "upper" : "lower") + " body";
         }
 
@@ -281,7 +282,7 @@ public final class InjuryTypes {
         }
 
         @Override
-        public String getFluffText(BodyLocation loc, int severity, int gender) {
+        public String getFluffText(BodyLocation loc, int severity, Gender gender) {
             return "Lost " + GenderDescriptors.HIS_HER.getDescriptor(gender) + " "
                     + loc.locationName();
         }
@@ -315,7 +316,7 @@ public final class InjuryTypes {
 
         @Override
         public String getName(BodyLocation loc, int severity) {
-            return Utilities.capitalize(getFluffText(loc, severity, 0));
+            return Utilities.capitalize(getFluffText(loc, severity, Gender.MALE));
         }
 
         @Override
@@ -324,7 +325,7 @@ public final class InjuryTypes {
         }
 
         @Override
-        public String getFluffText(BodyLocation loc, int severity, int gender) {
+        public String getFluffText(BodyLocation loc, int severity, Gender gender) {
             switch(severity) {
                 case 2: return "Severe internal bleeding";
                 case 3: return "Critical internal bleeding";
@@ -419,7 +420,7 @@ public final class InjuryTypes {
         }
 
         @Override
-        public String getFluffText(BodyLocation loc, int severity, int gender) {
+        public String getFluffText(BodyLocation loc, int severity, Gender gender) {
             return "A broken " + loc.locationName();
         }
 
@@ -579,7 +580,7 @@ public final class InjuryTypes {
         }
 
         @Override
-        public String getFluffText(BodyLocation loc, int severity, int gender) {
+        public String getFluffText(BodyLocation loc, int severity, Gender gender) {
             return "A sprained " + loc.locationName();
         }
 
@@ -610,7 +611,7 @@ public final class InjuryTypes {
         }
 
         @Override
-        public String getFluffText(BodyLocation loc, int severity, int gender) {
+        public String getFluffText(BodyLocation loc, int severity, Gender gender) {
             return "A laceration on " + GenderDescriptors.HIS_HER.getDescriptor(gender) + " head";
         }
 
@@ -638,7 +639,7 @@ public final class InjuryTypes {
         }
 
         @Override
-        public String getFluffText(BodyLocation loc, int severity, int gender) {
+        public String getFluffText(BodyLocation loc, int severity, Gender gender) {
             return "A bruise on " + GenderDescriptors.HIS_HER.getDescriptor(gender) + " "
                     + loc.locationName();
         }
@@ -667,7 +668,7 @@ public final class InjuryTypes {
         }
 
         @Override
-        public String getFluffText(BodyLocation loc, int severity, int gender) {
+        public String getFluffText(BodyLocation loc, int severity, Gender gender) {
             return "Some cuts on " + GenderDescriptors.HIS_HER.getDescriptor(gender) + " "
                     + loc.locationName();
         }

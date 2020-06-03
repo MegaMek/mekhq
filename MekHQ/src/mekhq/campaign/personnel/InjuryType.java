@@ -23,6 +23,7 @@ import java.util.*;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import org.joda.time.DateTime;
@@ -185,7 +186,7 @@ public class InjuryType {
         return Utilities.capitalize(fluffText);
     }
 
-    public String getFluffText(BodyLocation loc, int severity, int gender) {
+    public String getFluffText(BodyLocation loc, int severity, Gender gender) {
         return fluffText;
     }
 

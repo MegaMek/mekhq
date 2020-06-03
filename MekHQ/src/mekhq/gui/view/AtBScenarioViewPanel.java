@@ -33,6 +33,7 @@ import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
@@ -86,8 +87,8 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
     private AtBScenario scenario;
     private Campaign campaign;
     private ForceStub playerForces;
-    private ArrayList<String> attachedAllyStub;
-    private ArrayList<BotForceStub> botStubs;
+    private List<String> attachedAllyStub;
+    private List<BotForceStub> botStubs;
     private IconPackage icons;
     private JFrame frame;
 
@@ -114,9 +115,9 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
     private JLabel lblFog = new JLabel();
     private JLabel lblFogDesc = new JLabel();
     private JLabel lblAtmosphere = new JLabel();
-    private JLabel    lblAtmosphereDesc = new JLabel();
+    private JLabel lblAtmosphereDesc = new JLabel();
     private JLabel lblGravity = new JLabel();
-    private JLabel    lblGravityDesc = new JLabel();
+    private JLabel lblGravityDesc = new JLabel();
     private JLabel lblPlayerStart = new JLabel();
     private JLabel lblPlayerStartPos = new JLabel();
 
@@ -143,7 +144,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         this.scenario = s;
         this.campaign = c;
         this.icons = ip;
-        botStubs = new ArrayList<BotForceStub>();
+        botStubs = new ArrayList<>();
 
         if(s.isCurrent()) {
             s.refresh(c);

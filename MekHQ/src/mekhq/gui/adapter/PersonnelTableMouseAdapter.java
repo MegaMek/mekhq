@@ -22,8 +22,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,9 +47,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
-import mekhq.campaign.personnel.enums.ManeiDominiClass;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -59,8 +57,7 @@ import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
 
-public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
-        ActionListener {
+public class PersonnelTableMouseAdapter extends MouseInputAdapter implements ActionListener {
     private static final String CMD_RANKSYSTEM = "RANKSYSTEM"; //$NON-NLS-1$
     private static final String CMD_RANK = "RANK"; //$NON-NLS-1$
     private static final String CMD_MANEI_DOMINI_RANK = "MD_RANK"; //$NON-NLS-1$
@@ -151,25 +148,20 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter", new EncodeControl()); //$NON-NLS-1$
     }
 
-    //Mechwarrior Edge Options
+    // MechWarrior Edge Options
     private static final String OPT_EDGE_MASC_FAILURE = "edge_when_masc_fails"; //$NON-NLS-1$
     private static final String OPT_EDGE_EXPLOSION = "edge_when_explosion"; //$NON-NLS-1$
     private static final String OPT_EDGE_KO = "edge_when_ko"; //$NON-NLS-1$
     private static final String OPT_EDGE_TAC = "edge_when_tac"; //$NON-NLS-1$
     private static final String OPT_EDGE_HEADHIT = "edge_when_headhit"; //$NON-NLS-1$
 
-    //Aero Edge Options
+    // Aero Edge Options
     private static final String OPT_EDGE_WHEN_AERO_ALT_LOSS= "edge_when_aero_alt_loss"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_EXPLOSION= "edge_when_aero_explosion"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_KO= "edge_when_aero_ko"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_LUCKY_CRIT= "edge_when_aero_lucky_crit"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_NUKE_CRIT= "edge_when_aero_nuke_crit"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST= "edge_when_aero_unit_cargo_lost"; //$NON-NLS-1$
-
-    private static final String OPT_PRISONER_FREE = "free"; //$NON-NLS-1$
-    private static final String OPT_PRISONER_IMPRISONED = "imprisoned"; //$NON-NLS-1$
-    private static final String OPT_PRISONER_IMPRISONED_DEFECTING = "imprisoned_defecting"; //$NON-NLS-1$
-    private static final String OPT_PRISONER_BONDSMAN = "bondsman"; //$NON-NLS-1$
 
     private static final int MAX_POPUP_ITEMS = 20;
 
@@ -487,7 +479,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_ADD_PREGNANCY: {
-                if (selectedPerson.isFemale()) {
+                if (selectedPerson.getGender().isFemale()) {
                     selectedPerson.addPregnancy();
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
@@ -506,22 +498,27 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_ADD_SPOUSE: {
                 Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
-                selectedPerson.marry(spouse, Integer.parseInt(data[2]));
+                Marriage.valueOf(data[2]).marry(selectedPerson, spouse, gui.getCampaign());
                 break;
             }
             case CMD_ADD_AWARD: {
                 for (Person person : people) {
-                    person.getAwardController().addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+                    person.getAwardController().addAndLogAward(data[1], data[2],
+                            gui.getCampaign().getLocalDate());
                 }
                 break;
             }
             case CMD_RMV_AWARD: {
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 for (Person person : people) {
                     try {
                         if (person.getAwardController().hasAward(data[1], data[2])) {
                             person.getAwardController().removeAward(data[1], data[2],
-                                    (data.length > 3) ? df.parse(data[3]) : null, gui.getCampaign().getDate());
+                                    (data.length > 3)
+                                            ? LocalDate.parse(data[3], DateTimeFormatter.ofPattern(
+                                                    gui.getCampaign().getCampaignOptions()
+                                                            .getDisplayDateFormat()))
+                                            : null,
+                                    gui.getCampaign().getLocalDate());
                         }
                     } catch (Exception e) {
                         MekHQ.getLogger().error(getClass(), "actionPerformed", "Could not remove award.", e);
@@ -640,31 +637,23 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_CHANGE_PRISONER_STATUS: {
-                String selected = data[1];
-                for (Person person : people) {
-                    switch (selected) {
-                        case OPT_PRISONER_FREE:
-                            gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_NOT);
-                            break;
-                        case OPT_PRISONER_IMPRISONED:
-                            gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_YES);
-                            break;
-                        case OPT_PRISONER_IMPRISONED_DEFECTING:
-                            gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_YES);
-                            person.setWillingToDefect(true);
-                            break;
-                        case OPT_PRISONER_BONDSMAN:
-                            gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_BONDSMAN);
-                            break;
-                        default:
-                            // U WOT M8?
-                            break;
+                try {
+                    PrisonerStatus status = PrisonerStatus.valueOf(data[1]);
+                    for (Person person : people) {
+                        person.setPrisonerStatus(status);
                     }
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(getClass(), "actionPerformed",
+                            "Unknown PrisonerStatus Option. No changes will be made.", e);
                 }
                 break;
             }
             case CMD_IMPRISON: {
-                gui.getCampaign().changePrisonerStatus(selectedPerson, Person.PRISONER_YES);
+                for (Person person : people) {
+                    if (!person.getPrisonerStatus().isPrisoner()) {
+                        person.setPrisonerStatus(PrisonerStatus.PRISONER);
+                    }
+                }
                 break;
             }
             case CMD_FREE: {
@@ -681,8 +670,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_RECRUIT: {
                 for (Person person : people) {
-                    if (StaticChecks.isWillingToDefect(person)) {
-                        gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_NOT);
+                    if (person.getPrisonerStatus().isWillingToDefect()) {
+                        person.setPrisonerStatus(PrisonerStatus.FREE);
                     }
                 }
                 break;
@@ -1359,9 +1348,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             popup.add(menu);
 
-            if (oneSelected) {
-                popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON, person.isFree())); //$NON-NLS-1$
-                popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE, !person.isFree())); //$NON-NLS-1$
+            if (StaticChecks.areAnyFree(selected)) {
+                popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON));
+            }
+
+            if (oneSelected && !person.getPrisonerStatus().isFree()) {
+                popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE));
             }
 
             if (gui.getCampaign().getCampaignOptions().getUseAtB()
@@ -1474,7 +1466,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 int unitType = -1;
                 int weightClass = -1;
 
-                if (oneSelected && person.isActive() && person.isFree()) {
+                if (oneSelected && person.isActive() && person.getPrisonerStatus().isFree()) {
                     for (Unit unit : gui.getCampaign().getUnits(true, true, true)) {
                         if (!unit.isAvailable()) {
                             continue;
@@ -1813,13 +1805,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
 
             if (oneSelected && person.isActive()) {
-                if (person.oldEnoughToMarry() && (!person.hasSpouse())) {
+                if (person.oldEnoughToMarry(gui.getCampaign()) && (!person.hasSpouse())) {
                     menu = new JMenu(resourceMap.getString("chooseSpouse.text")); //$NON-NLS-1$
                     JMenu maleMenu = new JMenu(resourceMap.getString("spouseMenuMale.text"));
                     JMenu femaleMenu = new JMenu(resourceMap.getString("spouseMenuFemale.text"));
                     JMenu spouseMenu;
-                    JMenuItem surnameMenu;
-                    String type;
 
                     LocalDate today = gui.getCampaign().getLocalDate();
 
@@ -1827,81 +1817,28 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     personnel.sort(Comparator.comparing((Person p) -> p.getAge(today)).thenComparing(Person::getSurname));
 
                     for (Person ps : personnel) {
-                        if (person.safeSpouse(ps)) {
+                        if (person.safeSpouse(ps, gui.getCampaign())) {
                             String pStatus;
-                            if (ps.isBondsman()) {
+
+                            if (ps.getPrisonerStatus().isBondsman()) {
                                 pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"),
                                         ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
-                            } else if (ps.isPrisoner()) {
+                            } else if (ps.getPrisonerStatus().isPrisoner()) {
                                 pStatus = String.format(resourceMap.getString("marriagePrisonerDesc.format"),
                                         ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             } else {
                                 pStatus = String.format(resourceMap.getString("marriagePartnerDesc.format"),
                                         ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             }
-                            spouseMenu = new JMenu(pStatus);
-                            type = resourceMap.getString("marriageNoNameChange.text");
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_NO_CHANGE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageRenameSpouse.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_YOURS)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageRenameYourself.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_SPOUSE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageHyphenateYourself.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_HYP_YOURS)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageBothHyphenateYourself.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_BOTH_HYP_YOURS)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageHyphenateSpouse.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_HYP_SPOUSE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageBothHyphenateSpouse.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_BOTH_HYP_SPOUSE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageMale.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_MALE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageFemale.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_FEMALE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageRandomWeighted.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_WEIGHTED)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
 
-                            if (ps.isMale()) {
+                            spouseMenu = new JMenu(pStatus);
+
+                            for (Marriage style : Marriage.values()) {
+                                spouseMenu.add(newMenuItem(style.getDropDownText(),
+                                        makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), style.name())));
+                            }
+
+                            if (ps.getGender().isMale()) {
                                 maleMenu.add(spouseMenu);
                             } else {
                                 femaleMenu.add(spouseMenu);
@@ -1909,7 +1846,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                     }
 
-                    if (person.isMale()) {
+                    if (person.getGender().isMale()) {
                         JMenuHelpers.addMenuIfNonEmpty(menu, femaleMenu, MAX_POPUP_ITEMS);
                         JMenuHelpers.addMenuIfNonEmpty(menu, maleMenu, MAX_POPUP_ITEMS);
                     } else {
@@ -2009,7 +1946,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 if (oneSelected) {
                     for (Award award : person.getAwardController().getAwards()) {
                         JMenu singleAwardMenu = new JMenu(award.getName());
-                        for (String date : award.getFormatedDates()) {
+                        for (String date : award.getFormattedDates(gui.getCampaign())) {
                             JMenuItem specificAwardMenu = new JMenuItem(date);
                             specificAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), date));
                             specificAwardMenu.addActionListener(this);
@@ -2444,7 +2381,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
-                if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation() && person.isFemale()) {
+
+                if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation() && person.getGender().isFemale()) {
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
                     cbMenuItem.setToolTipText(resourceMap.getString("tryingToConceive.toolTipText"));
                     cbMenuItem.setSelected(person.isTryingToConceive());
@@ -2452,6 +2390,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                 }
+
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("founder.text"));
                 cbMenuItem.setSelected(person.isFounder());
                 cbMenuItem.setActionCommand(CMD_FOUNDER);
@@ -2712,21 +2651,21 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                 menuItem = new JMenu(resourceMap.getString("changePrisonerStatus.text")); //$NON-NLS-1$
                 menuItem.add(newCheckboxMenu(
-                        Person.getPrisonerStatusName(Person.PRISONER_NOT),
-                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_FREE),
-                        person.getPrisonerStatus() == Person.PRISONER_NOT));
+                        PrisonerStatus.FREE.toString(),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.FREE.name()),
+                        (person.getPrisonerStatus() == PrisonerStatus.FREE)));
                 menuItem.add(newCheckboxMenu(
-                        Person.getPrisonerStatusName(Person.PRISONER_YES),
-                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED),
-                        (person.getPrisonerStatus() == Person.PRISONER_YES) && !person.isWillingToDefect()));
+                        PrisonerStatus.PRISONER.toString(),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.PRISONER.name()),
+                        (person.getPrisonerStatus() == PrisonerStatus.PRISONER)));
                 menuItem.add(newCheckboxMenu(
-                        resourceMap.getString("prisonerWillingToDefect.text"), //$NON-NLS-1$
-                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED_DEFECTING),
-                        (person.getPrisonerStatus() == Person.PRISONER_YES) && person.isWillingToDefect()));
+                        PrisonerStatus.PRISONER_DEFECTOR.toString(),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.PRISONER_DEFECTOR.name()),
+                        (person.getPrisonerStatus() == PrisonerStatus.PRISONER_DEFECTOR)));
                 menuItem.add(newCheckboxMenu(
-                        Person.getPrisonerStatusName(Person.PRISONER_BONDSMAN),
-                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_BONDSMAN),
-                        person.getPrisonerStatus() == Person.PRISONER_BONDSMAN));
+                        PrisonerStatus.BONDSMAN.toString(),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.BONDSMAN.name()),
+                        (person.getPrisonerStatus() == PrisonerStatus.BONDSMAN)));
                 menu.add(menuItem);
 
                 menuItem = new JMenuItem(resourceMap.getString("removePerson.text")); //$NON-NLS-1$

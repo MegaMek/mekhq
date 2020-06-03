@@ -312,7 +312,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     continue;
                 ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
-                ribbonLabel.setToolTipText(award.getTooltip());
+                ribbonLabel.setToolTipText(award.getTooltip(campaign));
                 rowRibbonsBox.add(ribbonLabel, 0);
             } catch (Exception e) {
                 MekHQ.getLogger().error(getClass(), "drawRibbons", e);
@@ -356,7 +356,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     continue;
                 medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
                 medalLabel.setIcon(new ImageIcon(medal));
-                medalLabel.setToolTipText(award.getTooltip());
+                medalLabel.setToolTipText(award.getTooltip(campaign));
                 pnlMedals.add(medalLabel);
             } catch (Exception e) {
                 MekHQ.getLogger().error(getClass(), "drawMedals", e);
@@ -387,7 +387,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
                         Image.SCALE_DEFAULT);
                 miscLabel.setIcon(new ImageIcon(miscAward));
-                miscLabel.setToolTipText(award.getTooltip());
+                miscLabel.setToolTipText(award.getTooltip(campaign));
                 pnlMiscAwards.add(miscLabel);
             } catch (Exception e) {
                 MekHQ.getLogger().error(getClass(), "drawMiscAwards", e);
@@ -628,7 +628,6 @@ public class PersonViewPanel extends ScrollablePanel {
         firsty++;
 
         if (person.isPregnant()) {
-            String displayFormat = "yyyy-MM-dd"; // TODO : remove inline date format
             String dueDate;
 
             lblDueDate1.setName("lblDueDate1");
@@ -641,9 +640,11 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlInfo.add(lblDueDate1, gridBagConstraints);
 
             if (campaign.getCampaignOptions().getDisplayTrueDueDate()) {
-                dueDate = person.getDueDate().format(DateTimeFormatter.ofPattern(displayFormat));
+                dueDate = person.getDueDate().format(DateTimeFormatter.ofPattern(campaign
+                        .getCampaignOptions().getDisplayDateFormat()));
             } else {
-                dueDate = person.getExpectedDueDate().format(DateTimeFormatter.ofPattern(displayFormat));
+                dueDate = person.getExpectedDueDate().format(DateTimeFormatter.ofPattern(campaign
+                        .getCampaignOptions().getDisplayDateFormat()));
             }
 
             lblDueDate2.setName("lblDueDate2");
@@ -694,7 +695,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 pnlInfo.add(lblRecruited1, gridBagConstraints);
 
                 lblRecruited2.setName("lblRecruited2");
-                lblRecruited2.setText(person.getRecruitmentAsString());
+                lblRecruited2.setText(person.getRecruitmentAsString(campaign));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
                 gridBagConstraints.gridy = secondy;
@@ -739,7 +740,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlInfo.add(lblLastRankChangeDate1, gridBagConstraints);
 
-                JLabel lblLastRankChangeDate2 = new JLabel(person.getLastRankChangeDateAsString());
+                JLabel lblLastRankChangeDate2 = new JLabel(person.getLastRankChangeDateAsString(campaign));
                 lblLastRankChangeDate2.setName("lblLastRankChangeDate2");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;

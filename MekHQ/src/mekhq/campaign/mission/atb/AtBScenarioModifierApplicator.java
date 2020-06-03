@@ -21,7 +21,7 @@ package mekhq.campaign.mission.atb;
 
 import java.util.UUID;
 
-import megamek.client.RandomSkillsGenerator;
+import megamek.client.generator.RandomSkillsGenerator;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;

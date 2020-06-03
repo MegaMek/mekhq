@@ -44,7 +44,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
-import mekhq.campaign.ResolveScenarioTracker.PrisonerStatus;
+import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Contract;
@@ -131,7 +131,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
      */
     private List<JCheckBox> prisonerBtns = new ArrayList<>();
     private List<JSlider> pr_hitSliders = new ArrayList<>();
-    private List<PrisonerStatus> prstatuses = new ArrayList<>();
+    private List<OppositionPersonnelStatus> prstatuses = new ArrayList<>();
 
     /*
      * Salvage panel components
@@ -324,10 +324,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
             i++;
         }
         pnlMain.add(pnlUnitStatus, UNITSPANEL);
+        //endregion Unit Status Panel
 
+        //region Objective Status Panel
         generateObjectiveStatusPanel();
         pnlMain.add(pnlObjectiveStatus, OBJECTIVEPANEL);
-        //endregion Unit Status Panel
+        //endregion Objective Status Panel
 
         //region Pilot Status Panel
         pnlPilotStatus = new JPanel();
@@ -445,7 +447,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         j = 0;
 
         JButton btnViewPrisoner;
-        for (PrisonerStatus status : tracker.getSortedPrisoners()) {
+
+        for (OppositionPersonnelStatus status : tracker.getSortedPrisoners()) {
             j++;
             prstatuses.add(status);
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
@@ -469,7 +472,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-            if (j == tracker.getPrisonerStatus().keySet().size()) {
+            if (j == tracker.getOppositionPersonnel().keySet().size()) {
                 gridBagConstraints.weighty = 1.0;
             }
             pnlPrisonerStatus.add(nameLbl, gridBagConstraints);
@@ -1284,7 +1287,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         //now prisoners
         for (int i = 0; i < prstatuses.size(); i++) {
-            PrisonerStatus status = prstatuses.get(i);
+            OppositionPersonnelStatus status = prstatuses.get(i);
 
             if (pr_hitSliders.get(i).isEnabled()) {
                 status.setHits(pr_hitSliders.get(i).getValue());
@@ -1365,7 +1368,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             case PILOTPANEL:
                 return tracker.getPeopleStatus().keySet().size() > 0;
             case PRISONERPANEL:
-                return tracker.getPrisonerStatus().keySet().size() > 0;
+                return tracker.getOppositionPersonnel().keySet().size() > 0;
             case SALVAGEPANEL:
                 return tracker.getPotentialSalvage().size() > 0
                         && (!(tracker.getMission() instanceof Contract) || ((Contract) tracker.getMission()).canSalvage());
@@ -1624,9 +1627,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     private void showPrisoner(UUID id) {
         //dialog
-        PrisonerStatus pstatus = tracker.getPrisonerStatus().get(id);
+        OppositionPersonnelStatus pstatus = tracker.getOppositionPersonnel().get(id);
 
-        if (null == pstatus || null == pstatus.getPerson() ) {
+        if (null == pstatus || null == pstatus.getPerson()) {
             return;
         }
 
