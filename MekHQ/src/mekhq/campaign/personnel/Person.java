@@ -313,8 +313,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
 
-    private final static String DATE_DISPLAY_FORMAT = "yyyy-MM-dd";
-
     //region Reverse Compatibility
     private int oldUnitId = -1;
     private int oldDoctorId = -1;
@@ -1169,11 +1167,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return recruitment;
     }
 
-    public String getRecruitmentAsString() {
+    public String getRecruitmentAsString(Campaign campaign) {
         if (getRecruitment() == null) {
             return null;
         } else {
-            return getRecruitment().format(DateTimeFormatter.ofPattern(DATE_DISPLAY_FORMAT));
+            return getRecruitment().format(DateTimeFormatter.ofPattern(
+                    campaign.getCampaignOptions().getDisplayDateFormat()));
         }
     }
 
@@ -1185,11 +1184,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return lastRankChangeDate;
     }
 
-    public String getLastRankChangeDateAsString() {
+    public String getLastRankChangeDateAsString(Campaign campaign) {
         if (getLastRankChangeDate() == null) {
             return null;
         } else {
-            return getLastRankChangeDate().format(DateTimeFormatter.ofPattern(DATE_DISPLAY_FORMAT));
+            return getRecruitment().format(DateTimeFormatter.ofPattern(
+                    campaign.getCampaignOptions().getDisplayDateFormat()));
         }
     }
 
@@ -2003,25 +2003,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    // TODO : remove inline migration
-                    if (version.isLowerThan("0.47.6")) {
-                        switch (Integer.parseInt(wn2.getTextContent())) {
-                            case 1:
-                                retVal.status = PersonnelStatus.RETIRED;
-                                break;
-                            case 2:
-                                retVal.status = PersonnelStatus.KIA;
-                                break;
-                            case 3:
-                                retVal.status = PersonnelStatus.MIA;
-                                break;
-                            default:
-                                retVal.status = PersonnelStatus.ACTIVE;
-                                break;
-                        }
-                    } else {
-                        retVal.status = PersonnelStatus.valueOf(wn2.getTextContent());
-                    }
+                    retVal.status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerStatus")) {
                     retVal.prisonerStatus = PrisonerStatus.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) { // Legacy

@@ -297,6 +297,15 @@ public class ImageChoiceDialog extends JDialog {
             gbc.fill = GridBagConstraints.BOTH;
             gbc.anchor = GridBagConstraints.NORTHWEST;
             getContentPane().add(tabbedPane, gbc);
+
+            // Add the tableImages List Selection Listener now that the values have been
+            // initialized for Layered Icons
+            tableImages.getSelectionModel().addListSelectionListener(event -> {
+                // Clear selections on the layered tables
+                for (JTable table : layeredTables) {
+                    table.clearSelection();
+                }
+            });
         } else {
             // Add the image panel to the content pane
             gbc = new GridBagConstraints();
@@ -309,15 +318,6 @@ public class ImageChoiceDialog extends JDialog {
             gbc.anchor = GridBagConstraints.NORTHWEST;
             getContentPane().add(imagesPanel, gbc);
         }
-
-        // Add the tableImages List Selection Listener now that the values have been
-        // initialized for Layered Icons, if applicable.
-        tableImages.getSelectionModel().addListSelectionListener(event -> {
-            // Clear selections on the layered tables
-            for (JTable table : layeredTables) {
-                table.clearSelection();
-            }
-        });
 
         JButton btnSelect = new JButton(resourceMap.getString("btnSelect.text")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N

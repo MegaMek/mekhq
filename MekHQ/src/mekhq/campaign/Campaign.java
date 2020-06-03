@@ -152,7 +152,6 @@ import mekhq.campaign.universe.RangedPlanetSelector;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.gui.GuiTabType;
 import mekhq.gui.dialog.HistoricalDailyReportDialog;
 import mekhq.gui.utilities.PortraitFileFactory;
 import mekhq.module.atb.AtBEventProcessor;
@@ -239,6 +238,12 @@ public class Campaign implements Serializable, ITechManager {
     private String camoFileName = null;
     private int colorIndex = 0;
 
+    //unit icon
+    public static final String ROOT_ICON = "-- General --";
+    public static final String ICON_NONE = "None";
+    private String iconCategory = ROOT_ICON;
+    private String iconFileName = ICON_NONE;
+
     private Finances finances;
 
     private CurrentLocation location;
@@ -268,6 +273,7 @@ public class Campaign implements Serializable, ITechManager {
     private Calendar shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
+    private CampaignSummary campaignSummary;
 
     /** This is used to determine if the player has an active AtB Contract, and is recalculated on load */
     private transient boolean hasActiveContract;
@@ -322,6 +328,7 @@ public class Campaign implements Serializable, ITechManager {
         atbConfig = null;
         autosaveService = new AutosaveService();
         hasActiveContract = false;
+        campaignSummary = new CampaignSummary(this);
     }
 
     /**
@@ -779,6 +786,10 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         return true;
+    }
+
+    public CampaignSummary getCampaignSummary() {
+        return campaignSummary;
     }
 
     public News getNews() {
@@ -3045,7 +3056,13 @@ public class Campaign implements Serializable, ITechManager {
         return repairable;
     }
 
-    public void fixPart(IPartWork partWork, Person tech) {
+    /**
+     * Attempt to fix a part, which may have all kinds of effect depending on part type.
+     * @param partWork - the {@link IPartWork} to be fixed
+     * @param tech - the {@link Person} who will attempt to fix the part
+     * @return a <code>String</code> of the report that summarizes the outcome of the attempt to fix the part
+     */
+    public String fixPart(IPartWork partWork, Person tech) {
         TargetRoll target = getTargetFor(partWork, tech);
         String report = "";
         String action = " fix ";
@@ -3071,21 +3088,21 @@ public class Campaign implements Serializable, ITechManager {
             if (!((Armor) partWork).isInSupply()) {
                 report += "<b>Not enough armor remaining.  Task suspended.</b>";
                 addReport(report);
-                return;
+                return report;
             }
         }
         if ((partWork instanceof ProtomekArmor) && !partWork.isSalvaging()) {
             if (!((ProtomekArmor) partWork).isInSupply()) {
                 report += "<b>Not enough Protomech armor remaining.  Task suspended.</b>";
                 addReport(report);
-                return;
+                return report;
             }
         }
         if ((partWork instanceof BaArmor) && !partWork.isSalvaging()) {
             if (!((BaArmor) partWork).isInSupply()) {
                 report += "<b>Not enough BA armor remaining.  Task suspended.</b>";
                 addReport(report);
-                return;
+                return report;
             }
         }
         if (partWork instanceof SpacecraftCoolingSystem) {
@@ -3152,7 +3169,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
-                return;
+                return report;
             }
         } else {
             tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
@@ -3256,6 +3273,7 @@ public class Campaign implements Serializable, ITechManager {
         partWork.cancelReservation();
         MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(report);
+        return report;
     }
 
     /**
@@ -4161,11 +4179,17 @@ public class Campaign implements Serializable, ITechManager {
 
     public Force getForceFor(Person p) {
         Unit u = getUnit(p.getUnitId());
-        if (null == u) {
-            return null;
-        } else {
+        if (u != null) {
             return getForceFor(u);
+        } else if (p.isTech()) {
+            for (Force force : forceIds.values()) {
+                if (p.getId().equals(force.getTechID())) {
+                    return force;
+                }
+            }
         }
+
+        return null;
     }
 
     public String getDateAsString() {
@@ -4403,6 +4427,23 @@ public class Campaign implements Serializable, ITechManager {
     public void setColorIndex(int index) {
         colorIndex = index;
     }
+
+    public String getIconCategory() {
+        return iconCategory;
+    }
+
+    public void setIconCategory(String s) {
+        this.iconCategory = s;
+    }
+
+    public String getIconFileName() {
+        return iconFileName;
+    }
+
+    public void setIconFileName(String s) {
+        this.iconFileName = s;
+    }
+
 
     public ArrayList<Part> getSpareParts() {
         ArrayList<Part> spares = new ArrayList<>();
@@ -4653,8 +4694,6 @@ public class Campaign implements Serializable, ITechManager {
                 RandomGenderGenerator.getPercentFemale());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "gmMode", gmMode);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "showOverview", app.getCampaigngui()
-                .hasTab(GuiTabType.OVERVIEW));
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPool", astechPool);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPoolMinutes",
                 astechPoolMinutes);
@@ -4663,6 +4702,8 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "medicPool", medicPool);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoCategory", camoCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoFileName", camoFileName);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "iconCategory", iconCategory);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPartId", lastPartId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastForceId", lastForceId);

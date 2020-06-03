@@ -18,6 +18,6 @@ And provide the steps you have taken to reproduce the issue in the campaign file
 Provide the .cpnx campaign file that this issue occurs in.
 Provide any custom units that you are using in this campaign so that it will load on the developers machine.
 Provide any other files that you have customized in this campaign like the factions.xml for example.
-And provide the mekhqlog.txt file for any NPE's or errors that MekHQ might be reporting.
-Do not paste the entire logfile text into this ticket. Just attach the actual mekhqlog.txt file
+And provide the megameklog.txt and mekhqlog.txt files for any NPE's or errors that MekHQ might be reporting.
+Do not paste the entire logfile text into this ticket. Just attach the actual megameklog.txt and mekhqlog.txt files
 (Delete the above lines)

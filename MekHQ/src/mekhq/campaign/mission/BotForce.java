@@ -1,8 +1,27 @@
+/*
+ * Copyright (C) 2018, 2020 - The MegaMek Team. All Rights Reserved
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -23,13 +42,10 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 
 public class BotForce implements Serializable, MekHqXmlSerializable {
-    /**
-     *
-     */
     private static final long serialVersionUID = 8259058549964342518L;
 
     private String name;
-    private ArrayList<Entity> entityList;
+    private List<Entity> entityList;
     private int team;
     private int start;
     private String camoCategory;
@@ -48,15 +64,15 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public BotForce(String name, int team, int start, ArrayList<Entity> entityList) {
+    public BotForce(String name, int team, int start, List<Entity> entityList) {
         this(name, team, start, start, entityList, Player.NO_CAMO, null, -1);
     }
 
-    public BotForce(String name, int team, int start, int home, ArrayList<Entity> entityList) {
+    public BotForce(String name, int team, int start, int home, List<Entity> entityList) {
         this(name, team, start, home, entityList, Player.NO_CAMO, null, -1);
     }
 
-    public BotForce(String name, int team, int start, int home, ArrayList<Entity> entityList,
+    public BotForce(String name, int team, int start, int home, List<Entity> entityList,
             String camoCategory, String camoFileName, int colorIndex) {
         final String METHOD_NAME = "BotForce(String,int,int,int,ArrayList<Entity>,String,String,int)"; //$NON-NLS-1$
         this.name = name;
@@ -112,11 +128,11 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.name = name;
     }
 
-    public ArrayList<Entity> getEntityList() {
+    public List<Entity> getEntityList() {
         return entityList;
     }
 
-    public void setEntityList(ArrayList<Entity> entityList) {
+    public void setEntityList(List<Entity> entityList) {
         // Filter all nulls out of the parameter entityList
         this.entityList = entityList.stream().filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
     }
@@ -193,6 +209,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         behaviorSettings.setRetreatEdge(findCardinalEdge(i));
     }
 
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         final String METHOD_NAME = "writeToXml";
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "name", name);

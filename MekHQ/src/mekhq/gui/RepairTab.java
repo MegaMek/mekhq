@@ -19,34 +19,23 @@
 
 package mekhq.gui;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import javax.swing.JToggleButton;
-import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.DefaultCaret;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
 import megamek.common.MechView;
 import megamek.common.TargetRoll;
@@ -109,6 +98,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private JLabel lblTargetNum;
     private JTextPane txtServicedUnitView;
     private JTextArea textTarget;
+    private JTextPane txtResult;
     private JLabel astechPoolLabel;
     private JComboBox<String> choiceLocation;
     private JButton btnAcquisitions;
@@ -377,6 +367,27 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.weightx = 1.0;
         panTasks.add(panDoTaskText, gridBagConstraints);
 
+        txtResult = new JTextPane();
+        txtResult.addHyperlinkListener(getCampaignGui().getReportHLL());
+        txtResult.setContentType("text/html"); // NOI18N
+        txtResult.setEditable(false);
+        DefaultCaret caret = (DefaultCaret) txtResult.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        txtResult.setBorder(new EmptyBorder(2, 5, 2, 2));
+        JPanel panResult = new JPanel(new BorderLayout());
+        panResult.add(txtResult, BorderLayout.CENTER);
+        panResult.setBorder(BorderFactory.createTitledBorder("Last repair check"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        panTasks.add(panResult, gridBagConstraints);
+
         taskModel = new TaskTableModel(getCampaignGui(), this);
         taskTable = new JTable(taskModel);
         taskTable.setRowHeight(70);
@@ -396,7 +407,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -644,7 +655,19 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 return;
             }
         }
-        getCampaign().fixPart(part, selectedTech);
+        String r = getCampaign().fixPart(part, selectedTech);
+
+        Reader stringReader = new StringReader(r);
+        HTMLEditorKit htmlKit = new HTMLEditorKit();
+        HTMLDocument blank = (HTMLDocument) htmlKit.createDefaultDocument();
+        try {
+            htmlKit.read(stringReader, blank, 0);
+        } catch (Exception ignored) {
+
+        }
+        txtResult.setDocument(blank);
+        txtResult.setCaretPosition(blank.getLength());
+
         if (null != u) {
             if (!u.isRepairable() && !u.hasSalvageableParts()) {
                 selectedRow = -1;
