@@ -18,8 +18,19 @@ In addition, creators should be able to specify a variety of initial conditions 
 The main engine of StoryArcs will be the StoryEvent class. This will be an abstract class that can handle several different kind of sotryline events. A StoryEvent is the basic building block of the potentially branching narrative. All StoryEvents will be stored in a hash by unique ids (or integer ids?).
 
 The most important methods of a StoryEvent are the following:
+- startEvent: a method that will start the event and do whatever that kind of event needs to do. Some events may call completeEvent at the end of this. Others may hang around. An `active` boolean will be used to identify active events.
+- isTriggered: this method will check if certain conditions have been met that would trigger the event. A simple example would be passing a certain date on the calendar. But there could eventually be a lot of options here, including a random one to allow for random events.
+- checkTriggered: a check to see if the event's trigger condition has been met and if so, start the event.
 - completeEvent: a method that will determine whether preconditions for completing this event have been met.
 - getNextStoryEvent: a method that will provide the id of the next StoryEvent to trigger when this StoryEvent is complete. How that next StoryEvent gets determined will depend on the internals of the particular class.
+
+### How do events happen?
+
+Events can be started in one of two ways:
+- triggered by some condition in the campaign such as hitting a certain date, moving to a certain planet, acquring a certain number of units, etc.
+- called by a previous event upon its completion.
+
+### Concrete subclasses
 
 Here are the concrete sub-classes of a StoryEvent that I am considering at the moment:
 
@@ -30,8 +41,13 @@ Here are the concrete sub-classes of a StoryEvent that I am considering at the m
 - StoryChoice: Similar to the StoryNarrative above but the user has to make some kind of choice from a list of options and the choice may affect the next StoryElement as well.
 - StoryTalk: Allows for an rpg-style dialog between characters who may be represented by portraits. This will need to have its own branching logic for how the conversation progresses due to dialog options chosen.
 
+### Rewards and Penalties
 
 All StoryEvent classes would also have the ability to include boons such as equipment, new personnel, etc. or penalties such as the removal of personnel, destruction of equipment, etc. which can trigger depending on the logic of the StoryEvent.
+
+### Repeatability
+
+StoryEvents should be able to be designated as repeatable, although the default would be non-repeatable. In order to make this work well, we should probably add a `clone` method that would clone repeatable StoryEvents and add them with a new UUID when they are started.
 
 ## Saving Story Arcs
 
@@ -39,8 +55,8 @@ Story Arcs will be saved in an XML format. This XML format will be identical to 
 
 ## Building Story arcs
 
-For initial implementation, I will probably build some test cases in XML directly, but eventually we will want a dialog that allows people to create and edit Story Arcs. 
+For initial implementation, I will probably build some test cases in XML directly, but eventually we will want a dialog that allows people to create and edit Story Arcs.
 
 ## Plan for Implementation
 
-I fully subscribe to the KISS philosophy. My primary initial goal would be to get the basic structure set up by allowing for a simple branching mission and scenario structure with a StoryNarrative StoryEvent. The logic of these would be fairly simple and would basically branch on the success or failure of a single scenario (I may even go super simple on round one and only allow for a linear structure). Once this up and working, we could then add more complexity to the logic of how events are triggered as well as consider more complex narrative elements such as StoryChoice and StoryTalk. 
+I fully subscribe to the KISS philosophy. My primary initial goal would be to get the basic structure set up by allowing for a simple branching mission and scenario structure with a StoryNarrative StoryEvent. The logic of these would be fairly simple and would basically branch on the success or failure of a single scenario (I may even go super simple on round one and only allow for a linear structure). Once this up and working, we could then add more complexity to the logic of how events are triggered as well as consider more complex narrative elements such as StoryChoice and StoryTalk.
