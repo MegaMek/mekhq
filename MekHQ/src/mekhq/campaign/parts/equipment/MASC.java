@@ -49,7 +49,7 @@ public class MASC extends EquipmentPart {
     }
 
     public MASC(int tonnage, EquipmentType et, int equipNum, Campaign c, int rating, boolean omniPodded) {
-        super(tonnage, et, equipNum, omniPodded, c);
+        super(tonnage, et, equipNum, 1.0, omniPodded, c);
         this.engineRating = rating;
         equipTonnage = calculateTonnage();
     }

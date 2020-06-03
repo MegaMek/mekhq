@@ -87,9 +87,7 @@ import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.model.ScenarioTableModel;
-import mekhq.gui.view.AtBContractViewPanel;
 import mekhq.gui.view.AtBScenarioViewPanel;
-import mekhq.gui.view.ContractViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
@@ -102,12 +100,11 @@ public final class BriefingTab extends CampaignGuiTab {
 
     private static final long serialVersionUID = 5927572086088284329L;
 
-    private JPanel panBriefing;
+    private JPanel panMission;
     private JPanel panScenario;
     private LanceAssignmentView panLanceAssignment;
     private JSplitPane splitScenario;
     private JSplitPane splitBrief;
-    private JSplitPane splitMission;
     private JTable scenarioTable;
     private JComboBox<String> choiceMission;
     private JScrollPane scrollMissionView;
@@ -155,7 +152,7 @@ public final class BriefingTab extends CampaignGuiTab {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
-        panBriefing = new JPanel(new GridBagLayout());
+        panMission = new JPanel(new GridBagLayout());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -164,7 +161,7 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        panBriefing.add(new JLabel(resourceMap.getString("lblMission.text")), gridBagConstraints);
+        panMission.add(new JLabel(resourceMap.getString("lblMission.text")), gridBagConstraints);
 
         choiceMission = new JComboBox<>();
         choiceMission.addActionListener(ev -> changeMission());
@@ -175,7 +172,7 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        panBriefing.add(choiceMission, gridBagConstraints);
+        panMission.add(choiceMission, gridBagConstraints);
 
         panMissionButtons = new JPanel(new GridLayout(2, 3));
         gridBagConstraints = new GridBagConstraints();
@@ -185,7 +182,7 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        panBriefing.add(panMissionButtons, gridBagConstraints);
+        panMission.add(panMissionButtons, gridBagConstraints);
 
         btnAddMission = new JButton(resourceMap.getString("btnAddMission.text")); // NOI18N
         btnAddMission.setToolTipText(resourceMap.getString("btnAddMission.toolTipText")); // NOI18N
@@ -229,7 +226,7 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        panBriefing.add(scrollMissionView, gridBagConstraints);
+        panMission.add(scrollMissionView, gridBagConstraints);
 
         scenarioModel = new ScenarioTableModel(getCampaign());
         scenarioTable = new JTable(scenarioModel);
@@ -239,13 +236,6 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(ev -> refreshScenarioView());
-        JScrollPane scrollScenarioTable = new JScrollPane(scenarioTable);
-        scrollScenarioTable.setMinimumSize(new java.awt.Dimension(200, 200));
-        scrollScenarioTable.setPreferredSize(new java.awt.Dimension(200, 200));
-
-        splitMission = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panBriefing, scrollScenarioTable);
-        splitMission.setOneTouchExpandable(true);
-        splitMission.setResizeWeight(1.0);
 
         panScenario = new JPanel(new GridBagLayout());
 
@@ -324,7 +314,7 @@ public final class BriefingTab extends CampaignGuiTab {
         splitScenario.setOneTouchExpandable(true);
         splitScenario.setResizeWeight(1.0);
 
-        splitBrief = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, splitMission, splitScenario);
+        splitBrief = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, panMission, splitScenario);
         splitBrief.setOneTouchExpandable(true);
         splitBrief.setResizeWeight(0.5);
         splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
@@ -488,6 +478,10 @@ public final class BriefingTab extends CampaignGuiTab {
             CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, null, m, getCampaign());
             csd.setVisible(true);
         }
+        //need to update the scenario table and refresh the scroll view
+        refreshScenarioTableData();
+        scrollMissionView.revalidate();
+        scrollMissionView.repaint();
     }
 
     protected void clearAssignedUnits() {
@@ -887,13 +881,7 @@ public final class BriefingTab extends CampaignGuiTab {
             Mission m = getCampaign().getSortedMissions().get(idx);
             if (null != m) {
                 selectedMission = m.getId();
-                if (getCampaign().getCampaignOptions().getUseAtB() && m instanceof AtBContract) {
-                    scrollMissionView.setViewportView(new AtBContractViewPanel((AtBContract) m, getCampaign(), getCampaignGui()));
-                } else if (m instanceof Contract) {
-                    scrollMissionView.setViewportView(new ContractViewPanel((Contract) m, getCampaignGui()));
-                } else {
-                    scrollMissionView.setViewportView(new MissionViewPanel(m, getCampaignGui()));
-                }
+                scrollMissionView.setViewportView(new MissionViewPanel(m, scenarioTable, getCampaignGui()));
                 // This odd code is to make sure that the scrollbar stays at the
                 // top
                 // I can't just call it here, because it ends up getting reset
@@ -921,6 +909,8 @@ public final class BriefingTab extends CampaignGuiTab {
             scenarioModel.setData(new ArrayList<Scenario>());
         }
         selectedScenario = -1;
+        scenarioTable.setPreferredScrollableViewportSize(scenarioTable.getPreferredSize());
+        scenarioTable.setFillsViewportHeight(true);
     }
 
     private ActionScheduler scenarioDataScheduler = new ActionScheduler(this::refreshScenarioTableData);

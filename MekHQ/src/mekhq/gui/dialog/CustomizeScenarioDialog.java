@@ -12,18 +12,16 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -68,7 +66,6 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.preferences.PreferencesNode;
 
 /**
- *
  * @author  Taharqa
  */
 public class CustomizeScenarioDialog extends javax.swing.JDialog {
@@ -108,21 +105,21 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         super(parent, modal);
         this.frame = parent;
         this.mission = m;
-        if(null == s) {
-        	scenario = new Scenario("New Scenario");
-        	newScenario = true;
+        if (null == s) {
+            scenario = new Scenario("New Scenario");
+            newScenario = true;
         } else {
-        	scenario = s;
-        	newScenario = false;
+            scenario = s;
+            newScenario = false;
         }
         campaign = c;
         date = scenario.getDate();
-        if(null == date) {
-        	date = campaign.getCalendar().getTime();
+        if (null == date) {
+            date = campaign.getCalendar().getTime();
         }
-        dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
-        loots = new ArrayList<Loot>();
-        for(Loot loot : scenario.getLoot()) {
+        dateFormatter = new SimpleDateFormat("MM/dd/yyyy"); // TODO : Remove inline date format
+        loots = new ArrayList<>();
+        for (Loot loot : scenario.getLoot()) {
             loots.add((Loot)loot.clone());
         }
         lootModel = new LootTableModel(loots);
@@ -133,7 +130,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-    	 java.awt.GridBagConstraints gridBagConstraints;
+         java.awt.GridBagConstraints gridBagConstraints;
 
         txtName = new javax.swing.JTextField();
         lblName = new javax.swing.JLabel();
@@ -142,7 +139,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         lblStatus = new javax.swing.JLabel();
         panMain = new javax.swing.JPanel();
         panBtn = new javax.swing.JPanel();
-        choiceStatus = new javax.swing.JComboBox<String>();
+        choiceStatus = new javax.swing.JComboBox<>();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -174,43 +171,38 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(txtName, gridBagConstraints);
 
-        if(!scenario.isCurrent()) {
-	        lblStatus.setText(resourceMap.getString("lblStatus.text"));
-	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy++;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-	        panMain.add(lblStatus, gridBagConstraints);
+        if (!scenario.isCurrent()) {
+            lblStatus.setText(resourceMap.getString("lblStatus.text"));
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy++;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            panMain.add(lblStatus, gridBagConstraints);
 
-	        DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<String>();
-			for (int i = 1; i < Scenario.S_NUM; i++) {
-				statusModel.addElement(Scenario.getStatusName(i));
-			}
-			choiceStatus.setModel(statusModel);
-			choiceStatus.setName("choiceStatus"); // NOI18N
-			choiceStatus.setSelectedIndex(scenario.getStatus()-1);
-	        gridBagConstraints.gridx = 1;
-	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-	        panMain.add(choiceStatus, gridBagConstraints);
+            DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<>();
+            for (int i = 1; i < Scenario.S_NUM; i++) {
+                statusModel.addElement(Scenario.getStatusName(i));
+            }
+            choiceStatus.setModel(statusModel);
+            choiceStatus.setName("choiceStatus"); // NOI18N
+            choiceStatus.setSelectedIndex(scenario.getStatus()-1);
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            panMain.add(choiceStatus, gridBagConstraints);
         }
         if (!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario)) {
-	        btnDate = new javax.swing.JButton();
-	        btnDate.setText(dateFormatter.format(date));
-	        btnDate.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                changeDate();
-	            }
-	        });
-	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy++;
-	        gridBagConstraints.gridwidth = 2;
-	        gridBagConstraints.weightx = 1.0;
-	        gridBagConstraints.weighty = 0.0;
-	        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-	        panMain.add(btnDate, gridBagConstraints);
-
+            btnDate = new javax.swing.JButton();
+            btnDate.setText(dateFormatter.format(date));
+            btnDate.addActionListener(evt -> changeDate());
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            panMain.add(btnDate, gridBagConstraints);
         }
         if (scenario.isCurrent()) {
             initLootPanel();
@@ -225,8 +217,6 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                     BorderFactory.createTitledBorder("Potential Rewards"),
                     BorderFactory.createEmptyBorder(5,5,5,5)));
             panMain.add(panLoot, gridBagConstraints);
-
-
         }
 
         txtDesc = new MarkdownEditorPanel("Description");
@@ -243,7 +233,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(txtDesc, gridBagConstraints);
 
-        if(scenario instanceof AtBDynamicScenario && scenario.isCurrent()) {
+        if (scenario instanceof AtBDynamicScenario && scenario.isCurrent()) {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
             gridBagConstraints.gridwidth = 1;
@@ -252,24 +242,20 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             EventTiming scenarioState = ((AtBDynamicScenario) scenario).getNumBots() > 0 ?
                     EventTiming.PostForceGeneration : EventTiming.PreForceGeneration;
 
-            for(String modifierKey : AtBScenarioModifier.getOrderedModifierKeys()) {
-                if(AtBScenarioModifier.getScenarioModifier(modifierKey).getEventTiming() == scenarioState) {
+            for (String modifierKey : AtBScenarioModifier.getOrderedModifierKeys()) {
+                if (AtBScenarioModifier.getScenarioModifier(modifierKey).getEventTiming() == scenarioState) {
                     modifierBox.addItem(modifierKey);
                 }
             }
             panMain.add(modifierBox, gridBagConstraints);
 
             JButton addEventButton = new JButton("Apply Modifier");
-            addEventButton.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    btnAddModifierActionPerformed(evt);
-                }
-            });
+            addEventButton.addActionListener(this::btnAddModifierActionPerformed);
             gridBagConstraints.gridx = 1;
             panMain.add(addEventButton, gridBagConstraints);
         }
 
-        if(!scenario.isCurrent()) {
+        if (!scenario.isCurrent()) {
             txtReport = new MarkdownEditorPanel("After-Action Report");
             txtReport.setText(scenario.getReport());
             txtReport.setMinimumSize(new Dimension(400, 100));
@@ -285,47 +271,31 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             panMain.add(txtReport, gridBagConstraints);
         }
 
-        if(newScenario && (mission instanceof AtBContract)) {
+        if (newScenario && (mission instanceof AtBContract)) {
             JButton btnLoad = new JButton("Generate From Template");
-            btnLoad.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    btnLoadActionPerformed(evt);
-                }
-            });
+            btnLoad.addActionListener(this::btnLoadActionPerformed);
             panBtn.add(btnLoad);
         } else if (mission instanceof AtBContract && scenario instanceof AtBDynamicScenario) {
             JButton btnFinalize = new JButton();
 
-            if(((AtBDynamicScenario) scenario).getNumBots() > 0) {
+            if (((AtBDynamicScenario) scenario).getNumBots() > 0) {
                 btnFinalize.setText("Regenerate Bot Forces");
             } else {
                 btnFinalize.setText("Generate Bot Forces");
             }
 
-            btnFinalize.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    btnFinalizeActionPerformed(evt);
-                }
-            });
+            btnFinalize.addActionListener(this::btnFinalizeActionPerformed);
             panBtn.add(btnFinalize);
         }
 
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                btnOKActionPerformed(evt);
-            }
-        });
+        btnOK.addActionListener(this::btnOKActionPerformed);
         panBtn.add(btnOK);
 
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                btnCloseActionPerformed(evt);
-            }
-        });
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         gridBagConstraints.gridx = GridBagConstraints.RELATIVE;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
@@ -345,42 +315,42 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-    private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-    	scenario.setName(txtName.getText());
-    	scenario.setDesc(txtDesc.getText());
-    	if(!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario)) {
-            if(txtReport != null) {
+    private void btnOKActionPerformed(ActionEvent evt) {
+        scenario.setName(txtName.getText());
+        scenario.setDesc(txtDesc.getText());
+        if (!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario)) {
+            if (txtReport != null) {
                 scenario.setReport(txtReport.getText());
             }
 
             scenario.setStatus(choiceStatus.getSelectedIndex()+1);
             scenario.setDate(date);
-    	}
-    	scenario.resetLoot();
-    	for(Loot loot : lootModel.getAllLoot()) {
-    	    scenario.addLoot(loot);
-    	}
-    	if(newScenario) {
-    		campaign.addScenario(scenario, mission);
-    	}
-    	this.setVisible(false);
+        }
+        scenario.resetLoot();
+        for (Loot loot : lootModel.getAllLoot()) {
+            scenario.addLoot(loot);
+        }
+        if (newScenario) {
+            campaign.addScenario(scenario, mission);
+        }
+        this.setVisible(false);
     }
 
     private void btnLoadActionPerformed(ActionEvent evt) {
         File file = FileDialogs.openScenarioTemplate((JFrame) getOwner()).orElse(null);
-        if(file == null) {
+        if (file == null) {
             return;
         }
 
         ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(file);
 
-        if(scenarioTemplate == null) {
+        if (scenarioTemplate == null) {
             JOptionPane.showMessageDialog(this, "Error loading specified file. See log for details.", "Load Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         AtBDynamicScenario scenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(scenarioTemplate, (AtBContract) mission, campaign);
-        if(newScenario) {
+        if (newScenario) {
             campaign.addScenario(scenario, mission);
         }
 
@@ -393,51 +363,51 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     }
 
     public int getMissionId() {
-    	return mission.getId();
+        return mission.getId();
     }
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-    	this.setVisible(false);
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
+        this.setVisible(false);
     }
 
     private void changeDate() {
         // show the date chooser
-    	GregorianCalendar cal = new GregorianCalendar();
-    	cal.setTime(date);
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(date);
         DateChooser dc = new DateChooser(frame, cal);
-        // user can eiter choose a date or cancel by closing
+        // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-        	if (scenario.isCurrent()) {
-        		if (dc.getDate().getTime().before(campaign.getCalendar().getTime())) {
-            		JOptionPane.showMessageDialog(frame,
-            			    "You cannot choose a date before the current date for a pending battle.",
-            			    "Invalid date",
-            			    JOptionPane.ERROR_MESSAGE);
-            		return;
-        		} else {
-        			//Calendar math necessitated by variations in locales
-        			GregorianCalendar nextMonday = new GregorianCalendar();
-        			nextMonday.setTime(campaign.getDate());
-        			nextMonday.add(Calendar.DAY_OF_MONTH, 1);
-        			while (nextMonday.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
-        				nextMonday.add(Calendar.DAY_OF_MONTH, 1);
-        			}
-        			//
-        			if (!dc.getDate().getTime().before(nextMonday.getTime())) {
-                		JOptionPane.showMessageDialog(frame,
-                			    "You cannot choose a date beyond the current week.",
-                			    "Invalid date",
-                			    JOptionPane.ERROR_MESSAGE);
-                		return;
-        			}
-        		}
-        	} else if (dc.getDate().getTime().after(campaign.getCalendar().getTime())) {
-        		JOptionPane.showMessageDialog(frame,
-        			    "You cannot choose a date after the current date.",
-        			    "Invalid date",
-        			    JOptionPane.ERROR_MESSAGE);
-        		return;
-        	}
+            if (scenario.isCurrent()) {
+                if (dc.getDate().getTime().before(campaign.getCalendar().getTime())) {
+                    JOptionPane.showMessageDialog(frame,
+                            "You cannot choose a date before the current date for a pending battle.",
+                            "Invalid date",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                } else {
+                    //Calendar math necessitated by variations in locales
+                    GregorianCalendar nextMonday = new GregorianCalendar();
+                    nextMonday.setTime(campaign.getDate());
+                    nextMonday.add(Calendar.DAY_OF_MONTH, 1);
+                    while (nextMonday.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
+                        nextMonday.add(Calendar.DAY_OF_MONTH, 1);
+                    }
+                    //
+                    if (!dc.getDate().getTime().before(nextMonday.getTime())) {
+                        JOptionPane.showMessageDialog(frame,
+                                "You cannot choose a date beyond the current week.",
+                                "Invalid date",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+            } else if (dc.getDate().getTime().after(campaign.getDate())) {
+                JOptionPane.showMessageDialog(frame,
+                        "You cannot choose a date after the current date.",
+                        "Invalid date",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             date = dc.getDate().getTime();
             btnDate.setText(dateFormatter.format(date));
         }
@@ -448,34 +418,22 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAdd = new JButton("Add Loot"); // NOI18N
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addLoot();
-            }
-        });
+        btnAdd.addActionListener(evt -> addLoot());
         panBtns.add(btnAdd);
 
         btnEdit = new JButton("Edit Loot"); // NOI18N
         btnEdit.setEnabled(false);
-        btnEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editLoot();
-            }
-        });
+        btnEdit.addActionListener(evt -> editLoot());
         panBtns.add(btnEdit);
 
         btnDelete = new JButton("Delete Loot"); // NOI18N
         btnDelete.setEnabled(false);
-        btnDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-               deleteLoot();
-            }
-        });
+        btnDelete.addActionListener(evt -> deleteLoot());
         panBtns.add(btnDelete);
         panLoot.add(panBtns, BorderLayout.PAGE_START);
 
         lootTable = new JTable(lootModel);
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < LootTableModel.N_COL; i++) {
             column = lootTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(lootModel.getColumnWidth(i));
@@ -484,13 +442,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         lootTable.setIntercellSpacing(new Dimension(0, 0));
         lootTable.setShowGrid(false);
         lootTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        lootTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        lootTableValueChanged(evt);
-                    }
-                });
+        lootTable.getSelectionModel().addListSelectionListener(this::lootTableValueChanged);
 
         panLoot.add(new JScrollPane(lootTable), BorderLayout.CENTER);
     }
@@ -504,7 +456,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private void addLoot() {
         LootDialog ekld = new LootDialog(frame, true, new Loot(), campaign);
         ekld.setVisible(true);
-        if(null != ekld.getLoot()) {
+        if (null != ekld.getLoot()) {
             lootModel.addLoot(ekld.getLoot());
         }
         refreshTable();
@@ -512,7 +464,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 
     private void editLoot() {
         Loot loot = lootModel.getLootAt(lootTable.getSelectedRow());
-        if(null != loot) {
+        if (null != loot) {
             LootDialog ekld = new LootDialog(frame, true, loot, campaign);
             ekld.setVisible(true);
             refreshTable();
@@ -521,7 +473,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 
     private void deleteLoot() {
         int row = lootTable.getSelectedRow();
-        if(-1 != row) {
+        if (-1 != row) {
             loots.remove(row);
         }
         refreshTable();
@@ -530,9 +482,9 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private void refreshTable() {
         int selectedRow = lootTable.getSelectedRow();
         lootModel.setData(loots);
-        if(selectedRow != -1) {
-            if(lootTable.getRowCount() > 0) {
-                if(lootTable.getRowCount() == selectedRow) {
+        if (selectedRow != -1) {
+            if (lootTable.getRowCount() > 0) {
+                if (lootTable.getRowCount() == selectedRow) {
                     lootTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
                 } else {
                     lootTable.setRowSelectionInterval(selectedRow, selectedRow);

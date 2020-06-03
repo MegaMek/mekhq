@@ -47,11 +47,12 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     private int trooper;
 
     public MissingBattleArmorEquipmentPart() {
-        this(0, null, -1, -1, null, 0.0);
+        this(0, null, -1, 1.0, -1, null, 0.0);
     }
 
-    public MissingBattleArmorEquipmentPart(int tonnage, EquipmentType et, int equipNum, int trooper, Campaign c, double etonnage) {
-        super(tonnage, et, equipNum, c, etonnage);
+    public MissingBattleArmorEquipmentPart(int tonnage, EquipmentType et, int equipNum, double size,
+                                           int trooper, Campaign c, double etonnage) {
+        super(tonnage, et, equipNum, size, c, etonnage);
         this.trooper = trooper;
     }
 
@@ -68,22 +69,11 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<equipmentNum>"
-                +equipmentNum
-                +"</equipmentNum>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<typeName>"
-                +MekHqXmlUtil.escape(type.getInternalName())
-                +"</typeName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<equipTonnage>"
-                +equipTonnage
-                +"</equipTonnage>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<trooper>"
-                +trooper
-                +"</trooper>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "size", size);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trooper", trooper);
         writeToXmlEnd(pw1, indent);
     }
 
@@ -95,14 +85,13 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
                 equipmentNum = Integer.parseInt(wn2.getTextContent());
-            }
-            else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
                 typeName = wn2.getTextContent();
-            }
-            else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
                 equipTonnage = Double.parseDouble(wn2.getTextContent());
-            }
-            else if (wn2.getNodeName().equalsIgnoreCase("trooper")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("size")) {
+                size = Double.parseDouble(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("trooper")) {
                 trooper = Integer.parseInt(wn2.getTextContent());
             }
         }
@@ -179,14 +168,15 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
         if(part instanceof BattleArmorEquipmentPart) {
             BattleArmorEquipmentPart eqpart = (BattleArmorEquipmentPart)part;
             EquipmentType et = eqpart.getType();
-            return type.equals(et) && getTonnage() == part.getTonnage();
+            return type.equals(et) && (getTonnage() == part.getTonnage())
+                    && (getSize() == ((BattleArmorEquipmentPart) part).getSize());
         }
         return false;
     }
 
     @Override
     public Part getNewPart() {
-        BattleArmorEquipmentPart epart = new BattleArmorEquipmentPart(getUnitTonnage(), type, -1, -1, campaign);
+        BattleArmorEquipmentPart epart = new BattleArmorEquipmentPart(getUnitTonnage(), type, -1, size, -1, campaign);
         epart.setEquipTonnage(equipTonnage);
         return epart;
     }

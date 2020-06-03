@@ -9,8 +9,7 @@ import org.mockito.Mockito;
 import megamek.common.Entity;
 import mekhq.campaign.unit.Unit;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public class PersonTest {
@@ -47,52 +46,48 @@ public class PersonTest {
     }
 
     @Test
-    public void testAddAndRemoveAward() throws ParseException {
+    public void testAddAndRemoveAward() {
         initPerson();
         initAwards();
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
 
-        mockPerson.awardController.addAndLogAward("TestSet","Test Award 1", simpleDateFormat.parse("3000-01-01"));
-        mockPerson.awardController.addAndLogAward("TestSet","Test Award 1", simpleDateFormat.parse("3000-01-02"));
-        mockPerson.awardController.addAndLogAward("TestSet","Test Award 2", simpleDateFormat.parse("3000-01-01"));
+        mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"), LocalDate.parse("3000-01-02"));
 
-        mockPerson.awardController.removeAward("TestSet", "Test Award 1", simpleDateFormat.parse("3000-01-01"), simpleDateFormat.parse("3000-01-02"));
+        assertTrue(mockPerson.getAwardController().hasAwards());
+        assertEquals(2, mockPerson.getAwardController().getAwards().size());
 
-        assertTrue(mockPerson.awardController.hasAwards());
-        assertEquals(2, mockPerson.awardController.getAwards().size());
+        mockPerson.getAwardController().removeAward("TestSet", "Test Award 2", LocalDate.parse("3000-01-01"), LocalDate.parse("3000-01-02"));
 
-        mockPerson.awardController.removeAward("TestSet", "Test Award 2", simpleDateFormat.parse("3000-01-01"), simpleDateFormat.parse("3000-01-02"));
+        assertTrue(mockPerson.getAwardController().hasAwards());
+        assertEquals(1, mockPerson.getAwardController().getAwards().size());
 
-        assertTrue(mockPerson.awardController.hasAwards());
-        assertEquals(1, mockPerson.awardController.getAwards().size());
+        mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"), LocalDate.parse("3000-01-02"));
 
-        mockPerson.awardController.removeAward("TestSet", "Test Award 1", simpleDateFormat.parse("3000-01-02"), simpleDateFormat.parse("3000-01-02"));
-
-        assertFalse(mockPerson.awardController.hasAwards());
-        assertEquals(0, mockPerson.awardController.getAwards().size());
+        assertFalse(mockPerson.getAwardController().hasAwards());
+        assertEquals(0, mockPerson.getAwardController().getAwards().size());
     }
 
     @Test
-    public void testGetNumberOfAwards() throws ParseException {
+    public void testGetNumberOfAwards() {
         initPerson();
         initAwards();
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().addAndLogAward("TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
 
-        mockPerson.awardController.addAndLogAward("TestSet","Test Award 1", simpleDateFormat.parse("3000-01-01"));
-        mockPerson.awardController.addAndLogAward("TestSet","Test Award 1", simpleDateFormat.parse("3000-01-02"));
-        mockPerson.awardController.addAndLogAward("TestSet","Test Award 2", simpleDateFormat.parse("3000-01-01"));
+        assertEquals( 2, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
 
-        assertEquals( 2, mockPerson.awardController.getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
+        mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"), LocalDate.parse("3000-01-02"));
 
-        mockPerson.awardController.removeAward("TestSet", "Test Award 1", simpleDateFormat.parse("3000-01-01"), simpleDateFormat.parse("3000-01-02"));
+        assertEquals(1, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
 
-        assertEquals(1, mockPerson.awardController.getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
+        mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"), LocalDate.parse("3000-01-02"));
 
-        mockPerson.awardController.removeAward("TestSet", "Test Award 1", simpleDateFormat.parse("3000-01-02"), simpleDateFormat.parse("3000-01-02"));
-
-        assertEquals(0, mockPerson.awardController.getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
+        assertEquals(0, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
     }
 
     @Test

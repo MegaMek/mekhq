@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.Crew;
+import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 
 import java.util.ResourceBundle;
@@ -78,12 +79,16 @@ public enum GenderDescriptors {
      * @param gender the gender to return the descriptor for
      * @return the descriptor
      */
-    public String getDescriptor(int gender) {
+    public String getDescriptor(Gender gender) {
         switch (gender) {
-            case Crew.G_MALE:
+            case MALE:
                 return this.masculine;
-            case Crew.G_FEMALE:
+            case FEMALE:
                 return this.feminine;
+            case OTHER_MALE:
+                return (this.other != null) ? this.other : this.masculine;
+            case OTHER_FEMALE:
+                return (this.other != null) ? this.other : this.feminine;
             default:
                 return (this.other != null) ? this.other : "";
         }
@@ -94,7 +99,7 @@ public enum GenderDescriptors {
      * @param gender the gender to return the descriptor for
      * @return the string with its first letter capitalized
      */
-    public String getDescriptorCapitalized(int gender) {
+    public String getDescriptorCapitalized(Gender gender) {
         String descriptor = getDescriptor(gender).trim();
         switch (descriptor.length()) {
             case 0:
