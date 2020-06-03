@@ -1,6 +1,7 @@
 VERSION HISTORY:
 ----------------
 0.47.7-SNAPSHOT
++ PR #1776: Command center
 + PR #1769: Briefing room fixes
 + PR #1759: acquisition tables are not refreshing on new day
 + PR #1758: Planetary acquisition fixes
