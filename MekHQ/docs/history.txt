@@ -1,6 +1,8 @@
 VERSION HISTORY:
 ----------------
 0.47.7-SNAPSHOT
++ PR #1776: Command center
++ PR #1769: Briefing room fixes
 + PR #1759: acquisition tables are not refreshing on new day
 + PR #1758: Planetary acquisition fixes
 + Issue #1725: Refit does not save original part quality when the part is cloned
@@ -16,6 +18,15 @@ VERSION HISTORY:
 + Issue #1733: Adding Scenario Resolution Wizard and MUL Selection Dialog Mnemonics
 + PR #1762: Advance Days: Increasing Day Count Limit and Adding Advance to Next Year
 + Issue #1662 and 2/3rds of Issue #347: Remember Layered Force Icon Setup
++ PR #1764: Fixing Elemental Portrait Folder
++ PR #1655: Implementing Welsh and Icelandic Patronymic/Matronymics for Baby Surnames
++ PR #1713: Adding Spaced Marriage Surname formats and renaming formats to improve end-user readability
++ PR #1715: Varied Prisoner Status Bugfixes
++ PR #1714: Random Names and Gender Rework
++ Issue #1631: Regenerating Forces for AtB Dynamic Scenarios now Resets Attached Bot Forces
++ Issue #1706: Techs now display as part of the force in the personnel tab
++ Issue #1529: Begin Refit Should be Disabled For Negative Unallocated Armour Points
++ Issues #1343 and #1442: AtB Scenario Objective Fixes
 
 0.47.6 (2020-5-03 1715 UTC)
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.

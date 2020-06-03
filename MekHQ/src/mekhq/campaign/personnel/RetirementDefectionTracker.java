@@ -139,8 +139,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             int proto = 0;
             int support = 0;
             for (Person p : campaign.getPersonnel()) {
-                if (!p.isActive() || p.getPrimaryRole() == Person.T_NONE ||
-                        p.isDependent() || p.isPrisoner() || p.isBondsman()) {
+                if (!p.isActive() || p.getPrimaryRole() == Person.T_NONE || p.isDependent()
+                        || !p.getPrisonerStatus().isFree()) {
                     continue;
                 }
                 if (p.getPrimaryRole() >= Person.T_MECH_TECH) {
@@ -178,10 +178,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         }
 
         for (Person p : campaign.getPersonnel()) {
-            if (!p.isActive() || p.isDependent()
-                    || p.isPrisoner()
-                    || p.isBondsman()
-                    || p.isDeployed()
+            if (!p.isActive() || p.isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed()
                     || (p.isFounder() && campaign.getCampaignOptions().getFoundersNeverRetire())) {
                 continue;
             }
@@ -321,17 +318,14 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
          * handled as a unit in the AtB rules, so we're just going to ignore
          * them here.
          */
-        if (person.getPrimaryRole() == Person.T_INFANTRY ||
-            person.getPrimaryRole() == Person.T_BA ||
-                person.isPrisoner() || person.isBondsman()) {
+        if (person.getPrimaryRole() == Person.T_INFANTRY || person.getPrimaryRole() == Person.T_BA
+                || !person.getPrisonerStatus().isFree()) {
             return false;
         }
         payouts.put(person.getId(), new Payout(person, getShareValue(campaign),
                 killed, campaign.getCampaignOptions().getSharesForAll()));
         if (null != contract) {
-            if (null == unresolvedPersonnel.get(contract.getId())) {
-                unresolvedPersonnel.put(contract.getId(), new HashSet<>());
-            }
+            unresolvedPersonnel.computeIfAbsent(contract.getId(), k -> new HashSet<>());
             unresolvedPersonnel.get(contract.getId()).add(person.getId());
         }
         return true;

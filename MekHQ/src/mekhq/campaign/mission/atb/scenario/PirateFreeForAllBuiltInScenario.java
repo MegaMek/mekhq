@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019 - The Megamek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,12 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
 
-import megamek.client.RandomSkillsGenerator;
+import megamek.client.generator.RandomSkillsGenerator;
 import megamek.common.Board;
 import megamek.common.Entity;
 import megamek.common.UnitType;
@@ -99,7 +98,7 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
 
         addBotForce(getEnemyBotForce(getContract(campaign), Board.START_N, enemyEntities));
 
-        ArrayList<Entity> otherForce = new ArrayList<Entity>();
+        ArrayList<Entity> otherForce = new ArrayList<>();
 
         for (int i = 0; i < 12; i++) {
             otherForce.add(getEntity("PIR", RandomSkillsGenerator.L_REG, IUnitRating.DRAGOON_C, UnitType.MEK,

@@ -19,8 +19,8 @@
 
 package mekhq.campaign.mission.atb.scenario;
 
-import megamek.client.RandomSkillsGenerator;
-import megamek.client.RandomUnitGenerator;
+import megamek.client.generator.RandomSkillsGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -40,6 +40,7 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.rating.IUnitRating;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @AtBScenarioEnabled
 public class StarLeagueCache1BuiltInScenario extends AtBScenario {
@@ -116,7 +117,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)));
 
-        ArrayList<Entity> otherForce = new ArrayList<Entity>();
+        List<Entity> otherForce = new ArrayList<>();
         MechSummary ms = null;
 
         if (roll == 1) {

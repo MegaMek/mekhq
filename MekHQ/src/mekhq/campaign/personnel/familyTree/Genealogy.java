@@ -18,8 +18,8 @@
  */
 package mekhq.campaign.personnel.familyTree;
 
-import megamek.common.Crew;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -261,7 +261,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @param gender the gender of the parent(s) to get
      * @return a list of UUIDs of the person's parent(s) of the specified gender
      */
-    public List<UUID> getParentsByGender(Campaign campaign, int gender) {
+    public List<UUID> getParentsByGender(Campaign campaign, Gender gender) {
         List<UUID> parents = new ArrayList<>();
         for (UUID parentId : getFamily().getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>())) {
             Person parent = campaign.getPerson(parentId);
@@ -278,7 +278,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @return the person's father(s) id(s)
      */
     public List<UUID> getFathers(Campaign campaign) {
-        return getParentsByGender(campaign, Crew.G_MALE);
+        return getParentsByGender(campaign, Gender.MALE);
     }
 
     /**
@@ -286,7 +286,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @return the person's mother(s) id(s)
      */
     public List<UUID> getMothers(Campaign campaign) {
-        return getParentsByGender(campaign, Crew.G_FEMALE);
+        return getParentsByGender(campaign, Gender.FEMALE);
     }
 
     /**

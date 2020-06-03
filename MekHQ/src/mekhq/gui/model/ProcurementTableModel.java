@@ -7,6 +7,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
@@ -19,12 +21,13 @@ public class ProcurementTableModel extends DataTableModel {
     Campaign campaign;
 
     public final static int COL_NAME    =    0;
-    public final static int COL_COST     =   1;
-    public final static int COL_TOTAL_COST = 2;
-    public final static int COL_TARGET    =  3;
-    public final static int COL_NEXT      =  4;
-    public final static int COL_QUEUE     =  5;
-    public final static int N_COL          = 6;
+    public final static int COL_TYPE     =   1;
+    public final static int COL_COST     =   2;
+    public final static int COL_TOTAL_COST = 3;
+    public final static int COL_TARGET    =  4;
+    public final static int COL_NEXT      =  5;
+    public final static int COL_QUEUE     =  6;
+    public final static int N_COL          = 7;
 
     public ProcurementTableModel(Campaign c) {
         data = c.getShoppingList().getPartList();
@@ -44,6 +47,8 @@ public class ProcurementTableModel extends DataTableModel {
         switch(column) {
         case COL_NAME:
             return "Name";
+            case COL_TYPE:
+                return "Type";
         case COL_COST:
             return "Cost per Unit";
         case COL_TOTAL_COST:
@@ -87,6 +92,15 @@ public class ProcurementTableModel extends DataTableModel {
         }
         if(col == COL_NAME) {
             return shoppingItem.getAcquisitionName();
+        }
+        if (col == COL_TYPE) {
+            if (shoppingItem instanceof UnitOrder) {
+                return "Unit";
+            } else if (shoppingItem instanceof Part) {
+                return "Part";
+            } else {
+                return "Other";
+            }
         }
         if(col == COL_COST) {
             return shoppingItem.getBuyCost().toAmountAndSymbolString();
@@ -150,11 +164,13 @@ public class ProcurementTableModel extends DataTableModel {
 
     public int getAlignment(int col) {
         switch(col) {
-        case COL_COST:
-        case COL_TOTAL_COST:
-            return SwingConstants.RIGHT;
+            case COL_COST:
+                case COL_TOTAL_COST:
+                case COL_QUEUE:
+                return SwingConstants.RIGHT;
         case COL_TARGET:
         case COL_NEXT:
+        case COL_TYPE:
             return SwingConstants.CENTER;
         default:
             return SwingConstants.LEFT;

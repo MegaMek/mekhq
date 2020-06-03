@@ -4314,7 +4314,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private void ensurePersonIsRegistered(Person p) {
         Objects.requireNonNull(p);
         if (null == getCampaign().getPerson(p.getId())) {
-            getCampaign().recruitPerson(p, p.isPrisoner(), p.isDependent(), true,  false);
+            getCampaign().recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), true,  false);
             MekHQ.getLogger().log(Unit.class, "ensurePersonIsRegistered(Person)", LogLevel.WARNING,
                 String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
         }

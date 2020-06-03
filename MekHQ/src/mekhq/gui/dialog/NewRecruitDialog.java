@@ -26,6 +26,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import megamek.client.generator.RandomNameGenerator;
+import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
@@ -43,7 +45,6 @@ public class NewRecruitDialog extends javax.swing.JDialog {
      */
     private static final long serialVersionUID = -6265589976779860566L;
     private Person person;
-    private boolean newHire;
 
     private CampaignGUI hqView;
 
@@ -77,9 +78,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title")); // NOI18N
-        if (newHire) {
-            setTitle(resourceMap.getString("Form.title.new")); // NOI18N
-        }
+
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.BorderLayout());
 
@@ -211,8 +210,12 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void randomName() {
-        String[] name = hqView.getCampaign().getRNG().generateGivenNameSurnameSplit(person.isFemale(),
-                person.isClanner(), person.getOriginFaction().getShortName());
+        String factionCode = hqView.getCampaign().getCampaignOptions().useOriginFactionForNames()
+                ? person.getOriginFaction().getShortName()
+                : RandomNameGenerator.getInstance().getChosenFaction();
+
+        String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
+                person.getGender(), person.isClanner(), factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
         refreshView();
@@ -238,7 +241,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void editPerson() {
-        int gender = person.getGender();
+        Gender gender = person.getGender();
         CustomizePersonDialog npd = new CustomizePersonDialog(hqView.getFrame(), true, person, hqView.getCampaign());
         npd.setVisible(true);
         if (gender != person.getGender()) {

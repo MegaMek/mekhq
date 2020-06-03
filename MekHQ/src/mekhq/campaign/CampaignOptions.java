@@ -39,7 +39,10 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
+import mekhq.campaign.personnel.enums.Marriage;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -182,9 +185,7 @@ public class CampaignOptions implements Serializable {
     private boolean useSupportEdge;
     private boolean useImplants;
     private boolean capturePrisoners; // TODO : Merge me with the AtB option useAtBCapture
-    private int defaultPrisonerStatus;
-    public static final int PRISONER_RANK = 0;
-    public static final int BONDSMAN_RANK = 1;
+    private PrisonerStatus defaultPrisonerStatus;
     private boolean altQualityAveraging;
     private boolean useAdvancedMedical; // Unofficial
     private boolean useDylansRandomXp; // Unofficial
@@ -222,9 +223,7 @@ public class CampaignOptions implements Serializable {
     private double chanceProcreationNoRelationship;
     private boolean displayTrueDueDate;
     private boolean logConception;
-    private int babySurnameStyle;
-    public static final int BABY_SURNAME_MINE = 0; //baby uses mother's surname
-    public static final int BABY_SURNAME_SPOUSE = 1; //baby uses father's surname
+    private BabySurnameStyle babySurnameStyle;
     private boolean determineFatherAtBirth;
     private boolean displayParentage;
     private int displayFamilyLevel;
@@ -311,7 +310,7 @@ public class CampaignOptions implements Serializable {
     //endregion Rank System Tab
 
     //region Name and Portrait Generation
-    private boolean useFactionForNames;
+    private boolean useOriginFactionForNames;
     private boolean[] usePortraitForType;
     private boolean assignPortraitOnRoleChange;
     //endregion Name and Portrait Generation
@@ -515,7 +514,7 @@ public class CampaignOptions implements Serializable {
         useSupportEdge = false;
         useImplants = false;
         capturePrisoners = true;
-        defaultPrisonerStatus = PRISONER_RANK;
+        defaultPrisonerStatus = PrisonerStatus.PRISONER;
         altQualityAveraging = false;
         useAdvancedMedical = false;
         useDylansRandomXp = false;
@@ -544,16 +543,20 @@ public class CampaignOptions implements Serializable {
         useRandomMarriages = false;
         chanceRandomMarriages = 0.00025;
         marriageAgeRange = 10;
-        randomMarriageSurnameWeights = new int[Person.NUM_SURNAME];
-        randomMarriageSurnameWeights[Person.SURNAME_NO_CHANGE] = 100;
-        randomMarriageSurnameWeights[Person.SURNAME_YOURS] = 60;
-        randomMarriageSurnameWeights[Person.SURNAME_SPOUSE] = 60;
-        randomMarriageSurnameWeights[Person.SURNAME_HYP_YOURS] = 35;
-        randomMarriageSurnameWeights[Person.SURNAME_BOTH_HYP_YOURS] = 25;
-        randomMarriageSurnameWeights[Person.SURNAME_HYP_SPOUSE] = 35;
-        randomMarriageSurnameWeights[Person.SURNAME_BOTH_HYP_SPOUSE] = 25;
-        randomMarriageSurnameWeights[Person.SURNAME_MALE] = 500;
-        randomMarriageSurnameWeights[Person.SURNAME_FEMALE] = 160;
+        randomMarriageSurnameWeights = new int[Marriage.values().length - 1];
+        randomMarriageSurnameWeights[Marriage.NO_CHANGE.getWeightsNumber()] = 100;
+        randomMarriageSurnameWeights[Marriage.YOURS.getWeightsNumber()] = 55;
+        randomMarriageSurnameWeights[Marriage.SPOUSE.getWeightsNumber()] = 55;
+        randomMarriageSurnameWeights[Marriage.SPACE_YOURS.getWeightsNumber()] = 10;
+        randomMarriageSurnameWeights[Marriage.BOTH_SPACE_YOURS.getWeightsNumber()] = 5;
+        randomMarriageSurnameWeights[Marriage.HYP_YOURS.getWeightsNumber()] = 30;
+        randomMarriageSurnameWeights[Marriage.BOTH_HYP_YOURS.getWeightsNumber()] = 20;
+        randomMarriageSurnameWeights[Marriage.SPACE_SPOUSE.getWeightsNumber()] = 10;
+        randomMarriageSurnameWeights[Marriage.BOTH_SPACE_SPOUSE.getWeightsNumber()] = 5;
+        randomMarriageSurnameWeights[Marriage.HYP_SPOUSE.getWeightsNumber()] = 30;
+        randomMarriageSurnameWeights[Marriage.BOTH_HYP_SPOUSE.getWeightsNumber()] = 20;
+        randomMarriageSurnameWeights[Marriage.MALE.getWeightsNumber()] = 500;
+        randomMarriageSurnameWeights[Marriage.FEMALE.getWeightsNumber()] = 160;
         useRandomSameSexMarriages = false;
         chanceRandomSameSexMarriages = 0.00002;
         useUnofficialProcreation = false;
@@ -562,7 +565,7 @@ public class CampaignOptions implements Serializable {
         chanceProcreationNoRelationship = 0.00005;
         displayTrueDueDate = false;
         logConception = false;
-        babySurnameStyle = BABY_SURNAME_MINE;
+        babySurnameStyle = BabySurnameStyle.MOTHERS;
         determineFatherAtBirth = false;
         displayParentage = false;
         displayFamilyLevel = PARENTS_CHILDREN_SIBLINGS;
@@ -685,7 +688,7 @@ public class CampaignOptions implements Serializable {
         //endregion Rank System Tab
 
         //region Name and Portrait Generation Tab
-        useFactionForNames = true;
+        useOriginFactionForNames = true;
         usePortraitForType = new boolean[Person.T_NUM];
         for (int i = 0; i < Person.T_NUM; i++) {
             usePortraitForType[i] = false;
@@ -923,11 +926,11 @@ public class CampaignOptions implements Serializable {
         capturePrisoners = b;
     }
 
-    public int getDefaultPrisonerStatus() {
+    public PrisonerStatus getDefaultPrisonerStatus() {
         return defaultPrisonerStatus;
     }
 
-    public void setDefaultPrisonerStatus(int d) {
+    public void setDefaultPrisonerStatus(PrisonerStatus d) {
         defaultPrisonerStatus = d;
     }
 
@@ -1409,14 +1412,14 @@ public class CampaignOptions implements Serializable {
     /**
      * @return what style of surname to use for a baby
      */
-    public int getBabySurnameStyle() {
+    public BabySurnameStyle getBabySurnameStyle() {
         return babySurnameStyle;
     }
 
     /**
      * @param b the style of surname to use for a baby
      */
-    public void setBabySurnameStyle(int b) {
+    public void setBabySurnameStyle(BabySurnameStyle b) {
         babySurnameStyle = b;
     }
 
@@ -1850,12 +1853,18 @@ public class CampaignOptions implements Serializable {
         this.repairSystem = i;
     }
 
-    public boolean useFactionForNames() {
-        return useFactionForNames;
+    /**
+     * @return true to use the origin faction for personnel names instead of a set faction
+     */
+    public boolean useOriginFactionForNames() {
+        return useOriginFactionForNames;
     }
 
-    public void setFactionForNames(boolean b) {
-        this.useFactionForNames = b;
+    /**
+     * @param useOriginFactionForNames whether to use personnel names or a set faction
+     */
+    public void setUseOriginFactionForNames(boolean useOriginFactionForNames) {
+        this.useOriginFactionForNames = useOriginFactionForNames;
     }
 
     // Personnel Market
@@ -2989,7 +2998,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMaintenance", logMaintenance);
         //endregion Repair and Maintenance Tab
 
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useFactionForNames);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useOriginFactionForNames);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnitRating", useUnitRating);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.getDescription());
@@ -3099,7 +3108,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreationNoRelationship", chanceProcreationNoRelationship);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayTrueDueDate", displayTrueDueDate);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "determineFatherAtBirth", determineFatherAtBirth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", displayParentage);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel);
@@ -3145,7 +3154,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "timeInRankDisplayFormat", timeInRankDisplayFormat.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackTotalEarnings", trackTotalEarnings);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketName", personnelMarketName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
                                        personnelMarketRandomEliteRemoval);
@@ -3341,7 +3350,7 @@ public class CampaignOptions implements Serializable {
             //endregion Repair and Maintenance Tab
 
             } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
-                retVal.useFactionForNames = wn2.getTextContent().equalsIgnoreCase("true");
+                retVal.setUseOriginFactionForNames(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
                 retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useEraMods")) {
@@ -3552,8 +3561,15 @@ public class CampaignOptions implements Serializable {
                 retVal.marriageAgeRange = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) {
                 String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.randomMarriageSurnameWeights[i] = Integer.parseInt(values[i]);
+                if (values.length == 13) {
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.randomMarriageSurnameWeights[i] = Integer.parseInt(values[i]);
+                    }
+                } else if (values.length == 9) {
+                    migrateMarriageSurnameWeights(retVal, values);
+                } else {
+                    MekHQ.getLogger().error(CampaignOptions.class,
+                            "generateCampaignOptionsFromXml", "");
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
@@ -3572,7 +3588,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
                 retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
-                retVal.babySurnameStyle = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.setBabySurnameStyle(BabySurnameStyle.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
                 retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
@@ -3658,11 +3674,23 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
                 retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
-                retVal.defaultPrisonerStatus = Integer.parseInt(wn2.getTextContent().trim());
+                // This cannot use PrisonerStatus::parseFromString due to former save format differences
+                try {
+                    retVal.defaultPrisonerStatus = PrisonerStatus.valueOf(wn2.getTextContent().trim());
+                } catch (Exception ignored) {
+                    switch (wn2.getTextContent().trim()) {
+                        case "1":
+                            retVal.defaultPrisonerStatus = PrisonerStatus.BONDSMAN;
+                            break;
+                        case "0":
+                        default:
+                            retVal.defaultPrisonerStatus = PrisonerStatus.PRISONER;
+                            break;
+                    }
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
                 retVal.useRandomHitsForVees = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) {
-                // Legacy
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                 retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
                 retVal.personnelMarketName = wn2.getTextContent().trim();
@@ -3880,6 +3908,48 @@ public class CampaignOptions implements Serializable {
                 "Load Campaign Options Complete!"); //$NON-NLS-1$
 
         return retVal;
+    }
+
+    /**
+     * This is annoyingly required for the case of anyone having changed the surname weights.
+     * The code is not nice, but will nicely handle the cases where anyone has made changes
+     * @param retVal the return CampaignOptions
+     * @param values the values to migrate
+     */
+    private static void migrateMarriageSurnameWeights(CampaignOptions retVal, String[] values) {
+        int[] weights = new int[values.length];
+
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = Integer.parseInt(values[i]);
+        }
+
+        // Now we need to test to figure out the weights have changed. If not, we will keep the
+        // new default values. If they have, we save their changes and add the new surname weights
+        if (
+                (weights[0] != retVal.randomMarriageSurnameWeights[0])
+                || (weights[1] != retVal.randomMarriageSurnameWeights[1] + 5)
+                || (weights[2] != retVal.randomMarriageSurnameWeights[2] + 5)
+                || (weights[3] != retVal.randomMarriageSurnameWeights[9] + 5)
+                || (weights[4] != retVal.randomMarriageSurnameWeights[10] + 5)
+                || (weights[5] != retVal.randomMarriageSurnameWeights[5] + 5)
+                || (weights[6] != retVal.randomMarriageSurnameWeights[6] + 5)
+                || (weights[7] != retVal.randomMarriageSurnameWeights[11])
+                || (weights[8] != retVal.randomMarriageSurnameWeights[12])
+        ) {
+            retVal.randomMarriageSurnameWeights[0] = weights[0];
+            retVal.randomMarriageSurnameWeights[1] = weights[1];
+            retVal.randomMarriageSurnameWeights[2] = weights[2];
+            // 3 is newly added
+            // 4 is newly added
+            retVal.randomMarriageSurnameWeights[5] = weights[3];
+            retVal.randomMarriageSurnameWeights[6] = weights[4];
+            // 7 is newly added
+            // 8 is newly added
+            retVal.randomMarriageSurnameWeights[9] = weights[5];
+            retVal.randomMarriageSurnameWeights[10] = weights[6];
+            retVal.randomMarriageSurnameWeights[11] = weights[7];
+            retVal.randomMarriageSurnameWeights[12] = weights[8];
+        }
     }
 
     public static class MassRepairOption {

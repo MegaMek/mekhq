@@ -32,7 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
-import megamek.client.RandomNameGenerator;
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
 import megamek.common.logging.LogLevel;
@@ -269,7 +269,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                         cgpd.getSelectedPreset().apply(campaign);
                     }
                 }
-                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getIconPackage().getCamos());
+                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getIconPackage().getCamos(),
+                        app.getIconPackage().getForceIcons());
                 optionsDialog.setVisible(true);
                 if(optionsDialog.wasCancelled()) {
                     cancelled = true;
