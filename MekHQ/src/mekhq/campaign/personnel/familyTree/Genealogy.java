@@ -34,6 +34,10 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * The Genealogy class is used to track immediate familial relationships, spouses, and former spouses.
+ * It is also used to determine familial relationships between people
+ */
 public class Genealogy implements Serializable, MekHqXmlSerializable {
     //region Variables
     private static final long serialVersionUID = -6350146649504329173L;
@@ -174,12 +178,24 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
         return (getFamily().get(FamilialRelationshipType.PARENT) != null);
     }
 
-    // Recursive Search Format to determine mutual ancestry
+    /**
+     * This is used to determine if two people have mutual ancestors based on their genealogies
+     * @param person the person to check if they are related or not
+     * @param campaign the campaign the two people are a part of
+     * @return true if they have mutual ancestors, otherwise false
+     * @note this is a recursive search to ensure it goes to a specified depth of relation
+     */
     public boolean checkMutualAncestors(Person person, Campaign campaign) {
         return checkMutualAncestors(person.getGenealogy(), campaign,
                 campaign.getCampaignOptions().checkMutualAncestorsDepth());
     }
 
+    /**
+     * @param secondaryGenealogy the other genealogy to check using
+     * @param campaign the campaign the two people are a part of
+     * @param remainingDepth the remaining depth to check for
+     * @return true if they have mutual ancestors, otherwise false
+     */
     public boolean checkMutualAncestors(Genealogy secondaryGenealogy, Campaign campaign, int remainingDepth) {
         // We don't need to go any deeper if:
         // 1. the remaining depth is less than or equal to 0
@@ -389,6 +405,10 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
     //endregion Basic Family Getters
 
     //region Read/Write to XML
+    /**
+     * @param pw1 the PrintWriter to write to
+     * @param indent the indent for the base line (i.e. the line containing genealogy)
+     */
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "genealogy");
@@ -417,6 +437,10 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "genealogy");
     }
 
+    /**
+     * @param nl the NodeList containing the saved Genealogy
+     * @return the Genealogy generated from the provided NodeList
+     */
     public static Genealogy generateInstanceFromXML(NodeList nl) {
         Genealogy retVal = new Genealogy();
 
@@ -439,7 +463,12 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
         return retVal;
     }
 
-    // This must be public for migration reasons
+    /**
+     * This loads the FormerSpouses from their saved nodes
+     * @param retVal the Genealogy to load the FormerSpouse nodes into
+     * @param nl2 the NodeList containing the saved former spouses
+     * @note This must be public for migration reasons
+     */
     public static void loadFormerSpouses(Genealogy retVal, NodeList nl2) {
         for (int y = 0; y < nl2.getLength(); y++) {
             Node wn2 = nl2.item(y);
@@ -457,6 +486,11 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    /**
+     * This loads the familial relationships from their saved nodes
+     * @param retVal the Genealogy to load the family nodes into
+     * @param nl2 the NodeList containing the saved Genealogy familial relationships
+     */
     private static void loadFamily(Genealogy retVal, NodeList nl2) {
         for (int y = 0; y < nl2.getLength(); y++) {
             Node wn2 = nl2.item(y);
@@ -467,6 +501,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
             if (wn2.getNodeName().equalsIgnoreCase("relationship")) {
                 NodeList nl3 = wn2.getChildNodes();
+                // The default value should never be used, but it is useful to have a default
                 FamilialRelationshipType type = FamilialRelationshipType.PARENT;
                 List<UUID> ids = new ArrayList<>();
                 for (int i = 0; i < nl3.getLength(); i++) {
@@ -483,6 +518,9 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    /**
+     * @return whether the Genealogy object is empty or not
+     */
     public boolean isEmpty() {
         if ((getSpouseId() != null) || !getFormerSpouses().isEmpty()) {
             return false;
@@ -491,6 +529,10 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
         return familyIsEmpty();
     }
 
+    /**
+     * @return whether the family side of the Genealogy object is empty or not
+     * (i.e. spouse and formerSpouses are not included, just family)
+     */
     public boolean familyIsEmpty() {
         for (List<UUID> list : getFamily().values()) {
             if ((list != null) && !list.isEmpty()) {

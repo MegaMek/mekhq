@@ -1885,6 +1885,13 @@ public class CampaignXmlParser {
     //region Ancestry Migration
     private static Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
 
+    /**
+     * This method is used to add people to the ancestry migration map that is used to migrate
+     * from the old Ancestors setup to {@link mekhq.campaign.personnel.familyTree.Genealogy} starting
+     * from 0.47.7
+     * @param ancestorsId the Person's Ancestor Id
+     * @param person the person to add the the above HashMap
+     */
     public static void addToAncestryMigrationMap(UUID ancestorsId, Person person) {
         ancestryMigrationMap.putIfAbsent(ancestorsId, new ArrayList<>());
         ancestryMigrationMap.get(ancestorsId).add(person);

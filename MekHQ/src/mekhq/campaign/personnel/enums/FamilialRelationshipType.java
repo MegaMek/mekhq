@@ -18,14 +18,14 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.Crew;
 import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.Person;
 
 import java.util.ResourceBundle;
 
+/**
+ * This is used to track the relationship type between related personnel
+ */
 public enum FamilialRelationshipType {
     //region Enum Declarations
     // Direct Line
@@ -96,9 +96,9 @@ public enum FamilialRelationshipType {
     //endregion Enum Declarations
 
     //region Variable Declarations
-    private final String masculine;
-    private final String feminine;
-    private final String other;
+    private final String masculine; // Masculine form of the relationship type, like Father for Parent
+    private final String feminine;  // Feminine form of the relationship type, like Mother for Parent
+    private final String other; // Genderless form of the relationship type, like Parent for Parent
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             new EncodeControl());
@@ -113,6 +113,11 @@ public enum FamilialRelationshipType {
         this(masculine, feminine, null);
     }
 
+    /**
+     * @param masculine the masculine form of the relationship type
+     * @param feminine the feminine form of the relationship type
+     * @param other the non-gendered form of the relationship type
+     */
     FamilialRelationshipType(String masculine, String feminine, String other) {
         this.masculine = resources.getString(masculine);
         this.feminine = resources.getString(feminine);
@@ -129,6 +134,15 @@ public enum FamilialRelationshipType {
     public String getTypeName(Gender gender, boolean adopted) {
         return getTypeName(gender, 0, adopted);
     }
+
+    /**
+     * This is used to get the specific type name for a relationship between two people, based on the
+     * gender of the relative
+     * @param gender the relative's gender
+     * @param numGreats how many greats to add to the front of the relationship type
+     * @param adopted whether or not the relative was adopted
+     * @return the FamilialRelationshipType name
+     */
     public String getTypeName(Gender gender, int numGreats, boolean adopted) {
         StringBuilder name = new StringBuilder(adopted
                 ? resources.getString("FamilialRelationshipType.adopted") + " " : "");
@@ -152,17 +166,9 @@ public enum FamilialRelationshipType {
         return name.toString();
     }
 
-    public String getLateSpouseTypeName(Gender gender) {
-        if (this != WIDOW) {
-            MekHQ.getLogger().error(getClass(), "getLateSpouseTypeName",
-                    "Called late spouse type name for an invalid relationship type.");
-        }
-
-        String name = resources.getString("FamilialRelationshipType.late");
-        name += " " + SPOUSE.getTypeName(gender);
-        return name;
-    }
-
+    /**
+     * @return the different types of sibling relationships
+     */
     public static FamilialRelationshipType[] getSiblingRelationshipTypes() {
         return new FamilialRelationshipType[] {
                 FamilialRelationshipType.SIBLING,
