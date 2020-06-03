@@ -74,11 +74,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JPanel panReports;
 
     //icon panel
-    JPanel panIcon;
-    JLabel lblIcon;
+    private JPanel panIcon;
+    private JLabel lblIcon;
     private DirectoryItems icons;
 
-    ResourceBundle resourceMap;
+    private ResourceBundle resourceMap;
 
     /**
      *
