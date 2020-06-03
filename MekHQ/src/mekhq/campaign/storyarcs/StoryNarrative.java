@@ -36,24 +36,21 @@ public class StoryNarrative extends StoryEvent {
     /** narratives are linear so should link directly to another event **/
     UUID nextEventId;
 
-    public StoryNarrative() {
-
-    }
-
-    public StoryNarrative(String t, String n) {
+    public StoryNarrative(StoryArc a, String t, String n) {
+        super(a);
         this.title = t;
         this.narrative = n;
     }
 
     @Override
-    public void startEvent(Campaign c) {
-        super.startEvent(c);
+    public void startEvent() {
+        super.startEvent();
         //TODO: create dialog and display
-        completeEvent(c);
+        completeEvent();
     }
 
     @Override
-    protected UUID getNextStoryEvent(Campaign c) {
+    protected UUID getNextStoryEvent() {
         return nextEventId;
     }
 

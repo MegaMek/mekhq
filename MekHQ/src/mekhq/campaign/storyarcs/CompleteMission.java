@@ -30,21 +30,25 @@ public class CompleteMission extends StoryEvent {
 
     UUID missionId;
 
+    public CompleteMission(StoryArc a) {
+        super(a);
+    }
+
     @Override
-    public void startEvent(Campaign c) {
-        super.startEvent(c);
-        Mission m = arc.getCampaignMission(missionId, c);
+    public void startEvent() {
+        super.startEvent();
+        Mission m = arc.getCampaignMission(missionId, arc.getCampaign());
         if(null != m) {
             //TODO: review some criteria to determine status, but for now assume everyone wins
             m.setStatus(Mission.S_SUCCESS);
             //TODO: a pop-up dialog of a description for missions end
         }
         //no need for this event to stick around
-        super.completeEvent(c);
+        super.completeEvent();
     }
 
     @Override
-    protected UUID getNextStoryEvent(Campaign c) {
+    protected UUID getNextStoryEvent() {
         //TODO: need some setup to decide next StoryEvent based on concluding status of this mission
         return null;
     }

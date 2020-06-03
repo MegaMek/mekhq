@@ -38,56 +38,53 @@ public abstract class StoryEvent implements MekHqXmlSerializable {
 
     boolean active;
 
-    public StoryEvent() {
+    public StoryEvent(StoryArc a) {
         active = false;
+        this.arc = a;
     }
 
     /**
      * Determine whether the event should be triggered by some feature of the campaign
-     * @param c A MekHQ Campaign
      * @return boolean for whether the event is triggered
      */
-    private boolean isTriggered(Campaign c) {
+    private boolean isTriggered() {
         return false;
     }
 
-    public void checkTriggered(Campaign c) {
-        if(isTriggered(c)) {
-            startEvent(c);
+    public void checkTriggered() {
+        if(isTriggered()) {
+            startEvent();
         }
     }
 
     /**
-     * Do whatever needs to be done to start this event. Specific event types may need to override this and then
-     * call the super at the end.
-     * @param c
+     * Do whatever needs to be done to start this event. Specific event types may need to override this
      */
-    public void startEvent(Campaign c) {
+    public void startEvent() {
         active = true;
     }
 
     /**
      * Complete the event. Specific event types may need to override this.
-     * @param c A MekHQ Campaign
      */
-    public void completeEvent(Campaign c) {
+    public void completeEvent() {
         active = false;
-        proceedToNextStoryEvent(c);
+        proceedToNextStoryEvent();
     }
 
     /**
      * Gets the next story event and if it is not null, starts it
      */
-    protected void proceedToNextStoryEvent(Campaign c) {
+    protected void proceedToNextStoryEvent() {
         //get the next story event
-        UUID nextStoryEventId = getNextStoryEvent(c);
+        UUID nextStoryEventId = getNextStoryEvent();
         StoryEvent nextStoryEvent = arc.getStoryEvent(nextStoryEventId);
         if(null != nextStoryEvent) {
-            nextStoryEvent.startEvent(c);
+            nextStoryEvent.startEvent();
         }
     }
 
     /** determine the next story event in the story arc based on the event **/
-    protected abstract UUID getNextStoryEvent(Campaign c);
+    protected abstract UUID getNextStoryEvent();
 
 }

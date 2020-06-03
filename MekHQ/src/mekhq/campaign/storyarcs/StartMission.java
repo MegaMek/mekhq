@@ -43,20 +43,24 @@ public class StartMission extends StoryEvent {
      **/
     UUID nextEventId;
 
-    @Override
-    public void startEvent(Campaign c) {
-        Mission m = arc.getStoryMission(missionId);
-        if(null != m) {
-            campaignMissionId = c.addMission(m);
-            //TODO: a pop-up dialog of the mission
-        }
-        super.startEvent(c);
-        //no need for this event to stick around
-        super.completeEvent(c);
+    public StartMission(StoryArc a) {
+        super(a);
     }
 
     @Override
-    protected UUID getNextStoryEvent(Campaign c) {
+    public void startEvent() {
+        Mission m = arc.getStoryMission(missionId);
+        if(null != m) {
+            campaignMissionId = arc.getCampaign().addMission(m);
+            //TODO: a pop-up dialog of the mission
+        }
+        super.startEvent();
+        //no need for this event to stick around
+        super.completeEvent();
+    }
+
+    @Override
+    protected UUID getNextStoryEvent() {
         return nextEventId;
     }
 

@@ -39,10 +39,14 @@ public class AddScenario extends StoryEvent {
     /** for now we will force a linear narrative **/
     UUID nextEventId;
 
+    public AddScenario(StoryArc a) {
+        super(a);
+    }
+
     @Override
-    public void startEvent(Campaign c) {
-        super.startEvent(c);
-        Mission m = arc.getCampaignMission(missionId, c);
+    public void startEvent() {
+        super.startEvent();
+        Mission m = arc.getCampaignMission(missionId, arc.getCampaign());
         Scenario s = arc.getStoryScenario(scenarioId);
         if (null != m & null != s) {
             m.addScenario(s);
@@ -52,7 +56,7 @@ public class AddScenario extends StoryEvent {
     }
 
     @Override
-    protected UUID getNextStoryEvent(Campaign c) {
+    protected UUID getNextStoryEvent() {
         //TODO: not yet properly implemented because we need logic here
         return nextEventId;
     }
