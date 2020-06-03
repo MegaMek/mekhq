@@ -269,7 +269,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                         cgpd.getSelectedPreset().apply(campaign);
                     }
                 }
-                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getIconPackage().getCamos());
+                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getIconPackage().getCamos(),
+                        app.getIconPackage().getForceIcons());
                 optionsDialog.setVisible(true);
                 if(optionsDialog.wasCancelled()) {
                     cancelled = true;
