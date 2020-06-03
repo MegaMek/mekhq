@@ -157,21 +157,23 @@ public class TankLocation extends Part {
         super.fix();
         if(isBreached()) {
             breached = false;
-            unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-                // ignore empty & non-hittable slots
-                if (slot == null) {
-                    continue;
-                }
-                slot.setBreached(false);
-                Mounted m = slot.getMount();
-                if(null != m) {
-                    m.setBreached(false);
+            if (null != unit) {
+                unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
+                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                    CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+                    // ignore empty & non-hittable slots
+                    if (slot == null) {
+                        continue;
+                    }
+                    slot.setBreached(false);
+                    Mounted m = slot.getMount();
+                    if(null != m) {
+                        m.setBreached(false);
+                    }
                 }
             }
         } else {
-        damage = 0;
+            damage = 0;
             if(null != unit) {
                 unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
             }

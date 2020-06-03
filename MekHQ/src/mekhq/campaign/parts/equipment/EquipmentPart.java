@@ -62,6 +62,7 @@ public class EquipmentPart extends Part {
     protected String typeName;
     protected int equipmentNum;
     protected double equipTonnage;
+    protected double size = 1.0;
 
     public EquipmentType getType() {
         return type;
@@ -76,18 +77,18 @@ public class EquipmentPart extends Part {
     }
 
     public EquipmentPart() {
-        this(0, null, -1, false, null);
+        this(0, null, -1, 1.0, false, null);
     }
 
-    public EquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        this(tonnage, et, equipNum, false, c);
+    public EquipmentPart(int tonnage, EquipmentType et, int equipNum, double size, Campaign c) {
+        this(tonnage, et, equipNum, size, false, c);
     }
 
-    public EquipmentPart(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
+    public EquipmentPart(int tonnage, EquipmentType et, int equipNum, double size, boolean omniPodded, Campaign c) {
         super(tonnage, omniPodded, c);
         this.type = et;
         if (null != type) {
-            this.name = type.getName();
+            this.name = type.getName(size);
             this.typeName = type.getInternalName();
         }
         if (equipNum != -1) {
@@ -97,7 +98,7 @@ public class EquipmentPart extends Part {
         }
         if (null != type) {
             try {
-                equipTonnage = type.getTonnage(null);
+                equipTonnage = type.getTonnage(null, size);
             } catch (NullPointerException ex) {
                 MekHQ.getLogger().error(EquipmentPart.class, "EquipmentPart", ex);
             }
@@ -108,7 +109,7 @@ public class EquipmentPart extends Part {
     public void setUnit(Unit u) {
         super.setUnit(u);
         if (null != unit) {
-            equipTonnage = type.getTonnage(unit.getEntity());
+            equipTonnage = type.getTonnage(unit.getEntity(), size);
         }
     }
 
@@ -117,7 +118,7 @@ public class EquipmentPart extends Part {
     }
 
     public EquipmentPart clone() {
-        EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
+        EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, size, omniPodded, campaign);
         clone.copyBaseData(this);
         if (hasVariableTonnage(type)) {
             clone.setEquipTonnage(equipTonnage);
@@ -154,16 +155,17 @@ public class EquipmentPart extends Part {
         // http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
         return part instanceof EquipmentPart && getType().equals(((EquipmentPart) part).getType())
                 && getTonnage() == part.getTonnage() && getStickerPrice().equals(part.getStickerPrice())
+                && getSize() == ((EquipmentPart) part).getSize()
                 && isOmniPodded() == part.isOmniPodded();
     }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<equipmentNum>" + equipmentNum + "</equipmentNum>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<typeName>" + MekHqXmlUtil.escape(type.getInternalName())
-                + "</typeName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<equipTonnage>" + equipTonnage + "</equipTonnage>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "size", size);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
         writeToXmlEnd(pw1, indent);
     }
 
@@ -177,6 +179,8 @@ public class EquipmentPart extends Part {
                 equipmentNum = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
                 typeName = wn2.getTextContent();
+            } else if (wn2.getNodeName().equalsIgnoreCase("size")) {
+                size = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
                 equipTonnage = Double.parseDouble(wn2.getTextContent());
             }
@@ -211,7 +215,7 @@ public class EquipmentPart extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, omniPodded);
+        return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, size, omniPodded);
     }
 
     @Override
@@ -328,6 +332,10 @@ public class EquipmentPart extends Part {
             }
         }
         return -1;
+    }
+
+    public double getSize() {
+        return size;
     }
 
     public boolean isRearFacing() {
@@ -478,7 +486,7 @@ public class EquipmentPart extends Part {
             if (null != mounted) {
                 isArmored = mounted.isArmored();
             }
-            itemCost = Money.of(type.getCost(en, isArmored, getLocation()));
+            itemCost = Money.of(type.getCost(en, isArmored, getLocation(), getSize()));
         }
         if (isOmniPodded()) {
             itemCost = itemCost.multipliedBy(1.25);
@@ -497,10 +505,10 @@ public class EquipmentPart extends Part {
             en = getUnit().getEntity();
         }
         if (en != null) {
-            varCost = Money.of(type.getCost(en, isArmored, getLocation()));
+            varCost = Money.of(type.getCost(en, isArmored, getLocation(), getSize()));
         } else if (type instanceof MiscType) {
-            if (type.hasFlag(MiscType.F_DRONE_CARRIER_CONTROL)) {
-                varCost = Money.of(getTonnage() * 10000);
+            if (type.hasFlag(MiscType.F_DRONE_CARRIER_CONTROL) || type.hasFlag(MiscType.F_MASH)) {
+                varCost = Money.of(10000 * getTonnage());
             } else if (type.hasFlag(MiscType.F_OFF_ROAD)) {
                 varCost = Money.of(10 * getTonnage() * getTonnage());
             } else if (type.hasFlag(MiscType.F_FLOTATION_HULL) || type.hasFlag(MiscType.F_VACUUM_PROTECTION)

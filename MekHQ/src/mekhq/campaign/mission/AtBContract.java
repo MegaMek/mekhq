@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
@@ -33,11 +32,12 @@ import java.util.GregorianCalendar;
 import java.util.UUID;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.client.RandomSkillsGenerator;
-import megamek.client.RandomUnitGenerator;
+import megamek.client.generator.RandomSkillsGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.MechFileParser;
@@ -538,7 +538,7 @@ public class AtBContract extends Contract implements Serializable {
             moraleLevel -= 2;
         }
         // 2 – 5: Morale level decreases 1 level
-        else if (roll >= 2 && roll <= 5) {
+        else if (roll <= 5) {
             moraleLevel -= 1;
         }
         // 6 – 8: Morale level remains the same
@@ -682,7 +682,7 @@ public class AtBContract extends Contract implements Serializable {
                 c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
                 for (int i = 0; i < number; i++) {
                     Person p = c.newDependent(Person.T_ASTECH, false);
-                    c.recruitPerson(p, false, true, false, true);
+                    c.recruitPerson(p);
                 }
             }
             break;
@@ -915,13 +915,11 @@ public class AtBContract extends Contract implements Serializable {
                     partsAvailabilityLevel++;
                     break;
                 case 6:
-                    String unit =
-                            c.getUnitMarket().addSingleUnit(c, UnitMarket.MARKET_EMPLOYER,
-                                    UnitType.MEK, getEmployerCode(),
-                                    IUnitRating.DRAGOON_F, 50) +
-                                    " offered by employer on the <a href='UNIT_MARKET'>unit market</a>";
+                    String unit = c.getUnitMarket().addSingleUnit(c, UnitMarket.MARKET_EMPLOYER,
+                        UnitType.MEK, getEmployerCode(),
+                        IUnitRating.DRAGOON_F, 50);
                     if (unit != null) {
-                        text += "Surplus Sale: " + unit;
+                        text += String.format("Surplus Sale: %s offered by employer on the <a href='UNIT_MARKET'>unit market</a>", unit);
                     }
                 }
                 c.addReport(text);

@@ -47,6 +47,9 @@ import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import megamek.common.weapons.InfantryAttack;
+import megamek.common.weapons.autocannons.ACWeapon;
+import megamek.common.weapons.autocannons.LBXACWeapon;
+import megamek.common.weapons.autocannons.UACWeapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
@@ -330,10 +333,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public static void generateInstanceFromXML(Node wn, PilotOptions options, Version v) {
         final String METHOD_NAME = "generateInstanceFromXML(Node,PilotOptions,Version)"; //$NON-NLS-1$
 
-        SpecialAbility retVal = null;
-
         try {
-            retVal = new SpecialAbility();
+            SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
 
             for (int x=0; x<nl.getLength(); x++) {
@@ -368,51 +369,49 @@ public class SpecialAbility implements MekHqXmlSerializable {
                     retVal.prereqMisc.put(fields[0], fields[1]);
                 }
             }
+
+            if(retVal.displayName.isEmpty()) {
+                IOption option = options.getOption(retVal.lookupName);
+                if(null != option) {
+                    retVal.displayName = option.getDisplayableName();
+                }
+            }
+
+            if(retVal.desc.isEmpty()) {
+                IOption option = options.getOption(retVal.lookupName);
+                if(null != option) {
+                    retVal.desc = option.getDescription();
+                }
+            }
+            if (v != null) {
+                if (defaultSpecialAbilities != null && v.isLowerThan("0.3.6-r1965")) {
+                    if (defaultSpecialAbilities.get(retVal.lookupName) != null
+                            && defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills() != null) {
+                        retVal.prereqSkills = (Vector<SkillPrereq>) defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills().clone();
+                    }
+                }
+            }
+
+            if (wn.getNodeName().equalsIgnoreCase("edgetrigger")) {
+                edgeTriggers.put(retVal.lookupName, retVal);
+            } else if (wn.getNodeName().equalsIgnoreCase("implant")) {
+                implants.put(retVal.lookupName,  retVal);
+            } else {
+                specialAbilities.put(retVal.lookupName, retVal);
+            }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
             MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
-        }
-
-        if(retVal.displayName.isEmpty()) {
-            IOption option = options.getOption(retVal.lookupName);
-            if(null != option) {
-                retVal.displayName = option.getDisplayableName();
-            }
-        }
-
-        if(retVal.desc.isEmpty()) {
-            IOption option = options.getOption(retVal.lookupName);
-            if(null != option) {
-                retVal.desc = option.getDescription();
-            }
-        }
-        if (v != null) {
-            if (defaultSpecialAbilities != null && v.isLowerThan("0.3.6-r1965")) {
-                if (defaultSpecialAbilities.get(retVal.lookupName) != null
-                        && defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills() != null) {
-                    retVal.prereqSkills = (Vector<SkillPrereq>) defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills().clone();
-                }
-            }
-        }
-
-        if (wn.getNodeName().equalsIgnoreCase("edgetrigger")) {
-            edgeTriggers.put(retVal.lookupName, retVal);
-        } else if (wn.getNodeName().equalsIgnoreCase("implant")) {
-            implants.put(retVal.lookupName,  retVal);
-        } else {
-            specialAbilities.put(retVal.lookupName, retVal);
         }
     }
 
     public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PilotOptions options) {
         final String METHOD_NAME = "generateSeparateInstanceFromXML(Node,Hashtable<String, SpecialAbility>,PilotOptions)"; //$NON-NLS-1$
 
-        SpecialAbility retVal = null;
-
         try {
-            retVal = new SpecialAbility();
+            SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
 
             for (int x=0; x<nl.getLength(); x++) {
@@ -447,27 +446,27 @@ public class SpecialAbility implements MekHqXmlSerializable {
                     retVal.prereqMisc.put(fields[0], fields[1]);
                 }
             }
+
+            if(retVal.displayName.isEmpty()) {
+                IOption option = options.getOption(retVal.lookupName);
+                if(null != option) {
+                    retVal.displayName = option.getDisplayableName();
+                }
+            }
+
+            if(retVal.desc.isEmpty()) {
+                IOption option = options.getOption(retVal.lookupName);
+                if(null != option) {
+                    retVal.desc = option.getDescription();
+                }
+            }
+            spHash.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
             MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
         }
-
-        if(retVal.displayName.isEmpty()) {
-            IOption option = options.getOption(retVal.lookupName);
-            if(null != option) {
-                retVal.displayName = option.getDisplayableName();
-            }
-        }
-
-        if(retVal.desc.isEmpty()) {
-            IOption option = options.getOption(retVal.lookupName);
-            if(null != option) {
-                retVal.desc = option.getDescription();
-            }
-        }
-        spHash.put(retVal.lookupName, retVal);
     }
 
     public static void initializeSPA() {
@@ -476,7 +475,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         edgeTriggers = new Hashtable<>();
         implants = new Hashtable<>();
 
-        Document xmlDoc = null;
+        Document xmlDoc;
 
         try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) {
             // Using factory get an instance of document builder
@@ -486,6 +485,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
+            return;
         }
 
         Element spaEle = xmlDoc.getDocumentElement();
@@ -580,58 +580,39 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return implants.get(name);
     }
 
-    public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year) {
+    public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year, boolean clusterOnly) {
         ArrayList<String> candidates = new ArrayList<>();
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
-            if(!(et instanceof WeaponType)) {
+            
+            if(!isWeaponEligibleForSPA(et, type, clusterOnly)) {
                 continue;
             }
-            if(et instanceof InfantryWeapon
-                    || et instanceof BayWeapon
-                    || et instanceof InfantryAttack) {
-                continue;
-            }
-            WeaponType wt = (WeaponType)et;
-            if(wt.isCapital()
-                    || wt.isSubCapital()
-                    || wt.hasFlag(WeaponType.F_INFANTRY)
-                    || wt.hasFlag(WeaponType.F_ONESHOT)
-                    || wt.hasFlag(WeaponType.F_PROTOTYPE)) {
-                continue;
-            }
-            if(!((wt.hasFlag(WeaponType.F_MECH_WEAPON) && type == Person.T_MECHWARRIOR)
-                    || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && type != Person.T_AERO_PILOT)
-                    || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !(type == Person.T_VEE_GUNNER
-                            || type == Person.T_NVEE_DRIVER
-                            || type == Person.T_GVEE_DRIVER
-                            || type == Person.T_VTOL_PILOT))
-                    || (wt.hasFlag(WeaponType.F_BA_WEAPON) && type != Person.T_BA)
-                    || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && type != Person.T_PROTO_PILOT))) {
-                continue;
-            }
-            if(wt.getAtClass() == WeaponType.CLASS_NONE ||
-                    wt.getAtClass() == WeaponType.CLASS_POINT_DEFENSE ||
-                    wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER) {
-                continue;
-            }
+            
+            WeaponType wt = (WeaponType) et;
+            
             if(TechConstants.isClan(wt.getTechLevel(year)) != isClan) {
                 continue;
             }
+            
             int lvl = wt.getTechLevel(year);
             if(lvl < 0) {
                 continue;
             }
+            
             if(techLvl < Utilities.getSimpleTechLevel(lvl)) {
                 continue;
             }
+            
             if(techLvl == TechConstants.T_IS_UNOFFICIAL) {
                 continue;
             }
+            
             int ntimes = 10;
             if(techLvl >= TechConstants.T_IS_ADVANCED) {
                 ntimes = 1;
             }
+            
             while(ntimes > 0) {
                 candidates.add(et.getName());
                 ntimes--;
@@ -641,6 +622,60 @@ public class SpecialAbility implements MekHqXmlSerializable {
             return "??";
         }
         return Utilities.getRandomItem(candidates);
+    }
+    
+    /**
+     * Worker function that determines if a piece of equipment is eligible 
+     * for being selected for an SPA.
+     * @param et Equipment type to check
+     * @param type Person role, e.g. Person.T_MECHWARRIOR. This check is ignored if Person.T_NONE is passed in.
+     * @param clusterOnly All weapon types or just ones that do rolls on the cluster table
+     */
+    public static boolean isWeaponEligibleForSPA(EquipmentType et, int type, boolean clusterOnly) {
+        if(!(et instanceof WeaponType)) {
+            return false;
+        }
+        if(et instanceof InfantryWeapon
+                || et instanceof BayWeapon
+                || et instanceof InfantryAttack) {
+            return false;
+        }
+        WeaponType wt = (WeaponType)et;
+        if(wt.isCapital()
+                || wt.isSubCapital()
+                || wt.hasFlag(WeaponType.F_INFANTRY)
+                || wt.hasFlag(WeaponType.F_ONESHOT)
+                || wt.hasFlag(WeaponType.F_PROTOTYPE)) {
+            return false;
+        }
+        
+        if(type > Person.T_NONE && 
+                !((wt.hasFlag(WeaponType.F_MECH_WEAPON) && type == Person.T_MECHWARRIOR)
+                || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && type != Person.T_AERO_PILOT)
+                || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !(type == Person.T_VEE_GUNNER
+                        || type == Person.T_NVEE_DRIVER
+                        || type == Person.T_GVEE_DRIVER
+                        || type == Person.T_VTOL_PILOT))
+                || (wt.hasFlag(WeaponType.F_BA_WEAPON) && type != Person.T_BA)
+                || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && type != Person.T_PROTO_PILOT))) {
+            return false;
+        }
+        
+        if(wt.getAtClass() == WeaponType.CLASS_NONE ||
+                wt.getAtClass() == WeaponType.CLASS_POINT_DEFENSE ||
+                wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER) {
+            return false;
+        }
+        
+        if(clusterOnly && !(
+                (wt.getDamage() == WeaponType.DAMAGE_BY_CLUSTERTABLE) ||
+                (wt instanceof ACWeapon) ||
+                (wt instanceof UACWeapon) ||
+                (wt instanceof LBXACWeapon))) {
+            return false;
+        }
+        
+        return true;
     }
 
     public String getAllPrereqDesc() {

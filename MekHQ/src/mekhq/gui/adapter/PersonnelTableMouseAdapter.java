@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.adapter;
 
 import java.awt.*;
@@ -24,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,13 +32,7 @@ import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.util.MenuScroller;
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Crew;
-import megamek.common.Infantry;
-import megamek.common.Mech;
-import megamek.common.Mounted;
-import megamek.common.Tank;
+import megamek.common.*;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
@@ -53,7 +47,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -63,8 +57,7 @@ import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
 
-public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
-        ActionListener {
+public class PersonnelTableMouseAdapter extends MouseInputAdapter implements ActionListener {
     private static final String CMD_RANKSYSTEM = "RANKSYSTEM"; //$NON-NLS-1$
     private static final String CMD_RANK = "RANK"; //$NON-NLS-1$
     private static final String CMD_MANEI_DOMINI_RANK = "MD_RANK"; //$NON-NLS-1$
@@ -93,6 +86,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_CALLSIGN = "CALLSIGN"; //$NON-NLS-1$
     private static final String CMD_DEPENDENT = "DEPENDENT"; //$NON-NLS-1$
     private static final String CMD_COMMANDER = "COMMANDER"; //$NON-NLS-1$
+    private static final String CMD_TRYING_TO_CONCEIVE = "TRYING_TO_CONCEIVE";
+    private static final String CMD_TRYING_TO_MARRY = "TRYING_TO_MARRY";
+    private static final String CMD_FOUNDER = "FOUNDER";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG"; //$NON-NLS-1$
     private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE"; //$NON-NLS-1$
     private static final String CMD_EDIT_MISSIONS_LOG = "MISSIONS_LOG"; //$NON-NLS-1$
@@ -134,9 +130,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_RANSOM = "RANSOM";
 
     private static final String SEPARATOR = "@"; //$NON-NLS-1$
-    private static final String SPACE = " "; //$NON-NLS-1$
     private static final String HYPHEN = "-"; //$NON-NLS-1$
-    private static final String QUESTION_MARK = "?"; //$NON-NLS-1$
     private static final String TRUE = String.valueOf(true);
     private static final String FALSE = String.valueOf(false);
 
@@ -146,7 +140,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private ResourceBundle resourceMap;
 
     public PersonnelTableMouseAdapter(CampaignGUI gui, JTable personnelTable,
-            PersonnelTableModel personnelModel) {
+                                      PersonnelTableModel personnelModel) {
         super();
         this.gui = gui;
         this.personnelTable = personnelTable;
@@ -154,25 +148,20 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter", new EncodeControl()); //$NON-NLS-1$
     }
 
-    //Mechwarrior Edge Options
+    // MechWarrior Edge Options
     private static final String OPT_EDGE_MASC_FAILURE = "edge_when_masc_fails"; //$NON-NLS-1$
     private static final String OPT_EDGE_EXPLOSION = "edge_when_explosion"; //$NON-NLS-1$
     private static final String OPT_EDGE_KO = "edge_when_ko"; //$NON-NLS-1$
     private static final String OPT_EDGE_TAC = "edge_when_tac"; //$NON-NLS-1$
     private static final String OPT_EDGE_HEADHIT = "edge_when_headhit"; //$NON-NLS-1$
 
-    //Aero Edge Options
+    // Aero Edge Options
     private static final String OPT_EDGE_WHEN_AERO_ALT_LOSS= "edge_when_aero_alt_loss"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_EXPLOSION= "edge_when_aero_explosion"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_KO= "edge_when_aero_ko"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_LUCKY_CRIT= "edge_when_aero_lucky_crit"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_NUKE_CRIT= "edge_when_aero_nuke_crit"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST= "edge_when_aero_unit_cargo_lost"; //$NON-NLS-1$
-
-    private static final String OPT_PRISONER_FREE = "free"; //$NON-NLS-1$
-    private static final String OPT_PRISONER_IMPRISONED = "imprisoned"; //$NON-NLS-1$
-    private static final String OPT_PRISONER_IMPRISONED_DEFECTING = "imprisoned_defecting"; //$NON-NLS-1$
-    private static final String OPT_PRISONER_BONDSMAN = "bondsman"; //$NON-NLS-1$
 
     private static final int MAX_POPUP_ITEMS = 20;
 
@@ -182,19 +171,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
     @Override
     public void actionPerformed(ActionEvent action) {
-        final String METHOD_NAME = "actionPerformed(ActionEvent)"; //$NON-NLS-1$
-
         int row = personnelTable.getSelectedRow();
         if (row < 0) {
             return;
         }
-        Person selectedPerson = personnelModel.getPerson(personnelTable
-                .convertRowIndexToModel(row));
+        Person selectedPerson = personnelModel.getPerson(personnelTable.convertRowIndexToModel(row));
         int[] rows = personnelTable.getSelectedRows();
         Person[] people = new Person[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            people[i] = personnelModel.getPerson(personnelTable
-                    .convertRowIndexToModel(rows[i]));
+            people[i] = personnelModel.getPerson(personnelTable.convertRowIndexToModel(rows[i]));
         }
 
         String[] data = action.getActionCommand().split(SEPARATOR, -1);
@@ -229,23 +214,38 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_MANEI_DOMINI_CLASS: {
-                int md_class = Integer.parseInt(data[1]);
-                for (Person person : people) {
-                    person.setManeiDominiClass(md_class);
+                try {
+                    ManeiDominiClass mdClass = ManeiDominiClass.valueOf(data[1]);
+                    for (Person person : people) {
+                        person.setManeiDominiClass(mdClass);
+                    }
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(getClass(), "actionPerformed",
+                            "Failed to assign Manei Domini Class", e);
                 }
                 break;
             }
             case CMD_PRIMARY_DESIGNATOR: {
-                int designation = Integer.parseInt(data[1]);
-                for (Person person : people) {
-                    person.setPrimaryDesignator(designation);
+                try {
+                    ROMDesignation romDesignation = ROMDesignation.valueOf(data[1]);
+                    for (Person person : people) {
+                        person.setPrimaryDesignator(romDesignation);
+                    }
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(getClass(), "actionPerformed",
+                            "Failed to assign ROM designator", e);
                 }
                 break;
             }
             case CMD_SECONDARY_DESIGNATOR: {
-                int secDesignation = Integer.parseInt(data[1]);
-                for (Person person : people) {
-                    person.setSecondaryDesignator(secDesignation);
+                try {
+                    ROMDesignation romDesignation = ROMDesignation.valueOf(data[1]);
+                    for (Person person : people) {
+                        person.setSecondaryDesignator(romDesignation);
+                    }
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(getClass(), "actionPerformed",
+                            "Failed to assign ROM secondary designator", e);
                 }
                 break;
             }
@@ -479,7 +479,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_ADD_PREGNANCY: {
-                if (selectedPerson.isFemale()) {
+                if (selectedPerson.getGender().isFemale()) {
                     selectedPerson.addPregnancy();
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
@@ -498,15 +498,32 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_ADD_SPOUSE: {
                 Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
-                selectedPerson.marry(spouse, Integer.parseInt(data[2]));
+                Marriage.valueOf(data[2]).marry(selectedPerson, spouse, gui.getCampaign());
                 break;
             }
             case CMD_ADD_AWARD: {
-                selectedPerson.awardController.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+                for (Person person : people) {
+                    person.getAwardController().addAndLogAward(data[1], data[2],
+                            gui.getCampaign().getLocalDate());
+                }
                 break;
             }
             case CMD_RMV_AWARD: {
-                selectedPerson.awardController.removeAward(data[1], data[2], data[3]);
+                for (Person person : people) {
+                    try {
+                        if (person.getAwardController().hasAward(data[1], data[2])) {
+                            person.getAwardController().removeAward(data[1], data[2],
+                                    (data.length > 3)
+                                            ? LocalDate.parse(data[3], DateTimeFormatter.ofPattern(
+                                                    gui.getCampaign().getCampaignOptions()
+                                                            .getDisplayDateFormat()))
+                                            : null,
+                                    gui.getCampaign().getLocalDate());
+                        }
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error(getClass(), "actionPerformed", "Could not remove award.", e);
+                    }
+                }
                 break;
             }
             case CMD_IMPROVE: {
@@ -620,31 +637,23 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_CHANGE_PRISONER_STATUS: {
-                String selected = data[1];
-                for (Person person : people) {
-                    switch (selected) {
-                        case OPT_PRISONER_FREE:
-                            gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_NOT);
-                            break;
-                        case OPT_PRISONER_IMPRISONED:
-                            gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_YES);
-                            break;
-                        case OPT_PRISONER_IMPRISONED_DEFECTING:
-                            gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_YES);
-                            person.setWillingToDefect(true);
-                            break;
-                        case OPT_PRISONER_BONDSMAN:
-                            gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_BONDSMAN);
-                            break;
-                        default:
-                            // U WOT M8?
-                            break;
+                try {
+                    PrisonerStatus status = PrisonerStatus.valueOf(data[1]);
+                    for (Person person : people) {
+                        person.setPrisonerStatus(status);
                     }
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(getClass(), "actionPerformed",
+                            "Unknown PrisonerStatus Option. No changes will be made.", e);
                 }
                 break;
             }
             case CMD_IMPRISON: {
-                gui.getCampaign().changePrisonerStatus(selectedPerson, Person.PRISONER_YES);
+                for (Person person : people) {
+                    if (!person.getPrisonerStatus().isPrisoner()) {
+                        person.setPrisonerStatus(PrisonerStatus.PRISONER);
+                    }
+                }
                 break;
             }
             case CMD_FREE: {
@@ -661,8 +670,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_RECRUIT: {
                 for (Person person : people) {
-                    if (StaticChecks.isWillingToDefect(person)) {
-                        gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_NOT);
+                    if (person.getPrisonerStatus().isWillingToDefect()) {
+                        person.setPrisonerStatus(PrisonerStatus.FREE);
                     }
                 }
                 break;
@@ -811,11 +820,18 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         selectedPerson.getPortraitFileName(), gui.getIconPackage()
                         .getPortraits());
                 pcd.setVisible(true);
-                if (pcd.isChanged()) {
-                    selectedPerson.setPortraitCategory(pcd.getCategory());
-                    selectedPerson.setPortraitFileName(pcd.getFileName());
-                    gui.getCampaign().personUpdated(selectedPerson);
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+
+                final String category = pcd.getCategory();
+                final String fileName = pcd.getFileName();
+
+                for (Person person : people) {
+                    if (!person.getPortraitCategory().equals(category)
+                            && !person.getPortraitFileName().equals(fileName)) {
+                        person.setPortraitCategory(category);
+                        person.setPortraitFileName(fileName);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
                 }
                 break;
             }
@@ -994,7 +1010,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_DEPENDENT: {
                 if (people.length > 1) {
-                    boolean status = Boolean.parseBoolean(data[1]);
+                    boolean status = !people[0].isDependent();
                     for (Person person : people) {
                         person.setDependent(status);
                         gui.getCampaign().personUpdated(person);
@@ -1002,6 +1018,51 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     }
                 } else {
                     selectedPerson.setDependent(!selectedPerson.isDependent());
+                    gui.getCampaign().personUpdated(selectedPerson);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                }
+                break;
+            }
+            case CMD_TRYING_TO_MARRY: {
+                if (people.length > 1) {
+                    boolean status = !people[0].isTryingToMarry();
+                    for (Person person : people) {
+                        person.setTryingToMarry(status);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                } else {
+                    selectedPerson.setTryingToMarry(!selectedPerson.isTryingToMarry());
+                    gui.getCampaign().personUpdated(selectedPerson);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                }
+                break;
+            }
+            case CMD_TRYING_TO_CONCEIVE: {
+                if (people.length > 1) {
+                    boolean status = !people[0].isTryingToConceive();
+                    for (Person person : people) {
+                        person.setTryingToConceive(status);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                } else {
+                    selectedPerson.setTryingToConceive(!selectedPerson.isTryingToConceive());
+                    gui.getCampaign().personUpdated(selectedPerson);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                }
+                break;
+            }
+            case CMD_FOUNDER: {
+                if (people.length > 1) {
+                    boolean status = !people[0].isFounder();
+                    for (Person person : people) {
+                        person.setFounder(status);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                } else {
+                    selectedPerson.setFounder(!selectedPerson.isFounder());
                     gui.getCampaign().personUpdated(selectedPerson);
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
@@ -1084,8 +1145,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 break;
             }
-        default:
-            break;
+            default:
+                break;
         }
     }
 
@@ -1229,67 +1290,51 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             Rank.getManeiDominiRankName(i));
                     cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_RANK, String.valueOf(i)));
                     cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(true);
                     if (i == person.getManeiDominiRank()) {
                         cbMenuItem.setSelected(true);
                     }
                     menu.add(cbMenuItem);
                 }
-                if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-                    MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
-                }
-                popup.add(menu);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
 
                 // MD Classes
-                menu = new JMenu(resourceMap.getString("changeMDClass.text")); //$NON-NLS-1$
-                for (int i = Person.MD_NONE; i < Person.MD_NUM; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(
-                            Person.getManeiDominiClassNames(i, Ranks.RS_WOB));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_CLASS, String.valueOf(i)));
+                menu = new JMenu(resourceMap.getString("changeMDClass.text"));
+                for (ManeiDominiClass maneiDominiClass : ManeiDominiClass.values()) {
+                    cbMenuItem = new JCheckBoxMenuItem(maneiDominiClass.toString());
+                    cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_CLASS, maneiDominiClass.name()));
                     cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(true);
-                    if (i == person.getManeiDominiClass()) {
+                    if (maneiDominiClass == person.getManeiDominiClass()) {
                         cbMenuItem.setSelected(true);
                     }
                     menu.add(cbMenuItem);
                 }
-                if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-                    MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
-                }
-                popup.add(menu);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
             }
-            if (StaticChecks.areAllWoBOrComstar(selected)) {
-                menu = new JMenu(resourceMap.getString("changePrimaryDesignation.text")); //$NON-NLS-1$
-                for (int i = Person.DESIG_NONE; i < Person.DESIG_NUM; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(Person.parseDesignator(i));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_DESIGNATOR, String.valueOf(i)));
-                    cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(true);
-                    if (i == person.getPrimaryDesignator()) {
-                        cbMenuItem.setSelected(true);
-                    }
-                    menu.add(cbMenuItem);
-                }
-                if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-                    MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
-                }
-                popup.add(menu);
 
-                menu = new JMenu(resourceMap.getString("changeSecondaryDesignation.text")); //$NON-NLS-1$
-                for (int i = Person.DESIG_NONE; i < Person.DESIG_NUM; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(Person.parseDesignator(i));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_DESIGNATOR, String.valueOf(i)));
+            if (StaticChecks.areAllWoBOrComstar(selected)) {
+                menu = new JMenu(resourceMap.getString("changePrimaryDesignation.text"));
+                for (ROMDesignation romDesignation : ROMDesignation.values()) {
+                    cbMenuItem = new JCheckBoxMenuItem(romDesignation.toString());
+                    cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_DESIGNATOR, romDesignation.name()));
                     cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(true);
-                    if (i == person.getSecondaryDesignator()) {
+                    if (romDesignation == person.getPrimaryDesignator()) {
                         cbMenuItem.setSelected(true);
                     }
                     menu.add(cbMenuItem);
                 }
-                if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-                    MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+
+                menu = new JMenu(resourceMap.getString("changeSecondaryDesignation.text"));
+                for (ROMDesignation romDesignation : ROMDesignation.values()) {
+                    cbMenuItem = new JCheckBoxMenuItem(romDesignation.toString());
+                    cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_DESIGNATOR, romDesignation.name()));
+                    cbMenuItem.addActionListener(this);
+                    if (romDesignation == person.getSecondaryDesignator()) {
+                        cbMenuItem.setSelected(true);
+                    }
+                    menu.add(cbMenuItem);
                 }
-                popup.add(menu);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
             }
             menu = new JMenu(resourceMap.getString("changeStatus.text"));
             for (PersonnelStatus status : PersonnelStatus.values()) {
@@ -1303,9 +1348,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             popup.add(menu);
 
-            if (oneSelected) {
-                popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON, person.isFree())); //$NON-NLS-1$
-                popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE, !person.isFree())); //$NON-NLS-1$
+            if (StaticChecks.areAnyFree(selected)) {
+                popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON));
+            }
+
+            if (oneSelected && !person.getPrisonerStatus().isFree()) {
+                popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE));
             }
 
             if (gui.getCampaign().getCampaignOptions().getUseAtB()
@@ -1374,6 +1422,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menuItem.setEnabled(StaticChecks.areAllActive(selected));
                 popup.add(menuItem);
             }
+
             // change salary
             if (gui.getCampaign().getCampaignOptions().payForSalaries()) {
                 menuItem = new JMenuItem(resourceMap.getString("setSalary.text")); //$NON-NLS-1$
@@ -1382,305 +1431,385 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menuItem.setEnabled(StaticChecks.areAllActive(selected));
                 popup.add(menuItem);
             }
-            // switch pilot
-            menu = new JMenu(resourceMap.getString("assignToUnit.text")); //$NON-NLS-1$
-            JMenu pilotMenu = new JMenu(resourceMap.getString("assignAsPilot.text")); //$NON-NLS-1$
-            JMenu crewMenu = new JMenu(resourceMap.getString("assignAsCrewmember.text")); //$NON-NLS-1$
-            JMenu driverMenu = new JMenu(resourceMap.getString("assignAsDriver.text")); //$NON-NLS-1$
-            JMenu gunnerMenu = new JMenu(resourceMap.getString("assignAsGunner.text")); //$NON-NLS-1$
-            JMenu soldierMenu = new JMenu(resourceMap.getString("assignAsSoldier.text")); //$NON-NLS-1$
-            JMenu techMenu = new JMenu(resourceMap.getString("assignAsTech.text")); //$NON-NLS-1$
-            JMenu navMenu = new JMenu(resourceMap.getString("assignAsNavigator.text")); //$NON-NLS-1$
-            JMenu techOfficerMenu = new JMenu(resourceMap.getString("assignAsTechOfficer.text")); //$NON-NLS-1$
-            JMenu consoleCmdrMenu = new JMenu(resourceMap.getString("assignAsConsoleCmdr.text")); //$NON-NLS-1$
-            /*
-             * if(!person.isAssigned()) { cbMenuItem.setSelected(true); }
-             */
-            if (oneSelected && person.isActive() && !(person.isPrisoner() || person.isBondsman())) {
-                for (Unit unit : gui.getCampaign().getUnits()) {
-                    if (!unit.isAvailable()) {
-                        continue;
-                    }
-                    if (unit.usesSoloPilot()) {
-                        if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())
-                                && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_PILOT, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            pilotMenu.add(cbMenuItem);
+
+            if (!person.isDeployed()) {
+                // Assign pilot to unit/none
+                menu = new JMenu(resourceMap.getString("assignToUnit.text")); //$NON-NLS-1$
+                JMenu pilotMenu = new JMenu(resourceMap.getString("assignAsPilot.text")); //$NON-NLS-1$
+                JMenu pilotUnitTypeMenu = new JMenu();
+                JMenu pilotEntityWeightMenu = new JMenu();
+                JMenu driverMenu = new JMenu(resourceMap.getString("assignAsDriver.text")); //$NON-NLS-1$
+                JMenu driverUnitTypeMenu = new JMenu();
+                JMenu driverEntityWeightMenu = new JMenu();
+                JMenu crewMenu = new JMenu(resourceMap.getString("assignAsCrewmember.text")); //$NON-NLS-1$
+                JMenu crewUnitTypeMenu = new JMenu();
+                JMenu crewEntityWeightMenu = new JMenu();
+                JMenu gunnerMenu = new JMenu(resourceMap.getString("assignAsGunner.text")); //$NON-NLS-1$
+                JMenu gunnerUnitTypeMenu = new JMenu();
+                JMenu gunnerEntityWeightMenu = new JMenu();
+                JMenu navMenu = new JMenu(resourceMap.getString("assignAsNavigator.text")); //$NON-NLS-1$
+                JMenu navUnitTypeMenu = new JMenu();
+                JMenu navEntityWeightMenu = new JMenu();
+                JMenu soldierMenu = new JMenu(resourceMap.getString("assignAsSoldier.text")); //$NON-NLS-1$
+                JMenu soldierUnitTypeMenu = new JMenu();
+                JMenu soldierEntityWeightMenu = new JMenu();
+                JMenu techOfficerMenu = new JMenu(resourceMap.getString("assignAsTechOfficer.text")); //$NON-NLS-1$
+                JMenu techOfficerUnitTypeMenu = new JMenu();
+                JMenu techOfficerEntityWeightMenu = new JMenu();
+                JMenu consoleCmdrMenu = new JMenu(resourceMap.getString("assignAsConsoleCmdr.text")); //$NON-NLS-1$
+                JMenu consoleCmdrUnitTypeMenu = new JMenu();
+                JMenu consoleCmdrEntityWeightMenu = new JMenu();
+                JMenu techMenu = new JMenu(resourceMap.getString("assignAsTech.text")); //$NON-NLS-1$
+                JMenu techUnitTypeMenu = new JMenu();
+                JMenu techEntityWeightMenu = new JMenu();
+
+                int unitType = -1;
+                int weightClass = -1;
+
+                if (oneSelected && person.isActive() && person.getPrisonerStatus().isFree()) {
+                    for (Unit unit : gui.getCampaign().getUnits(true, true, true)) {
+                        if (!unit.isAvailable()) {
+                            continue;
+                        } else if (unit.getEntity().getUnitType() != unitType) {
+                            unitType = unit.getEntity().getUnitType();
+                            String unitTypeName = UnitType.getTypeName(unitType);
+                            weightClass = unit.getEntity().getWeightClass();
+                            String weightClassName = unit.getEntity().getWeightClassName();
+
+                            // Add Weight Menus to Unit Type Menus
+                            JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(techUnitTypeMenu, techEntityWeightMenu, MAX_POPUP_ITEMS);
+
+                            // Then add the Unit Type Menus to the Role Menus
+                            JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(techOfficerMenu, techOfficerUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrMenu, consoleCmdrUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(techMenu, techUnitTypeMenu, MAX_POPUP_ITEMS);
+
+                            // Create new UnitType and EntityWeight Menus
+                            pilotUnitTypeMenu = new JMenu(unitTypeName);
+                            pilotEntityWeightMenu = new JMenu(weightClassName);
+                            driverUnitTypeMenu = new JMenu(unitTypeName);
+                            driverEntityWeightMenu = new JMenu(weightClassName);
+                            crewUnitTypeMenu = new JMenu(unitTypeName);
+                            crewEntityWeightMenu = new JMenu(weightClassName);
+                            gunnerUnitTypeMenu = new JMenu(unitTypeName);
+                            gunnerEntityWeightMenu = new JMenu(weightClassName);
+                            navUnitTypeMenu = new JMenu(unitTypeName);
+                            navEntityWeightMenu = new JMenu(weightClassName);
+                            soldierUnitTypeMenu = new JMenu(unitTypeName);
+                            soldierEntityWeightMenu = new JMenu(weightClassName);
+                            techOfficerUnitTypeMenu = new JMenu(unitTypeName);
+                            techOfficerEntityWeightMenu = new JMenu(weightClassName);
+                            consoleCmdrUnitTypeMenu = new JMenu(unitTypeName);
+                            consoleCmdrEntityWeightMenu = new JMenu(weightClassName);
+                            techUnitTypeMenu = new JMenu(unitTypeName);
+                            techEntityWeightMenu = new JMenu(weightClassName);
+                        } else if (unit.getEntity().getWeightClass() != weightClass) {
+                            weightClass = unit.getEntity().getWeightClass();
+                            String weightClassName = unit.getEntity().getWeightClassName();
+
+                            JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(techUnitTypeMenu, techEntityWeightMenu, MAX_POPUP_ITEMS);
+
+                            pilotEntityWeightMenu = new JMenu(weightClassName);
+                            driverEntityWeightMenu = new JMenu(weightClassName);
+                            crewEntityWeightMenu = new JMenu(weightClassName);
+                            gunnerEntityWeightMenu = new JMenu(weightClassName);
+                            navEntityWeightMenu = new JMenu(weightClassName);
+                            soldierEntityWeightMenu = new JMenu(weightClassName);
+                            techOfficerEntityWeightMenu = new JMenu(weightClassName);
+                            consoleCmdrEntityWeightMenu = new JMenu(weightClassName);
+                            techEntityWeightMenu = new JMenu(weightClassName);
                         }
-                    } else if (unit.usesSoldiers()) {
-                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            soldierMenu.add(cbMenuItem);
-                        }
-                    } else {
-                        if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_DRIVER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            if (unit.getEntity() instanceof Aero || unit.getEntity() instanceof Mech) {
-                                pilotMenu.add(cbMenuItem);
-                            } else {
-                                driverMenu.add(cbMenuItem);
+
+                        if (unit.usesSoloPilot()) {
+                            if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())
+                                    && person.canGun(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_PILOT, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                pilotEntityWeightMenu.add(cbMenuItem);
                             }
-                        }
-                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            gunnerMenu.add(cbMenuItem);
-                        }
-                        if (unit.canTakeMoreVesselCrew()
-                                && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
-                                || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            crewMenu.add(cbMenuItem);
-                        }
-                        if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            navMenu.add(cbMenuItem);
-                        }
-                        if (unit.canTakeTechOfficer()) {
-                            //For a vehicle command console we will require the commander to be a driver or a gunner, but not necessarily both
-                            if (unit.getEntity() instanceof Tank) {
-                                if (person.canDrive(unit.getEntity()) || person.canGun(unit.getEntity())) {
+                        } else if (unit.usesSoldiers()) {
+                            if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                soldierEntityWeightMenu.add(cbMenuItem);
+                            }
+                        } else {
+                            if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_DRIVER, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                if (unit.getEntity() instanceof Aero || unit.getEntity() instanceof Mech) {
+                                    pilotEntityWeightMenu.add(cbMenuItem);
+                                } else {
+                                    driverEntityWeightMenu.add(cbMenuItem);
+                                }
+                            }
+                            if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                gunnerEntityWeightMenu.add(cbMenuItem);
+                            }
+                            if (unit.canTakeMoreVesselCrew()
+                                    && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
+                                    || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                crewEntityWeightMenu.add(cbMenuItem);
+                            }
+                            if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                navEntityWeightMenu.add(cbMenuItem);
+                            }
+                            if (unit.canTakeTechOfficer()) {
+                                //For a vehicle command console we will require the commander to be a driver or a gunner, but not necessarily both
+                                if (unit.getEntity() instanceof Tank) {
+                                    if (person.canDrive(unit.getEntity()) || person.canGun(unit.getEntity())) {
+                                        cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                        cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                        cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
+                                        cbMenuItem.addActionListener(this);
+                                        consoleCmdrEntityWeightMenu.add(cbMenuItem);
+                                    }
+                                } else if (person.canDrive(unit.getEntity()) && person.canGun(unit.getEntity())) {
                                     cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                                     cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                                     cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
                                     cbMenuItem.addActionListener(this);
-                                    consoleCmdrMenu.add(cbMenuItem);
+                                    techOfficerEntityWeightMenu.add(cbMenuItem);
                                 }
-                            } else if (person.canDrive(unit.getEntity()) && person.canGun(unit.getEntity())) {
+                            }
+                        }
+                        if (unit.canTakeTech() && person.canTech(unit.getEntity())
+                                && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime() <= 480)) {
+                            cbMenuItem = new JCheckBoxMenuItem(String.format(resourceMap.getString("maintenanceTimeDesc.format"), //$NON-NLS-1$
+                                    unit.getName(), unit.getMaintenanceTime()));
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH, unit.getId().toString()));
+                            cbMenuItem.addActionListener(this);
+                            techEntityWeightMenu.add(cbMenuItem);
+                        }
+                    }
+                } else if (StaticChecks.areAllActive(selected) && StaticChecks.areAllEligible(selected)) {
+                    for (Unit unit : gui.getCampaign().getUnits( true, true, true)) {
+                        if (!unit.isAvailable()) {
+                            continue;
+                        } else if (unit.getEntity().getUnitType() != unitType) {
+                            unitType = unit.getEntity().getUnitType();
+                            String unitTypeName = UnitType.getTypeName(unitType);
+                            weightClass = unit.getEntity().getWeightClass();
+                            String weightClassName = unit.getEntity().getWeightClassName();
+
+                            // Add Weight Menus to Unit Type Menus
+                            JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
+
+                            // Then add the Unit Type Menus to the Role Menus
+                            JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu, MAX_POPUP_ITEMS);
+
+                            // Create new UnitType and EntityWeight Menus
+                            pilotUnitTypeMenu = new JMenu(unitTypeName);
+                            pilotEntityWeightMenu = new JMenu(weightClassName);
+                            driverUnitTypeMenu = new JMenu(unitTypeName);
+                            driverEntityWeightMenu = new JMenu(weightClassName);
+                            crewUnitTypeMenu = new JMenu(unitTypeName);
+                            crewEntityWeightMenu = new JMenu(weightClassName);
+                            gunnerUnitTypeMenu = new JMenu(unitTypeName);
+                            gunnerEntityWeightMenu = new JMenu(weightClassName);
+                            navUnitTypeMenu = new JMenu(unitTypeName);
+                            navEntityWeightMenu = new JMenu(weightClassName);
+                            soldierUnitTypeMenu = new JMenu(unitTypeName);
+                            soldierEntityWeightMenu = new JMenu(weightClassName);
+                        } else if (unit.getEntity().getWeightClass() != weightClass) {
+                            weightClass = unit.getEntity().getWeightClass();
+                            String weightClassName = unit.getEntity().getWeightClassName();
+
+                            JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
+
+                            pilotEntityWeightMenu = new JMenu(weightClassName);
+                            driverEntityWeightMenu = new JMenu(weightClassName);
+                            crewEntityWeightMenu = new JMenu(weightClassName);
+                            gunnerEntityWeightMenu = new JMenu(weightClassName);
+                            navEntityWeightMenu = new JMenu(weightClassName);
+                            soldierEntityWeightMenu = new JMenu(weightClassName);
+                        }
+
+                        if (StaticChecks.areAllInfantry(selected)) {
+                            if (!(unit.getEntity() instanceof Infantry) || unit.getEntity() instanceof BattleArmor) {
+                                continue;
+                            }
+                            if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                                 cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
-                                techOfficerMenu.add(cbMenuItem);
+                                soldierEntityWeightMenu.add(cbMenuItem);
+                            }
+                        } else if (StaticChecks.areAllBattleArmor(selected)) {
+                            if (!(unit.getEntity() instanceof BattleArmor)) {
+                                continue;
+                            }
+                            if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                soldierEntityWeightMenu.add(cbMenuItem);
+                            }
+                        } else if (StaticChecks.areAllVeeGunners(selected)) {
+                            if (!(unit.getEntity() instanceof Tank)) {
+                                continue;
+                            }
+                            if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                gunnerEntityWeightMenu.add(cbMenuItem);
+                            }
+                        } else if (StaticChecks.areAllVesselGunners(selected)) {
+                            if (!(unit.getEntity() instanceof Aero)) {
+                                continue;
+                            }
+                            if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                gunnerEntityWeightMenu.add(cbMenuItem);
+                            }
+                        } else if (StaticChecks.areAllVesselCrew(selected)) {
+                            if (!(unit.getEntity() instanceof Aero)) {
+                                continue;
+                            }
+                            if (unit.canTakeMoreVesselCrew()
+                                    && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
+                                    || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                crewEntityWeightMenu.add(cbMenuItem);
+                            }
+                        } else if (StaticChecks.areAllVesselPilots(selected)) {
+                            if (!(unit.getEntity() instanceof Aero)) {
+                                continue;
+                            }
+                            if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_VESSEL_PILOT, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                pilotEntityWeightMenu.add(cbMenuItem);
+                            }
+                        } else if (StaticChecks.areAllVesselNavigators(selected)) {
+                            if (!(unit.getEntity() instanceof Aero)) {
+                                continue;
+                            }
+                            if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                navEntityWeightMenu.add(cbMenuItem);
                             }
                         }
                     }
-                    if (unit.canTakeTech() && person.canTech(unit.getEntity())
-                            && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime() <= 480)) {
-                        cbMenuItem = new JCheckBoxMenuItem(String.format(resourceMap.getString("maintenanceTimeDesc.format"), //$NON-NLS-1$
-                                unit.getName(), unit.getMaintenanceTime()));
-                        cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH, unit.getId().toString()));
-                        cbMenuItem.addActionListener(this);
-                        techMenu.add(cbMenuItem);
-                    }
                 }
-                if (pilotMenu.getItemCount() > 0) {
-                    menu.add(pilotMenu);
-                    if (pilotMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(pilotMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (driverMenu.getItemCount() > 0) {
-                    menu.add(driverMenu);
-                    if (driverMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(driverMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (crewMenu.getItemCount() > 0) {
-                    menu.add(crewMenu);
-                    if (crewMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(crewMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (navMenu.getItemCount() > 0) {
-                    menu.add(navMenu);
-                    if (navMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(navMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (gunnerMenu.getItemCount() > 0) {
-                    menu.add(gunnerMenu);
-                    if (gunnerMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(gunnerMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (soldierMenu.getItemCount() > 0) {
-                    menu.add(soldierMenu);
-                    if (soldierMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(soldierMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (techOfficerMenu.getItemCount() > 0) {
-                    menu.add(techOfficerMenu);
-                    if (techOfficerMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(techOfficerMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (consoleCmdrMenu.getItemCount() > 0) {
-                    menu.add(consoleCmdrMenu);
-                    if (consoleCmdrMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(consoleCmdrMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (techMenu.getItemCount() > 0) {
-                    menu.add(techMenu);
-                    if (techMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(techMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                menu.setEnabled(!person.isDeployed());
-                popup.add(menu);
-            } else if (StaticChecks.areAllActive(selected) && StaticChecks.areAllEligible(selected)) {
-                for (Unit unit : gui.getCampaign().getUnits()) {
-                    if (!unit.isAvailable()) {
-                        continue;
-                    }
-                    if (StaticChecks.areAllInfantry(selected)) {
-                        if (!(unit.getEntity() instanceof Infantry) || unit.getEntity() instanceof BattleArmor) {
-                            continue;
-                        }
-                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            soldierMenu.add(cbMenuItem);
-                        }
-                    } else if (StaticChecks.areAllBattleArmor(selected)) {
-                        if (!(unit.getEntity() instanceof BattleArmor)) {
-                            continue;
-                        }
-                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            soldierMenu.add(cbMenuItem);
-                        }
-                    } else if (StaticChecks.areAllVeeGunners(selected)) {
-                        if (!(unit.getEntity() instanceof Tank)) {
-                            continue;
-                        }
-                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            gunnerMenu.add(cbMenuItem);
-                        }
-                    } else if (StaticChecks.areAllVesselGunners(selected)) {
-                        if (!(unit.getEntity() instanceof Aero)) {
-                            continue;
-                        }
-                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            gunnerMenu.add(cbMenuItem);
-                        }
-                    } else if (StaticChecks.areAllVesselCrew(selected)) {
-                        if (!(unit.getEntity() instanceof Aero)) {
-                            continue;
-                        }
-                        if (unit.canTakeMoreVesselCrew()
-                                && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
-                                || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            crewMenu.add(cbMenuItem);
-                        }
-                    } else if (StaticChecks.areAllVesselPilots(selected)) {
-                        if (!(unit.getEntity() instanceof Aero)) {
-                            continue;
-                        }
-                        if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_VESSEL_PILOT, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            pilotMenu.add(cbMenuItem);
-                        }
-                    } else if (StaticChecks.areAllVesselNavigators(selected)) {
-                        if (!(unit.getEntity() instanceof Aero)) {
-                            continue;
-                        }
-                        if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            navMenu.add(cbMenuItem);
-                        }
-                    }
-                }
-                if (soldierMenu.getItemCount() > 0) {
-                    menu.add(soldierMenu);
-                    if (soldierMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(soldierMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (pilotMenu.getItemCount() > 0) {
-                    menu.add(pilotMenu);
-                    if (pilotMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(pilotMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (driverMenu.getItemCount() > 0) {
-                    menu.add(driverMenu);
-                    if (driverMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(driverMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (crewMenu.getItemCount() > 0) {
-                    menu.add(crewMenu);
-                    if (crewMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(crewMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (navMenu.getItemCount() > 0) {
-                    menu.add(navMenu);
-                    if (navMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(navMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (gunnerMenu.getItemCount() > 0) {
-                    menu.add(gunnerMenu);
-                    if (gunnerMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(gunnerMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                if (soldierMenu.getItemCount() > 0) {
-                    menu.add(soldierMenu);
-                    if (soldierMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(soldierMenu, MAX_POPUP_ITEMS);
-                    }
-                }
-                menu.setEnabled(!person.isDeployed());
+
+                // Add the last grouping of entity weight menus to the last grouping of entity menus
+                JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(techUnitTypeMenu, techEntityWeightMenu, MAX_POPUP_ITEMS);
+
+                // then add the last grouping of entity menus to the primary menus
+                JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(techOfficerMenu, techOfficerUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(consoleCmdrMenu, consoleCmdrUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(techMenu, techUnitTypeMenu, MAX_POPUP_ITEMS);
+
+                // and finally add any non-empty menus to the primary menu
+                JMenuHelpers.addMenuIfNonEmpty(menu, pilotMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, driverMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, crewMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, gunnerMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, navMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, soldierMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, techOfficerMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, consoleCmdrMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, techMenu, MAX_POPUP_ITEMS);
+
+                // and we always include the None checkbox
+                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("none.text")); //$NON-NLS-1$
+                cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1")); //$NON-NLS-1$
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
                 popup.add(menu);
             }
-            cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("none.text")); //$NON-NLS-1$
-            cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1")); //$NON-NLS-1$
-            cbMenuItem.addActionListener(this);
-            menu.add(cbMenuItem);
 
             if (oneSelected && person.isActive()) {
-                if (person.oldEnoughToMarry() && (!person.hasSpouse())) {
+                if (person.oldEnoughToMarry(gui.getCampaign()) && (!person.hasSpouse())) {
                     menu = new JMenu(resourceMap.getString("chooseSpouse.text")); //$NON-NLS-1$
                     JMenu maleMenu = new JMenu(resourceMap.getString("spouseMenuMale.text"));
                     JMenu femaleMenu = new JMenu(resourceMap.getString("spouseMenuFemale.text"));
                     JMenu spouseMenu;
-                    JMenuItem surnameMenu;
-                    String type;
 
                     LocalDate today = gui.getCampaign().getLocalDate();
 
@@ -1688,81 +1817,28 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     personnel.sort(Comparator.comparing((Person p) -> p.getAge(today)).thenComparing(Person::getSurname));
 
                     for (Person ps : personnel) {
-                        if (person.safeSpouse(ps)) {
+                        if (person.safeSpouse(ps, gui.getCampaign())) {
                             String pStatus;
-                            if (ps.isBondsman()) {
-                                pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"), //$NON-NLS-1$
+
+                            if (ps.getPrisonerStatus().isBondsman()) {
+                                pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"),
                                         ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
-                            } else if (ps.isPrisoner()) {
-                                pStatus = String.format(resourceMap.getString("marriagePrisonerDesc.format"), //$NON-NLS-1$
+                            } else if (ps.getPrisonerStatus().isPrisoner()) {
+                                pStatus = String.format(resourceMap.getString("marriagePrisonerDesc.format"),
                                         ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             } else {
-                                pStatus = String.format(resourceMap.getString("marriagePartnerDesc.format"), //$NON-NLS-1$
+                                pStatus = String.format(resourceMap.getString("marriagePartnerDesc.format"),
                                         ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             }
-                            spouseMenu = new JMenu(pStatus);
-                            type = resourceMap.getString("marriageNoNameChange.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_NO_CHANGE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageRenameSpouse.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_YOURS)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageRenameYourself.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_SPOUSE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageHyphenateYourself.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_HYP_YOURS)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageBothHyphenateYourself.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_BOTH_HYP_YOURS)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageHyphenateSpouse.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_HYP_SPOUSE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageBothHyphenateSpouse.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_BOTH_HYP_SPOUSE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageMale.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_MALE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageFemale.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_FEMALE)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
-                            type = resourceMap.getString("marriageRandomWeighted.text"); //$NON-NLS-1$
-                            surnameMenu = new JMenuItem(type);
-                            surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_WEIGHTED)));
-                            surnameMenu.addActionListener(this);
-                            spouseMenu.add(surnameMenu);
 
-                            if (ps.isMale()) {
+                            spouseMenu = new JMenu(pStatus);
+
+                            for (Marriage style : Marriage.values()) {
+                                spouseMenu.add(newMenuItem(style.getDropDownText(),
+                                        makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), style.name())));
+                            }
+
+                            if (ps.getGender().isMale()) {
                                 maleMenu.add(spouseMenu);
                             } else {
                                 femaleMenu.add(spouseMenu);
@@ -1770,7 +1846,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                     }
 
-                    if (person.isMale()) {
+                    if (person.getGender().isMale()) {
                         JMenuHelpers.addMenuIfNonEmpty(menu, femaleMenu, MAX_POPUP_ITEMS);
                         JMenuHelpers.addMenuIfNonEmpty(menu, maleMenu, MAX_POPUP_ITEMS);
                     } else {
@@ -1813,95 +1889,97 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                     popup.add(menu);
                 }
+            }
 
-                JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
-                List<String> setNames = AwardsFactory.getInstance().getAllSetNames();
-                Collections.sort(setNames);
-                for (String setName : setNames) {
-                    JMenu setAwardMenu = new JMenu(setName);
+            //region Awards Menu
+            JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
+            List<String> setNames = AwardsFactory.getInstance().getAllSetNames();
+            Collections.sort(setNames);
+            for (String setName : setNames) {
+                JMenu setAwardMenu = new JMenu(setName);
 
-                    List<Award> awardsOfSet = AwardsFactory.getInstance().getAllAwardsForSet(setName);
-                    Collections.sort(awardsOfSet);
+                List<Award> awardsOfSet = AwardsFactory.getInstance().getAllAwardsForSet(setName);
+                Collections.sort(awardsOfSet);
 
-                    for (Award award : awardsOfSet) {
+                for (Award award : awardsOfSet) {
+                    if (!award.canBeAwarded(selected)) {
+                        continue;
+                    }
 
-                        if (!award.canBeAwarded(person)) continue;
+                    StringBuilder awardMenuItem = new StringBuilder();
+                    awardMenuItem.append(String.format("%s", award.getName()));
 
-                        StringBuilder awardMenuItem = new StringBuilder();
-                        awardMenuItem.append(String.format("%s", award.getName()));
+                    if ((award.getXPReward() != 0) || (award.getEdgeReward() != 0)) {
+                        awardMenuItem.append(" (");
 
-                        if (award.getXPReward() != 0 || award.getEdgeReward() != 0) {
-                            awardMenuItem.append(" (");
-
-                            if (award.getXPReward() != 0) {
-                                awardMenuItem.append(award.getXPReward()).append(" XP");
-                                if (award.getEdgeReward() != 0)
-                                    awardMenuItem.append(" & ");
-                            }
-
+                        if (award.getXPReward() != 0) {
+                            awardMenuItem.append(award.getXPReward()).append(" XP");
                             if (award.getEdgeReward() != 0) {
-                                awardMenuItem.append(award.getEdgeReward()).append(" Edge");
+                                awardMenuItem.append(" & ");
                             }
-
-                            awardMenuItem.append(")");
                         }
 
-                        menuItem = new JMenuItem(awardMenuItem.toString());
-                        menuItem.setToolTipText(MultiLineTooltip.splitToolTip(award.getDescription()));
+                        if (award.getEdgeReward() != 0) {
+                            awardMenuItem.append(award.getEdgeReward()).append(" Edge");
+                        }
 
-                        if (!award.canBeAwarded(person) && !gui.getCampaign().isGM())
-                            menuItem.setEnabled(false);
-
-                        menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getSet(), award.getName()));
-                        menuItem.addActionListener(this);
-
-                        setAwardMenu.add(menuItem);
+                        awardMenuItem.append(")");
                     }
-                    if (setAwardMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(setAwardMenu, MAX_POPUP_ITEMS);
-                    }
-                    awardMenu.add(setAwardMenu);
+
+                    menuItem = new JMenuItem(awardMenuItem.toString());
+                    menuItem.setToolTipText(MultiLineTooltip.splitToolTip(award.getDescription()));
+                    menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getSet(), award.getName()));
+                    menuItem.addActionListener(this);
+                    setAwardMenu.add(menuItem);
                 }
-                awardMenu.addSeparator();
+
+                JMenuHelpers.addMenuIfNonEmpty(awardMenu, setAwardMenu, MAX_POPUP_ITEMS);
+            }
+
+            if (StaticChecks.doAnyHaveAnAward(selected)) {
+                if (awardMenu.getItemCount() > 0) {
+                    awardMenu.addSeparator();
+                }
+
                 JMenu removeAwardMenu = new JMenu(resourceMap.getString("removeAward.text"));
 
-                if (!person.awardController.hasAwards())
-                    removeAwardMenu.setEnabled(false);
-
-                for (Award award : person.awardController.getAwards()) {
-                    JMenu singleAwardMenu = new JMenu(award.getName());
-                    for (String date : award.getFormatedDates()) {
-                        JMenuItem specificAwardMenu = new JMenuItem(date);
-                        specificAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), date));
-                        specificAwardMenu.addActionListener(this);
-                        singleAwardMenu.add(specificAwardMenu);
-                    }
-                    removeAwardMenu.add(singleAwardMenu);
-                }
-                awardMenu.add(removeAwardMenu);
-                popup.add(awardMenu);
-
-                menu = new JMenu(resourceMap.getString("spendXP.text")); //$NON-NLS-1$
-                JMenu currentMenu = new JMenu(resourceMap.getString("spendOnCurrentSkills.text")); //$NON-NLS-1$
-                JMenu newMenu = new JMenu(resourceMap.getString("spendOnNewSkills.text")); //$NON-NLS-1$
-                for (int i = 0; i < SkillType.getSkillList().length; i++) {
-                    String type = SkillType.getSkillList()[i];
-                    int cost = person.hasSkill(type) ? person.getSkill(type).getCostToImprove() : SkillType.getType(type).getCost(0);
-                    if (cost >= 0) {
-                        String desc = String.format(resourceMap.getString("skillDesc.format"), type, cost); //$NON-NLS-1$
-                        menuItem = new JMenuItem(desc);
-                        menuItem.setActionCommand(makeCommand(CMD_IMPROVE, type, String.valueOf(cost)));
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(person.getXp() >= cost);
-                        if (person.hasSkill(type)) {
-                            currentMenu.add(menuItem);
-                        } else {
-                            newMenu.add(menuItem);
+                if (oneSelected) {
+                    for (Award award : person.getAwardController().getAwards()) {
+                        JMenu singleAwardMenu = new JMenu(award.getName());
+                        for (String date : award.getFormattedDates(gui.getCampaign())) {
+                            JMenuItem specificAwardMenu = new JMenuItem(date);
+                            specificAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), date));
+                            specificAwardMenu.addActionListener(this);
+                            singleAwardMenu.add(specificAwardMenu);
                         }
+                        JMenuHelpers.addMenuIfNonEmpty(removeAwardMenu, singleAwardMenu, MAX_POPUP_ITEMS);
+                    }
+                } else {
+                    Set<Award> awards = new TreeSet<>((a1, a2) -> {
+                        if (a1.getSet().equalsIgnoreCase(a2.getSet())) {
+                            return a1.getName().compareToIgnoreCase(a2.getName());
+                        } else {
+                            return a1.getSet().compareToIgnoreCase(a2.getSet());
+                        }
+                    });
+                    for (Person p : selected) {
+                        awards.addAll(p.getAwardController().getAwards());
+                    }
+
+                    for (Award award : awards) {
+                        JMenuItem singleAwardMenu = new JMenuItem(award.getName());
+                        singleAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName()));
+                        singleAwardMenu.addActionListener(this);
+                        removeAwardMenu.add(singleAwardMenu);
                     }
                 }
-                menu.add(currentMenu);
-                menu.add(newMenu);
+                JMenuHelpers.addMenuIfNonEmpty(awardMenu, removeAwardMenu, MAX_POPUP_ITEMS);
+            }
+            popup.add(awardMenu);
+            //endregion Awards Menu
+
+            if (oneSelected && person.isActive()) {
+                menu = new JMenu(resourceMap.getString("spendXP.text")); //$NON-NLS-1$
                 if (gui.getCampaign().getCampaignOptions().useAbilities()) {
                     JMenu abMenu = new JMenu(resourceMap.getString("spendOnSpecialAbilities.text")); //$NON-NLS-1$
                     int cost;
@@ -2071,32 +2149,50 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             abMenu.add(menuItem);
                         }
                     }
-                    if (abMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(abMenu, MAX_POPUP_ITEMS);
-                    }
-                    menu.add(abMenu);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, abMenu, MAX_POPUP_ITEMS);
                 }
-                menu.add(currentMenu);
-                menu.add(newMenu);
+
+                JMenu currentMenu = new JMenu(resourceMap.getString("spendOnCurrentSkills.text")); //$NON-NLS-1$
+                JMenu newMenu = new JMenu(resourceMap.getString("spendOnNewSkills.text")); //$NON-NLS-1$
+                for (int i = 0; i < SkillType.getSkillList().length; i++) {
+                    String type = SkillType.getSkillList()[i];
+                    int cost = person.hasSkill(type) ? person.getSkill(type).getCostToImprove() : SkillType.getType(type).getCost(0);
+                    if (cost >= 0) {
+                        String desc = String.format(resourceMap.getString("skillDesc.format"), type, cost); //$NON-NLS-1$
+                        menuItem = new JMenuItem(desc);
+                        menuItem.setActionCommand(makeCommand(CMD_IMPROVE, type, String.valueOf(cost)));
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(person.getXp() >= cost);
+                        if (person.hasSkill(type)) {
+                            currentMenu.add(menuItem);
+                        } else {
+                            newMenu.add(menuItem);
+                        }
+                    }
+                }
+                JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, newMenu, MAX_POPUP_ITEMS);
+
+                // Edge Purchasing
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
                     JMenu edgeMenu = new JMenu(resourceMap.getString("edge.text")); //$NON-NLS-1$
                     int cost = gui.getCampaign().getCampaignOptions().getEdgeCost();
-                    boolean available = (cost >= 0) && (person.getXp() >= cost);
 
-                    menuItem = new JMenuItem(String.format(resourceMap.getString("spendOnEdge.text"), cost)); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_BUY_EDGE, String.valueOf(cost)));
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(available);
-                    edgeMenu.add(menuItem);
-                    menu.add(edgeMenu);
+                    if ((cost >= 0) && (person.getXp() >= cost)) {
+                        menuItem = new JMenuItem(String.format(resourceMap.getString("spendOnEdge.text"), cost)); //$NON-NLS-1$
+                        menuItem.setActionCommand(makeCommand(CMD_BUY_EDGE, String.valueOf(cost)));
+                        menuItem.addActionListener(this);
+                        edgeMenu.add(menuItem);
+                    }
+                    JMenuHelpers.addMenuIfNonEmpty(menu, edgeMenu, MAX_POPUP_ITEMS);
                 }
-                popup.add(menu);
-            }
-            if (oneSelected && person.isActive()) {
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+
+                // Edge Triggers
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
                     menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                     //Start of Edge reroll options
-                    //Mechwarriors
+                    //MechWarriors
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerHeadHits.text")); //$NON-NLS-1$
                     cbMenuItem.setSelected(person.getOptions()
                             .booleanOption(OPT_EDGE_HEADHIT));
@@ -2267,6 +2363,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                     popup.add(menu);
                 }
+
                 menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("dependent.text")); //$NON-NLS-1$
                 cbMenuItem.setSelected(person.isDependent());
@@ -2276,6 +2373,27 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("commander.text")); //$NON-NLS-1$
                 cbMenuItem.setSelected(person.isCommander());
                 cbMenuItem.setActionCommand(CMD_COMMANDER);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToMarry.text"));
+                cbMenuItem.setToolTipText(resourceMap.getString("tryingToMarry.toolTipText"));
+                cbMenuItem.setSelected(person.isTryingToMarry());
+                cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+
+                if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation() && person.getGender().isFemale()) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
+                    cbMenuItem.setToolTipText(resourceMap.getString("tryingToConceive.toolTipText"));
+                    cbMenuItem.setSelected(person.isTryingToConceive());
+                    cbMenuItem.setActionCommand(CMD_TRYING_TO_CONCEIVE);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
+
+                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("founder.text"));
+                cbMenuItem.setSelected(person.isFounder());
+                cbMenuItem.setActionCommand(CMD_FOUNDER);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
                 popup.add(menu);
@@ -2412,69 +2530,92 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menu.add(submenu);
                     popup.add(menu);
                 }
-                menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
-                submenu = new JMenu(resourceMap.getString("dependent.text")); //$NON-NLS-1$
-                menuItem = new JMenuItem(resourceMap.getString("yes.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(makeCommand(CMD_DEPENDENT, TRUE));
-                menuItem.addActionListener(this);
-                submenu.add(menuItem);
-                menuItem = new JMenuItem(resourceMap.getString("no.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(makeCommand(CMD_DEPENDENT, FALSE));
-                menuItem.addActionListener(this);
-                submenu.add(menuItem);
-                menu.add(submenu);
+
+                menu = new JMenu(resourceMap.getString("specialFlags.text"));
+                if (StaticChecks.areEitherAllDependentsOrNot(selected)) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("dependent.text"));
+                    cbMenuItem.setSelected(selected[0].isDependent());
+                    cbMenuItem.setActionCommand(CMD_DEPENDENT);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
+                if (StaticChecks.areEitherAllTryingToMarryOrNot(selected)) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToMarry.text"));
+                    cbMenuItem.setToolTipText(resourceMap.getString("tryingToMarry.toolTipText"));
+                    cbMenuItem.setSelected(selected[0].isTryingToMarry());
+                    cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
+                if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation()
+                        && StaticChecks.areAllFemale(selected)
+                        && StaticChecks.areEitherAllTryingToConceiveOrNot(selected)) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
+                    cbMenuItem.setToolTipText(resourceMap.getString("tryingToConceive.toolTipText"));
+                    cbMenuItem.setSelected(selected[0].isTryingToConceive());
+                    cbMenuItem.setActionCommand(CMD_TRYING_TO_CONCEIVE);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
+                if (StaticChecks.areEitherAllFoundersOrNot(selected)) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("founder.text"));
+                    cbMenuItem.setSelected(person.isFounder());
+                    cbMenuItem.setActionCommand(CMD_FOUNDER);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
                 popup.add(menu);
             }
+
             // generate new appropriate random portrait
             menuItem = new JMenuItem(resourceMap.getString("randomizePortrait.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_RANDOM_PORTRAIT);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(true);
             popup.add(menuItem);
+
+            // change portrait
+            menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "changePortrait.text" : "bulkAssignSinglePortrait.text"));
+            menuItem.setActionCommand(CMD_EDIT_PORTRAIT);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+
             if (oneSelected) {
-                // change portrait
-                menuItem = new JMenuItem(resourceMap.getString("changePortrait.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(CMD_EDIT_PORTRAIT);
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
-                popup.add(menuItem);
                 // change Biography
                 menuItem = new JMenuItem(resourceMap.getString("changeBiography.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_BIOGRAPHY);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
                 popup.add(menuItem);
+
                 menuItem = new JMenuItem(resourceMap.getString("changeCallsign.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_CALLSIGN);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
                 popup.add(menuItem);
+
                 menuItem = new JMenuItem(resourceMap.getString("editPersonnelLog.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_PERSONNEL_LOG);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
                 popup.add(menuItem);
-
             }
+
             menuItem = new JMenuItem(resourceMap.getString("addSingleLogEntry.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_ADD_LOG_ENTRY);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(true);
             popup.add(menuItem);
+
             if (oneSelected) {
                 // Edit mission log
                 menuItem = new JMenuItem(resourceMap.getString("editMissionLog.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_MISSIONS_LOG);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
                 popup.add(menuItem);
             }
+
             // Add one item to all personnel mission logs
             menuItem = new JMenuItem(resourceMap.getString("addMissionEntry.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_ADD_MISSION_ENTRY);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(true);
             popup.add(menuItem);
+
             if (oneSelected) {
                 menuItem = new JMenuItem(resourceMap.getString("editKillLog.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_KILL_LOG);
@@ -2510,21 +2651,21 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                 menuItem = new JMenu(resourceMap.getString("changePrisonerStatus.text")); //$NON-NLS-1$
                 menuItem.add(newCheckboxMenu(
-                        Person.getPrisonerStatusName(Person.PRISONER_NOT),
-                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_FREE),
-                        person.getPrisonerStatus() == Person.PRISONER_NOT));
+                        PrisonerStatus.FREE.toString(),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.FREE.name()),
+                        (person.getPrisonerStatus() == PrisonerStatus.FREE)));
                 menuItem.add(newCheckboxMenu(
-                        Person.getPrisonerStatusName(Person.PRISONER_YES),
-                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED),
-                        (person.getPrisonerStatus() == Person.PRISONER_YES) && !person.isWillingToDefect()));
+                        PrisonerStatus.PRISONER.toString(),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.PRISONER.name()),
+                        (person.getPrisonerStatus() == PrisonerStatus.PRISONER)));
                 menuItem.add(newCheckboxMenu(
-                        resourceMap.getString("prisonerWillingToDefect.text"), //$NON-NLS-1$
-                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED_DEFECTING),
-                        (person.getPrisonerStatus() == Person.PRISONER_YES) && person.isWillingToDefect()));
+                        PrisonerStatus.PRISONER_DEFECTOR.toString(),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.PRISONER_DEFECTOR.name()),
+                        (person.getPrisonerStatus() == PrisonerStatus.PRISONER_DEFECTOR)));
                 menuItem.add(newCheckboxMenu(
-                        Person.getPrisonerStatusName(Person.PRISONER_BONDSMAN),
-                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_BONDSMAN),
-                        person.getPrisonerStatus() == Person.PRISONER_BONDSMAN));
+                        PrisonerStatus.BONDSMAN.toString(),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.BONDSMAN.name()),
+                        (person.getPrisonerStatus() == PrisonerStatus.BONDSMAN)));
                 menu.add(menuItem);
 
                 menuItem = new JMenuItem(resourceMap.getString("removePerson.text")); //$NON-NLS-1$

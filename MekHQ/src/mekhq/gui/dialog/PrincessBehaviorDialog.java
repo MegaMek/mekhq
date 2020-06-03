@@ -42,7 +42,7 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
 	private static final long serialVersionUID = -1697757949925940582L;
 
 	public PrincessBehaviorDialog(JFrame parent, BehaviorSettings princessBehavior, String name) {
-	    super(parent, null);
+	    super(parent);
 	    
 	    try {
 	        this.princessBehavior = princessBehavior.getCopy();
@@ -62,10 +62,6 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
-
-	public BehaviorSettings getBehaviorSettings() {
-		return princessBehavior;
-	}
 	
     private void getPrincessFields() {
         LogLevel logLevel = LogLevel.getLogLevel((String) verbosityCombo.getSelectedItem());

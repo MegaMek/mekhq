@@ -293,7 +293,7 @@ public class MekHqXmlUtil {
      *            The entity to serialize to XML.
      * @return A string containing the XML representation of the entity.
      */
-    public static String writeEntityToXmlString(Entity tgtEnt, int indentLvl, ArrayList<Entity> list) {
+    public static String writeEntityToXmlString(Entity tgtEnt, int indentLvl, List<Entity> list) {
         // Holdover from EntityListFile in MM.
         // I guess they simply ignored all squadrons for writing out entities?
         if (tgtEnt instanceof FighterSquadron) {
@@ -328,14 +328,14 @@ public class MekHqXmlUtil {
         }
 
          if ((null != tgtEnt.getCamoCategory())
-                 && (tgtEnt.getCamoCategory() != IPlayer.NO_CAMO)
+                 && !IPlayer.NO_CAMO.equals(tgtEnt.getCamoCategory())
                  && !tgtEnt.getCamoCategory().isEmpty()) {
              retVal += "\" camoCategory=\"";
              retVal += String.valueOf(escape(tgtEnt.getCamoCategory()));
          }
 
          if ((null != tgtEnt.getCamoFileName())
-                 && (tgtEnt.getCamoFileName() != IPlayer.NO_CAMO)
+                 && !IPlayer.NO_CAMO.equals(tgtEnt.getCamoFileName())
                  && !tgtEnt.getCamoFileName().isEmpty()) {
              retVal += "\" camoFileName=\"";
              retVal += String.valueOf(escape(tgtEnt.getCamoFileName()));

@@ -57,7 +57,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
      */
     private static final long serialVersionUID = -7931419849350769887L;
 
-    private double capacity;
     private int bayEqNum;
 
     transient private Mounted bay;
@@ -69,13 +68,13 @@ public class LargeCraftAmmoBin extends AmmoBin {
     public LargeCraftAmmoBin(int tonnage, EquipmentType et, int equipNum, int shotsNeeded, double capacity,
             Campaign c) {
         super(tonnage, et, equipNum, shotsNeeded, false, false, c);
-        this.capacity = capacity;
+        this.size = capacity;
     }
 
     @Override
     public LargeCraftAmmoBin clone() {
         LargeCraftAmmoBin clone = new LargeCraftAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(),
-                shotsNeeded, capacity, campaign);
+                shotsNeeded, size, campaign);
         clone.copyBaseData(this);
         return clone;
     }
@@ -139,20 +138,16 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
 
     public double getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(double capacity) {
-        this.capacity = capacity;
+        return size;
     }
 
     public double getUnusedCapacity() {
-        return capacity - Math.ceil(getCurrentShots() * type.getTonnage(null) / ((AmmoType) type).getShots());
+        return size - Math.ceil(getCurrentShots() * type.getTonnage(null) / ((AmmoType) type).getShots());
     }
 
     @Override
     public int getFullShots() {
-        return (int) Math.floor(capacity * ((AmmoType) type).getShots() / type.getTonnage(null));
+        return (int) Math.floor(size * ((AmmoType) type).getShots() / type.getTonnage(null));
     }
 
     @Override
@@ -162,7 +157,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         }
 
         return adjustCostsForCampaignOptions(getPricePerTon()
-                .multipliedBy(capacity)
+                .multipliedBy(size)
                 .multipliedBy(shotsNeeded)
                 .dividedBy(getShotsPerTon()));
     }
@@ -181,7 +176,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         }
 
         return getPricePerTon()
-                .multipliedBy(capacity)
+                .multipliedBy(size)
                 .multipliedBy(getCurrentShots())
                 .dividedBy(getShotsPerTon());
     }
@@ -192,7 +187,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", typeName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "shotsNeeded", shotsNeeded);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capacity", capacity);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capacity", size);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bayEqNum", bayEqNum);
         writeToXmlEnd(pw1, indent);
     }
@@ -205,7 +200,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("capacity")) {
-                capacity = Double.parseDouble(wn2.getTextContent());
+                size = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("bayEqNum")) {
                 bayEqNum = Integer.parseInt(wn2.getTextContent());
             }
@@ -282,7 +277,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
                 MekHQ.getLogger().log(LargeCraftAmmoBin.class, METHOD_NAME, LogLevel.WARNING,
                         unit.getName() + " has an " + mounted.getName() + " that thinks it's an ammo bin at equipment number " + equipmentNum);
             } else {
-                capacity = mounted.getAmmoCapacity();
+                size = mounted.getSize();
                 type = mounted.getType();
                 if(mounted.isMissing() || mounted.isDestroyed()) {
                     mounted.setShotsLeft(0);
@@ -320,7 +315,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
                 mounted.changeAmmoType((AmmoType) type);
                 unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
                 mounted.setShotsLeft(getFullShots() - shotsNeeded);
-                mounted.setAmmoCapacity(capacity);
+                mounted.setSize(size);
             }
         }
     }

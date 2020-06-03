@@ -1,6 +1,34 @@
 VERSION HISTORY:
 ----------------
-0.47.6-SNAPSHOT
+0.47.7-SNAPSHOT
++ PR #1776: Command center
++ PR #1769: Briefing room fixes
++ PR #1759: acquisition tables are not refreshing on new day
++ PR #1758: Planetary acquisition fixes
++ Issue #1725: Refit does not save original part quality when the part is cloned
++ Issue #1665: Use ammo by type (unofficial) does not work
++ Issue #1741: Adding Unit::isPresent check for Maintenance
++ Issue #1734: Scenario Resolution Dialog: View Unit is now Always Enabled
++ PR #1728: Adding Option to Disable Chases
++ Issue #1698: Option to Determine Father Based on Spouse at Time of Birth
++ Issue #1740: Adding Unit::isPresent check for FMMR Unit Rating
++ PR #1750: Fixing LogEntryController Typo
++ Issues #1735, #1736, #1737: Fixing how units are edited in Scenario Resolution Wizard
++ Issue #1753: Fixed advance day NPE related to contract start date extension when player is in-system but still in transit
++ Issue #1733: Adding Scenario Resolution Wizard and MUL Selection Dialog Mnemonics
++ PR #1762: Advance Days: Increasing Day Count Limit and Adding Advance to Next Year
++ Issue #1662 and 2/3rds of Issue #347: Remember Layered Force Icon Setup
++ PR #1764: Fixing Elemental Portrait Folder
++ PR #1655: Implementing Welsh and Icelandic Patronymic/Matronymics for Baby Surnames
++ PR #1713: Adding Spaced Marriage Surname formats and renaming formats to improve end-user readability
++ PR #1715: Varied Prisoner Status Bugfixes
++ PR #1714: Random Names and Gender Rework
++ Issue #1631: Regenerating Forces for AtB Dynamic Scenarios now Resets Attached Bot Forces
++ Issue #1706: Techs now display as part of the force in the personnel tab
++ Issue #1529: Begin Refit Should be Disabled For Negative Unallocated Armour Points
++ Issues #1343 and #1442: AtB Scenario Objective Fixes
+
+0.47.6 (2020-5-03 1715 UTC)
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
 + PR #1627: Moved pregnancy GM items to Personnel GM menu (and hide GM menu if not a GM)
 + Issue #1612: Adding Scrolling to Marriage Candidates
@@ -17,7 +45,28 @@ VERSION HISTORY:
 + PR #1645: Deploying units as reinforcements to AtB and template scenarios no longer defaults them to the "any" deployment zone
 + Issue #1649, #1651: Fixing ExtraData Unmarshaller
 + PR #1654: Fixing Spouse and Baby Load from Personnel export
-+ PR #1656: Avoid NRE in Person::isMothballing
++ PR #1656: Avoid NPE in Person::isMothballing
++ Issue #1635: Base Salaries Not Displaying Correctly in Nimbus
++ PR #1659: Implementing Log Maintenance
++ PR #1666: Fix bug with personnel original unit tech (if clan tech level)
++ PR #1673: Removing Prisoner to Personnel Random Marriage by implementing Prisoner to Prisoner Random Marriage.
++ PR #1663: Fixing Clanner Name Migration
++ PR #1681: Change refit model weight calculation to work with BA
++ PR #1685: Adding All Role and No Role options for Portraits
++ PR #1688: Single Portrait Bulk Assignment to Personnel
++ Issue #1683: Adding the option to log marriage name changes
++ PR #1670: Improved Standard Awards
++ PR #1693: Fixing Campaign Options Display Spacing Issues
++ Issue #1285: Adding default value to prevent Personnel Market No-Role Personnel
++ Issues #880 and #1671: Paid Recruitment Roll is now based on having an active contract
++ Issues #1614 and #1615: Adding a Financial Year Duration Option
++ PR #1700: Fixed NPE resulting in failure to display personnel tab when a unit is assigned to a non-existent scenario
++ Issue #1691: Personnel are now filtered by primary and secondary roles in the Personnel Tab
++ PR #1580: Adding TryingToMarry and TryingToConceive Flags
++ Issue #1625: Adding Display Format Options for Time in Rank and Time in Service
++ PR #1604: Adding Mnemonics to the Main Tabs and Advance Day
++ Issue #850: Bulk Award Assignment
++ Issues #780 and #1102: Implementing Submenus for Personnel Unit Assignment
 
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error

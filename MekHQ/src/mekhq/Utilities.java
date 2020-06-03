@@ -65,6 +65,8 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
+import megamek.client.generator.RandomNameGenerator;
+import megamek.common.enums.Gender;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
@@ -369,17 +371,30 @@ public class Utilities {
         CampaignOptions options = campaign.getCampaignOptions();
         ArrayList<String> variants = new ArrayList<>();
         for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
-            // If this isn't the same chassis, is our current unit, or is a different weight we continue
-            if(!en.getChassis().equalsIgnoreCase(summary.getChassis())
+            // If this isn't the same chassis, is our current unit, we continue
+            if (!en.getChassis().equalsIgnoreCase(summary.getChassis())
                     || en.getModel().equalsIgnoreCase(summary.getModel())
-                    || summary.getTons() != en.getWeight()
-                    || !summary.getUnitType().equals(UnitType.determineUnitType(en))) {
+                    || !summary.getUnitType().equals(UnitType.getTypeName(en.getUnitType()))) {
                 continue;
             }
+
+            // Weight of the two units must match or we continue, but BA weight gets
+            // checked differently
+            if (en instanceof BattleArmor) {
+                if (((BattleArmor) en).getTroopers() != (int) summary.getTWweight()) {
+                    continue;
+                }
+            } else {
+                if (summary.getTons() != en.getWeight()) {
+                    continue;
+                }
+            }
+
             // If we only allow canon units and this isn't canon we continue
-            if(!summary.isCanon() && options.allowCanonRefitOnly()) {
+            if (!summary.isCanon() && options.allowCanonRefitOnly()) {
                 continue;
             }
+
             // If the unit doesn't meet the tech filter criteria we continue
             ITechnology techProg = UnitTechProgression.getProgression(summary, campaign.getTechFaction(), true);
             if (null == techProg) {
@@ -925,18 +940,21 @@ public class Utilities {
         // this is a bit of a hack, but instead of tracking it elsewhere we only set gender to
         // male or female when a name is generated. G_RANDOMIZE will therefore only be returned for
         // crew that don't have names, so we can just leave them with their randomly generated name
-        if (oldCrew.getGender(crewIndex) != Crew.G_RANDOMIZE) {
+        if (oldCrew.getGender(crewIndex) != Gender.RANDOMIZE) {
             String givenName = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_GIVEN_NAME);
 
             if (StringUtil.isNullOrEmpty(givenName)) {
                 String name = oldCrew.getName(crewIndex);
 
-                if (!(name.equalsIgnoreCase(Crew.UNNAMED) || name.equalsIgnoreCase(Crew.UNNAMED_FULL_NAME))) {
+                if (!(name.equalsIgnoreCase(RandomNameGenerator.UNNAMED) || name.equalsIgnoreCase(RandomNameGenerator.UNNAMED_FULL_NAME))) {
                     p.migrateName(name);
                 }
             } else {
                 p.setGivenName(givenName);
                 p.setSurname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_SURNAME));
+                if (p.getSurname() == null) {
+                    p.setSurname("");
+                }
 
                 String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
                 if (phenotype != null) {

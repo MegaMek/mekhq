@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import megamek.client.RandomUnitGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.MechSummary;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;

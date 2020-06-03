@@ -72,8 +72,8 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     public static final int OK_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
 
-    private final DateFormat MMDDYYYY = new SimpleDateFormat("MM/dd/yyyy"); // TODO : remove inline date
-    private final DateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd"); // TODO : remove inline date
+    private final DateFormat MMDDYYYY = new SimpleDateFormat("MM/dd/yyyy"); // TODO : LocalDate : remove inline date
+    private final DateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd"); // TODO : LocalDate : remove inline date
 
     private static final ArrayList<String> monthNames;
     static {

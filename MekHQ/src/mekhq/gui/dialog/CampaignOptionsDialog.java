@@ -49,7 +49,6 @@ import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -63,6 +62,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
+import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -82,7 +83,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
@@ -90,6 +91,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.Marriage;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
+import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RATManager;
@@ -98,7 +103,6 @@ import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.preferences.JWindowPreference;
-import mekhq.gui.utilities.JMoneyTextField;
 import mekhq.gui.utilities.TableCellListener;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
@@ -107,7 +111,7 @@ import mekhq.preferences.PreferencesNode;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class CampaignOptionsDialog extends javax.swing.JDialog {
+public class CampaignOptionsDialog extends JDialog {
     //region Variable Declarations
     //region General Variables (ones not relating to a specific tab)
     private static final long serialVersionUID = 1935043247792962964L;
@@ -121,6 +125,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private String camoFileName;
     private int colorIndex;
     private DirectoryItems camos;
+    private String iconCategory;
+    private String iconFileName;
+    private DirectoryItems forceIcons;
     private Hashtable<String, JSpinner> hashSkillTargets;
     private Hashtable<String, JSpinner> hashGreenSkill;
     private Hashtable<String, JSpinner> hashRegSkill;
@@ -146,6 +153,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JComboBox<String> unitRatingMethodCombo;
     private JButton btnDate;
     private JButton btnCamo;
+    private JButton btnIcon;
     //endregion General Tab
 
     //region Repair and Maintenance Tab
@@ -224,7 +232,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useSupportEdgeBox;
     private JCheckBox useImplantsBox;
     private JCheckBox chkCapturePrisoners;
-    private JComboBox<String> comboPrisonerStatus;
+    private JComboBox<PrisonerStatus> comboPrisonerStatus;
     private JCheckBox altQualityAveragingCheckBox;
     private JCheckBox useAdvancedMedicalBox;
     private JCheckBox useDylansRandomXpBox;
@@ -235,7 +243,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useTougherHealing;
     private JCheckBox chkUseTransfers;
     private JCheckBox chkUseTimeInService;
+    private JComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
     private JCheckBox chkUseTimeInRank;
+    private JComboBox<TimeInDisplayFormat> comboTimeInRankDisplayFormat;
     private JCheckBox chkTrackTotalEarnings;
     private JCheckBox chkShowOriginFaction;
     private JCheckBox chkRandomizeOrigin;
@@ -244,6 +254,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     //Family
     private JSpinner spnMinimumMarriageAge;
     private JSpinner spnCheckMutualAncestorsDepth;
+    private JCheckBox chkLogMarriageNameChange;
     private JCheckBox chkUseRandomMarriages;
     private JSpinner spnChanceRandomMarriages;
     private JSpinner spnMarriageAgeRange;
@@ -256,8 +267,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnChanceProcreationNoRelationship;
     private JCheckBox chkDisplayTrueDueDate;
     private JCheckBox chkLogConception;
-    private JComboBox<String> comboBabySurnameStyle;
-    private JCheckBox chkUseParentage;
+    private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
+    private JCheckBox chkDetermineFatherAtBirth;
+    private JCheckBox chkDisplayParentage;
     private JComboBox<String> comboDisplayFamilyLevel;
     private JCheckBox chkUseRandomDeaths;
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
@@ -287,7 +299,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox usePeacetimeCostBox;
     private JCheckBox useExtendedPartsModifierBox;
     private JCheckBox showPeacetimeCostBox;
-    private JCheckBox yearlyFinancesToCSVExportBox;
+    private JCheckBox newFinancialYearFinancesToCSVExportBox;
+    private JComboBox<FinancialYearDuration> comboFinancialYearDuration;
     private JSpinner spnClanPriceModifier;
     private JSpinner[] spnUsedPartsValue;
     private JSpinner spnDamagedPartsValue;
@@ -379,7 +392,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     //region Name and Portrait Generation Tab
     private JPanel panNameGen;
-    private JCheckBox useFactionForNamesBox;
+    private JCheckBox chkUseOriginFactionForNames;
     private JComboBox<String> comboFactionNames;
     private JSlider sldGender;
     private JPanel panRandomPortrait;
@@ -439,6 +452,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JLabel lblDefendPct;
     private JLabel lblScoutPct;
     private JLabel lblTrainingPct;
+    private JCheckBox chkGenerateChases;
 
     //RATs
     private JRadioButton btnDynamicRATs;
@@ -486,7 +500,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     /**
      * Creates new form CampaignOptionsDialog
      */
-    public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos) {
+    public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos,
+                                 DirectoryItems forceIcons) {
         super(parent, modal);
         this.campaign = c;
         this.options = c.getCampaignOptions();
@@ -499,6 +514,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         this.camoFileName = campaign.getCamoFileName();
         this.colorIndex = campaign.getColorIndex();
         this.camos = camos;
+        this.iconCategory = campaign.getIconCategory();
+        this.iconFileName = campaign.getIconFileName();
+        this.forceIcons = forceIcons;
         hashSkillTargets = new Hashtable<>();
         hashGreenSkill = new Hashtable<>();
         hashRegSkill = new Hashtable<>();
@@ -508,6 +526,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         initComponents();
         setCamoIcon();
+        setForceIcon();
         setLocationRelativeTo(parent);
 
         // Rules panel
@@ -516,7 +535,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 		resetToFirstTechCheckBox.setSelected(options.useResetToFirstTech());
         useUnitRatingCheckBox.setSelected(options.useDragoonRating());
         unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod().getDescription());
-        useFactionForNamesBox.setSelected(options.useFactionForNames());
         useTacticsBox.setSelected(options.useTactics());
         useInitBonusBox.setSelected(options.useInitBonus());
         useToughnessBox.setSelected(options.useToughness());
@@ -592,6 +610,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboRanks = new JComboBox<>();
         sldGender = new JSlider(SwingConstants.HORIZONTAL);
         btnCamo = new JButton();
+        btnIcon = new JButton();
         panRepair = new JPanel();
         panSupplies = new JPanel();
         panPersonnel = new JPanel();
@@ -612,7 +631,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         JLabel clanPriceModifierLabel = new JLabel();
         JLabel usedPartsValueLabel = new JLabel();
         JLabel damagedPartsValueLabel = new JLabel();
-        useFactionForNamesBox = new JCheckBox();
         useTacticsBox = new JCheckBox();
         useInitBonusBox = new JCheckBox();
         useToughnessBox = new JCheckBox();
@@ -667,7 +685,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useQualityMaintenance = new JCheckBox();
         useUnofficialMaintenance = new JCheckBox();
         checkMaintenance = new JCheckBox();
-        logMaintenance = new JCheckBox();
         reverseQualityNames = new JCheckBox();
 
         chkSupportStaffOnly = new JCheckBox();
@@ -748,7 +765,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboFaction.setMinimumSize(new java.awt.Dimension(400, 30));
         comboFaction.setName("comboFaction"); // NOI18N
         comboFaction.setPreferredSize(new java.awt.Dimension(400, 30));
-        comboFaction.addActionListener(evt -> factionSelected());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -796,6 +812,23 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(lblCamo, gridBagConstraints);
+
+        btnIcon.setMaximumSize(new java.awt.Dimension(84, 72));
+        btnIcon.setMinimumSize(new java.awt.Dimension(84, 72));
+        btnIcon.setPreferredSize(new java.awt.Dimension(84, 72));
+        btnIcon.addActionListener(this::btnIconActionPerformed);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panGeneral.add(btnIcon, gridBagConstraints);
+
+        JLabel lblIcon = new JLabel(resourceMap.getString("lblIcon.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panGeneral.add(lblIcon, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panGeneral.TabConstraints.tabTitle"), panGeneral); // NOI18N
 
@@ -963,12 +996,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 spnMaintenanceDays.setEnabled(true);
                 useQualityMaintenance.setEnabled(true);
                 useUnofficialMaintenance.setEnabled(true);
+                reverseQualityNames.setEnabled(true);
                 spnMaintenanceBonus.setEnabled(true);
                 logMaintenance.setEnabled(true);
             } else {
                 spnMaintenanceDays.setEnabled(false);
                 useQualityMaintenance.setEnabled(false);
                 useUnofficialMaintenance.setEnabled(false);
+                reverseQualityNames.setEnabled(false);
                 spnMaintenanceBonus.setEnabled(false);
                 logMaintenance.setEnabled(false);
             }
@@ -1044,15 +1079,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(useUnofficialMaintenance, gridBagConstraints);
 
-        logMaintenance.setText(resourceMap.getString("logMaintenance.text")); // NOI18N
+        logMaintenance = new JCheckBox(resourceMap.getString("logMaintenance.text")); // NOI18N
         logMaintenance.setToolTipText(resourceMap.getString("logMaintenance.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        logMaintenance.setName("logMaintenance");
+        logMaintenance.setSelected(options.logMaintenance());
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(logMaintenance, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panRepair.TabConstraints.tabTitle"), panRepair); // NOI18N
@@ -1624,14 +1657,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkCapturePrisoners, gridBagConstraints);
 
-        DefaultComboBoxModel<String> prisonerStatusModel = new DefaultComboBoxModel<>();
-        prisonerStatusModel.addElement(resourceMap.getString("prisonerStatus.Prisoner"));
-        prisonerStatusModel.addElement(resourceMap.getString("prisonerStatus.Bondsman"));
+        DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
+        prisonerStatusModel.removeElement(PrisonerStatus.FREE); // we don't want this as a standard use case for prisoners
         comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
-        comboPrisonerStatus.setSelectedIndex(options.getDefaultPrisonerStatus());
+        comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
         JPanel pnlPrisonerStatus = new JPanel();
-        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisonerStatus.text")));
         pnlPrisonerStatus.add(comboPrisonerStatus);
+        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisonerStatus.text")));
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(pnlPrisonerStatus, gridBagConstraints);
 
@@ -1701,13 +1733,33 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkUseTimeInService, gridBagConstraints);
 
+        DefaultComboBoxModel<TimeInDisplayFormat> timeInServiceDisplayFormatModel = new DefaultComboBoxModel<>(TimeInDisplayFormat.values());
+        comboTimeInServiceDisplayFormat = new JComboBox<>(timeInServiceDisplayFormatModel);
+        comboTimeInServiceDisplayFormat.setName("comboTimeInServiceDisplayFormat");
+        comboTimeInServiceDisplayFormat.setSelectedItem(options.getTimeInServiceDisplayFormat());
+        JPanel pnlTimeInServiceDisplayFormat = new JPanel();
+        pnlTimeInServiceDisplayFormat.add(comboTimeInServiceDisplayFormat);
+        pnlTimeInServiceDisplayFormat.add(new JLabel(resourceMap.getString("timeInServiceDisplayFormat.text")));
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(pnlTimeInServiceDisplayFormat, gridBagConstraints);
+
         chkUseTimeInRank = new JCheckBox(resourceMap.getString("useTimeInRank.text"));
         chkUseTimeInRank.setSelected(options.getUseTimeInRank());
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkUseTimeInRank, gridBagConstraints);
 
+        DefaultComboBoxModel<TimeInDisplayFormat> timeInRankDisplayFormatModel = new DefaultComboBoxModel<>(TimeInDisplayFormat.values());
+        comboTimeInRankDisplayFormat = new JComboBox<>(timeInRankDisplayFormatModel);
+        comboTimeInRankDisplayFormat.setName("comboTimeInRankDisplayFormat");
+        comboTimeInRankDisplayFormat.setSelectedItem(options.getTimeInRankDisplayFormat());
+        JPanel pnlTimeInRankDisplayFormat = new JPanel();
+        pnlTimeInRankDisplayFormat.add(comboTimeInRankDisplayFormat);
+        pnlTimeInRankDisplayFormat.add(new JLabel(resourceMap.getString("timeInRankDisplayFormat.text")));
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(pnlTimeInRankDisplayFormat, gridBagConstraints);
+
         chkTrackTotalEarnings = new JCheckBox(resourceMap.getString("trackTotalEarnings.text"));
-        chkTrackTotalEarnings.setToolTipText("trackTotalEarnings.toolTipText");
+        chkTrackTotalEarnings.setToolTipText(resourceMap.getString("trackTotalEarnings.toolTipText"));
         chkTrackTotalEarnings.setSelected(options.trackTotalEarnings());
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkTrackTotalEarnings, gridBagConstraints);
@@ -1740,26 +1792,26 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         int panFamilyGridY = ++gridy;
 
         spnMinimumMarriageAge = new JSpinner(new SpinnerNumberModel(options.getMinimumMarriageAge(), 14, null, 1));
-        Dimension dimensionMinimumMarriageAge = spnMinimumMarriageAge.getPreferredSize();
-        dimensionMinimumMarriageAge.width = 40;
-        spnMinimumMarriageAge.setPreferredSize(dimensionMinimumMarriageAge);
         JPanel panMinimumMarriageAge = new JPanel();
+        panMinimumMarriageAge.add(spnMinimumMarriageAge);
         panMinimumMarriageAge.add(new JLabel(resourceMap.getString("minimumMarriageAge.text")));
         panMinimumMarriageAge.setToolTipText(resourceMap.getString("minimumMarriageAge.toolTipText"));
-        panMinimumMarriageAge.add(spnMinimumMarriageAge);
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panMinimumMarriageAge, gridBagConstraints);
 
         spnCheckMutualAncestorsDepth = new JSpinner(new SpinnerNumberModel(options.checkMutualAncestorsDepth(), 0, 20, 1));
-        Dimension dimensionCheckMutualAncestorsDepth = spnCheckMutualAncestorsDepth.getPreferredSize();
-        dimensionCheckMutualAncestorsDepth.width = 40;
-        spnCheckMutualAncestorsDepth.setPreferredSize(dimensionCheckMutualAncestorsDepth);
         JPanel panCheckMutualAncestorsDepth = new JPanel();
+        panCheckMutualAncestorsDepth.add(spnCheckMutualAncestorsDepth);
         panCheckMutualAncestorsDepth.add(new JLabel(resourceMap.getString("checkMutualAncestorsDepth.text")));
         panCheckMutualAncestorsDepth.setToolTipText(resourceMap.getString("checkMutualAncestorsDepth.toolTipText"));
-        panCheckMutualAncestorsDepth.add(spnCheckMutualAncestorsDepth);
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panCheckMutualAncestorsDepth, gridBagConstraints);
+
+        chkLogMarriageNameChange = new JCheckBox(resourceMap.getString("logMarriageNameChange.text"));
+        chkLogMarriageNameChange.setToolTipText(resourceMap.getString("logMarriageNameChange.toolTipText"));
+        chkLogMarriageNameChange.setSelected(options.logMarriageNameChange());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkLogMarriageNameChange, gridBagConstraints);
 
         chkUseRandomMarriages = new JCheckBox(resourceMap.getString("useRandomMarriages.text"));
         chkUseRandomMarriages.setToolTipText(resourceMap.getString("useRandomMarriages.toolTipText"));
@@ -1768,40 +1820,43 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panFamily.add(chkUseRandomMarriages, gridBagConstraints);
 
         spnChanceRandomMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomMarriages() * 100.0, 0, 100, 0.001));
-        Dimension dimensionChanceRandomMarriages = spnChanceRandomMarriages.getPreferredSize();
-        dimensionChanceRandomMarriages.width = 50;
-        spnChanceRandomMarriages.setPreferredSize(dimensionChanceRandomMarriages);
         JPanel panChanceRandomMarriages = new JPanel();
+        panChanceRandomMarriages.add(spnChanceRandomMarriages);
         panChanceRandomMarriages.add(new JLabel(resourceMap.getString("chanceRandomMarriages.text")));
         panChanceRandomMarriages.setToolTipText(resourceMap.getString("chanceRandomMarriages.toolTipText"));
-        panChanceRandomMarriages.add(spnChanceRandomMarriages);
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panChanceRandomMarriages, gridBagConstraints);
 
-        spnMarriageAgeRange = new JSpinner(new SpinnerNumberModel(options.getMarriageAgeRange(), 0, null, 1));
-        Dimension dimensionMarriageAgeRange = spnMarriageAgeRange.getPreferredSize();
-        dimensionMarriageAgeRange.width = 40;
-        spnMarriageAgeRange.setPreferredSize(dimensionMarriageAgeRange);
+        spnMarriageAgeRange = new JSpinner(new SpinnerNumberModel(options.getMarriageAgeRange(), 0, null, 1.0));
+        spnMarriageAgeRange.setPreferredSize(new Dimension(50,
+                spnMarriageAgeRange.getEditor().getPreferredSize().height + 5));
         JPanel panMarriageAgeRange = new JPanel();
+        panMarriageAgeRange.add(spnMarriageAgeRange);
         panMarriageAgeRange.add(new JLabel(resourceMap.getString("marriageAgeRange.text")));
         panMarriageAgeRange.setToolTipText(resourceMap.getString("marriageAgeRange.toolTipText"));
-        panMarriageAgeRange.add(spnMarriageAgeRange);
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panMarriageAgeRange, gridBagConstraints);
 
-        JPanel panRandomMarriageSurnameWeights = new JPanel(new GridLayout((int) Math.ceil(Person.NUM_SURNAME / 3.0), 3));
+        Marriage[] marriageStyles = Marriage.values();
+        int surnameWeightLength = marriageStyles.length - 1;
+        JPanel panRandomMarriageSurnameWeights = new JPanel(new GridLayout((int)
+                Math.ceil(((double) surnameWeightLength) / 3.0), 3));
         panRandomMarriageSurnameWeights.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("randomMarriageSurnameWeights.text")));
         panRandomMarriageSurnameWeights.setToolTipText(resourceMap.getString("randomMarriageSurnameWeights.toolTipText"));
-        spnRandomMarriageSurnameWeights = new JSpinner[Person.NUM_SURNAME];
-        JSpinner spnRandomMarriageSurnameWeight;
-        JPanel panRandomMarriageSurnameWeight;
-        for (int i = 0; i < Person.NUM_SURNAME; i++) {
-            spnRandomMarriageSurnameWeight = new JSpinner(new SpinnerNumberModel((options.getRandomMarriageSurnameWeights(i) / 10.0), 0, 100, 0.1));
-            panRandomMarriageSurnameWeight = new JPanel();
-            panRandomMarriageSurnameWeight.add(spnRandomMarriageSurnameWeight);
-            panRandomMarriageSurnameWeight.add(new JLabel(Person.SURNAME_TYPE_NAMES[i]));
-            panRandomMarriageSurnameWeights.add(panRandomMarriageSurnameWeight);
+        spnRandomMarriageSurnameWeights = new JSpinner[surnameWeightLength];
+        for (int i = 0; i < surnameWeightLength; i++) {
+            JSpinner spnRandomMarriageSurnameWeight = new JSpinner(new SpinnerNumberModel(
+                    (options.getRandomMarriageSurnameWeights(i) / 10.0), 0, 100, 0.1));
             spnRandomMarriageSurnameWeights[i] = spnRandomMarriageSurnameWeight;
+
+            JPanel panRandomMarriageSurnameWeight = new JPanel();
+            panRandomMarriageSurnameWeight.add(spnRandomMarriageSurnameWeight);
+
+            JLabel lblRandomMarriageSurnameWeight = new JLabel(marriageStyles[i].toString());
+            lblRandomMarriageSurnameWeight.setToolTipText(marriageStyles[i].getToolTipText());
+            panRandomMarriageSurnameWeight.add(lblRandomMarriageSurnameWeight);
+
+            panRandomMarriageSurnameWeights.add(panRandomMarriageSurnameWeight);
         }
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panRandomMarriageSurnameWeights, gridBagConstraints);
@@ -1813,13 +1868,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panFamily.add(chkUseRandomSameSexMarriages, gridBagConstraints);
 
         spnChanceRandomSameSexMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomSameSexMarriages() * 100.0, 0, 100, 0.001));
-        Dimension dimensionChanceRandomSameSexMarriages = spnChanceRandomSameSexMarriages.getPreferredSize();
-        dimensionChanceRandomSameSexMarriages.width = 50;
-        spnChanceRandomSameSexMarriages.setPreferredSize(dimensionChanceRandomSameSexMarriages);
         JPanel panChanceRandomSameSexMarriages = new JPanel();
+        panChanceRandomSameSexMarriages.add(spnChanceRandomSameSexMarriages);
         panChanceRandomSameSexMarriages.add(new JLabel(resourceMap.getString("chanceRandomSameSexMarriages.text")));
         panChanceRandomSameSexMarriages.setToolTipText(resourceMap.getString("chanceRandomSameSexMarriages.toolTipText"));
-        panChanceRandomSameSexMarriages.add(spnChanceRandomSameSexMarriages);
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panChanceRandomSameSexMarriages, gridBagConstraints);
 
@@ -1830,13 +1882,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panFamily.add(chkUseUnofficialProcreation, gridBagConstraints);
 
         spnChanceProcreation = new JSpinner(new SpinnerNumberModel(options.getChanceProcreation() * 100.0, 0, 100, 0.001));
-        Dimension dimensionChanceProcreation = spnChanceProcreation.getPreferredSize();
-        dimensionChanceProcreation.width = 50;
-        spnChanceProcreation.setPreferredSize(dimensionChanceProcreation);
         JPanel panChanceProcreation = new JPanel();
+        panChanceProcreation.add(spnChanceProcreation);
         panChanceProcreation.add(new JLabel(resourceMap.getString("chanceProcreation.text")));
         panChanceProcreation.setToolTipText(resourceMap.getString("chanceProcreation.toolTipText"));
-        panChanceProcreation.add(spnChanceProcreation);
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panChanceProcreation, gridBagConstraints);
 
@@ -1847,13 +1896,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panFamily.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
 
         spnChanceProcreationNoRelationship = new JSpinner(new SpinnerNumberModel(options.getChanceProcreationNoRelationship() * 100.0, 0, 100, 0.001));
-        Dimension dimensionChanceProcreationNoRelationship = spnChanceProcreationNoRelationship.getPreferredSize();
-        dimensionChanceProcreationNoRelationship.width = 50;
-        spnChanceProcreationNoRelationship.setPreferredSize(dimensionChanceProcreationNoRelationship);
         JPanel panChanceProcreationNoRelationship = new JPanel();
+        panChanceProcreationNoRelationship.add(spnChanceProcreationNoRelationship);
         panChanceProcreationNoRelationship.add(new JLabel(resourceMap.getString("chanceProcreationNoRelationship.text")));
         panChanceProcreationNoRelationship.setToolTipText(resourceMap.getString("chanceProcreationNoRelationship.toolTipText"));
-        panChanceProcreationNoRelationship.add(spnChanceProcreationNoRelationship);
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panChanceProcreationNoRelationship, gridBagConstraints);
 
@@ -1868,22 +1914,42 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(chkLogConception, gridBagConstraints);
 
-        DefaultComboBoxModel<String> babySurnameStyleModel = new DefaultComboBoxModel<>();
-        babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Mother"));
-        babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Father"));
+        DefaultComboBoxModel<BabySurnameStyle> babySurnameStyleModel = new DefaultComboBoxModel<>(BabySurnameStyle.values());
         comboBabySurnameStyle = new JComboBox<>(babySurnameStyleModel);
-        comboBabySurnameStyle.setSelectedIndex(options.getBabySurnameStyle());
+        comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
+            private static final long serialVersionUID = -543354619818226314L;
+
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (isSelected && (index > -1)) {
+                    list.setToolTipText((list.getSelectedValue() instanceof BabySurnameStyle)
+                            ? ((BabySurnameStyle) list.getSelectedValue()).getStyleToolTip() : "");
+                }
+
+                return this;
+            }
+        });
+        comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
         JPanel pnlBabySurnameStyle = new JPanel();
+        pnlBabySurnameStyle.add(comboBabySurnameStyle);
         pnlBabySurnameStyle.add(new JLabel(resourceMap.getString("babySurnameStyle.text")));
         pnlBabySurnameStyle.setToolTipText(resourceMap.getString("babySurnameStyle.toolTipText"));
-        pnlBabySurnameStyle.add(comboBabySurnameStyle);
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(pnlBabySurnameStyle, gridBagConstraints);
 
-        chkUseParentage = new JCheckBox(resourceMap.getString("useParentage.text"));
-        chkUseParentage.setSelected(options.useParentage());
+        chkDetermineFatherAtBirth = new JCheckBox(resourceMap.getString("determineFatherAtBirth.text"));
+        chkDetermineFatherAtBirth.setToolTipText(resourceMap.getString("determineFatherAtBirth.toolTipText"));
+        chkDetermineFatherAtBirth.setName("chkDetermineFatherAtBirth");
+        chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
         gridBagConstraints.gridy = ++gridy;
-        panFamily.add(chkUseParentage, gridBagConstraints);
+        panFamily.add(chkDetermineFatherAtBirth, gridBagConstraints);
+
+        chkDisplayParentage = new JCheckBox(resourceMap.getString("displayParentage.text"));
+        chkDisplayParentage.setSelected(options.displayParentage());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkDisplayParentage, gridBagConstraints);
 
         DefaultComboBoxModel<String> familyLevelStatusModel = new DefaultComboBoxModel<>();
         familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.ParentsChildren"));
@@ -1892,9 +1958,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboDisplayFamilyLevel = new JComboBox<>(familyLevelStatusModel);
         comboDisplayFamilyLevel.setSelectedIndex(options.displayFamilyLevel());
         JPanel pnlDisplayFamilyLevel = new JPanel();
+        pnlDisplayFamilyLevel.add(comboDisplayFamilyLevel);
         pnlDisplayFamilyLevel.add(new JLabel(resourceMap.getString("displayFamilyLevel.text")));
         pnlDisplayFamilyLevel.setToolTipText(resourceMap.getString("displayFamilyLevel.toolTipText"));
-        pnlDisplayFamilyLevel.add(comboDisplayFamilyLevel);
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(pnlDisplayFamilyLevel, gridBagConstraints);
 
@@ -1989,7 +2055,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             panType.add(new JLabel(Person.getRoleDesc(i, false)), gridBagConstraints);
 
             JSpinner spnType = new JSpinner(new SpinnerNumberModel(options.getBaseSalary(i), 0d, null, 10d));
-            spnType.setPreferredSize(new Dimension(75, 20));
+            spnType.setMinimumSize(new Dimension(75, 20));
+            spnType.setPreferredSize(new Dimension(75, 25));
             spnSalaryBase[i] = spnType;
             gridBagConstraints.gridx = 1;
             gridBagConstraints.weightx = 0.0;
@@ -2205,12 +2272,34 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(showPeacetimeCostBox, gridBagConstraints);
 
-        yearlyFinancesToCSVExportBox = new JCheckBox(resourceMap.getString("yearlyFinancesToCSVExportBox.text"));
-        yearlyFinancesToCSVExportBox.setToolTipText(resourceMap.getString("yearlyFinancesToCSVExportBox.toolTipText"));
-        yearlyFinancesToCSVExportBox.setName("yearlyFinancesToCSVExportBox");
-        yearlyFinancesToCSVExportBox.setSelected(options.getYearlyFinancesToCSVExport());
+        DefaultComboBoxModel<FinancialYearDuration> financialYearDurationModel = new DefaultComboBoxModel<>(FinancialYearDuration.values());
+        comboFinancialYearDuration = new JComboBox<>(financialYearDurationModel);
+        comboFinancialYearDuration.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                    if (isSelected && (index > -1)) {
+                        list.setToolTipText((list.getSelectedValue() instanceof FinancialYearDuration)
+                                ? ((FinancialYearDuration) list.getSelectedValue()).getToolTipText() : "");
+                    }
+
+                    return this;
+                }
+            });
+        comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
+        JPanel pnlFinancialYearDuration = new JPanel();
+        pnlFinancialYearDuration.add(new JLabel(resourceMap.getString("financialYearDuration.text")));
+        pnlFinancialYearDuration.setToolTipText(resourceMap.getString("financialYearDuration.toolTipText"));
+        pnlFinancialYearDuration.add(comboFinancialYearDuration);
         gridBagConstraints.gridy = gridy++;
-        panFinances.add(yearlyFinancesToCSVExportBox, gridBagConstraints);
+        panFinances.add(pnlFinancialYearDuration, gridBagConstraints);
+
+        newFinancialYearFinancesToCSVExportBox = new JCheckBox(resourceMap.getString("newFinancialYearFinancesToCSVExportBox.text"));
+        newFinancialYearFinancesToCSVExportBox.setToolTipText(resourceMap.getString("newFinancialYearFinancesToCSVExportBox.toolTipText"));
+        newFinancialYearFinancesToCSVExportBox.setName("newFinancialYearFinancesToCSVExportBox");
+        newFinancialYearFinancesToCSVExportBox.setSelected(options.getNewFinancialYearFinancesToCSVExport());
+        gridBagConstraints.gridy = gridy++;
+        panFinances.add(newFinancialYearFinancesToCSVExportBox, gridBagConstraints);
 
         clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
         clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
@@ -3279,55 +3368,55 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         // Name and Portraits tab controls below
         panNameGen.setName("panNameGen"); // NOI18N
-        panNameGen.setLayout(new java.awt.GridBagLayout());
+        panNameGen.setLayout(new GridBagLayout());
 
-        useFactionForNamesBox.setText(resourceMap.getString("useFactionForNamesBox.text")); // NOI18N
-        useFactionForNamesBox.setToolTipText(resourceMap.getString("useFactionForNamesBox.toolTipText")); // NOI18N
-        useFactionForNamesBox.setName("useFactionForNamesBox"); // NOI18N
-        useFactionForNamesBox.setSelected(options.useFactionForNames());
-        useFactionForNamesBox.addActionListener(this::useFactionForNamesBoxEvent);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        chkUseOriginFactionForNames = new JCheckBox(resourceMap.getString("chkUseOriginFactionForNames.text"));
+        chkUseOriginFactionForNames.setToolTipText(resourceMap.getString("chkUseOriginFactionForNames.toolTipText"));
+        chkUseOriginFactionForNames.setName("chkUseOriginFactionForNames"); // NOI18N
+        chkUseOriginFactionForNames.setSelected(options.useOriginFactionForNames());
+        chkUseOriginFactionForNames.addActionListener(
+                evt -> comboFactionNames.setEnabled(!chkUseOriginFactionForNames.isSelected()));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridy = 0;
         gridBagConstraints.gridy = gridy;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panNameGen.add(useFactionForNamesBox, gridBagConstraints);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panNameGen.add(chkUseOriginFactionForNames, gridBagConstraints);
 
 
         JLabel lblFactionNames = new JLabel(resourceMap.getString("lblFactionNames.text")); // NOI18N
         lblFactionNames.setName("lblFactionNames"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panNameGen.add(lblFactionNames, gridBagConstraints);
 
         DefaultComboBoxModel<String> factionNamesModel = new DefaultComboBoxModel<>();
-        for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
-            String faction = i.next();
+        for (String faction : RandomNameGenerator.getInstance().getFactions()) {
             factionNamesModel.addElement(faction);
         }
-        factionNamesModel.setSelectedItem(campaign.getRNG().getChosenFaction());
+        factionNamesModel.setSelectedItem(RandomNameGenerator.getInstance().getChosenFaction());
         comboFactionNames.setModel(factionNamesModel);
         comboFactionNames.setMinimumSize(new java.awt.Dimension(400, 30));
         comboFactionNames.setName("comboFactionNames"); // NOI18N
         comboFactionNames.setPreferredSize(new java.awt.Dimension(400, 30));
-        comboFactionNames.setEnabled(!useFactionForNamesBox.isSelected());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        comboFactionNames.setEnabled(!chkUseOriginFactionForNames.isSelected());
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panNameGen.add(comboFactionNames, gridBagConstraints);
 
         JLabel lblGender = new JLabel(resourceMap.getString("lblGender.text")); // NOI18N
         lblGender.setName("lblGender"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.insets = new Insets(10, 0, 0, 0);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panNameGen.add(lblGender, gridBagConstraints);
 
         sldGender.setMaximum(100);
@@ -3335,20 +3424,51 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         sldGender.setMajorTickSpacing(25);
         sldGender.setPaintTicks(true);
         sldGender.setPaintLabels(true);
-        sldGender.setValue(campaign.getRNG().getPercentFemale());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        sldGender.setValue(RandomGenderGenerator.getPercentFemale());
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(10, 0, 0, 0);
         panNameGen.add(sldGender, gridBagConstraints);
 
         panRandomPortrait.setName("panRandomPortrait"); // NOI18N
         panRandomPortrait.setLayout(new BorderLayout());
 
-        JPanel panUsePortrait = new JPanel(new GridLayout(nRow, 4));
-
+        // The math below is used to determine how to split the personnel role options for portraits,
+        // which it does into 4 columns with rows equal to the number of roles plus two, with the
+        // additional two being the all role and no role options.
+        JPanel panUsePortrait = new JPanel(new GridLayout((int) Math.ceil((Person.T_NUM + 2) / 4.0), 4));
         chkUsePortrait = new JCheckBox[Person.T_NUM];
+        JCheckBox allPortraitsBox = new JCheckBox(resourceMap.getString("panUsePortrait.all.text"));
+        JCheckBox noPortraitsBox = new JCheckBox(resourceMap.getString("panUsePortrait.no.text"));
+        allPortraitsBox.addActionListener(evt -> {
+            final boolean selected = allPortraitsBox.isSelected();
+            for (JCheckBox box : chkUsePortrait) {
+                if (selected) {
+                    box.setSelected(true);
+                }
+                box.setEnabled(!selected);
+            }
+            if (selected) {
+                noPortraitsBox.setSelected(false);
+            }
+        });
+        noPortraitsBox.addActionListener(evt -> {
+            final boolean selected = noPortraitsBox.isSelected();
+            for (JCheckBox box : chkUsePortrait) {
+                if (selected) {
+                    box.setSelected(false);
+                }
+                box.setEnabled(!selected);
+            }
+            if (selected) {
+                allPortraitsBox.setSelected(false);
+            }
+        });
+        panUsePortrait.add(allPortraitsBox);
+        panUsePortrait.add(noPortraitsBox);
+
         JCheckBox box;
         for (int i = 0; i < Person.T_NUM; i++) {
             box = new JCheckBox(Person.getRoleDesc(i, false));
@@ -3615,7 +3735,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         // End Personnel Market
 
         // Start Against the Bot
-
         panAtB = new JPanel();
         chkUseAtB = new JCheckBox();
 
@@ -3634,7 +3753,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkUseStrategy = new JCheckBox();
         spnBaseStrategyDeployment = new JSpinner();
         spnAdditionalStrategyDeployment = new JSpinner();
-        chkAdjustPaymentForStrategy = new JCheckBox();
 
         chkUseAero = new JCheckBox();
         chkUseVehicles = new JCheckBox();
@@ -3660,7 +3778,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkIgnoreRatEra = new JCheckBox();
 
         spnSearchRadius = new JSpinner();
-        spnIntensity = new JSpinner();
         chkVariableContractLength = new JCheckBox();
         chkMercSizeLimited = new JCheckBox();
         chkRestrictPartsByMission = new JCheckBox();
@@ -3678,7 +3795,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
 
         panAtB.setName("panAtB");
-        panAtB.setLayout(new java.awt.GridBagLayout());
+        panAtB.setLayout(new GridBagLayout());
 
         JPanel panSubAtBAdmin = new JPanel(new GridBagLayout());
         JPanel panSubAtBRat = new JPanel(new GridBagLayout());
@@ -4094,7 +4211,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 9;
         panSubAtBContract.add(spnAdditionalStrategyDeployment, gridBagConstraints);
 
-        chkAdjustPaymentForStrategy.setText(resourceMap.getString("chkAdjustPaymentForStrategy.text"));
+        chkAdjustPaymentForStrategy = new JCheckBox(resourceMap.getString("chkAdjustPaymentForStrategy.text"));
+        chkAdjustPaymentForStrategy.setName("chkAdjustPaymentForStrategy");
         chkAdjustPaymentForStrategy.setSelected(options.getAdjustPaymentForStrategy());
         chkAdjustPaymentForStrategy.setToolTipText(resourceMap.getString("chkAdjustPaymentForStrategy.toolTipText"));
         gridBagConstraints.gridx = 0;
@@ -4107,7 +4225,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 11;
         panSubAtBContract.add(lblIntensity, gridBagConstraints);
 
-        spnIntensity.setModel(new SpinnerNumberModel(options.getIntensity(), 0.0, 5.0, 0.1));
+        spnIntensity = new JSpinner(new SpinnerNumberModel(options.getIntensity(), 0.0, 5.0, 0.1));
         spnIntensity.setToolTipText(resourceMap.getString("spnIntensity.toolTipText"));
         spnIntensity.setValue(options.getIntensity());
         spnIntensity.setMinimumSize(new Dimension(60, 25));
@@ -4168,6 +4286,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panSubAtBContract.add(lblTrainingPct, gridBagConstraints);
 
         updateBattleChances();
+
+        chkGenerateChases = new JCheckBox(resourceMap.getString("chkGenerateChases.text"));
+        chkGenerateChases.setName("chkGenerateChases");
+        chkGenerateChases.setToolTipText(resourceMap.getString("chkGenerateChases.toolTipText"));
+        chkGenerateChases.setSelected(options.generateChases());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 17;
+        panSubAtBContract.add(chkGenerateChases, gridBagConstraints);
 
         int yTablePosition = 0;
         chkDoubleVehicles.setText(resourceMap.getString("chkDoubleVehicles.text"));
@@ -4467,28 +4593,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNameActionPerformed
 
-    private void factionSelected() {
-        if (useFactionForNamesBox.isSelected()) {
-            switchFaction();
-        }
-    }
-
-    private void switchFaction() {
-        String factionCode = Faction.getFactionFromFullNameAndYear(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR))
-                                    .getNameGenerator();
-        boolean found = false;
-        for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
-            String nextFaction = i.next();
-            if (nextFaction.equals(factionCode)) {
-                found = true;
-                break;
-            }
-        }
-        if (found) {
-            comboFactionNames.setSelectedItem(factionCode);
-        }
-    }
-
     private void fillRankInfo() {
         Ranks ranks = new Ranks(comboRanks.getSelectedIndex());
         ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
@@ -4542,22 +4646,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
     }
 
-    private void useFactionForNamesBoxEvent(java.awt.event.ActionEvent evt) {
-        if (useFactionForNamesBox.isSelected()) {
-            comboFactionNames.setEnabled(false);
-            switchFaction();
-        } else {
-            comboFactionNames.setEnabled(true);
-        }
-    }
-
     private void btnLoadActionPerformed() {
     	ArrayList<GamePreset> presets = GamePreset.getGamePresetsIn(MekHQ.PRESET_DIR);
 
-		if(!presets.isEmpty()) {
+		if (!presets.isEmpty()) {
 			ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(null, true, presets);
 			cgpd.setVisible(true);
-			if(!cgpd.wasCancelled() && null != cgpd.getSelectedPreset()) {
+			if (!cgpd.wasCancelled() && null != cgpd.getSelectedPreset()) {
 				cgpd.getSelectedPreset().apply(campaign);
 				// TODO: it would be nice if we could just update the choices in this dialog now
 				// TODO: rather than closing it, but that is currently not possible given how
@@ -4575,7 +4670,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     	}
     	GamePresetDescriptionDialog gpdd = new GamePresetDescriptionDialog(null, true, "Enter a title", "Enter description of preset");
         gpdd.setVisible(true);
-        if(!gpdd.wasChanged()) {
+        if (!gpdd.wasChanged()) {
         	return;
         }
 
@@ -4651,17 +4746,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         campaign.setFactionCode(Faction.getFactionFromFullNameAndYear
         		(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR)).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
-            campaign.getRNG().setChosenFaction((String) comboFactionNames.getSelectedItem());
+            RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
-        campaign.getRNG().setPercentFemale(sldGender.getValue());
+        RandomGenderGenerator.setPercentFemale(sldGender.getValue());
         campaign.setRankSystem(comboRanks.getSelectedIndex());
-        if (comboRanks.getSelectedIndex() == Ranks.RS_CUSTOM)
-        {
+        if (comboRanks.getSelectedIndex() == Ranks.RS_CUSTOM) {
 	        campaign.getRanks().setRanksFromModel(ranksModel);
         }
         campaign.setCamoCategory(camoCategory);
         campaign.setCamoFileName(camoFileName);
         campaign.setColorIndex(colorIndex);
+
+        campaign.setIconCategory(iconCategory);
+        campaign.setIconFileName(iconFileName);
 
         for (int i = 0; i < chkUsePortrait.length; i++) {
             options.setUsePortraitForType(i, chkUsePortrait[i].isSelected());
@@ -4685,7 +4782,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setDragoonRating(useUnitRatingCheckBox.isSelected());
         options.setUnitRatingMethod(UnitRatingMethod.getUnitRatingMethod((String) unitRatingMethodCombo
                 .getSelectedItem()));
-        options.setFactionForNames(useFactionForNamesBox.isSelected());
+        options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
         options.setUseTactics(useTacticsBox.isSelected());
         campaign.getGameOptions().getOption("command_init").setValue(useTacticsBox.isSelected());
         options.setDestroyByMargin(useDamageMargin.isSelected());
@@ -4696,6 +4793,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
         options.setReverseQualityNames(reverseQualityNames.isSelected());
         options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
+        options.setLogMaintenance(logMaintenance.isSelected());
         options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getModel().getValue());
         options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getModel().getValue());
         options.setPayForParts(payForPartsBox.isSelected());
@@ -4714,7 +4812,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
         options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
         options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
-        options.setYearlyFinancesToCSVExport(yearlyFinancesToCSVExportBox.isSelected());
+        options.setNewFinancialYearFinancesToCSVExport(newFinancialYearFinancesToCSVExportBox.isSelected());
+        options.setFinancialYearDuration((FinancialYearDuration) comboFinancialYearDuration.getSelectedItem());
         options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
 
         options.setEquipmentContractBase(btnContractEquipment.isSelected());
@@ -4826,7 +4925,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setImplants(useImplantsBox.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
         options.setCapturePrisoners(chkCapturePrisoners.isSelected());
-        options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
+        options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
         options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
         options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
@@ -4839,7 +4938,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setTougherHealing(useTougherHealing.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
         options.setUseTimeInService(chkUseTimeInService.isSelected());
+        options.setTimeInServiceDisplayFormat((TimeInDisplayFormat) comboTimeInServiceDisplayFormat.getSelectedItem());
         options.setUseTimeInRank(chkUseTimeInRank.isSelected());
+        options.setTimeInRankDisplayFormat((TimeInDisplayFormat) comboTimeInRankDisplayFormat.getSelectedItem());
         options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
         options.setShowOriginFaction(chkShowOriginFaction.isSelected());
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
@@ -4848,10 +4949,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //Family
         options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getModel().getValue());
         options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
+        options.setLogMarriageNameChange(chkLogMarriageNameChange.isSelected());
         options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
         options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue() / 100.0);
         options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());
-        for (int i = 0; i < Person.NUM_SURNAME; i++) {
+        for (int i = 0; i < spnRandomMarriageSurnameWeights.length; i++) {
             int val = (int) Math.round(((Double) spnRandomMarriageSurnameWeights[i].getModel().getValue()) * 10);
             options.setRandomMarriageSurnameWeight(i, val);
         }
@@ -4863,8 +4965,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getModel().getValue() / 100.0);
         options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
         options.setLogConception(chkLogConception.isSelected());
-        options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedIndex());
-        options.setUseParentage(chkUseParentage.isSelected());
+        options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
+        options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
+        options.setDisplayParentage(chkDisplayParentage.isSelected());
         options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());
         options.setUseRandomDeaths(chkUseRandomDeaths.isSelected());
         options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
@@ -4915,8 +5018,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
         options.setUseLeadership(chkUseLeadership.isSelected());
         options.setUseStrategy(chkUseStrategy.isSelected());
-        options.setBaseStrategyDeployment((Integer)spnBaseStrategyDeployment.getValue());
-        options.setAdditionalStrategyDeployment((Integer)spnAdditionalStrategyDeployment.getValue());
+        options.setBaseStrategyDeployment((Integer) spnBaseStrategyDeployment.getValue());
+        options.setAdditionalStrategyDeployment((Integer) spnAdditionalStrategyDeployment.getValue());
         options.setAdjustPaymentForStrategy(chkAdjustPaymentForStrategy.isSelected());
 
         options.setUseAero(chkUseAero.isSelected());
@@ -4924,9 +5027,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setClanVehicles(chkClanVehicles.isSelected());
         options.setDoubleVehicles(chkDoubleVehicles.isSelected());
         options.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
-        options.setOpforLanceTypeMechs((Integer)spnOpforLanceTypeMechs.getValue());
-        options.setOpforLanceTypeMixed((Integer)spnOpforLanceTypeMixed.getValue());
-        options.setOpforLanceTypeVehicles((Integer)spnOpforLanceTypeVehicles.getValue());
+        options.setOpforLanceTypeMechs((Integer) spnOpforLanceTypeMechs.getValue());
+        options.setOpforLanceTypeMixed((Integer) spnOpforLanceTypeMixed.getValue());
+        options.setOpforLanceTypeVehicles((Integer) spnOpforLanceTypeVehicles.getValue());
         options.setOpforUsesVTOLs(chkOpforUsesVTOLs.isSelected());
         options.setAllowOpforAeros(chkOpforUsesAero.isSelected());
         options.setAllowOpforLocalUnits(chkOpforUsesLocalForces.isSelected());
@@ -4942,8 +5045,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         	ratList[i] = chosenRatModel.elementAt(i).replaceFirst(" \\(.*?\\)", "");
         }
         options.setRATs(ratList);
-        options.setSearchRadius((Integer)spnSearchRadius.getValue());
-        options.setIntensity((Double)spnIntensity.getValue());
+        options.setSearchRadius((Integer) spnSearchRadius.getValue());
+        options.setIntensity((Double) spnIntensity.getValue());
+        options.setGenerateChases(chkGenerateChases.isSelected());
         options.setVariableContractLength(chkVariableContractLength.isSelected());
         options.setMercSizeLimited(chkMercSizeLimited.isSelected());
         options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
@@ -4952,7 +5056,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
         options.setUseAtBCapture(chkUseAtBCapture.isSelected());
-        options.setStartGameDelay((Integer)spnStartGameDelay.getValue());
+        options.setStartGameDelay((Integer) spnStartGameDelay.getValue());
 
         options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
         options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
@@ -5040,6 +5144,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnDateActionPerformed
 
+    private void btnIconActionPerformed(java.awt.event.ActionEvent evt) {
+        ImageChoiceDialog pcd = new ImageChoiceDialog(frame, true, iconCategory, iconFileName, forceIcons);
+        pcd.setVisible(true);
+        if (pcd.isChanged()) {
+            iconCategory = pcd.getCategory();
+            iconFileName = pcd.getFileName();
+        }
+        setForceIcon();
+    }
+
     private void btnCamoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCamoActionPerformed
         CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex, camos);
         ccd.setVisible(true);
@@ -5049,8 +5163,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             colorIndex = ccd.getColorIndex();
         }
         setCamoIcon();
-    }//GEN-LAST:event_btnCamoActionPerformed
-
+    }
 
     private Vector<String> getUnusedSPA() {
     	Vector<String> unused = new Vector<>();
@@ -5209,6 +5322,32 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
     }
 
+    public void setForceIcon() {
+        if (null == iconCategory) {
+            return;
+        }
+
+        if (Campaign.ICON_NONE.equals(iconFileName)) {
+            btnIcon.setIcon(null);
+            btnIcon.setText("None");
+            return;
+        }
+
+        // Try to get the root file.
+        try {
+            // Translate the root icon directory name.
+            if (Campaign.ROOT_ICON.equals(iconCategory)) {
+                iconCategory = ""; //$NON-NLS-1$
+            }
+            Image icon = (Image) forceIcons.getItem(iconCategory, iconFileName);
+            icon = icon.getScaledInstance(75, -1, Image.SCALE_DEFAULT);
+            btnIcon.setIcon(new ImageIcon(icon));
+        } catch (Exception err) {
+            iconFileName = Campaign.ICON_NONE;
+            setForceIcon();
+        }
+    }
+
     private void enableAtBComponents(JPanel panel, boolean enabled) {
     	for (Component c : panel.getComponents()) {
     		if (c.equals(chkUseAtB)) {
@@ -5232,7 +5371,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void updateBattleChances() {
-        double intensity = (Double)spnIntensity.getValue();
+        double intensity = (Double) spnIntensity.getValue();
         if (intensity >= AtBContract.MINIMUM_INTENSITY) {
             lblFightPct.setText((int)(40.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) + "%");
             lblDefendPct.setText((int)(20.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) + "%");

@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.market;
 
 import java.io.PrintWriter;
@@ -54,7 +53,6 @@ import mekhq.module.api.PersonnelMarketMethod;
 
 public class PersonnelMarket {
 	private List<Person> personnel = new ArrayList<>();
-	private Map<UUID, Person> personnelIds = new LinkedHashMap<>();
 	private PersonnelMarketMethod method;
 
 	public static final int TYPE_RANDOM = 0;
@@ -69,7 +67,7 @@ public class PersonnelMarket {
 	private Map<UUID, Entity> attachedEntities = new LinkedHashMap<>();
 	/* Alternate types of rolls, set by PersonnelMarketDialog */
 	private boolean paidRecruitment = false;
-	private int paidRecruitType;
+	private int paidRecruitType = Person.T_MECHWARRIOR; // Default value to avoid errors from missing type
 
 	public PersonnelMarket() {
 	    method = new PersonnelMarketRandom();
@@ -114,7 +112,6 @@ public class PersonnelMarket {
 		    if ((null != newPersonnel) && !newPersonnel.isEmpty()) {
     		    for (Person recruit : newPersonnel) {
                     personnel.add(recruit);
-                    personnelIds.put(recruit.getId(), recruit);
     		    }
     		    updated = true;
                 MekHQ.triggerEvent(new MarketNewPersonnelEvent(newPersonnel));

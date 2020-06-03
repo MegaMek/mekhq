@@ -53,6 +53,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
@@ -169,55 +170,45 @@ public class PersonnelMarketDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelFilterBtns.add(comboPersonType, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().getUseAtB()) {
-        	boolean activeContract = false;
-        	for (Mission m : campaign.getMissions()) {
-        		if (m.isActive() && m instanceof mekhq.campaign.mission.Contract &&
-        				((mekhq.campaign.mission.Contract)m).getStartDate().before(campaign.getDate())) {
-        			activeContract = true;
-        			break;
-        		}
-        	}
-        	if (!activeContract) {
-        		radioNormalRoll.setText("Make normal roll next week");
-                gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = 1;
-                gridBagConstraints.gridwidth = 2;
-                gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-                panelFilterBtns.add(radioNormalRoll, gridBagConstraints);
+        if (campaign.getCampaignOptions().getUseAtB() && !campaign.hasActiveContract()) {
+            radioNormalRoll.setText("Make normal roll next week");
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 1;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            panelFilterBtns.add(radioNormalRoll, gridBagConstraints);
 
-        		radioPaidRecruitment.setText("Make paid recruitment roll next week (100,000 C-bills)");
-                gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = 2;
-                gridBagConstraints.gridwidth = 2;
-                gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-                panelFilterBtns.add(radioPaidRecruitment, gridBagConstraints);
+            radioPaidRecruitment.setText("Make paid recruitment roll next week (100,000 C-bills)");
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            panelFilterBtns.add(radioPaidRecruitment, gridBagConstraints);
 
-        		ButtonGroup group = new ButtonGroup();
-        		group.add(radioNormalRoll);
-        		group.add(radioPaidRecruitment);
-                if (personnelMarket.getPaidRecruitment()) {
-                	radioPaidRecruitment.setSelected(true);
-                } else {
-                	radioNormalRoll.setSelected(true);
-                }
+            ButtonGroup group = new ButtonGroup();
+            group.add(radioNormalRoll);
+            group.add(radioPaidRecruitment);
+            if (personnelMarket.getPaidRecruitment()) {
+                radioPaidRecruitment.setSelected(true);
+            } else {
+                radioNormalRoll.setSelected(true);
+            }
 
-                for (int i = 1; i < Person.T_NUM; i++) {
-                	comboRecruitType.addItem(Person.getRoleDesc(i, campaign.getFaction().isClan()));
-                }
-                gridBagConstraints.gridx = 2;
-                gridBagConstraints.gridy = 2;
-                gridBagConstraints.gridwidth = 1;
-                gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-                panelFilterBtns.add(comboRecruitType, gridBagConstraints);
+            for (int i = 1; i < Person.T_NUM; i++) {
+                comboRecruitType.addItem(Person.getRoleDesc(i, campaign.getFaction().isClan()));
+            }
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            panelFilterBtns.add(comboRecruitType, gridBagConstraints);
 
-                if (personnelMarket.getPaidRecruitment()) {
-                	radioPaidRecruitment.setSelected(true);
-                	comboRecruitType.setSelectedIndex(personnelMarket.getPaidRecruitType() - 1);
-                } else {
-                	radioNormalRoll.setSelected(true);
-                }
-        	}
+            if (personnelMarket.getPaidRecruitment()) {
+                radioPaidRecruitment.setSelected(true);
+                comboRecruitType.setSelectedIndex(personnelMarket.getPaidRecruitType() - 1);
+            } else {
+                radioNormalRoll.setSelected(true);
+            }
         }
 
         scrollTablePersonnel.setMinimumSize(new java.awt.Dimension(500, 400));
@@ -366,7 +357,7 @@ public class PersonnelMarketDialog extends JDialog {
 			Entity en = personnelMarket.getAttachedEntity(selectedPerson);
 			UUID pid = selectedPerson.getId();
 
-            if (campaign.recruitPerson(selectedPerson, false, false, true, true)) {
+            if (campaign.recruitPerson(selectedPerson, true)) {
                 addUnit(en, false);
                 personnelMarket.removePerson(selectedPerson);
                 personnelModel.setData(personnelMarket.getPersonnel());
@@ -392,7 +383,12 @@ public class PersonnelMarketDialog extends JDialog {
 				unit = u;
 				break;
 			}
-		}
+        }
+        if (unit == null) {
+            // No such unit matching the entity.
+            return;
+        }
+
 		if (unit.usesSoloPilot()) {
 			unit.addPilotOrSoldier(selectedPerson);
 			selectedPerson.setOriginalUnit(unit);

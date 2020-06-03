@@ -24,29 +24,29 @@ import mekhq.preferences.PreferencesNode;
  * @author Jay Lawson
  */
 public class ReportDialog extends JDialog {
-    
+
     private static final long serialVersionUID = 3624327778807359294L;
 
     private JTextPane txtReport;
     private JScrollPane scrReport;
- 
+
     public ReportDialog(Frame parent, Report report) {
         super(parent, false);
         setTitle(report.getTitle());
         txtReport = report.getReport();
         initComponents();
-        setPreferredSize(new Dimension(800, 500));
+        pack();
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
-    
+
     private void initComponents() {
         setLayout(new BorderLayout());
-        
+
         scrReport = new JScrollPane(txtReport);
         txtReport.setEditable(false);
         scrReport.setBorder( new EmptyBorder(2,10,2,2));
-        
+
         getContentPane().add(scrReport, BorderLayout.CENTER);
     }
 

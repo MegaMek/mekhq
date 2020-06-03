@@ -76,8 +76,13 @@
 			AlliedArtySupport.xml
 		</modifier>
 		<modifier>
-			AlliedTreachery.xml
+			AlliedReinforcements.xml
 		</modifier>
+		<!--modifier>
+			Need campaign state
+			Need way to change rat for opfor
+			AlliedTreachery.xml
+		</modifier-->
 		<modifier>
 			PreBattleDamageHostiles.xml
 		</modifier>

@@ -32,7 +32,7 @@ import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.client.RandomSkillsGenerator;
+import megamek.client.generator.RandomSkillsGenerator;
 import megamek.common.Compute;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;

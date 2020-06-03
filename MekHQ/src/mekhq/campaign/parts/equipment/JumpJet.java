@@ -46,7 +46,7 @@ public class JumpJet extends EquipmentPart {
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
         // account for compatibility)
-        super(tonnage, et, equipNum, omniPodded, c);
+        super(tonnage, et, equipNum, 1.0, omniPodded, c);
     }
 
     public JumpJet clone() {

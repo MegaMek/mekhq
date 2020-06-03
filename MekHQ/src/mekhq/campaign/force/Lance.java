@@ -25,8 +25,6 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
@@ -319,143 +317,172 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         // debugging code that will allow you to force the generation of a particular scenario.
         // when generating a lance-based scenario (Standup, Probe, etc), the second parameter in
         // createScenario is "this" (the lance). Otherwise, it should be null.
-        /*if(true) {
+        /*if (true) {
             AtBScenario scenario = AtBScenarioFactory.createScenario(c, null, AtBScenario.CIVILIANHELP, true, getBattleDate(c.getCalendar()));
             scenario.setMissionId(this.getMissionId());
             return scenario;
         }*/
 
         switch (role) {
-        case ROLE_FIGHT:
-            noBattle = (int)(60.0 / intensity + 0.5);
-            roll = Compute.randomInt(40 + noBattle) + battleTypeMod;
-            if (roll < 1) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.BASEATTACK, false,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 9) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.BREAKTHROUGH, true,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 9 + noBattle) {
-                return null;
-            } else if (roll < 17 + noBattle) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.STANDUP, true,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 25 + noBattle) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.STANDUP, false,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 33 + noBattle) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.CHASE, false,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 41 + noBattle) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.HOLDTHELINE, true,
-                        getBattleDate(c.getCalendar()));
-            } else {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.BASEATTACK, true,
-                        getBattleDate(c.getCalendar()));
+            case ROLE_FIGHT: {
+                noBattle = (int) (60.0 / intensity + 0.5);
+                roll = Compute.randomInt(40 + noBattle) + battleTypeMod;
+                if (roll < 1) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.BASEATTACK, false,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 9) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.BREAKTHROUGH, true,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 9 + noBattle) {
+                    return null;
+                } else if (roll < 17 + noBattle) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.STANDUP, true,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 25 + noBattle) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.STANDUP, false,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 33 + noBattle) {
+                    if (c.getCampaignOptions().generateChases()) {
+                        return AtBScenarioFactory.createScenario(c, this,
+                                AtBScenario.CHASE, false,
+                                getBattleDate(c.getCalendar()));
+                    } else {
+                        return AtBScenarioFactory.createScenario(c, this,
+                                AtBScenario.HOLDTHELINE, false,
+                                getBattleDate(c.getCalendar()));
+                    }
+                } else if (roll < 41 + noBattle) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.HOLDTHELINE, true,
+                            getBattleDate(c.getCalendar()));
+                } else {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.BASEATTACK, true,
+                            getBattleDate(c.getCalendar()));
+                }
             }
-        case Lance.ROLE_SCOUT:
-            noBattle = (int)(40.0 / intensity + 0.5);
-            roll = Compute.randomInt(60 + noBattle) + battleTypeMod;
-            if (roll < 1) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.BASEATTACK, false,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 11) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.CHASE, true,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 21) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.HIDEANDSEEK, true,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 31) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.PROBE, true,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 41) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.PROBE, false,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 41 + noBattle) {
-                return null;
-            } else if (roll < 51 + noBattle) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.EXTRACTION, true,
-                        getBattleDate(c.getCalendar()));
-            } else {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.RECONRAID, true,
-                        getBattleDate(c.getCalendar()));
+            case Lance.ROLE_SCOUT: {
+                noBattle = (int) (40.0 / intensity + 0.5);
+                roll = Compute.randomInt(60 + noBattle) + battleTypeMod;
+                if (roll < 1) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.BASEATTACK, false,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 11) {
+                    if (c.getCampaignOptions().generateChases()) {
+                        return AtBScenarioFactory.createScenario(c, this,
+                                AtBScenario.CHASE, true,
+                                getBattleDate(c.getCalendar()));
+                    } else {
+                        return AtBScenarioFactory.createScenario(c, this,
+                                AtBScenario.HIDEANDSEEK, false,
+                                getBattleDate(c.getCalendar()));
+                    }
+                } else if (roll < 21) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.HIDEANDSEEK, true,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 31) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.PROBE, true,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 41) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.PROBE, false,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 41 + noBattle) {
+                    return null;
+                } else if (roll < 51 + noBattle) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.EXTRACTION, true,
+                            getBattleDate(c.getCalendar()));
+                } else {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.RECONRAID, true,
+                            getBattleDate(c.getCalendar()));
+                }
             }
-        case Lance.ROLE_DEFEND:
-            noBattle = (int)(80.0 / intensity + 0.5);
-            roll = Compute.randomInt(20 + noBattle) + battleTypeMod;
-            if (roll < 1) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.BASEATTACK, false,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 5) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.HOLDTHELINE, false,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 9) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.RECONRAID, false,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 13) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.EXTRACTION, false,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 13 + noBattle) {
-                return null;
-            } else if (roll < 17 + noBattle) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.HIDEANDSEEK, true,
-                        getBattleDate(c.getCalendar()));
-            } else {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.BREAKTHROUGH, false,
-                        getBattleDate(c.getCalendar()));
+            case Lance.ROLE_DEFEND: {
+                noBattle = (int) (80.0 / intensity + 0.5);
+                roll = Compute.randomInt(20 + noBattle) + battleTypeMod;
+                if (roll < 1) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.BASEATTACK, false,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 5) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.HOLDTHELINE, false,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 9) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.RECONRAID, false,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 13) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.EXTRACTION, false,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 13 + noBattle) {
+                    return null;
+                } else if (roll < 17 + noBattle) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.HIDEANDSEEK, true,
+                            getBattleDate(c.getCalendar()));
+                } else {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.BREAKTHROUGH, false,
+                            getBattleDate(c.getCalendar()));
+                }
             }
-        case Lance.ROLE_TRAINING:
-            noBattle = (int)(90.0 / intensity + 0.5);
-            roll = Compute.randomInt(10 + noBattle) + battleTypeMod;
-            if (roll < 1) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.BASEATTACK, false,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 3) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.HOLDTHELINE, false,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 5) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.BREAKTHROUGH, true,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 7) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.CHASE, true,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 9) {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.HIDEANDSEEK, false,
-                        getBattleDate(c.getCalendar()));
-            } else if (roll < 9 + noBattle) {
-                return null;
-            } else {
-                return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.CHASE, false,
-                        getBattleDate(c.getCalendar()));
+            case Lance.ROLE_TRAINING: {
+                noBattle = (int) (90.0 / intensity + 0.5);
+                roll = Compute.randomInt(10 + noBattle) + battleTypeMod;
+                if (roll < 1) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.BASEATTACK, false,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 3) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.HOLDTHELINE, false,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 5) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.BREAKTHROUGH, true,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 7) {
+                    if (c.getCampaignOptions().generateChases()) {
+                        return AtBScenarioFactory.createScenario(c, this,
+                                AtBScenario.CHASE, true,
+                                getBattleDate(c.getCalendar()));
+                    } else {
+                        return AtBScenarioFactory.createScenario(c, this,
+                                AtBScenario.BREAKTHROUGH, false,
+                                getBattleDate(c.getCalendar()));
+                    }
+                } else if (roll < 9) {
+                    return AtBScenarioFactory.createScenario(c, this,
+                            AtBScenario.HIDEANDSEEK, false,
+                            getBattleDate(c.getCalendar()));
+                } else if (roll < 9 + noBattle) {
+                    return null;
+                } else {
+                    if (c.getCampaignOptions().generateChases()) {
+                        return AtBScenarioFactory.createScenario(c, this,
+                                AtBScenario.CHASE, false,
+                                getBattleDate(c.getCalendar()));
+                    } else {
+                        return AtBScenarioFactory.createScenario(c, this,
+                                AtBScenario.HOLDTHELINE, false,
+                                getBattleDate(c.getCalendar()));
+                    }
+                }
             }
-        default:
-            return null;
+            default: {
+                return null;
+            }
         }
     }
 

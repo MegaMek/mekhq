@@ -40,6 +40,8 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.RandomNameGenerator;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -334,7 +336,6 @@ public class CampaignXmlParser {
                 // If it's a text node or attribute or whatever at this level,
                 // it's probably white-space.
                 // We can safely ignore it even if it isn't, for now.
-                continue;
             }
         }
 
@@ -347,9 +348,6 @@ public class CampaignXmlParser {
         if (version.isLowerThan("0.3.4-r1782")) {
             retVal.setRankSystem(
                     RankTranslator.translateRankSystem(retVal.getRanks().getOldRankSystem(), retVal.getFactionCode()));
-            if (retVal.getRanks() == null) {
-
-            }
         }
 
         // if the version is earlier than 0.1.14, then we need to replace all
@@ -724,6 +722,7 @@ public class CampaignXmlParser {
             retVal.setRetirementDefectionTracker(new RetirementDefectionTracker());
         }
         if (retVal.getCampaignOptions().getUseAtB()) {
+            retVal.setHasActiveContract();
             retVal.setAtBConfig(AtBConfiguration.loadFromXml());
             retVal.setAtBEventProcessor(new AtBEventProcessor(retVal));
         }
@@ -908,6 +907,22 @@ public class CampaignXmlParser {
                     }
                 } else if (xn.equalsIgnoreCase("colorIndex")) {
                     retVal.setColorIndex(Integer.parseInt(wn.getTextContent().trim()));
+                } else if (xn.equalsIgnoreCase("iconCategory")) {
+                    String val = wn.getTextContent().trim();
+
+                    if (val.equals("null")) {
+                        retVal.setIconCategory(null);
+                    } else {
+                        retVal.setIconCategory(val);
+                    }
+                } else if (xn.equalsIgnoreCase("iconFileName")) {
+                    String val = wn.getTextContent().trim();
+
+                    if (val.equals("null")) {
+                        retVal.setIconFileName(null);
+                    } else {
+                        retVal.setIconFileName(val);
+                    }
                 } else if (xn.equalsIgnoreCase("nameGen")) {
                     // First, get all the child nodes;
                     NodeList nl2 = wn.getChildNodes();
@@ -917,9 +932,9 @@ public class CampaignXmlParser {
                             continue;
                         }
                         if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-                            retVal.getRNG().setChosenFaction(wn2.getTextContent().trim());
+                            RandomNameGenerator.getInstance().setChosenFaction(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
-                            retVal.getRNG().setPercentFemale(Integer.parseInt(wn2.getTextContent().trim()));
+                            RandomGenderGenerator.setPercentFemale(Integer.parseInt(wn2.getTextContent().trim()));
                         }
                     }
                 } else if (xn.equalsIgnoreCase("currentReport")) {
