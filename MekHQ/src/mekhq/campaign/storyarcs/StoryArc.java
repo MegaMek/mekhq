@@ -38,6 +38,8 @@ public class StoryArc implements MekHqXmlSerializable {
     private String title;
     private String description;
 
+    private Campaign campaign;
+
     /** Can this story arc be added to existing campaign or does it need to start fresh? **/
     private boolean startNew;
 
@@ -60,8 +62,13 @@ public class StoryArc implements MekHqXmlSerializable {
     private Map<UUID, Integer> campaignMissionIds = new LinkedHashMap<>();
 
 
-    public StoryArc() {
+    public StoryArc(Campaign c) {
+        this.campaign = c;
         startNew = false;
+    }
+
+    protected Campaign getCampaign() {
+        return campaign;
     }
 
     public StoryEvent getStoryEvent(UUID id) {

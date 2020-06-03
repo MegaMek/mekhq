@@ -67,10 +67,18 @@ public abstract class StoryEvent implements MekHqXmlSerializable {
     }
 
     /**
-     * Complete the event. Specific event types may need to override this and then call the super at the end.
+     * Complete the event. Specific event types may need to override this.
      * @param c A MekHQ Campaign
      */
     public void completeEvent(Campaign c) {
+        active = false;
+        proceedToNextStoryEvent(c);
+    }
+
+    /**
+     * Gets the next story event and if it is not null, starts it
+     */
+    protected void proceedToNextStoryEvent(Campaign c) {
         //get the next story event
         UUID nextStoryEventId = getNextStoryEvent(c);
         StoryEvent nextStoryEvent = arc.getStoryEvent(nextStoryEventId);
