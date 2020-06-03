@@ -920,8 +920,8 @@ public class CampaignGUI extends JPanel {
         //endregion Community Menu
 
         //region View Menu
-        // The View menu uses the following Mnemonic keys as of 19-March-2020:
-        // A, B, D, H, O, R
+        // The View menu uses the following Mnemonic keys as of 02-June-2020:
+        // B, H, R
         JMenu menuView = new JMenu(resourceMap.getString("menuView.text")); // NOI18N
         menuView.setMnemonic(KeyEvent.VK_V);
 

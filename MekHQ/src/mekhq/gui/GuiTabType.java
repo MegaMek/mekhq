@@ -33,7 +33,7 @@ import megamek.common.util.EncodeControl;
  */
 public enum GuiTabType {
     //region Enum Declaration
-    COMMAND(0,  "panCommand.TabConstraints.tabTitle", KeyEvent.VK_C),
+    COMMAND(0,  "panCommand.TabConstraints.tabTitle", KeyEvent.VK_O),
     TOE(1,  "panOrganization.TabConstraints.tabTitle", KeyEvent.VK_T),
     BRIEFING(2, "panBriefing.TabConstraints.tabTitle", KeyEvent.VK_B),
     MAP(3, "panMap.TabConstraints.tabTitle", KeyEvent.VK_S),

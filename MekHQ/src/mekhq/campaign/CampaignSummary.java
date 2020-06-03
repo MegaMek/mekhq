@@ -155,16 +155,14 @@ public class CampaignSummary {
         int noMech = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_MECH) - campaign.getOccupiedBays(Entity.ETYPE_MECH), 0);
         int noSC = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - campaign.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
-                int noCF = Math
-                .max(campaign.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - campaign.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
+                int noCF = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - campaign.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
         int noASF = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_AERO) - campaign.getOccupiedBays(Entity.ETYPE_AERO), 0);
         int nolv = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) - campaign.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int nohv = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_TANK) - campaign.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int noinf = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - campaign.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - campaign.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         @SuppressWarnings("unused") // FIXME: This should be used somewhere...
-                int noProto = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - campaign.getOccupiedBays(Entity.ETYPE_PROTOMECH),
-                0);
+                int noProto = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - campaign.getOccupiedBays(Entity.ETYPE_PROTOMECH),  0);
         int freehv = Math.max(campaign.getTotalHeavyVehicleBays() - campaign.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int freeSC = Math.max(campaign.getTotalSmallCraftBays() - campaign.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
 
