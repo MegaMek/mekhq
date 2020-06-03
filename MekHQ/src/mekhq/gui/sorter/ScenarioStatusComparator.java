@@ -31,6 +31,7 @@ public class ScenarioStatusComparator implements Comparator<String>, Serializabl
         int a = -1;
         int b = -1;
 
+        // First we need to determine the numbers based on the name
         for (int i = 0; i < Scenario.S_NUM; i++) {
             if (Scenario.getStatusName(i).equals(o1)) {
                 a = i;
@@ -39,6 +40,26 @@ public class ScenarioStatusComparator implements Comparator<String>, Serializabl
             }
         }
 
+        // Now we need to fix the references to Defeat and Draw so they sort nicely
+        switch (a) {
+            case 3:
+                a = 5;
+                break;
+            case 5:
+                a = 3;
+                break;
+        }
+
+        switch (b) {
+            case 3:
+                b = 5;
+                break;
+            case 5:
+                b = 3;
+                break;
+        }
+
+        // Then we just subtract b from a to determine the sort order
         return a - b;
     }
 }
