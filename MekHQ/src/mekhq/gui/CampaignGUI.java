@@ -272,7 +272,7 @@ public class CampaignGUI extends JPanel {
         //and if so change its color to standard
         tabMain.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                if(tabMain.getSelectedIndex() == 0) {
+                if (tabMain.getSelectedIndex() == 0) {
                     tabMain.setBackgroundAt(0, null);
                     logNagActive = false;
                 }
@@ -2495,7 +2495,7 @@ public class CampaignGUI extends JPanel {
      * in order to draw attention to it
      */
     public void checkDailyLogNag() {
-        if(!logNagActive) {
+        if (!logNagActive) {
             if (tabMain.getSelectedIndex() != 0) {
                 tabMain.setBackgroundAt(0, Color.RED);
                 logNagActive = true;

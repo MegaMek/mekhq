@@ -93,10 +93,10 @@ public class ProcurementTableModel extends DataTableModel {
         if(col == COL_NAME) {
             return shoppingItem.getAcquisitionName();
         }
-        if(col == COL_TYPE) {
-            if(shoppingItem instanceof UnitOrder) {
+        if (col == COL_TYPE) {
+            if (shoppingItem instanceof UnitOrder) {
                 return "Unit";
-            } else if(shoppingItem instanceof Part) {
+            } else if (shoppingItem instanceof Part) {
                 return "Part";
             } else {
                 return "Other";
@@ -166,11 +166,11 @@ public class ProcurementTableModel extends DataTableModel {
         switch(col) {
             case COL_COST:
                 case COL_TOTAL_COST:
-                    case COL_QUEUE:
+                case COL_QUEUE:
                 return SwingConstants.RIGHT;
         case COL_TARGET:
         case COL_NEXT:
-            case COL_TYPE:
+        case COL_TYPE:
             return SwingConstants.CENTER;
         default:
             return SwingConstants.LEFT;

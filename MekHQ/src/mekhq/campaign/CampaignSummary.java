@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign;
 
@@ -82,31 +82,31 @@ public class CampaignSummary {
         totalCombatPersonnel = 0;
         totalSupportPersonnel = 0;
         totalInjuries = 0;
-        for (Person p : campaign.getPersonnel()) {
+        for (Person p : campaign.getActivePersonnel()) {
             // Add them to the total count
-            if(!p.getPrisonerStatus().isFree() || !p.isActive()) {
+            if (!p.getPrisonerStatus().isFree()) {
                 continue;
             }
-            if(p.getHits() > 0) {
+            if (p.getHits() > 0) {
                 totalInjuries++;
             }
             if (p.hasPrimaryCombatRole()) {
                 totalCombatPersonnel++;
-            } else if(p.hasPrimarySupportRole(false)) {
+            } else if (p.hasPrimarySupportRole(false)) {
                 totalSupportPersonnel++;
             }
         }
 
         //units
-        countDamageStatus = new int[Entity.DMG_CRIPPLED+1];
+        countDamageStatus = new int[Entity.DMG_CRIPPLED + 1];
         mechCount = 0;
         veeCount = 0;
         aeroCount = 0;
         infantryCount = 0;
         int squadCount = 0;
-        for(Unit u : campaign.getUnits()) {
+        for (Unit u : campaign.getUnits()) {
             Entity e = u.getEntity();
-            if(u.isUnmanned() || u.isSalvage() || u.isMothballed() || u.isMothballing() || !u.isPresent() || null == e) {
+            if (u.isUnmanned() || u.isSalvage() || u.isMothballed() || u.isMothballing() || !u.isPresent() || (null == e)) {
                 continue;
             }
             countDamageStatus[u.getDamageState()]++;
@@ -133,16 +133,16 @@ public class CampaignSummary {
             }
         }
         //squad should count as 1/4 of a unit for force composition
-        infantryCount += (int)Math.ceil(squadCount/4.0);
-        totalUnitCount = mechCount+veeCount+infantryCount+aeroCount;
+        infantryCount += (int) Math.ceil(squadCount / 4.0);
+        totalUnitCount = mechCount + veeCount + infantryCount + aeroCount;
 
         //missions
         countMissionByStatus = new int[Mission.S_NUM];
-        for(Mission m : campaign.getMissions()) {
+        for (Mission m : campaign.getMissions()) {
             countMissionByStatus[m.getStatus()]++;
         }
-        completedMissions = countMissionByStatus[Mission.S_SUCCESS]+
-                countMissionByStatus[Mission.S_FAILED]+
+        completedMissions = countMissionByStatus[Mission.S_SUCCESS] +
+                countMissionByStatus[Mission.S_FAILED] +
                 countMissionByStatus[Mission.S_BREACH];
 
         //cargo capacity
@@ -170,14 +170,14 @@ public class CampaignSummary {
         noASF = Math.max(noASF - freeSC, 0);
         nolv = Math.max(nolv - freehv, 0);
 
-        unitsOver = noMech+noASF+nolv+nohv+noinf+noBA+noProto;
-        unitsTransported = campaign.getOccupiedBays(Entity.ETYPE_MECH)+
-                campaign.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT)+
-                campaign.getOccupiedBays(Entity.ETYPE_AERO)+
-                campaign.getOccupiedBays(Entity.ETYPE_TANK, true)+
-                campaign.getOccupiedBays(Entity.ETYPE_TANK)+
-                campaign.getOccupiedBays(Entity.ETYPE_INFANTRY)+
-                campaign.getOccupiedBays(Entity.ETYPE_BATTLEARMOR)+
+        unitsOver = noMech + noASF + nolv + nohv + noinf + noBA + noProto;
+        unitsTransported = campaign.getOccupiedBays(Entity.ETYPE_MECH) +
+                campaign.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) +
+                campaign.getOccupiedBays(Entity.ETYPE_AERO) +
+                campaign.getOccupiedBays(Entity.ETYPE_TANK, true) +
+                campaign.getOccupiedBays(Entity.ETYPE_TANK) +
+                campaign.getOccupiedBays(Entity.ETYPE_INFANTRY) +
+                campaign.getOccupiedBays(Entity.ETYPE_BATTLEARMOR) +
                 campaign.getOccupiedBays(Entity.ETYPE_PROTOMECH);
 
         nDS = campaign.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
@@ -202,7 +202,6 @@ public class CampaignSummary {
                 countDamageStatus[Entity.DMG_MODERATE] + " moderate, " +
                 countDamageStatus[Entity.DMG_HEAVY] + " heavy, " +
                 countDamageStatus[Entity.DMG_CRIPPLED] + " crippled";
-
     }
 
     /**
@@ -211,16 +210,16 @@ public class CampaignSummary {
      */
     public String getForceCompositionReport() {
         List<String> composition = new ArrayList<String>();
-        if(mechCount > 0) {
-            composition.add(Integer.toString((int) Math.round(100 * mechCount / (double)totalUnitCount)) + "% mech");
+        if (mechCount > 0) {
+            composition.add(Integer.toString((int) Math.round(100 * mechCount / (double) totalUnitCount)) + "% mech");
         }
-        if(veeCount > 0) {
+        if (veeCount > 0) {
             composition.add(Integer.toString((int) Math.round(100 * veeCount / (double) totalUnitCount)) + "% armor");
         }
-        if(infantryCount > 0) {
+        if (infantryCount > 0) {
             composition.add(Integer.toString((int) Math.round(100 * infantryCount / (double) totalUnitCount)) + "% infantry");
         }
-        if(aeroCount > 0) {
+        if (aeroCount > 0) {
             composition.add(Integer.toString((int) Math.round(100 * aeroCount / (double) totalUnitCount)) + "% aero");
         }
         return String.join(", ", composition);
@@ -231,7 +230,7 @@ public class CampaignSummary {
      * @return a <code>String</code> of the report
      */
     public String getMissionSuccessReport() {
-        int successRate = (int)Math.round((100 * countMissionByStatus[Mission.S_SUCCESS]) / (double) completedMissions);
+        int successRate = (int) Math.round((100 * countMissionByStatus[Mission.S_SUCCESS]) / (double) completedMissions);
         return Integer.toString(successRate) + "%";
     }
 
@@ -240,8 +239,8 @@ public class CampaignSummary {
      * @return a <code>String</code> of the report
      */
     public String getCargoCapacityReport() {
-        return Integer.toString((int)Math.round(cargoTons)) + " tons (" +
-                Integer.toString((int)Math.round(cargoCapacity)) + " tons capacity)";
+        return Integer.toString((int) Math.round(cargoTons)) + " tons (" +
+                Integer.toString((int) Math.round(cargoCapacity)) + " tons capacity)";
     }
 
     /**
@@ -250,12 +249,12 @@ public class CampaignSummary {
      */
     public String getTransportCapacity() {
         int percentTransported = 0;
-        if((unitsOver+unitsTransported)>0) {
-            percentTransported = 100-(int)Math.round(100*unitsOver/(double)(unitsOver+unitsTransported));
+        if ((unitsOver + unitsTransported) > 0) {
+            percentTransported = 100 - (int) Math.round(100 * unitsOver / (double) (unitsOver + unitsTransported));
         }
         String dropshipAppend = "";
         int dockingCollars = campaign.getTotalDockingCollars();
-        if(nDS > 0) {
+        if (nDS > 0) {
             dropshipAppend = ", " + Integer.toString(nDS) + " dropships/" + Integer.toString(dockingCollars) + " docking collars";
         }
 
