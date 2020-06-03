@@ -1732,7 +1732,7 @@ public class CampaignOptionsDialog extends JDialog {
         panPersonnel.add(pnlTimeInRankDisplayFormat, gridBagConstraints);
 
         chkTrackTotalEarnings = new JCheckBox(resourceMap.getString("trackTotalEarnings.text"));
-        chkTrackTotalEarnings.setToolTipText("trackTotalEarnings.toolTipText");
+        chkTrackTotalEarnings.setToolTipText(resourceMap.getString("trackTotalEarnings.toolTipText"));
         chkTrackTotalEarnings.setSelected(options.trackTotalEarnings());
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkTrackTotalEarnings, gridBagConstraints);
