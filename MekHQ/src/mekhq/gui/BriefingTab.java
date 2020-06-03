@@ -80,6 +80,7 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
+import mekhq.gui.sorter.ScenarioStatusComparator;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
@@ -227,6 +228,7 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         scenarioSorter = new TableRowSorter<>(scenarioModel);
         scenarioSorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
+        scenarioSorter.setComparator(ScenarioTableModel.COL_STATUS, new ScenarioStatusComparator());
         scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator(getCampaign()));
         scenarioTable.setRowSorter(scenarioSorter);
         scenarioTable.setShowGrid(false);
