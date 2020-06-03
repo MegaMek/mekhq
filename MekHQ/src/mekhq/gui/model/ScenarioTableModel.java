@@ -40,7 +40,7 @@ public class ScenarioTableModel extends DataTableModel {
     public final static int COL_ASSIGN     = 3;
 
     public ScenarioTableModel(Campaign c) {
-        columnNames = new String[] { "Scenario Name", "Resolution", "Date", "# Units" };
+        columnNames = new String[] { "Scenario Name", "Resolution", "Date", "# Units Assigned" };
         data = new ArrayList<Scenario>();
         campaign = c;
     }
