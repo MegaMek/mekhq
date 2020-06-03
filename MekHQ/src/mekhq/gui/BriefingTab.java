@@ -45,6 +45,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.event.MissionCompletedEvent;
 import mekhq.campaign.event.MissionNewEvent;
@@ -986,5 +987,10 @@ public final class BriefingTab extends CampaignGuiTab {
         if (ev.getMission().getId() == selectedMission) {
             changeMission();
         }
+    }
+
+    @Subscribe
+    public void handle(GMModeEvent ev) {
+        btnGMGenerateScenarios.setEnabled(ev.isGMMode());
     }
 }
