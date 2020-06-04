@@ -72,10 +72,14 @@ public class StratconPanel extends JPanel implements ActionListener {
     
     private StratconScenarioWizard scenarioWizard;
     private TrackForceAssignmentUI assignmentUI;
+    
+    private JLabel infoArea;
 
-    StratconPanel(CampaignGUI gui) {
+    StratconPanel(CampaignGUI gui, JLabel infoArea) {
         campaign = gui.getCampaign();
         scenarioWizard = new StratconScenarioWizard(campaign);
+        this.infoArea = infoArea;
+        infoArea.setText("WTF");
         
         buildRightClickMenu(null);
         
@@ -353,15 +357,24 @@ public class StratconPanel extends JPanel implements ActionListener {
         if(e.getButton() == MouseEvent.BUTTON1) {        
             clickedPoint = e.getPoint();
             boolean pointFoundOnBoard = detectClickedHex();
+            
+            if(pointFoundOnBoard) {
+                infoArea.setText(buildSelectedHexInfo());
+            }
 
             repaint();
         } else if(e.getButton() == MouseEvent.BUTTON3) {
             clickedPoint = new Point(e.getX(), e.getY());
             boolean pointFoundOnBoard = detectClickedHex();
 
+            StratconCoords selectedCoords = boardState.getSelectedCoords();
+            if(selectedCoords == null) {
+                return;
+            }
+            
             StratconScenario selectedScenario = null;
             if(pointFoundOnBoard) {
-                selectedScenario = currentTrack.getScenario(new StratconCoords(boardState.selectedX, boardState.selectedY));
+                selectedScenario = currentTrack.getScenario(selectedCoords);
             }
              
             menuItemManageForceAssignments.setEnabled(selectedScenario == null);
@@ -370,6 +383,33 @@ public class StratconPanel extends JPanel implements ActionListener {
             rightClickMenu.show(this, e.getX(), e.getY());
         }
     }
+    
+    public StratconScenario getSelectedScenario() {
+        return currentTrack.getScenario(boardState.getSelectedCoords());
+    }
+    
+    
+    private String buildSelectedHexInfo() {
+        StringBuilder infoBuilder = new StringBuilder();
+        infoBuilder.append("<html>");
+        
+        if(currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords())) {
+            infoBuilder.append("<span color='green'>Recon complete</span>");
+        } else {
+            infoBuilder.append("<span color='red'>Recon incomplete</span>");
+        }
+        infoBuilder.append("<br/>");
+        
+        
+        StratconScenario selectedScenario = getSelectedScenario();
+        if(selectedScenario != null) {
+            infoBuilder.append(selectedScenario.getInfo());
+        }
+        
+        infoBuilder.append("</html>");
+        
+        return infoBuilder.toString();
+    }
 
     public void focusLostHandler(FocusEvent e) {
         //clickedPoint = null;
@@ -377,14 +417,25 @@ public class StratconPanel extends JPanel implements ActionListener {
     }
 
     private class BoardState {
-        public int selectedX;
-        public int selectedY;
+        public Integer selectedX;
+        public Integer selectedY;
         public int selectedTrack;
+        
+        public StratconCoords getSelectedCoords() {
+            if((selectedX == null) || (selectedY == null)) {
+                return null;
+            } else {
+                return new StratconCoords(selectedX, selectedY);
+            }
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        StratconCoords selectedCoords = new StratconCoords(boardState.selectedX, boardState.selectedY);
+        StratconCoords selectedCoords = boardState.getSelectedCoords();
+        if(selectedCoords == null) {
+            return;
+        }
         
         switch(e.getActionCommand()) {
         case RCLICK_COMMAND_MANAGE_FORCES:

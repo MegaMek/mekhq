@@ -14,6 +14,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -133,7 +134,25 @@ public class StratconScenario implements IStratconDisplayable {
         stateBuilder.append("Status: ");
         stateBuilder.append(scenarioStateNames.get(currentState));
         stateBuilder.append("<br/>");
+        
+        stateBuilder.append("Terrain: ");
+        stateBuilder.append(AtBScenario.terrainTypes[backingScenario.getTerrainType()]);
+        stateBuilder.append(" : ");
+        stateBuilder.append(backingScenario.getMap());
+        stateBuilder.append("<br/>");
 
+        stateBuilder.append("Deployment Date: ");
+        stateBuilder.append(deploymentDate.toString());
+        stateBuilder.append("<br/>");
+        
+        stateBuilder.append("Battle Date: ");
+        stateBuilder.append(deploymentDate.toString());
+        stateBuilder.append("<br/>");
+        
+        stateBuilder.append("Return Date: ");
+        stateBuilder.append(deploymentDate.toString());
+        stateBuilder.append("<br/>");
+        
         /*if(includeForces) {
             List<UUID> unitIDs = backingScenario.getForces(currentCampaign).getAllUnits();
             

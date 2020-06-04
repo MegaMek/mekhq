@@ -12,6 +12,7 @@ import javax.swing.JScrollPane;
 
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 
 public class StratconTab extends CampaignGuiTab {
@@ -23,6 +24,7 @@ public class StratconTab extends CampaignGuiTab {
     private StratconPanel stratconPanel;
     private JPanel infoPanel;
     private JComboBox<TrackDropdownItem> cboCurrentTrack;
+    private JLabel infoPanelText;
 
     StratconTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
@@ -31,13 +33,15 @@ public class StratconTab extends CampaignGuiTab {
     @Override
     public void initTab() { 
         removeAll();
+        infoPanelText = new JLabel();
+        
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 4;
         gbc.fill = GridBagConstraints.BOTH;
-        stratconPanel = new StratconPanel(getCampaignGui());
+        stratconPanel = new StratconPanel(getCampaignGui(), infoPanelText);
         JScrollPane scrollPane = new JScrollPane(stratconPanel);
         scrollPane.getHorizontalScrollBar().setUnitIncrement(StratconPanel.HEX_X_RADIUS);
         scrollPane.getVerticalScrollBar().setUnitIncrement(StratconPanel.HEX_Y_RADIUS);
@@ -83,6 +87,9 @@ public class StratconTab extends CampaignGuiTab {
             TrackDropdownItem tdi = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
             stratconPanel.selectTrack(tdi.contract.getStratconCampaignState(), tdi.track);
         }
+        
+        gbc.gridy++;
+        infoPanel.add(infoPanelText, gbc);
     }
     
     @Override
