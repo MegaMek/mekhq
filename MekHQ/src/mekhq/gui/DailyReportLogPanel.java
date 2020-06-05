@@ -28,7 +28,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -52,10 +51,12 @@ public class DailyReportLogPanel extends JPanel {
 
     private static final long serialVersionUID = -6512675362473724385L;
 
+    CampaignGUI gui;
     JTextPane txtLog;
     String logText = "";
 
-    public DailyReportLogPanel(ReportHyperlinkListener listener) {
+    public DailyReportLogPanel(CampaignGUI gui) {
+        this.gui = gui;
         txtLog = new JTextPane() {
             /**
              *
@@ -66,22 +67,19 @@ public class DailyReportLogPanel extends JPanel {
                 return true;
             }
         };
-        txtLog.addHyperlinkListener(listener);
+        txtLog.addHyperlinkListener(gui.getReportHLL());
         initComponents();
     }
 
     private void initComponents() {
         setLayout(new BorderLayout());
-        JLabel title = new JLabel("<html><b><nobr>Daily Log</nobr></b></html>");
         txtLog.setContentType("text/html"); // NOI18N
         txtLog.setEditable(false);
         DefaultCaret caret = (DefaultCaret)txtLog.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane scrLog = new JScrollPane(txtLog);
         scrLog.setBorder(new EmptyBorder(2,5,2,2));
-        title.setBorder(new EmptyBorder(2,5,2,2));
         add(scrLog, BorderLayout.CENTER);
-        add(title, BorderLayout.PAGE_START);
     }
 
     public void clearLogPanel() {
@@ -105,6 +103,8 @@ public class DailyReportLogPanel extends JPanel {
 		}
         txtLog.setDocument(blank);
 		txtLog.setCaretPosition(blank.getLength());
+		//possibly nag user about new reports in command center
+		gui.checkDailyLogNag();
     }
 
 	public void appendLog(List<String> newReports) {
@@ -120,6 +120,7 @@ public class DailyReportLogPanel extends JPanel {
     				// Shouldn't happen
     			}
     			txtLog.setCaretPosition(doc.getLength());
+    			gui.checkDailyLogNag();
 		    } else {
 		        refreshLog(addedText);
 		    }

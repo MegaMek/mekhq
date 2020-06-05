@@ -133,7 +133,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      *            The entity to serialize to XML.
      * @return A string containing the XML representation of the entity.
      */
-    public static String writeEntityToXmlString(Entity tgtEnt, int indentLvl, ArrayList<Entity> list) {
+    public static String writeEntityToXmlString(Entity tgtEnt, int indentLvl, List<Entity> list) {
         // Holdover from EntityListFile in MM.
         // I guess they simply ignored all squadrons for writing out entities?
         if (tgtEnt instanceof FighterSquadron) {

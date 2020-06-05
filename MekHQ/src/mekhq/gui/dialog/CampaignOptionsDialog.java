@@ -125,6 +125,9 @@ public class CampaignOptionsDialog extends JDialog {
     private String camoFileName;
     private int colorIndex;
     private DirectoryItems camos;
+    private String iconCategory;
+    private String iconFileName;
+    private DirectoryItems forceIcons;
     private Hashtable<String, JSpinner> hashSkillTargets;
     private Hashtable<String, JSpinner> hashGreenSkill;
     private Hashtable<String, JSpinner> hashRegSkill;
@@ -150,6 +153,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JComboBox<String> unitRatingMethodCombo;
     private JButton btnDate;
     private JButton btnCamo;
+    private JButton btnIcon;
     //endregion General Tab
 
     //region Repair and Maintenance Tab
@@ -496,7 +500,8 @@ public class CampaignOptionsDialog extends JDialog {
     /**
      * Creates new form CampaignOptionsDialog
      */
-    public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos) {
+    public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos,
+                                 DirectoryItems forceIcons) {
         super(parent, modal);
         this.campaign = c;
         this.options = c.getCampaignOptions();
@@ -509,6 +514,9 @@ public class CampaignOptionsDialog extends JDialog {
         this.camoFileName = campaign.getCamoFileName();
         this.colorIndex = campaign.getColorIndex();
         this.camos = camos;
+        this.iconCategory = campaign.getIconCategory();
+        this.iconFileName = campaign.getIconFileName();
+        this.forceIcons = forceIcons;
         hashSkillTargets = new Hashtable<>();
         hashGreenSkill = new Hashtable<>();
         hashRegSkill = new Hashtable<>();
@@ -518,6 +526,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         initComponents();
         setCamoIcon();
+        setForceIcon();
         setLocationRelativeTo(parent);
 
         // Rules panel
@@ -601,6 +610,7 @@ public class CampaignOptionsDialog extends JDialog {
         comboRanks = new JComboBox<>();
         sldGender = new JSlider(SwingConstants.HORIZONTAL);
         btnCamo = new JButton();
+        btnIcon = new JButton();
         panRepair = new JPanel();
         panSupplies = new JPanel();
         panPersonnel = new JPanel();
@@ -802,6 +812,23 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(lblCamo, gridBagConstraints);
+
+        btnIcon.setMaximumSize(new java.awt.Dimension(84, 72));
+        btnIcon.setMinimumSize(new java.awt.Dimension(84, 72));
+        btnIcon.setPreferredSize(new java.awt.Dimension(84, 72));
+        btnIcon.addActionListener(this::btnIconActionPerformed);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panGeneral.add(btnIcon, gridBagConstraints);
+
+        JLabel lblIcon = new JLabel(resourceMap.getString("lblIcon.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panGeneral.add(lblIcon, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panGeneral.TabConstraints.tabTitle"), panGeneral); // NOI18N
 
@@ -1732,7 +1759,7 @@ public class CampaignOptionsDialog extends JDialog {
         panPersonnel.add(pnlTimeInRankDisplayFormat, gridBagConstraints);
 
         chkTrackTotalEarnings = new JCheckBox(resourceMap.getString("trackTotalEarnings.text"));
-        chkTrackTotalEarnings.setToolTipText("trackTotalEarnings.toolTipText");
+        chkTrackTotalEarnings.setToolTipText(resourceMap.getString("trackTotalEarnings.toolTipText"));
         chkTrackTotalEarnings.setSelected(options.trackTotalEarnings());
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkTrackTotalEarnings, gridBagConstraints);
@@ -4730,6 +4757,9 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.setCamoFileName(camoFileName);
         campaign.setColorIndex(colorIndex);
 
+        campaign.setIconCategory(iconCategory);
+        campaign.setIconFileName(iconFileName);
+
         for (int i = 0; i < chkUsePortrait.length; i++) {
             options.setUsePortraitForType(i, chkUsePortrait[i].isSelected());
         }
@@ -5114,6 +5144,16 @@ public class CampaignOptionsDialog extends JDialog {
         }
     }//GEN-LAST:event_btnDateActionPerformed
 
+    private void btnIconActionPerformed(java.awt.event.ActionEvent evt) {
+        ImageChoiceDialog pcd = new ImageChoiceDialog(frame, true, iconCategory, iconFileName, forceIcons);
+        pcd.setVisible(true);
+        if (pcd.isChanged()) {
+            iconCategory = pcd.getCategory();
+            iconFileName = pcd.getFileName();
+        }
+        setForceIcon();
+    }
+
     private void btnCamoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCamoActionPerformed
         CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex, camos);
         ccd.setVisible(true);
@@ -5123,8 +5163,7 @@ public class CampaignOptionsDialog extends JDialog {
             colorIndex = ccd.getColorIndex();
         }
         setCamoIcon();
-    }//GEN-LAST:event_btnCamoActionPerformed
-
+    }
 
     private Vector<String> getUnusedSPA() {
     	Vector<String> unused = new Vector<>();
@@ -5280,6 +5319,32 @@ public class CampaignOptionsDialog extends JDialog {
         	camoCategory = Player.NO_CAMO;
         	colorIndex = 0;
         	setCamoIcon();
+        }
+    }
+
+    public void setForceIcon() {
+        if (null == iconCategory) {
+            return;
+        }
+
+        if (Campaign.ICON_NONE.equals(iconFileName)) {
+            btnIcon.setIcon(null);
+            btnIcon.setText("None");
+            return;
+        }
+
+        // Try to get the root file.
+        try {
+            // Translate the root icon directory name.
+            if (Campaign.ROOT_ICON.equals(iconCategory)) {
+                iconCategory = ""; //$NON-NLS-1$
+            }
+            Image icon = (Image) forceIcons.getItem(iconCategory, iconFileName);
+            icon = icon.getScaledInstance(75, -1, Image.SCALE_DEFAULT);
+            btnIcon.setIcon(new ImageIcon(icon));
+        } catch (Exception err) {
+            iconFileName = Campaign.ICON_NONE;
+            setForceIcon();
         }
     }
 
