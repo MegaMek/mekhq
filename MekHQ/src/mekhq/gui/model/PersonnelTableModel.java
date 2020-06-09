@@ -37,7 +37,9 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.UnitType;
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
+import megamek.common.util.CrewSkillSummaryUtil;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.IconPackage;
@@ -409,99 +411,69 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_TYPE:
                 return p.getRoleDesc();
             case COL_MECH:
-                if (p.hasSkill(SkillType.S_GUN_MECH)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_MECH)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
+                return CrewSkillSummaryUtil.getPilotSkillSummary(
+                                                                 p.hasSkill(SkillType.S_GUN_MECH) ? Integer.toString(p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, SkillType.S_RPG_GUN_LASER)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, SkillType.S_RPG_GUN_LASER)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, SkillType.S_RPG_GUN_MISSILE)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, SkillType.S_RPG_GUN_MISSILE)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, SkillType.S_RPG_GUN_BALLISTIC)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, SkillType.S_RPG_GUN_BALLISTIC)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.S_PILOT_MECH) ? Integer.toString(p.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue()) : "-",
+                                                                 campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY));
             case COL_AERO:
-                if (p.hasSkill(SkillType.S_GUN_AERO)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_AERO)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
+                return CrewSkillSummaryUtil.getPilotSkillSummary(
+                                                                 p.hasSkill(SkillType.S_GUN_AERO) ? Integer.toString(p.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, SkillType.S_RPG_GUN_LASER)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, SkillType.S_RPG_GUN_LASER)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, SkillType.S_RPG_GUN_MISSILE)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, SkillType.S_RPG_GUN_MISSILE)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, SkillType.S_RPG_GUN_BALLISTIC)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, SkillType.S_RPG_GUN_BALLISTIC)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.S_PILOT_AERO) ? Integer.toString(p.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue()) : "-",
+                                                                 campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY));
             case COL_JET:
-                if (p.hasSkill(SkillType.S_GUN_JET)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_JET).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_JET)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_JET).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
+                return CrewSkillSummaryUtil.getPilotSkillSummary(
+                                                                 p.hasSkill(SkillType.S_GUN_JET) ? Integer.toString(p.getSkill(SkillType.S_GUN_JET).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_JET, SkillType.S_RPG_GUN_LASER)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_JET, SkillType.S_RPG_GUN_LASER)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_JET, SkillType.S_RPG_GUN_MISSILE)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_JET, SkillType.S_RPG_GUN_MISSILE)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_JET, SkillType.S_RPG_GUN_BALLISTIC)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_JET, SkillType.S_RPG_GUN_BALLISTIC)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.S_PILOT_JET) ? Integer.toString(p.getSkill(SkillType.S_PILOT_JET).getFinalSkillValue()) : "-",
+                                                                 campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY));
             case COL_SPACE:
-                if (p.hasSkill(SkillType.S_GUN_SPACE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_SPACE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
+                return CrewSkillSummaryUtil.getPilotSkillSummary(
+                                                                 p.hasSkill(SkillType.S_GUN_SPACE) ? Integer.toString(p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, SkillType.S_RPG_GUN_LASER)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, SkillType.S_RPG_GUN_LASER)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, SkillType.S_RPG_GUN_MISSILE)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, SkillType.S_RPG_GUN_MISSILE)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, SkillType.S_RPG_GUN_BALLISTIC)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, SkillType.S_RPG_GUN_BALLISTIC)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.S_PILOT_SPACE) ? Integer.toString(p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue()) : "-",
+                                                                 campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY));
             case COL_VEE:
-                if (p.hasSkill(SkillType.S_GUN_VEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_GVEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
+                return CrewSkillSummaryUtil.getPilotSkillSummary(
+                                                                 p.hasSkill(SkillType.S_GUN_VEE) ? Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_LASER)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_LASER)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_MISSILE)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_MISSILE)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_BALLISTIC)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_BALLISTIC)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.S_PILOT_GVEE) ? Integer.toString(p.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()) : "-",
+                                                                 campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY));
             case COL_NVEE:
-                if (p.hasSkill(SkillType.S_GUN_VEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_NVEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
+                return CrewSkillSummaryUtil.getPilotSkillSummary(
+                                                                 p.hasSkill(SkillType.S_GUN_VEE) ? Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_LASER)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_LASER)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_MISSILE)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_MISSILE)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_BALLISTIC)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_BALLISTIC)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.S_PILOT_NVEE) ? Integer.toString(p.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()) : "-",
+                                                                 campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY));
             case COL_VTOL:
-                if (p.hasSkill(SkillType.S_GUN_VEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_VTOL)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
+                return CrewSkillSummaryUtil.getPilotSkillSummary(
+                                                                 p.hasSkill(SkillType.S_GUN_VEE) ? Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_LASER)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_LASER)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_MISSILE)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_MISSILE)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_BALLISTIC)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, SkillType.S_RPG_GUN_BALLISTIC)).getFinalSkillValue()) : "-",
+                                                                 p.hasSkill(SkillType.S_PILOT_VTOL) ? Integer.toString(p.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()) : "-",
+                                                                 campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY));
             case COL_GUN_BA:
-                if (p.hasSkill(SkillType.S_GUN_BA)) {
-                    return Integer.toString(p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue());
+                if (p.hasSkillOrRPGGunnerySkills(SkillType.S_GUN_BA)) {
+                    return CrewSkillSummaryUtil.getGunnnerySkillSummary(
+                                                                    p.hasSkill(SkillType.S_GUN_BA) ? Integer.toString(p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue()) : "-",
+                                                                    p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_LASER)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_LASER)).getFinalSkillValue()) : "-",
+                                                                    p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_MISSILE)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_MISSILE)).getFinalSkillValue()) : "-",
+                                                                    p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_BALLISTIC)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_BALLISTIC)).getFinalSkillValue()) : "-",
+                                                                    campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY));
                 }
                 break;
             case COL_ANTI_MECH:
@@ -510,8 +482,13 @@ public class PersonnelTableModel extends DataTableModel {
                 }
                 break;
             case COL_SMALL_ARMS:
-                if (p.hasSkill(SkillType.S_SMALL_ARMS)) {
-                    return Integer.toString(p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue());
+                if (p. hasSkillOrRPGGunnerySkills(SkillType.S_SMALL_ARMS)) {
+                    return CrewSkillSummaryUtil.getGunnnerySkillSummary(
+                                                                        p.hasSkill(SkillType.S_SMALL_ARMS) ? Integer.toString(p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue()) : "-",
+                                                                        p.hasSkill(SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, SkillType.S_RPG_GUN_LASER)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_LASER)).getFinalSkillValue()) : "-",
+                                                                        p.hasSkill(SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, SkillType.S_RPG_GUN_MISSILE)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_MISSILE)).getFinalSkillValue()) : "-",
+                                                                        p.hasSkill(SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, SkillType.S_RPG_GUN_BALLISTIC)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_BALLISTIC)).getFinalSkillValue()) : "-",
+                                                                        campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY));
                 }
                 break;
             case COL_ARTY:

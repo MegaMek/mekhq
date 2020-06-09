@@ -15,6 +15,8 @@ import javax.swing.ListCellRenderer;
 import megamek.common.Aero;
 import megamek.common.Tank;
 import megamek.common.VTOL;
+import megamek.common.options.OptionsConstants;
+import megamek.common.util.CrewSkillSummaryUtil;
 import mekhq.IconPackage;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -133,16 +135,28 @@ public class CrewListModel extends AbstractListModel<Person> {
                     .append(" (");
             String gunSkill = SkillType.getGunnerySkillFor(unit.getEntity());
             String driveSkill = SkillType.getDrivingSkillFor(unit.getEntity());
-            if (p.hasSkill(gunSkill)) {
-                sb.append(p.getSkill(gunSkill).getFinalSkillValue());
+
+            if (SkillType.isRPGGunnery(gunSkill)) {
+                sb.append(
+                        CrewSkillSummaryUtil.getPilotSkillSummary(
+                                p.hasSkill(gunSkill) ? Integer.toString(p.getSkill(gunSkill).getFinalSkillValue()) : "-",
+                                p.hasSkill(SkillType.getRPGSkillName(gunSkill, SkillType.S_RPG_GUN_LASER)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(gunSkill, SkillType.S_RPG_GUN_LASER)).getFinalSkillValue()) : "-",
+                                p.hasSkill(SkillType.getRPGSkillName(gunSkill, SkillType.S_RPG_GUN_MISSILE)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(gunSkill, SkillType.S_RPG_GUN_MISSILE)).getFinalSkillValue()) : "-",
+                                p.hasSkill(SkillType.getRPGSkillName(gunSkill, SkillType.S_RPG_GUN_BALLISTIC)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(gunSkill, SkillType.S_RPG_GUN_BALLISTIC)).getFinalSkillValue()) : "-",
+                                p.hasSkill(driveSkill) ? Integer.toString(p.getSkill(driveSkill).getFinalSkillValue()) : "-",
+                                unit.getCampaign().getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)));
             } else {
-                sb.append("-");
-            }
-            sb.append("/");
-            if (p.hasSkill(driveSkill)) {
-                sb.append(p.getSkill(driveSkill).getFinalSkillValue());
-            } else {
-                sb.append("-");
+                if (p.hasSkill(gunSkill)) {
+                    sb.append(p.getSkill(gunSkill).getFinalSkillValue());
+                } else {
+                    sb.append("-");
+                }
+                sb.append("/");
+                if (p.hasSkill(driveSkill)) {
+                    sb.append(p.getSkill(driveSkill).getFinalSkillValue());
+                } else {
+                    sb.append("-");
+                }
             }
             sb.append(")</font></html>");
             setHtmlText(sb.toString());

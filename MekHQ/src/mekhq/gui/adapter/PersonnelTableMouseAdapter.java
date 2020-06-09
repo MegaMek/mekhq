@@ -2156,6 +2156,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 JMenu newMenu = new JMenu(resourceMap.getString("spendOnNewSkills.text")); //$NON-NLS-1$
                 for (int i = 0; i < SkillType.getSkillList().length; i++) {
                     String type = SkillType.getSkillList()[i];
+                    if (gui.getCampaign().getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                        if (SkillType.isSingleGunnery(type)) {
+                            continue;
+                        }
+                    } else {
+                        if (SkillType.isSpecificRPGGunnery(type)) {
+                            continue;
+                        }
+                    }
                     int cost = person.hasSkill(type) ? person.getSkill(type).getCostToImprove() : SkillType.getType(type).getCost(0);
                     if (cost >= 0) {
                         String desc = String.format(resourceMap.getString("skillDesc.format"), type, cost); //$NON-NLS-1$

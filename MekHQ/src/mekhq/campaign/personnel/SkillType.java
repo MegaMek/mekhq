@@ -92,17 +92,45 @@ public class SkillType implements Serializable {
     public static final String S_SCROUNGE      = "Scrounge";
     public static final String S_STRATEGY      = "Strategy";
 
+    public static final String S_RPG_GUN_LASER     = "Laser";
+    public static final String S_RPG_GUN_BALLISTIC = "Ballistic";
+    public static final String S_RPG_GUN_MISSILE   = "Missile";
+
     public static final int NUM_LEVELS = 11;
 
-    public static final String[] skillList = {S_PILOT_MECH,S_GUN_MECH,S_PILOT_AERO,S_GUN_AERO,
-                                              S_PILOT_GVEE,S_PILOT_VTOL,S_PILOT_NVEE,S_GUN_VEE,
-                                              S_PILOT_JET,S_GUN_JET,S_PILOT_SPACE,S_GUN_SPACE,S_ARTILLERY,
-                                              S_GUN_BA,S_GUN_PROTO,S_SMALL_ARMS,S_ANTI_MECH,
-                                              S_TECH_MECH,S_TECH_MECHANIC,S_TECH_AERO,S_TECH_BA,S_TECH_VESSEL,S_ASTECH,
-                                              S_DOCTOR,S_MEDTECH,S_NAV,
-                                              S_ADMIN,
-                                              S_TACTICS,S_STRATEGY,
-                                              S_NEG,S_LEADER,S_SCROUNGE};
+    public static final String[] skillList;
+
+    public static final String[] rpgGunnerySkillList = {S_GUN_MECH,S_GUN_AERO,S_GUN_VEE,S_GUN_BA,
+            S_GUN_JET,S_GUN_SPACE,S_GUN_PROTO,S_SMALL_ARMS};
+
+    public static final String[] rpgGunneryTypeList = {S_RPG_GUN_LASER,
+            S_RPG_GUN_BALLISTIC,
+            S_RPG_GUN_MISSILE};
+
+    // Dynamically build RPG gunnery skills
+    static {
+        String[] basicSkillList = {S_PILOT_MECH, S_GUN_MECH, S_PILOT_AERO, S_GUN_AERO,
+                S_PILOT_GVEE, S_PILOT_VTOL, S_PILOT_NVEE, S_GUN_VEE,
+                S_PILOT_JET, S_GUN_JET, S_PILOT_SPACE, S_GUN_SPACE,
+                S_ARTILLERY,
+                S_GUN_BA, S_GUN_PROTO, S_SMALL_ARMS, S_ANTI_MECH,
+                S_TECH_MECH, S_TECH_MECHANIC, S_TECH_AERO, S_TECH_BA,
+                S_TECH_VESSEL, S_ASTECH,
+                S_DOCTOR, S_MEDTECH, S_NAV,
+                S_ADMIN,
+                S_TACTICS, S_STRATEGY,
+                S_NEG, S_LEADER, S_SCROUNGE};
+        skillList = new String[basicSkillList.length + (rpgGunnerySkillList.length * rpgGunneryTypeList.length)];
+        int skillIndex = 0;
+        for (String skill : basicSkillList) {
+            skillList[skillIndex++] = skill;
+            if (isRPGGunnery(skill)) {
+                for (String gunneryType : rpgGunneryTypeList) {
+                    skillList[skillIndex++] = getRPGSkillName(skill, gunneryType);
+                }
+            }
+        }
+    }
 
     public static Hashtable<String, SkillType> lookupHash;
 
@@ -254,6 +282,20 @@ public class SkillType implements Serializable {
                     || name.equals(S_ARTILLERY);
     }
 
+    public static boolean isRPGGunnery(String name) {
+        for (String skill : rpgGunnerySkillList) {
+            if (name.equals(skill)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static String getRPGSkillName(String name, String type) {
+        return name + "/" + type;
+    }
+
     public int getExperienceLevel(int lvl) {
         if(lvl >= eliteLvl) {
             return EXP_ELITE;
@@ -309,6 +351,12 @@ public class SkillType implements Serializable {
         lookupHash.put(S_LEADER, createLeadership());
         lookupHash.put(S_NEG, createNegotiation());
         lookupHash.put(S_SCROUNGE, createScrounge());
+
+        for (String gunnery : rpgGunnerySkillList) {
+            for (String rpgType : rpgGunneryTypeList) {
+                lookupHash.put(getRPGSkillName(gunnery, rpgType), createRPGGunnery(gunnery, rpgType));
+            }
+        }
     }
 
     public static SkillType getType(String t) {
@@ -399,6 +447,22 @@ public class SkillType implements Serializable {
             return S_GUN_PROTO;
         }
         return S_GUN_MECH;
+    }
+
+    public static boolean isSingleGunnery(String skillName) {
+        return isRPGGunnery(skillName);
+    }
+
+    public static boolean isSpecificRPGGunnery(String skillName) {
+        for (String gunnery : rpgGunnerySkillList) {
+            for (String rpgType : rpgGunneryTypeList) {
+                if (skillName.equals(getRPGSkillName(gunnery, rpgType))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public static String[][] getSkillCostsArray() {
@@ -880,6 +944,17 @@ public class SkillType implements Serializable {
         skill.target = 10;
         skill.countUp = false;
         skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
+
+        return skill;
+    }
+
+    public static SkillType createRPGGunnery(String name, String type) {
+        SkillType skill = new SkillType();
+        skill.name = getRPGSkillName(name, type);
+        skill.target = 7;
+        skill.greenLvl = 2;
+        skill.countUp = false;
+        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
 
         return skill;
     }

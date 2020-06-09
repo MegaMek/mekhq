@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.*;
 import megamek.common.enums.Gender;
+import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.*;
@@ -1083,7 +1084,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case (T_NONE):
                 return true;
             case (T_MECHWARRIOR):
-                return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH);
+                return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH);
             case (T_GVEE_DRIVER):
                 return hasSkill(SkillType.S_PILOT_GVEE);
             case (T_NVEE_DRIVER):
@@ -1091,23 +1092,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case (T_VTOL_PILOT):
                 return hasSkill(SkillType.S_PILOT_VTOL);
             case (T_VEE_GUNNER):
-                return hasSkill(SkillType.S_GUN_VEE);
+                return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_VEE);
             case (T_AERO_PILOT):
-                return hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
+                return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
             case (T_CONV_PILOT):
-                return hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
+                return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
             case (T_PROTO_PILOT):
-                return hasSkill(SkillType.S_GUN_PROTO);
+                return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_PROTO);
             case (T_BA):
-                return hasSkill(SkillType.S_GUN_BA);
+                return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_BA);
             case (T_INFANTRY):
-                return hasSkill(SkillType.S_SMALL_ARMS);
+                return hasSkillOrRPGGunnerySkills(SkillType.S_SMALL_ARMS);
             case (T_SPACE_PILOT):
                 return hasSkill(SkillType.S_PILOT_SPACE);
             case (T_SPACE_CREW):
                 return hasSkill(SkillType.S_TECH_VESSEL);
             case (T_SPACE_GUNNER):
-                return hasSkill(SkillType.S_GUN_SPACE);
+                return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_SPACE);
             case (T_NAVIGATOR):
                 return hasSkill(SkillType.S_NAV);
             case (T_MECH_TECH):
@@ -2291,6 +2292,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
                 retVal.addSkill(SkillType.S_TACTICS, pilotCommandBonus, 0);
             }
+
+            for (String gunSkill : SkillType.rpgGunnerySkillList) {
+                if (retVal.skills.hasSkill(gunSkill)) {
+                    Skill skill = retVal.skills.getSkill(gunSkill);
+                    for (String rpgGunType : SkillType.rpgGunneryTypeList) {
+                        if (!retVal.skills.hasSkill(SkillType.getRPGSkillName(gunSkill, rpgGunType))) {
+                            retVal.addSkill(SkillType.getRPGSkillName(gunSkill, rpgGunType), skill.getLevel(), skill.getBonus());
+                        }
+                    }
+                }
+            }
+
             if (pilotName != null) {
                 retVal.migrateName(pilotName);
             }
@@ -2603,25 +2616,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         switch (role) {
             case T_MECHWARRIOR:
-                if (hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH)) {
-                    /* Attempt to use higher precision averaging, but if it doesn't provide a clear result
-                    due to non-standard experience thresholds then fall back on lower precision averaging
-                    See Bug #140 */
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
-                        int rawScore = (int) Math.floor(
-                            (getSkill(SkillType.S_GUN_MECH).getLevel() + getSkill(SkillType.S_PILOT_MECH).getLevel()) / 2.0
-                        );
-                        if (getSkill(SkillType.S_GUN_MECH).getType().getExperienceLevel(rawScore) ==
-                            getSkill(SkillType.S_PILOT_MECH).getType().getExperienceLevel(rawScore)) {
-                            return getSkill(SkillType.S_GUN_MECH).getType().getExperienceLevel(rawScore);
-                        }
-                    }
-
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_MECH).getExperienceLevel()
-                                             + getSkill(SkillType.S_PILOT_MECH).getExperienceLevel()) / 2.0);
-                } else {
-                    return -1;
-                }
+                return getGunneryExperienceLevel(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH);
             case T_GVEE_DRIVER:
                 if (hasSkill(SkillType.S_PILOT_GVEE)) {
                     return getSkill(SkillType.S_PILOT_GVEE).getExperienceLevel();
@@ -2641,77 +2636,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     return -1;
                 }
             case T_VEE_GUNNER:
-                if (hasSkill(SkillType.S_GUN_VEE)) {
-                    return getSkill(SkillType.S_GUN_VEE).getExperienceLevel();
-                } else {
-                    return -1;
-                }
+                return getGunneryExperienceLevel(SkillType.S_GUN_VEE);
             case T_AERO_PILOT:
-                if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
-                        int rawScore = (int) Math.floor(
-                            (getSkill(SkillType.S_GUN_AERO).getLevel() + getSkill(SkillType.S_PILOT_AERO)
-                                    .getLevel()) / 2.0
-                        );
-                        if (getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore) ==
-                            getSkill(SkillType.S_PILOT_AERO).getType().getExperienceLevel(rawScore)) {
-                            return getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore);
-                        }
-                    }
-
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel()
-                                                 + getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
-                } else {
-                    return -1;
-                }
+                return getGunneryExperienceLevel(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
             case T_CONV_PILOT:
-                if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
-                        int rawScore = (int) Math.floor(
-                            (getSkill(SkillType.S_GUN_JET).getLevel() + getSkill(SkillType.S_PILOT_JET)
-                                    .getLevel()) / 2.0
-                        );
-                        if (getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore) ==
-                            getSkill(SkillType.S_PILOT_JET).getType().getExperienceLevel(rawScore)) {
-                            return getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore);
-                        }
-                    }
-
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_JET).getExperienceLevel()
-                                             + getSkill(SkillType.S_PILOT_JET).getExperienceLevel()) / 2.0);
-                } else {
-                    return -1;
-                }
+                return getGunneryExperienceLevel(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
             case T_BA:
-                if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MECH)) {
-                    if (campaign.getCampaignOptions().useAltQualityAveraging()) {
-                        int rawScore = (int) Math.floor(
-                            (getSkill(SkillType.S_GUN_BA).getLevel() + getSkill(SkillType.S_ANTI_MECH)
-                                    .getLevel()) / 2.0
-                        );
-                        if (getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore) ==
-                            getSkill(SkillType.S_ANTI_MECH).getType().getExperienceLevel(rawScore)) {
-                            return getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore);
-                        }
-                    }
-
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel()
-                                             + getSkill(SkillType.S_ANTI_MECH).getExperienceLevel()) / 2.0);
-                } else {
-                    return -1;
-                }
+                return getGunneryExperienceLevel(SkillType.S_GUN_BA, SkillType.S_ANTI_MECH);
             case T_PROTO_PILOT:
-                if (hasSkill(SkillType.S_GUN_PROTO)) {
-                    return getSkill(SkillType.S_GUN_PROTO).getExperienceLevel();
-                } else {
-                    return -1;
-                }
+                return getGunneryExperienceLevel(SkillType.S_GUN_PROTO);
             case T_INFANTRY:
-                if (hasSkill(SkillType.S_SMALL_ARMS)) {
-                    return getSkill(SkillType.S_SMALL_ARMS).getExperienceLevel();
-                } else {
-                    return -1;
-                }
+                return getGunneryExperienceLevel(SkillType.S_SMALL_ARMS);
             case T_SPACE_PILOT:
                 if (hasSkill(SkillType.S_PILOT_SPACE)) {
                     return getSkill(SkillType.S_PILOT_SPACE).getExperienceLevel();
@@ -2725,11 +2660,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     return -1;
                 }
             case T_SPACE_GUNNER:
-                if (hasSkill(SkillType.S_GUN_SPACE)) {
-                    return getSkill(SkillType.S_GUN_SPACE).getExperienceLevel();
-                } else {
-                    return -1;
-                }
+                return getGunneryExperienceLevel(SkillType.S_GUN_SPACE);
             case T_NAVIGATOR:
                 if (hasSkill(SkillType.S_NAV)) {
                     return getSkill(SkillType.S_NAV).getExperienceLevel();
@@ -2790,6 +2721,95 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             default:
                 return -1;
+        }
+    }
+    
+    private int getGunneryExperienceLevel(String gunnerySkill, String pilotSkill) {
+        if (getCampaign().getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+            if (hasRPGGunnerySkills(gunnerySkill) && hasSkill(pilotSkill)) {
+                /* Attempt to use higher precision averaging, but if it doesn't provide a clear result
+                due to non-standard experience thresholds then fall back on lower precision averaging
+                See Bug #140 */
+                int laserLevel = hasSkill(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_LASER)) ? getSkill(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_LASER)).getExperienceLevel() : 0;
+                int ballisticLevel = hasSkill(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_BALLISTIC)) ? getSkill(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_BALLISTIC)).getExperienceLevel() : 0;
+                int missileLevel = hasSkill(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_MISSILE)) ? getSkill(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_MISSILE)).getExperienceLevel() : 0;
+
+                if (campaign.getCampaignOptions().useAltQualityAveraging()) {
+                    int rawScore = (int) Math.floor(
+                            (laserLevel + ballisticLevel + missileLevel + getSkill(pilotSkill).getLevel()) / 4.0
+                    );
+                    if ((SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_LASER)).getExperienceLevel(rawScore)
+                            == SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_BALLISTIC)).getExperienceLevel(rawScore))
+                        && (SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_BALLISTIC)).getExperienceLevel(rawScore)
+                            == SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_MISSILE)).getExperienceLevel(rawScore))
+                        && (SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_MISSILE)).getExperienceLevel(rawScore)
+                            == getSkill(pilotSkill).getType().getExperienceLevel(rawScore))) {
+                        return getSkill(pilotSkill).getType().getExperienceLevel(rawScore);
+                    }
+                }
+
+                return (int) Math.floor((SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_LASER)).getExperienceLevel(laserLevel)
+                        + SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_BALLISTIC)).getExperienceLevel(ballisticLevel)
+                        + SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_MISSILE)).getExperienceLevel(missileLevel)
+                        + getSkill(pilotSkill).getExperienceLevel()) / 4.0);
+            } else {
+                return -1;
+            }
+        } else {
+            if (hasSkill(gunnerySkill) && hasSkill(pilotSkill)) {
+                /* Attempt to use higher precision averaging, but if it doesn't provide a clear result
+                due to non-standard experience thresholds then fall back on lower precision averaging
+                See Bug #140 */
+                if (campaign.getCampaignOptions().useAltQualityAveraging()) {
+                    int rawScore = (int) Math.floor(
+                            (getSkill(gunnerySkill).getLevel() + getSkill(pilotSkill).getLevel()) / 2.0
+                    );
+                    if (getSkill(gunnerySkill).getType().getExperienceLevel(rawScore) ==
+                            getSkill(pilotSkill).getType().getExperienceLevel(rawScore)) {
+                        return getSkill(gunnerySkill).getType().getExperienceLevel(rawScore);
+                    }
+                }
+
+                return (int) Math.floor((getSkill(gunnerySkill).getExperienceLevel()
+                        + getSkill(pilotSkill).getExperienceLevel()) / 2.0);
+            } else {
+                return -1;
+            }
+        }
+    }
+
+    private int getGunneryExperienceLevel(String gunnerySkill) {
+        if (getCampaign().getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+            if (hasRPGGunnerySkills(gunnerySkill)) {
+                int laserLevel = hasSkill(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_LASER)) ? getSkill(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_LASER)).getExperienceLevel() : 0;
+                int ballisticLevel = hasSkill(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_BALLISTIC)) ? getSkill(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_BALLISTIC)).getExperienceLevel() : 0;
+                int missileLevel = hasSkill(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_MISSILE)) ? getSkill(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_MISSILE)).getExperienceLevel() : 0;
+
+
+                if (campaign.getCampaignOptions().useAltQualityAveraging()) {
+                    int rawScore = (int) Math.floor(
+                            (laserLevel + ballisticLevel + missileLevel) / 3.0
+                    );
+                    if ((SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_LASER)).getExperienceLevel(rawScore)
+                            == SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_BALLISTIC)).getExperienceLevel(rawScore))
+                            && (SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_BALLISTIC)).getExperienceLevel(rawScore)
+                            == SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_MISSILE)).getExperienceLevel(rawScore))) {
+                        return SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_LASER)).getExperienceLevel(rawScore);
+                    }
+                }
+
+                return (int) Math.floor((SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_LASER)).getExperienceLevel(laserLevel)
+                        + SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_BALLISTIC)).getExperienceLevel(ballisticLevel)
+                        + SkillType.getType(SkillType.getRPGSkillName(gunnerySkill, SkillType.S_RPG_GUN_MISSILE)).getExperienceLevel(missileLevel)) / 3.0);
+            } else {
+                return -1;
+            }
+        } else {
+            if (hasSkill(gunnerySkill)) {
+                return getSkill(gunnerySkill).getExperienceLevel();
+            } else {
+                return -1;
+            }
         }
     }
 
@@ -2897,6 +2917,24 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public Skills getSkills() {
         return skills;
+    }
+
+    public boolean hasRPGGunnerySkills(String name) {
+        for (String gunneryType : SkillType.rpgGunneryTypeList) {
+            if (!hasSkill(SkillType.getRPGSkillName(name, gunneryType))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean hasSkillOrRPGGunnerySkills(String name) {
+        if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+            return hasRPGGunnerySkills(name);
+        } else {
+            return hasSkill(name);
+        }
     }
 
     @Nullable
@@ -3204,34 +3242,34 @@ public class Person implements Serializable, MekHqXmlSerializable {
         } else if (ent instanceof Aero) {
             return hasSkill(SkillType.S_PILOT_AERO);
         } else if (ent instanceof BattleArmor) {
-            return hasSkill(SkillType.S_GUN_BA);
+            return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_BA);
         } else if (ent instanceof Infantry) {
-            return hasSkill(SkillType.S_SMALL_ARMS);
+            return hasSkillOrRPGGunnerySkills(SkillType.S_SMALL_ARMS);
         } else if (ent instanceof Protomech) {
-            return hasSkill(SkillType.S_GUN_PROTO);
+            return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_PROTO);
         }
         return false;
     }
 
     public boolean canGun(Entity ent) {
         if (ent instanceof LandAirMech) {
-            return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_GUN_AERO);
+            return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_MECH) && hasSkillOrRPGGunnerySkills(SkillType.S_GUN_AERO);
         } else if (ent instanceof Mech) {
-            return hasSkill(SkillType.S_GUN_MECH);
+            return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_MECH);
         } else if (ent instanceof Tank) {
-            return hasSkill(SkillType.S_GUN_VEE);
+            return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_VEE);
         } else if (ent instanceof ConvFighter) {
-            return hasSkill(SkillType.S_GUN_JET) || hasSkill(SkillType.S_GUN_AERO);
+            return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_JET) || hasSkillOrRPGGunnerySkills(SkillType.S_GUN_AERO);
         } else if (ent instanceof SmallCraft || ent instanceof Jumpship) {
-            return hasSkill(SkillType.S_GUN_SPACE);
+            return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_SPACE);
         } else if (ent instanceof Aero) {
-            return hasSkill(SkillType.S_GUN_AERO);
+            return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_AERO);
         } else if (ent instanceof BattleArmor) {
-            return hasSkill(SkillType.S_GUN_BA);
+            return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_BA);
         } else if (ent instanceof Infantry) {
-            return hasSkill(SkillType.S_SMALL_ARMS);
+            return hasSkillOrRPGGunnerySkills(SkillType.S_SMALL_ARMS);
         } else if (ent instanceof Protomech) {
-            return hasSkill(SkillType.S_GUN_PROTO);
+            return hasSkillOrRPGGunnerySkills(SkillType.S_GUN_PROTO);
         }
         return false;
     }

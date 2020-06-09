@@ -609,54 +609,93 @@ public class Utilities {
             if (u.getEntity() instanceof LandAirMech) {
                 p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
-                        - oldCrew.getPiloting(), 0);
+                           - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
-                        - oldCrew.getGunnery(), 0);
+                           - oldCrew.getGunnery(), 0);
                 p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget()
-                        - oldCrew.getPiloting(), 0);
+                           - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
-                        - oldCrew.getGunnery(), 0);
+                           - oldCrew.getGunnery(), 0);
+                
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType),
+                               SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_MECH,
+                                                                           gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                    p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, gunneryType),
+                               SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_AERO,
+                                                                           gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                }
+
                 p.setSecondaryRole(Person.T_AERO_PILOT);
             } else if (u.getEntity() instanceof Mech) {
                 p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
-                        - oldCrew.getPiloting(), 0);
+                           - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
-                        - oldCrew.getGunnery(), 0);
+                           - oldCrew.getGunnery(), 0);
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType),
+                               SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_MECH,
+                                                                           gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                }
             } else if (u.getEntity() instanceof Aero) {
                 p = c.newPerson(Person.T_AERO_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget()
-                        - oldCrew.getPiloting(), 0);
+                           - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
-                        - oldCrew.getGunnery(), 0);
+                           - oldCrew.getGunnery(), 0);
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, gunneryType),
+                               SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_AERO,
+                                                                           gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                }
             } else if (u.getEntity() instanceof ConvFighter) {
                 p = c.newPerson(Person.T_CONV_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_JET, SkillType.getType(SkillType.S_PILOT_JET).getTarget()
-                        - oldCrew.getPiloting(), 0);
+                           - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget()
-                        - oldCrew.getPiloting(), 0);
+                           - oldCrew.getPiloting(), 0);
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_JET, gunneryType),
+                               SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_JET,
+                                                                           gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                }
             } else if (u.getEntity() instanceof Protomech) {
                 p = c.newPerson(Person.T_PROTO_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget()
-                        - oldCrew.getGunnery(), 0);
+                           - oldCrew.getGunnery(), 0);
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_PROTO, gunneryType),
+                               SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_PROTO,
+                                                                           gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                }
             } else if (u.getEntity() instanceof VTOL) {
                 p = c.newPerson(Person.T_VTOL_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget()
-                        - oldCrew.getPiloting(), 0);
+                           - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget()
-                        - oldCrew.getGunnery(), 0);
+                           - oldCrew.getGunnery(), 0);
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType),
+                               SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_VEE,
+                                                                           gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                }
             } else {
                 //assume tanker if we got here
                 p = c.newPerson(Person.T_GVEE_DRIVER, Person.T_NONE, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget()
-                        - oldCrew.getPiloting(), 0);
+                           - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget()
-                        - oldCrew.getGunnery(), 0);
+                           - oldCrew.getGunnery(), 0);
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType),
+                               SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_VEE,
+                                                                           gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                }
             }
 
             migrateCrewData(p, oldCrew, 0, true);
             drivers.add(p);
-            //endregion Solo Pilot
         } else {
             if (oldCrew.getSlotCount() > 1) {
                 //region Multi-Slot Crew
@@ -665,21 +704,27 @@ public class Utilities {
                     if (u.getEntity() instanceof Mech) {
                         p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode, oldCrew.getGender(slot));
                         p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
-                                - oldCrew.getPiloting(slot), 0);
+                                   - oldCrew.getPiloting(slot), 0);
                         p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
-                                - oldCrew.getGunnery(slot), 0);
+                                   - oldCrew.getGunnery(slot), 0);
+                        for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                            p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                        }
                     } else if (u.getEntity() instanceof Aero) {
                         p = c.newPerson(Person.T_AERO_PILOT, Person.T_NONE, factionCode, oldCrew.getGender(slot));
                         p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget()
-                                - oldCrew.getPiloting(slot), 0);
+                                   - oldCrew.getPiloting(slot), 0);
                         p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
-                                - oldCrew.getGunnery(slot), 0);
+                                   - oldCrew.getGunnery(slot), 0);
+                        for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                            p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                        }
                     }
                     if (null != p) {
                         if (!oldCrew.getExternalIdAsString(numberPeopleGenerated).equals("-1")) {
                             p.setId(UUID.fromString(oldCrew.getExternalIdAsString(numberPeopleGenerated)));
                         }
-
+                        
                         migrateCrewData(p, oldCrew, numberPeopleGenerated++, true);
                         drivers.add(p);
                     }
@@ -694,7 +739,7 @@ public class Utilities {
             // TODO : 26-Feb-2020)
             else {
                 // Generate drivers for multi-crewed vehicles and vessels
-
+                
                 //Uggh, BA are a nightmare. The getTotalDriverNeeds will adjust for missing/destroyed suits
                 //but we can't change that because lots of other stuff needs that to be right, so we will hack
                 //it here to make it the starting squad size
@@ -702,66 +747,107 @@ public class Utilities {
                 if (u.getEntity() instanceof BattleArmor) {
                     driversNeeded = ((BattleArmor) u.getEntity()).getSquadSize();
                 }
-
+                
                 for (int slot = 0; slot < driversNeeded; slot++) {
                     Person p;
                     if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
                         p = c.newPerson(Person.T_SPACE_PILOT, Person.T_NONE, factionCode,
-                                oldCrew.getGender(numberPeopleGenerated));
+                                        oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(
-                                SkillType.getType(SkillType.S_PILOT_SPACE).getTarget()
-                                        - oldCrew.getPiloting()),
-                                0);
+                                                                                  SkillType.getType(SkillType.S_PILOT_SPACE).getTarget()
+                                                                                  - oldCrew.getPiloting()),
+                                   0);
                         totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
                     } else if(u.getEntity() instanceof BattleArmor) {
                         p = c.newPerson(Person.T_BA, Person.T_NONE, factionCode,
-                                oldCrew.getGender(numberPeopleGenerated));
+                                        oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(
-                                SkillType.getType(SkillType.S_GUN_BA).getTarget()
-                                        - oldCrew.getGunnery()),
-                                0);
-                        totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
+                                                                             SkillType.getType(SkillType.S_GUN_BA).getTarget()
+                                                                             - oldCrew.getGunnery()),
+                                   0);
+                        
+                        int avgRpgGunnery = 0;
+                        for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                            p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_BA, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                            avgRpgGunnery += p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, gunneryType)).getFinalSkillValue();
+                        }
+                        
+                        if (c.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                            totalGunnery += avgRpgGunnery / SkillType.rpgGunneryTypeList.length;
+                        } else {
+                            totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
+                        }
                     } else if(u.getEntity() instanceof Infantry) {
                         p = c.newPerson(Person.T_INFANTRY, Person.T_NONE, factionCode,
-                                oldCrew.getGender(numberPeopleGenerated));
+                                        oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(
-                                SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()),
-                                0);
-                        totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
+                                                                                 SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()),
+                                   0);
+                        
+                        int avgRpgGunnery = 0;
+                        for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                            p.addSkill(SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                            avgRpgGunnery += p.getSkill(SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType)).getFinalSkillValue();
+                        }
+                        
+                        if (c.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                            totalGunnery += avgRpgGunnery / SkillType.rpgGunneryTypeList.length;
+                        } else {
+                            totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
+                        }
                     } else if(u.getEntity() instanceof VTOL) {
                         p = c.newPerson(Person.T_VTOL_PILOT, Person.T_NONE, factionCode,
-                                oldCrew.getGender(numberPeopleGenerated));
+                                        oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(
-                                SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
-                                0);
+                                                                             SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
+                                   0);
                         p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(
-                                SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
-                                0);
+                                                                          SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
+                                   0);
+                        for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                            p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                        }
+                        
                     } else if (u.getEntity() instanceof Mech) {
                         p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode,
-                                oldCrew.getGender(numberPeopleGenerated));
+                                        oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(
-                                SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(),
-                                0);
+                                                                             SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(),
+                                   0);
                         p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(
-                                SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(),
-                                0);
+                                                                           SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(),
+                                   0);
+                        
+                        int avgRpgGunnery = 0;
+                        for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                            p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                            avgRpgGunnery += p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType)).getFinalSkillValue();
+                        }
+                        
+                        if (c.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                            totalGunnery += avgRpgGunnery / SkillType.rpgGunneryTypeList.length;
+                        } else {
+                            totalGunnery += p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
+                        }
                     } else {
                         //assume tanker if we got here
                         p = c.newPerson(Person.T_GVEE_DRIVER, Person.T_NONE, factionCode,
-                                oldCrew.getGender(numberPeopleGenerated));
+                                        oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(
-                                SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(),
-                                0);
+                                                                             SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(),
+                                   0);
                         p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(
-                                SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
-                                0);
+                                                                          SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
+                                   0);
+                        for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                            p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                        }
                     }
-
+                    
                     migrateCrewData(p, oldCrew, numberPeopleGenerated++, true);
                     drivers.add(p);
                 }
-
+                
                 // Regenerate as needed to balance
                 if (drivers.size() != 0) {
                     averageGunnery = (int) Math.round(((double) totalGunnery) / drivers.size());
@@ -771,9 +857,9 @@ public class Utilities {
                             totalPiloting = 0;
                             for (Person p : drivers) {
                                 p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(
-                                        SkillType.getType(SkillType.S_PILOT_SPACE).getTarget()
-                                                - oldCrew.getPiloting()),
-                                        0);
+                                                                                          SkillType.getType(SkillType.S_PILOT_SPACE).getTarget()
+                                                                                          - oldCrew.getPiloting()),
+                                           0);
                                 totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
                             }
                             averagePiloting = (int) Math.round(((double) totalPiloting) / drivers.size());
@@ -783,10 +869,21 @@ public class Utilities {
                             totalGunnery = 0;
                             for (Person p : drivers) {
                                 p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(
-                                        SkillType.getType(SkillType.S_GUN_BA).getTarget()
-                                                - oldCrew.getGunnery()),
-                                        0);
-                                totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
+                                                                                     SkillType.getType(SkillType.S_GUN_BA).getTarget()
+                                                                                     - oldCrew.getGunnery()),
+                                           0);
+                                
+                                int avgRpgGunnery = 0;
+                                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                                    p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_BA, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                                    avgRpgGunnery += p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, gunneryType)).getFinalSkillValue();
+                                }
+                                
+                                if (c.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                                    totalGunnery += avgRpgGunnery / SkillType.rpgGunneryTypeList.length;
+                                } else {
+                                    totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
+                                }
                             }
                             averageGunnery = (int) Math.round(((double) totalGunnery) / drivers.size());
                         }
@@ -795,54 +892,98 @@ public class Utilities {
                             totalGunnery = 0;
                             for (Person p : drivers) {
                                 p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(
-                                        SkillType.getType(SkillType.S_SMALL_ARMS).getTarget()
-                                                - oldCrew.getGunnery()),
-                                        0);
-                                totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
+                                                                                         SkillType.getType(SkillType.S_SMALL_ARMS).getTarget()
+                                                                                         - oldCrew.getGunnery()),
+                                           0);
+                                
+                                int avgRpgGunnery = 0;
+                                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                                    p.addSkill(SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                                    avgRpgGunnery += p.getSkill(SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType)).getFinalSkillValue();
+                                }
+                                
+                                if (c.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                                    totalGunnery += avgRpgGunnery / SkillType.rpgGunneryTypeList.length;
+                                } else {
+                                    totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
+                                }
                             }
                             averageGunnery = (int) Math.round(((double) totalGunnery) / drivers.size());
                         }
                     }
                 }
-
+                
                 if (!u.usesSoldiers()) {
                     // Generate gunners for multi-crew vehicles
                     for (int slot = 0; slot < u.getTotalGunnerNeeds(); slot++) {
                         Person p;
                         if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
                             p = c.newPerson(Person.T_SPACE_GUNNER, Person.T_NONE, factionCode,
-                                    oldCrew.getGender(numberPeopleGenerated));
+                                            oldCrew.getGender(numberPeopleGenerated));
                             p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(
-                                    SkillType.getType(SkillType.S_GUN_SPACE).getTarget()
-                                            - oldCrew.getGunnery()),
-                                    0);
-                            totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
+                                                                                    SkillType.getType(SkillType.S_GUN_SPACE).getTarget()
+                                                                                    - oldCrew.getGunnery()),
+                                       0);
+                            
+                            int avgRpgGunnery = 0;
+                            for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                                p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                                avgRpgGunnery += p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, gunneryType)).getFinalSkillValue();
+                            }
+                            
+                            if (c.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                                totalGunnery += avgRpgGunnery / SkillType.rpgGunneryTypeList.length;
+                            } else {
+                                totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
+                            }
                         } else if (u.getEntity() instanceof Mech) {
                             p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode,
-                                    oldCrew.getGender(numberPeopleGenerated));
+                                            oldCrew.getGender(numberPeopleGenerated));
                             p.addSkill(SkillType.S_PILOT_MECH,
-                                    SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
-                                            - oldCrew.getPiloting(),
-                                    0);
+                                       SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
+                                       - oldCrew.getPiloting(),
+                                       0);
                             p.addSkill(SkillType.S_GUN_MECH,
-                                    SkillType.getType(SkillType.S_GUN_MECH).getTarget()
-                                            - oldCrew.getGunnery(),
-                                    0);
-                            totalGunnery += p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
+                                       SkillType.getType(SkillType.S_GUN_MECH).getTarget()
+                                       - oldCrew.getGunnery(),
+                                       0);
+                            
+                            int avgRpgGunnery = 0;
+                            for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                                p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                                avgRpgGunnery += p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType)).getFinalSkillValue();
+                            }
+                            
+                            if (c.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                                totalGunnery += avgRpgGunnery / SkillType.rpgGunneryTypeList.length;
+                            } else {
+                                totalGunnery += p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
+                            }
                         } else {
                             //assume tanker if we got here
                             p = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode,
-                                    oldCrew.getGender(numberPeopleGenerated));
+                                            oldCrew.getGender(numberPeopleGenerated));
                             p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(
-                                    SkillType.getType(SkillType.S_GUN_VEE).getTarget()
-                                            - oldCrew.getGunnery()), 0);
-                            totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
+                                                                                  SkillType.getType(SkillType.S_GUN_VEE).getTarget()
+                                                                                  - oldCrew.getGunnery()), 0);
+                            
+                            int avgRpgGunnery = 0;
+                            for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                                p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                                avgRpgGunnery += p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType)).getFinalSkillValue();
+                            }
+                            
+                            if (c.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                                totalGunnery += avgRpgGunnery / SkillType.rpgGunneryTypeList.length;
+                            } else {
+                                totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
+                            }
                         }
-
+                        
                         migrateCrewData(p, oldCrew, numberPeopleGenerated++, true);
                         gunners.add(p);
                     }
-
+                    
                     // Regenerate gunners as needed to balance
                     if (gunners.size() != 0) {
                         averageGunnery = (int) Math.round(((double) totalGunnery) / gunners.size());
@@ -851,50 +992,71 @@ public class Utilities {
                                 totalGunnery = 0;
                                 for (Person p : gunners) {
                                     p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(
-                                            SkillType.getType(SkillType.S_GUN_VEE).getTarget()
-                                                    - oldCrew.getGunnery()), 0);
-                                    totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
+                                                                                          SkillType.getType(SkillType.S_GUN_VEE).getTarget()
+                                                                                          - oldCrew.getGunnery()), 0);
+
+                                    int avgRpgGunnery = 0;
+                                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                                        p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                                        avgRpgGunnery += p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType)).getFinalSkillValue();
+                                    }
+
+                                    if (c.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                                        totalGunnery += avgRpgGunnery / SkillType.rpgGunneryTypeList.length;
+                                    } else {
+                                        totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
+                                    }
                                 }
-                                averageGunnery = (int) Math.round(((double) totalGunnery) / gunners.size());
                             }
                         } else if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
                             while (averageGunnery != oldCrew.getGunnery()) {
                                 totalGunnery = 0;
                                 for (Person p : gunners) {
                                     p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(
-                                            SkillType.getType(SkillType.S_GUN_SPACE).getTarget()
-                                                    - oldCrew.getGunnery()), 0);
-                                    totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
+                                                                                            SkillType.getType(SkillType.S_GUN_SPACE).getTarget()
+                                                                                            - oldCrew.getGunnery()), 0);
+
+                                    int avgRpgGunnery = 0;
+                                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                                        p.addSkill(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, gunneryType), SkillType.getType(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, gunneryType)).getTarget() - oldCrew.getGunnery(), 0);
+                                        avgRpgGunnery += p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, gunneryType)).getFinalSkillValue();
+                                    }
+
+                                    if (c.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                                        totalGunnery += avgRpgGunnery / SkillType.rpgGunneryTypeList.length;
+                                    } else {
+                                        totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
+                                    }
                                 }
-                                averageGunnery = (int) Math.round(((double) totalGunnery) / gunners.size());
                             }
                         }
                     }
                 }
             }
-
+            
             for (int slot = 0; slot < u.getTotalCrewNeeds(); slot++) {
                 Person p = c.newPerson(u.getEntity().isSupportVehicle()
-                                ? Person.T_VEHICLE_CREW
-                                : Person.T_SPACE_CREW,
-                        Person.T_NONE, factionCode, oldCrew.getGender(numberPeopleGenerated));
-
+                                       ? Person.T_VEHICLE_CREW
+                                       : Person.T_SPACE_CREW,
+                                       Person.T_NONE, factionCode, oldCrew.getGender(numberPeopleGenerated));
+                
                 migrateCrewData(p, oldCrew, numberPeopleGenerated++, false);
                 vesselCrew.add(p);
             }
-
+            
             if (u.canTakeNavigator()) {
                 navigator = c.newPerson(Person.T_NAVIGATOR, Person.T_NONE, factionCode,
-                        oldCrew.getGender(numberPeopleGenerated));
+                                        oldCrew.getGender(numberPeopleGenerated));
                 migrateCrewData(navigator, oldCrew, numberPeopleGenerated++, false);
             }
-
+            
             if (u.canTakeTechOfficer()) {
                 consoleCmdr = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode,
-                        oldCrew.getGender(numberPeopleGenerated));
+                                          oldCrew.getGender(numberPeopleGenerated));
                 migrateCrewData(consoleCmdr, oldCrew, numberPeopleGenerated, false);
             }
         }
+
 
         //region Data Gathering
         Map<CrewType, Collection<Person>> result = new HashMap<>();

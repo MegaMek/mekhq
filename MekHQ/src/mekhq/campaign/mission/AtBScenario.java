@@ -45,6 +45,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.logging.LogLevel;
+import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -1487,8 +1488,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 stub.add("<html><font color='red'>No random assignment table found for faction</font></html>");
             } else {
                 stub.add("<html>" + en.getCrew().getName() + " (" +
-                        en.getCrew().getGunnery() + "/" +
-                        en.getCrew().getPiloting() + "), " +
+                        en.getCrew().getSkillsAsString(
+                                en.getGame().getOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) + "), " +
                         "<i>" + en.getShortName() + "</i>" +
                         "</html>");
             }

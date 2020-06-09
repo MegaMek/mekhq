@@ -733,8 +733,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public String getPilotDesc() {
         if (hasPilot()) {
             return entity.getCrew().getName() + " "
-                    + entity.getCrew().getGunnery() + "/"
-                    + entity.getCrew().getPiloting();
+                    + entity.getCrew().getSkillsAsString(
+                            getCampaign()
+                                    .getGameOptions()
+                                    .booleanOption(OptionsConstants.RPG_RPG_GUNNERY));
         }
         return "NO PILOT";
     }
@@ -3666,6 +3668,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                             cdrOptions.getOption(implantName).setValue(option.getValue());
                         }
                     }
+
                     entity.getCrew().setOptions(cdrOptions);
 
                     if(usesSoloPilot()) {
@@ -3703,12 +3706,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         int piloting = 13;
         int gunnery = 13;
+        int gunneryL = 13;
+        int gunneryB = 13;
+        int gunneryM = 13;
         int artillery = 13;
         String driveType = SkillType.getDrivingSkillFor(entity);
         String gunType = SkillType.getGunnerySkillFor(entity);
         int sumPiloting = 0;
         int nDrivers = 0;
         int sumGunnery = 0;
+        int[] sumGunneryRpg = {0, 0, 0};
         int nGunners = 0;
         int nCrew = 0;
 
@@ -3727,10 +3734,41 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
 
             if (entity instanceof Tank
-                    && Compute.getFullCrewSize(entity) == 1
-                    && p.hasSkill(gunType)) {
-                sumGunnery += p.getSkill(gunType).getFinalSkillValue();
-                nGunners++;
+                    && Compute.getFullCrewSize(entity) == 1) {
+                if (SkillType.isRPGGunnery(gunType) &&
+                        campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+
+                    // All gunners should have all 3 skills, but we need to protect for the case
+                    // that they don't.  Instead look for at least 1 RPG skill and treat the missing
+                    // skills as having a 13.
+                    boolean hasGunnery = false;
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        if (p.hasSkill(SkillType.getRPGSkillName(gunType, gunneryType))) {
+                            hasGunnery = true;
+                            break;
+                        }
+                    }
+
+                    if (hasGunnery) {
+                        int totalRpgGunnery = 0;
+                        for (int i = 0; i < SkillType.rpgGunneryTypeList.length; ++i) {
+                            String gunneryType = SkillType.rpgGunneryTypeList[i];
+                            if (p.hasSkill(SkillType.getRPGSkillName(gunType, gunneryType))) {
+                                sumGunneryRpg[i] += p.getSkill(SkillType.getRPGSkillName(gunType, gunneryType)).getFinalSkillValue();
+                            }
+
+                            totalRpgGunnery += sumGunneryRpg[i];
+                        }
+
+                        sumGunnery += totalRpgGunnery / SkillType.rpgGunneryTypeList.length;
+                        nGunners++;
+                    }
+                } else {
+                    if (p.hasSkill(gunType)) {
+                        sumGunnery += p.getSkill(gunType).getFinalSkillValue();
+                        nGunners++;
+                    }
+                }
             }
             if(getCampaign().getCampaignOptions().useAdvancedMedical()) {
                 sumPiloting += p.getPilotingInjuryMod();
@@ -3741,10 +3779,42 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if(p.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
-            if(p.hasSkill(gunType)) {
-                sumGunnery += p.getSkill(gunType).getFinalSkillValue();
-                nGunners++;
+
+            if (SkillType.isRPGGunnery(gunType) &&
+                    campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+
+                // All gunners should have all 3 skills, but we need to protect for the case
+                // that they don't.  Instead look for at least 1 RPG skill and treat the missing
+                // skills as having a 13.
+                boolean hasGunnery = false;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    if (p.hasSkill(SkillType.getRPGSkillName(gunType, gunneryType))) {
+                        hasGunnery = true;
+                        break;
+                    }
+                }
+
+                if (hasGunnery) {
+                    int totalRpgGunnery = 0;
+                    for (int i = 0; i < SkillType.rpgGunneryTypeList.length; ++i) {
+                        String gunneryType = SkillType.rpgGunneryTypeList[i];
+                        if (p.hasSkill(SkillType.getRPGSkillName(gunType, gunneryType))) {
+                            sumGunneryRpg[i] += p.getSkill(SkillType.getRPGSkillName(gunType, gunneryType)).getFinalSkillValue();
+                        }
+
+                        totalRpgGunnery += sumGunneryRpg[i];
+                    }
+
+                    sumGunnery += totalRpgGunnery / SkillType.rpgGunneryTypeList.length;
+                    nGunners++;
+                }
+            } else {
+                if (p.hasSkill(gunType)) {
+                    sumGunnery += p.getSkill(gunType).getFinalSkillValue();
+                    nGunners++;
+                }
             }
+
             if(p.hasSkill(SkillType.S_ARTILLERY)
                     && p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue() < artillery) {
                 artillery = p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
@@ -3785,7 +3855,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         if(nGunners > 0) {
             gunnery = (int)Math.round(((double)sumGunnery)/nGunners);
+            if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                gunneryL = (int) Math.round(((double) sumGunneryRpg[0]) / nGunners);
+                gunneryM = (int) Math.round(((double) sumGunneryRpg[1]) / nGunners);
+                gunneryB = (int) Math.round(((double) sumGunneryRpg[2]) / nGunners);
+            }
         }
+
         if(entity instanceof Infantry) {
             if(entity instanceof BattleArmor) {
                 int ntroopers = 0;
@@ -3846,6 +3922,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //and set it to true when we start up through MHQ
         entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), 0);
         entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), 0);
+        if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+            entity.getCrew().setGunneryL(Math.min(Math.max(gunneryL, 0), 7), 0);
+            entity.getCrew().setGunneryM(Math.min(Math.max(gunneryM, 0), 7), 0);
+            entity.getCrew().setGunneryB(Math.min(Math.max(gunneryB, 0), 7), 0);
+        } else {
+            entity.getCrew().setGunneryL(Math.min(Math.max(gunnery, 0), 7), 0);
+            entity.getCrew().setGunneryM(Math.min(Math.max(gunnery, 0), 7), 0);
+            entity.getCrew().setGunneryB(Math.min(Math.max(gunnery, 0), 7), 0);
+        }
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 8), 0);
         if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             //Use tacops crew hits calculations and current size versus maximum size
@@ -3875,22 +3960,86 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         int pilotingMech = 13;
         int gunneryMech = 13;
+        int[] gunneryMechRpg = {13, 13, 13};
         int pilotingAero = 13;
         int gunneryAero = 13;
+        int[] gunneryAeroRpg = {13, 13, 13};
         int artillery = 13;
 
         if (pilot.hasSkill(SkillType.S_PILOT_MECH)) {
             pilotingMech = pilot.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue();
         }
-        if (pilot.hasSkill(SkillType.S_GUN_MECH)) {
-            gunneryMech = pilot.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
+
+        if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+
+            // All gunners should have all 3 skills, but we need to protect for the case
+            // that they don't.  Instead look for at least 1 RPG skill and treat the missing
+            // skills as having a 13.
+            boolean hasGunnery = false;
+            for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                if (pilot.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType))) {
+                    hasGunnery = true;
+                    break;
+                }
+            }
+
+            if (hasGunnery) {
+                int totalRpgGunnery = 0;
+                for (int i = 0; i < SkillType.rpgGunneryTypeList.length; ++i) {
+                    String gunneryType = SkillType.rpgGunneryTypeList[i];
+                    if (pilot.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType))) {
+                        gunneryMechRpg[i] = pilot.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType)).getFinalSkillValue();
+                    }
+
+                    totalRpgGunnery += gunneryMechRpg[i];
+                }
+
+                gunneryMech = totalRpgGunnery / SkillType.rpgGunneryTypeList.length;
+            }
+        } else {
+            if (pilot.hasSkill(SkillType.S_GUN_MECH)) {
+                gunneryMech = pilot.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
+            }
         }
+
+
         if (pilot.hasSkill(SkillType.S_PILOT_AERO)) {
             pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue();
         }
-        if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
-            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue();
+
+        if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+
+            // All gunners should have all 3 skills, but we need to protect for the case
+            // that they don't.  Instead look for at least 1 RPG skill and treat the missing
+            // skills as having a 13.
+            boolean hasGunnery = false;
+            for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                if (pilot.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, gunneryType))) {
+                    hasGunnery = true;
+                    break;
+                }
+            }
+
+            if (hasGunnery) {
+                int totalRpgGunnery = 0;
+                for (int i = 0; i < SkillType.rpgGunneryTypeList.length; ++i) {
+                    String gunneryType = SkillType.rpgGunneryTypeList[i];
+                    if (pilot.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, gunneryType))) {
+                        gunneryAeroRpg[i] = pilot.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, gunneryType)).getFinalSkillValue();
+                    }
+
+                    totalRpgGunnery += gunneryAeroRpg[i];
+                }
+
+                gunneryAero = totalRpgGunnery / SkillType.rpgGunneryTypeList.length;
+            }
+        } else {
+            if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
+                gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue();
+            }
         }
+
+
         if (pilot.hasSkill(SkillType.S_ARTILLERY)) {
             artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
         }
@@ -3901,12 +4050,35 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             pilotingAero += pilot.getPilotingInjuryMod();
             gunneryAero += pilot.getGunneryInjuryMod();
             artillery += pilot.getGunneryInjuryMod();
+            if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                for (int i = 0; i < SkillType.rpgGunneryTypeList.length; ++i) {
+                    gunneryMechRpg[i] += pilot.getGunneryInjuryMod();
+                    gunneryAeroRpg[i] += pilot.getGunneryInjuryMod();
+                }
+            }
         }
+
+
         LAMPilot crew = (LAMPilot)entity.getCrew();
         crew.setPiloting(Math.min(Math.max(pilotingMech, 0), 8));
         crew.setGunnery(Math.min(Math.max(gunneryMech, 0), 7));
-        crew.setPilotingAero(Math.min(Math.max(pilotingAero, 0), 8));
         crew.setGunneryAero(Math.min(Math.max(gunneryAero, 0), 7));
+        crew.setPilotingAero(Math.min(Math.max(pilotingAero, 0), 8));
+        if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+            crew.setGunneryMechL(Math.min(Math.max(gunneryMechRpg[0], 0), 7));
+            crew.setGunneryMechM(Math.min(Math.max(gunneryMechRpg[1], 0), 7));
+            crew.setGunneryMechB(Math.min(Math.max(gunneryMechRpg[2], 0), 7));
+            crew.setGunneryAeroL(Math.min(Math.max(gunneryAeroRpg[0], 0), 7));
+            crew.setGunneryAeroM(Math.min(Math.max(gunneryAeroRpg[1], 0), 7));
+            crew.setGunneryAeroB(Math.min(Math.max(gunneryAeroRpg[2], 0), 7));
+        } else {
+            crew.setGunneryMechL(Math.min(Math.max(gunneryMech, 0), 7));
+            crew.setGunneryMechM(Math.min(Math.max(gunneryMech, 0), 7));
+            crew.setGunneryMechB(Math.min(Math.max(gunneryMech, 0), 7));
+            crew.setGunneryAeroL(Math.min(Math.max(gunneryAero, 0), 7));
+            crew.setGunneryAeroM(Math.min(Math.max(gunneryAero, 0), 7));
+            crew.setGunneryAeroB(Math.min(Math.max(gunneryAero, 0), 7));
+        }
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 8), 0);
         entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
@@ -3928,13 +4100,50 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         entity.getCrew().setPortraitFileName(p.getPortraitFileName(), slot);
         entity.getCrew().setHits(p.getHits(), slot);
         int gunnery = 7;
+        int[] gunneryRpg = {7, 7, 7};
         int artillery = 7;
         int piloting = 8;
-        if (p.hasSkill(gunType)) {
-            gunnery = p.getSkill(gunType).getFinalSkillValue();
+
+
+        if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+
+            // All gunners should have all 3 skills, but we need to protect for the case
+            // that they don't.  Instead look for at least 1 RPG skill and treat the missing
+            // skills as having a 13.
+            boolean hasGunnery = false;
+            for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                if (p.hasSkill(SkillType.getRPGSkillName(gunType, gunneryType))) {
+                    hasGunnery = true;
+                    break;
+                }
+            }
+
+            if (hasGunnery) {
+                int totalRpgGunnery = 0;
+                for (int i = 0; i < SkillType.rpgGunneryTypeList.length; ++i) {
+                    String gunneryType = SkillType.rpgGunneryTypeList[i];
+                    if (p.hasSkill(SkillType.getRPGSkillName(gunType, gunneryType))) {
+                        gunneryRpg[i] += p.getSkill(SkillType.getRPGSkillName(gunType, gunneryType)).getFinalSkillValue();
+                    }
+
+                    totalRpgGunnery += gunneryRpg[i];
+                }
+
+                gunnery = totalRpgGunnery / SkillType.rpgGunneryTypeList.length;
+            }
+        } else {
+            if (p.hasSkill(gunType)) {
+                gunnery = p.getSkill(gunType).getFinalSkillValue();
+            }
         }
+
         if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
             gunnery += p.getGunneryInjuryMod();
+            if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                for (int i = 0; i < SkillType.rpgGunneryTypeList.length; ++i) {
+                    gunneryRpg[i] += p.getGunneryInjuryMod();
+                }
+            }
         }
         if (p.hasSkill(driveType)) {
             piloting = p.getSkill(driveType).getFinalSkillValue();
@@ -3946,9 +4155,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), slot);
         entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), slot);
         //also set RPG gunnery skills in case present in game options
-        entity.getCrew().setGunneryL(Math.min(Math.max(gunnery, 0), 7), slot);
-        entity.getCrew().setGunneryM(Math.min(Math.max(gunnery, 0), 7), slot);
-        entity.getCrew().setGunneryB(Math.min(Math.max(gunnery, 0), 7), slot);
+        if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+            entity.getCrew().setGunneryL(Math.min(Math.max(gunneryRpg[0], 0), 7), slot);
+            entity.getCrew().setGunneryM(Math.min(Math.max(gunneryRpg[1], 0), 7), slot);
+            entity.getCrew().setGunneryB(Math.min(Math.max(gunneryRpg[2], 0), 7), slot);
+        } else {
+            entity.getCrew().setGunneryL(Math.min(Math.max(gunnery, 0), 7), slot);
+            entity.getCrew().setGunneryM(Math.min(Math.max(gunnery, 0), 7), slot);
+            entity.getCrew().setGunneryB(Math.min(Math.max(gunnery, 0), 7), slot);
+        }
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 7), slot);
         entity.getCrew().setToughness(p.getToughness(), slot);
         entity.getCrew().setExternalIdAsString(p.getId().toString(), slot);

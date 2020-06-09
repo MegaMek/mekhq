@@ -70,53 +70,141 @@ public abstract class AbstractSkillGenerator {
             case (Person.T_MECHWARRIOR):
                 addSkill(person, SkillType.S_PILOT_MECH, expLvl,
                         rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                int levelMechGunTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType),
+                            expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    levelMechGunTotal += person.getSkill(
+                            SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_GUN_MECH, levelMechGunTotal / SkillType.rpgGunneryTypeList.length,
+                        rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case (Person.T_GVEE_DRIVER):
                 addSkill(person, SkillType.S_PILOT_GVEE, expLvl,
                         rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                int levelGVeeGunTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType),
+                            expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    levelGVeeGunTotal += person.getSkill(
+                            SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_GUN_VEE, levelGVeeGunTotal / SkillType.rpgGunneryTypeList.length,
+                        rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case (Person.T_NVEE_DRIVER):
                 addSkill(person, SkillType.S_PILOT_NVEE, expLvl,
                         rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                int levelNVeeGunTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType),
+                            expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    levelNVeeGunTotal += person.getSkill(
+                            SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_GUN_VEE, levelNVeeGunTotal / SkillType.rpgGunneryTypeList.length,
+                        rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case (Person.T_VTOL_PILOT):
                 addSkill(person, SkillType.S_PILOT_VTOL, expLvl,
                         rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                int levelVtolGunTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType),
+                            expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    levelVtolGunTotal += person.getSkill(SkillType.getRPGSkillName(
+                            SkillType.S_GUN_VEE, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_GUN_VEE, levelVtolGunTotal / SkillType.rpgGunneryTypeList.length,
+                        rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case (Person.T_VEE_GUNNER):
-                addSkill(person, SkillType.S_GUN_VEE, expLvl,
+                int levelVeeGunTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType),
+                            expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    levelVeeGunTotal += person.getSkill(
+                            SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_GUN_VEE, levelVeeGunTotal / SkillType.rpgGunneryTypeList.length,
                         rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case (Person.T_CONV_PILOT):
                 addSkill(person, SkillType.S_PILOT_JET, expLvl,
                         rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_JET, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                int levelConvGunTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_GUN_JET, gunneryType),
+                            expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    levelConvGunTotal += person.getSkill(
+                            SkillType.getRPGSkillName(SkillType.S_GUN_JET, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_GUN_JET, levelConvGunTotal / SkillType.rpgGunneryTypeList.length,
+                        rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case (Person.T_AERO_PILOT):
                 addSkill(person, SkillType.S_PILOT_AERO, expLvl,
                         rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                int levelAeroGunTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_GUN_AERO, gunneryType),
+                            expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    levelAeroGunTotal += person.getSkill(
+                            SkillType.getRPGSkillName(SkillType.S_GUN_AERO, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_GUN_AERO, levelAeroGunTotal / SkillType.rpgGunneryTypeList.length,
+                        rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case (Person.T_PROTO_PILOT):
-                addSkill(person, SkillType.S_GUN_PROTO, expLvl,
+                int levelProtoGunTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_GUN_PROTO, gunneryType),
+                            expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    levelProtoGunTotal += person.getSkill(
+                            SkillType.getRPGSkillName(SkillType.S_GUN_PROTO, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_GUN_PROTO, levelProtoGunTotal / SkillType.rpgGunneryTypeList.length,
                         rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case (Person.T_BA):
-                addSkill(person, SkillType.S_GUN_BA, expLvl,
+                int levelBaGunTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_GUN_BA, gunneryType),
+                            expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    levelBaGunTotal += person.getSkill(
+                            SkillType.getRPGSkillName(SkillType.S_GUN_BA, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_GUN_BA, levelBaGunTotal / SkillType.rpgGunneryTypeList.length,
                         rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 addSkill(person, SkillType.S_ANTI_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+
+
+                int levelBaSmArmTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType),
+                            expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    levelBaSmArmTotal += person.getSkill(
+                            SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_SMALL_ARMS, levelBaSmArmTotal / SkillType.rpgGunneryTypeList.length,
+                        rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case (Person.T_INFANTRY):
                 if (Utilities.rollProbability(rskillPrefs.getAntiMekProb())) {
                     addSkill(person, SkillType.S_ANTI_MECH, expLvl,
                             rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 }
-                addSkill(person, SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+
+                int levelInfantrySmArmTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType),
+                            expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    levelInfantrySmArmTotal += person.getSkill(
+                            SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_SMALL_ARMS, levelInfantrySmArmTotal / SkillType.rpgGunneryTypeList.length,
+                        rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case (Person.T_SPACE_PILOT):
                 addSkill(person, SkillType.S_PILOT_SPACE, expLvl,
@@ -127,7 +215,14 @@ public abstract class AbstractSkillGenerator {
                         rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case (Person.T_SPACE_GUNNER):
-                addSkill(person, SkillType.S_GUN_SPACE, expLvl,
+                int levelSpaceGunTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, gunneryType),
+                            expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    levelSpaceGunTotal += person.getSkill(
+                            SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_GUN_SPACE, levelSpaceGunTotal / SkillType.rpgGunneryTypeList.length,
                         rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case (Person.T_NAVIGATOR):

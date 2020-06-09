@@ -34,6 +34,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import org.joda.time.DateTime;
 
 import megamek.common.Crew;
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
@@ -1167,8 +1168,18 @@ public class PersonViewPanel extends ScrollablePanel {
         double weight = 0.5;
 
         int j = 0;
-        for(int i = 0; i < SkillType.getSkillList().length; i++) {
-            if(person.hasSkill(SkillType.getSkillList()[i])) {
+        for(String skill : SkillType.getSkillList()) {
+            if(person.hasSkill(skill)) {
+                if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                    if (SkillType.isSingleGunnery(skill)) {
+                        continue;
+                    }
+                } else {
+                    if (SkillType.isSpecificRPGGunnery(skill)) {
+                        continue;
+                    }
+                }
+                
                 j++;
                 if(j == colBreak) {
                     addition = 2;
@@ -1176,8 +1187,8 @@ public class PersonViewPanel extends ScrollablePanel {
                     weight = 1.0;
                 }
                 lblName = new JLabel(
-                    String.format(resourceMap.getString("format.itemHeader"), SkillType.getSkillList()[i])); //$NON-NLS-1$
-                lblValue = new JLabel(person.getSkill(SkillType.getSkillList()[i]).toString());
+                    String.format(resourceMap.getString("format.itemHeader"), skill)); //$NON-NLS-1$
+                lblValue = new JLabel(person.getSkill(skill).toString());
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = addition;
                 gridBagConstraints.gridy = firsty;
