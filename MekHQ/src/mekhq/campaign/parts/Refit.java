@@ -622,20 +622,23 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     nPart.setUnit(newUnit);
                     int loc;
                     EquipmentType type;
+                    double size;
                     if(nPart instanceof MissingEquipmentPart) {
                         loc = nPart.getLocation();
                         if(loc > -1 && loc < newEntity.locations()) {
                             locationHasNewStuff[loc] = true;
                         }
-                        type = ((MissingEquipmentPart)nPart).getType();
+                        type = ((MissingEquipmentPart) nPart).getType();
+                        size = ((MissingEquipmentPart) nPart).getSize();
                     } else {
                         loc = nPart.getLocation();
                         if(loc > -1 && loc < newEntity.locations()) {
                             locationHasNewStuff[loc] = true;
                         }
-                        type = ((AmmoBin)nPart).getType();
+                        type = ((AmmoBin) nPart).getType();
+                        size = ((AmmoBin) nPart).getSize();
                     }
-                    int crits = type.getCriticals(newUnit.getEntity());
+                    int crits = type.getCriticals(newUnit.getEntity(), size);
                     nPart.setUnit(oldUnit);
                     int i = -1;
                     boolean matchFound = false;
@@ -650,11 +653,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                         if (oPart instanceof MissingEquipmentPart) {
                             oLoc = oPart.getLocation();
                             oType = ((MissingEquipmentPart) oPart).getType();
-                            oCrits = oType.getCriticals(oldUnit.getEntity());
+                            oCrits = oType.getCriticals(oldUnit.getEntity(),
+                                    ((MissingEquipmentPart) oPart).getSize());
                         } else if (oPart instanceof EquipmentPart) {
                             oLoc = oPart.getLocation();
                             oType = ((EquipmentPart) oPart).getType();
-                            oCrits = oType.getCriticals(oldUnit.getEntity());
+                            oCrits = oType.getCriticals(oldUnit.getEntity(),
+                                ((EquipmentPart) oPart).getSize());
                         }
                         if (loc != oLoc) {
                             continue;
