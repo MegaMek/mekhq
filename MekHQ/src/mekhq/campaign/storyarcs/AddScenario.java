@@ -33,24 +33,28 @@ import java.util.UUID;
  */
 public class AddScenario extends StoryEvent {
 
-    UUID missionId;
+    /* the storyScenario id for this scenario */
     UUID scenarioId;
 
-    /** for now we will force a linear narrative **/
+    /* The mission id in the campaign that this scenario should be added to*/
+    int campaignMissionId;
+
+    /* for now we will force a linear narrative */
     UUID nextEventId;
 
-    public AddScenario(StoryArc a) {
+    public AddScenario(StoryArc a, int missionId) {
         super(a);
+        campaignMissionId = missionId;
     }
 
     @Override
     public void startEvent() {
         super.startEvent();
-        Mission m = arc.getCampaignMission(missionId, arc.getCampaign());
+        Mission m = arc.getCampaign().getMission(campaignMissionId);
         Scenario s = arc.getStoryScenario(scenarioId);
         if (null != m & null != s) {
             m.addScenario(s);
-            //need some way to add the scenario UUID to Scenario so Scenario can check for completion
+            //TODO: need some way to add the scenario UUID to Scenario so Scenario can check for completion
         }
         //this event should stick around until the scenario is completed
     }
