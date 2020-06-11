@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StoryArc>
+    <title>A Test Campaign</title>
+    <description>Just Testing Stuff Out</description>
+    <startNew>false</startNew>
+    <startingEventId></startingEventId>
+    <storyMissions>
+
+    </storyMissions>
+    <storyScenarios>
+
+    </storyScenarios>
+    <storyEvents>
+
+    </storyEvents>
+</StoryArc>
