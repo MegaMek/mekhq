@@ -78,7 +78,8 @@
 		<lookupName>melee_master</lookupName>
 		<xpCost>15</xpCost>
 		<weight>6</weight>
-		<skillPrereq>
+        <prereqAbilities>melee_specialist</prereqAbilities>
+        <skillPrereq>
 	    	<skill>Piloting/Mech::Regular</skill>
 	        <skill>Gunnery/Protomech::Regular</skill>
 	    </skillPrereq>
@@ -87,9 +88,9 @@
         <lookupName>zweihander</lookupName>
         <xpCost>10</xpCost>
         <weight>6</weight>
+        <prereqAbilities>melee_specialist</prereqAbilities>
         <skillPrereq>
             <skill>Piloting/Mech::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
         </skillPrereq>
     </ability>
 	<ability>
