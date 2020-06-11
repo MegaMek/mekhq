@@ -79,6 +79,7 @@
 		<xpCost>15</xpCost>
 		<weight>6</weight>
         <prereqAbilities>melee_specialist</prereqAbilities>
+        <invalidAbilities>zweihander</invalidAbilities>
         <skillPrereq>
 	    	<skill>Piloting/Mech::Regular</skill>
 	        <skill>Gunnery/Protomech::Regular</skill>
@@ -89,6 +90,7 @@
         <xpCost>10</xpCost>
         <weight>6</weight>
         <prereqAbilities>melee_specialist</prereqAbilities>
+        <invalidAbilities>melee_master</invalidAbilities>
         <skillPrereq>
             <skill>Piloting/Mech::Regular</skill>
         </skillPrereq>
@@ -222,7 +224,8 @@
 	        <skill>Gunnery/Vehicle::Regular</skill>
 	        <skill>Gunnery/Battlesuit::Regular</skill>
 	        <skill>Gunnery/Protomech::Regular</skill>
-	    </skillPrereq>
+            <skill>Artillery::Regular</skill>
+        </skillPrereq>
 	</ability>
 	<ability>
 		<lookupName>range_master</lookupName>
