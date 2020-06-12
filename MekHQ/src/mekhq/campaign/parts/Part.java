@@ -949,27 +949,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			 	|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.GENERAL_LOCATION)) {
 			mods.addModifier(-1, "Internal specialist");
 		}
-		String qualityName = getQualityName(quality, campaign.getCampaignOptions().reverseQualityNames());
-		switch(quality) {
-		case QUALITY_A:
-            mods.addModifier(3, qualityName);
-            break;
-        case QUALITY_B:
-            mods.addModifier(2, qualityName);
-            break;
-        case QUALITY_C:
-            mods.addModifier(1, qualityName);
-            break;
-        case QUALITY_D:
-            mods.addModifier(0, qualityName);
-            break;
-        case QUALITY_E:
-            mods.addModifier(-1, qualityName);
-            break;
-        case QUALITY_F:
-            mods.addModifier(-2, qualityName);
-            break;
-        }
+
+		mods = getQualityMods(mods, tech);
 
         return mods;
     }
@@ -1000,29 +981,47 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         }
 
         if(campaign.getCampaignOptions().useQualityMaintenance()) {
-            switch(quality) {
+            mods = getQualityMods(mods, getUnit().getTech());
+        }
+        return mods;
+    }
+
+    /**
+     * adds the quality modifiers for repair and maintenance of this part to a TargetRoll
+     * @param mods - the {@link TargetRoll} that quality modifiers should be added to
+     * @param tech - the {@link Person} that will make the repair or maintenance check, may be null
+     * @return the modified {@link TargetRoll}
+     */
+    private TargetRoll getQualityMods(TargetRoll mods, Person tech) {
+        int qualityMod = 0;
+        switch (quality) {
             case QUALITY_A:
-                mods.addModifier(3, "Quality A");
+                qualityMod = 3;
                 break;
             case QUALITY_B:
-                mods.addModifier(2, "Quality B");
+                qualityMod = 2;
                 break;
             case QUALITY_C:
-                mods.addModifier(1, "Quality C");
+                qualityMod = 1;
                 break;
             case QUALITY_D:
-                mods.addModifier(0, "Quality D");
+                qualityMod = 0;
                 break;
             case QUALITY_E:
-                mods.addModifier(-1, "Quality E");
+                qualityMod = -1;
                 break;
             case QUALITY_F:
-                mods.addModifier(-2, "Quality F");
+                qualityMod = -2;
                 break;
-            }
         }
-
-        return mods;
+        mods.addModifier(qualityMod, getQualityName(quality, campaign.getCampaignOptions().reverseQualityNames()));
+        if ((qualityMod > 0) &&
+                (null != tech) &&
+                tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
+            //fixers can ignore the first point of penalty for poor quality
+            mods.addModifier(-1, "Mr/Ms Fix-it");
+        }
+	    return mods;
     }
 
     public String getCurrentModeName() {
