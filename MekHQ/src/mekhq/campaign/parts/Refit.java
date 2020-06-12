@@ -1600,7 +1600,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         if(customJob) {
             mods.addModifier(2, "custom job");
         }
-        if(null != tech && tech.getOptions().booleanOption("tech_engineer")) {
+        if ((null != tech) && tech.getOptions().booleanOption("tech_engineer")) {
             mods.addModifier(-2, "engineer");
         }
         return mods;

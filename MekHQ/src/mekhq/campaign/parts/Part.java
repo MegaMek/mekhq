@@ -994,7 +994,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
      */
     private TargetRoll getQualityMods(TargetRoll mods, Person tech) {
         int qualityMod = 0;
-        switch(quality) {
+        switch (quality) {
             case QUALITY_A:
                 qualityMod = 3;
                 break;
@@ -1015,8 +1015,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 break;
         }
         mods.addModifier(qualityMod, getQualityName(quality, campaign.getCampaignOptions().reverseQualityNames()));
-        if(qualityMod > 0 &&
-                null != tech &&
+        if ((qualityMod > 0) &&
+                (null != tech) &&
                 tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
             //fixers can ignore the first point of penalty for poor quality
             mods.addModifier(-1, "Mr/Ms Fix-it");
