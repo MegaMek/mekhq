@@ -496,6 +496,11 @@ public class AtBDynamicScenarioFactory {
                 for (Entity en : botForce.getEntityList()) {
                     scenario.getAlliesPlayer().add(en);
                     scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
+
+                    if (campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
+                        en.setCamoCategory(campaign.getCamoCategory());
+                        en.setCamoFileName(campaign.getCamoFileName());
+                    }
                 }
 
                 scenario.botForces.remove(botIndex);
