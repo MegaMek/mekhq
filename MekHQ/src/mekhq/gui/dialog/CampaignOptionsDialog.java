@@ -233,6 +233,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox useImplantsBox;
     private JCheckBox chkCapturePrisoners;
     private JComboBox<PrisonerStatus> comboPrisonerStatus;
+    private JCheckBox chkPrisonerBabyStatus;
     private JCheckBox altQualityAveragingCheckBox;
     private JCheckBox useAdvancedMedicalBox;
     private JCheckBox useDylansRandomXpBox;
@@ -544,7 +545,6 @@ public class CampaignOptionsDialog extends JDialog {
         useSupportEdgeBox.setSelected(options.useSupportEdge());
         useImplantsBox.setSelected(options.useImplants());
         chkCapturePrisoners.setSelected(options.capturePrisoners());
-		altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
         useAdvancedMedicalBox.setSelected(options.useAdvancedMedical());
         useDylansRandomXpBox.setSelected(options.useDylansRandomXp());
         payForPartsBox.setSelected(options.payForParts());
@@ -640,7 +640,6 @@ public class CampaignOptionsDialog extends JDialog {
         useSupportEdgeBox = new JCheckBox();
         useImplantsBox = new JCheckBox();
         chkCapturePrisoners = new JCheckBox();
-		altQualityAveragingCheckBox = new JCheckBox();
         useAdvancedMedicalBox = new JCheckBox();
         useDylansRandomXpBox = new JCheckBox();
         payForPartsBox = new JCheckBox();
@@ -1667,9 +1666,17 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(pnlPrisonerStatus, gridBagConstraints);
 
-        altQualityAveragingCheckBox.setText(resourceMap.getString("altQualityAveragingCheckBox.text"));
+        chkPrisonerBabyStatus = new JCheckBox(resourceMap.getString("prisonerBabyStatus.text"));
+        chkPrisonerBabyStatus.setToolTipText(resourceMap.getString("prisonerBabyStatus.toolTipText"));
+        chkPrisonerBabyStatus.setName("chkPrisonerBabyStatus");
+        chkPrisonerBabyStatus.setSelected(options.getPrisonerBabyStatus());
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkPrisonerBabyStatus, gridBagConstraints);
+
+        altQualityAveragingCheckBox = new JCheckBox(resourceMap.getString("altQualityAveragingCheckBox.text"));
         altQualityAveragingCheckBox.setToolTipText(resourceMap.getString("altQualityAveragingCheckBox.toolTipText"));
         altQualityAveragingCheckBox.setName("altQualityAveragingCheckBox");
+        altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(altQualityAveragingCheckBox, gridBagConstraints);
 
@@ -4926,6 +4933,7 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
         options.setCapturePrisoners(chkCapturePrisoners.isSelected());
         options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
+        options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
         options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
         options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
