@@ -57,12 +57,10 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
     private JButton btnNextYear;
     private DailyReportLogPanel logPanel;
     private CampaignGUI gui;
-    private ReportHyperlinkListener listener;
 
-    public AdvanceDaysDialog(Frame owner, CampaignGUI gui, ReportHyperlinkListener listener) {
+    public AdvanceDaysDialog(Frame owner, CampaignGUI gui) {
         super(owner, true);
         this.gui = gui;
-        this.listener = listener;
         setName("formADD"); // NOI18N
         getContentPane().setLayout(new GridBagLayout());
         this.setPreferredSize(new Dimension(500,500));
@@ -101,7 +99,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
 
         getContentPane().add(pnlNumDays, BorderLayout.NORTH);
 
-        logPanel = new DailyReportLogPanel(listener);
+        logPanel = new DailyReportLogPanel(gui);
         getContentPane().add(logPanel, BorderLayout.CENTER);
 
         addWindowListener(new WindowAdapter() {
@@ -182,7 +180,6 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
 
             gui.refreshCalendar();
             gui.refreshLocation();
-            gui.initReport();
 
             gui.refreshAllTabs();
         }

@@ -94,7 +94,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
         int enemyStart = startPos[Compute.randomInt(4)];
 
         for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-            enemyEntities = new ArrayList<Entity>();
+            enemyEntities = new ArrayList<>();
             for (int i = 0; i < 3; i++)
                 enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
                         getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
@@ -103,7 +103,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 
         addBotForce(new BotForce(GUARD_FORCE_ID, 2, enemyStart, getSpecMissionEnemies().get(0)));
 
-        ArrayList<Entity> otherForce = new ArrayList<Entity>();
+        ArrayList<Entity> otherForce = new ArrayList<>();
 
         addCivilianUnits(otherForce, 4, campaign);
 
@@ -125,11 +125,14 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(GUARD_FORCE_ID, 100);
         destroyHostiles.getSuccessEffects().clear();
         destroyHostiles.addDetail(getResourceBundle().getString("commonObjectives.battlefieldControl"));
-        
+        destroyHostiles.setTimeLimit(8);
+        destroyHostiles.setTimeLimitAtMost(true);
+        destroyHostiles.setTimeLimitType(TimeLimitType.Fixed);
+
         keepFriendliesAlive.setTimeLimit(8);
         keepFriendliesAlive.setTimeLimitAtMost(false);
         keepFriendliesAlive.setTimeLimitType(TimeLimitType.Fixed);
-        
+
         // not losing the scenario also gets you a "bonus"
         ObjectiveEffect bonusEffect = new ObjectiveEffect();
         bonusEffect.effectType = ObjectiveEffectType.AtBBonus;
@@ -146,7 +149,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
         getScenarioObjectives().add(keepPrisonersAlive);
         getScenarioObjectives().add(destroyHostiles);
     }
-    
+
     @Override
     public String getBattlefieldControlDescription() {
         return "";

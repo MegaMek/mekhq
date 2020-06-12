@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -512,7 +513,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     try {
                         if (person.getAwardController().hasAward(data[1], data[2])) {
                             person.getAwardController().removeAward(data[1], data[2],
-                                    (data.length > 3) ? LocalDate.parse(data[3]) : null,
+                                    (data.length > 3)
+                                            ? LocalDate.parse(data[3], DateTimeFormatter.ofPattern(
+                                                    gui.getCampaign().getCampaignOptions()
+                                                            .getDisplayDateFormat()))
+                                            : null,
                                     gui.getCampaign().getLocalDate());
                         }
                     } catch (Exception e) {

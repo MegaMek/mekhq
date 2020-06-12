@@ -907,6 +907,22 @@ public class CampaignXmlParser {
                     }
                 } else if (xn.equalsIgnoreCase("colorIndex")) {
                     retVal.setColorIndex(Integer.parseInt(wn.getTextContent().trim()));
+                } else if (xn.equalsIgnoreCase("iconCategory")) {
+                    String val = wn.getTextContent().trim();
+
+                    if (val.equals("null")) {
+                        retVal.setIconCategory(null);
+                    } else {
+                        retVal.setIconCategory(val);
+                    }
+                } else if (xn.equalsIgnoreCase("iconFileName")) {
+                    String val = wn.getTextContent().trim();
+
+                    if (val.equals("null")) {
+                        retVal.setIconFileName(null);
+                    } else {
+                        retVal.setIconFileName(val);
+                    }
                 } else if (xn.equalsIgnoreCase("nameGen")) {
                     // First, get all the child nodes;
                     NodeList nl2 = wn.getChildNodes();

@@ -358,8 +358,7 @@ public class MekHQ implements GameListener {
     }
 
     public void showNewView() {
-    	campaigngui = new CampaignGUI(this);
-    	campaigngui.showOverviewTab(getCampaign().isOverviewLoadingValue());
+        campaigngui = new CampaignGUI(this);
     }
 
     /**
@@ -656,7 +655,6 @@ public class MekHQ implements GameListener {
                 RandomNameGenerator.getInstance();
             }
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
-            campaigngui.initReport();
 
         }// end try
         catch (Exception ex) {

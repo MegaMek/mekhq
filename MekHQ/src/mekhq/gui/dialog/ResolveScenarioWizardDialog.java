@@ -325,10 +325,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
             i++;
         }
         pnlMain.add(pnlUnitStatus, UNITSPANEL);
+        //endregion Unit Status Panel
 
+        //region Objective Status Panel
         generateObjectiveStatusPanel();
         pnlMain.add(pnlObjectiveStatus, OBJECTIVEPANEL);
-        //endregion Unit Status Panel
+        //endregion Objective Status Panel
 
         //region Pilot Status Panel
         pnlPilotStatus = new JPanel();
