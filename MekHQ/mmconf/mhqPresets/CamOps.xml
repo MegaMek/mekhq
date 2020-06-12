@@ -671,8 +671,8 @@
 			<removeAbilities>hopping_jack</removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -686,12 +686,12 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -707,12 +707,12 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -728,8 +728,8 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel</skill>
-				<skill>Tech/BA</skill>
 				<skill>Tech/Aero</skill>
+				<skill>Tech/BA</skill>
 				<skill>Tech/Mechanic</skill>
 				<skill>Tech/Mech</skill>
 			</skillPrereq>
@@ -752,24 +752,6 @@ Note: Only one Tactical Genius may be utilized per team.</desc>
 			</skillPrereq>
 		</ability>
 		<ability>
-			<displayName>Tech Specialist, Armor (Unofficial)</displayName>
-			<lookupName>tech_armor_specialist</lookupName>
-			<desc>-1 to repair and maintenance checks when working with armor</desc>
-			<xpCost>4</xpCost>
-			<weight>2</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-			<choiceValues></choiceValues>
-			<skillPrereq>
-				<skill>Tech/Vessel::Regular</skill>
-				<skill>Tech/BA::Regular</skill>
-				<skill>Tech/Aero::Regular</skill>
-				<skill>Tech/Mechanic::Regular</skill>
-				<skill>Tech/Mech::Regular</skill>
-			</skillPrereq>
-		</ability>
-		<ability>
 			<displayName>Terrain Master [Forest Ranger] (CamOps)</displayName>
 			<lookupName>tm_forest_ranger</lookupName>
 			<desc>Movement in woods or jungle costs 1 less MP.
@@ -783,8 +765,8 @@ Additionally, you gain -1 to PSR checks in Jungle terrain.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
 				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -801,8 +783,26 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Tech Specialist, Armor (Unofficial)</displayName>
+			<lookupName>tech_armor_specialist</lookupName>
+			<desc>-1 to repair and maintenance checks when working with armor</desc>
+			<xpCost>4</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
+				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Mechanic::Regular</skill>
+				<skill>Tech/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -831,12 +831,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aircraft::Veteran</skill>
-				<skill>Gunnery/Spacecraft::Veteran</skill>
+				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
-				<skill>Gunnery/Vehicle::Veteran</skill>
+				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Vehicle::Veteran</skill>
 				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
@@ -853,8 +853,8 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
 				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -868,13 +868,31 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aircraft::Veteran</skill>
-				<skill>Gunnery/Spacecraft::Veteran</skill>
+				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
-				<skill>Gunnery/Vehicle::Veteran</skill>
+				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Vehicle::Veteran</skill>
 				<skill>Gunnery/Protomech::Veteran</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Mr/Ms Fix-it (unofficial)</displayName>
+			<lookupName>tech_fixer</lookupName>
+			<desc>Ignore first point of penalty for repair and maintenance on low quality equipment</desc>
+			<xpCost>4</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Regular</skill>
+				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
+				<skill>Tech/Mechanic::Regular</skill>
+				<skill>Tech/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -927,12 +945,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -961,12 +979,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -982,8 +1000,8 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Veteran</skill>
 				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1013,8 +1031,8 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Regular</skill>
-				<skill>Tech/BA::Regular</skill>
 				<skill>Tech/Aero::Regular</skill>
+				<skill>Tech/BA::Regular</skill>
 				<skill>Tech/Mechanic::Regular</skill>
 				<skill>Tech/Mech::Regular</skill>
 			</skillPrereq>
@@ -1037,8 +1055,8 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Piloting/VTOL::Green</skill>
 				<skill>Piloting/Aircraft::Green</skill>
-				<skill>Gunnery/Protomech::Green</skill>
 				<skill>Piloting/Mech::Green</skill>
+				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1069,11 +1087,11 @@ Finally, urban guerrillas can call on local support once per scenario.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -1096,8 +1114,8 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Piloting/VTOL::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1111,11 +1129,26 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Melee Master (CamOps)</displayName>
+			<lookupName>melee_master</lookupName>
+			<desc>Enables the unit to do one additional kick, punch, or club attack on the same opponent.</desc>
+			<xpCost>15</xpCost>
+			<weight>6</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Piloting/Mech::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -1134,21 +1167,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			</skillPrereq>
 		</ability>
 		<ability>
-			<displayName>Melee Master (CamOps)</displayName>
-			<lookupName>melee_master</lookupName>
-			<desc>Enables the unit to do one additional kick, punch, or club attack on the same opponent.</desc>
-			<xpCost>15</xpCost>
-			<weight>6</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-			<choiceValues></choiceValues>
-			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
-			</skillPrereq>
-		</ability>
-		<ability>
 			<displayName>Cluster Master (Unofficial)</displayName>
 			<lookupName>cluster_master</lookupName>
 			<desc>A pilot with this ability gets a +2 to the cluster hit table</desc>
@@ -1159,12 +1177,12 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities>cluster_hitter</removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aircraft::Veteran</skill>
-				<skill>Gunnery/Spacecraft::Veteran</skill>
+				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
-				<skill>Gunnery/Vehicle::Veteran</skill>
+				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Vehicle::Veteran</skill>
 				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
@@ -1182,8 +1200,8 @@ NOTE: The quirk should be used only on bipedal units that have an animal like ap
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1198,8 +1216,8 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1256,8 +1274,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Piloting/VTOL::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1276,6 +1294,24 @@ Note: This ability is only used for BattleMechs.</desc>
 			</skillPrereq>
 		</ability>
 		<ability>
+			<displayName>Engineer (unofficial)</displayName>
+			<lookupName>tech_engineer</lookupName>
+			<desc>-2 on refit rolls</desc>
+			<xpCost>8</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Veteran</skill>
+				<skill>Tech/BA::Veteran</skill>
+				<skill>Tech/Aero::Veteran</skill>
+				<skill>Tech/Mechanic::Veteran</skill>
+				<skill>Tech/Mech::Veteran</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
 			<displayName>Terrain Master [Swamp Beast] (CamOps)</displayName>
 			<lookupName>tm_swamp_beast</lookupName>
 			<desc>Movement in mud or swamp costs 1 less MP.
@@ -1288,8 +1324,8 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
 				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1303,8 +1339,8 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1318,11 +1354,11 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -1337,12 +1373,12 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -1358,8 +1394,8 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Regular</skill>
-				<skill>Tech/BA::Regular</skill>
 				<skill>Tech/Aero::Regular</skill>
+				<skill>Tech/BA::Regular</skill>
 				<skill>Tech/Mechanic::Regular</skill>
 				<skill>Tech/Mech::Regular</skill>
 			</skillPrereq>

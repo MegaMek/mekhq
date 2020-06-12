@@ -464,6 +464,7 @@
     <ability>
         <lookupName>clan_tech_knowledge</lookupName>
         <displayName>Clan Tech Knowledge (Unofficial)</displayName>
+        <desc>Can work on clan equipment without penalty</desc>
         <xpCost>4</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -508,6 +509,34 @@
         <displayName>Tech Specialist, Internal (Unofficial)</displayName>
         <desc>-1 to repair and maintenance checks when working with internal systems</desc>
         <xpCost>6</xpCost>
+        <weight>2</weight>
+        <skillPrereq>
+            <skill>Tech/Mech::Regular</skill>
+            <skill>Tech/Mechanic::Regular</skill>
+            <skill>Tech/Aero::Regular</skill>
+            <skill>Tech/BA::Regular</skill>
+            <skill>Tech/Vessel::Regular</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>tech_engineer</lookupName>
+        <displayName>Engineer (unofficial)</displayName>
+        <desc>-2 on refit rolls</desc>
+        <xpCost>8</xpCost>
+        <weight>2</weight>
+        <skillPrereq>
+            <skill>Tech/Mech::Veteran</skill>
+            <skill>Tech/Mechanic::Veteran</skill>
+            <skill>Tech/Aero::Veteran</skill>
+            <skill>Tech/BA::Veteran</skill>
+            <skill>Tech/Vessel::Veteran</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>tech_fixer</lookupName>
+        <displayName>Mr/Ms Fix-it (unofficial)</displayName>
+        <desc>Ignore first point of penalty for repair and maintenance on low quality equipment</desc>
+        <xpCost>4</xpCost>
         <weight>2</weight>
         <skillPrereq>
             <skill>Tech/Mech::Regular</skill>

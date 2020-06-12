@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gamePreset>
 	<title>Taharqa&apos;s MW2ish Presets</title>
-	<description>This preset largely affects skill levels and XP costs. Namely, all skills range from level 0 to level 6 and XP costs rise with the level of the skill such that, for example, it costs more XP to advance from Regular to Veteran than from Green to Regular. Special abilities have also been tweaked with these costs in mind, so that players have more incentive to pay for special abilities at higher skill levels rather than increasing skills further.</description>
+	<description>This preset largely affects skill levels and XP costs. Namely, all skills range from level 0 to level 6 and XP costs rise with the level of the skill such that, for example, it costs more XP to advance from Regular to Veteran than from Green to Regular. Special abilities have also been tweaked with these costs in mind.</description>
 	<campaignOptions>
 		<displayDateFormat>yyyy-MM-dd</displayDateFormat>
 		<logMaintenance>false</logMaintenance>
@@ -685,12 +685,12 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
-				<skill>Gunnery/Spacecraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Spacecraft::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -706,12 +706,12 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
-				<skill>Gunnery/Spacecraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Spacecraft::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -727,8 +727,8 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel</skill>
-				<skill>Tech/Aero</skill>
 				<skill>Tech/BA</skill>
+				<skill>Tech/Aero</skill>
 				<skill>Tech/Mechanic</skill>
 				<skill>Tech/Mech</skill>
 			</skillPrereq>
@@ -764,8 +764,8 @@ Additionally, you gain -1 to PSR checks in Jungle terrain.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Green</skill>
-				<skill>Piloting/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
+				<skill>Piloting/Mech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -797,8 +797,8 @@ Note: This ability is only used for BattleMechs.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Green</skill>
-				<skill>Tech/Aero::Green</skill>
 				<skill>Tech/BA::Green</skill>
+				<skill>Tech/Aero::Green</skill>
 				<skill>Tech/Mechanic::Green</skill>
 				<skill>Tech/Mech::Green</skill>
 			</skillPrereq>
@@ -832,12 +832,12 @@ Plasma and Flamer).</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Spacecraft::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -855,12 +855,12 @@ RL and ATM).</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Spacecraft::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -875,12 +875,12 @@ RL and ATM).</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
-				<skill>Gunnery/Spacecraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Spacecraft::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -897,8 +897,8 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Green</skill>
-				<skill>Piloting/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
+				<skill>Piloting/Mech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -912,13 +912,31 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
-				<skill>Gunnery/Spacecraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Spacecraft::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Mr/Ms Fix-it (unofficial)</displayName>
+			<lookupName>tech_fixer</lookupName>
+			<desc>Ignore first point of penalty for repair and maintenance on low quality equipment</desc>
+			<xpCost>4</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Green</skill>
+				<skill>Tech/BA::Green</skill>
+				<skill>Tech/Aero::Green</skill>
+				<skill>Tech/Mechanic::Green</skill>
+				<skill>Tech/Mech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -971,12 +989,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
-				<skill>Gunnery/Spacecraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Spacecraft::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -1005,12 +1023,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
-				<skill>Gunnery/Spacecraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Spacecraft::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -1026,8 +1044,8 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Piloting/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
+				<skill>Piloting/Mech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1058,8 +1076,8 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Green</skill>
-				<skill>Tech/Aero::Green</skill>
 				<skill>Tech/BA::Green</skill>
+				<skill>Tech/Aero::Green</skill>
 				<skill>Tech/Mechanic::Green</skill>
 				<skill>Tech/Mech::Green</skill>
 			</skillPrereq>
@@ -1113,11 +1131,11 @@ Finally, urban guerrillas can call on local support once per scenario.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -1154,11 +1172,11 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 				<skill>Artillery::Green</skill>
 			</skillPrereq>
@@ -1202,12 +1220,12 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities>cluster_hitter</removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
-				<skill>Gunnery/Spacecraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Spacecraft::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -1225,8 +1243,8 @@ NOTE: The quirk should be used only on bipedal units that have an animal like ap
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Piloting/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
+				<skill>Piloting/Mech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1303,6 +1321,24 @@ Note: This ability is only used for BattleMechs.</desc>
 			</skillPrereq>
 		</ability>
 		<ability>
+			<displayName>Engineer (unofficial)</displayName>
+			<lookupName>tech_engineer</lookupName>
+			<desc>-2 on refit rolls</desc>
+			<xpCost>8</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Green</skill>
+				<skill>Tech/BA::Green</skill>
+				<skill>Tech/Aero::Green</skill>
+				<skill>Tech/Mechanic::Green</skill>
+				<skill>Tech/Mech::Green</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
 			<displayName>Terrain Master [Swamp Beast] (CamOps)</displayName>
 			<lookupName>tm_swamp_beast</lookupName>
 			<desc>Movement in mud or swamp costs 1 less MP.
@@ -1315,8 +1351,8 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Green</skill>
-				<skill>Piloting/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
+				<skill>Piloting/Mech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1344,12 +1380,12 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Spacecraft::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -1364,11 +1400,11 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -1384,8 +1420,8 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Green</skill>
-				<skill>Tech/Aero::Green</skill>
 				<skill>Tech/BA::Green</skill>
+				<skill>Tech/Aero::Green</skill>
 				<skill>Tech/Mechanic::Green</skill>
 				<skill>Tech/Mech::Green</skill>
 			</skillPrereq>
@@ -1403,12 +1439,12 @@ Gaussrifles).</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Spacecraft::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
