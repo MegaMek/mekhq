@@ -36,26 +36,28 @@ public class DateStringComparator implements Comparator<String>, Serializable {
 
     @Override
     public int compare(String o1, String o2) {
+        if (o1.equals(o2)) {
+            return 0;
+        } else if ("-".equals(o1)) {
+            return -1;
+        } else if ("-".equals(o2)) {
+            return 1;
+        }
+
         LocalDate dateA;
         LocalDate dateB;
         try {
             dateA = LocalDate.parse(o1, DateTimeFormatter.ofPattern(
                     campaign.getCampaignOptions().getDisplayDateFormat()));
         } catch (Exception ignored) {
-            if ("-".equals(o2) && "-".equals(o1)) {
-                return 0;
-            } else if ("-".equals(o1)) {
-                return 1;
-            } else {
-                return -1;
-            }
+            return -1;
         }
 
         try {
             dateB = LocalDate.parse(o2, DateTimeFormatter.ofPattern(
                     campaign.getCampaignOptions().getDisplayDateFormat()));
         } catch (Exception ignored) {
-            return -1;
+            return 1;
         }
 
         return dateA.compareTo(dateB);

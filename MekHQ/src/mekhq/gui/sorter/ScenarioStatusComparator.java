@@ -19,47 +19,50 @@
 package mekhq.gui.sorter;
 
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.Part;
 
 import java.io.Serializable;
 import java.util.Comparator;
 
+/**
+ * This class compares two {@link Scenario} status integers
+ */
 public class ScenarioStatusComparator implements Comparator<String>, Serializable {
     private static final long serialVersionUID = -6287998488809978029L;
 
     @Override
     public int compare(String o1, String o2) {
-        int a = -1;
-        int b = -1;
-
-        // First we need to determine the numbers based on the name
-        for (int i = 0; i < Scenario.S_NUM; i++) {
-            if (Scenario.getStatusName(i).equals(o1)) {
-                a = i;
-            } else if (Scenario.getStatusName(i).equals(o2)) {
-                b = i;
-            }
+        if (o1.equals(o2)) {
+            return 0;
         }
 
-        // Now we need to fix the references to Defeat and Draw so they sort nicely
-        switch (a) {
-            case 3:
-                a = 5;
-                break;
-            case 5:
-                a = 3;
-                break;
-        }
-
-        switch (b) {
-            case 3:
-                b = 5;
-                break;
-            case 5:
-                b = 3;
-                break;
-        }
+        int a = getStatusInt(o1);
+        int b = getStatusInt(o2);
 
         // Then we just subtract b from a to determine the sort order
         return a - b;
+    }
+
+    private int getStatusInt(String status) {
+        int statusInt = -1;
+
+        for (int i = 0; i < Scenario.S_NUM; i++) {
+            if (Scenario.getStatusName(i).equals(status)) {
+                statusInt = i;
+                break;
+            }
+        }
+
+        // Now we need to fix the references to Defeat (3) and Draw (5) so they sort nicely
+        switch (statusInt) {
+            case 3: // Defeat is listed as 3, but is best sorted as 5
+                statusInt = 5;
+                break;
+            case 5: // Draw is listed as 5, but is best sorted as 3 (in the middle between Victory and Defeat)
+                statusInt = 3;
+                break;
+        }
+
+        return statusInt;
     }
 }
