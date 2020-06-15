@@ -468,7 +468,7 @@ public class PersonnelTableModel extends DataTableModel {
                                                                  campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY));
             case COL_GUN_BA:
                 if (p.hasSkillOrRPGGunnerySkills(SkillType.S_GUN_BA)) {
-                    return CrewSkillSummaryUtil.getGunnnerySkillSummary(
+                    return CrewSkillSummaryUtil.getGunnerySkillSummary(
                                                                     p.hasSkill(SkillType.S_GUN_BA) ? Integer.toString(p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue()) : "-",
                                                                     p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_LASER)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_LASER)).getFinalSkillValue()) : "-",
                                                                     p.hasSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_MISSILE)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_MISSILE)).getFinalSkillValue()) : "-",
@@ -483,7 +483,7 @@ public class PersonnelTableModel extends DataTableModel {
                 break;
             case COL_SMALL_ARMS:
                 if (p. hasSkillOrRPGGunnerySkills(SkillType.S_SMALL_ARMS)) {
-                    return CrewSkillSummaryUtil.getGunnnerySkillSummary(
+                    return CrewSkillSummaryUtil.getGunnerySkillSummary(
                                                                         p.hasSkill(SkillType.S_SMALL_ARMS) ? Integer.toString(p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue()) : "-",
                                                                         p.hasSkill(SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, SkillType.S_RPG_GUN_LASER)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_LASER)).getFinalSkillValue()) : "-",
                                                                         p.hasSkill(SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, SkillType.S_RPG_GUN_MISSILE)) ? Integer.toString(p.getSkill(SkillType.getRPGSkillName(SkillType.S_GUN_BA, SkillType.S_RPG_GUN_MISSILE)).getFinalSkillValue()) : "-",
