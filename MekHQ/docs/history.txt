@@ -30,6 +30,7 @@ VERSION HISTORY:
 + Issues #1343 and #1442: AtB Scenario Objective Fixes
 + Issue #1711: Adding Option for Babies born to Prisoners to be Born Free
 + Issue #1766: Adding an option for attached units to use the faction camo
++ Issue #1781: Adding Sorting to the Scenario Table
 
 0.47.6 (2020-5-03 1715 UTC)
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
