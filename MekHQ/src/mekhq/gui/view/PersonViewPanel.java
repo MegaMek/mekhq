@@ -1168,8 +1168,8 @@ public class PersonViewPanel extends ScrollablePanel {
         double weight = 0.5;
 
         int j = 0;
-        for(String skill : SkillType.getSkillList()) {
-            if(person.hasSkill(skill)) {
+        for (String skill : SkillType.getSkillList()) {
+            if (person.hasSkill(skill)) {
                 if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
                     if (SkillType.isSingleGunnery(skill)) {
                         continue;
