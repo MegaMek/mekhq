@@ -954,7 +954,7 @@ public class SkillType implements Serializable {
         skill.target = 7;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
+        skill.costs = new Integer[]{16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1};
 
         return skill;
     }
