@@ -1066,7 +1066,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
 
     private void setSkills() {
-    	for(int i = 0; i < SkillType.getSkillList().length; i++) {
+    	for (int i = 0; i < SkillType.getSkillList().length; i++) {
             final String type = SkillType.getSkillList()[i];
             if (skillChks.containsKey(type)) {
                 if (skillChks.get(type).isSelected()) {
