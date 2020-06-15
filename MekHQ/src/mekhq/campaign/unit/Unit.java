@@ -3735,8 +3735,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
             if (entity instanceof Tank
                     && Compute.getFullCrewSize(entity) == 1) {
-                if (SkillType.isRPGGunnery(gunType) &&
-                        campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY) &&
+                        SkillType.isRPGGunnery(gunType)) {
 
                     // All gunners should have all 3 skills, but we need to protect for the case
                     // that they don't.  Instead look for at least 1 RPG skill and treat the missing
@@ -3780,8 +3780,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 continue;
             }
 
-            if (SkillType.isRPGGunnery(gunType) &&
-                    campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+            if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY) &&
+                    SkillType.isRPGGunnery(gunType)) {
 
                 // All gunners should have all 3 skills, but we need to protect for the case
                 // that they don't.  Instead look for at least 1 RPG skill and treat the missing

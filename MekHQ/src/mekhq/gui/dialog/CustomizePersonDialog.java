@@ -1077,7 +1077,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
                     person.removeSkill(type);
                 }
             }
-    	}
+        }
         IOption option;
         for (final Object newVar : optionComps) {
             DialogOptionComponent comp = (DialogOptionComponent) newVar;

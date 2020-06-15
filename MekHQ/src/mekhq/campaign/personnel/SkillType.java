@@ -100,11 +100,10 @@ public class SkillType implements Serializable {
 
     public static final String[] skillList;
 
-    public static final String[] rpgGunnerySkillList = {S_GUN_MECH,S_GUN_AERO,S_GUN_VEE,S_GUN_BA,
-            S_GUN_JET,S_GUN_SPACE,S_GUN_PROTO,S_SMALL_ARMS};
+    public static final String[] rpgGunnerySkillList = {S_GUN_MECH, S_GUN_AERO, S_GUN_VEE, S_GUN_BA,
+            S_GUN_JET, S_GUN_SPACE, S_GUN_PROTO, S_SMALL_ARMS};
 
-    public static final String[] rpgGunneryTypeList = {S_RPG_GUN_LASER,
-            S_RPG_GUN_BALLISTIC,
+    public static final String[] rpgGunneryTypeList = {S_RPG_GUN_LASER, S_RPG_GUN_BALLISTIC,
             S_RPG_GUN_MISSILE};
 
     // Dynamically build RPG gunnery skills
