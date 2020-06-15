@@ -23,6 +23,7 @@ import mekhq.campaign.parts.Part;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * This class compares two {@link Scenario} status integers
@@ -32,7 +33,7 @@ public class ScenarioStatusComparator implements Comparator<String>, Serializabl
 
     @Override
     public int compare(String o1, String o2) {
-        if (o1.equals(o2)) {
+        if (Objects.equals(o1, o2)) {
             return 0;
         }
 
