@@ -286,6 +286,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             lblsUnitName.add(nameLbl);
 
             chkTotaled = new JCheckBox("");
+            chkTotaled.setName("chkTotaled");
             chkTotaled.setSelected(status.isTotalLoss());
             chkTotaled.setName(Integer.toString(j));
             chkTotaled.setActionCommand(unit.getId().toString());
@@ -393,12 +394,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlPilotStatus.add(hitSlider, gridBagConstraints);
 
             JCheckBox miaCheck = new JCheckBox("");
+            miaCheck.setName("miaCheck");
             miaCheck.setSelected(status.isMissing());
             miaBtns.add(miaCheck);
             gridBagConstraints.gridx = gridx++;
             pnlPilotStatus.add(miaCheck, gridBagConstraints);
 
             JCheckBox kiaCheck = new JCheckBox("");
+            kiaCheck.setName("kiaCheck");
             kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, miaCheck));
             kiaCheck.setSelected(status.isDead());
             kiaBtns.add(kiaCheck);
@@ -468,12 +471,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
 
             JCheckBox prisonerCheck = new JCheckBox("");
+            prisonerCheck.setName("prisonerCheck");
             prisonerCheck.setSelected(status.isCaptured());
             prisonerBtns.add(prisonerCheck);
             gridBagConstraints.gridx = gridx++;
             pnlPrisonerStatus.add(prisonerCheck, gridBagConstraints);
 
             JCheckBox kiaCheck = new JCheckBox("");
+            kiaCheck.setName("kiaCheck");
             prisonerKiaBtns.add(kiaCheck);
             gridBagConstraints.gridx = gridx++;
             pnlPrisonerStatus.add(kiaCheck, gridBagConstraints);
