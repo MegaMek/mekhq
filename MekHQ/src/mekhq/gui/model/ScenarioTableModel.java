@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.model;
 
 import java.text.SimpleDateFormat;
@@ -14,99 +32,72 @@ import mekhq.campaign.mission.Scenario;
 public class ScenarioTableModel extends DataTableModel {
     private static final long serialVersionUID = 534443424190075264L;
 
-    Campaign campaign;
-    
-    private final static int COL_NAME       = 0;
-    private final static int COL_STATUS     = 1;
-    private final static int COL_DATE       = 2;
-    private final static int COL_ASSIGN     = 3;
-    private final static int N_COL          = 4;
+    private Campaign campaign;
+
+    public final static int COL_NAME       = 0;
+    public final static int COL_STATUS     = 1;
+    public final static int COL_DATE       = 2;
+    public final static int COL_ASSIGN     = 3;
 
     public ScenarioTableModel(Campaign c) {
+        columnNames = new String[] { "Scenario Name", "Resolution", "Date", "# Units Assigned" };
         data = new ArrayList<Scenario>();
         campaign = c;
     }
-    
-    public int getRowCount() {
-        return data.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return N_COL;
-    }
-
-    @Override
-    public String getColumnName(int column) {
-        switch(column) {
-        case COL_NAME:
-            return "Scenario Name";
-        case COL_STATUS:
-            return "Resolution";
-        case COL_DATE:
-            return "Date";
-        case COL_ASSIGN:
-            return "# Units";
-        default:
-            return "?";
-        }
-    }
-
-    public Object getValueAt(int row, int col) {
-        Scenario scenario = getScenario(row);
-        if(col == COL_NAME) {
-            return scenario.getName();
-        }
-        if(col == COL_STATUS) {
-            return scenario.getStatusName();
-        }
-        if(col == COL_DATE) {
-            if(null == scenario.getDate()) {
-                return "-";
-            } else {
-                SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
-                return shortDateFormat.format(scenario.getDate());
-            }
-        }
-        if(col == COL_ASSIGN) {
-            return scenario.getForces(getCampaign()).getAllUnits().size();
-        }
-        return "?";
-    }
 
     public int getColumnWidth(int c) {
-        switch(c) {
-        case COL_NAME:
-            return 100;
-        case COL_STATUS:
-            return 50;
-        default:
-            return 20;
+        switch (c) {
+            case COL_NAME:
+                return 100;
+            case COL_STATUS:
+                return 50;
+            default:
+                return 20;
         }
     }
 
     public int getAlignment(int col) {
-        switch(col) {
-        default:
-            return SwingConstants.LEFT;
+        return SwingConstants.LEFT;
+    }
+
+    private Campaign getCampaign() {
+        return campaign;
+    }
+
+    public Scenario getScenario(int row) {
+        if (row >= getRowCount()) {
+            return null;
+        } else {
+            return (Scenario) data.get(row);
         }
     }
 
     @Override
-    public Class<?> getColumnClass(int c) {
-        return getValueAt(0, c).getClass();
-    }
+    public Object getValueAt(int row, int col) {
+        if (data.isEmpty()) {
+            return "";
+        }
+        Scenario scenario = getScenario(row);
+        if (scenario == null) {
+            return "?";
+        }
 
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-
-    public Scenario getScenario(int row) {
-        return (Scenario)data.get(row);
-    }
-    
-    private Campaign getCampaign() {
-        return campaign;
+        if (col == COL_NAME) {
+            return scenario.getName();
+        } else if (col == COL_STATUS) {
+            return scenario.getStatusName();
+        } else if (col == COL_DATE) {
+            if (scenario.getDate() == null) {
+                return "-";
+            } else {
+                SimpleDateFormat shortDateFormat = new SimpleDateFormat(
+                        getCampaign().getCampaignOptions().getDisplayDateFormat());
+                return shortDateFormat.format(scenario.getDate());
+            }
+        } else if (col == COL_ASSIGN) {
+            return scenario.getForces(getCampaign()).getAllUnits().size();
+        } else {
+            return "?";
+        }
     }
 }
