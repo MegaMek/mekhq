@@ -1342,34 +1342,52 @@ public class Person implements Serializable, MekHqXmlSerializable {
         extraData.set(PREGNANCY_FATHER_DATA, null);
     }
 
+    /**
+     * This method is how a person gives birth to a number of babies and have them added to the campaign
+     * @param campaign the campaign to add the baby in question to
+     */
     public void birth(Campaign campaign) {
         int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
+
+        // Determine father information
         String fatherIdString = extraData.get(PREGNANCY_FATHER_DATA);
         UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
         fatherId = campaign.getCampaignOptions().determineFatherAtBirth()
                 ? Utilities.nonNull(getSpouseId(), fatherId) : fatherId;
 
+        // Determine Ancestry
         Ancestors anc = campaign.getAncestors(fatherId, id);
         if (anc == null) {
             anc = campaign.createAncestors(fatherId, id);
         }
         final UUID ancId = anc.getId();
 
-        // Cleanup
-        removePregnancy();
+        // Determine Prisoner Status
+        PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
+                ? PrisonerStatus.FREE : getPrisonerStatus();
 
+        // Output a specific report to the campaign if they are giving birth to multiple children
+        if (PREGNANCY_MULTIPLE_NAMES[size] != null) {
+            campaign.addReport(String.format("%s has given birth to %s!", getHyperlinkedName(),
+                    PREGNANCY_MULTIPLE_NAMES[size]));
+        }
+
+        // Create Babies
         for (int i = 0; i < size; i++) {
+            // Create the specific baby
             Person baby = campaign.newDependent(T_NONE, true);
+            baby.setId(UUID.randomUUID());
             String surname = campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
             baby.setSurname(surname);
             baby.setBirthday(campaign.getLocalDate());
-
-            baby.setId(UUID.randomUUID());
+            baby.setPrisonerStatus(prisonerStatus);
             baby.setAncestorsId(ancId);
 
+            // Recruit the baby
             campaign.recruitPerson(baby, baby.getPrisonerStatus(), baby.isDependent(), true, false);
 
+            // Create reports and log the birth
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             if (campaign.getCampaignOptions().logConception()) {
@@ -1379,6 +1397,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             }
         }
+
+        // Cleanup Data
+        removePregnancy();
     }
     //endregion Pregnancy
 

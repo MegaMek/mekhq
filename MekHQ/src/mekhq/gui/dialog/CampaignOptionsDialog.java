@@ -233,6 +233,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox useImplantsBox;
     private JCheckBox chkCapturePrisoners;
     private JComboBox<PrisonerStatus> comboPrisonerStatus;
+    private JCheckBox chkPrisonerBabyStatus;
     private JCheckBox altQualityAveragingCheckBox;
     private JCheckBox useAdvancedMedicalBox;
     private JCheckBox useDylansRandomXpBox;
@@ -479,6 +480,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner spnOpforLocalForceChance;
     private JCheckBox chkAdjustPlayerVehicles;
     private JCheckBox chkRegionalMechVariations;
+    private JCheckBox chkAttachedPlayerCamouflage;
     private JCheckBox chkUseDropShips;
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
@@ -544,7 +546,6 @@ public class CampaignOptionsDialog extends JDialog {
         useSupportEdgeBox.setSelected(options.useSupportEdge());
         useImplantsBox.setSelected(options.useImplants());
         chkCapturePrisoners.setSelected(options.capturePrisoners());
-		altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
         useAdvancedMedicalBox.setSelected(options.useAdvancedMedical());
         useDylansRandomXpBox.setSelected(options.useDylansRandomXp());
         payForPartsBox.setSelected(options.payForParts());
@@ -640,7 +641,6 @@ public class CampaignOptionsDialog extends JDialog {
         useSupportEdgeBox = new JCheckBox();
         useImplantsBox = new JCheckBox();
         chkCapturePrisoners = new JCheckBox();
-		altQualityAveragingCheckBox = new JCheckBox();
         useAdvancedMedicalBox = new JCheckBox();
         useDylansRandomXpBox = new JCheckBox();
         payForPartsBox = new JCheckBox();
@@ -1667,9 +1667,17 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(pnlPrisonerStatus, gridBagConstraints);
 
-        altQualityAveragingCheckBox.setText(resourceMap.getString("altQualityAveragingCheckBox.text"));
+        chkPrisonerBabyStatus = new JCheckBox(resourceMap.getString("prisonerBabyStatus.text"));
+        chkPrisonerBabyStatus.setToolTipText(resourceMap.getString("prisonerBabyStatus.toolTipText"));
+        chkPrisonerBabyStatus.setName("chkPrisonerBabyStatus");
+        chkPrisonerBabyStatus.setSelected(options.getPrisonerBabyStatus());
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkPrisonerBabyStatus, gridBagConstraints);
+
+        altQualityAveragingCheckBox = new JCheckBox(resourceMap.getString("altQualityAveragingCheckBox.text"));
         altQualityAveragingCheckBox.setToolTipText(resourceMap.getString("altQualityAveragingCheckBox.toolTipText"));
         altQualityAveragingCheckBox.setName("altQualityAveragingCheckBox");
+        altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(altQualityAveragingCheckBox, gridBagConstraints);
 
@@ -3775,7 +3783,6 @@ public class CampaignOptionsDialog extends JDialog {
         chkOpforUsesVTOLs = new JCheckBox();
         chkOpforUsesAero = new JCheckBox();
         chkOpforUsesLocalForces = new JCheckBox();
-        chkUseDropShips = new JCheckBox();
         spnOpforAeroChance = new JSpinner();
         spnOpforLocalForceChance = new JSpinner();
 
@@ -3791,8 +3798,6 @@ public class CampaignOptionsDialog extends JDialog {
         chkVariableContractLength = new JCheckBox();
         chkMercSizeLimited = new JCheckBox();
         chkRestrictPartsByMission = new JCheckBox();
-        chkRegionalMechVariations = new JCheckBox();
-        chkUseWeatherConditions = new JCheckBox();
         chkUseLightConditions = new JCheckBox();
         chkUsePlanetaryConditions = new JCheckBox();
         chkUseAtBCapture = new JCheckBox();
@@ -4408,37 +4413,27 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkAdjustPlayerVehicles, gridBagConstraints);
 
-        chkRegionalMechVariations.setText(resourceMap.getString("chkRegionalMechVariations.text"));
+        chkRegionalMechVariations = new JCheckBox(resourceMap.getString("chkRegionalMechVariations.text"));
         chkRegionalMechVariations.setToolTipText(resourceMap.getString("chkRegionalMechVariations.toolTipText"));
         chkRegionalMechVariations.setSelected(options.getRegionalMechVariations());
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = yTablePosition++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkRegionalMechVariations, gridBagConstraints);
 
-        chkUseDropShips.setText(resourceMap.getString("chkUseDropShips.text"));
+        chkAttachedPlayerCamouflage = new JCheckBox(resourceMap.getString("chkAttachedPlayerCamouflage.text"));
+        chkAttachedPlayerCamouflage.setSelected(options.getAttachedPlayerCamouflage());
+        gridBagConstraints.gridy = yTablePosition++;
+        panSubAtBScenario.add(chkAttachedPlayerCamouflage, gridBagConstraints);
+
+        chkUseDropShips = new JCheckBox(resourceMap.getString("chkUseDropShips.text"));
         chkUseDropShips.setToolTipText(resourceMap.getString("chkUseDropShips.toolTipText"));
         chkUseDropShips.setSelected(options.getUseDropShips());
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = yTablePosition++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUseDropShips, gridBagConstraints);
 
-        chkUseWeatherConditions.setText(resourceMap.getString("chkUseWeatherConditions.text"));
+        chkUseWeatherConditions = new JCheckBox(resourceMap.getString("chkUseWeatherConditions.text"));
         chkUseWeatherConditions.setToolTipText(resourceMap.getString("chkUseWeatherConditions.toolTipText"));
         chkUseWeatherConditions.setSelected(options.getUseWeatherConditions());
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = yTablePosition++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUseWeatherConditions, gridBagConstraints);
 
         chkUseLightConditions.setText(resourceMap.getString("chkUseLightConditions.text"));
@@ -4936,6 +4931,7 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
         options.setCapturePrisoners(chkCapturePrisoners.isSelected());
         options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
+        options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
         options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
         options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
@@ -5062,6 +5058,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setMercSizeLimited(chkMercSizeLimited.isSelected());
         options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
         options.setRegionalMechVariations(chkRegionalMechVariations.isSelected());
+        options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
         options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());

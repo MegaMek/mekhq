@@ -1,7 +1,6 @@
 /*
- * RatingReport.java
- *
  * Copyright (c) 2013 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +11,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.report;
 
@@ -25,6 +24,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.swing.JTextPane;
 import javax.swing.JTree;
@@ -47,29 +47,34 @@ import megamek.common.SmallCraft;
 import megamek.common.SpaceStation;
 import megamek.common.Tank;
 import megamek.common.Warship;
+import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 
 /**
  * @author Jay Lawson
- * @version %I% %G%
  * @since 3/12/2012
  */
 public class HangarReport extends Report {
-    //Private Variables
+    //region Variable Declarations
     private int totalNumberOfUnits = 0;
     private int countUnitsInTransit = 0;
     private int countUnitsPresent = 0;
     private int countDamagedUnits = 0;
     private int countDeployedUnits = 0;
 
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Reports",
+            new EncodeControl());
+    //endregion Variable Declarations
+
     public HangarReport(Campaign c) {
         super(c);
     }
 
+    @Override
     public String getTitle() {
-        return "Hangar Breakdown";
+        return resources.getString("HangarReport.title");
     }
 
     public JTree getHangarTree() {
@@ -403,7 +408,7 @@ public class HangarReport extends Report {
         //endregion Variable Declarations
 
         //region Tree Creation
-        DefaultMutableTreeNode top = new DefaultMutableTreeNode("Hangar");
+        DefaultMutableTreeNode top = new DefaultMutableTreeNode(resources.getString("HangarReport.Origin"));
         JTree overviewHangarTree = new JTree(top);
 
         // Mech Nodes
@@ -1002,7 +1007,7 @@ public class HangarReport extends Report {
                 countMechs++;
                 if (e.isOmni()) {
                     countOmniMechs++;
-                    switch(e.getWeightClass()) {
+                    switch (e.getWeightClass()) {
                         case EntityWeightClass.WEIGHT_COLOSSAL:
                             colossalOmniMech++;
                             colossalOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1065,7 +1070,7 @@ public class HangarReport extends Report {
                     countSupportOmniVees++;
                     if (e.getMovementMode() == EntityMovementMode.WHEELED) {
                         countSupportOmniWheeled++;
-                        switch(e.getWeightClass()) {
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniWheeledLarge++;
                                 oSupportWheeledLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1081,7 +1086,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
                         countSupportOmniTracked++;
-                        switch(e.getWeightClass()) {
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniTrackedLarge++;
                                 oSupportTrackedLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1097,7 +1102,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
                         countSupportOmniHover++;
-                        switch(e.getWeightClass()) {
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniHoverLarge++;
                                 oSupportHoverLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1113,7 +1118,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.VTOL) {
                         countSupportOmniVTOL++;
-                        switch(e.getWeightClass()) {
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniVTOLLarge++;
                                 oSupportVTOLLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1129,7 +1134,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
                         countSupportOmniWiGE++;
-                        switch(e.getWeightClass()) {
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniWiGELarge++;
                                 oSupportWiGELarge.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1145,7 +1150,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.AIRSHIP) {
                         countSupportOmniAirship++;
-                        switch(e.getWeightClass()) {
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniAirshipLarge++;
                                 oSupportAirshipLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1161,7 +1166,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.isFighter()) {
                         countSupportOmniFixedWing++;
-                        switch(e.getWeightClass()) {
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniFixedWingLarge++;
                                 oSupportFixedWingLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1177,7 +1182,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
                         countSupportOmniNaval++;
-                        switch(e.getWeightClass()) {
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniNavalLarge++;
                                 oSupportNavalLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1193,7 +1198,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
                         countSupportOmniSub++;
-                        switch(e.getWeightClass()) {
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniSubLarge++;
                                 oSupportSubLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1209,7 +1214,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
                         countSupportOmniHydrofoil++;
-                        switch(e.getWeightClass()) {
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniHydrofoilLarge++;
                                 oSupportHydrofoilLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1493,7 +1498,7 @@ public class HangarReport extends Report {
             } else if (e instanceof Warship) {
                 countSpace++;
                 countWarShips++;
-                switch(e.getWeightClass()){
+                switch (e.getWeightClass()) {
                     case EntityWeightClass.WEIGHT_LARGE_WAR:
                         countLargeWS++;
                         lgws.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1510,7 +1515,7 @@ public class HangarReport extends Report {
             } else if (e instanceof Dropship) {
                 countSpace++;
                 countDropships++;
-                switch(e.getWeightClass()) {
+                switch (e.getWeightClass()) {
                     case EntityWeightClass.WEIGHT_LARGE_DROP:
                         countLargeDS++;
                         lgds.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1532,7 +1537,7 @@ public class HangarReport extends Report {
                 countASF++;
                 if (e.isOmni()) {
                     countOmniASF++;
-                    switch(e.getWeightClass()) {
+                    switch (e.getWeightClass()) {
                         case EntityWeightClass.WEIGHT_HEAVY:
                             countOmniHeavyASF++;
                             oHeavyASF.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1548,7 +1553,7 @@ public class HangarReport extends Report {
                     }
                 } else {
                     countStandardASF++;
-                    switch(e.getWeightClass()) {
+                    switch (e.getWeightClass()) {
                         case EntityWeightClass.WEIGHT_HEAVY:
                             countHeavyASF++;
                             sHeavyASF.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1565,7 +1570,7 @@ public class HangarReport extends Report {
                 }
             } else if (e instanceof Protomech) {
                 countProtos++;
-                switch(e.getWeightClass()) {
+                switch (e.getWeightClass()) {
                     case EntityWeightClass.WEIGHT_ASSAULT:
                         countAssaultProtos++;
                         pAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1592,7 +1597,7 @@ public class HangarReport extends Report {
                     countOmniVees++;
                     if (e.getMovementMode() == EntityMovementMode.TRACKED) {
                         countOmniTracked++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_COLOSSAL:
                                 countOmniTrackedColossal++;
                                 oTrackedColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1616,7 +1621,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
                         countOmniWheeled++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniWheeledAssault++;
                                 oWheeledAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1636,7 +1641,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
                         countOmniHover++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countOmniHoverMedium++;
                                 oHoverMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1654,7 +1659,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
                         countOmniWiGE++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniWiGEAssault++;
                                 oWiGEAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1674,7 +1679,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
                         countOmniNaval++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_COLOSSAL:
                                 countOmniNavalColossal++;
                                 oNavalColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1698,7 +1703,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
                         countOmniSub++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_COLOSSAL:
                                 countOmniSubColossal++;
                                 oSubColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1722,7 +1727,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
                         countOmniHydrofoil++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniHydrofoilAssault++;
                                 oHydrofoilAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1745,7 +1750,7 @@ public class HangarReport extends Report {
                     countStandardVees++;
                     if (e.getMovementMode() == EntityMovementMode.TRACKED) {
                         countTracked++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_COLOSSAL:
                                 countTrackedColossal++;
                                 sTrackedColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1769,7 +1774,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
                         countWheeled++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countWheeledAssault++;
                                 sWheeledAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1789,7 +1794,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
                         countHover++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countHoverMedium++;
                                 sHoverMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1807,7 +1812,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
                         countWiGE++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countWiGEAssault++;
                                 sWiGEAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1827,7 +1832,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
                         countNaval++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_COLOSSAL:
                                 countNavalColossal++;
                                 sNavalColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1851,7 +1856,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
                         countSub++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_COLOSSAL:
                                 countSubColossal++;
                                 sSubColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1875,7 +1880,7 @@ public class HangarReport extends Report {
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
                         countHydrofoil++;
-                        switch(e.getWeightClass()){
+                        switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countHydrofoilAssault++;
                                 sHydrofoilAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1897,7 +1902,7 @@ public class HangarReport extends Report {
                 }
             } else if (e instanceof BattleArmor) {
                 countBA++;
-                switch(e.getWeightClass()){
+                switch (e.getWeightClass()) {
                     case EntityWeightClass.WEIGHT_ASSAULT:
                         countBAAssault++;
                         baAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
@@ -1940,324 +1945,323 @@ public class HangarReport extends Report {
 
         //region Tree Description Assignment
         // Mech Nodes
-        mechs.setUserObject("'Mechs: " + countMechs);
+        mechs.setUserObject(resources.getString("HangarReport.Mechs") + " " + countMechs);
 
-        battlemechs.setUserObject("BattleMechs: " + countBattleMechs);
-        colossalMechs.setUserObject("Super Heavy: " + colossalMech);
-        assaultMechs.setUserObject("Assault: " + assaultMech);
-        heavyMechs.setUserObject("Heavy: " + heavyMech);
-        mediumMechs.setUserObject("Medium: " + mediumMech);
-        lightMechs.setUserObject("Light: " + lightMech);
-        ultralightMechs.setUserObject("Ultralight: " + ultralightMech);
+        battlemechs.setUserObject(resources.getString("HangarReport.BattleMechs") + " " + countBattleMechs);
+        colossalMechs.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + colossalMech);
+        assaultMechs.setUserObject(resources.getString("HangarReport.Assault") + " " + assaultMech);
+        heavyMechs.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyMech);
+        mediumMechs.setUserObject(resources.getString("HangarReport.Medium") + " " + mediumMech);
+        lightMechs.setUserObject(resources.getString("HangarReport.Light") + " " + lightMech);
+        ultralightMechs.setUserObject(resources.getString("HangarReport.Ultralight") + " " + ultralightMech);
 
-        omnis.setUserObject("OmniMechs: " + countOmniMechs);
-        colossalOmniMechs.setUserObject("Super Heavy: " + colossalOmniMech);
-        assaultOmniMechs.setUserObject("Assault: " + assaultOmniMech);
-        heavyOmniMechs.setUserObject("Heavy: " + heavyOmniMech);
-        mediumOmniMechs.setUserObject("Medium: " + mediumOmniMech);
-        lightOmniMechs.setUserObject("Light: " + lightOmniMech);
-        ultralightOmniMechs.setUserObject("Ultralight: " + ultralightOmniMech);
+        omnis.setUserObject(resources.getString("HangarReport.OmniMechs") + " " + countOmniMechs);
+        colossalOmniMechs.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + colossalOmniMech);
+        assaultOmniMechs.setUserObject(resources.getString("HangarReport.Assault") + " " + assaultOmniMech);
+        heavyOmniMechs.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyOmniMech);
+        mediumOmniMechs.setUserObject(resources.getString("HangarReport.Medium") + " " + mediumOmniMech);
+        lightOmniMechs.setUserObject(resources.getString("HangarReport.Light") + " " + lightOmniMech);
+        ultralightOmniMechs.setUserObject(resources.getString("HangarReport.Ultralight") + " " + ultralightOmniMech);
 
         // ASF Nodes
-        ASF.setUserObject("Aerospace Fighters: " + countASF);
+        ASF.setUserObject(resources.getString("HangarReport.AerospaceFighters") + " " + countASF);
 
-        sASF.setUserObject("Standard Fighters: " + countStandardASF);
-        sHeavyASF.setUserObject("Heavy: " + countHeavyASF);
-        sMediumASF.setUserObject("Medium: " + countMediumASF);
-        sLightASF.setUserObject("Light: " + countLightASF);
+        sASF.setUserObject(resources.getString("HangarReport.StandardFighters") + " " + countStandardASF);
+        sHeavyASF.setUserObject(resources.getString("HangarReport.Heavy") + " " + countHeavyASF);
+        sMediumASF.setUserObject(resources.getString("HangarReport.Medium") + " " + countMediumASF);
+        sLightASF.setUserObject(resources.getString("HangarReport.Light") + " " + countLightASF);
 
-        oASF.setUserObject("OmniFighters: " + countOmniASF);
-        oHeavyASF.setUserObject("Heavy: " + countOmniHeavyASF);
-        oMediumASF.setUserObject("Medium: " + countOmniMediumASF);
-        oLightASF.setUserObject("Light: " + countOmniLightASF);
+        oASF.setUserObject(resources.getString("HangarReport.OmniFighters") + " " + countOmniASF);
+        oHeavyASF.setUserObject(resources.getString("HangarReport.Heavy") + " " + countOmniHeavyASF);
+        oMediumASF.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniMediumASF);
+        oLightASF.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniLightASF);
 
         // Vee Nodes
-        vees.setUserObject("Vehicles: " + countVees);
+        vees.setUserObject(resources.getString("HangarReport.Vehicles") + " " + countVees);
 
-        sVees.setUserObject("Standard: " + countStandardVees);
+        sVees.setUserObject(resources.getString("HangarReport.Standard") + " " + countStandardVees);
 
-        sTracked.setUserObject("Tracked: " + countTracked);
-        sTrackedColossal.setUserObject("Super Heavy: " + countTrackedColossal);
-        sTrackedAssault.setUserObject("Assault: " + countTrackedAssault);
-        sTrackedHeavy.setUserObject("Heavy: " + countTrackedHeavy);
-        sTrackedMedium.setUserObject("Medium: " + countTrackedMedium);
-        sTrackedLight.setUserObject("Light: " + countTrackedLight);
+        sTracked.setUserObject(resources.getString("HangarReport.Tracked") + " " + countTracked);
+        sTrackedColossal.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countTrackedColossal);
+        sTrackedAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countTrackedAssault);
+        sTrackedHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countTrackedHeavy);
+        sTrackedMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countTrackedMedium);
+        sTrackedLight.setUserObject(resources.getString("HangarReport.Light") + " " + countTrackedLight);
 
-        sWheeled.setUserObject("Wheeled: " + countWheeled);
-        sWheeledAssault.setUserObject("Assault: " + countWheeledAssault);
-        sWheeledHeavy.setUserObject("Heavy: " + countWheeledHeavy);
-        sWheeledMedium.setUserObject("Medium: " + countWheeledMedium);
-        sWheeledLight.setUserObject("Light: " + countWheeledLight);
+        sWheeled.setUserObject(resources.getString("HangarReport.Wheeled") + " " + countWheeled);
+        sWheeledAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countWheeledAssault);
+        sWheeledHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countWheeledHeavy);
+        sWheeledMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countWheeledMedium);
+        sWheeledLight.setUserObject(resources.getString("HangarReport.Light") + " " + countWheeledLight);
 
-        sHover.setUserObject("Hover: " + countHover);
-        sHoverMedium.setUserObject("Medium: " + countHoverMedium);
-        sHoverLight.setUserObject("Light: " + countHoverLight);
+        sHover.setUserObject(resources.getString("HangarReport.Hover") + " " + countHover);
+        sHoverMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countHoverMedium);
+        sHoverLight.setUserObject(resources.getString("HangarReport.Light") + " " + countHoverLight);
 
-        sVTOL.setUserObject("VTOL: " + countVTOL);
-        sVTOLLight.setUserObject("Light: " + countVTOLLight);
+        sVTOL.setUserObject(resources.getString("HangarReport.VTOL") + " " + countVTOL);
+        sVTOLLight.setUserObject(resources.getString("HangarReport.Light") + " " + countVTOLLight);
 
-        sWiGE.setUserObject("WiGE: " + countWiGE);
-        sWiGEAssault.setUserObject("Assault: " + countWiGEAssault);
-        sWiGEHeavy.setUserObject("Heavy: " + countWiGEHeavy);
-        sWiGEMedium.setUserObject("Medium: " + countWiGEMedium);
-        sWiGELight.setUserObject("Light: " + countWiGELight);
+        sWiGE.setUserObject(resources.getString("HangarReport.WiGE") + " " + countWiGE);
+        sWiGEAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countWiGEAssault);
+        sWiGEHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countWiGEHeavy);
+        sWiGEMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countWiGEMedium);
+        sWiGELight.setUserObject(resources.getString("HangarReport.Light") + " " + countWiGELight);
 
-        sNaval.setUserObject("Naval: " + countNaval);
-        sNavalColossal.setUserObject("Super Heavy: " + countNavalColossal);
-        sNavalAssault.setUserObject("Assault: " + countNavalAssault);
-        sNavalHeavy.setUserObject("Heavy: " + countNavalHeavy);
-        sNavalMedium.setUserObject("Medium: " + countNavalMedium);
-        sNavalLight.setUserObject("Light: " + countNavalLight);
+        sNaval.setUserObject(resources.getString("HangarReport.Naval") + " " + countNaval);
+        sNavalColossal.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countNavalColossal);
+        sNavalAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countNavalAssault);
+        sNavalHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countNavalHeavy);
+        sNavalMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countNavalMedium);
+        sNavalLight.setUserObject(resources.getString("HangarReport.Light") + " " + countNavalLight);
 
-        sSub.setUserObject("Sub: " + countSub);
-        sSubColossal.setUserObject("Super Heavy: " + countSubColossal);
-        sSubAssault.setUserObject("Assault: " + countSubAssault);
-        sSubHeavy.setUserObject("Heavy: " + countSubHeavy);
-        sSubMedium.setUserObject("Medium: " + countSubMedium);
-        sSubLight.setUserObject("Light: " + countSubLight);
+        sSub.setUserObject(resources.getString("HangarReport.Sub") + " " + countSub);
+        sSubColossal.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countSubColossal);
+        sSubAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countSubAssault);
+        sSubHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countSubHeavy);
+        sSubMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSubMedium);
+        sSubLight.setUserObject(resources.getString("HangarReport.Light") + " " + countSubLight);
 
-        sHydrofoil.setUserObject("Hydrofoil: " + countHydrofoil);
-        sHydrofoilAssault.setUserObject("Assault: " + countHydrofoilAssault);
-        sHydrofoilHeavy.setUserObject("Heavy: " + countHydrofoilHeavy);
-        sHydrofoilMedium.setUserObject("Medium: " + countHydrofoilMedium);
-        sHydrofoilLight.setUserObject("Light: " + countHydrofoilLight);
+        sHydrofoil.setUserObject(resources.getString("HangarReport.Hydrofoil") + " " + countHydrofoil);
+        sHydrofoilAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countHydrofoilAssault);
+        sHydrofoilHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countHydrofoilHeavy);
+        sHydrofoilMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countHydrofoilMedium);
+        sHydrofoilLight.setUserObject(resources.getString("HangarReport.Light") + " " + countHydrofoilLight);
 
-        oVees.setUserObject("OmniVees: " + countOmniVees);
+        oVees.setUserObject(resources.getString("HangarReport.OmniVees") + " " + countOmniVees);
 
-        oTracked.setUserObject("Tracked: " + countOmniTracked);
-        oTrackedColossal.setUserObject("Super Heavy: " + countOmniTrackedColossal);
-        oTrackedAssault.setUserObject("Assault: " + countOmniTrackedAssault);
-        oTrackedHeavy.setUserObject("Heavy: " +countOmniTrackedHeavy);
-        oTrackedMedium.setUserObject("Medium: " + countOmniTrackedMedium);
-        oTrackedLight.setUserObject("Light: " + countOmniTrackedLight);
+        oTracked.setUserObject(resources.getString("HangarReport.Tracked") + " " + countOmniTracked);
+        oTrackedColossal.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniTrackedColossal);
+        oTrackedAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countOmniTrackedAssault);
+        oTrackedHeavy.setUserObject(resources.getString("HangarReport.Heavy") +countOmniTrackedHeavy);
+        oTrackedMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniTrackedMedium);
+        oTrackedLight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniTrackedLight);
 
-        oWheeled.setUserObject("Wheeled: " + countOmniWheeled);
-        oWheeledAssault.setUserObject("Assault: " + countOmniWheeledAssault);
-        oWheeledHeavy.setUserObject("Heavy: " + countOmniWheeledHeavy);
-        oWheeledMedium.setUserObject("Medium: " + countOmniWheeledMedium);
-        oWheeledLight.setUserObject("Light: " + countOmniWheeledLight);
+        oWheeled.setUserObject(resources.getString("HangarReport.Wheeled") + " " + countOmniWheeled);
+        oWheeledAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countOmniWheeledAssault);
+        oWheeledHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countOmniWheeledHeavy);
+        oWheeledMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniWheeledMedium);
+        oWheeledLight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniWheeledLight);
 
-        oHover.setUserObject("Hover: " + countOmniHover);
-        oHoverMedium.setUserObject("Medium: " + countOmniHoverMedium);
-        oHoverLight.setUserObject("Light: " + countOmniHoverLight);
+        oHover.setUserObject(resources.getString("HangarReport.Hover") + " " + countOmniHover);
+        oHoverMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniHoverMedium);
+        oHoverLight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniHoverLight);
 
-        oVTOL.setUserObject("VTOL: " + countOmniVTOL);
-        oVTOLLight.setUserObject("Light: " + countOmniVTOLLight);
+        oVTOL.setUserObject(resources.getString("HangarReport.VTOL") + " " + countOmniVTOL);
+        oVTOLLight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniVTOLLight);
 
-        oWiGE.setUserObject("WiGE: " + countOmniWiGE);
-        oWiGEAssault.setUserObject("Assault: " + countOmniWiGEAssault);
-        oWiGEHeavy.setUserObject("Heavy: " + countOmniWiGEHeavy);
-        oWiGEMedium.setUserObject("Medium: " + countOmniWiGEMedium);
-        oWiGELight.setUserObject("Light: " + countOmniWiGELight);
+        oWiGE.setUserObject(resources.getString("HangarReport.WiGE") + " " + countOmniWiGE);
+        oWiGEAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countOmniWiGEAssault);
+        oWiGEHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countOmniWiGEHeavy);
+        oWiGEMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniWiGEMedium);
+        oWiGELight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniWiGELight);
 
-        oNaval.setUserObject("Naval: " + countOmniNaval);
-        oNavalColossal.setUserObject("Super Heavy: " + countOmniNavalColossal);
-        oNavalAssault.setUserObject("Assault: " + countOmniNavalAssault);
-        oNavalHeavy.setUserObject("Heavy: " + countOmniNavalHeavy);
-        oNavalMedium.setUserObject("Medium: " + countOmniNavalMedium);
-        oNavalLight.setUserObject("Light: " + countOmniNavalLight);
+        oNaval.setUserObject(resources.getString("HangarReport.Naval") + " " + countOmniNaval);
+        oNavalColossal.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniNavalColossal);
+        oNavalAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countOmniNavalAssault);
+        oNavalHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countOmniNavalHeavy);
+        oNavalMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniNavalMedium);
+        oNavalLight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniNavalLight);
 
-        oSub.setUserObject("Sub: " + countOmniSub);
-        oSubColossal.setUserObject("Super Heavy: " + countOmniSubColossal);
-        oSubAssault.setUserObject("Assault: " + countOmniSubAssault);
-        oSubHeavy.setUserObject("Heavy: " + countOmniSubHeavy);
-        oSubMedium.setUserObject("Medium: " + countOmniSubMedium);
-        oSubLight.setUserObject("Light: " + countOmniSubLight);
+        oSub.setUserObject(resources.getString("HangarReport.Sub") + " " + countOmniSub);
+        oSubColossal.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + countOmniSubColossal);
+        oSubAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countOmniSubAssault);
+        oSubHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countOmniSubHeavy);
+        oSubMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniSubMedium);
+        oSubLight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniSubLight);
 
-        oHydrofoil.setUserObject("Hydrofoil: " + countOmniHydrofoil);
-        oHydrofoilAssault.setUserObject("Assault: " + countOmniHydrofoilAssault);
-        oHydrofoilHeavy.setUserObject("Heavy: " + countOmniHydrofoilHeavy);
-        oHydrofoilMedium.setUserObject("Medium: " + countOmniHydrofoilMedium);
-        oHydrofoilLight.setUserObject("Light: " + countOmniHydrofoilLight);
+        oHydrofoil.setUserObject(resources.getString("HangarReport.Hydrofoil") + " " + countOmniHydrofoil);
+        oHydrofoilAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countOmniHydrofoilAssault);
+        oHydrofoilHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countOmniHydrofoilHeavy);
+        oHydrofoilMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countOmniHydrofoilMedium);
+        oHydrofoilLight.setUserObject(resources.getString("HangarReport.Light") + " " + countOmniHydrofoilLight);
 
         // Support Vee Nodes
-        supportVees.setUserObject("Support Vehicles: " + countSupportVees);
+        supportVees.setUserObject(resources.getString("HangarReport.SupportVehicles") + " " + countSupportVees);
 
         // Standard Support Vees
-        sSupportVees.setUserObject("Standard: " + countSupportStandardVees);
+        sSupportVees.setUserObject(resources.getString("HangarReport.Standard") + " " + countSupportStandardVees);
 
-        sSupportWheeled.setUserObject("Wheeled: " + countSupportWheeled);
-        sSupportWheeledLarge.setUserObject("Large: " + countSupportWheeledLarge);
-        sSupportWheeledMedium.setUserObject("Medium: " + countSupportWheeledMedium);
-        sSupportWheeledSmall.setUserObject("Small: " + countSupportWheeledSmall);
+        sSupportWheeled.setUserObject(resources.getString("HangarReport.Wheeled") + " " + countSupportWheeled);
+        sSupportWheeledLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportWheeledLarge);
+        sSupportWheeledMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportWheeledMedium);
+        sSupportWheeledSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportWheeledSmall);
 
-        sSupportTracked.setUserObject("Tracked: " + countSupportTracked);
-        sSupportTrackedLarge.setUserObject("Large: " + countSupportTrackedLarge);
-        sSupportTrackedMedium.setUserObject("Medium: " + countSupportTrackedMedium);
-        sSupportTrackedSmall.setUserObject("Small: " + countSupportTrackedSmall);
+        sSupportTracked.setUserObject(resources.getString("HangarReport.Tracked") + " " + countSupportTracked);
+        sSupportTrackedLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportTrackedLarge);
+        sSupportTrackedMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportTrackedMedium);
+        sSupportTrackedSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportTrackedSmall);
 
-        sSupportHover.setUserObject("Hover: " + countSupportHover);
-        sSupportHoverLarge.setUserObject("Large: " + countSupportHoverLarge);
-        sSupportHoverMedium.setUserObject("Medium: " + countSupportHoverMedium);
-        sSupportHoverSmall.setUserObject("Small: " + countSupportHoverSmall);
+        sSupportHover.setUserObject(resources.getString("HangarReport.Hover") + " " + countSupportHover);
+        sSupportHoverLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportHoverLarge);
+        sSupportHoverMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportHoverMedium);
+        sSupportHoverSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportHoverSmall);
 
-        sSupportVTOL.setUserObject("VTOL: " + countSupportVTOL);
-        sSupportVTOLLarge.setUserObject("Large: " + countSupportVTOLLarge);
-        sSupportVTOLMedium.setUserObject("Medium: " + countSupportVTOLMedium);
-        sSupportVTOLSmall.setUserObject("Small: " + countSupportVTOLSmall);
+        sSupportVTOL.setUserObject(resources.getString("HangarReport.VTOL") + " " + countSupportVTOL);
+        sSupportVTOLLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportVTOLLarge);
+        sSupportVTOLMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportVTOLMedium);
+        sSupportVTOLSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportVTOLSmall);
 
-        sSupportWiGE.setUserObject("WiGE: " + countSupportWiGE);
-        sSupportWiGELarge.setUserObject("Large: " + countSupportWiGELarge);
-        sSupportWiGEMedium.setUserObject("Medium: " + countSupportWiGEMedium);
-        sSupportWiGESmall.setUserObject("Small: " + countSupportWiGESmall);
+        sSupportWiGE.setUserObject(resources.getString("HangarReport.WiGE") + " " + countSupportWiGE);
+        sSupportWiGELarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportWiGELarge);
+        sSupportWiGEMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportWiGEMedium);
+        sSupportWiGESmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportWiGESmall);
 
-        sSupportAirship.setUserObject("Airship: " + countSupportAirship);
-        sSupportAirshipLarge.setUserObject("Large: " + countSupportAirshipLarge);
-        sSupportAirshipMedium.setUserObject("Medium: " + countSupportAirshipMedium);
-        sSupportAirshipSmall.setUserObject("Small: " + countSupportAirshipSmall);
+        sSupportAirship.setUserObject(resources.getString("HangarReport.Airship") + " " + countSupportAirship);
+        sSupportAirshipLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportAirshipLarge);
+        sSupportAirshipMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportAirshipMedium);
+        sSupportAirshipSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportAirshipSmall);
 
-        sSupportFixedWing.setUserObject("Fixed-Wing: " + countSupportFixedWing);
-        sSupportFixedWingLarge.setUserObject("Large: " + countSupportFixedWingLarge);
-        sSupportFixedWingMedium.setUserObject("Medium: " + countSupportFixedWingMedium);
-        sSupportFixedWingSmall.setUserObject("Small: " + countSupportFixedWingSmall);
+        sSupportFixedWing.setUserObject(resources.getString("HangarReport.FixedWing") + " " + countSupportFixedWing);
+        sSupportFixedWingLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportFixedWingLarge);
+        sSupportFixedWingMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportFixedWingMedium);
+        sSupportFixedWingSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportFixedWingSmall);
 
-        sSupportNaval.setUserObject("Naval: " + countSupportNaval);
-        sSupportNavalLarge.setUserObject("Large: " + countSupportNavalLarge);
-        sSupportNavalMedium.setUserObject("Medium: " + countSupportNavalMedium);
-        sSupportNavalSmall.setUserObject("Small: " + countSupportNavalSmall);
+        sSupportNaval.setUserObject(resources.getString("HangarReport.Naval") + " " + countSupportNaval);
+        sSupportNavalLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportNavalLarge);
+        sSupportNavalMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportNavalMedium);
+        sSupportNavalSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportNavalSmall);
 
-        sSupportSub.setUserObject("Sub: " + countSupportSub);
-        sSupportSubLarge.setUserObject("Large: " + countSupportSubLarge);
-        sSupportSubMedium.setUserObject("Medium: " + countSupportSubMedium);
-        sSupportSubSmall.setUserObject("Small: " + countSupportSubSmall);
+        sSupportSub.setUserObject(resources.getString("HangarReport.Sub") + " " + countSupportSub);
+        sSupportSubLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportSubLarge);
+        sSupportSubMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportSubMedium);
+        sSupportSubSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportSubSmall);
 
-        sSupportHydrofoil.setUserObject("Hydrofoil: " + countSupportHydrofoil);
-        sSupportHydrofoilLarge.setUserObject("Large: " + countSupportHydrofoilLarge);
-        sSupportHydrofoilMedium.setUserObject("Medium: " + countSupportHydrofoilMedium);
-        sSupportHydrofoilSmall.setUserObject("Small: " + countSupportHydrofoilSmall);
+        sSupportHydrofoil.setUserObject(resources.getString("HangarReport.Hydrofoil") + " " + countSupportHydrofoil);
+        sSupportHydrofoilLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportHydrofoilLarge);
+        sSupportHydrofoilMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportHydrofoilMedium);
+        sSupportHydrofoilSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportHydrofoilSmall);
 
-        sSupportSatellite.setUserObject("Satellite: " + countSupportSatellite);
-        sSupportSatelliteLarge.setUserObject("Large: " + countSupportSatelliteLarge);
-        sSupportSatelliteMedium.setUserObject("Medium: " + countSupportSatelliteMedium);
-        sSupportSatelliteSmall.setUserObject("Small: " + countSupportSatelliteSmall);
+        sSupportSatellite.setUserObject(resources.getString("HangarReport.Satellite") + " " + countSupportSatellite);
+        sSupportSatelliteLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportSatelliteLarge);
+        sSupportSatelliteMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportSatelliteMedium);
+        sSupportSatelliteSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportSatelliteSmall);
 
-        sSupportRail.setUserObject("Rail: " + countSupportRail);
-        sSupportRailLarge.setUserObject("Large: " + countSupportRailLarge);
-        sSupportRailMedium.setUserObject("Medium: " + countSupportRailMedium);
-        sSupportRailSmall.setUserObject("Small: " + countSupportRailSmall);
+        sSupportRail.setUserObject(resources.getString("HangarReport.Rail") + " " + countSupportRail);
+        sSupportRailLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportRailLarge);
+        sSupportRailMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportRailMedium);
+        sSupportRailSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportRailSmall);
 
-        sSupportMaglev.setUserObject("Maglev: " + countSupportMaglev);
-        sSupportMaglevLarge.setUserObject("Large: " + countSupportMaglevLarge);
-        sSupportMaglevMedium.setUserObject("Medium: " + countSupportMaglevMedium);
-        sSupportMaglevSmall.setUserObject("Small: " + countSupportMaglevSmall);
+        sSupportMaglev.setUserObject(resources.getString("HangarReport.Maglev") + " " + countSupportMaglev);
+        sSupportMaglevLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportMaglevLarge);
+        sSupportMaglevMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportMaglevMedium);
+        sSupportMaglevSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportMaglevSmall);
 
         // Omni Support Vees
-        oSupportVees.setUserObject("OmniVees: " + countSupportOmniVees);
+        oSupportVees.setUserObject(resources.getString("HangarReport.OmniVees") + " " + countSupportOmniVees);
 
-        oSupportWheeled.setUserObject("Wheeled: " + countSupportOmniWheeled);
-        oSupportWheeledLarge.setUserObject("Large: " + countSupportOmniWheeledLarge);
-        oSupportWheeledMedium.setUserObject("Medium: " + countSupportOmniWheeledMedium);
-        oSupportWheeledSmall.setUserObject("Small: " + countSupportOmniWheeledSmall);
+        oSupportWheeled.setUserObject(resources.getString("HangarReport.Wheeled") + " " + countSupportOmniWheeled);
+        oSupportWheeledLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniWheeledLarge);
+        oSupportWheeledMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniWheeledMedium);
+        oSupportWheeledSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniWheeledSmall);
 
-        oSupportTracked.setUserObject("Tracked: " + countSupportOmniTracked);
-        oSupportTrackedLarge.setUserObject("Large: " +countSupportOmniTrackedLarge);
-        oSupportTrackedMedium.setUserObject("Medium: " + countSupportOmniTrackedMedium);
-        oSupportTrackedSmall.setUserObject("Small: " + countSupportOmniTrackedSmall);
+        oSupportTracked.setUserObject(resources.getString("HangarReport.Tracked") + " " + countSupportOmniTracked);
+        oSupportTrackedLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniTrackedLarge);
+        oSupportTrackedMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniTrackedMedium);
+        oSupportTrackedSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniTrackedSmall);
 
-        oSupportHover.setUserObject("Hover: " + countSupportOmniHover);
-        oSupportHoverLarge.setUserObject("Large: " + countSupportOmniHoverLarge);
-        oSupportHoverMedium.setUserObject("Medium: " + countSupportOmniHoverMedium);
-        oSupportHoverSmall.setUserObject("Small: " + countSupportOmniHoverSmall);
+        oSupportHover.setUserObject(resources.getString("HangarReport.Hover") + " " + countSupportOmniHover);
+        oSupportHoverLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniHoverLarge);
+        oSupportHoverMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniHoverMedium);
+        oSupportHoverSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniHoverSmall);
 
-        oSupportVTOL.setUserObject("VTOL: " + countSupportOmniVTOL);
-        oSupportVTOLLarge.setUserObject("Large: " + countSupportOmniVTOLLarge);
-        oSupportVTOLMedium.setUserObject("Medium: " + countSupportOmniVTOLMedium);
-        oSupportVTOLSmall.setUserObject("Small: " + countSupportOmniVTOLSmall);
+        oSupportVTOL.setUserObject(resources.getString("HangarReport.VTOL") + " " + countSupportOmniVTOL);
+        oSupportVTOLLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniVTOLLarge);
+        oSupportVTOLMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniVTOLMedium);
+        oSupportVTOLSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniVTOLSmall);
 
-        oSupportWiGE.setUserObject("WiGE: " + countSupportOmniWiGE);
-        oSupportWiGELarge.setUserObject("Large: " + countSupportOmniWiGELarge);
-        oSupportWiGEMedium.setUserObject("Medium: " + countSupportOmniWiGEMedium);
-        oSupportWiGESmall.setUserObject("Small: " + countSupportOmniWiGESmall);
+        oSupportWiGE.setUserObject(resources.getString("HangarReport.WiGE") + " " + countSupportOmniWiGE);
+        oSupportWiGELarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniWiGELarge);
+        oSupportWiGEMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniWiGEMedium);
+        oSupportWiGESmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniWiGESmall);
 
-        oSupportAirship.setUserObject("Airship: " + countSupportOmniAirship);
-        oSupportAirshipLarge.setUserObject("Large: " + countSupportOmniAirshipLarge);
-        oSupportAirshipMedium.setUserObject("Medium: " + countSupportOmniAirshipMedium);
-        oSupportAirshipSmall.setUserObject("Small: " + countSupportOmniAirshipSmall);
+        oSupportAirship.setUserObject(resources.getString("HangarReport.Airship") + " " + countSupportOmniAirship);
+        oSupportAirshipLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniAirshipLarge);
+        oSupportAirshipMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniAirshipMedium);
+        oSupportAirshipSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniAirshipSmall);
 
-        oSupportFixedWing.setUserObject("Fixed-Wing: " + countSupportOmniFixedWing);
-        oSupportFixedWingLarge.setUserObject("Large: " + countSupportOmniFixedWingLarge);
-        oSupportFixedWingMedium.setUserObject("Medium: " + countSupportOmniFixedWingMedium);
-        oSupportFixedWingSmall.setUserObject("Small: " + countSupportOmniFixedWingSmall);
+        oSupportFixedWing.setUserObject(resources.getString("HangarReport.FixedWing") + " " + countSupportOmniFixedWing);
+        oSupportFixedWingLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniFixedWingLarge);
+        oSupportFixedWingMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniFixedWingMedium);
+        oSupportFixedWingSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniFixedWingSmall);
 
-        oSupportNaval.setUserObject("Naval: " + countSupportOmniNaval);
-        oSupportNavalLarge.setUserObject("Large: " + countSupportOmniNavalLarge);
-        oSupportNavalMedium.setUserObject("Medium: " + countSupportOmniNavalMedium);
-        oSupportNavalSmall.setUserObject("Small: " + countSupportOmniNavalSmall);
+        oSupportNaval.setUserObject(resources.getString("HangarReport.Naval") + " " + countSupportOmniNaval);
+        oSupportNavalLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniNavalLarge);
+        oSupportNavalMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniNavalMedium);
+        oSupportNavalSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniNavalSmall);
 
-        oSupportSub.setUserObject("Sub: " + countSupportOmniSub);
-        oSupportSubLarge.setUserObject("Large: " + countSupportOmniSubLarge);
-        oSupportSubMedium.setUserObject("Medium: " + countSupportOmniSubMedium);
-        oSupportSubSmall.setUserObject("Small: " + countSupportOmniSubSmall);
+        oSupportSub.setUserObject(resources.getString("HangarReport.Sub") + " " + countSupportOmniSub);
+        oSupportSubLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniSubLarge);
+        oSupportSubMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniSubMedium);
+        oSupportSubSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniSubSmall);
 
-        oSupportHydrofoil.setUserObject("Hydrofoil: " + countSupportOmniHydrofoil);
-        oSupportHydrofoilLarge.setUserObject("Large: " + countSupportOmniHydrofoilLarge);
-        oSupportHydrofoilMedium.setUserObject("Medium: " + countSupportOmniHydrofoilMedium);
-        oSupportHydrofoilSmall.setUserObject("Small: " + countSupportOmniHydrofoilSmall);
+        oSupportHydrofoil.setUserObject(resources.getString("HangarReport.Hydrofoil") + " " + countSupportOmniHydrofoil);
+        oSupportHydrofoilLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniHydrofoilLarge);
+        oSupportHydrofoilMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniHydrofoilMedium);
+        oSupportHydrofoilSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniHydrofoilSmall);
 
-        oSupportSatellite.setUserObject("Satellite: " + countSupportOmniSatellite);
-        oSupportSatelliteLarge.setUserObject("Large: " + countSupportOmniSatelliteLarge);
-        oSupportSatelliteMedium.setUserObject("Medium: " + countSupportOmniSatelliteMedium);
-        oSupportSatelliteSmall.setUserObject("Small: " + countSupportOmniSatelliteSmall);
+        oSupportSatellite.setUserObject(resources.getString("HangarReport.Satellite") + " " + countSupportOmniSatellite);
+        oSupportSatelliteLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniSatelliteLarge);
+        oSupportSatelliteMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniSatelliteMedium);
+        oSupportSatelliteSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniSatelliteSmall);
 
-        oSupportRail.setUserObject("Rail: " + countSupportOmniRail);
-        oSupportRailLarge.setUserObject("Large: " + countSupportOmniRailLarge);
-        oSupportRailMedium.setUserObject("Medium: " + countSupportOmniRailMedium);
-        oSupportRailSmall.setUserObject("Small: " + countSupportOmniRailSmall);
+        oSupportRail.setUserObject(resources.getString("HangarReport.Rail") + " " + countSupportOmniRail);
+        oSupportRailLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniRailLarge);
+        oSupportRailMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniRailMedium);
+        oSupportRailSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniRailSmall);
 
-        oSupportMaglev.setUserObject("Maglev: " + countSupportOmniMaglev);
-        oSupportMaglevLarge.setUserObject("Large: " + countSupportOmniMaglevLarge);
-        oSupportMaglevMedium.setUserObject("Medium: " + countSupportOmniMaglevMedium);
-        oSupportMaglevSmall.setUserObject("Small: " + countSupportOmniMaglevSmall);
+        oSupportMaglev.setUserObject(resources.getString("HangarReport.Maglev") + " " + countSupportOmniMaglev);
+        oSupportMaglevLarge.setUserObject(resources.getString("HangarReport.Large") + " " + countSupportOmniMaglevLarge);
+        oSupportMaglevMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countSupportOmniMaglevMedium);
+        oSupportMaglevSmall.setUserObject(resources.getString("HangarReport.Small") + " " + countSupportOmniMaglevSmall);
 
         // Infantry Nodes
         int allInfantry = (countInfantry + countBA);
-        inf.setUserObject("Infantry: " + allInfantry);
+        inf.setUserObject(resources.getString("HangarReport.Infantry") + " " + allInfantry);
 
-        cInf.setUserObject("Conventional: " + countInfantry);
-        infFoot.setUserObject("Foot Platoons: " + countFootInfantry);
-        infMotorized.setUserObject("Motorized Platoons: " + countMotorizedInfantry);
-        infJump.setUserObject("Jump Platoons: " + countJumpInfantry);
-        infMechanized.setUserObject("Mechanized Platoons: " + countMechanizedInfantry);
+        cInf.setUserObject(resources.getString("HangarReport.Conventional") + " " + countInfantry);
+        infFoot.setUserObject(resources.getString("HangarReport.FootPlatoons") + " " + countFootInfantry);
+        infMotorized.setUserObject(resources.getString("HangarReport.MotorizedPlatoons") + " " + countMotorizedInfantry);
+        infJump.setUserObject(resources.getString("HangarReport.JumpPlatoons") + " " + countJumpInfantry);
+        infMechanized.setUserObject(resources.getString("HangarReport.MechanizedPlatoons") + " " + countMechanizedInfantry);
 
-        BAInf.setUserObject("Battle Armor: " + countBA);
-        baAssault.setUserObject("Assault: " + countBAAssault);
-        baHeavy.setUserObject("Heavy: " + countBAHeavy);
-        baMedium.setUserObject("Medium: " + countBAMedium);
-        baLight.setUserObject("Light: " + countBALight);
-        baPAL.setUserObject("PAL/Exoskeleton: " + countBAPAL);
+        BAInf.setUserObject(resources.getString("HangarReport.BattleArmor") + " " + countBA);
+        baAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countBAAssault);
+        baHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countBAHeavy);
+        baMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countBAMedium);
+        baLight.setUserObject(resources.getString("HangarReport.Light") + " " + countBALight);
+        baPAL.setUserObject(resources.getString("HangarReport.PAL_Exoskeleton") + " " + countBAPAL);
 
         // Conventional Fighters
-        conv.setUserObject("Conventional Fighters: " + countConv);
+        conv.setUserObject(resources.getString("HangarReport.ConventionalFighters") + " " + countConv);
 
         // ProtoMechs
-        protos.setUserObject("ProtoMechs: " + countProtos);
-        pAssault.setUserObject("Assault: " + countAssaultProtos);
-        pHeavy.setUserObject("Heavy: " + countHeavyProtos);
-        pMedium.setUserObject("Medium: " + countMediumProtos);
-        pLight.setUserObject("Light: " + countLightProtos);
+        protos.setUserObject(resources.getString("HangarReport.ProtoMechs") + " " + countProtos);
+        pAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countAssaultProtos);
+        pHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countHeavyProtos);
+        pMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countMediumProtos);
+        pLight.setUserObject(resources.getString("HangarReport.Light") + " " + countLightProtos);
 
         // Turrets
-        ge.setUserObject("Gun Emplacements: " + countGE);
+        ge.setUserObject(resources.getString("HangarReport.GunEmplacements") + " " + countGE);
 
         // Space
-        space.setUserObject("Spacecraft: " + countSpace);
+        space.setUserObject(resources.getString("HangarReport.Spacecraft") + " " + countSpace);
 
-        sc.setUserObject("Small Craft: " + countSmallCraft);
+        sc.setUserObject(resources.getString("HangarReport.SmallCraft") + " " + countSmallCraft);
 
-        ds.setUserObject("DropShips: " + countDropships);
-        lgds.setUserObject("Large DropShips: " + countLargeDS);
-        mdds.setUserObject("Medium DropShips: " + countMediumDS);
-        smds.setUserObject("Small DropShips: " + countSmallDS);
+        ds.setUserObject(resources.getString("HangarReport.DropShips") + " " + countDropships);
+        lgds.setUserObject(resources.getString("HangarReport.Large") + " " + countLargeDS);
+        mdds.setUserObject(resources.getString("HangarReport.Medium") + " " + countMediumDS);
+        smds.setUserObject(resources.getString("HangarReport.Small") + " " + countSmallDS);
 
-        js.setUserObject("JumpShips: " + countJumpShips);
+        js.setUserObject(resources.getString("HangarReport.JumpShips") + " " + countJumpShips);
 
-        ws.setUserObject("WarShips: " + countWarShips);
-        lgws.setUserObject("Large WarShips: " + countLargeWS);
-        smws.setUserObject("Small WarShips: " + countSmallWS);
+        ws.setUserObject(resources.getString("HangarReport.WarShips") + " " + countWarShips);
+        lgws.setUserObject(resources.getString("HangarReport.Large") + " " + countLargeWS);
+        smws.setUserObject(resources.getString("HangarReport.Small") + " " + countSmallWS);
 
         //Space Stations
-        spaceStation.setUserObject("Space Station: " + countSpaceStations);
-
+        spaceStation.setUserObject(resources.getString("HangarReport.SpaceStations") + " " + countSpaceStations);
         //endregion Tree Description Assignment
 
         overviewHangarTree.setSelectionPath(null);
@@ -2298,31 +2302,21 @@ public class HangarReport extends Report {
     }
 
     private String createNodeName(Unit u) {
-        String name = u.getName();
-
-        if (u.isMothballed()) {
-            name += " (Mothballed)";
-        }
-
-        return name;
+        return u.getName() + (u.isMothballed() ? resources.getString("HangarReport.Mothballed") : "");
     }
 
     public String getHangarTotals() {
-        return String.format("Total Units: %d\n  Present: %d\n  In Transit: %d\n  Damaged: %d\n  Deployed: %d",
+        return String.format(resources.getString("HangarReport.HangarTotals"),
                 totalNumberOfUnits, countUnitsPresent, countUnitsInTransit, countDamagedUnits, countDeployedUnits);
     }
 
+    @Override
     public JTextPane getReport() {
         JTextPane txtReport = new JTextPane();
         txtReport.setMinimumSize(new Dimension(800, 500));
         txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
-
         txtReport.setAlignmentY(1.0f);
-
-        JTree hangarTree = getHangarTree();
-
-        txtReport.setText(getHangarTotals() + "\n\n\n");
-        txtReport.insertComponent(hangarTree);
+        txtReport.insertComponent(getHangarTree());
 
         return txtReport;
     }

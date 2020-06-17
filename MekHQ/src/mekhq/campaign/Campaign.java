@@ -39,7 +39,9 @@ import javax.swing.JOptionPane;
 
 import megamek.common.event.Subscribe;
 import mekhq.*;
+import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.*;
@@ -91,7 +93,6 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.ReportEvent;
-import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.ScenarioNewEvent;
 import mekhq.campaign.event.UnitNewEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
@@ -920,13 +921,12 @@ public class Campaign implements Serializable, ITechManager {
      *
      * @param m The mission to be added
      */
-    public int addMission(Mission m) {
+    public void addMission(Mission m) {
         int id = lastMissionId + 1;
         m.setId(id);
         missions.put(id, m);
         lastMissionId = id;
         MekHQ.triggerEvent(new MissionNewEvent(m));
-        return id;
     }
 
     /**
@@ -4059,7 +4059,7 @@ public class Campaign implements Serializable, ITechManager {
             mission.removeScenario(scenario.getId());
         }
         scenarios.remove(id);
-        MekHQ.triggerEvent(new ScenarioChangedEvent(scenario));
+        MekHQ.triggerEvent(new ScenarioRemovedEvent(scenario));
     }
 
     public void removeMission(int id) {
@@ -4075,6 +4075,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         missions.remove(id);
+        MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
     public void removePart(Part part) {
