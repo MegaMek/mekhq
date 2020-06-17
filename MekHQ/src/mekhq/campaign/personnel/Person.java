@@ -1768,7 +1768,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastRankChangeDate",
                         MekHqXmlUtil.saveFormattedDate(lastRankChangeDate));
             }
+            boolean rpgGunnery = campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY);
             for (Skill skill : skills.getSkills()) {
+                if (rpgGunnery) {
+                    if (SkillType.isSingleGunnery(skill.getType().getName())) {
+                        continue;
+                    }
+                } else {
+                    if (SkillType.isSpecificRPGGunnery(skill.getType().getName())) {
+                        continue;
+                    }
+                }
+
                 skill.writeToXml(pw1, indent + 1);
             }
             if (countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
@@ -2293,16 +2304,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 retVal.addSkill(SkillType.S_TACTICS, pilotCommandBonus, 0);
             }
 
-            for (String gunSkill : SkillType.rpgGunnerySkillList) {
-                if (retVal.skills.hasSkill(gunSkill)) {
-                    Skill skill = retVal.skills.getSkill(gunSkill);
-                    for (String rpgGunType : SkillType.rpgGunneryTypeList) {
-                        if (!retVal.skills.hasSkill(SkillType.getRPGSkillName(gunSkill, rpgGunType))) {
-                            retVal.addSkill(SkillType.getRPGSkillName(gunSkill, rpgGunType), skill.getLevel(), skill.getBonus());
-                        }
-                    }
-                }
-            }
+            retVal.resolveGunnerySkills(c);
 
             if (pilotName != null) {
                 retVal.migrateName(pilotName);
@@ -2332,6 +2334,44 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         return retVal;
+    }
+
+    public void resolveGunnerySkills(Campaign campaign) {
+        if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+            for (String gunSkill : SkillType.rpgGunnerySkillList) {
+                if (hasSkill(gunSkill)) {
+                    Skill skill = getSkill(gunSkill);
+                    for (String rpgGunType : SkillType.rpgGunneryTypeList) {
+                        if (!hasSkill(SkillType.getRPGSkillName(gunSkill, rpgGunType))) {
+                            addSkill(SkillType.getRPGSkillName(gunSkill, rpgGunType), skill.getLevel(), skill.getBonus());
+                        }
+                    }
+                }
+            }
+        } else {
+            for (String gunSkill : SkillType.rpgGunnerySkillList) {
+                if (!hasSkill(gunSkill)) {
+                    int gunneryLevelSum = 0;
+                    int gunneryBonusSum = 0;
+                    boolean hasSpecificGunnery = false;
+                    for (String rpgGunType : SkillType.rpgGunneryTypeList) {
+                        if (hasSkill(SkillType.getRPGSkillName(gunSkill, rpgGunType))) {
+                            hasSpecificGunnery = true;
+                            Skill skill = getSkill(SkillType.getRPGSkillName(gunSkill, rpgGunType));
+                            gunneryLevelSum += skill.getLevel();
+                            gunneryBonusSum += skill.getBonus();
+                        } else {
+                            gunneryLevelSum += 8;
+                            gunneryBonusSum += 0;
+                        }
+                    }
+
+                    if (hasSpecificGunnery) {
+                        addSkill(gunSkill, gunneryLevelSum / 3, gunneryBonusSum / 3);
+                    }
+                }
+            }
+        }
     }
 
     public void setSalary(Money s) {

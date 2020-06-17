@@ -37,7 +37,9 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import megamek.common.event.Subscribe;
 import mekhq.*;
+import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.*;
@@ -329,6 +331,7 @@ public class Campaign implements Serializable, ITechManager {
         autosaveService = new AutosaveService();
         hasActiveContract = false;
         campaignSummary = new CampaignSummary(this);
+        MekHQ.registerHandler(this);
     }
 
     /**
@@ -8592,5 +8595,12 @@ public class Campaign implements Serializable, ITechManager {
     @Override
     public boolean showExtinct() {
         return !campaignOptions.disallowExtinctStuff();
+    }
+
+    @Subscribe
+    public void handle(OptionsChangedEvent ev) {
+        for (Person person : getPersonnel()) {
+            person.resolveGunnerySkills(this);
+        }
     }
 }
