@@ -78,11 +78,23 @@
 		<lookupName>melee_master</lookupName>
 		<xpCost>15</xpCost>
 		<weight>6</weight>
-		<skillPrereq>
+        <prereqAbilities>melee_specialist</prereqAbilities>
+        <invalidAbilities>zweihander</invalidAbilities>
+        <skillPrereq>
 	    	<skill>Piloting/Mech::Regular</skill>
 	        <skill>Gunnery/Protomech::Regular</skill>
 	    </skillPrereq>
 	</ability>
+    <ability>
+        <lookupName>zweihander</lookupName>
+        <xpCost>10</xpCost>
+        <weight>6</weight>
+        <prereqAbilities>melee_specialist</prereqAbilities>
+        <invalidAbilities>melee_master</invalidAbilities>
+        <skillPrereq>
+            <skill>Piloting/Mech::Regular</skill>
+        </skillPrereq>
+    </ability>
 	<ability>
 		<lookupName>shaky_stick</lookupName>
 		<xpCost>10</xpCost>
@@ -212,7 +224,8 @@
 	        <skill>Gunnery/Vehicle::Regular</skill>
 	        <skill>Gunnery/Battlesuit::Regular</skill>
 	        <skill>Gunnery/Protomech::Regular</skill>
-	    </skillPrereq>
+            <skill>Artillery::Regular</skill>
+        </skillPrereq>
 	</ability>
 	<ability>
 		<lookupName>range_master</lookupName>
@@ -451,6 +464,7 @@
     <ability>
         <lookupName>clan_tech_knowledge</lookupName>
         <displayName>Clan Tech Knowledge (Unofficial)</displayName>
+        <desc>Can work on clan equipment without penalty</desc>
         <xpCost>4</xpCost>
         <weight>2</weight>
         <skillPrereq>
