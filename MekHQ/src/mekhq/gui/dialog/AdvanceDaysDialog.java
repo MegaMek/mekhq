@@ -24,6 +24,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Collections;
 
@@ -63,8 +65,8 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
         this.gui = gui;
         setName("formADD"); // NOI18N
         getContentPane().setLayout(new GridBagLayout());
-        this.setPreferredSize(new Dimension(500,500));
         initComponents();
+        this.setPreferredSize(new Dimension(500,500));
         setLocationRelativeTo(owner);
         setUserPreferences();
     }
@@ -146,6 +148,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                 days = today.lengthOfYear() + 1 - today.getDayOfYear();
             }
 
+            List<String> reports = new ArrayList<String>();
             for (; days > 0; days--) {
                 if (gui.getCampaign().checkOverDueLoans()
                         || gui.nagShortMaintenance()
@@ -161,16 +164,19 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                 if (!gui.getCampaign().newDay()) {
                     break;
                 }
-                //String newLogString = logPanel.getLogText();
-                //newLogString = newLogString.concat(gui.getCampaign().getCurrentReportHTML());
                 if (firstDay) {
-                    logPanel.refreshLog(gui.getCampaign().getCurrentReportHTML());
+                    String report = gui.getCampaign().getCurrentReportHTML();
+                    logPanel.refreshLog(report);
                     firstDay = false;
+                    gui.getCampaign().fetchAndClearNewReports();
                 } else {
-                    logPanel.appendLog(Collections.singletonList("<hr/>")); //$NON-NLS-1$
-                    logPanel.appendLog(gui.getCampaign().fetchAndClearNewReports());
+                    String report = gui.getCampaign().getCurrentReportHTML();
+                    reports.add("<hr/>");
+                    reports.add(report);
+                    gui.getCampaign().fetchAndClearNewReports();
                 }
             }
+            logPanel.appendLog(reports);
 
             // We couldn't advance all days for some reason,
             // set the spinner to the number of remaining days
