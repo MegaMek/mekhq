@@ -350,7 +350,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
             ((MekLabTab) gui.getTab(GuiTabType.MEKLAB)).loadUnit(selectedUnit);
-            gui.getTabMain().setSelectedIndex(8);
+            gui.getTabMain().setSelectedIndex(GuiTabType.MEKLAB.getDefaultPos());
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) { // Single Unit only
             selectedUnit.getRefit().cancel();
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) { // Single Unit only
