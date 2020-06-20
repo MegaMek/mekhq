@@ -43,6 +43,7 @@ import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.enums.Divorce;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
@@ -6047,8 +6048,9 @@ public class Campaign implements Serializable, ITechManager {
             person.setDateOfDeath(getLocalDate());
             // Don't forget to tell the spouse
             if (person.hasSpouse()) {
-                person.divorce(getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
-                        ? Person.OPT_KEEP_SURNAME : Person.OPT_SPOUSE_CHANGE_SURNAME);
+                Divorce divorceType = getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
+                        ? Divorce.ORIGIN_CHANGE_SURNAME : Divorce.SPOUSE_CHANGE_SURNAME;
+                divorceType.divorce(person, this);
             }
         } else if (person.getStatus() == PersonnelStatus.KIA) {
             // remove date of death for resurrection
