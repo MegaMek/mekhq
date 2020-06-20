@@ -1,7 +1,7 @@
 /*
  * Faction.java
  *
- * Copyright (C) 2009-2016 MegaMek team
+ * Copyright (C) 2009-2016 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -13,18 +13,18 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.universe;
 
 import java.awt.Color;
 import java.io.FileInputStream;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,9 +40,6 @@ import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import mekhq.campaign.finances.Currency;
-import mekhq.campaign.finances.CurrencyManager;
-import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -229,7 +226,7 @@ public class Faction {
         return (year >= start) && (year <= end);
     }
 
-    public boolean validIn(DateTime time) {
+    public boolean validIn(LocalDate time) {
         return validIn(time.getYear());
     }
 
