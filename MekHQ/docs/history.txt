@@ -1,6 +1,9 @@
 VERSION HISTORY:
 ----------------
 0.47.7-SNAPSHOT
++ PR #1811: Fix advance multiple days reports not showing
++ PR #1810: use grid layout for repair tab main panels
++ PR #1802: Updates to special abilities in all presets
 + PR #1800: Two new unofficial special abilities for techs
 + PR #1776: Command center
 + PR #1769: Briefing room fixes

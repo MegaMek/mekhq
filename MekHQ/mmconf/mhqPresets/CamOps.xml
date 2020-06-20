@@ -3,7 +3,8 @@
 	<title>Campaign Operations</title>
 	<description>Options to run a unit using the Campaign Operations rules. This preset uses the basic rules and rating system. Optional rules are off by default as well as SPAs, Implants, and Quirks. For games using the older Field Manual Mercenaries system use the Total Warfare (TW) preset instead.</description>
 	<campaignOptions>
-		<clanPriceModifier>1.0</clanPriceModifier>
+		<displayDateFormat>yyyy-MM-dd</displayDateFormat>
+		<logMaintenance>false</logMaintenance>
 		<useFactionForNames>true</useFactionForNames>
 		<repairSystem>0</repairSystem>
 		<useUnitRating>true</useUnitRating>
@@ -23,25 +24,11 @@
 		<useAdvancedMedical>false</useAdvancedMedical>
 		<useDylansRandomXp>false</useDylansRandomXp>
 		<useQuirks>false</useQuirks>
-		<payForParts>true</payForParts>
-		<payForUnits>true</payForUnits>
-		<payForSalaries>true</payForSalaries>
-		<payForOverhead>false</payForOverhead>
-		<payForMaintain>true</payForMaintain>
-		<payForTransport>false</payForTransport>
-		<usePeacetimeCost>true</usePeacetimeCost>
-		<useExtendedPartsModifier>false</useExtendedPartsModifier>
-		<showPeacetimeCost>false</showPeacetimeCost>
-		<usedPartsValueA>0.1</usedPartsValueA>
-		<usedPartsValueB>0.2</usedPartsValueB>
-		<usedPartsValueC>0.3</usedPartsValueC>
-		<usedPartsValueD>0.5</usedPartsValueD>
-		<usedPartsValueE>0.7</usedPartsValueE>
-		<usedPartsValueF>0.9</usedPartsValueF>
-		<damagedPartsValue>0.33</damagedPartsValue>
-		<canceledOrderReimbursement>0.5</canceledOrderReimbursement>
-		<sellUnits>true</sellUnits>
-		<sellParts>true</sellParts>
+		<showOriginFaction>true</showOriginFaction>
+		<randomizeOrigin>false</randomizeOrigin>
+		<randomizeDependentOrigin>false</randomizeDependentOrigin>
+		<originSearchRadius>45</originSearchRadius>
+		<isOriginExtraRandom>false</isOriginExtraRandom>
 		<scenarioXP>1</scenarioXP>
 		<killsForXP>0</killsForXP>
 		<killXPAward>0</killXPAward>
@@ -65,7 +52,6 @@
 		<variableTechLevel>false</variableTechLevel>
 		<factionIntroDate>false</factionIntroDate>
 		<useAmmoByType>false</useAmmoByType>
-		<usePercentageMaint>false</usePercentageMaint>
 		<waitingPeriod>7</waitingPeriod>
 		<acquisitionSkill>Tech</acquisitionSkill>
 		<acquisitionSupportStaffOnly>true</acquisitionSupportStaffOnly>
@@ -77,6 +63,13 @@
 		<acquireMosUnit>2</acquireMosUnit>
 		<acquireMinimumTime>1</acquireMinimumTime>
 		<acquireMinimumTimeUnit>2</acquireMinimumTimeUnit>
+		<usePlanetaryAcquisition>false</usePlanetaryAcquisition>
+		<planetAcquisitionFactionLimit>1</planetAcquisitionFactionLimit>
+		<planetAcquisitionNoClanCrossover>true</planetAcquisitionNoClanCrossover>
+		<noClanPartsFromIS>true</noClanPartsFromIS>
+		<penaltyClanPartsFromIS>4</penaltyClanPartsFromIS>
+		<planetAcquisitionVerbose>false</planetAcquisitionVerbose>
+		<maxJumpsPlanetaryAcquisition>2</maxJumpsPlanetaryAcquisition>
 		<equipmentContractPercent>5.0</equipmentContractPercent>
 		<dropshipContractPercent>0.0</dropshipContractPercent>
 		<jumpshipContractPercent>0.0</jumpshipContractPercent>
@@ -86,13 +79,12 @@
 		<blcSaleValue>false</blcSaleValue>
 		<clanAcquisitionPenalty>0</clanAcquisitionPenalty>
 		<isAcquisitionPenalty>0</isAcquisitionPenalty>
-		<useLoanLimits>false</useLoanLimits>
-		<payForRecruitment>false</payForRecruitment>
 		<healWaitingPeriod>1</healWaitingPeriod>
 		<naturalHealingWaitingPeriod>15</naturalHealingWaitingPeriod>
 		<destroyByMargin>false</destroyByMargin>
 		<destroyMargin>4</destroyMargin>
 		<destroyPartTarget>10</destroyPartTarget>
+		<useAeroSystemHits>false</useAeroSystemHits>
 		<maintenanceCycleDays>7</maintenanceCycleDays>
 		<maintenanceBonus>-1</maintenanceBonus>
 		<useQualityMaintenance>true</useQualityMaintenance>
@@ -102,15 +94,63 @@
 		<useRandomHitsForVees>false</useRandomHitsForVees>
 		<minimumHitsForVees>1</minimumHitsForVees>
 		<maxAcquisitions>0</maxAcquisitions>
+		<minimumMarriageAge>16</minimumMarriageAge>
+		<checkMutualAncestorsDepth>4</checkMutualAncestorsDepth>
+		<logMarriageNameChange>false</logMarriageNameChange>
+		<useRandomMarriages>false</useRandomMarriages>
+		<chanceRandomMarriages>2.5E-4</chanceRandomMarriages>
+		<marriageAgeRange>10</marriageAgeRange>
+		<randomMarriageSurnameWeights>100,55,55,10,5,30,20,10,5,30,20,500,160</randomMarriageSurnameWeights>
+		<useRandomSameSexMarriages>false</useRandomSameSexMarriages>
+		<chanceRandomSameSexMarriages>2.0E-5</chanceRandomSameSexMarriages>
 		<useUnofficialProcreation>false</useUnofficialProcreation>
+		<chanceProcreation>5.0E-4</chanceProcreation>
 		<useUnofficialProcreationNoRelationship>false</useUnofficialProcreationNoRelationship>
-		<useParentage>false</useParentage>
+		<chanceProcreationNoRelationship>5.0E-5</chanceProcreationNoRelationship>
+		<displayTrueDueDate>false</displayTrueDueDate>
 		<logConception>false</logConception>
+		<babySurnameStyle>MOTHERS</babySurnameStyle>
+		<determineFatherAtBirth>false</determineFatherAtBirth>
+		<useParentage>false</useParentage>
+		<displayFamilyLevel>0</displayFamilyLevel>
+		<useRandomDeaths>true</useRandomDeaths>
+		<keepMarriedNameUponSpouseDeath>true</keepMarriedNameUponSpouseDeath>
+		<payForParts>true</payForParts>
+		<payForRepairs>false</payForRepairs>
+		<payForUnits>true</payForUnits>
+		<payForSalaries>true</payForSalaries>
+		<payForOverhead>false</payForOverhead>
+		<payForMaintain>true</payForMaintain>
+		<payForTransport>false</payForTransport>
+		<sellUnits>true</sellUnits>
+		<sellParts>true</sellParts>
+		<payForRecruitment>false</payForRecruitment>
+		<useLoanLimits>false</useLoanLimits>
+		<usePercentageMaint>false</usePercentageMaint>
+		<infantryDontCount>false</infantryDontCount>
+		<usePeacetimeCost>true</usePeacetimeCost>
+		<useExtendedPartsModifier>false</useExtendedPartsModifier>
+		<showPeacetimeCost>false</showPeacetimeCost>
+		<financialYearDuration>ANNUAL</financialYearDuration>
+		<newFinancialYearFinancesToCSVExport>false</newFinancialYearFinancesToCSVExport>
+		<clanPriceModifier>1.0</clanPriceModifier>
+		<usedPartsValueA>0.1</usedPartsValueA>
+		<usedPartsValueB>0.2</usedPartsValueB>
+		<usedPartsValueC>0.3</usedPartsValueC>
+		<usedPartsValueD>0.5</usedPartsValueD>
+		<usedPartsValueE>0.7</usedPartsValueE>
+		<usedPartsValueF>0.9</usedPartsValueF>
+		<damagedPartsValue>0.33</damagedPartsValue>
+		<canceledOrderReimbursement>0.5</canceledOrderReimbursement>
 		<useTransfers>true</useTransfers>
 		<useTimeInService>false</useTimeInService>
+		<timeInServiceDisplayFormat>YEARS</timeInServiceDisplayFormat>
+		<useTimeInRank>false</useTimeInRank>
+		<timeInRankDisplayFormat>MONTHS_YEARS</timeInRankDisplayFormat>
+		<trackTotalEarnings>false</trackTotalEarnings>
 		<capturePrisoners>true</capturePrisoners>
-		<defaultPrisonerStatus>0</defaultPrisonerStatus>
-		<personnelMarketType>3</personnelMarketType>
+		<defaultPrisonerStatus>PRISONER</defaultPrisonerStatus>
+		<personnelMarketName>Strat Ops</personnelMarketName>
 		<personnelMarketRandomEliteRemoval>10</personnelMarketRandomEliteRemoval>
 		<personnelMarketRandomVeteranRemoval>8</personnelMarketRandomVeteranRemoval>
 		<personnelMarketRandomRegularRemoval>6</personnelMarketRandomRegularRemoval>
@@ -145,12 +185,15 @@
 		<retirementRolls>true</retirementRolls>
 		<customRetirementMods>false</customRetirementMods>
 		<foundersNeverRetire>false</foundersNeverRetire>
+		<atbAddDependents>true</atbAddDependents>
+		<dependentsNeverLeave>false</dependentsNeverLeave>
 		<trackUnitFatigue>false</trackUnitFatigue>
 		<mercSizeLimited>false</mercSizeLimited>
 		<trackOriginalUnit>false</trackOriginalUnit>
 		<regionalMechVariations>false</regionalMechVariations>
 		<searchRadius>800</searchRadius>
 		<intensity>1.0</intensity>
+		<generateChases>true</generateChases>
 		<variableContractLength>false</variableContractLength>
 		<instantUnitMarketDelivery>false</instantUnitMarketDelivery>
 		<useWeatherConditions>true</useWeatherConditions>
@@ -173,6 +216,7 @@
 		<allowOpforLocalUnits>false</allowOpforLocalUnits>
 		<opforAeroChance>5</opforAeroChance>
 		<opforLocalUnitChance>5</opforLocalUnitChance>
+		<historicalDailyLog>false</historicalDailyLog>
 		<massRepairUseExtraTime>true</massRepairUseExtraTime>
 		<massRepairUseRushJob>true</massRepairUseRushJob>
 		<massRepairAllowCarryover>true</massRepairAllowCarryover>
@@ -246,7 +290,7 @@
 				<btnMax>4</btnMax>
 			</massRepairOption7>
 			<massRepairOption8>
-				<type>12</type>
+				<type>8</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
@@ -254,7 +298,7 @@
 				<btnMax>4</btnMax>
 			</massRepairOption8>
 			<massRepairOption9>
-				<type>8</type>
+				<type>12</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
@@ -262,9 +306,12 @@
 				<btnMax>4</btnMax>
 			</massRepairOption9>
 		</massRepairOptions>
-		<salaryTypeBase>0,1500,1500,900,900,900,900,960,750,960,900,1000,1000,1000,1000,800,800,800,800,400,1500,400,500,500,500,500,0</salaryTypeBase>
+		<planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>
+		<planetIndustryAcquisitionBonus>0,0,0,0,0,0</planetIndustryAcquisitionBonus>
+		<planetOutputAcquisitionBonus>-1,0,1,2,4,8</planetOutputAcquisitionBonus>
+		<salaryTypeBase>0 CSB,1500 CSB,1500 CSB,900 CSB,900 CSB,900 CSB,900 CSB,960 CSB,750 CSB,960 CSB,900 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB</salaryTypeBase>
 		<salaryXpMultiplier>0.6,0.6,1.0,1.6,3.2</salaryXpMultiplier>
-		<usePortraitForType>false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
+		<usePortraitForType>false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
 		<rats>Xotl,Total Warfare</rats>
 	</campaignOptions>
 	<skillTypes>
@@ -741,6 +788,24 @@ Note: This ability is only used for BattleMechs.</desc>
 			</skillPrereq>
 		</ability>
 		<ability>
+			<displayName>Tech Specialist, Armor (Unofficial)</displayName>
+			<lookupName>tech_armor_specialist</lookupName>
+			<desc>-1 to repair and maintenance checks when working with armor</desc>
+			<xpCost>4</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
+				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Mechanic::Regular</skill>
+				<skill>Tech/Mech::Regular</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
 			<displayName>Golden Goose (CamOps)</displayName>
 			<lookupName>golden_goose</lookupName>
 			<desc>Ground attacks are easier. Strike gives -1 BTH and Bombing is -2. Also decreases scatter distance by 2 hexes</desc>
@@ -810,6 +875,24 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 				<skill>Gunnery/Mech::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
 				<skill>Gunnery/Protomech::Veteran</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Mr/Ms Fix-it (unofficial)</displayName>
+			<lookupName>tech_fixer</lookupName>
+			<desc>Ignore first point of penalty for repair and maintenance on low quality equipment</desc>
+			<xpCost>4</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Regular</skill>
+				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
+				<skill>Tech/Mechanic::Regular</skill>
+				<skill>Tech/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -937,6 +1020,24 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 			</skillPrereq>
 		</ability>
 		<ability>
+			<displayName>Tech Specialist, Internal (Unofficial)</displayName>
+			<lookupName>tech_internal_specialist</lookupName>
+			<desc>-1 to repair and maintenance checks when working with internal systems</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
+				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Mechanic::Regular</skill>
+				<skill>Tech/Mech::Regular</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
 			<displayName>Sensor Geek (Unofficial)</displayName>
 			<lookupName>sensor_geek</lookupName>
 			<desc>A pilot with this ability gets a -2 bonus on sensor checks.
@@ -1049,6 +1150,20 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<skillPrereq>
 				<skill>Piloting/Mech::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Zweihander (CamOps)</displayName>
+			<lookupName>zweihander</lookupName>
+			<desc>You can do more damage with two-handed physical attacks at the risk of damaging yourself.</desc>
+			<xpCost>10</xpCost>
+			<weight>6</weight>
+			<prereqAbilities>melee_specialist</prereqAbilities>
+			<invalidAbilities>melee_master</invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Piloting/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1179,6 +1294,24 @@ Note: This ability is only used for BattleMechs.</desc>
 			</skillPrereq>
 		</ability>
 		<ability>
+			<displayName>Engineer (unofficial)</displayName>
+			<lookupName>tech_engineer</lookupName>
+			<desc>-2 on refit rolls</desc>
+			<xpCost>8</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Veteran</skill>
+				<skill>Tech/BA::Veteran</skill>
+				<skill>Tech/Aero::Veteran</skill>
+				<skill>Tech/Mechanic::Veteran</skill>
+				<skill>Tech/Mech::Veteran</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
 			<displayName>Terrain Master [Swamp Beast] (CamOps)</displayName>
 			<lookupName>tm_swamp_beast</lookupName>
 			<desc>Movement in mud or swamp costs 1 less MP.
@@ -1211,6 +1344,25 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			</skillPrereq>
 		</ability>
 		<ability>
+			<displayName>Blind Fighter (Unofficial)</displayName>
+			<lookupName>blind_fighter</lookupName>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to darkness.</desc>
+			<xpCost>10</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Gunnery/Aircraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
 			<displayName>RangeMaster (CamOps)</displayName>
 			<lookupName>range_master</lookupName>
 			<desc>Range modifiers are swapped with short range (Medium, Long, or Extreme).</desc>
@@ -1231,28 +1383,27 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			</skillPrereq>
 		</ability>
 		<ability>
-			<displayName>Blind Fighter (Unofficial)</displayName>
-			<lookupName>blind_fighter</lookupName>
-			<desc>A pilot with this ability does not suffer the initial -1 to hit due to darkness.</desc>
-			<xpCost>10</xpCost>
+			<displayName>Tech Specialist, Weapon (Unofficial)</displayName>
+			<lookupName>tech_weapon_specialist</lookupName>
+			<desc>-1 to repair and maintenance checks when working with weapons</desc>
+			<xpCost>4</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Tech/Vessel::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
+				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Mechanic::Regular</skill>
+				<skill>Tech/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 	</specialAbilities>
 	<randomSkillPreferences>
 		<overallRecruitBonus>0</overallRecruitBonus>
-		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
+		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
 		<specialAbilBonus>-10,-10,-2,0,1</specialAbilBonus>
 		<tacticsMod>-10,-10,-7,-4,-1</tacticsMod>
 		<randomizeSkill>true</randomizeSkill>
