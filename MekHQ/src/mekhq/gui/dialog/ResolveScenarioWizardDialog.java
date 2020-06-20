@@ -287,6 +287,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             chkTotaled = new JCheckBox("");
             chkTotaled.setName("chkTotaled");
+            chkTotaled.getAccessibleContext().setAccessibleName(resourceMap.getString("totaled"));
             chkTotaled.setSelected(status.isTotalLoss());
             chkTotaled.setName(Integer.toString(j));
             chkTotaled.setActionCommand(unit.getId().toString());
@@ -395,6 +396,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             JCheckBox miaCheck = new JCheckBox("");
             miaCheck.setName("miaCheck");
+            miaCheck.getAccessibleContext().setAccessibleName(resourceMap.getString("mia"));
             miaCheck.setSelected(status.isMissing());
             miaBtns.add(miaCheck);
             gridBagConstraints.gridx = gridx++;
@@ -402,6 +404,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             JCheckBox kiaCheck = new JCheckBox("");
             kiaCheck.setName("kiaCheck");
+            kiaCheck.getAccessibleContext().setAccessibleName(resourceMap.getString("kia"));
             kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, miaCheck));
             kiaCheck.setSelected(status.isDead());
             kiaBtns.add(kiaCheck);
@@ -469,9 +472,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = gridx++;
             pnlPrisonerStatus.add(hitSlider, gridBagConstraints);
 
-
             JCheckBox prisonerCheck = new JCheckBox("");
             prisonerCheck.setName("prisonerCheck");
+            prisonerCheck.getAccessibleContext().setAccessibleName(resourceMap.getString("prisoner"));
             prisonerCheck.setSelected(status.isCaptured());
             prisonerBtns.add(prisonerCheck);
             gridBagConstraints.gridx = gridx++;
@@ -479,6 +482,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             JCheckBox kiaCheck = new JCheckBox("");
             kiaCheck.setName("kiaCheck");
+            kiaCheck.getAccessibleContext().setAccessibleName(resourceMap.getString("kia"));
             prisonerKiaBtns.add(kiaCheck);
             gridBagConstraints.gridx = gridx++;
             pnlPrisonerStatus.add(kiaCheck, gridBagConstraints);
@@ -551,7 +555,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlSalvageValue.add(lblSalvageValueEmployer2, gridBagConstraints);
 
             JLabel lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvagePct1.text"));
-            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = gridx++;
             gridBagConstraints.gridy = gridy++;
             gridBagConstraints.weightx = 0.0;
@@ -560,7 +563,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             String lead = "<html><font" + ((currentSalvagePct > maxSalvagePct) ? " color='red'" : "") + ">";
             lblSalvagePct2 = new JLabel(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
             gridBagConstraints.gridx = gridx--;
-            gridBagConstraints.gridy = gridy++;
             gridBagConstraints.weightx = 1.0;
             pnlSalvageValue.add(lblSalvagePct2, gridBagConstraints);
 
