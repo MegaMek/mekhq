@@ -111,7 +111,7 @@ public class Injury {
      * This should never be used, but is required for the Unmarshaller
      */
     public Injury() {
-        this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, LocalDate.now(ZoneId.of("UTC")), false, false, false);
+        this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, LocalDate.now(), false, false, false);
     }
 
     public Injury(LocalDate start) {
