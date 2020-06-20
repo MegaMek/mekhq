@@ -1,7 +1,5 @@
 /*
- * EditPersonnelInjuriesDialog.java
- *
- * Copyright (C) 2009-2018 MegaMek team
+ * Copyright (C) 2009-2018 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -13,13 +11,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -53,7 +50,6 @@ import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
 /**
- *
  * @author  Ralgith
  */
 public class EditPersonnelInjuriesDialog extends JDialog {
@@ -80,7 +76,6 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     }
 
     private void initComponents() {
-
         JButton btnOK = new JButton();
         JButton btnAdd = new JButton();
         btnEdit = new JButton();
@@ -157,7 +152,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     }
 
     private void addEntry() {
-        EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, new Injury(campaign.getDateTime()));
+        EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, new Injury(campaign.getLocalDate()));
         eied.setAlwaysOnTop(true);
         eied.setVisible(true);
         if (null != eied.getEntry()) {
@@ -231,23 +226,23 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
         @Override
         public String getColumnName(int column) {
-            switch(column) {
-            case COL_DAYS:
-                return "Days Remaining";
-            case COL_LOCATION:
-                return "Location on Body";
-            case COL_TYPE:
-                return "Type of Injury";
-            case COL_FLUFF:
-                return "Fluff Message";
-            case COL_HITS:
-                return "Number of Hits";
-            case COL_PERMANENT:
-                return "Is Permanent";
-            case COL_WORKEDON:
-                return "Doctor Has Worked On";
-            case COL_EXTENDED:
-                return "Was Extended Time";
+            switch (column) {
+                case COL_DAYS:
+                    return "Days Remaining";
+                case COL_LOCATION:
+                    return "Location on Body";
+                case COL_TYPE:
+                    return "Type of Injury";
+                case COL_FLUFF:
+                    return "Fluff Message";
+                case COL_HITS:
+                    return "Number of Hits";
+                case COL_PERMANENT:
+                    return "Is Permanent";
+                case COL_WORKEDON:
+                    return "Doctor Has Worked On";
+                case COL_EXTENDED:
+                    return "Was Extended Time";
                 default:
                     return "?";
             }
@@ -299,7 +294,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         }
 
          public int getColumnWidth(int c) {
-            switch(c) {
+            switch (c) {
                 case COL_DAYS:
                 case COL_HITS:
                 case COL_PERMANENT:
@@ -317,7 +312,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         }
 
         public int getAlignment(int col) {
-            switch(col) {
+            switch (col) {
                 case COL_DAYS:
                 case COL_HITS:
                 case COL_PERMANENT:
