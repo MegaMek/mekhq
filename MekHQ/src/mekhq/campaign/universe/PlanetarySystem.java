@@ -307,7 +307,7 @@ public class PlanetarySystem implements Serializable {
         }
     }
 
-    /** Recharge time in hours (assuming the usage of the fastest charing method available) */
+    /** Recharge time in hours (assuming the usage of the fastest charging method available) */
     public double getRechargeTime(LocalDate when) {
         if (isZenithCharge(when) || isNadirCharge(when)) {
         	//The 176 value comes from pg. 87-88 and 138 of StratOps
