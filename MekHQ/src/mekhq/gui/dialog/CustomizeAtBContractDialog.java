@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -53,7 +52,6 @@ import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
@@ -68,13 +66,8 @@ import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Neoancient
- *
  */
 public class CustomizeAtBContractDialog extends JDialog {
-
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = -7018467869340880912L;
 	private Frame frame;
 	private AtBContract contract;
@@ -284,7 +277,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         leftPanel.add(lblPlanetName, gbc);
 
         suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
-        suggestPlanet.setText(contract.getSystemName(Utilities.getDateTimeDay(campaign.getCalendar())));
+        suggestPlanet.setText(contract.getSystemName(campaign.getLocalDate()));
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
@@ -626,7 +619,7 @@ public class CustomizeAtBContractDialog extends JDialog {
     	contract.setEnemyColorIndex(enemyColorIndex);
 
     	PlanetarySystem canonSystem = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
-                Utilities.getDateTimeDay(campaign.getCalendar()));
+                campaign.getLocalDate());
 
         if(canonSystem != null) {
             contract.setSystemId(canonSystem.getId());

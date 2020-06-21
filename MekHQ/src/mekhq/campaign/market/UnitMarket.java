@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.market;
 
@@ -52,13 +52,8 @@ import mekhq.campaign.universe.UnitGeneratorParameters;
  * Generates units available for sale.
  *
  * @author Neoancient
- *
  */
 public class UnitMarket implements Serializable {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -2085002038852079114L;
 
     public static class MarketOffer {
@@ -167,7 +162,7 @@ public class UnitMarket implements Serializable {
             }
 
             if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
-                Set<Faction> factions = campaign.getCurrentSystem().getFactionSet(Utilities.getDateTimeDay(campaign.getCalendar()));
+                Set<Faction> factions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
                 String faction = Utilities.getRandomItem(factions).getShortName();
                 if (campaign.getFaction().isClan() ||
                         !Faction.getFaction(faction).isClan()) {

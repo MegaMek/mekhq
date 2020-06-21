@@ -1,9 +1,21 @@
 /*
- * MissionViewPanel
+ * Copyright (c) 2009 - The MegaMek Team. All Rights Reserved.
  *
- * Created on July 26, 2009, 11:32 PM
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.view;
 
 import java.awt.*;
@@ -15,7 +27,6 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 
 import megamek.common.util.EncodeControl;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -29,10 +40,6 @@ import mekhq.gui.utilities.MarkdownRenderer;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissionViewPanel extends ScrollablePanel {
-
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 7004741688464105277L;
 
 	private Mission mission;
@@ -619,7 +626,7 @@ public class MissionViewPanel extends ScrollablePanel {
         pnlStats.add(lblLocation, gridBagConstraints);
 
         txtLocation.setName("txtLocation"); // NOI18N
-        String systemName = contract.getSystemName(Utilities.getDateTimeDay(campaign.getCalendar()));
+        String systemName = contract.getSystemName(campaign.getLocalDate());
         txtLocation.setText(String.format("<html><a href='#'>%s</a></html>", systemName));
         txtLocation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         txtLocation.addMouseListener(new MouseAdapter() {
@@ -994,5 +1001,4 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtDesc, gridBagConstraints);
     }
-
 }

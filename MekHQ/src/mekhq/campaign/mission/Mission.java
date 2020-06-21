@@ -1,31 +1,31 @@
 /*
  * Mission.java
- * 
+ *
  * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
-import org.joda.time.DateTime;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -41,16 +41,12 @@ import mekhq.campaign.universe.Systems;
 
 /**
  * Missions are primarily holder objects for a set of scenarios.
- * 
+ *
  * The really cool stuff will happen when we subclass this into Contract
- * 
+ *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Mission implements Serializable, MekHqXmlSerializable {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = -5692134027829715149L;
 
     public static final int S_ACTIVE = 0;
@@ -82,18 +78,17 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     public static String getStatusName(int s) {
-
         switch (s) {
-        case S_ACTIVE:
-            return "Active";
-        case S_SUCCESS:
-            return "Success";
-        case S_FAILED:
-            return "Failed";
-        case S_BREACH:
-            return "Contract Breach";
-        default:
-            return "?";
+            case S_ACTIVE:
+                return "Active";
+            case S_SUCCESS:
+                return "Success";
+            case S_FAILED:
+                return "Failed";
+            case S_BREACH:
+                return "Contract Breach";
+            default:
+                return "?";
         }
     }
 
@@ -124,21 +119,21 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     public PlanetarySystem getSystem() {
         return Systems.getInstance().getSystemById(systemId);
     }
-    
+
     /**
-     * Convenience property to return the name of the current planet. 
+     * Convenience property to return the name of the current planet.
      * Sometimes, the "current planet" doesn't match up with an existing planet in our planet database,
      * in which case we return whatever was stored.
      * @return
      */
-    public String getSystemName(DateTime when) {
-        if(getSystem() == null) {
+    public String getSystemName(LocalDate when) {
+        if (getSystem() == null) {
             return legacyPlanetName;
         }
-        
+
         return getSystem().getName(when);
     }
-    
+
     public void setLegacyPlanetName(String name) {
         legacyPlanetName = name;
     }
@@ -170,7 +165,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     /**
      * Don't use this method directly as it will not add an id to the added
      * scenario. Use Campaign#AddScenario instead
-     * 
+     *
      * @param s
      */
     public void addScenario(Scenario s) {
@@ -228,8 +223,8 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<mission id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<name>" + MekHqXmlUtil.escape(name) + "</name>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<type>" + MekHqXmlUtil.escape(type) + "</type>");
-        
-        if(systemId != null) {         
+
+        if (systemId != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<systemId>" + MekHqXmlUtil.escape(systemId) + "</systemId>");
         } else {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<planetName>" + MekHqXmlUtil.escape(legacyPlanetName) + "</planetName>");
@@ -278,7 +273,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
                     retVal.systemId = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
                     PlanetarySystem system = c.getSystemByName(wn2.getTextContent());
-                    
+
                     if(system != null) {
                         retVal.systemId = c.getSystemByName(wn2.getTextContent()).getId();
                     } else {
@@ -325,5 +320,4 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 
         return retVal;
     }
-
 }

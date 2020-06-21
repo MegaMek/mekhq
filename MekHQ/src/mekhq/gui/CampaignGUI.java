@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui;
 
@@ -1015,7 +1015,7 @@ public class CampaignGUI extends JPanel {
     private void initTopButtons() {
         GridBagConstraints gridBagConstraints;
 
-        lblLocation = new JLabel(getCampaign().getLocation().getReport(getCampaign().getCalendar().getTime())); // NOI18N
+        lblLocation = new JLabel(getCampaign().getLocation().getReport(getCampaign().getLocalDate())); // NOI18N
 
         btnPanel = new JPanel(new GridBagLayout());
 
@@ -1171,7 +1171,7 @@ public class CampaignGUI extends JPanel {
     public void showNews(int id) {
         NewsItem news = getCampaign().getNews().getNewsItem(id);
         if (null != news) {
-            NewsReportDialog nrd = new NewsReportDialog(frame, news);
+            NewsReportDialog nrd = new NewsReportDialog(frame, news, getCampaign());
             nrd.setVisible(true);
         }
     }
@@ -2636,8 +2636,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshLocation() {
-        lblLocation.setText(getCampaign().getLocation().getReport(
-                getCampaign().getCalendar().getTime()));
+        lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
     }
 
     protected MekHQ getApplication() {

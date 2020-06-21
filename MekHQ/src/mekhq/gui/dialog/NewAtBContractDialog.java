@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -28,17 +28,14 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
@@ -55,14 +52,8 @@ import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Neoancient
- *
  */
-
 public class NewAtBContractDialog extends NewContractDialog {
-
-    /**
-	 *
-	 */
 	private static final long serialVersionUID = 7965491540448120578L;
 
 	protected FactionComboBox cbEmployer;
@@ -118,10 +109,9 @@ public class NewAtBContractDialog extends NewContractDialog {
         }
 
 
-        if(cbPlanets.getSelectedItem() != null) {
-            ((AtBContract) contract)
-                .setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
-                    Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
+        if (cbPlanets.getSelectedItem() != null) {
+            contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
+                    campaign.getLocalDate())).getId());
         }
 
         spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
@@ -158,11 +148,11 @@ public class NewAtBContractDialog extends NewContractDialog {
         String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         // TODO : Switch me to use IUnitRating
         String[] ratingNames = {"F", "D", "C", "B", "A"};
-    	cbAllySkill = new JComboBox<String>(skillNames);
-    	cbAllyQuality = new JComboBox<String>(ratingNames);
+    	cbAllySkill = new JComboBox<>(skillNames);
+    	cbAllyQuality = new JComboBox<>(ratingNames);
         JLabel lblAllyRating = new JLabel();
-    	cbEnemySkill = new JComboBox<String>(skillNames);
-    	cbEnemyQuality = new JComboBox<String>(ratingNames);;
+    	cbEnemySkill = new JComboBox<>(skillNames);
+    	cbEnemyQuality = new JComboBox<>(ratingNames);;
         JLabel lblEnemyRating = new JLabel();
         JLabel lblShares = new JLabel();
         spnShares = new JSpinner(new SpinnerNumberModel(20, 20, 50, 10));
@@ -481,14 +471,14 @@ public class NewAtBContractDialog extends NewContractDialog {
 				getCurrentEnemyCode()== null) {
 			return;
 		}
-		AtBContract contract = (AtBContract)this.contract;
-		HashSet<String> systems = new HashSet<String>();
+		AtBContract contract = (AtBContract) this.contract;
+		HashSet<String> systems = new HashSet<>();
 		if (contract.getMissionType() >= AtBContract.MT_PLANETARYASSAULT ||
 				getCurrentEnemyCode().equals("REB") ||
 				getCurrentEnemyCode().equals("PIR")) {
 			for (PlanetarySystem p : RandomFactionGenerator.getInstance().
 					getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode())) {
-			    systems.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
+			    systems.add(p.getName(campaign.getLocalDate()));
 			}
 		}
 		if ((contract.getMissionType() < AtBContract.MT_PLANETARYASSAULT ||
@@ -496,7 +486,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 				!contract.getEnemyCode().equals("REB")) {
 			for (PlanetarySystem p : RandomFactionGenerator.getInstance().
 					getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode())) {
-				systems.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
+				systems.add(p.getName(campaign.getLocalDate()));
 			}
 		}
 		cbPlanets.removeAllItems();
@@ -526,7 +516,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 	    	//contract.setPlanetName(suggestPlanet.getText());
 		} else {
             contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
-                    Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
+                    campaign.getLocalDate())).getId());
 		}
     	contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
     	contract.setMissionType(cbMissionType.getSelectedIndex());
@@ -557,7 +547,7 @@ public class NewAtBContractDialog extends NewContractDialog {
     	AtBContract contract = (AtBContract)this.contract;
         if (cbPlanets.equals(source) && null != cbPlanets.getSelectedItem()) {
             contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
-                    Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
+                    campaign.getLocalDate())).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);
             needUpdatePayment = true;
