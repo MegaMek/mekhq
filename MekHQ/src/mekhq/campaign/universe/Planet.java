@@ -235,13 +235,10 @@ public class Planet implements Serializable {
                 nameChangeYear = Integer.parseInt(yearString);
             }
 
-            // this is a dirty hack: in order to avoid colliding with faction changes, we
-            // set name changes to be a second into the new year
-            LocalDate nameChangeYearDate = new DateTime(nameChangeYear, 1, 1, 0, 0, 1, 0);
+            LocalDate nameChangeYearDate = LocalDate.ofYearDay(nameChangeYear, 1);
 
             String altName;
             String primaryName = nameString;
-            PlanetaryEvent nameChangeEvent = null;
             int parenIndex = nameString.indexOf('(');
             int closingParenIndex = nameString.indexOf(')');
             // this indicates that there's an (Alternate Name) sequence of some kind
@@ -261,19 +258,17 @@ public class Planet implements Serializable {
                 if ((null == Faction.getFaction(altName)) && (null == Systems.getInstance().getSystemById(primaryName))) {
                     primaryName = nameString.substring(0, parenIndex - 1);
 
-                    nameChangeEvent = new PlanetaryEvent();
+                    PlanetaryEvent nameChangeEvent = new PlanetaryEvent();
                     nameChangeEvent.date = nameChangeYearDate;
                     nameChangeEvent.name = altName;
+
+                    events.put(nameChangeYearDate, nameChangeEvent);
+                    eventList.add(nameChangeEvent);
                 }
             }
 
-            // now we have a primary name and possibly a name change planetary event
+            // now we have a primary name
             this.name = primaryName;
-
-            if (null != nameChangeEvent) {
-                this.events.put(nameChangeYearDate, nameChangeEvent);
-                this.eventList.add(nameChangeEvent);
-            }
 
             this.id = this.name;
             this.x = Double.parseDouble(infoElements[1]);
@@ -282,10 +277,6 @@ public class Planet implements Serializable {
             for (int x = 3; x < infoElements.length; x++) {
                 String infoElement = infoElements[x].replace("\"", "");
                 String newFaction;
-
-                if (infoElement.trim().length() == 0) {
-                    newFaction = "";
-                }
 
                 int commaIndex = infoElement.indexOf(',');
                 if (commaIndex < 0) { // sometimes there are no commas
@@ -307,14 +298,18 @@ public class Planet implements Serializable {
                 // dirty hack here assumes that there's only one faction per event, which is true in the case
                 // of this spreadsheet
                 if ((x == 3) || !eventList.get(eventList.size() - 1).faction.get(0).equals(newFaction)) {
-                    PlanetaryEvent pe = new PlanetaryEvent();
                     LocalDate eventDate = years.get(x - 3);
+
+                    PlanetaryEvent pe = events.getOrDefault(eventDate, new PlanetaryEvent());
                     pe.faction = new ArrayList<>();
                     pe.faction.add(newFaction);
-                    pe.date = eventDate;
 
-                    this.eventList.add(pe);
-                    this.events.put(eventDate, pe);
+                    if (!events.containsKey(eventDate)) {
+                        pe.date = eventDate;
+
+                        events.put(eventDate, pe);
+                        eventList.add(pe);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -981,7 +976,7 @@ public class Planet implements Serializable {
 
                         // if we're at the last event, then just check that the planet doesn't have a faction in the year 3600
                         if (nextEvent == null) {
-                            nextEventDate = new DateTime(3600, 1, 1, 0, 0, 1, 0);
+                            nextEventDate = LocalDate.ofYearDay(3600, 1);
                         } else {
                             nextEventDate = nextEvent.date;
                         }
