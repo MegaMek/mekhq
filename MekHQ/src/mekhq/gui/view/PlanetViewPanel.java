@@ -178,10 +178,10 @@ public class PlanetViewPanel extends ScrollablePanel {
             				planet.getOrbitRadius());
             	} else {
             		text = String.format("%s (%.3f AU)", //$NON-NLS-1$
-            				planet.getDiplayableSystemPosition(), planet.getOrbitRadius());
+            				planet.getDisplayableSystemPosition(), planet.getOrbitRadius());
             	}
             } else {
-                text = planet.getDiplayableSystemPosition();
+                text = planet.getDisplayableSystemPosition();
             }
             JLabel txtPosition = new JLabel(text);
             gbcText.gridy = infoRow;

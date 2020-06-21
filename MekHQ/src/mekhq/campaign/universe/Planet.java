@@ -433,7 +433,7 @@ public class Planet implements Serializable {
      * this result may be different than that actual sysPos variable.
      * @return String of system position after removing asteroid belts
      */
-    public String getDiplayableSystemPosition() {
+    public String getDisplayableSystemPosition() {
     	//We won't give the actual system position here, because we don't want asteroid belts to count
     	//for system position
     	if ((null == getParentSystem()) || (null == sysPos)) {
