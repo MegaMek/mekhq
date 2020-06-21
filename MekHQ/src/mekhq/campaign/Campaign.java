@@ -214,6 +214,7 @@ public class Campaign implements Serializable, ITechManager {
 
     // calendar stuff
     private GregorianCalendar calendar;
+    private LocalDate currentDay;
     private String dateFormat;
     private String shortDateFormat;
 
@@ -286,6 +287,7 @@ public class Campaign implements Serializable, ITechManager {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
+        currentDay = LocalDate.ofYearDay(3067, 1);
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Outreach"), 0);
         campaignOptions = new CampaignOptions();
@@ -417,13 +419,21 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     @Deprecated
+    public GregorianCalendar getCalendar() {
+        return calendar;
+    }
+
+    @Deprecated
     public void setCalendar(GregorianCalendar c) {
         calendar = c;
     }
 
-    @Deprecated
-    public GregorianCalendar getCalendar() {
-        return calendar;
+    public LocalDate getLocalDate() {
+        return currentDay;
+    }
+
+    public void setLocalDate(LocalDate currentDay) {
+        this.currentDay = currentDay;
     }
 
     @Deprecated
@@ -434,6 +444,21 @@ public class Campaign implements Serializable, ITechManager {
     @Deprecated
     public DateFormat getShortDateFormatter() {
         return new SimpleDateFormat(shortDateFormat);
+    }
+
+    @Deprecated
+    public Date getDate() {
+        return calendar.getTime();
+    }
+
+    @Deprecated
+    public String getDateAsString() {
+        return getDateFormatter().format(calendar.getTime());
+    }
+
+    @Deprecated
+    public String getShortDateAsString() {
+        return getShortDateFormatter().format(calendar.getTime());
     }
 
     public String getCurrentSystemName() {
@@ -1705,18 +1730,6 @@ public class Campaign implements Serializable, ITechManager {
     }
     //endregion Personnel Selectors and Generators
     //endregion Personnel
-
-    @Deprecated
-    public Date getDate() {
-        return calendar.getTime();
-    }
-
-    /**
-     * For now, this is just going to parse through the current date time
-     */
-    public LocalDate getLocalDate() {
-        return LocalDate.of(getCalendar().get(Calendar.YEAR), getCalendar().get(Calendar.MONTH), getCalendar().get(Calendar.DAY_OF_MONTH));
-    }
 
     public List<Person> getPatients() {
         List<Person> patients = new ArrayList<>();
@@ -3280,10 +3293,10 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void readNews() {
         //read the news
-        for(NewsItem article : news.fetchNewsFor(getLocalDate())) {
+        for (NewsItem article : news.fetchNewsFor(getLocalDate())) {
             addReport(article.getHeadlineForReport());
         }
-        for(NewsItem article : Systems.getInstance().getPlanetaryNews(getLocalDate())) {
+        for (NewsItem article : Systems.getInstance().getPlanetaryNews(getLocalDate())) {
             addReport(article.getHeadlineForReport());
         }
     }
@@ -3575,7 +3588,7 @@ public class Campaign implements Serializable, ITechManager {
                 p.resetCurrentEdge();
             }
 
-            if ((getCampaignOptions().getIdleXP() > 0) && (calendar.get(Calendar.DAY_OF_MONTH) == 1)
+            if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
                     && p.isActive() && !p.getPrisonerStatus().isPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
                 p.setIdleMonths(p.getIdleMonths() + 1);
                 if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
@@ -3712,8 +3725,9 @@ public class Campaign implements Serializable, ITechManager {
         // Autosave based on the previous day's information
         this.autosaveService.requestDayAdvanceAutosave(this);
 
-        // Advance the day by one - TODO : LocalDate : Swap me to LocalDate tracking instead
+        // Advance the day by one - TODO : LocalDate : Remove the Calendar addition
         calendar.add(Calendar.DAY_OF_MONTH, 1);
+        currentDay = currentDay.plus(1, ChronoUnit.DAYS);
 
         // Determine if we have an active contract or not, as this can get used elsewhere before
         // we actually hit the AtB new day (e.g. personnel market)
@@ -4181,14 +4195,6 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         return null;
-    }
-
-    public String getDateAsString() {
-        return getDateFormatter().format(calendar.getTime());
-    }
-
-    public String getShortDateAsString() {
-        return getShortDateFormatter().format(calendar.getTime());
     }
 
     public void restore() {

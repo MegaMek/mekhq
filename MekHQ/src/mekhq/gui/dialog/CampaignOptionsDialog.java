@@ -43,6 +43,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -4732,6 +4733,7 @@ public class CampaignOptionsDialog extends JDialog {
     private void updateOptions() {
     	campaign.setName(txtName.getText());
     	campaign.setCalendar(date);
+        campaign.setLocalDate(LocalDate.ofYearDay(date.get(Calendar.YEAR), date.get(Calendar.DAY_OF_YEAR)));
         // Ensure that the MegaMek year GameOption matches the campaign year
         GameOptions gameOpts = campaign.getGameOptions();
         int campaignYear = campaign.getGameYear();
