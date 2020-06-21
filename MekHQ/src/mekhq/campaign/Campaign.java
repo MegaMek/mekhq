@@ -8519,7 +8519,7 @@ public class Campaign implements Serializable, ITechManager {
 
     @Override
     public int getGameYear() {
-        return getCalendar().get(Calendar.YEAR);
+        return getLocalDate().getYear();
     }
 
     @Override

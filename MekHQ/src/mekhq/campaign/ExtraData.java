@@ -20,7 +20,6 @@ package mekhq.campaign;
 
 import java.io.OutputStream;
 import java.io.Writer;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

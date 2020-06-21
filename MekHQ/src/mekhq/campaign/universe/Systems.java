@@ -89,16 +89,16 @@ public class Systems {
     private static Marshaller planetMarshaller;
     private static Unmarshaller planetUnmarshaller;
     static {
-    	try {
-    		//creating the JAXB context
-    		JAXBContext jContext = JAXBContext.newInstance(Planet.class);
-    		planetMarshaller = jContext.createMarshaller();
-    		planetMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-    		planetMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-	        planetUnmarshaller = jContext.createUnmarshaller();
-	    } catch (Exception e) {
-    	    MekHQ.getLogger().error(Systems.class, "Systems", e);
-    	}
+        try {
+            //creating the JAXB context
+            JAXBContext jContext = JAXBContext.newInstance(Planet.class);
+            planetMarshaller = jContext.createMarshaller();
+            planetMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+            planetMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            planetUnmarshaller = jContext.createUnmarshaller();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(Systems.class, "Systems", e);
+        }
     }
 
     public static Systems getInstance() {
@@ -154,7 +154,7 @@ public class Systems {
     }
 
     public List<PlanetarySystem> getNearbySystems(final double centerX, final double centerY, int distance) {
-    	 List<PlanetarySystem> neighbors = new ArrayList<>();
+         List<PlanetarySystem> neighbors = new ArrayList<>();
 
          visitNearbySystems(centerX, centerY, distance, neighbors::add);
 
@@ -187,10 +187,10 @@ public class Systems {
         //remove dead planets
         Iterator<PlanetarySystem> iter = shoppingSystems.iterator();
         while (iter.hasNext()) {
-        	PlanetarySystem s = iter.next();
-        	if (null == s.getPrimaryPlanet() || s.getPrimaryPlanet().isEmpty(when)) {
-        		iter.remove();
-        	}
+            PlanetarySystem s = iter.next();
+            if (null == s.getPrimaryPlanet() || s.getPrimaryPlanet().isEmpty(when)) {
+                iter.remove();
+            }
         }
 
         shoppingSystems.sort((p1, p2) -> {
@@ -368,7 +368,7 @@ public class Systems {
                 }
                 //make sure the primary slot is not larger than the number of planets
                 if (system.getPrimaryPlanetPosition() > system.getPlanets().size()) {
-                	MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             String.format("System \"%s\" has a primary slot greater than the number of planets", system.getId())); //$NON-NLS-1$
                     toRemove.add(system);
                     continue;
@@ -570,14 +570,14 @@ public class Systems {
      * @return
      */
     public boolean updatePlanetaryEvents(String id, Collection<Planet.PlanetaryEvent> events, boolean replace) {
-    	//assume the primary planet
-    	PlanetarySystem system = getSystemById(id);
+        //assume the primary planet
+        PlanetarySystem system = getSystemById(id);
         if (null == system) {
             return false;
         }
         int pos = system.getPrimaryPlanetPosition();
         if (pos == 0) {
-        	return false;
+            return false;
         }
         return(updatePlanetaryEvents(id, events, replace, pos));
     }
@@ -593,7 +593,7 @@ public class Systems {
                 if (null != event.date) {
                     Planet.PlanetaryEvent planetaryEvent = system.getOrCreateEvent(event.date, position);
                     if (null == planetaryEvent) {
-                    	continue;
+                        continue;
                     }
                     if (replace) {
                         planetaryEvent.replaceDataFrom(event);
@@ -623,12 +623,12 @@ public class Systems {
                 if (null != event.date) {
                     PlanetarySystem.PlanetarySystemEvent systemEvent = system.getOrCreateEvent(event.date);
                     if (null == systemEvent) {
-                    	continue;
+                        continue;
                     }
                     if (replace) {
-                    	systemEvent.replaceDataFrom(event);
+                        systemEvent.replaceDataFrom(event);
                     } else {
-                    	systemEvent.copyDataFrom(event);
+                        systemEvent.copyDataFrom(event);
                     }
                 }
             }
