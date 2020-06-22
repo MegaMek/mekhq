@@ -495,6 +495,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         int atype = 0;
         boolean aclan = false;
         HashMap<Integer,Integer> partQuantity = new HashMap<>();
+        List<Part> plannedReplacementParts = new ArrayList<>();
         for(Part nPart : newPartList) {
             //TODO: I don't think we need this here anymore
             nPart.setUnit(oldUnit);
@@ -518,6 +519,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     newUnitParts.add(replacement.getId());
                     //adjust quantity
                     partQuantity.put(replacement.getId(), partQuantity.get(replacement.getId())-1);
+                    //If the quantity is now 0 set usedForRefitPlanning flag so findReplacement ignores this item
+                    if (partQuantity.get(replacement.getId()) == 0) {
+                        replacement.setUsedForRefitPlanning(true);
+                        plannedReplacementParts.add(replacement);
+                    }
                 } else {
                     replacement = ((MissingPart)nPart).getNewPart();
                     //set entity for variable cost items
@@ -559,6 +565,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                         newUnitParts.add(replacement.getId());
                         //adjust quantity
                         partQuantity.put(replacement.getId(), partQuantity.get(replacement.getId())-1);
+                        //If the quantity is now 0 set usedForRefitPlanning flag so findReplacement ignores this item
+                        if (partQuantity.get(replacement.getId()) == 0) {
+                            replacement.setUsedForRefitPlanning(true);
+                            plannedReplacementParts.add(replacement);
+                        }
                     } else {
                         shoppingList.add(nPart);
                     }
@@ -694,6 +705,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     }
                 }
             }
+        }
+        //clear any planned replacement flags
+        for (Part rPart : plannedReplacementParts) {
+            rPart.setUsedForRefitPlanning(false);
         }
 
         //if oldUnitParts is not empty we are removing some stuff and so this should
