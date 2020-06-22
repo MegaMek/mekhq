@@ -185,7 +185,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     protected UUID refitId;
     protected UUID reserveId;
     //temporarily mark the part used by current refit planning
-    protected boolean usedForRefitPlanning;
+    protected transient boolean usedForRefitPlanning;
 
     //for delivery
     protected int daysToArrival;
