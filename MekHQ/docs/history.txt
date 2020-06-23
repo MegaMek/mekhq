@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+0.47.8-SNAPSHOT
+
 0.47.7 (2020-06-22 2330 UTC)
 + PR #1811: Fix advance multiple days reports not showing
 + PR #1810: use grid layout for repair tab main panels
