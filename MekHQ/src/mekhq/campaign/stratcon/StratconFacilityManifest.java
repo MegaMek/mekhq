@@ -12,11 +12,11 @@
 * details.
 */
 
-package mekhq.campaign.mission.atb;
+package mekhq.campaign.stratcon;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Map;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -30,39 +30,38 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 
 /**
- * A manifest containing IDs and file names of scenario template definitions
+ * A manifest containing IDs and file names of stratcon facility definitions
  * @author NickAragua
- *
  */
-@XmlRootElement(name="scenarioManifest")
-public class AtBScenarioManifest {
-    @XmlElementWrapper(name="scenarioFileNames")
-    @XmlElement(name="scenarioFileName")
-    public Map<Integer, String> scenarioFileNames;
+@XmlRootElement(name="facilityManifest")
+public class StratconFacilityManifest {
+    @XmlElementWrapper(name="facilityFileNames")
+    @XmlElement(name="facilityFileName")
+    public List<String> facilityFileNames;
     
     /**
-     * Attempt to deserialize an instance of an AtBScenarioManifest from the passed-in file 
+     * Attempt to deserialize an instance of a StratconFacilityManifest from the passed-in file 
      * @param inputFile The path to the manifest
-     * @return Possibly an instance of a ScenarioManifest
+     * @return Possibly an instance of a StratconFacilityManifest
      */
-    public static AtBScenarioManifest Deserialize(String fileName) {
-        AtBScenarioManifest resultingManifest = null;
+    public static StratconFacilityManifest Deserialize(String fileName) {
+        StratconFacilityManifest resultingManifest = null;
         File inputFile = new File(fileName);
         if(!inputFile.exists()) {
-            MekHQ.getLogger().warning(ScenarioModifierManifest.class, "Deserialize", String.format("Specified file %s does not exist", fileName));
+            MekHQ.getLogger().warning(StratconFacilityManifest.class, "Deserialize", String.format("Specified file %s does not exist", fileName));
             return null;
         }
 
         try {
-            JAXBContext context = JAXBContext.newInstance(AtBScenarioManifest.class);
+            JAXBContext context = JAXBContext.newInstance(StratconFacilityManifest.class);
             Unmarshaller um = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
                 Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
-                JAXBElement<AtBScenarioManifest> manifestElement = um.unmarshal(inputSource, AtBScenarioManifest.class);
+                JAXBElement<StratconFacilityManifest> manifestElement = um.unmarshal(inputSource, StratconFacilityManifest.class);
                 resultingManifest = manifestElement.getValue();
             }
         } catch(Exception e) {
-            MekHQ.getLogger().error(AtBScenarioManifest.class, "Deserialize", "Error Deserializing Scenario Manifest", e);
+            MekHQ.getLogger().error(StratconFacilityManifest.class, "Deserialize", "Error Deserializing Facility Manifest", e);
         }
 
         return resultingManifest;

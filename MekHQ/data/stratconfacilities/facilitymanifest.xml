@@ -1,0 +1,15 @@
+<facilityManifest>
+	<facilityFileNames>
+		<facilityFileName>MekBase.xml</facilityFileName>
+		<facilityFileName>TankBase.xml</facilityFileName>
+		<facilityFileName>AirBase.xml</facilityFileName>
+		<facilityFileName>ArtilleryBase.xml</facilityFileName>
+		<facilityFileName>SupplyDepot.xml</facilityFileName>
+		<facilityFileName>DataCenter.xml</facilityFileName>
+		<facilityFileName>IndustrialFacility.xml</facilityFileName>
+		<facilityFileName>CommsCenter.xml</facilityFileName>
+		<facilityFileName>EarlyWarningSystem.xml</facilityFileName>
+		<facilityFileName>OrbitalDefense.xml</facilityFileName>
+		<facilityFileName>BaseOfOperations.xml</facilityFileName>
+	</facilityFileNames>
+</facilityManifest>

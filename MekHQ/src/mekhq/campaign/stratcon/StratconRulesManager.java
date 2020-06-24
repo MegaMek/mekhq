@@ -92,7 +92,8 @@ public class StratconRulesManager {
         
         // generate the facilities
         //for(int fCount = 0; fCount < numLances; fCount++) {
-            StratconFacility sf = StratconFacility.createTestFacility();
+            StratconFacilityFactory.reloadFacilities();
+            StratconFacility sf = StratconFacilityFactory.getRandomFacility();
             
             int fIndex = Compute.randomInt(StratconFacility.FacilityType.values().length);
             sf.setFacilityType(FacilityType.values()[fIndex]);

@@ -4,6 +4,8 @@ import megamek.common.Coords;
 import megamek.common.util.HashCodeUtil;
 
 public class StratconCoords extends Coords {
+    private static final long serialVersionUID = 2660132431077309812L;
+
     public StratconCoords(int x, int y) {
         super(x, y);
     }

@@ -146,7 +146,8 @@ public class StratconCampaignState {
             JAXBContext context = JAXBContext.newInstance(StratconCampaignState.class);
             JAXBElement<StratconCampaignState> stateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), StratconCampaignState.class, this);
             Marshaller m = context.createMarshaller();
-            m.setProperty("jaxb.fragment", true);
+            m.setProperty(Marshaller.JAXB_FRAGMENT, true);
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(stateElement, pw);
         } catch(Exception e) {
             MekHQ.getLogger().error(StratconCampaignState.class, "Serialize", e.getMessage());
