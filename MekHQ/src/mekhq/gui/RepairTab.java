@@ -136,7 +136,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
-        setLayout(new GridBagLayout());
+        setLayout(new GridLayout());
 
         JPanel panServicedUnits = new JPanel(new GridBagLayout());
 
@@ -182,9 +182,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 						txt += String.format(" (%s missing)", PartsAcquisitionService.getMissingCount());
 					}
 				}
-
 				btnAcquisitions.setText(txt);
-
 				btnAcquisitions.repaint();
 			}
 		});
@@ -447,32 +445,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panTechs.add(astechPoolLabel, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        add(panServicedUnits, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        add(panTasks, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        add(panTechs, gridBagConstraints);
+        add(panServicedUnits);
+        add(panTasks);
+        add(panTechs);
 
         filterTechs();
     }

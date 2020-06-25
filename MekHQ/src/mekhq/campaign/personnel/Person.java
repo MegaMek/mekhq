@@ -164,13 +164,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // provided that they are not married, are old enough, etc.
     private boolean tryingToMarry;
     //endregion Marriage
-
-    //region Divorce Variables
-    public static final String OPT_SELECTED_CHANGE_SURNAME = "selected_change_surname";
-    public static final String OPT_SPOUSE_CHANGE_SURNAME = "spouse_change_surname";
-    public static final String OPT_BOTH_CHANGE_SURNAME = "both_change_surname";
-    public static final String OPT_KEEP_SURNAME = "keep_surname";
-    //endregion Divorce Variables
     //endregion Family Variables
 
     private UUID id;
@@ -1346,24 +1339,40 @@ public class Person implements Serializable, MekHqXmlSerializable {
         extraData.set(PREGNANCY_FATHER_DATA, null);
     }
 
+    /**
+     * This method is how a person gives birth to a number of babies and have them added to the campaign
+     * @param campaign the campaign to add the baby in question to
+     */
     public void birth(Campaign campaign) {
+        // Determine the number of children
+        int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
+
+        // Determine father information
         String fatherIdString = getExtraData().get(PREGNANCY_FATHER_DATA);
         UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
         fatherId = campaign.getCampaignOptions().determineFatherAtBirth()
                 ? Utilities.nonNull(getGenealogy().getSpouseId(), fatherId) : fatherId;
 
-        // Cleanup
-        removePregnancy();
+        // Determine Prisoner Status
+        PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
+                ? PrisonerStatus.FREE : getPrisonerStatus();
 
-        for (int i = 0; i < getExtraData().get(PREGNANCY_CHILDREN_DATA, 1); i++) {
-            // Create the baby
+        // Output a specific report to the campaign if they are giving birth to multiple children
+        if (PREGNANCY_MULTIPLE_NAMES[size] != null) {
+            campaign.addReport(String.format("%s has given birth to %s!", getHyperlinkedName(),
+                    PREGNANCY_MULTIPLE_NAMES[size]));
+        }
+
+        // Create Babies
+        for (int i = 0; i < size; i++) {
+            // Create the specific baby
             Person baby = campaign.newDependent(T_NONE, true);
-
+            baby.setId(UUID.randomUUID());
             String surname = campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
             baby.setSurname(surname);
             baby.setBirthday(campaign.getLocalDate());
-            baby.setId(UUID.randomUUID());
+            baby.setPrisonerStatus(prisonerStatus);
 
             // Add the baby to the campaign
             campaign.recruitPerson(baby, baby.getPrisonerStatus(), baby.isDependent(), true, false);
@@ -1377,7 +1386,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         .addFamilyMember(FamilialRelationshipType.CHILD, baby.getId());
             }
 
-            // Log the birth
+            // Create reports and log the birth
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             if (campaign.getCampaignOptions().logConception()) {
@@ -1388,6 +1397,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             }
         }
+
+        // Cleanup Data
+        removePregnancy();
     }
     //endregion Pregnancy
 
@@ -1475,71 +1487,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return (ageDifference <= campaign.getCampaignOptions().getMarriageAgeRange());
     }
     //endregion Marriage
-
-    //region Divorce
-    public void divorce(String divorceOption) {
-        Person spouse = getGenealogy().getSpouse(getCampaign());
-        int reason = FormerSpouse.REASON_WIDOWED;
-
-        switch (divorceOption) {
-            case OPT_SELECTED_CHANGE_SURNAME:
-                if (getMaidenName() != null) {
-                    setSurname(getMaidenName());
-                }
-                break;
-            case OPT_SPOUSE_CHANGE_SURNAME:
-                if (spouse.getMaidenName() != null) {
-                    spouse.setSurname(spouse.getMaidenName());
-                }
-                break;
-            case OPT_BOTH_CHANGE_SURNAME:
-                if (getMaidenName() != null) {
-                    setSurname(getMaidenName());
-                }
-                if (spouse.getMaidenName() != null) {
-                    spouse.setSurname(spouse.getMaidenName());
-                }
-                break;
-            case OPT_KEEP_SURNAME:
-            default:
-                break;
-        }
-
-        if (!(spouse.isDeadOrMIA() && isDeadOrMIA())) {
-            reason = FormerSpouse.REASON_DIVORCE;
-
-            PersonalLogger.divorcedFrom(this, spouse, getCampaign().getDate());
-            PersonalLogger.divorcedFrom(spouse, this, getCampaign().getDate());
-
-            campaign.addReport(String.format("%s has divorced %s!", getHyperlinkedName(),
-                    spouse.getHyperlinkedName()));
-
-            spouse.setMaidenName(null);
-            setMaidenName(null);
-
-            spouse.getGenealogy().setSpouse(null);
-            getGenealogy().setSpouse(null);
-        } else if (spouse.isDeadOrMIA()) {
-            setMaidenName(null);
-            getGenealogy().setSpouse(null);
-        } else if (isDeadOrMIA()) {
-            spouse.setMaidenName(null);
-            spouse.getGenealogy().setSpouse(null);
-        }
-
-        // Output a message for Spouses who are KIA
-        if (reason == FormerSpouse.REASON_WIDOWED) {
-            PersonalLogger.spouseKia(spouse, this, getCampaign().getDate());
-        }
-
-        // Add to former spouse list
-        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(getId(), getCampaign().getLocalDate(), reason));
-        getGenealogy().addFormerSpouse(new FormerSpouse(spouse.getId(), getCampaign().getLocalDate(), reason));
-
-        MekHQ.triggerEvent(new PersonChangedEvent(this));
-        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
-    }
-    //endregion Divorce
 
     public int getXp() {
         return xp;

@@ -4,7 +4,7 @@
 
 	<!-- PILOTING SPA -->
 	<ability>
-		<lookupName>animal_mimic</lookupName>	
+		<lookupName>animal_mimic</lookupName>
 		<xpCost>5</xpCost>
 		<skillPrereq>
 	    	<skill>Piloting/Mech::Regular</skill>
@@ -12,7 +12,7 @@
 	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>dodge_maneuver</lookupName>	
+		<lookupName>dodge_maneuver</lookupName>
 		<xpCost>10</xpCost>
 		<skillPrereq>
 	    	<skill>Piloting/Mech::Regular</skill>
@@ -20,7 +20,7 @@
 	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>hot_dog</lookupName>	
+		<lookupName>hot_dog</lookupName>
 		<xpCost>5</xpCost>
 		<weight>2</weight>
 		<skillPrereq>
@@ -35,21 +35,21 @@
 		<invalidAbilities>jumping_jack</invalidAbilities>
 		<skillPrereq>
 	    	<skill>Piloting/Mech::Regular</skill>
-	        <skill>Gunnery/Protomech::Regular</skill>	    		    	    	
-	    </skillPrereq>	
+	        <skill>Gunnery/Protomech::Regular</skill>
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>jumping_jack</lookupName>	
+		<lookupName>jumping_jack</lookupName>
 		<xpCost>10</xpCost>
-		<!-- the extra weight on this one helps increase its likelihood if hopping 
+		<!-- the extra weight on this one helps increase its likelihood if hopping
 		     jack was already selected -->
 		<weight>6</weight>
 		<prereqAbilities>hopping_jack</prereqAbilities>
 	    <removeAbilities>hopping_jack</removeAbilities>
 		<skillPrereq>
 	    	<skill>Piloting/Mech::Regular</skill>
-	        <skill>Gunnery/Protomech::Regular</skill>	    		    	    	
-	    </skillPrereq>	
+	        <skill>Gunnery/Protomech::Regular</skill>
+	    </skillPrereq>
 	</ability>
 	<ability>
 		<lookupName>maneuvering_ace</lookupName>
@@ -63,35 +63,47 @@
 	    	<skill>Piloting/Aerospace::Regular</skill>
 	        <skill>Piloting/Aircraft::Regular</skill>
 	        <skill>Piloting/Naval::Regular</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>melee_specialist</lookupName>	
+		<lookupName>melee_specialist</lookupName>
 		<xpCost>10</xpCost>
 		<weight>3</weight>
 		<skillPrereq>
 	    	<skill>Piloting/Mech::Regular</skill>
-	        <skill>Gunnery/Protomech::Regular</skill>	    		    	    	
-	    </skillPrereq>	
+	        <skill>Gunnery/Protomech::Regular</skill>
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>melee_master</lookupName>	
+		<lookupName>melee_master</lookupName>
 		<xpCost>15</xpCost>
 		<weight>6</weight>
-		<skillPrereq>
+        <prereqAbilities>melee_specialist</prereqAbilities>
+        <invalidAbilities>zweihander</invalidAbilities>
+        <skillPrereq>
 	    	<skill>Piloting/Mech::Regular</skill>
-	        <skill>Gunnery/Protomech::Regular</skill>	    		    	    	
-	    </skillPrereq>	
+	        <skill>Gunnery/Protomech::Regular</skill>
+	    </skillPrereq>
 	</ability>
+    <ability>
+        <lookupName>zweihander</lookupName>
+        <xpCost>10</xpCost>
+        <weight>6</weight>
+        <prereqAbilities>melee_specialist</prereqAbilities>
+        <invalidAbilities>melee_master</invalidAbilities>
+        <skillPrereq>
+            <skill>Piloting/Mech::Regular</skill>
+        </skillPrereq>
+    </ability>
 	<ability>
-		<lookupName>shaky_stick</lookupName>	
+		<lookupName>shaky_stick</lookupName>
 		<xpCost>10</xpCost>
 		<weight>3</weight>
 		<skillPrereq>
 	    	<skill>Piloting/VTOL::Regular</skill>
 	    	<skill>Piloting/Aerospace::Regular</skill>
 	        <skill>Piloting/Aircraft::Regular</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 	<ability>
 		<lookupName>tm_forest_ranger</lookupName>
@@ -101,7 +113,7 @@
 	    	<skill>Piloting/Mech::Veteran</skill>
 	        <skill>Gunnery/Protomech::Veteran</skill>
 			<skill>Piloting/Ground Vehicle::Veteran</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 	<ability>
 		<lookupName>tm_frogman</lookupName>
@@ -110,7 +122,7 @@
 		<skillPrereq>
 	    	<skill>Piloting/Mech::Veteran</skill>
 	        <skill>Gunnery/Protomech::Veteran</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 	<ability>
 		<lookupName>tm_mountaineer</lookupName>
@@ -135,7 +147,7 @@
 
 	<!-- GUNNERY SPA -->
 	<ability>
-		<lookupName>cluster_hitter</lookupName>	
+		<lookupName>cluster_hitter</lookupName>
 		<xpCost>10</xpCost>
 		<weight>3</weight>
 		<skillPrereq>
@@ -145,12 +157,12 @@
 	        <skill>Gunnery/Vehicle::Regular</skill>
 	        <skill>Gunnery/Spacecraft::Regular</skill>
 	        <skill>Gunnery/Battlesuit::Regular</skill>
-	        <skill>Gunnery/Protomech::Regular</skill>	    		    	    	
-	    </skillPrereq>	
+	        <skill>Gunnery/Protomech::Regular</skill>
+	    </skillPrereq>
 		<invalidAbilities>cluster_master</invalidAbilities>
 	</ability>
 	<ability>
-		<lookupName>cluster_master</lookupName>	
+		<lookupName>cluster_master</lookupName>
 		<weight>6</weight>
 		<xpCost>5</xpCost>
 		<prereqAbilities>cluster_hitter</prereqAbilities>
@@ -163,19 +175,19 @@
 	        <skill>Gunnery/Spacecraft::Veteran</skill>
 	        <skill>Gunnery/Battlesuit::Veteran</skill>
 	        <skill>Gunnery/Protomech::Veteran</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>golden_goose</lookupName>	
+		<lookupName>golden_goose</lookupName>
 		<weight>3</weight>
 		<xpCost>10</xpCost>
 	    <skillPrereq>
 	        <skill>Gunnery/Aerospace::Regular</skill>
 	        <skill>Gunnery/Aircraft::Regular</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>multi_tasker</lookupName>	
+		<lookupName>multi_tasker</lookupName>
 		<xpCost>5</xpCost>
 		<weight>2</weight>
 		<skillPrereq>
@@ -185,11 +197,11 @@
 	        <skill>Gunnery/Vehicle::Regular</skill>
 	        <skill>Gunnery/Spacecraft::Regular</skill>
 	        <skill>Gunnery/Battlesuit::Regular</skill>
-	        <skill>Gunnery/Protomech::Regular</skill>	    		    	    	
-	    </skillPrereq>	
+	        <skill>Gunnery/Protomech::Regular</skill>
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>oblique_attacker</lookupName>	
+		<lookupName>oblique_attacker</lookupName>
 		<xpCost>5</xpCost>
 		<weight>2</weight>
 		<skillPrereq>
@@ -198,11 +210,11 @@
 	        <skill>Gunnery/Aircraft::Regular</skill>
 	        <skill>Gunnery/Vehicle::Regular</skill>
 	        <skill>Gunnery/Battlesuit::Regular</skill>
-	        <skill>Gunnery/Protomech::Regular</skill>	    		    	    	
-	    </skillPrereq>	
+	        <skill>Gunnery/Protomech::Regular</skill>
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>oblique_artillery</lookupName>	
+		<lookupName>oblique_artillery</lookupName>
 		<xpCost>10</xpCost>
 		<weight>2</weight>
 		<skillPrereq>
@@ -211,11 +223,12 @@
 	        <skill>Gunnery/Aircraft::Regular</skill>
 	        <skill>Gunnery/Vehicle::Regular</skill>
 	        <skill>Gunnery/Battlesuit::Regular</skill>
-	        <skill>Gunnery/Protomech::Regular</skill>	    		    	    	
-	    </skillPrereq>	
+	        <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Artillery::Regular</skill>
+        </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>range_master</lookupName>	
+		<lookupName>range_master</lookupName>
 		<xpCost>10</xpCost>
 		<weight>3</weight>
 	    <skillPrereq>
@@ -226,10 +239,10 @@
 	        <skill>Gunnery/Spacecraft::Regular</skill>
 	        <skill>Gunnery/Battlesuit::Regular</skill>
 	        <skill>Gunnery/Protomech::Regular</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>sniper</lookupName>	
+		<lookupName>sniper</lookupName>
 		<xpCost>15</xpCost>
 		<weight>1</weight>
 		<skillPrereq>
@@ -239,11 +252,11 @@
 	        <skill>Gunnery/Vehicle::Veteran</skill>
 	        <skill>Gunnery/Spacecraft::Veteran</skill>
 	        <skill>Gunnery/Battlesuit::Veteran</skill>
-	        <skill>Gunnery/Protomech::Veteran</skill>	    		    	    	
-	    </skillPrereq>	
+	        <skill>Gunnery/Protomech::Veteran</skill>
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>sandblaster</lookupName>	
+		<lookupName>sandblaster</lookupName>
 		<xpCost>10</xpCost>
 		<weight>3</weight>
 		<invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
@@ -255,10 +268,10 @@
 	        <skill>Gunnery/Spacecraft::Regular</skill>
 	        <skill>Gunnery/Battlesuit::Regular</skill>
 	        <skill>Gunnery/Protomech::Regular</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>specialist</lookupName>	
+		<lookupName>specialist</lookupName>
 		<xpCost>6</xpCost>
 		<weight>4</weight>
 		<invalidAbilities>weapon_specialist</invalidAbilities>
@@ -269,11 +282,11 @@
 	        <skill>Gunnery/Vehicle::Regular</skill>
 	        <skill>Gunnery/Spacecraft::Regular</skill>
 	        <skill>Gunnery/Battlesuit::Regular</skill>
-	        <skill>Gunnery/Protomech::Regular</skill>	    		    	    	
-	    </skillPrereq>	
+	        <skill>Gunnery/Protomech::Regular</skill>
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>weapon_specialist</lookupName>	
+		<lookupName>weapon_specialist</lookupName>
 		<xpCost>15</xpCost>
 		<weight>2</weight>
 		<invalidAbilities>specialist</invalidAbilities>
@@ -284,11 +297,11 @@
 	        <skill>Gunnery/Vehicle::Veteran</skill>
 	        <skill>Gunnery/Spacecraft::Veteran</skill>
 	        <skill>Gunnery/Battlesuit::Veteran</skill>
-	        <skill>Gunnery/Protomech::Veteran</skill>	    		    	    	
-	    </skillPrereq>	
+	        <skill>Gunnery/Protomech::Veteran</skill>
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>aptitude_gunnery</lookupName>	
+		<lookupName>aptitude_gunnery</lookupName>
 		<xpCost>40</xpCost>
 		<weight>0</weight>
 	    <skillPrereq>
@@ -298,17 +311,17 @@
 	        <skill>Gunnery/Vehicle</skill>
 	        <skill>Gunnery/Spacecraft</skill>
 	        <skill>Gunnery/Battlesuit</skill>
-	        <skill>Gunnery/Protomech</skill>	    		    	    	
-	    </skillPrereq>	
+	        <skill>Gunnery/Protomech</skill>
+	    </skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>some_like_it_hot</lookupName>	
+		<lookupName>some_like_it_hot</lookupName>
 		<xpCost>5</xpCost>
 		<weight>2</weight>
 	    <skillPrereq>
 	    	<skill>Gunnery/Mech::Regular</skill>
 	        <skill>Gunnery/Aerospace::Regular</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 
 	<!-- Misc SPA -->
@@ -364,7 +377,7 @@
     	</skillPrereq>
 	</ability>
     <ability>
-		<lookupName>tactical_genius</lookupName>	
+		<lookupName>tactical_genius</lookupName>
 		<xpCost>15</xpCost>
 		<weight>1</weight>
 		<skillPrereq>
@@ -383,7 +396,7 @@
 	    	<skill>Piloting/Aerospace::Regular</skill>
 	        <skill>Piloting/Aircraft::Regular</skill>
 	        <skill>Piloting/Naval::Regular</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 	<ability>
 		<lookupName>sensor_geek</lookupName>
@@ -398,7 +411,7 @@
 	        <skill>Piloting/Aircraft::Green</skill>
 	        <skill>Piloting/Naval::Green</skill>
 	        <skill>Gunnery/Battlesuit::Green</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 	<ability>
 		<lookupName>weathered</lookupName>
@@ -412,7 +425,7 @@
 	        <skill>Gunnery/Spacecraft::Regular</skill>
 	        <skill>Gunnery/Battlesuit::Regular</skill>
 	        <skill>Gunnery/Protomech::Regular</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 	<ability>
 		<lookupName>blind_fighter</lookupName>
@@ -425,12 +438,12 @@
 	        <skill>Gunnery/Vehicle::Regular</skill>
 	        <skill>Gunnery/Battlesuit::Regular</skill>
 	        <skill>Gunnery/Protomech::Regular</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 
 	<!-- Infantry SPA -->
 	<ability>
-		<lookupName>foot_cav</lookupName>	
+		<lookupName>foot_cav</lookupName>
 		<xpCost>5</xpCost>
 		<weight>3</weight>
 		<skillPrereq>
@@ -438,7 +451,7 @@
     	</skillPrereq>
 	</ability>
 	<ability>
-		<lookupName>urban_guerrilla</lookupName>	
+		<lookupName>urban_guerrilla</lookupName>
 		<xpCost>5</xpCost>
 		<weight>3</weight>
 		<skillPrereq>
@@ -449,8 +462,9 @@
 
     <!-- Tech SPA -->
     <ability>
-        <lookupName>clan_tech_knowledge</lookupName> 
-        <displayName>Clan Tech Knowledge (Unofficial)</displayName>   
+        <lookupName>clan_tech_knowledge</lookupName>
+        <displayName>Clan Tech Knowledge (Unofficial)</displayName>
+        <desc>Can work on clan equipment without penalty</desc>
         <xpCost>4</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -463,9 +477,9 @@
         <miscPrereq>clanner:false</miscPrereq>
     </ability>
     <ability>
-        <lookupName>tech_weapon_specialist</lookupName> 
-        <displayName>Tech Specialist, Weapon (Unofficial)</displayName>  
-        <desc>-1 to repair and maintenance checks when working with weapons</desc>  
+        <lookupName>tech_weapon_specialist</lookupName>
+        <displayName>Tech Specialist, Weapon (Unofficial)</displayName>
+        <desc>-1 to repair and maintenance checks when working with weapons</desc>
         <xpCost>4</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -477,9 +491,9 @@
         </skillPrereq>
     </ability>
     <ability>
-        <lookupName>tech_armor_specialist</lookupName> 
-        <displayName>Tech Specialist, Armor (Unofficial)</displayName>  
-        <desc>-1 to repair and maintenance checks when working with armor</desc> 
+        <lookupName>tech_armor_specialist</lookupName>
+        <displayName>Tech Specialist, Armor (Unofficial)</displayName>
+        <desc>-1 to repair and maintenance checks when working with armor</desc>
         <xpCost>4</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -491,9 +505,9 @@
         </skillPrereq>
     </ability>
     <ability>
-        <lookupName>tech_internal_specialist</lookupName> 
-        <displayName>Tech Specialist, Internal (Unofficial)</displayName>   
-        <desc>-1 to repair and maintenance checks when working with internal systems</desc> 
+        <lookupName>tech_internal_specialist</lookupName>
+        <displayName>Tech Specialist, Internal (Unofficial)</displayName>
+        <desc>-1 to repair and maintenance checks when working with internal systems</desc>
         <xpCost>6</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -504,32 +518,60 @@
             <skill>Tech/Vessel::Regular</skill>
         </skillPrereq>
     </ability>
-	
+    <ability>
+        <lookupName>tech_engineer</lookupName>
+        <displayName>Engineer (unofficial)</displayName>
+        <desc>-2 on refit rolls</desc>
+        <xpCost>8</xpCost>
+        <weight>2</weight>
+        <skillPrereq>
+            <skill>Tech/Mech::Veteran</skill>
+            <skill>Tech/Mechanic::Veteran</skill>
+            <skill>Tech/Aero::Veteran</skill>
+            <skill>Tech/BA::Veteran</skill>
+            <skill>Tech/Vessel::Veteran</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>tech_fixer</lookupName>
+        <displayName>Mr/Ms Fix-it (unofficial)</displayName>
+        <desc>Ignore first point of penalty for repair and maintenance on low quality equipment</desc>
+        <xpCost>4</xpCost>
+        <weight>2</weight>
+        <skillPrereq>
+            <skill>Tech/Mech::Regular</skill>
+            <skill>Tech/Mechanic::Regular</skill>
+            <skill>Tech/Aero::Regular</skill>
+            <skill>Tech/BA::Regular</skill>
+            <skill>Tech/Vessel::Regular</skill>
+        </skillPrereq>
+    </ability>
+
 	<!-- OTHER SPA -->
 	<ability>
-		<lookupName>pain_resistance</lookupName>	
+		<lookupName>pain_resistance</lookupName>
 		<xpCost>4</xpCost>
 		<weight>2</weight>
 	</ability>
-	
+
 	<edgeTrigger>
 		<lookupName>edge_when_heal_crit_fail</lookupName>
 		<displayName>Use Edge for doctor critical failure.</displayName>
 		<desc>Healing check critical failure will be rerolled with Edge.</desc>
 	</edgeTrigger>
-	
+
 	<edgeTrigger>
 		<lookupName>edge_when_repair_break_part</lookupName>
 		<displayName>Use Edge for tech breaking part.</displayName>
 		<desc>Failed repair check that breaks the part will be rerolled with Edge.</desc>
 	</edgeTrigger>
-	
+
 	<edgeTrigger>
 		<lookupName>edge_when_fail_refit_check</lookupName>
 		<displayName>Use Edge for refit failure.</displayName>
 		<desc>Failed refit check will be rerolled with Edge.</desc>
 	</edgeTrigger>
-	
+
 	<edgeTrigger>
 		<lookupName>edge_when_admin_acquire_fail</lookupName>
 		<displayName>Use Edge for acquisition failure.</displayName>
@@ -538,7 +580,7 @@
 
 <!-- Example entries corresponding to the examples in customspa.xml
      See docs/custom_spa.txt
-	
+
 	<ability>
 		<lookupName>tetris_master</lookupName>
 		<displayName>Tetris Master</displayName>
@@ -550,13 +592,13 @@
         <desc>Increase the capacity of a cargo or transport bay.</desc>
         <choiceValues>None::Cargo::Mech::Vehicle::Fighter::Infantry</choiceValues>
 	</ability>
-	
+
 	<edgeTrigger>
 	    <lookupName>edge_paper_cut</lookupName>
 	    <displayName>Use Edge to avoid paper cut.</displayName>
 	    <desc>A paper cut injury check will be rerolled with edge.</desc>
 	</edgeTrigger>
-	
+
 	<implant>
 	    <lookupName>md_prosthetic_blowtorch</lookupName>
 	    <displayName>Prosthetic Blowtorch</displayName>
@@ -570,10 +612,10 @@
         </skillPrereq>
 	</implant>
 -->
-	
+
 </abilities>
 
-<!--  
+<!--
 
 public static final String S_PILOT_MECH  = "Piloting/Mech";
 	public static final String S_PILOT_AERO  = "Piloting/Aerospace";
@@ -638,7 +680,7 @@ public static final String S_PILOT_MECH  = "Piloting/Mech";
         addOption(adv, "allweather", false); //$NON-NLS-1$
         addOption(adv, "blind_fighter", false); //$NON-NLS-1$
         addOption(adv, "sensor_geek", false); //$NON-NLS-1$
-        
+
         /*
 		abilityCosts = new HashMap<String, Integer>();
 		abilityCosts.put("hot_dog", 4);

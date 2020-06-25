@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import java.awt.BorderLayout;
@@ -33,16 +32,8 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
+import javax.swing.table.TableRowSorter;
 
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
@@ -50,9 +41,11 @@ import megamek.common.event.Subscribe;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.event.MissionCompletedEvent;
 import mekhq.campaign.event.MissionNewEvent;
@@ -68,7 +61,6 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
@@ -86,7 +78,10 @@ import mekhq.gui.dialog.NewAtBContractDialog;
 import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.ScenarioTableModel;
+import mekhq.gui.sorter.DateStringComparator;
+import mekhq.gui.sorter.ScenarioStatusComparator;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
@@ -94,7 +89,6 @@ import mekhq.gui.view.ScenarioViewPanel;
 
 /**
  * Displays Mission/Contract and Scenario details.
- *
  */
 public final class BriefingTab extends CampaignGuiTab {
 
@@ -126,6 +120,7 @@ public final class BriefingTab extends CampaignGuiTab {
     private JButton btnResolveScenario;
 
     private ScenarioTableModel scenarioModel;
+    private TableRowSorter<ScenarioTableModel> scenarioSorter;
 
     public int selectedMission;
     public int selectedScenario;
@@ -230,10 +225,15 @@ public final class BriefingTab extends CampaignGuiTab {
 
         scenarioModel = new ScenarioTableModel(getCampaign());
         scenarioTable = new JTable(scenarioModel);
-        scenarioTable.setShowGrid(false);
         scenarioTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(getCampaignGui(), scenarioTable, scenarioModel));
         scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        scenarioSorter = new TableRowSorter<>(scenarioModel);
+        scenarioSorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
+        scenarioSorter.setComparator(ScenarioTableModel.COL_STATUS, new ScenarioStatusComparator());
+        scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator(getCampaign()));
+        scenarioTable.setRowSorter(scenarioSorter);
+        scenarioTable.setShowGrid(false);
+        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(getCampaignGui(), scenarioTable, scenarioModel));
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(ev -> refreshScenarioView());
 
@@ -457,12 +457,12 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void gmGenerateScenarios() {
-    	if (!getCampaign().isGM()) {
-			JOptionPane.showMessageDialog(this,
-					"Only allowed for GM players",
-					"Not GM", JOptionPane.ERROR_MESSAGE);
-			return;
-    	}
+        if (!getCampaign().isGM()) {
+            JOptionPane.showMessageDialog(this,
+                    "Only allowed for GM players",
+                    "Not GM", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to generate a new set of scenarios?", "Generate scenarios?",
                 JOptionPane.YES_NO_OPTION)) {
@@ -534,8 +534,10 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if (scenario == null) {
+            return;
+        }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
         if (uids.size() == 0) {
             return;
         }
@@ -587,8 +589,10 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if (scenario == null) {
+            return;
+        }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
         if (uids.size() == 0) {
             return;
         }
@@ -675,8 +679,10 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if (scenario == null) {
+            return;
+        }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
         if (uids.size() == 0) {
             return;
         }
@@ -723,8 +729,10 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if (scenario == null) {
+            return;
+        }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
         if (uids.size() == 0) {
             return;
         }
@@ -829,6 +837,9 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if (scenario == null) {
+            return;
+        }
         selectedScenario = scenario.getId();
         if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
             scrollScenarioView.setViewportView(
@@ -852,7 +863,6 @@ public final class BriefingTab extends CampaignGuiTab {
         btnClearAssignedUnits.setEnabled(scenario.isCurrent() && unitsAssigned);
         btnResolveScenario.setEnabled(canStartGame);
         btnPrintRS.setEnabled(scenario.isCurrent() && unitsAssigned);
-
     }
 
     public void refreshLanceAssignments() {
@@ -977,5 +987,10 @@ public final class BriefingTab extends CampaignGuiTab {
         if (ev.getMission().getId() == selectedMission) {
             changeMission();
         }
+    }
+
+    @Subscribe
+    public void handle(GMModeEvent ev) {
+        btnGMGenerateScenarios.setEnabled(ev.isGMMode());
     }
 }
