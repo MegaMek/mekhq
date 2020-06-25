@@ -968,7 +968,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            List<UUID> siblings = person.getGenealogy().getSiblings();
+            List<UUID> siblings = person.getGenealogy().getSiblings(campaign);
             if (!siblings.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
                 lblSiblings1.setName("lblSiblings1"); // NOI18N //$NON-NLS-1$
                 lblSiblings1.setText(resourceMap.getString("lblSiblings1.text")); //$NON-NLS-1$

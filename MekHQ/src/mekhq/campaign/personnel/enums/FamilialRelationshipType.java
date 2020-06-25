@@ -165,15 +165,4 @@ public enum FamilialRelationshipType {
 
         return name.toString();
     }
-
-    /**
-     * @return the different types of sibling relationships
-     */
-    public static FamilialRelationshipType[] getSiblingRelationshipTypes() {
-        return new FamilialRelationshipType[] {
-                FamilialRelationshipType.SIBLING,
-                FamilialRelationshipType.HALF_SIBLING,
-                FamilialRelationshipType.STEPSIBLING
-        };
-    }
 }

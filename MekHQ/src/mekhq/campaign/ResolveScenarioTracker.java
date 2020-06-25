@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign;
 
@@ -956,10 +956,6 @@ public class ResolveScenarioTracker {
                 casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
             }
             for (Person p : crew) {
-                // We need to assign them a UUID now to place them into the oppositionPersonnel hash
-                UUID id = (p.getId() == null) ? UUID.randomUUID() : p.getId();
-                p.setId(id);
-
                 OppositionPersonnelStatus status = new OppositionPersonnelStatus(p.getFullName(), u.getEntity().getDisplayName(), p);
                 if (en instanceof Mech
                         || en instanceof Protomech
@@ -1048,7 +1044,7 @@ public class ResolveScenarioTracker {
                 }
                 status.setCaptured(Utilities.isLikelyCapture(en) || pickedUp);
                 status.setXP(campaign.getCampaignOptions().getScenarioXP());
-                oppositionPersonnel.put(id, status);
+                oppositionPersonnel.put(p.getId(), status);
             }
         }
     }

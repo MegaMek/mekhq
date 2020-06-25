@@ -130,7 +130,6 @@ public class AtBEventProcessor {
 
         for (int i = 0; i < q; i++) {
             Person p = campaign.newPerson(campaign.getPersonnelMarket().getPaidRecruitType());
-            p.setId(UUID.randomUUID());
             campaign.getPersonnelMarket().addPerson(p);
             addRecruitUnit(p);
         }

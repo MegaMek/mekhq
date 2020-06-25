@@ -2,7 +2,7 @@
  * Person.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
@@ -346,7 +346,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.campaign = campaign;
 
         // Then, we assign the variables in XML file order
-        id = null;
+        id = UUID.randomUUID();
         this.givenName = givenName;
         this.surname = surname;
         this.honorific = honorific;
@@ -365,7 +365,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         bloodname = "";
         biography = "";
         idleMonths = -1;
-        genealogy = new Genealogy();
+        genealogy = new Genealogy(getId());
         tryingToMarry = true;
         tryingToConceive = true;
         dueDate = null;
@@ -1367,7 +1367,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         for (int i = 0; i < size; i++) {
             // Create the specific baby
             Person baby = campaign.newDependent(T_NONE, true);
-            baby.setId(UUID.randomUUID());
             String surname = campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
             baby.setSurname(surname);
@@ -2226,11 +2225,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 retVal.setCallsign(pilotNickname);
             }
 
-            if (retVal.id == null) {
-                MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                        "ID not pre-defined; generating person's ID."); //$NON-NLS-1$
-                retVal.id = UUID.randomUUID();
-            }
+            // Ensure the Genealogy Origin Id is set to the proper id
+            retVal.getGenealogy().setOrigin(retVal.getId());
 
             // Prisoner and Bondsman updating
             if ((retVal.prisonerStatus != PrisonerStatus.FREE) && (retVal.rank == 0)) {

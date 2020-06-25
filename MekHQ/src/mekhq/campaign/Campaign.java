@@ -1388,9 +1388,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        UUID id = (p.getId() == null) ? UUID.randomUUID() : p.getId();
-        p.setId(id);
-        personnel.put(id, p);
+        personnel.put(p.getId(), p);
 
         if (log) {
             String add = !prisonerStatus.isFree() ? (prisonerStatus.isBondsman() ? " as a bondsman" : " as a prisoner") : "";

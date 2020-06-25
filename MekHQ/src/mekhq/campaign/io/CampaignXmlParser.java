@@ -1933,7 +1933,6 @@ public class CampaignXmlParser {
             while (people.hasNext()) {
                 Person person = people.next();
                 people.remove();
-                List<Person> siblings = ancestryMigrationMap.get(id);
 
                 if (fatherId != null) {
                     person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, fatherId);
@@ -1943,11 +1942,6 @@ public class CampaignXmlParser {
                 if (motherId != null) {
                     person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, motherId);
                     retVal.getPerson(motherId).getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person.getId());
-                }
-
-                for (Person sibling : siblings) {
-                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.SIBLING, sibling.getId());
-                    sibling.getGenealogy().addFamilyMember(FamilialRelationshipType.SIBLING, person.getId());
                 }
             }
         }
