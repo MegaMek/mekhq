@@ -237,7 +237,6 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
         remainingDepth--;
 
         // First, we check if there are any shared parents
-        // TODO : determine how we want to handle this for stepparents
         for (UUID id : getParents()) {
             if (secondaryGenealogy.getParents().contains(id)) {
                 return true;
