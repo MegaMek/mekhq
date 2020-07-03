@@ -129,10 +129,10 @@ public class NewsItem {
         int maxRandomDays;
         switch (datePrecision) {
             case MONTH:
-                maxRandomDays = date.lengthOfMonth() - date.getDayOfMonth();
+                maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plus(1, ChronoUnit.MONTHS)));
                 break;
             case YEAR:
-                maxRandomDays = date.lengthOfYear() - date.getDayOfYear();
+                maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plus(1, ChronoUnit.YEARS)));
                 break;
             case DECADE:
                 maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plus(1, ChronoUnit.DECADES)));
