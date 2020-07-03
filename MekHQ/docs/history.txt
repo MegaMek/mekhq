@@ -6,6 +6,7 @@ VERSION HISTORY:
 + Issue #1827: Adding documentation comment for required Excel version for Awards Tracker
 + Issue #1819: Fixing Time in Rank without Time in Service
 + Issue #1821: Can now reach all directories for images
++ PR #1830: Picking techs for refit now orders the techs by type then skill level, so you don't have to strain your eyes looking for that one aero tech
 
 0.47.7 (2020-06-22 2330 UTC)
 + PR #1811: Fix advance multiple days reports not showing
