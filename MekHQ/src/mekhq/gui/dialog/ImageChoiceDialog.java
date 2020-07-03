@@ -144,7 +144,6 @@ public class ImageChoiceDialog extends JDialog {
                 categoryModel.addElement(name);
                 if (category.equals(name)) {
                     match = name;
-                    break;
                 }
             }
         }
