@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.Vector;
 
+import mekhq.gui.enums.LayeredForceIcon;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -61,7 +62,7 @@ public class Force implements Serializable {
     public static final String ROOT_LAYERED = "Layered";
     public static final String ICON_NONE = "None";
     public static final int FORCE_NONE = -1;
-    private String iconCategory = ROOT_ICON;
+    private String iconCategory = ROOT_LAYERED;
     private String iconFileName = ICON_NONE;
     private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
 
@@ -86,6 +87,11 @@ public class Force implements Serializable {
         this.units = new Vector<>();
         this.oldUnits = new Vector<>();
         this.scenarioId = -1;
+
+        // Initialize the Force Icon
+        Vector<String> frame = new Vector<>();
+        frame.add("Frame.png");
+        iconMap.put(LayeredForceIcon.FRAME.getLayerPath(), frame);
     }
 
     public Force(String n, int id, Force parent) {
