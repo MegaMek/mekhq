@@ -1181,7 +1181,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (getLastRankChangeDate() == null) {
             return null;
         } else {
-            return getRecruitment().format(DateTimeFormatter.ofPattern(
+            return getLastRankChangeDate().format(DateTimeFormatter.ofPattern(
                     campaign.getCampaignOptions().getDisplayDateFormat()));
         }
     }
