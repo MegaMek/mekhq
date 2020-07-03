@@ -65,6 +65,8 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
+import megamek.client.generator.RandomNameGenerator;
+import megamek.common.enums.Gender;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
@@ -939,13 +941,13 @@ public class Utilities {
         // this is a bit of a hack, but instead of tracking it elsewhere we only set gender to
         // male or female when a name is generated. G_RANDOMIZE will therefore only be returned for
         // crew that don't have names, so we can just leave them with their randomly generated name
-        if (oldCrew.getGender(crewIndex) != Crew.G_RANDOMIZE) {
+        if (oldCrew.getGender(crewIndex) != Gender.RANDOMIZE) {
             String givenName = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_GIVEN_NAME);
 
             if (StringUtil.isNullOrEmpty(givenName)) {
                 String name = oldCrew.getName(crewIndex);
 
-                if (!(name.equalsIgnoreCase(Crew.UNNAMED) || name.equalsIgnoreCase(Crew.UNNAMED_FULL_NAME))) {
+                if (!(name.equalsIgnoreCase(RandomNameGenerator.UNNAMED) || name.equalsIgnoreCase(RandomNameGenerator.UNNAMED_FULL_NAME))) {
                     p.migrateName(name);
                 }
             } else {

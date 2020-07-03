@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2014, 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,24 +10,23 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Frame;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Collections;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -42,7 +41,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.ReportEvent;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
-import mekhq.gui.ReportHyperlinkListener;
 import mekhq.gui.preferences.JIntNumberSpinnerPreference;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
@@ -53,25 +51,21 @@ import mekhq.preferences.PreferencesNode;
 public class AdvanceDaysDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;
 
-    private ResourceBundle resourceMap;
-
     private JSpinner spnDays;
     private JButton btnStart;
+    private JButton btnNextWeek;
     private JButton btnNextMonth;
-    private JLabel lblDays;
-    private JPanel pnlNumDays;
+    private JButton btnNextYear;
     private DailyReportLogPanel logPanel;
     private CampaignGUI gui;
-    private ReportHyperlinkListener listener;
 
-    public AdvanceDaysDialog(Frame owner, CampaignGUI gui, ReportHyperlinkListener listener) {
+    public AdvanceDaysDialog(Frame owner, CampaignGUI gui) {
         super(owner, true);
         this.gui = gui;
-        this.listener = listener;
         setName("formADD"); // NOI18N
-        getContentPane().setLayout(new java.awt.GridBagLayout());
-        this.setPreferredSize(new Dimension(500,500));
+        getContentPane().setLayout(new GridBagLayout());
         initComponents();
+        this.setPreferredSize(new Dimension(500,500));
         setLocationRelativeTo(owner);
         setUserPreferences();
     }
@@ -79,24 +73,38 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
     public void initComponents() {
         setLayout(new BorderLayout());
 
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.AdvanceDaysDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AdvanceDaysDialog", new EncodeControl()); //$NON-NLS-1$
 
         this.setTitle(resourceMap.getString("dlgTitle.text"));
-        lblDays = new JLabel(resourceMap.getString("dlgDays.text"));
-        pnlNumDays = new JPanel();
-        spnDays = new JSpinner(new SpinnerNumberModel(7, 1, 365, 1));
-        ((JSpinner.DefaultEditor)spnDays.getEditor()).getTextField().setEditable(true);
+        JPanel pnlNumDays = new JPanel();
+
+        // Maxing out at 10 years for dev testing reasons
+        spnDays = new JSpinner(new SpinnerNumberModel(7, 1, 3650, 1));
+        ((JSpinner.DefaultEditor) spnDays.getEditor()).getTextField().setEditable(true);
         pnlNumDays.add(spnDays);
+
+        JLabel lblDays = new JLabel(resourceMap.getString("dlgDays.text"));
         pnlNumDays.add(lblDays);
+
         btnStart = new JButton(resourceMap.getString("dlgStartAdvancement.text"));
         btnStart.addActionListener(this);
+        pnlNumDays.add(btnStart);
+
+        btnNextWeek = new JButton(resourceMap.getString("dlgAdvanceNextWeek.text"));
+        btnNextWeek.addActionListener(this);
+        pnlNumDays.add(btnNextWeek);
+
         btnNextMonth = new JButton(resourceMap.getString("dlgAdvanceNextMonth.text"));
         btnNextMonth.addActionListener(this);
-        pnlNumDays.add(btnStart);
         pnlNumDays.add(btnNextMonth);
+
+        btnNextYear = new JButton(resourceMap.getString("dlgAdvanceNextYear.text"));
+        btnNextYear.addActionListener(this);
+        pnlNumDays.add(btnNextYear);
+
         getContentPane().add(pnlNumDays, BorderLayout.NORTH);
 
-        logPanel = new DailyReportLogPanel(listener);
+        logPanel = new DailyReportLogPanel(gui);
         getContentPane().add(logPanel, BorderLayout.CENTER);
 
         addWindowListener(new WindowAdapter() {
@@ -124,54 +132,64 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent event) {
-        if (event.getSource().equals(btnStart) || event.getSource().equals(btnNextMonth)) {
+        if (event.getSource().equals(btnStart) || event.getSource().equals(btnNextWeek)
+                || event.getSource().equals(btnNextMonth) || event.getSource().equals(btnNextYear)) {
             int days = (int) spnDays.getValue();
             boolean firstDay = true;
             MekHQ.registerHandler(this);
-            if (event.getSource().equals(btnNextMonth)) {
-                LocalDate today = gui.getCampaign().getLocalDate();
+
+            LocalDate today = gui.getCampaign().getLocalDate();
+            if (btnNextWeek.equals(event.getSource())) {
+                // The number of days till the next monday is eight days (a week and a day) minus
+                // the current day of the week. The additional one is added to ensure we get the next
+                // Monday instead of the Sunday
+                days = 8 - today.getDayOfWeek().getValue();
+            } else if (btnNextMonth.equals(event.getSource())) {
                 // The number of days till the next month is the length of the month plus one minus
                 // the current day, with the one added because otherwise we get the last day of the same
                 // month
                 days = today.lengthOfMonth() + 1 - today.getDayOfMonth();
+            } else if (btnNextYear.equals(event.getSource())) {
+                // The number of days till the next year is the length of the year plus one minus
+                // the current day, with the one added because otherwise we get the last day of the same
+                // year
+                days = today.lengthOfYear() + 1 - today.getDayOfYear();
             }
 
-            int numDays;
-            for (numDays = days; numDays > 0; numDays--) {
+            List<String> reports = new ArrayList<>();
+            for (; days > 0; days--) {
                 if (gui.getCampaign().checkOverDueLoans()
                         || gui.nagShortMaintenance()
                         || (gui.getCampaign().getCampaignOptions().getUseAtB())
                         && (gui.nagShortDeployments() || gui.nagOutstandingScenarios())) {
                     break;
-                }
-                if (gui.getCampaign().checkRetirementDefections()
+                } else if (gui.getCampaign().checkRetirementDefections()
                         || gui.getCampaign().checkYearlyRetirements()) {
                     gui.showRetirementDefectionDialog();
                     break;
-                }
-                if (!gui.getCampaign().newDay()) {
+                } else if (!gui.getCampaign().newDay()) {
                     break;
                 }
-                //String newLogString = logPanel.getLogText();
-                //newLogString = newLogString.concat(gui.getCampaign().getCurrentReportHTML());
+                String report = gui.getCampaign().getCurrentReportHTML();
                 if (firstDay) {
-                    logPanel.refreshLog(gui.getCampaign().getCurrentReportHTML());
+                    logPanel.refreshLog(report);
                     firstDay = false;
                 } else {
-                    logPanel.appendLog(Collections.singletonList("<hr/>")); //$NON-NLS-1$
-                    logPanel.appendLog(gui.getCampaign().fetchAndClearNewReports());
+                    reports.add("<hr/>");
+                    reports.add(report);
                 }
+                gui.getCampaign().fetchAndClearNewReports();
             }
+            logPanel.appendLog(reports);
 
             // We couldn't advance all days for some reason,
             // set the spinner to the number of remaining days
-            if (numDays > 0) {
-                this.spnDays.setValue(numDays);
+            if (days > 0) {
+                this.spnDays.setValue(days);
             }
 
             gui.refreshCalendar();
             gui.refreshLocation();
-            gui.initReport();
 
             gui.refreshAllTabs();
         }

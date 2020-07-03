@@ -1,18 +1,18 @@
 /*
  * Copyright (C) 2018 MegaMek team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,22 +40,22 @@ import mekhq.campaign.parts.equipment.MASC;
 
 /**
  * Like {@link OmniPod} this is never added to a <code>Unit</code>. <code>OmniPod</code> is used for empty
- * pods in the warehouse, and <code>MissingOmniPod</code> is used for acquisition. 
- * 
+ * pods in the warehouse, and <code>MissingOmniPod</code> is used for acquisition.
+ *
  * @author neoancient
  *
  */
 public class MissingOmniPod extends MissingPart {
 
     private static final long serialVersionUID = -1231514024730868438L;
-    
+
     // Pods are specific to the type of equipment they contain.
     private Part partType;
-    
+
     public MissingOmniPod() {
         this(new EquipmentPart(), null);
     }
-    
+
     /**
      * @param partType The type of part that can be installed in this pod
      * @param c        The campaign
@@ -70,7 +70,7 @@ public class MissingOmniPod extends MissingPart {
         super.setCampaign(c);
         partType.setCampaign(c);
     }
-    
+
     /**
      * @return The type of part that can be installed in this pod
      */
@@ -84,7 +84,7 @@ public class MissingOmniPod extends MissingPart {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         final String METHOD_NAME = "writeToXml(PrintWriter,int)"; //$NON-NLS-1$
-        
+
         writeToXmlBegin(pw1, indent);
         pw1.print(MekHqXmlUtil.indentStr(indent + 1) + "<partType tonnage='" + partType.getUnitTonnage()
             + "' type='");
@@ -163,7 +163,7 @@ public class MissingOmniPod extends MissingPart {
                                         "OmniPod for MASC lacks engine rating"); //$NON-NLS-1$
                             }
                         } else {
-                            partType = new EquipmentPart(tonnage, et, -1, false, campaign);
+                            partType = new EquipmentPart(tonnage, et, -1, 1.0, false, campaign);
                         }
                     }
                 }
@@ -181,7 +181,7 @@ public class MissingOmniPod extends MissingPart {
     public int getTechRating() {
         return EquipmentType.RATING_E;
     }
-    
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return Entity.getOmniAdvancement();

@@ -37,22 +37,28 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
-import megamek.common.*;
-import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.*;
+import mekhq.campaign.event.MissionRemovedEvent;
+import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.enums.Divorce;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
 
-import megamek.client.RandomNameGenerator;
-import megamek.client.RandomUnitGenerator;
+import megamek.common.*;
+import megamek.common.enums.Gender;
+import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.generator.RandomGenderGenerator;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -87,7 +93,6 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.ReportEvent;
-import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.ScenarioNewEvent;
 import mekhq.campaign.event.UnitNewEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
@@ -150,7 +155,6 @@ import mekhq.campaign.universe.RangedPlanetSelector;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.gui.GuiTabType;
 import mekhq.gui.dialog.HistoricalDailyReportDialog;
 import mekhq.gui.utilities.PortraitFileFactory;
 import mekhq.module.atb.AtBEventProcessor;
@@ -206,8 +210,6 @@ public class Campaign implements Serializable, ITechManager {
 
     private String name;
 
-    private RandomNameGenerator rng = RandomNameGenerator.getInstance();
-
     // hierarchically structured Force object to define TO&E
     private Force forces;
     private Hashtable<Integer, Lance> lances; //AtB
@@ -239,6 +241,12 @@ public class Campaign implements Serializable, ITechManager {
     private String camoFileName = null;
     private int colorIndex = 0;
 
+    //unit icon
+    public static final String ROOT_ICON = "-- General --";
+    public static final String ICON_NONE = "None";
+    private String iconCategory = ROOT_ICON;
+    private String iconFileName = ICON_NONE;
+
     private Finances finances;
 
     private CurrentLocation location;
@@ -268,6 +276,7 @@ public class Campaign implements Serializable, ITechManager {
     private Calendar shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
+    private CampaignSummary campaignSummary;
 
     /** This is used to determine if the player has an active AtB Contract, and is recalculated on load */
     private transient boolean hasActiveContract;
@@ -322,6 +331,7 @@ public class Campaign implements Serializable, ITechManager {
         atbConfig = null;
         autosaveService = new AutosaveService();
         hasActiveContract = false;
+        campaignSummary = new CampaignSummary(this);
     }
 
     /**
@@ -429,10 +439,6 @@ public class Campaign implements Serializable, ITechManager {
     @Deprecated
     public DateFormat getShortDateFormatter() {
         return new SimpleDateFormat(shortDateFormat);
-    }
-
-    public RandomNameGenerator getRNG() {
-        return rng;
     }
 
     public String getCurrentSystemName() {
@@ -785,6 +791,10 @@ public class Campaign implements Serializable, ITechManager {
         return true;
     }
 
+    public CampaignSummary getCampaignSummary() {
+        return campaignSummary;
+    }
+
     public News getNews() {
         return news;
     }
@@ -910,13 +920,12 @@ public class Campaign implements Serializable, ITechManager {
      *
      * @param m The mission to be added
      */
-    public int addMission(Mission m) {
+    public void addMission(Mission m) {
         int id = lastMissionId + 1;
         m.setId(id);
         missions.put(id, m);
         lastMissionId = id;
         MekHQ.triggerEvent(new MissionNewEvent(m));
-        return id;
     }
 
     /**
@@ -1242,7 +1251,7 @@ public class Campaign implements Serializable, ITechManager {
             person = newPerson(type);
         } else {
             person = newPerson(type, Person.T_NONE, new DefaultFactionSelector(),
-                    new DefaultPlanetSelector(), Crew.G_RANDOMIZE);
+                    new DefaultPlanetSelector(), Gender.RANDOMIZE);
         }
 
         person.setDependent(true);
@@ -1269,7 +1278,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(int type, int secondary) {
-        return newPerson(type, secondary, getFactionSelector(), getPlanetSelector(), Crew.G_RANDOMIZE);
+        return newPerson(type, secondary, getFactionSelector(), getPlanetSelector(), Gender.RANDOMIZE);
     }
 
     /**
@@ -1282,7 +1291,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param gender The gender of the person to be generated, or a randomize it value
      * @return A new {@link Person}.
      */
-    public Person newPerson(int type, int secondary, String factionCode, int gender) {
+    public Person newPerson(int type, int secondary, String factionCode, Gender gender) {
         return newPerson(type, secondary, new DefaultFactionSelector(factionCode), getPlanetSelector(), gender);
     }
 
@@ -1298,7 +1307,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector,
-                            AbstractPlanetSelector planetSelector, int gender) {
+                            AbstractPlanetSelector planetSelector, Gender gender) {
         AbstractPersonnelGenerator personnelGenerator = getPersonnelGenerator(factionSelector, planetSelector);
         return newPerson(type, secondary, personnelGenerator, gender);
     }
@@ -1311,7 +1320,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param gender The gender of the person to be generated, or a randomize it value
      * @return A new {@link Person} configured using {@code personnelGenerator}.
      */
-    public Person newPerson(int type, int secondary, AbstractPersonnelGenerator personnelGenerator, int gender) {
+    public Person newPerson(int type, int secondary, AbstractPersonnelGenerator personnelGenerator, Gender gender) {
         if (type == Person.T_LAM_PILOT) {
             type = Person.T_MECHWARRIOR;
             secondary = Person.T_AERO_PILOT;
@@ -1330,16 +1339,14 @@ public class Campaign implements Serializable, ITechManager {
 
     //region Personnel Recruitment
     /**
-     *
      * @param p         the person being added
      * @return          true if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p) {
-        return recruitPerson(p, false, false, false, true);
+        return recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), false, true);
     }
 
     /**
-     *
      * @param p         the person being added
      * @param gmAdd     false means that they need to pay to hire this person, provided that
      *                  the campaign option to pay for new hires is set, while
@@ -1347,24 +1354,34 @@ public class Campaign implements Serializable, ITechManager {
      * @return          true if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p, boolean gmAdd) {
-        return recruitPerson(p, false,  false, gmAdd, true);
+        return recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), gmAdd, true);
     }
 
     /**
      *
-     * @param p         the person being added
-     * @param prisoner  if the person is a prisoner or not. True means they are a prisoner
-     * @param dependent if the person is a dependent or not. True means they are a dependent
-     * @param gmAdd     false means that they need to pay to hire this person, true means it is added without paying
-     * @param log       whether or not to write to logs
-     * @return          true if the person is hired successfully, otherwise false
+     * @param p              the person being added
+     * @param prisonerStatus the person's prisoner status upon recruitment
+     * @return               true if the person is hired successfully, otherwise false
      */
-    public boolean recruitPerson(Person p, boolean prisoner, boolean dependent, boolean gmAdd, boolean log) {
+    public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus) {
+        return recruitPerson(p, prisonerStatus, p.isDependent(), false, true);
+    }
+
+    /**
+     * @param p              the person being added
+     * @param prisonerStatus the person's prisoner status upon recruitment
+     * @param dependent      if the person is a dependent or not. True means they are a dependent
+     * @param gmAdd          false means that they need to pay to hire this person, true means it is added without paying
+     * @param log            whether or not to write to logs
+     * @return               true if the person is hired successfully, otherwise false
+     */
+    public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus, boolean dependent,
+                                 boolean gmAdd, boolean log) {
         if (p == null) {
             return false;
         }
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
-        if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && !prisoner) {
+        if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && prisonerStatus.isFree()) {
             if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
                     "recruitment of " + p.getFullName(), getCalendar().getTime())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
@@ -1377,49 +1394,20 @@ public class Campaign implements Serializable, ITechManager {
         p.setId(id);
         personnel.put(id, p);
 
-        boolean bondsman = campaignOptions.getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK;
-        String add = prisoner ? (bondsman ? " as a bondsman" : " as a prisoner") : "";
         if (log) {
+            String add = !prisonerStatus.isFree() ? (prisonerStatus.isBondsman() ? " as a bondsman" : " as a prisoner") : "";
             addReport(String.format("%s has been added to the personnel roster%s.", p.getHyperlinkedName(), add));
         }
+
         if (p.getPrimaryRole() == Person.T_ASTECH) {
             astechPoolMinutes += 480;
             astechPoolOvertime += 240;
-        }
-        if (p.getSecondaryRole() == Person.T_ASTECH) {
+        } else if (p.getSecondaryRole() == Person.T_ASTECH) {
             astechPoolMinutes += 240;
             astechPoolOvertime += 120;
         }
-        String rankEntry = LogEntryController.generateRankEntryString(p);
 
-        if (prisoner) {
-            if (getCampaignOptions().getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK) {
-                p.setBondsman();
-                if (log) {
-                    ServiceLogger.madeBondsman(p, getDate(), getName(), rankEntry);
-                }
-            } else {
-                p.setPrisoner();
-                if (log) {
-                    ServiceLogger.madePrisoner(p, getDate(), getName(), rankEntry);
-                }
-            }
-        } else {
-            p.setFreeMan();
-            if (log) {
-                ServiceLogger.joined(p, getDate(), getName(), rankEntry);
-            }
-        }
-
-        // Add their recruitment date if using track time in service
-        if (!prisoner && !dependent) {
-            if (getCampaignOptions().getUseTimeInService()) {
-                p.setRecruitment(getLocalDate());
-            }
-            if (getCampaignOptions().getUseTimeInRank()) {
-                p.setLastRankChangeDate(getLocalDate());
-            }
-        }
+        p.setPrisonerStatus(prisonerStatus, log);
 
         MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
@@ -1648,9 +1636,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Person getPerson(UUID id) {
-        if (id == null) {
-            return null;
-        }
         return personnel.get(id);
     }
 
@@ -1712,7 +1697,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
         DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
-        generator.setNameGenerator(rng);
+        generator.setNameGenerator(RandomNameGenerator.getInstance());
         generator.setSkillPreferences(getRandomSkillPreferences());
         return generator;
     }
@@ -2723,9 +2708,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return true if your target roll succeeded.
      */
     public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, PlanetarySystem system) {
-        if (person.getAcquisitions() >= getCampaignOptions().getMaxAcquisitions()) {
-            return false;
-        }
+
         DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
         TargetRoll target = getTargetForAcquisition(acquisition, person, false);
         target = system.getPrimaryPlanet().getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
@@ -3068,7 +3051,13 @@ public class Campaign implements Serializable, ITechManager {
         return repairable;
     }
 
-    public void fixPart(IPartWork partWork, Person tech) {
+    /**
+     * Attempt to fix a part, which may have all kinds of effect depending on part type.
+     * @param partWork - the {@link IPartWork} to be fixed
+     * @param tech - the {@link Person} who will attempt to fix the part
+     * @return a <code>String</code> of the report that summarizes the outcome of the attempt to fix the part
+     */
+    public String fixPart(IPartWork partWork, Person tech) {
         TargetRoll target = getTargetFor(partWork, tech);
         String report = "";
         String action = " fix ";
@@ -3094,21 +3083,21 @@ public class Campaign implements Serializable, ITechManager {
             if (!((Armor) partWork).isInSupply()) {
                 report += "<b>Not enough armor remaining.  Task suspended.</b>";
                 addReport(report);
-                return;
+                return report;
             }
         }
         if ((partWork instanceof ProtomekArmor) && !partWork.isSalvaging()) {
             if (!((ProtomekArmor) partWork).isInSupply()) {
                 report += "<b>Not enough Protomech armor remaining.  Task suspended.</b>";
                 addReport(report);
-                return;
+                return report;
             }
         }
         if ((partWork instanceof BaArmor) && !partWork.isSalvaging()) {
             if (!((BaArmor) partWork).isInSupply()) {
                 report += "<b>Not enough BA armor remaining.  Task suspended.</b>";
                 addReport(report);
-                return;
+                return report;
             }
         }
         if (partWork instanceof SpacecraftCoolingSystem) {
@@ -3175,7 +3164,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
-                return;
+                return report;
             }
         } else {
             tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
@@ -3279,6 +3268,7 @@ public class Campaign implements Serializable, ITechManager {
         partWork.cancelReservation();
         MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(report);
+        return report;
     }
 
     /**
@@ -3344,6 +3334,7 @@ public class Campaign implements Serializable, ITechManager {
              * system for transport or splitting the unit, etc.
              */
             if (!getLocation().isOnPlanet() &&
+                    !getLocation().getJumpPath().isEmpty() &&
                     getLocation().getJumpPath().getLastSystem().getId().equals(m.getSystemId())) {
                 /*
                  * transitTime is measured in days; round up to the next whole day, then convert
@@ -3510,7 +3501,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (getCampaignOptions().canAtBAddDependents()) {
                     for (int i = 0; i < change; i++) {
                         Person p = newDependent(Person.T_ASTECH, false);
-                        recruitPerson(p, false, true, false, true);
+                        recruitPerson(p);
                     }
                 }
             }
@@ -3542,32 +3533,14 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void processNewDayPersonnel() {
-        List<Person> babies = new ArrayList<>();
-        for (Person p : getPersonnel()) {
-            if (!p.isActive()) {
-                continue;
-            }
-
+        // This MUST use getActivePersonnel as we only want to process active personnel, and
+        // furthermore this allows us to add and remove personnel without issue
+        for (Person p : getActivePersonnel()) {
             // Random Death
 
             // Random Marriages
             if (getCampaignOptions().useRandomMarriages()) {
-                p.randomMarriage();
-            }
-
-            // Procreation
-            if (p.isFemale()) {
-                if (p.isPregnant()) {
-                    if (getCampaignOptions().useUnofficialProcreation()) {
-                        if (getLocalDate().compareTo((p.getDueDate())) == 0) {
-                            babies.addAll(p.birth());
-                        }
-                    } else {
-                        p.removePregnancy();
-                    }
-                } else if (getCampaignOptions().useUnofficialProcreation()) {
-                    p.procreate();
-                }
+                p.randomMarriage(this);
             }
 
             p.resetMinutesLeft();
@@ -3597,6 +3570,8 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
 
+            // TODO : Reset this based on hasSupportRole(false) instead of checking for each type
+            // TODO : p.isEngineer will need to stay, however
             // Reset edge points to the purchased value each week. This should only
             // apply for support personnel - combat troops reset with each new mm game
             if ((p.isAdmin() || p.isDoctor() || p.isEngineer() || p.isTech())
@@ -3605,7 +3580,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             if ((getCampaignOptions().getIdleXP() > 0) && (calendar.get(Calendar.DAY_OF_MONTH) == 1)
-                    && p.isActive() && !p.isPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
+                    && p.isActive() && !p.getPrisonerStatus().isPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
                 p.setIdleMonths(p.getIdleMonths() + 1);
                 if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
@@ -3616,10 +3591,21 @@ public class Campaign implements Serializable, ITechManager {
                     p.setIdleMonths(0);
                 }
             }
-        }
 
-        for (Person baby : babies) {
-            recruitPerson(baby, false, true, false, false);
+            // Procreation
+            if (p.getGender().isFemale()) {
+                if (p.isPregnant()) {
+                    if (getCampaignOptions().useUnofficialProcreation()) {
+                        if (getLocalDate().compareTo((p.getDueDate())) == 0) {
+                            p.birth(this);
+                        }
+                    } else {
+                        p.removePregnancy();
+                    }
+                } else if (getCampaignOptions().useUnofficialProcreation()) {
+                    p.procreate();
+                }
+            }
         }
     }
 
@@ -3730,7 +3716,7 @@ public class Campaign implements Serializable, ITechManager {
         // Autosave based on the previous day's information
         this.autosaveService.requestDayAdvanceAutosave(this);
 
-        // Advance the day by one - TODO : Swap me to LocalDate tracking instead
+        // Advance the day by one - TODO : LocalDate : Swap me to LocalDate tracking instead
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentDateTime = new DateTime(calendar);
 
@@ -3787,15 +3773,15 @@ public class Campaign implements Serializable, ITechManager {
      */
     public List<Contract> getActiveContracts() {
         List<Contract> active = new ArrayList<>();
-        for (Mission m : getMissions()) {
-            if (!(m instanceof Contract)) {
+        for (Mission mission : getMissions()) {
+            if (!(mission instanceof Contract)) {
                 continue;
             }
-            Contract c = (Contract) m;
-            if (c.isActive()
-                    && !getCalendar().getTime().after(c.getEndingDate())
-                    && !getCalendar().getTime().before(c.getStartDate())) {
-                active.add(c);
+            Contract contract = (Contract) mission;
+            if (contract.isActive()
+                    && !getCalendar().getTime().after(contract.getEndingDate())
+                    && !getCalendar().getTime().before(contract.getStartDate())) {
+                active.add(contract);
             }
         }
         return active;
@@ -4065,7 +4051,7 @@ public class Campaign implements Serializable, ITechManager {
             mission.removeScenario(scenario.getId());
         }
         scenarios.remove(id);
-        MekHQ.triggerEvent(new ScenarioChangedEvent(scenario));
+        MekHQ.triggerEvent(new ScenarioRemovedEvent(scenario));
     }
 
     public void removeMission(int id) {
@@ -4081,6 +4067,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         missions.remove(id);
+        MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
     public void removePart(Part part) {
@@ -4188,11 +4175,17 @@ public class Campaign implements Serializable, ITechManager {
 
     public Force getForceFor(Person p) {
         Unit u = getUnit(p.getUnitId());
-        if (null == u) {
-            return null;
-        } else {
+        if (u != null) {
             return getForceFor(u);
+        } else if (p.isTech()) {
+            for (Force force : forceIds.values()) {
+                if (p.getId().equals(force.getTechID())) {
+                    return force;
+                }
+            }
         }
+
+        return null;
     }
 
     public String getDateAsString() {
@@ -4430,6 +4423,23 @@ public class Campaign implements Serializable, ITechManager {
     public void setColorIndex(int index) {
         colorIndex = index;
     }
+
+    public String getIconCategory() {
+        return iconCategory;
+    }
+
+    public void setIconCategory(String s) {
+        this.iconCategory = s;
+    }
+
+    public String getIconFileName() {
+        return iconFileName;
+    }
+
+    public void setIconFileName(String s) {
+        this.iconFileName = s;
+    }
+
 
     public ArrayList<Part> getSpareParts() {
         ArrayList<Part> spares = new ArrayList<>();
@@ -4675,13 +4685,11 @@ public class Campaign implements Serializable, ITechManager {
         ranks.writeToXml(pw1, 3);
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen",
-                rng.getChosenFaction());
+                RandomNameGenerator.getInstance().getChosenFaction());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale",
-                rng.getPercentFemale());
+                RandomGenderGenerator.getPercentFemale());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "gmMode", gmMode);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "showOverview", app.getCampaigngui()
-                .hasTab(GuiTabType.OVERVIEW));
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPool", astechPool);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPoolMinutes",
                 astechPoolMinutes);
@@ -4690,6 +4698,8 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "medicPool", medicPool);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoCategory", camoCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoFileName", camoFileName);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "iconCategory", iconCategory);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPartId", lastPartId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastForceId", lastForceId);
@@ -4702,10 +4712,10 @@ public class Campaign implements Serializable, ITechManager {
         {
             pw1.println("\t\t<nameGen>");
             pw1.print("\t\t\t<faction>");
-            pw1.print(MekHqXmlUtil.escape(rng.getChosenFaction()));
+            pw1.print(MekHqXmlUtil.escape(RandomNameGenerator.getInstance().getChosenFaction()));
             pw1.println("</faction>");
             pw1.print("\t\t\t<percentFemale>");
-            pw1.print(rng.getPercentFemale());
+            pw1.print(RandomGenderGenerator.getPercentFemale());
             pw1.println("</percentFemale>");
             pw1.println("\t\t</nameGen>");
         }
@@ -6024,48 +6034,6 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
     }
 
-    public void changePrisonerStatus(Person p, int status) {
-        switch (status) {
-            case Person.PRISONER_NOT:
-                p.setFreeMan();
-                if (p.getRankNumeric() < 0) {
-                    changeRank(p, 0, false);
-                }
-                ServiceLogger.freed(p, getDate());
-                if (getCampaignOptions().getUseTimeInService()) {
-                    p.setRecruitment(getLocalDate());
-                }
-                break;
-            case Person.PRISONER_YES:
-                if (p.getRankNumeric() != Ranks.RANK_PRISONER) {
-                    changeRank(p, Ranks.RANK_PRISONER, true); // They don't get to have a rank. Their
-                    // rank is Prisoner or Bondsman.
-                }
-                p.setPrisoner();
-                ServiceLogger.madePrisoner(p, getDate());
-                p.setRecruitment(null); //more efficient to just set it to null instead of checking if the setting is enabled
-                break;
-            case Person.PRISONER_BONDSMAN:
-                if (p.getRankNumeric() != Ranks.RANK_BONDSMAN) {
-                    changeRank(p, Ranks.RANK_BONDSMAN, true); // They don't get to have a rank. Their
-                    // rank is Prisoner or Bondsman.
-                }
-                p.setBondsman();
-                ServiceLogger.madeBondsman(p, getDate());
-                p.setRecruitment(null); //more efficient to just set it to null instead of checking if the setting is enabled
-                break;
-            default:
-                break;
-        }
-        if (p.isBondsman() || p.isPrisoner()) {
-            Unit u = getUnit(p.getUnitId());
-            if (u != null) {
-                u.remove(p, true);
-            }
-        }
-        MekHQ.triggerEvent(new PersonChangedEvent(p));
-    }
-
     public void changeStatus(Person person, PersonnelStatus status) {
         Unit u = getUnit(person.getUnitId());
         if (status == PersonnelStatus.KIA) {
@@ -6074,8 +6042,9 @@ public class Campaign implements Serializable, ITechManager {
             person.setDateOfDeath(getLocalDate());
             // Don't forget to tell the spouse
             if (person.hasSpouse()) {
-                person.divorce(getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
-                        ? Person.OPT_KEEP_SURNAME : Person.OPT_SPOUSE_CHANGE_SURNAME);
+                Divorce divorceType = getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
+                        ? Divorce.ORIGIN_CHANGE_SURNAME : Divorce.SPOUSE_CHANGE_SURNAME;
+                divorceType.divorce(person, this);
             }
         } else if (person.getStatus() == PersonnelStatus.KIA) {
             // remove date of death for resurrection
@@ -6126,7 +6095,7 @@ public class Campaign implements Serializable, ITechManager {
         person.setRankLevel(rankLevel);
 
         if (getCampaignOptions().getUseTimeInRank()) {
-            if (person.isFree() && !person.isDependent()) {
+            if (person.getPrisonerStatus().isFree() && !person.isDependent()) {
                 person.setLastRankChangeDate(getLocalDate());
             } else {
                 person.setLastRankChangeDate(null);
@@ -6370,7 +6339,7 @@ public class Campaign implements Serializable, ITechManager {
             unit.setNavigator(p);
         }
         if (unit.canTakeTechOfficer()) {
-            Person p = null;
+            Person p;
             //For vehicle command console we will default to gunner
             if (unit.getEntity() instanceof Tank) {
                 p = newPerson(Person.T_VEE_GUNNER);
@@ -6435,8 +6404,8 @@ public class Campaign implements Serializable, ITechManager {
         p.addLogEntry(entry);
     }
 
-    private ArrayList<String> getPossibleRandomPortraits (DirectoryItems portraits, ArrayList<String> existingPortraits, String subDir ) {
-        ArrayList<String> possiblePortraits = new ArrayList<>();
+    private List<String> getPossibleRandomPortraits (DirectoryItems portraits, List<String> existingPortraits, String subDir ) {
+        List<String> possiblePortraits = new ArrayList<>();
         Iterator<String> categories = portraits.getCategoryNames();
         while (categories.hasNext()) {
             String category = categories.next();
@@ -6458,7 +6427,7 @@ public class Campaign implements Serializable, ITechManager {
     public void assignRandomPortraitFor(Person p) {
         // first create a list of existing portrait strings, so we can check for
         // duplicates
-        ArrayList<String> existingPortraits = new ArrayList<>();
+        List<String> existingPortraits = new ArrayList<>();
         for (Person existingPerson : this.getPersonnel()) {
             existingPortraits.add(existingPerson.getPortraitCategory() + ":"
                     + existingPerson.getPortraitFileName());
@@ -6474,18 +6443,18 @@ public class Campaign implements Serializable, ITechManager {
             MekHQ.getLogger().error(getClass(), "assignRandomPortraitFor", e);
             return;
         }
-        ArrayList<String> possiblePortraits;
+        List<String> possiblePortraits;
 
         // Will search for portraits in the /gender/primaryrole folder first,
         // and if none are found then /gender/rolegroup, then /gender/combat or
         // /gender/support, then in /gender.
         String searchCat_Gender = "";
-        if (p.getGender() == Crew.G_FEMALE) {
+        if (p.getGender().isFemale()) {
             searchCat_Gender += "Female/";
         } else {
             searchCat_Gender += "Male/";
         }
-        String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
+        String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), true) + "/";
         String searchCat_RoleGroup = "";
         String searchCat_CombatSupport = "";
         if (p.getPrimaryRole() == Person.T_ADMIN_COM
@@ -7901,7 +7870,7 @@ public class Campaign implements Serializable, ITechManager {
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (p.hasPrimaryCombatRole() && p.isFree() && p.isActive()) {
+            if (p.hasPrimaryCombatRole() && p.getPrisonerStatus().isFree() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
                 if (getCampaignOptions().useAdvancedMedical() && p.getInjuries().size() > 0) {
@@ -7964,19 +7933,19 @@ public class Campaign implements Serializable, ITechManager {
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (p.hasPrimarySupportRole(false) && p.isFree() && p.isActive()) {
+            if (p.hasPrimarySupportRole(false) && p.getPrisonerStatus().isFree() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary());
-            } else if (p.isPrisoner() && p.isActive()) {
+            } else if (p.getPrisonerStatus().isPrisoner() && p.isActive()) {
                 prisoners++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
-            } else if (p.isBondsman() && p.isActive()) {
+            } else if (p.getPrisonerStatus().isBondsman() && p.isActive()) {
                 bondsmen++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
@@ -8267,7 +8236,7 @@ public class Campaign implements Serializable, ITechManager {
                     break;
                 }
             }
-            if (!p.isDependent() && p.isFree()) {
+            if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {
@@ -8293,7 +8262,7 @@ public class Campaign implements Serializable, ITechManager {
                     join = e.getDate();
                 }
             }
-            if (!p.isDependent() && p.isFree()) {
+            if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {

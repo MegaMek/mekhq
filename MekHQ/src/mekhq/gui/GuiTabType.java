@@ -33,17 +33,17 @@ import megamek.common.util.EncodeControl;
  */
 public enum GuiTabType {
     //region Enum Declaration
-    TOE(0,  "panOrganization.TabConstraints.tabTitle", KeyEvent.VK_T),
-    BRIEFING(1, "panBriefing.TabConstraints.tabTitle", KeyEvent.VK_B),
-    MAP(2, "panMap.TabConstraints.tabTitle", KeyEvent.VK_S),
-    PERSONNEL(3, "panPersonnel.TabConstraints.tabTitle", KeyEvent.VK_P),
-    HANGAR(4, "panHangar.TabConstraints.tabTitle", KeyEvent.VK_H),
-    WAREHOUSE(5, "panSupplies.TabConstraints.tabTitle", KeyEvent.VK_W),
-    REPAIR(6, "panRepairBay.TabConstraints.tabTitle", KeyEvent.VK_R),
-    INFIRMARY(7, "panInfirmary.TabConstraints.tabTitle", KeyEvent.VK_I),
-    MEKLAB(8, "panMekLab.TabConstraints.tabTitle", KeyEvent.VK_L),
-    FINANCES(9, "panFinances.TabConstraints.tabTitle", KeyEvent.VK_N),
-    OVERVIEW(10, "panOverview.TabConstraints.tabTitle", KeyEvent.VK_O),
+    COMMAND(0, "panCommand.TabConstraints.tabTitle", KeyEvent.VK_O),
+    TOE(1, "panOrganization.TabConstraints.tabTitle", KeyEvent.VK_T),
+    BRIEFING(2, "panBriefing.TabConstraints.tabTitle", KeyEvent.VK_B),
+    MAP(3, "panMap.TabConstraints.tabTitle", KeyEvent.VK_S),
+    PERSONNEL(4, "panPersonnel.TabConstraints.tabTitle", KeyEvent.VK_P),
+    HANGAR(5, "panHangar.TabConstraints.tabTitle", KeyEvent.VK_H),
+    WAREHOUSE(6, "panSupplies.TabConstraints.tabTitle", KeyEvent.VK_W),
+    REPAIR(7, "panRepairBay.TabConstraints.tabTitle", KeyEvent.VK_R),
+    INFIRMARY(8, "panInfirmary.TabConstraints.tabTitle", KeyEvent.VK_I),
+    MEKLAB(9, "panMekLab.TabConstraints.tabTitle", KeyEvent.VK_L),
+    FINANCES(10, "panFinances.TabConstraints.tabTitle", KeyEvent.VK_N),
     CUSTOM(11, "panCustom.TabConstraints.tabTitle", KeyEvent.VK_UNDEFINED);
     //endregion Enum Declaration
 
@@ -78,6 +78,8 @@ public enum GuiTabType {
 
     public CampaignGuiTab createTab(CampaignGUI gui) {
         switch (this) {
+            case COMMAND:
+                return new CommandCenterTab(gui, name);
             case TOE:
                 return new TOETab(gui, name);
             case BRIEFING:
@@ -98,8 +100,6 @@ public enum GuiTabType {
                 return new MekLabTab(gui, name);
             case FINANCES:
                 return new FinancesTab(gui, name);
-            case OVERVIEW:
-                return new OverviewTab(gui, name);
             default:
                 return null;
         }

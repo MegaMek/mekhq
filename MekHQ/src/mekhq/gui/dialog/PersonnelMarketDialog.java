@@ -53,6 +53,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
@@ -356,7 +357,7 @@ public class PersonnelMarketDialog extends JDialog {
 			Entity en = personnelMarket.getAttachedEntity(selectedPerson);
 			UUID pid = selectedPerson.getId();
 
-            if (campaign.recruitPerson(selectedPerson, false, false, true, true)) {
+            if (campaign.recruitPerson(selectedPerson, true)) {
                 addUnit(en, false);
                 personnelMarket.removePerson(selectedPerson);
                 personnelModel.setData(personnelMarket.getPersonnel());
