@@ -829,8 +829,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 final String fileName = pcd.getFileName();
 
                 for (Person person : people) {
-                    if (!person.getPortraitCategory().equals(category)
-                            && !person.getPortraitFileName().equals(fileName)) {
+                    if (!(person.getPortraitCategory().equals(category)
+                            && person.getPortraitFileName().equals(fileName))) {
                         person.setPortraitCategory(category);
                         person.setPortraitFileName(fileName);
                         gui.getCampaign().personUpdated(person);
