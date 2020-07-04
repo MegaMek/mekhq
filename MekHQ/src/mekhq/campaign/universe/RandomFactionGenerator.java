@@ -247,6 +247,8 @@ public class RandomFactionGenerator {
      */
     public String getEnemy(Faction employer, boolean useRebels) {
         final String METHOD_NAME = "getEnemy(Faction,boolean)"; //$NON-NLS-1$
+        
+        String employerName = employer != null ? employer.getShortName() : "no employer supplied or faction does not exist";
 
         /* Rebels occur on a 1-4 (d20) on nearly every enemy chart */
         if (useRebels && (Compute.randomInt(5) == 0)) {
@@ -258,15 +260,18 @@ public class RandomFactionGenerator {
             employer = factionHints.getContainedFactionHost(employer, getCurrentDate());
         }
         if (null != employer) {
+            employerName = employer.getShortName();
             WeightedMap<Faction> enemyMap = buildEnemyMap(employer);
             enemy = enemyMap.randomItem();
         }
         if (null != enemy) {
             return enemy.getShortName();
         }
-        // Fallback; there are always pirates.
+        
         MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                "Could not find enemy for " + employer.getShortName()); //$NON-NLS-1$
+                "Could not find enemy for " + employerName); //$NON-NLS-1$
+        
+        // Fallback; there are always pirates.
         return "PIR";
     }
 

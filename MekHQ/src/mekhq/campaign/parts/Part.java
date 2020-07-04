@@ -184,6 +184,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     //this tracks whether the part is reserved for a refit
     protected UUID refitId;
     protected UUID reserveId;
+    //temporarily mark the part used by current refit planning
+    protected transient boolean usedForRefitPlanning;
 
     //for delivery
     protected int daysToArrival;
@@ -235,6 +237,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         this.workingOvertime = false;
         this.shorthandedMod = 0;
         this.refitId = null;
+        this.usedForRefitPlanning = false;
         this.daysToArrival = 0;
         this.campaign = c;
         this.brandNew = true;
@@ -1231,6 +1234,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public boolean isReservedForReplacement() {
         return reserveId != null;
+    }
+
+    public boolean isUsedForRefitPlanning() {
+        return usedForRefitPlanning;
+    }
+
+    public void setUsedForRefitPlanning(boolean flag) {
+        usedForRefitPlanning = flag;
     }
 
     public void setDaysToArrival(int days) {

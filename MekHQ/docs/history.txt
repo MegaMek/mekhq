@@ -1,6 +1,16 @@
 VERSION HISTORY:
 ----------------
-0.47.7-SNAPSHOT
+0.47.8-SNAPSHOT
++ PR #1825: Adding Advance to Next Monday to the AdvanceDaysDialog
++ Issue #1828: Rolling over to the next month when using AtB and your current faction goes extinct will no longer cause an error
++ Issue #1827: Adding documentation comment for required Excel version for Awards Tracker
++ Issue #1819: Fixing Time in Rank without Time in Service
++ Issue #1821: Can now reach all directories for images
++ PR #1830: Picking techs for refit now orders the techs by type then skill level, so you don't have to strain your eyes looking for that one aero tech
++ Issue #1822: Making the default Force Icon into a transparent background
++ Issue #1816: Fixing Portrait Changing in the Same Category
+
+0.47.7 (2020-06-22 2330 UTC)
 + PR #1811: Fix advance multiple days reports not showing
 + PR #1810: use grid layout for repair tab main panels
 + PR #1802: Updates to special abilities in all presets
@@ -35,6 +45,7 @@ VERSION HISTORY:
 + Issue #1766: Adding an option for attached units to use the faction camo
 + Issue #1781: Adding Sorting to the Scenario Table
 + Issue #1738: Scenario Resolution Wizard: Add View Personnel button to Pilot Status
++ Issue #1718: Refit configuration change does not look for multiple qualities in warehouse
 
 0.47.6 (2020-5-03 1715 UTC)
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
