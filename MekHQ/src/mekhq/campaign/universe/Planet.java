@@ -161,10 +161,9 @@ public class Planet implements Serializable {
      * <p>
      * sorted map of [date of change: change information]
      * <p>
-     * Package-private so that Planets can access it
      */
     @XmlTransient
-    TreeMap<LocalDate, PlanetaryEvent> events;
+    private transient TreeMap<LocalDate, PlanetaryEvent> events;
 
     /**
      * This is a cache of the current event data based
@@ -258,11 +257,9 @@ public class Planet implements Serializable {
                 if ((null == Faction.getFaction(altName)) && (null == Systems.getInstance().getSystemById(primaryName))) {
                     primaryName = nameString.substring(0, parenIndex - 1);
 
-                    PlanetaryEvent nameChangeEvent = new PlanetaryEvent();
-                    nameChangeEvent.date = nameChangeYearDate;
+                    PlanetaryEvent nameChangeEvent = getOrCreateEvent(nameChangeYearDate);
                     nameChangeEvent.name = altName;
 
-                    events.put(nameChangeYearDate, nameChangeEvent);
                     eventList.add(nameChangeEvent);
                 }
             }
@@ -304,10 +301,7 @@ public class Planet implements Serializable {
                     pe.faction = new ArrayList<>();
                     pe.faction.add(newFaction);
 
-                    if (!events.containsKey(eventDate)) {
-                        pe.date = eventDate;
-
-                        events.put(eventDate, pe);
+                    if (!eventList.contains(pe)) {
                         eventList.add(pe);
                     }
                 }
