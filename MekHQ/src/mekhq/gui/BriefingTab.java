@@ -78,7 +78,6 @@ import mekhq.gui.dialog.NewAtBContractDialog;
 import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.sorter.ScenarioStatusComparator;
