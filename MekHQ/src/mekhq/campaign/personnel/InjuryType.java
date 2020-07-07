@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 MegaMek team
+ * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
@@ -26,7 +26,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.campaign.personnel.enums.InjuryLevel;
-import org.joda.time.DateTime;
 
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -123,6 +122,7 @@ public class InjuryType {
     protected Set<BodyLocation> allowedLocations = null;
 
     protected InjuryType() {
+
     }
 
     public final int getId() {
@@ -134,7 +134,7 @@ public class InjuryType {
     }
 
     public boolean isValidInLocation(BodyLocation loc) {
-        if(null == allowedLocations) {
+        if (null == allowedLocations) {
             allowedLocations = EnumSet.allOf(BodyLocation.class);
         }
         return allowedLocations.contains(loc);
@@ -200,7 +200,7 @@ public class InjuryType {
         }
         final int recoveryTime = getRecoveryTime(severity);
         final String fluff = getFluffText(loc, severity, p.getGender());
-        Injury result = new Injury(recoveryTime, fluff, loc, this, severity, new DateTime(c.getCalendar()), false);
+        Injury result = new Injury(recoveryTime, fluff, loc, this, severity, c.getLocalDate(), false);
         result.setVersion(Injury.VERSION);
         return result;
     }

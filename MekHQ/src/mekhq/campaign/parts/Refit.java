@@ -495,6 +495,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         int atype = 0;
         boolean aclan = false;
         HashMap<Integer,Integer> partQuantity = new HashMap<>();
+        List<Part> plannedReplacementParts = new ArrayList<>();
         for(Part nPart : newPartList) {
             //TODO: I don't think we need this here anymore
             nPart.setUnit(oldUnit);
@@ -518,6 +519,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     newUnitParts.add(replacement.getId());
                     //adjust quantity
                     partQuantity.put(replacement.getId(), partQuantity.get(replacement.getId())-1);
+                    //If the quantity is now 0 set usedForRefitPlanning flag so findReplacement ignores this item
+                    if (partQuantity.get(replacement.getId()) == 0) {
+                        replacement.setUsedForRefitPlanning(true);
+                        plannedReplacementParts.add(replacement);
+                    }
                 } else {
                     replacement = ((MissingPart)nPart).getNewPart();
                     //set entity for variable cost items
@@ -559,6 +565,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                         newUnitParts.add(replacement.getId());
                         //adjust quantity
                         partQuantity.put(replacement.getId(), partQuantity.get(replacement.getId())-1);
+                        //If the quantity is now 0 set usedForRefitPlanning flag so findReplacement ignores this item
+                        if (partQuantity.get(replacement.getId()) == 0) {
+                            replacement.setUsedForRefitPlanning(true);
+                            plannedReplacementParts.add(replacement);
+                        }
                     } else {
                         shoppingList.add(nPart);
                     }
@@ -622,20 +633,23 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     nPart.setUnit(newUnit);
                     int loc;
                     EquipmentType type;
+                    double size;
                     if(nPart instanceof MissingEquipmentPart) {
                         loc = nPart.getLocation();
                         if(loc > -1 && loc < newEntity.locations()) {
                             locationHasNewStuff[loc] = true;
                         }
-                        type = ((MissingEquipmentPart)nPart).getType();
+                        type = ((MissingEquipmentPart) nPart).getType();
+                        size = ((MissingEquipmentPart) nPart).getSize();
                     } else {
                         loc = nPart.getLocation();
                         if(loc > -1 && loc < newEntity.locations()) {
                             locationHasNewStuff[loc] = true;
                         }
-                        type = ((AmmoBin)nPart).getType();
+                        type = ((AmmoBin) nPart).getType();
+                        size = ((AmmoBin) nPart).getSize();
                     }
-                    int crits = type.getCriticals(newUnit.getEntity());
+                    int crits = type.getCriticals(newUnit.getEntity(), size);
                     nPart.setUnit(oldUnit);
                     int i = -1;
                     boolean matchFound = false;
@@ -650,11 +664,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                         if (oPart instanceof MissingEquipmentPart) {
                             oLoc = oPart.getLocation();
                             oType = ((MissingEquipmentPart) oPart).getType();
-                            oCrits = oType.getCriticals(oldUnit.getEntity());
+                            oCrits = oType.getCriticals(oldUnit.getEntity(),
+                                    ((MissingEquipmentPart) oPart).getSize());
                         } else if (oPart instanceof EquipmentPart) {
                             oLoc = oPart.getLocation();
                             oType = ((EquipmentPart) oPart).getType();
-                            oCrits = oType.getCriticals(oldUnit.getEntity());
+                            oCrits = oType.getCriticals(oldUnit.getEntity(),
+                                ((EquipmentPart) oPart).getSize());
                         }
                         if (loc != oLoc) {
                             continue;
@@ -689,6 +705,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     }
                 }
             }
+        }
+        //clear any planned replacement flags
+        for (Part rPart : plannedReplacementParts) {
+            rPart.setUsedForRefitPlanning(false);
         }
 
         //if oldUnitParts is not empty we are removing some stuff and so this should
@@ -1599,6 +1619,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         }
         if(customJob) {
             mods.addModifier(2, "custom job");
+        }
+        if ((null != tech) && tech.getOptions().booleanOption("tech_engineer")) {
+            mods.addModifier(-2, "engineer");
         }
         return mods;
     }

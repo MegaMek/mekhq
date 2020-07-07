@@ -1,6 +1,25 @@
+/*
+ * Copyright (C) 2013-2020 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.universe;
 
 import java.io.FileInputStream;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +31,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 
-import org.joda.time.DateTime;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -27,7 +45,6 @@ import mekhq.MekHqXmlUtil;
  * worth of news items at the start of every year, to cut down on memory usage. If this
  * slows things down too much on year turn over we can reconsider
  * @author Jay Lawson
- *
  */
 public class News {
     private final static Object LOADING_LOCK = new Object[0];
@@ -44,13 +61,13 @@ public class News {
             unmarshaller = context.createUnmarshaller();
             // For debugging only!
             unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
-        } catch(JAXBException e) {
+        } catch (JAXBException e) {
             MekHQ.getLogger().error(News.class, "<init>", e);
         }
     }
 
     //we need two hashes - one to access by date and the other by an id
-    private Map<DateTime, List<NewsItem>> archive;
+    private Map<LocalDate, List<NewsItem>> archive;
     private Map<Integer, NewsItem> news;
 
     public News(int year, long seed) {
@@ -58,14 +75,14 @@ public class News {
     }
 
     public NewsItem getNewsItem(int id) {
-        synchronized(LOADING_LOCK) {
+        synchronized (LOADING_LOCK) {
             return news.get(id);
         }
     }
 
-    public List<NewsItem> fetchNewsFor(DateTime d) {
-        synchronized(LOADING_LOCK) {
-            if(archive.containsKey(d)) {
+    public List<NewsItem> fetchNewsFor(LocalDate d) {
+        synchronized (LOADING_LOCK) {
+            if (archive.containsKey(d)) {
                 return archive.get(d);
             }
             return new ArrayList<>();
@@ -74,7 +91,7 @@ public class News {
 
     public void loadNewsFor(int year, long seed) {
         final String METHOD_NAME = "loadNewsFor(int,long)"; //$NON-NLS-1$
-        synchronized(LOADING_LOCK) {
+        synchronized (LOADING_LOCK) {
             archive = new HashMap<>();
             news = new HashMap<>();
             int id = 0;
@@ -84,7 +101,7 @@ public class News {
             // Initialize variables.
             Document xmlDoc;
 
-            try(FileInputStream fis = new FileInputStream("data/universe/news.xml")) {
+            try (FileInputStream fis = new FileInputStream("data/universe/news.xml")) {
                 // Using factory get an instance of document builder
                 DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
@@ -119,24 +136,24 @@ public class News {
                     String xn = wn.getNodeName();
 
                     if (xn.equalsIgnoreCase("newsItem")) {
-                        NewsItem newsItem = null;
+                        NewsItem newsItem;
                         try {
                             newsItem = (NewsItem) unmarshaller.unmarshal(wn);
-                        } catch(JAXBException e) {
+                        } catch (JAXBException e) {
                             MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                             continue;
                         }
-                        if(null == newsItem.getDate()) {
+                        if (null == newsItem.getDate()) {
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                     "The date is null for news Item " + newsItem.getHeadline()); //$NON-NLS-1$
                         }
-                        if(!newsItem.isInYear(year)) {
+                        if (!newsItem.isInYear(year)) {
                             continue;
                         }
                         List<NewsItem> items;
                         newsItem.finalizeDate();
-                        if(null == archive.get(newsItem.getDate())) {
-                            items = new ArrayList<NewsItem>();
+                        if (null == archive.get(newsItem.getDate())) {
+                            items = new ArrayList<>();
                             items.add(newsItem);
                             archive.put(newsItem.getDate(), items);
                         } else {

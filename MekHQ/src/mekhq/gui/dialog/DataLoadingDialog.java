@@ -21,7 +21,9 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
@@ -233,12 +235,14 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 }
             }
             setProgress(4);
-            if(newCampaign) {
+            if (newCampaign) {
                 // show the date chooser
                 DateChooser dc = new DateChooser(frame, campaign.getCalendar());
                 // user can either choose a date or cancel by closing
                 if (dc.showDateChooser() == DateChooser.OK_OPTION) {
                     campaign.setCalendar(dc.getDate());
+                    campaign.setLocalDate(LocalDate.ofYearDay(dc.getDate().get(Calendar.YEAR),
+                            dc.getDate().get(Calendar.DAY_OF_YEAR)));
                     // Ensure that the MegaMek year GameOption matches the campaign year
                     GameOptions gameOpts = campaign.getGameOptions();
                     int campaignYear = campaign.getGameYear();

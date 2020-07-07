@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gamePreset>
 	<title>Simple Presets</title>
-	<description>This set of presets attempts to provide the simplest rules settings possible for those who just want to get into the action. Acquisitions are automatic and maintenance is turned off. </description>
+	<description>This set of presets attempts to provide the simplest rules settings possible for those who just want to get into the action. Acquisitions are automatic and maintenance is turned off.</description>
 	<campaignOptions>
-		<clanPriceModifier>1.0</clanPriceModifier>
+		<displayDateFormat>yyyy-MM-dd</displayDateFormat>
+		<logMaintenance>false</logMaintenance>
 		<useFactionForNames>true</useFactionForNames>
 		<repairSystem>0</repairSystem>
 		<useUnitRating>true</useUnitRating>
-		<unitRatingMethod>Interstellar Ops</unitRatingMethod>
+		<unitRatingMethod>Campaign Ops</unitRatingMethod>
 		<useEraMods>false</useEraMods>
 		<assignedTechFirst>false</assignedTechFirst>
 		<resetToFirstTech>false</resetToFirstTech>
@@ -17,27 +18,17 @@
 		<useArtillery>false</useArtillery>
 		<useAbilities>false</useAbilities>
 		<useEdge>false</useEdge>
+		<useSupportEdge>false</useSupportEdge>
 		<useImplants>false</useImplants>
 		<altQualityAveraging>false</altQualityAveraging>
 		<useAdvancedMedical>false</useAdvancedMedical>
 		<useDylansRandomXp>false</useDylansRandomXp>
 		<useQuirks>false</useQuirks>
-		<payForParts>false</payForParts>
-		<payForUnits>false</payForUnits>
-		<payForSalaries>false</payForSalaries>
-		<payForOverhead>false</payForOverhead>
-		<payForMaintain>false</payForMaintain>
-		<payForTransport>false</payForTransport>
-		<usedPartsValueA>0.1</usedPartsValueA>
-		<usedPartsValueB>0.2</usedPartsValueB>
-		<usedPartsValueC>0.3</usedPartsValueC>
-		<usedPartsValueD>0.5</usedPartsValueD>
-		<usedPartsValueE>0.7</usedPartsValueE>
-		<usedPartsValueF>0.9</usedPartsValueF>
-		<damagedPartsValue>0.33</damagedPartsValue>
-		<canceledOrderReimbursement>0.5</canceledOrderReimbursement>
-		<sellUnits>false</sellUnits>
-		<sellParts>false</sellParts>
+		<showOriginFaction>true</showOriginFaction>
+		<randomizeOrigin>false</randomizeOrigin>
+		<randomizeDependentOrigin>false</randomizeDependentOrigin>
+		<originSearchRadius>45</originSearchRadius>
+		<isOriginExtraRandom>false</isOriginExtraRandom>
 		<scenarioXP>1</scenarioXP>
 		<killsForXP>0</killsForXP>
 		<killXPAward>0</killXPAward>
@@ -50,13 +41,17 @@
 		<monthsIdleXP>2</monthsIdleXP>
 		<contractNegotiationXP>0</contractNegotiationXP>
 		<adminWeeklyXP>0</adminWeeklyXP>
+		<adminXPPeriod>1</adminXPPeriod>
+		<edgeCost>10</edgeCost>
 		<limitByYear>true</limitByYear>
 		<disallowExtinctStuff>true</disallowExtinctStuff>
 		<allowClanPurchases>true</allowClanPurchases>
 		<allowISPurchases>true</allowISPurchases>
 		<allowCanonOnly>false</allowCanonOnly>
+		<allowCanonRefitOnly>false</allowCanonRefitOnly>
+		<variableTechLevel>false</variableTechLevel>
+		<factionIntroDate>false</factionIntroDate>
 		<useAmmoByType>false</useAmmoByType>
-		<usePercentageMaint>false</usePercentageMaint>
 		<waitingPeriod>7</waitingPeriod>
 		<acquisitionSkill>Automatic Success</acquisitionSkill>
 		<acquisitionSupportStaffOnly>false</acquisitionSupportStaffOnly>
@@ -68,30 +63,94 @@
 		<acquireMosUnit>2</acquireMosUnit>
 		<acquireMinimumTime>1</acquireMinimumTime>
 		<acquireMinimumTimeUnit>2</acquireMinimumTimeUnit>
+		<usePlanetaryAcquisition>false</usePlanetaryAcquisition>
+		<planetAcquisitionFactionLimit>1</planetAcquisitionFactionLimit>
+		<planetAcquisitionNoClanCrossover>true</planetAcquisitionNoClanCrossover>
+		<noClanPartsFromIS>true</noClanPartsFromIS>
+		<penaltyClanPartsFromIS>4</penaltyClanPartsFromIS>
+		<planetAcquisitionVerbose>false</planetAcquisitionVerbose>
+		<maxJumpsPlanetaryAcquisition>2</maxJumpsPlanetaryAcquisition>
 		<equipmentContractPercent>5.0</equipmentContractPercent>
+		<dropshipContractPercent>1.0</dropshipContractPercent>
+		<jumpshipContractPercent>0.0</jumpshipContractPercent>
+		<warshipContractPercent>0.0</warshipContractPercent>
 		<equipmentContractBase>false</equipmentContractBase>
 		<equipmentContractSaleValue>false</equipmentContractSaleValue>
 		<blcSaleValue>false</blcSaleValue>
 		<clanAcquisitionPenalty>0</clanAcquisitionPenalty>
 		<isAcquisitionPenalty>0</isAcquisitionPenalty>
-		<useLoanLimits>false</useLoanLimits>
-		<payForRecruitment>false</payForRecruitment>
 		<healWaitingPeriod>1</healWaitingPeriod>
 		<naturalHealingWaitingPeriod>15</naturalHealingWaitingPeriod>
 		<destroyByMargin>false</destroyByMargin>
 		<destroyMargin>4</destroyMargin>
+		<destroyPartTarget>10</destroyPartTarget>
+		<useAeroSystemHits>false</useAeroSystemHits>
 		<maintenanceCycleDays>7</maintenanceCycleDays>
 		<maintenanceBonus>-1</maintenanceBonus>
 		<useQualityMaintenance>true</useQualityMaintenance>
+		<reverseQualityNames>false</reverseQualityNames>
 		<useUnofficalMaintenance>false</useUnofficalMaintenance>
 		<checkMaintenance>false</checkMaintenance>
 		<useRandomHitsForVees>false</useRandomHitsForVees>
 		<minimumHitsForVees>1</minimumHitsForVees>
 		<maxAcquisitions>0</maxAcquisitions>
+		<minimumMarriageAge>16</minimumMarriageAge>
+		<checkMutualAncestorsDepth>4</checkMutualAncestorsDepth>
+		<logMarriageNameChange>false</logMarriageNameChange>
+		<useRandomMarriages>false</useRandomMarriages>
+		<chanceRandomMarriages>2.5E-4</chanceRandomMarriages>
+		<marriageAgeRange>10</marriageAgeRange>
+		<randomMarriageSurnameWeights>100,55,55,10,5,30,20,10,5,30,20,500,160</randomMarriageSurnameWeights>
+		<useRandomSameSexMarriages>false</useRandomSameSexMarriages>
+		<chanceRandomSameSexMarriages>2.0E-5</chanceRandomSameSexMarriages>
 		<useUnofficialProcreation>false</useUnofficialProcreation>
+		<chanceProcreation>5.0E-4</chanceProcreation>
 		<useUnofficialProcreationNoRelationship>false</useUnofficialProcreationNoRelationship>
+		<chanceProcreationNoRelationship>5.0E-5</chanceProcreationNoRelationship>
+		<displayTrueDueDate>false</displayTrueDueDate>
+		<logConception>false</logConception>
+		<babySurnameStyle>MOTHERS</babySurnameStyle>
+		<determineFatherAtBirth>false</determineFatherAtBirth>
+		<useParentage>false</useParentage>
+		<displayFamilyLevel>0</displayFamilyLevel>
+		<useRandomDeaths>true</useRandomDeaths>
+		<keepMarriedNameUponSpouseDeath>true</keepMarriedNameUponSpouseDeath>
+		<payForParts>false</payForParts>
+		<payForRepairs>false</payForRepairs>
+		<payForUnits>false</payForUnits>
+		<payForSalaries>false</payForSalaries>
+		<payForOverhead>false</payForOverhead>
+		<payForMaintain>false</payForMaintain>
+		<payForTransport>false</payForTransport>
+		<sellUnits>false</sellUnits>
+		<sellParts>false</sellParts>
+		<payForRecruitment>false</payForRecruitment>
+		<useLoanLimits>false</useLoanLimits>
+		<usePercentageMaint>false</usePercentageMaint>
+		<infantryDontCount>false</infantryDontCount>
+		<usePeacetimeCost>false</usePeacetimeCost>
+		<useExtendedPartsModifier>false</useExtendedPartsModifier>
+		<showPeacetimeCost>false</showPeacetimeCost>
+		<financialYearDuration>ANNUAL</financialYearDuration>
+		<newFinancialYearFinancesToCSVExport>false</newFinancialYearFinancesToCSVExport>
+		<clanPriceModifier>1.0</clanPriceModifier>
+		<usedPartsValueA>0.1</usedPartsValueA>
+		<usedPartsValueB>0.2</usedPartsValueB>
+		<usedPartsValueC>0.3</usedPartsValueC>
+		<usedPartsValueD>0.5</usedPartsValueD>
+		<usedPartsValueE>0.7</usedPartsValueE>
+		<usedPartsValueF>0.9</usedPartsValueF>
+		<damagedPartsValue>0.33</damagedPartsValue>
+		<canceledOrderReimbursement>0.5</canceledOrderReimbursement>
 		<useTransfers>true</useTransfers>
-		<personnelMarketType>3</personnelMarketType>
+		<useTimeInService>false</useTimeInService>
+		<timeInServiceDisplayFormat>YEARS</timeInServiceDisplayFormat>
+		<useTimeInRank>false</useTimeInRank>
+		<timeInRankDisplayFormat>MONTHS_YEARS</timeInRankDisplayFormat>
+		<trackTotalEarnings>false</trackTotalEarnings>
+		<capturePrisoners>true</capturePrisoners>
+		<defaultPrisonerStatus>PRISONER</defaultPrisonerStatus>
+		<personnelMarketName>Strat Ops</personnelMarketName>
 		<personnelMarketRandomEliteRemoval>10</personnelMarketRandomEliteRemoval>
 		<personnelMarketRandomVeteranRemoval>8</personnelMarketRandomVeteranRemoval>
 		<personnelMarketRandomRegularRemoval>6</personnelMarketRandomRegularRemoval>
@@ -125,18 +184,21 @@
 		<sharesForAll>false</sharesForAll>
 		<retirementRolls>true</retirementRolls>
 		<customRetirementMods>false</customRetirementMods>
+		<foundersNeverRetire>false</foundersNeverRetire>
+		<atbAddDependents>true</atbAddDependents>
+		<dependentsNeverLeave>false</dependentsNeverLeave>
 		<trackUnitFatigue>false</trackUnitFatigue>
 		<mercSizeLimited>false</mercSizeLimited>
 		<trackOriginalUnit>false</trackOriginalUnit>
 		<regionalMechVariations>false</regionalMechVariations>
 		<searchRadius>800</searchRadius>
 		<intensity>1.0</intensity>
+		<generateChases>true</generateChases>
 		<variableContractLength>false</variableContractLength>
 		<instantUnitMarketDelivery>false</instantUnitMarketDelivery>
 		<useWeatherConditions>true</useWeatherConditions>
 		<useLightConditions>true</useLightConditions>
 		<usePlanetaryConditions>false</usePlanetaryConditions>
-		<useAltMapgen>false</useAltMapgen>
 		<useLeadership>true</useLeadership>
 		<useStrategy>true</useStrategy>
 		<baseStrategyDeployment>3</baseStrategyDeployment>
@@ -149,11 +211,108 @@
 		<contractMarketReportRefresh>true</contractMarketReportRefresh>
 		<unitMarketReportRefresh>true</unitMarketReportRefresh>
 		<startGameDelay>500</startGameDelay>
-		<salaryTypeBase>0,1500,1500,900,900,900,900,960,750,960,900,1000,1000,1000,1000,800,800,800,800,400,1500,400,500,500,500,500</salaryTypeBase>
+		<assignPortraitOnRoleChange>false</assignPortraitOnRoleChange>
+		<allowOpforAeros>false</allowOpforAeros>
+		<allowOpforLocalUnits>false</allowOpforLocalUnits>
+		<opforAeroChance>5</opforAeroChance>
+		<opforLocalUnitChance>5</opforLocalUnitChance>
+		<historicalDailyLog>false</historicalDailyLog>
+		<massRepairUseExtraTime>true</massRepairUseExtraTime>
+		<massRepairUseRushJob>true</massRepairUseRushJob>
+		<massRepairAllowCarryover>true</massRepairAllowCarryover>
+		<massRepairOptimizeToCompleteToday>false</massRepairOptimizeToCompleteToday>
+		<massRepairScrapImpossible>false</massRepairScrapImpossible>
+		<massRepairUseAssignedTechsFirst>false</massRepairUseAssignedTechsFirst>
+		<massRepairReplacePod>true</massRepairReplacePod>
+		<massRepairOptions>
+			<massRepairOption0>
+				<type>0</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption0>
+			<massRepairOption1>
+				<type>1</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption1>
+			<massRepairOption2>
+				<type>2</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption2>
+			<massRepairOption3>
+				<type>3</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption3>
+			<massRepairOption4>
+				<type>4</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption4>
+			<massRepairOption5>
+				<type>5</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption5>
+			<massRepairOption6>
+				<type>6</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption6>
+			<massRepairOption7>
+				<type>7</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption7>
+			<massRepairOption8>
+				<type>8</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption8>
+			<massRepairOption9>
+				<type>12</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption9>
+		</massRepairOptions>
+		<planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>
+		<planetIndustryAcquisitionBonus>0,0,0,0,0,0</planetIndustryAcquisitionBonus>
+		<planetOutputAcquisitionBonus>-1,0,1,2,4,8</planetOutputAcquisitionBonus>
+		<salaryTypeBase>0 CSB,1500 CSB,1500 CSB,900 CSB,900 CSB,900 CSB,900 CSB,960 CSB,750 CSB,960 CSB,900 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB</salaryTypeBase>
 		<salaryXpMultiplier>0.6,0.6,1.0,1.6,3.2</salaryXpMultiplier>
-		<usePortraitForType>false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
+		<usePortraitForType>false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
 		<rats>Xotl,Total Warfare</rats>
-		<ratsNoEra>Xotl,Total Warfare</ratsNoEra>
 	</campaignOptions>
 	<skillTypes>
 		<skillType>
@@ -629,6 +788,24 @@ Note: This ability is only used for BattleMechs.</desc>
 			</skillPrereq>
 		</ability>
 		<ability>
+			<displayName>Tech Specialist, Armor (Unofficial)</displayName>
+			<lookupName>tech_armor_specialist</lookupName>
+			<desc>-1 to repair and maintenance checks when working with armor</desc>
+			<xpCost>4</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
+				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Mechanic::Regular</skill>
+				<skill>Tech/Mech::Regular</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
 			<displayName>Golden Goose (CamOps)</displayName>
 			<lookupName>golden_goose</lookupName>
 			<desc>Ground attacks are easier. Strike gives -1 BTH and Bombing is -2. Also decreases scatter distance by 2 hexes</desc>
@@ -718,6 +895,24 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 				<skill>Gunnery/Vehicle</skill>
 				<skill>Gunnery/Mech</skill>
 				<skill>Gunnery/Protomech</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Mr/Ms Fix-it (unofficial)</displayName>
+			<lookupName>tech_fixer</lookupName>
+			<desc>Ignore first point of penalty for repair and maintenance on low quality equipment</desc>
+			<xpCost>4</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Regular</skill>
+				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
+				<skill>Tech/Mechanic::Regular</skill>
+				<skill>Tech/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -846,6 +1041,24 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 			</skillPrereq>
 		</ability>
 		<ability>
+			<displayName>Tech Specialist, Internal (Unofficial)</displayName>
+			<lookupName>tech_internal_specialist</lookupName>
+			<desc>-1 to repair and maintenance checks when working with internal systems</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
+				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Mechanic::Regular</skill>
+				<skill>Tech/Mech::Regular</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
 			<displayName>Sensor Geek (Unofficial)</displayName>
 			<lookupName>sensor_geek</lookupName>
 			<desc>A pilot with this ability gets a -2 bonus on sensor checks.
@@ -957,6 +1170,20 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Piloting/Mech::Regular</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Zweihander (CamOps)</displayName>
+			<lookupName>zweihander</lookupName>
+			<desc>You can do more damage with two-handed physical attacks at the risk of damaging yourself.</desc>
+			<xpCost>10</xpCost>
+			<weight>6</weight>
+			<prereqAbilities>melee_specialist</prereqAbilities>
+			<invalidAbilities>melee_master</invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
 				<skill>Piloting/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -1109,6 +1336,24 @@ Note: This ability is only used for BattleMechs.</desc>
 			</skillPrereq>
 		</ability>
 		<ability>
+			<displayName>Engineer (unofficial)</displayName>
+			<lookupName>tech_engineer</lookupName>
+			<desc>-2 on refit rolls</desc>
+			<xpCost>8</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Veteran</skill>
+				<skill>Tech/BA::Veteran</skill>
+				<skill>Tech/Aero::Veteran</skill>
+				<skill>Tech/Mechanic::Veteran</skill>
+				<skill>Tech/Mech::Veteran</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
 			<displayName>Terrain Master [Swamp Beast] (CamOps)</displayName>
 			<lookupName>tm_swamp_beast</lookupName>
 			<desc>Movement in mud or swamp costs 1 less MP.
@@ -1179,10 +1424,28 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
+		<ability>
+			<displayName>Tech Specialist, Weapon (Unofficial)</displayName>
+			<lookupName>tech_weapon_specialist</lookupName>
+			<desc>-1 to repair and maintenance checks when working with weapons</desc>
+			<xpCost>4</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Tech/Vessel::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
+				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Mechanic::Regular</skill>
+				<skill>Tech/Mech::Regular</skill>
+			</skillPrereq>
+		</ability>
 	</specialAbilities>
 	<randomSkillPreferences>
 		<overallRecruitBonus>0</overallRecruitBonus>
-		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
+		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
 		<specialAbilBonus>-10,-10,-10,-10,-10</specialAbilBonus>
 		<tacticsMod>-10,-10,-10,-10,-10</tacticsMod>
 		<randomizeSkill>false</randomizeSkill>
