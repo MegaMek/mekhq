@@ -1,7 +1,20 @@
 /*
- * NewPilotDialog.java
+ * Copyright (C) 2013, 2020 - The MegaMek Team. All Rights Reserved.
  *
- * Created on July 16, 2009, 5:30 PM
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -21,10 +34,8 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.common.enums.Gender;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
-import megamek.common.AmmoType;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
-import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
@@ -48,13 +59,12 @@ import mekhq.gui.control.EditPersonnelLogControl;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.preferences.PreferencesNode;
-import org.joda.time.DateTime;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class CustomizePersonDialog extends javax.swing.JDialog implements DialogOptionListener {
+public class CustomizePersonDialog extends JDialog implements DialogOptionListener {
     private static final long serialVersionUID = -6265589976779860566L;
 
     private Person person;
@@ -379,7 +389,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
                                                    cellHasFocus);
                 if (value instanceof PlanetarySystem) {
                     PlanetarySystem system = (PlanetarySystem)value;
-                    setText(system.getName(campaign.getDateTime()));
+                    setText(system.getName(campaign.getLocalDate()));
                 }
 
                 return this;
@@ -439,7 +449,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
                                                    cellHasFocus);
                 if (value instanceof Planet) {
                     Planet planet = (Planet)value;
-                    setText(planet.getName(campaign.getDateTime()));
+                    setText(planet.getName(campaign.getLocalDate()));
                 }
 
                 return this;
@@ -800,7 +810,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<>();
         for (Faction faction : orderedFactions) {
             // Always include the person's faction
-            if (faction == person.getOriginFaction()) {
+            if (faction.equals(person.getOriginFaction())) {
                 factionsModel.addElement(faction);
             } else {
                 if (faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)) {
@@ -825,9 +835,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel() {
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
 
-        DateTime currentYear = new DateTime(campaign.getCalendar());
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
-            .sorted(Comparator.comparing(a -> a.getName(currentYear)))
+            .sorted(Comparator.comparing(a -> a.getName(campaign.getLocalDate())))
             .collect(Collectors.toList());
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
@@ -838,10 +847,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel(Faction faction) {
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
 
-        DateTime birthYear = new DateTime(Instant.from(person.getBirthday().atStartOfDay(ZoneId.systemDefault())));
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
-            .filter(a -> a.getFactionSet(birthYear).contains(faction))
-            .sorted(Comparator.comparing(a -> a.getName(birthYear)))
+            .filter(a -> a.getFactionSet(person.getBirthday()).contains(faction))
+            .sorted(Comparator.comparing(a -> a.getName(person.getBirthday())))
             .collect(Collectors.toList());
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);

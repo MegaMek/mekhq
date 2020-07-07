@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.view;
 
@@ -25,12 +25,12 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
 
 import megamek.common.util.EncodeControl;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.ContractMarket;
@@ -205,7 +205,7 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(lblLocation, gridBagConstraintsLabels);
 
         JLabel txtLocation = new JLabel(String.format("<html><a href='#'>%s</a></html>",
-                contract.getSystemName(Utilities.getDateTimeDay(campaign.getCalendar()))));
+                contract.getSystemName(campaign.getLocalDate())));
         txtLocation.setName("txtLocation");
         txtLocation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         txtLocation.addMouseListener(new MouseAdapter() {
@@ -226,7 +226,9 @@ public class ContractSummaryPanel extends JPanel {
             mainPanel.add(lblDistance, gridBagConstraintsLabels);
 
             JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
-            int days = (int) Math.ceil(path.getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()),
+
+            int days = (int) Math.ceil(path.getTotalTime(
+                    contract.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
                     campaign.getLocation().getTransitTime()));
             int jumps = path.getJumps();
             if (campaign.getCurrentSystem().getId().equals(contract.getSystemId())

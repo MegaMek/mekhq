@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team
+ * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,20 +10,19 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.universe;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -44,7 +43,6 @@ import mekhq.MekHqXmlUtil;
 
 /**
  * @author Neoancient
- *
  */
 public class FactionHints {
 
@@ -127,7 +125,7 @@ public class FactionHints {
      * @param f2 Faction Two
      * @return   Whether the factions are allies
      */
-    public boolean isAlliedWith(Faction f1, Faction f2, Date date) {
+    public boolean isAlliedWith(Faction f1, Faction f2, LocalDate date) {
         return hintApplies(alliances, f1, f2, date);
     }
 
@@ -136,7 +134,7 @@ public class FactionHints {
      * @param f2 Faction Two
      * @return   Whether the factions are rivals
      */
-    public boolean isRivalOf(Faction f1, Faction f2, Date date) {
+    public boolean isRivalOf(Faction f1, Faction f2, LocalDate date) {
         return hintApplies(rivals, f1, f2, date);
     }
 
@@ -145,7 +143,7 @@ public class FactionHints {
      * @param f2 Faction Two
      * @return   Whether the factions are at war on the given date
      */
-    public boolean isAtWarWith(Faction f1, Faction f2, Date date) {
+    public boolean isAtWarWith(Faction f1, Faction f2, LocalDate date) {
         return hintApplies(wars, f1, f2, date);
     }
 
@@ -157,7 +155,7 @@ public class FactionHints {
      * @return      The name of the current war the two factions are involved in, or {@code null} if they
      *              are not currently at war.
      */
-    @Nullable public String getCurrentWar(Faction f1, Faction f2, Date date) {
+    @Nullable public String getCurrentWar(Faction f1, Faction f2, LocalDate date) {
         if (wars.get(f1) != null && wars.get(f1).get(f2) != null) {
             for (FactionHint fh : wars.get(f1).get(f2)) {
                 if (fh.isInDateRange(date)) {
@@ -196,14 +194,14 @@ public class FactionHints {
      * @param date     The campaign date
      * @return         true if the potential opponent should not be considered as an enemy
      */
-    public boolean isNeutral(Faction faction, Faction opponent, Date date) {
+    public boolean isNeutral(Faction faction, Faction opponent, LocalDate date) {
         return neutralFactions.contains(faction)
                 && !hintApplies(neutralExceptions, faction, opponent, date)
                 && !isAtWarWith(faction, opponent, date);
     }
 
     private boolean hintApplies(Map<Faction, Map<Faction, List<FactionHint>>> hints,
-                Faction f1, Faction f2, Date date) {
+                                Faction f1, Faction f2, LocalDate date) {
         if (hints.get(f1) != null && hints.get(f1).get(f2) != null) {
             for (FactionHint fh : hints.get(f1).get(f2)) {
                 if (fh.isInDateRange(date)) {
@@ -231,7 +229,7 @@ public class FactionHints {
      * @param date  The campaign date
      * @return      A Set of all factions (if any) contained within the borders of the host faction.
      */
-    public Set<Faction> getContainedFactions(Faction f, Date date) {
+    public Set<Faction> getContainedFactions(Faction f, LocalDate date) {
         HashSet<Faction> retval = new HashSet<>();
         if (containedFactions.get(f) != null) {
             for (Faction f2 : containedFactions.get(f).keySet()) {
@@ -252,7 +250,7 @@ public class FactionHints {
      * @return           The faction that controls the planets where the contained faction is positioned,
      *                   or {@code null} if the faction is not contained within another at the time.
      */
-    @Nullable public Faction getContainedFactionHost(Faction contained, Date date) {
+    @Nullable public Faction getContainedFactionHost(Faction contained, LocalDate date) {
         for (Faction f : containedFactions.keySet()) {
             List<AltLocation> locs = containedFactions.get(f).get(contained);
             if (null != locs) {
@@ -274,7 +272,7 @@ public class FactionHints {
      * @param date      The campaign date
      * @return          The ratio of space taken up by the contained faction to that of the host.
      */
-    public double getAltLocationFraction(Faction host, Faction contained, Date date) {
+    public double getAltLocationFraction(Faction host, Faction contained, LocalDate date) {
         if (containedFactions.get(host) != null && containedFactions.get(host).get(contained) != null) {
             for (AltLocation l : containedFactions.get(host).get(contained)) {
                 if (l.isInDateRange(date)) {
@@ -300,14 +298,12 @@ public class FactionHints {
      * @param date      The campaign date
      * @return          Whether {@code opponent} can be treated as an enemy of {@code inner}.
      */
-    public boolean isContainedFactionOpponent(Faction outer, Faction inner,
-            Faction opponent, Date date) {
+    public boolean isContainedFactionOpponent(Faction outer, Faction inner, Faction opponent, LocalDate date) {
         if (containedFactions.get(outer) != null && containedFactions.get(outer).get(inner) != null) {
             for (AltLocation l : containedFactions.get(outer).get(inner)) {
                 if (l.isInDateRange(date)) {
                     if (l.opponents == null) {
-                        return !inner.equals(opponent) ||
-                                hintApplies(wars, inner, inner, date);
+                        return !inner.equals(opponent) || hintApplies(wars, inner, inner, date);
                     }
                     for (Faction f : l.opponents) {
                         if (f.equals(opponent)) {
@@ -328,7 +324,7 @@ public class FactionHints {
      * @param end          The alliance end date
      * @param parties      All the factions involved in the alliance
      */
-    protected void addAlliance(String allianceName, @Nullable Date start, @Nullable Date end, Faction... parties) {
+    protected void addAlliance(String allianceName, @Nullable LocalDate start, @Nullable LocalDate end, Faction... parties) {
         addFactionHint(alliances, allianceName, start, end, parties);
     }
 
@@ -341,7 +337,7 @@ public class FactionHints {
      * @param end          The war end date
      * @param parties      All the factions involved in the war.
      */
-    protected void addWar(String warName, @Nullable Date start, @Nullable Date end, Faction... parties) {
+    protected void addWar(String warName, @Nullable LocalDate start, @Nullable LocalDate end, Faction... parties) {
         addFactionHint(wars, warName, start, end, parties);
     }
 
@@ -353,7 +349,7 @@ public class FactionHints {
      * @param end          The rivalry end date
      * @param parties      All the factions involved in the rivalry
      */
-    protected void addRivalry(String rivalryName, @Nullable Date start, @Nullable Date end, Faction... parties) {
+    protected void addRivalry(String rivalryName, @Nullable LocalDate start, @Nullable LocalDate end, Faction... parties) {
         addFactionHint(rivals, rivalryName, start, end, parties);
     }
 
@@ -365,8 +361,8 @@ public class FactionHints {
      * @param faction    The generally neutral faction
      * @param exceptions The factions that should be considered exceptions to neutrality
      */
-    protected void addNeutralExceptions(String exceptionName, @Nullable Date start, @Nullable Date end,
-            Faction faction, Faction... exceptions) {
+    protected void addNeutralExceptions(String exceptionName, @Nullable LocalDate start,
+                                        @Nullable LocalDate end, Faction faction, Faction... exceptions) {
         neutralExceptions.putIfAbsent(faction, new HashMap<>());
         for (Faction exception : exceptions) {
             neutralExceptions.get(faction).putIfAbsent(exception, new ArrayList<>());
@@ -413,7 +409,8 @@ public class FactionHints {
      * @param end        The end date
      * @param ratio      The ratio of the size of the contained faction to that of the host
      */
-    protected void addContainedFaction(Faction host, Faction contained, Date start, Date end, double ratio) {
+    protected void addContainedFaction(Faction host, Faction contained, LocalDate start,
+                                       LocalDate end, double ratio) {
         addContainedFaction(host, contained, start, end, ratio, null);
     }
 
@@ -429,15 +426,15 @@ public class FactionHints {
      * @param opponents  If non-null, all possible opponents based on the position within the other
      *                   faction should be restricted to this list.
      */
-    protected void addContainedFaction(Faction host, Faction contained, Date start, Date end,
-            double ratio, @Nullable List<Faction> opponents) {
+    protected void addContainedFaction(Faction host, Faction contained, LocalDate start, LocalDate end,
+                                       double ratio, @Nullable List<Faction> opponents) {
         containedFactions.putIfAbsent(host, new HashMap<>());
         containedFactions.get(host).putIfAbsent(contained, new ArrayList<>());
         containedFactions.get(host).get(contained).add(new AltLocation(start, end, ratio, opponents));
     }
 
-    private void addFactionHint(Map<Faction, Map<Faction, List<FactionHint>>> hintMap,
-            String name, Date start, Date end, Faction[] parties) {
+    private void addFactionHint(Map<Faction, Map<Faction, List<FactionHint>>> hintMap, String name,
+                                LocalDate start, LocalDate end, Faction[] parties) {
         FactionHint hint = new FactionHint(name, start, end);
         for (int i = 0; i < parties.length - 1; i++) {
             for (int j = i + 1; j < parties.length; j++) {
@@ -470,7 +467,6 @@ public class FactionHints {
         NodeList nl = rootElement.getChildNodes();
         rootElement.normalize();
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
 
@@ -517,17 +513,17 @@ public class FactionHints {
                 } else if (nodeName.equals("alliance")) {
                     setFactionHint(alliances, wn);
                 } else if (nodeName.equals("location")) {
-                    Date start = null;
-                    Date end = null;
+                    LocalDate start = null;
+                    LocalDate end = null;
                     double fraction = 0.0;
                     Faction outer = null;
                     Faction inner = null;
                     List<Faction> opponents = null;
                     if (wn.getAttributes().getNamedItem("start") != null) {
-                        start = df.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+                        start = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                     }
                     if (wn.getAttributes().getNamedItem("end") != null) {
-                        end = df.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+                        end = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
                     }
                     for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
                         Node wn2 = wn.getChildNodes().item(j);
@@ -558,34 +554,31 @@ public class FactionHints {
         }
     }
 
-    private void setFactionHint(Map<Faction, Map<Faction, List<FactionHint>>> hint,
-            Node node) throws DOMException, ParseException {
+    private void setFactionHint(Map<Faction, Map<Faction, List<FactionHint>>> hint, Node node) throws DOMException {
         final String METHOD_NAME = "setFactionHint(Map<Faction,Map<Faction,List<FactionHint>>>,Node"; //$NON-NLS-1$
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
         String name = "";
-        Date start = null;
-        Date end = null;
+        LocalDate start = null;
+        LocalDate end = null;
         if (node.getAttributes().getNamedItem("name") != null) {
             name = node.getAttributes().getNamedItem("name").getTextContent().trim();
         }
         if (node.getAttributes().getNamedItem("start") != null) {
-            start = df.parse(node.getAttributes().getNamedItem("start").getTextContent().trim());
+            start = MekHqXmlUtil.parseDate(node.getAttributes().getNamedItem("start").getTextContent().trim());
         }
         if (node.getAttributes().getNamedItem("end") != null) {
-            end = df.parse(node.getAttributes().getNamedItem("end").getTextContent().trim());
+            end = MekHqXmlUtil.parseDate(node.getAttributes().getNamedItem("end").getTextContent().trim());
         }
         for (int n = 0; n < node.getChildNodes().getLength(); n++) {
             Node wn = node.getChildNodes().item(n);
             if (wn.getNodeName().equals("parties")) {
-                Date localStart = start;
-                Date localEnd = end;
+                LocalDate localStart = start;
+                LocalDate localEnd = end;
                 if (wn.getAttributes().getNamedItem("start") != null) {
-                    localStart = df.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+                    localStart = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                 }
                 if (wn.getAttributes().getNamedItem("end") != null) {
-                    localEnd = df.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+                    localEnd = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
                 }
 
                 String[] factionKeys = wn.getTextContent().trim().split(",");
@@ -602,25 +595,23 @@ public class FactionHints {
         }
     }
 
-    private void addNeutralExceptions(Faction faction, Node node) throws DOMException, ParseException {
+    private void addNeutralExceptions(Faction faction, Node node) throws DOMException {
         final String METHOD_NAME = "addNeutralExceptions(Faction,Node)"; //$NON-NLS-1$
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
-        Date end = null;
+        LocalDate end = null;
         if (node.getAttributes().getNamedItem("end") != null) {
-            end = df.parse(node.getAttributes().getNamedItem("end").getTextContent().trim());
+            end = MekHqXmlUtil.parseDate(node.getAttributes().getNamedItem("end").getTextContent().trim());
         }
         for (int n = 0; n < node.getChildNodes().getLength(); n++) {
             Node wn = node.getChildNodes().item(n);
             if (wn.getNodeName().equals("exceptions")) {
-                Date localStart = null;
-                Date localEnd = end;
+                LocalDate localStart = null;
+                LocalDate localEnd = end;
                 if (wn.getAttributes().getNamedItem("start") != null) {
-                    localStart = df.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+                    localStart = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                 }
                 if (wn.getAttributes().getNamedItem("end") != null) {
-                    localEnd = df.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+                    localEnd = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
                 }
 
                 String[] parties = wn.getTextContent().trim().split(",");
@@ -644,17 +635,17 @@ public class FactionHints {
          * of this class for each of the other factions involved.
          */
         public String name;
-        public Date start;
-        public Date end;
+        public LocalDate start;
+        public LocalDate end;
 
-        public FactionHint (String n, Date s, Date e) {
+        public FactionHint (String n, LocalDate s, LocalDate e) {
             name = n;
-            start = (s == null)? null : (Date) s.clone();
-            end = (e == null)? null : (Date) e.clone();
+            start = s;
+            end = e;
         }
 
-        public boolean isInDateRange(Date date) {
-            return ((start == null) || date.after(start)) && ((end == null) || date.before(end));
+        public boolean isInDateRange(LocalDate date) {
+            return ((start == null) || date.isAfter(start)) && ((end == null) || date.isBefore(end));
         }
     }
 
@@ -662,7 +653,7 @@ public class FactionHints {
         public double fraction;
         public List<Faction> opponents;
 
-        public AltLocation (Date s, Date e, double f, List<Faction> opponents) {
+        public AltLocation (LocalDate s, LocalDate e, double f, List<Faction> opponents) {
             super(null, s, e);
             fraction = f;
             if (null != opponents) {

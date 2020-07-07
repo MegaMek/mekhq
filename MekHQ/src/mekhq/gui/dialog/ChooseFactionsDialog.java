@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.dialog;
 
 import java.awt.Component;
@@ -7,6 +25,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,26 +43,25 @@ import javax.swing.JScrollPane;
 import mekhq.MekHQ;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
-import org.joda.time.DateTime;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.universe.Faction;
 
 public class ChooseFactionsDialog extends JDialog {
     private static final long serialVersionUID = 805616085217507489L;
-    
-    private DateTime date;
-    
+
+    private LocalDate date;
+
     ResourceBundle resourceMap;
     private JList<Faction> factionList;
     private List<String> result;
     private boolean changed;
-    
-    public ChooseFactionsDialog(Frame parent, DateTime date, List<String> defaults) {
+
+    public ChooseFactionsDialog(Frame parent, LocalDate date, List<String> defaults) {
         this(parent, date, defaults, true);
     }
-    
-    public ChooseFactionsDialog(Frame parent, DateTime date, List<String> defaults, boolean modal) {
+
+    public ChooseFactionsDialog(Frame parent, LocalDate date, List<String> defaults, boolean modal) {
         super(parent, modal);
         this.date = Objects.requireNonNull(date);
         this.result = defaults;
@@ -78,16 +96,16 @@ public class ChooseFactionsDialog extends JDialog {
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
                     boolean cellHasFocus) {
                 DefaultListCellRenderer result = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if(value instanceof Faction) {
+                if (value instanceof Faction) {
                     result.setText(((Faction)value).getFullName(date.getYear()));
                 }
                 return result;
             }
-            
+
         });
         scrollPane.setViewportView(factionList);
         content.add(scrollPane, gbc);
-        
+
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.weighty = 0.0;
@@ -99,7 +117,7 @@ public class ChooseFactionsDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 result = new ArrayList<>();
-                for(Faction faction : factionList.getSelectedValuesList()) {
+                for (Faction faction : factionList.getSelectedValuesList()) {
                     result.add(faction.getShortName());
                 }
                 changed = true;
@@ -109,7 +127,7 @@ public class ChooseFactionsDialog extends JDialog {
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.label")){ //$NON-NLS-1$
+        content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.label")) { //$NON-NLS-1$
             private static final long serialVersionUID = -8920630119126015955L;
 
             @Override
@@ -130,24 +148,24 @@ public class ChooseFactionsDialog extends JDialog {
     public List<String> getResult() {
         return result;
     }
-    
+
     public boolean isChanged() {
         return changed;
     }
 
     private static class FactionListModel extends AbstractListModel<Faction> {
         private static final long serialVersionUID = 2779479232585980171L;
-        
+
         private TreeMap<String, Faction> factionMap = new TreeMap<>();
         private List<String> names;
-        
-        public FactionListModel(DateTime date) {
-            for(Faction faction : Faction.getFactions()) {
+
+        public FactionListModel(LocalDate date) {
+            for (Faction faction : Faction.getFactions()) {
                 factionMap.put(faction.getFullName(date.getYear()), faction);
             }
             names = new ArrayList<>(factionMap.navigableKeySet());
         }
-        
+
         @Override
         public int getSize() {
             return names.size();

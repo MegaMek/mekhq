@@ -40,7 +40,6 @@ import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.enums.*;
-import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -144,7 +143,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private static final IntSupplier PREGNANCY_SIZE = () -> {
         int children = 1;
         // Hellin's law says it's 1:89 chance, to not make it appear too seldom, we use 1:50
-        while(Compute.randomInt(50) == 0) {
+        while (Compute.randomInt(50) == 0) {
             ++ children;
         }
         return Math.min(children, 10); // Limit to decuplets, for the sake of sanity
@@ -2109,7 +2108,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
                     }
-                    DateTime now = new DateTime(c.getCalendar());
+                    LocalDate now = c.getLocalDate();
                     retVal.injuries.stream().filter(inj -> (null == inj.getStart()))
                         .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
@@ -3254,11 +3253,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setMinutesLeft(int m) {
         this.minutesLeft = m;
-        if(engineer && null != getUnitId()) {
+        if (engineer && null != getUnitId()) {
             //set minutes for all crewmembers
             Unit u = campaign.getUnit(getUnitId());
-            if(null != u) {
-                for(Person p : u.getActiveCrew()) {
+            if (null != u) {
+                for (Person p : u.getActiveCrew()) {
                     p.setMinutesLeft(m);
                 }
             }
@@ -3271,11 +3270,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setOvertimeLeft(int m) {
         this.overtimeLeft = m;
-        if(engineer && null != getUnitId()) {
+        if (engineer && null != getUnitId()) {
             //set minutes for all crewmembers
             Unit u = campaign.getUnit(getUnitId());
-            if(null != u) {
-                for(Person p : u.getActiveCrew()) {
+            if (null != u) {
+                for (Person p : u.getActiveCrew()) {
                     p.setMinutesLeft(m);
                 }
             }
