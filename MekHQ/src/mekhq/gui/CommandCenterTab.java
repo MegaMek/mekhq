@@ -18,6 +18,9 @@
  */
 package mekhq.gui;
 
+import megamek.client.ui.swing.UnitLoadingDialog;
+import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.common.MechSummaryCache;
 import megamek.common.event.Subscribe;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
@@ -515,10 +518,15 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     /**
-     * brings up the {@link UnitSelectorDialog}
+     * brings up the {@link AbstractUnitSelectorDialog}
      */
     private void getUnit() {
-        UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), getCampaign(), true);
+        UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(getFrame());
+        if (!MechSummaryCache.getInstance().isInitialized()) {
+            unitLoadingDialog.setVisible(true);
+        }
+        AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(), unitLoadingDialog,
+                getCampaign(), true);
         usd.setVisible(true);
     }
 
