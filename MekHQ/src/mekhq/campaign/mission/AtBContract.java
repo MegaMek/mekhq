@@ -547,10 +547,7 @@ public class AtBContract extends Contract implements Serializable {
         // Garrison-type, and a 1d6-3 (minimum 1) months without enemy
         // activity for Garrison-type contracts.
         if ((moraleLevel == 0) && (missionType <= MT_RIOTDUTY)) {
-            routEnd = today.plusMonths(Math.max(1, Compute.d6() - 3));
-            if (routEnd.getDayOfMonth() != 1) {
-                routEnd = routEnd.minusDays(1);
-            }
+            routEnd = today.plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
         }
 
         moraleMod = 0;

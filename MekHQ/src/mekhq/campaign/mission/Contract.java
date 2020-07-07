@@ -543,7 +543,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         return getTotalAdvanceAmount()
                 .plus(getTotalMonthlyPayOut(c))
                 .minus(getTotalTransportationFees(c));
-	}
+    }
 
     /**
      * Get the number of months left in this contract after the given date. Partial months are counted as
@@ -552,21 +552,21 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @param date the date to use in the calculation
      * @return the number of months left
      */
-	public int getMonthsLeft(LocalDate date) {
-		int monthsLeft = Math.toIntExact(ChronoUnit.MONTHS.between(date, endDate));
-		// Ensure partial months are counted based on the current day of the month, as the above only
+    public int getMonthsLeft(LocalDate date) {
+        int monthsLeft = Math.toIntExact(ChronoUnit.MONTHS.between(date, endDate));
+        // Ensure partial months are counted based on the current day of the month, as the above only
         // counts full months
-		if (date.getDayOfMonth() != endDate.getDayOfMonth()) {
-		    monthsLeft++;
+        if (date.getDayOfMonth() != endDate.getDayOfMonth()) {
+            monthsLeft++;
         }
-		return monthsLeft;
-	}
+        return monthsLeft;
+    }
 
-	/**
-	 * Only do this at the time the contract is set up, otherwise amounts may change after
-	 * the ink is signed, which is a no-no.
-	 * @param c current campaign
-	 */
+    /**
+     * Only do this at the time the contract is set up, otherwise amounts may change after
+     * the ink is signed, which is a no-no.
+     * @param c current campaign
+     */
     public void calculateContract(Campaign c) {
         //calculate base amount
         baseAmount = c.getContractBase()
