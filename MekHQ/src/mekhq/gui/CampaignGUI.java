@@ -271,12 +271,10 @@ public class CampaignGUI extends JPanel {
 
         //check to see if we just selected the command center tab
         //and if so change its color to standard
-        tabMain.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (tabMain.getSelectedIndex() == 0) {
-                    tabMain.setBackgroundAt(0, null);
-                    logNagActive = false;
-                }
+        tabMain.addChangeListener(e -> {
+            if (tabMain.getSelectedIndex() == 0) {
+                tabMain.setBackgroundAt(0, null);
+                logNagActive = false;
             }
         });
 
@@ -1248,7 +1246,7 @@ public class CampaignGUI extends JPanel {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
                     continue;
                 }
-                if (getCampaign().getDate().equals(s.getDate())) {
+                if (getCampaign().getLocalDate().equals(s.getDate())) {
                     return 0 != JOptionPane
                             .showConfirmDialog(
                                     null,
@@ -1589,7 +1587,7 @@ public class CampaignGUI extends JPanel {
             List<String> techList = new ArrayList<>();
             String skillLvl;
             int TimePerDay;
-            
+
             List<Person> techs = getCampaign().getTechs();
             techs.sort(Comparator.comparingInt(Person::getPrimaryRole));
             for (Person tech : techs) {
@@ -1616,15 +1614,15 @@ public class CampaignGUI extends JPanel {
                 techHash.put(name, tech);
                 techList.add(name);
             }
-            
+
             String s = (String) JOptionPane.showInputDialog(frame,
                     "Which tech should work on the refit?", "Select Tech",
                     JOptionPane.PLAIN_MESSAGE, null, techList.toArray(), techList.get(0));
-            
+
             if (null == s) {
                 return;
             }
-            
+
             r.setTeamId(techHash.get(s).getId());
         } else {
             JOptionPane.showMessageDialog(frame,

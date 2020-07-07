@@ -684,7 +684,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         indent++;
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "nMonths", nMonths);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startDate", MekHqXmlUtil.saveFormattedDate(startDate));
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startDate", MekHqXmlUtil.saveFormattedDate(endDate));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "endDate", MekHqXmlUtil.saveFormattedDate(endDate));
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "employer", employer);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "paymentMultiplier", paymentMultiplier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "commandRights", commandRights);

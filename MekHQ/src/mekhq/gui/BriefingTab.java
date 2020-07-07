@@ -853,7 +853,7 @@ public final class BriefingTab extends CampaignGuiTab {
         boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits().size() > 0;
         boolean canStartGame = scenario.isCurrent() && unitsAssigned;
         if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
-            canStartGame = canStartGame && getCampaign().getDate().equals(scenario.getDate());
+            canStartGame = canStartGame && getCampaign().getLocalDate().equals(scenario.getDate());
         }
         btnStartGame.setEnabled(canStartGame);
         btnJoinGame.setEnabled(canStartGame);
