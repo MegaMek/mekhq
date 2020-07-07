@@ -163,7 +163,7 @@ public class Planet implements Serializable {
      * <p>
      */
     @XmlTransient
-    private transient TreeMap<LocalDate, PlanetaryEvent> events;
+    private TreeMap<LocalDate, PlanetaryEvent> events;
 
     /**
      * This is a cache of the current event data based
