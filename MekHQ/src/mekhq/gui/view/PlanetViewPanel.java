@@ -1,9 +1,21 @@
 /*
- * PlanetViewPanel
+ * Copyright (C) 2009-2020 - The MegaMek Team. All Rights Reserved.
  *
- * Created on July 26, 2009, 11:32 PM
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.view;
 
 import java.awt.Color;
@@ -16,6 +28,7 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.geom.Arc2D;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -25,8 +38,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.text.DefaultCaret;
-
-import org.joda.time.DateTime;
 
 import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
@@ -64,31 +75,30 @@ public class PlanetViewPanel extends ScrollablePanel {
     }
 
     private void initComponents() {
-
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel", new EncodeControl()); //$NON-NLS-1
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         pnlSystem = getSystemPanel();
-        pnlSystem.setBorder(BorderFactory.createTitledBorder(system.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar())) + " " + resourceMap.getString("system.text")));
+        pnlSystem.setBorder(BorderFactory.createTitledBorder(system.getPrintableName(campaign.getLocalDate()) + " " + resourceMap.getString("system.text")));
         add(pnlSystem);
 
         Planet planet = system.getPlanet(planetPos);
-        if(null == planet) {
+        if (null == planet) {
             //try the primary - but still could be null
             planet = system.getPrimaryPlanet();
         }
-        if(null != planet) {
+        if (null != planet) {
             pnlPlanet = getPlanetPanel(planet);
-            pnlPlanet.setBorder(BorderFactory.createTitledBorder(planet.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()))));
+            pnlPlanet.setBorder(BorderFactory.createTitledBorder(planet.getPrintableName(campaign.getLocalDate())));
             add(pnlPlanet);
-        };
+        }
     }
 
     @Override
     protected void paintChildren(Graphics g) {
         super.paintChildren(g);
 
-        if(null != planetIcon) {
+        if (null != planetIcon) {
             Graphics2D gfx = (Graphics2D) g;
             final int width = getWidth();
             final int offset = 6;
@@ -105,13 +115,12 @@ public class PlanetViewPanel extends ScrollablePanel {
     }
 
     private JPanel getPlanetPanel(Planet planet) {
-
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel", new EncodeControl()); //$NON-NLS-1
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
-        DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
+        LocalDate currentDate = campaign.getLocalDate();
 
-        JLabel lblOwner = new JLabel("<html><nobr><i>" + planet.getFactionDesc(currentDate) + "</i></nobr></html>");
+        JLabel lblOwner = new JLabel("<html><nobr><i>" + planet.getFactionDesc(campaign.getLocalDate()) + "</i></nobr></html>");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -169,10 +178,10 @@ public class PlanetViewPanel extends ScrollablePanel {
             				planet.getOrbitRadius());
             	} else {
             		text = String.format("%s (%.3f AU)", //$NON-NLS-1$
-            				planet.getDiplayableSystemPosition(), planet.getOrbitRadius());
+            				planet.getDisplayableSystemPosition(), planet.getOrbitRadius());
             	}
             } else {
-                text = planet.getDiplayableSystemPosition();
+                text = planet.getDisplayableSystemPosition();
             }
             JLabel txtPosition = new JLabel(text);
             gbcText.gridy = infoRow;
@@ -190,7 +199,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         ++ infoRow;
 
         //Year length
-        if(null != planet.getYearLength()) {
+        if (null != planet.getYearLength()) {
             JLabel lblYear = new JLabel(resourceMap.getString("lblYear1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblYear, gbcLabel);
@@ -201,7 +210,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //day length
-        if(null != planet.getDayLength(currentDate)) {
+        if (null != planet.getDayLength(currentDate)) {
             JLabel lblDay = new JLabel(resourceMap.getString("lblDay1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDay, gbcLabel);
@@ -212,7 +221,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //Gravity
-        if(null != planet.getGravity()) {
+        if (null != planet.getGravity()) {
             JLabel lblGravity = new JLabel(resourceMap.getString("lblGravity1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblGravity, gbcLabel);
@@ -223,7 +232,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //Atmosphere
-        if(null != planet.getAtmosphere(currentDate)) {
+        if (null != planet.getAtmosphere(currentDate)) {
             JLabel lblAtmosphere = new JLabel(resourceMap.getString("lblAtmosphere.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblAtmosphere, gbcLabel);
@@ -234,7 +243,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //Atmospheric Pressure
-        if(null != planet.getPressure(currentDate)) {
+        if (null != planet.getPressure(currentDate)) {
             JLabel lblPressure = new JLabel(resourceMap.getString("lblPressure1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPressure, gbcLabel);
@@ -245,7 +254,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //Atmospheric composition
-        if(null != planet.getComposition(currentDate)) {
+        if (null != planet.getComposition(currentDate)) {
             JLabel lblComposition = new JLabel(resourceMap.getString("lblComposition.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblComposition, gbcLabel);
@@ -256,7 +265,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //Temperature
-        if((null != planet.getTemperature(currentDate))) {
+        if ((null != planet.getTemperature(currentDate))) {
             JLabel lblTemp = new JLabel(resourceMap.getString("lblTemp1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblTemp, gbcLabel);
@@ -268,7 +277,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //Water
-        if(null != planet.getPercentWater(currentDate)) {
+        if (null != planet.getPercentWater(currentDate)) {
             JLabel lblWater = new JLabel(resourceMap.getString("lblWater1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblWater, gbcLabel);
@@ -279,7 +288,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //native life forms
-        if(null != planet.getLifeForm(currentDate)) {
+        if (null != planet.getLifeForm(currentDate)) {
             JLabel lblAnimal = new JLabel(resourceMap.getString("lblAnimal1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblAnimal, gbcLabel);
@@ -290,7 +299,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //satellites
-        if(null != planet.getSatellites() || planet.getSmallMoons()>0) {
+        if (null != planet.getSatellites() || planet.getSmallMoons()>0) {
         	JLabel lblSatellite = new JLabel(resourceMap.getString("lblSatellite1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblSatellite, gbcLabel);
@@ -301,7 +310,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //landmasses
-        if(null != planet.getLandMasses()) {
+        if (null != planet.getLandMasses()) {
             JLabel lblLandMass = new JLabel(resourceMap.getString("lblLandMass1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblLandMass, gbcLabel);
@@ -312,7 +321,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //Population
-        if(null != planet.getPopulation(currentDate)) {
+        if (null != planet.getPopulation(currentDate)) {
             JLabel lblPopulation = new JLabel(resourceMap.getString("lblPopulation.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPopulation, gbcLabel);
@@ -323,7 +332,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //SIC codes
-        if(null != planet.getSocioIndustrial(currentDate)) {
+        if (null != planet.getSocioIndustrial(currentDate)) {
             JLabel lblSocioIndustrial = new JLabel(resourceMap.getString("lblSocioIndustrial1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblSocioIndustrial, gbcLabel);
@@ -336,7 +345,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //HPG status
-        if(null != planet.getHPGClass(currentDate)) {
+        if (null != planet.getHPGClass(currentDate)) {
             JLabel lblHPG = new JLabel(resourceMap.getString("lblHPG1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblHPG, gbcLabel);
@@ -346,7 +355,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             ++ infoRow;
         }
 
-        if(null != planet.getDescription()) {
+        if (null != planet.getDescription()) {
             JTextPane txtDesc = new JTextPane();
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
@@ -368,11 +377,10 @@ public class PlanetViewPanel extends ScrollablePanel {
     }
 
     private JPanel getSystemPanel() {
-
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel", new EncodeControl()); //$NON-NLS-1$
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
-        DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
+        LocalDate currentDate = campaign.getLocalDate();
 
         //Set up grid bag constraints
         GridBagConstraints gbcLabel = new GridBagConstraints();

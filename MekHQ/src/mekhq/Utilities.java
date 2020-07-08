@@ -73,9 +73,6 @@ import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.enums.Phenotype;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
 
 import megamek.client.Client;
 import megamek.common.ASFBay;
@@ -1396,16 +1393,6 @@ public class Utilities {
             return 1;
         }
         return diff;
-    }
-
-    /** @return the current date as a DateTime time stamp for midnight in UTC time zone */
-    public static DateTime getDateTimeDay(Calendar cal) {
-        return new LocalDateTime(cal).toDateTime(DateTimeZone.UTC);
-    }
-
-    /** @return the current date as a DateTime time stamp for midnight in UTC time zone */
-    public static DateTime getDateTimeDay(Date date) {
-        return new LocalDateTime(date).toDateTime(DateTimeZone.UTC);
     }
 
     /**

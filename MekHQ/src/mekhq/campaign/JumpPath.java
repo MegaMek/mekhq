@@ -12,21 +12,20 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -45,12 +44,8 @@ import mekhq.campaign.universe.PlanetarySystem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class JumpPath implements Serializable {
-
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 708430867050359759L;
-	private ArrayList<PlanetarySystem> path;
+	private List<PlanetarySystem> path;
 
 	public JumpPath() {
 		path = new ArrayList<>();
@@ -60,7 +55,7 @@ public class JumpPath implements Serializable {
 		path = p;
 	}
 
-	public ArrayList<PlanetarySystem> getSystems() {
+	public List<PlanetarySystem> getSystems() {
 		return path;
 	}
 
@@ -69,7 +64,7 @@ public class JumpPath implements Serializable {
 	}
 
 	public PlanetarySystem getFirstSystem() {
-		if(path.isEmpty()) {
+		if (path.isEmpty()) {
 			return null;
 		} else {
 			return path.get(0);
@@ -77,7 +72,7 @@ public class JumpPath implements Serializable {
 	}
 
 	public PlanetarySystem getLastSystem() {
-		if(path.isEmpty()) {
+		if (path.isEmpty()) {
 			return null;
 		} else {
 			return path.get(path.size() - 1);
@@ -86,7 +81,7 @@ public class JumpPath implements Serializable {
 
 	public double getStartTime(double currentTransit) {
 		double startTime = 0.0;
-		if(null != getFirstSystem()) {
+		if (null != getFirstSystem()) {
 			startTime = getFirstSystem().getTimeToJumpPoint(1.0);
 		}
 		return startTime - currentTransit;
@@ -94,19 +89,19 @@ public class JumpPath implements Serializable {
 
 	public double getEndTime() {
 		double endTime = 0.0;
-		if(null != getLastSystem()) {
+		if (null != getLastSystem()) {
 			endTime = getLastSystem().getTimeToJumpPoint(1.0);
 		}
 		return endTime;
 	}
 
-	public double getTotalRechargeTime(DateTime when) {
+	public double getTotalRechargeTime(LocalDate when) {
 		int rechargeTime = 0;
-		for(PlanetarySystem system : path) {
-			if(system.equals(getFirstSystem())) {
+		for (PlanetarySystem system : path) {
+			if (system.equals(getFirstSystem())) {
 				continue;
 			}
-			if(system.equals(getLastSystem())) {
+			if (system.equals(getLastSystem())) {
 				continue;
 			}
 			rechargeTime += (int) Math.ceil(system.getRechargeTime(when));
@@ -115,10 +110,10 @@ public class JumpPath implements Serializable {
 	}
 
 	public int getJumps() {
-		return size()-1;
+		return size() - 1;
 	}
 
-	public double getTotalTime(DateTime when, double currentTransit) {
+	public double getTotalTime(LocalDate when, double currentTransit) {
 		return getTotalRechargeTime(when) + getStartTime(currentTransit) + getEndTime();
 	}
 
@@ -131,7 +126,7 @@ public class JumpPath implements Serializable {
 	}
 
 	public void removeFirstSystem() {
-		if(!path.isEmpty()) {
+		if (!path.isEmpty()) {
 			path.remove(0);
 		}
 	}
@@ -141,7 +136,7 @@ public class JumpPath implements Serializable {
 	}
 
 	public PlanetarySystem get(int i) {
-		if(i >= size()) {
+		if (i >= size()) {
 			return null;
 		} else {
 			return path.get(i);
@@ -154,11 +149,11 @@ public class JumpPath implements Serializable {
 
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<jumpPath>");
-		for(PlanetarySystem p : path) {
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<planetName>"
-				+MekHqXmlUtil.escape(p.getId())
-				+"</planetName>");
+		for (PlanetarySystem p : path) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                    +"<planetName>"
+                    +MekHqXmlUtil.escape(p.getId())
+                    +"</planetName>");
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</jumpPath>");
 
@@ -173,11 +168,11 @@ public class JumpPath implements Serializable {
 			retVal = new JumpPath();
 			NodeList nl = wn.getChildNodes();
 
-			for (int x=0; x<nl.getLength(); x++) {
+			for (int x = 0; x < nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
 				if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
 					PlanetarySystem p = c.getSystemByName(wn2.getTextContent());
-					if(null != p) {
+					if (null != p) {
 						retVal.addSystem(p);
 					} else {
 					    MekHQ.getLogger().log(JumpPath.class, METHOD_NAME, LogLevel.ERROR,

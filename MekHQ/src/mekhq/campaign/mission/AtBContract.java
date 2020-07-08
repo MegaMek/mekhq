@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.mission;
 
@@ -32,7 +32,6 @@ import java.util.GregorianCalendar;
 import java.util.UUID;
 
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -63,13 +62,8 @@ import mekhq.gui.view.LanceAssignmentView;
  * Contract class for use with Against the Bot rules
  *
  * @author Neoancient
- *
  */
 public class AtBContract extends Contract implements Serializable {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 1491090021356604379L;
 
     public static final int MT_GARRISONDUTY = 0;
@@ -1045,7 +1039,7 @@ public class AtBContract extends Contract implements Serializable {
                 getMissionType() != MT_RIOTDUTY) {
             String warName = RandomFactionGenerator.getInstance()
                     .getFactionHints().getCurrentWar(Faction.getFaction(getEmployerCode()),
-                    Faction.getFaction(getEnemyCode()), campaign.getDate());
+                    Faction.getFaction(getEnemyCode()), campaign.getLocalDate());
             if (null != warName) {
                 int extension = 0;
                 int roll = Compute.d6();
