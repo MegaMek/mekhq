@@ -6969,7 +6969,7 @@ public class Campaign implements Serializable, ITechManager {
      * computation. This method does not calculate an exact jump path but rather determines the number of jumps
      * crudely by dividing distance in light years by 30 and then rounding up. Total part time is determined by
      * several by adding the following:
-     * - (number of jumps - 1)*7 days with a minimum value of zero.
+     * - (number of jumps - 1) * 7 days with a minimum value of zero.
      * - transit times from current planet and planet of supply origins in cases where the supply planet is not the same as current planet.
      * - a random 1d6 days for each jump plus 1d6 to simulate all of the other logistics of delivery.
      * @param system - A <code>PlanetarySystem</code> object where the supplies are shipping from
@@ -6978,84 +6978,81 @@ public class Campaign implements Serializable, ITechManager {
     public int calculatePartTransitTime(PlanetarySystem system) {
         //calculate number of jumps by light year distance as the crow flies divided by 30
         //the basic formula assumes 7 days per jump + system transit time on each side + random days equal
-        //to (1+number of jumps)d6
+        //to (1 + number of jumps) d6
         double distance = system.getDistanceTo(getCurrentSystem());
         //calculate number of jumps by dividing by 30
-        int jumps = (int)Math.ceil(distance/30.0);
+        int jumps = (int) Math.ceil(distance / 30.0);
         //you need a recharge except for the first jump
         int recharges = Math.max(jumps - 1, 0);
         //if you are delivering from the same planet then no transit times
-        int currentTransitTime = (distance>0) ? (int)Math.ceil(getCurrentSystem().getTimeToJumpPoint(1.0)) : 0;
-        int originTransitTime = (distance>0) ? (int)Math.ceil(system.getTimeToJumpPoint(1.0)) : 0;
-        int amazonFreeShipping = Compute.d6(1+jumps);
-        return recharges*7+currentTransitTime+originTransitTime+amazonFreeShipping;
+        int currentTransitTime = (distance > 0) ? (int) Math.ceil(getCurrentSystem().getTimeToJumpPoint(1.0)) : 0;
+        int originTransitTime = (distance > 0) ? (int) Math.ceil(system.getTimeToJumpPoint(1.0)) : 0;
+        int amazonFreeShipping = Compute.d6(1 + jumps);
+        return (recharges * 7) + currentTransitTime+originTransitTime + amazonFreeShipping;
     }
 
     /***
-     * Calculate transit times based on the margin of success from an acquisition roll. The values here are
-     * all based on what the user entered for the campaign options.
+     * Calculate transit times based on the margin of success from an acquisition roll. The values here
+     * are all based on what the user entered for the campaign options.
      * @param mos - an integer of the margin of success of an acquisition roll
      * @return the number of days that supplies will take to arrive.
      */
     public int calculatePartTransitTime(int mos) {
-
         int nDice = getCampaignOptions().getNDiceTransitTime();
         int time = getCampaignOptions().getConstantTransitTime();
         if (nDice > 0) {
             time += Compute.d6(nDice);
         }
         // now step forward through the calendar
-        GregorianCalendar arrivalDate = (GregorianCalendar) calendar.clone();
+        LocalDate arrivalDate = getLocalDate();
         switch (getCampaignOptions().getUnitTransitTime()) {
             case CampaignOptions.TRANSIT_UNIT_MONTH:
-                arrivalDate.add(Calendar.MONTH, time);
+                arrivalDate = arrivalDate.plusMonths(time);
                 break;
             case CampaignOptions.TRANSIT_UNIT_WEEK:
-                arrivalDate.add(Calendar.WEEK_OF_YEAR, time);
+                arrivalDate = arrivalDate.plusWeeks(time);
                 break;
             case CampaignOptions.TRANSIT_UNIT_DAY:
             default:
-                arrivalDate.add(Calendar.DAY_OF_MONTH, time);
+                arrivalDate = arrivalDate.plusDays(time);
+                break;
         }
 
         // now adjust for MoS and minimums
         int mosBonus = getCampaignOptions().getAcquireMosBonus() * mos;
         switch (getCampaignOptions().getAcquireMosUnit()) {
             case CampaignOptions.TRANSIT_UNIT_MONTH:
-                arrivalDate.add(Calendar.MONTH, -1 * mosBonus);
+                arrivalDate = arrivalDate.minusMonths(mosBonus);
                 break;
             case CampaignOptions.TRANSIT_UNIT_WEEK:
-                arrivalDate.add(Calendar.WEEK_OF_YEAR, -1 * mosBonus);
+                arrivalDate = arrivalDate.minusWeeks(mosBonus);
                 break;
             case CampaignOptions.TRANSIT_UNIT_DAY:
             default:
-                arrivalDate.add(Calendar.DAY_OF_MONTH, -1 * mosBonus);
+                arrivalDate = arrivalDate.minusDays(mosBonus);
+                break;
         }
+
         // now establish minimum date and if this is before
-        GregorianCalendar minimumDate = (GregorianCalendar) calendar.clone();
+        LocalDate minimumDate = getLocalDate();
         switch (getCampaignOptions().getAcquireMinimumTimeUnit()) {
             case CampaignOptions.TRANSIT_UNIT_MONTH:
-                minimumDate.add(Calendar.MONTH, getCampaignOptions()
-                        .getAcquireMinimumTime());
+                minimumDate = minimumDate.plusMonths(getCampaignOptions().getAcquireMinimumTime());
                 break;
             case CampaignOptions.TRANSIT_UNIT_WEEK:
-                minimumDate.add(Calendar.WEEK_OF_YEAR, getCampaignOptions()
-                        .getAcquireMinimumTime());
+                minimumDate = minimumDate.plusWeeks(getCampaignOptions().getAcquireMinimumTime());
                 break;
             case CampaignOptions.TRANSIT_UNIT_DAY:
             default:
-                minimumDate.add(Calendar.DAY_OF_MONTH, getCampaignOptions()
-                        .getAcquireMinimumTime());
+                minimumDate = minimumDate.plusDays(getCampaignOptions().getAcquireMinimumTime());
+                break;
         }
 
-        if (arrivalDate.before(minimumDate)) {
-            return Utilities.getDaysBetween(calendar.getTime(),
-                    minimumDate.getTime());
+        if (arrivalDate.isBefore(minimumDate)) {
+            return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), minimumDate));
         } else {
-            return Utilities.getDaysBetween(calendar.getTime(),
-                    arrivalDate.getTime());
+            return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), arrivalDate));
         }
-
     }
 
     /**
