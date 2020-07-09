@@ -35,14 +35,14 @@ import java.util.*;
 
 /**
  * This is used to supply clan data needed to generate bloodnames
- * TODO : Windchild should this be merge into Faction?
+ * TODO : This should probably be merged into Faction
  */
 public class Clan {
     //region Variable Declarations
     private static Map<String, Clan> allClans;
 
     private String code;
-    private String generationCode; // this is used to enable RA name generation using CSR lists
+    private String generationCode; // this is used to enable RA name generation using CSR lists, for example
     private String fullName;
     private int startDate;
     private int endDate;
@@ -99,7 +99,7 @@ public class Clan {
     public String getFullName(int year) {
         for (DatedRecord r : nameChanges) {
             if (r.isActive(year)) {
-                return r.description;
+                return r.getDescription();
             }
         }
         return fullName;
@@ -129,7 +129,7 @@ public class Clan {
         List<Clan> retVal = new ArrayList<>();
         for (DatedRecord r : rivals) {
             if (r.isActive(year)) {
-                Clan c = allClans.get(r.description);
+                Clan c = allClans.get(r.getDescription());
                 if (c.isActive(year)) {
                     retVal.add(c);
                 }
@@ -252,18 +252,42 @@ public class Clan {
     }
 
     private static class DatedRecord {
-        public int startDate;
-        public int endDate;
-        public String description;
+        private int startDate;
+        private int endDate;
+        private String description;
 
         public DatedRecord(int s, int e, String d) {
-            startDate = s;
-            endDate = e;
-            description = d;
+            setStartDate(s);
+            setEndDate(e);
+            setDescription(d);
         }
 
         public boolean isActive(int year) {
-            return (startDate < year) && ((endDate == 0) || (endDate > year));
+            return (getStartDate() < year) && ((getEndDate() == 0) || (getEndDate() > year));
+        }
+
+        public int getStartDate() {
+            return startDate;
+        }
+
+        public void setStartDate(int startDate) {
+            this.startDate = startDate;
+        }
+
+        public int getEndDate() {
+            return endDate;
+        }
+
+        public void setEndDate(int endDate) {
+            this.endDate = endDate;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
         }
     }
 }

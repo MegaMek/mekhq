@@ -34,7 +34,7 @@ public enum Phenotype {
     VEHICLE(3, "Phenotype.VEHICLE.text", "Phenotype.TRUEBORN", "Phenotype.VEHICLE.groupingNameText", "Phenotype.VEHICLE.toolTipText"),
     PROTOMECH(4, "Phenotype.PROTOMECH.text", "Phenotype.TRUEBORN", "Phenotype.PROTOMECH.groupingNameText", "Phenotype.PROTOMECH.toolTipText"),
     NAVAL(5, "Phenotype.NAVAL.text", "Phenotype.TRUEBORN", "Phenotype.NAVAL.groupingNameText", "Phenotype.NAVAL.toolTipText"),
-    // Internal Phenotypes - Must have an index of -1 of they will be displayed in external facing methods
+    // Internal Phenotypes - Must have an index of -1 or they will be displayed in external facing methods
     NONE(-1, "Phenotype.NONE.text", "Phenotype.FREEBORN", "Phenotype.NONE.text",  "Phenotype.NONE.toolTipText"),
     GENERAL(-1, "Phenotype.GENERAL.text", "Phenotype.TRUEBORN","Phenotype.GENERAL.text", "Phenotype.GENERAL.toolTipText");
     //endregion Enum Declarations

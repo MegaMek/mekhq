@@ -1445,8 +1445,8 @@ public class Campaign implements Serializable, ITechManager {
      * @param ignoreDice If true, skips the random roll and assigns a Bloodname automatically
      */
     public void checkBloodnameAdd(Person person, boolean ignoreDice) {
-        // if a non-clanner is here, we can just return
-        if (!person.isClanner()) {
+        // if a non-clanner or a clanner without a phenotype is here, we can just return
+        if (!person.isClanner() || (person.getPhenotype() == Phenotype.NONE)) {
             return;
         }
 
@@ -1465,9 +1465,8 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Go ahead and generate a new bloodname
-        // TODO : Make it a very rare generation chance for freeborn personnel
-        if (person.getPhenotype() != Phenotype.NONE) {
-            int bloodnameTarget = 6;
+        int bloodnameTarget = 6;
+        if (!ignoreDice) {
             switch (person.getPhenotype()) {
                 case MECHWARRIOR: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_MECH)
@@ -1567,39 +1566,36 @@ public class Campaign implements Serializable, ITechManager {
             if (year <= 2950) {
                 bloodnameTarget--;
             }
+
             if (year > 3055) {
                 bloodnameTarget++;
             }
+
             if (year > 3065) {
                 bloodnameTarget++;
             }
+
             if (year > 3080) {
                 bloodnameTarget++;
             }
 
             // Officers have better chance; no penalty for non-officer
             bloodnameTarget += Math.min(0, ranks.getOfficerCut() - person.getRankNumeric());
+        }
 
-            if (ignoreDice || (Compute.d6(2) >= bloodnameTarget)) {
-                /*
-                 * The Bloodname generator has slight differences in categories that do not map
-                 * easily onto Person constants
-                 */
-                Phenotype phenotype = person.getPhenotype();
-                if (phenotype == Phenotype.NONE) {
-                    phenotype = Phenotype.GENERAL;
-                }
-
-                Bloodname bloodname = Bloodname.randomBloodname(
-                        getFaction().isClan() ? getFaction().getShortName()
-                                : person.getOriginFaction().getShortName(),
-                        phenotype, getGameYear());
-                if (bloodname != null) {
-                    person.setBloodname(bloodname.getName());
-                }
+        if (ignoreDice || (Compute.d6(2) >= bloodnameTarget)) {
+            Phenotype phenotype = person.getPhenotype();
+            if (phenotype == Phenotype.NONE) {
+                phenotype = Phenotype.GENERAL;
             }
 
-            MekHQ.triggerEvent(new PersonChangedEvent(person));
+            Bloodname bloodname = Bloodname.randomBloodname(
+                    (getFaction().isClan() ? getFaction() : person.getOriginFaction()).getShortName(),
+                    phenotype, getGameYear());
+            if (bloodname != null) {
+                person.setBloodname(bloodname.getName());
+                personUpdated(person);
+            }
         }
     }
     //endregion Bloodnames
