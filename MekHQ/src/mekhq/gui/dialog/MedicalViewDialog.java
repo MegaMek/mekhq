@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 MegaMek team
+ * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -38,8 +38,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -59,10 +59,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
-
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import megamek.common.util.EncodeControl;
 
@@ -85,11 +81,8 @@ import mekhq.campaign.personnel.Person;
 
 public class MedicalViewDialog extends JDialog {
     private static final long serialVersionUID = 6178230374580087883L;
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd"); // TODO : LocalDate : Remove me with the logs rework
     private static final String MENU_CMD_SEPARATOR = ","; //$NON-NLS-1$
-    private static final String DISPLAY_FORMAT = "yyyy-MM-dd";
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
-    private final static DateTimeFormatter DATE_FORMATTER =
-        DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC()); //$NON-NLS-1$
 
     private static final ExtraData.Key<String> DOCTOR_NOTES = new ExtraData.StringKey("doctor_notes"); //$NON-NLS-1$
     // TODO: Custom paper dolls
@@ -162,7 +155,7 @@ public class MedicalViewDialog extends JDialog {
                     String[] commands = addEvent.getActionCommand().split(MENU_CMD_SEPARATOR, 2);
                     InjuryType addIType = InjuryType.byKey(commands[0]);
                     int severity = Integer.parseInt(commands[1]);
-                    person.addInjury(addIType.newInjury(campaign, person, loc, severity));
+                    person.addInjury(addIType.newInjury(c, person, loc, severity));
                     revalidate();
                 };
                 JMenu addMenu = new JMenu(resourceMap.getString("menuAdd.text")); //$NON-NLS-1$
@@ -284,7 +277,7 @@ public class MedicalViewDialog extends JDialog {
     private JPanel fillDoll(JPanel panel, Campaign c, Person p) {
         panel.removeAll();
 
-        if(null != doll) {
+        if (null != doll) {
             doll.removeActionListener(dollActionListener);
         }
         doll = person.getGender().isMale() ? defaultMaleDoll : defaultFemaleDoll;
@@ -299,7 +292,7 @@ public class MedicalViewDialog extends JDialog {
                 } else if (!person.isLocationMissing(bl)) {
                     InjuryLevel level = getMaxInjuryLevel(person, bl);
                     Color col;
-                    switch(level) {
+                    switch (level) {
                         case CHRONIC:
                             col =  new Color(255, 204, 255);
                             break;
@@ -321,7 +314,8 @@ public class MedicalViewDialog extends JDialog {
                     doll.setLocColor(bl, col);
                 }
             });
-        if (campaign.isGM()) {
+
+        if (c.isGM()) {
             doll.addActionListener(dollActionListener);
         }
         panel.add(doll);
@@ -344,10 +338,10 @@ public class MedicalViewDialog extends JDialog {
             surname = p.getBloodname();
         }
 
-        LocalDate birthday = p.getBirthday();
-        String birthdayString = birthday.format(java.time.format.DateTimeFormatter.ofPattern(DISPLAY_FORMAT));
+        String birthdayString = p.getBirthday().format(DateTimeFormatter.ofPattern(
+                c.getCampaignOptions().getDisplayDateFormat()));
 
-        Period age = Period.between(birthday, campaign.getLocalDate());
+        Period age = Period.between(p.getBirthday(), c.getLocalDate());
 
         String phenotype = (p.getPhenotype() != Person.PHENOTYPE_NONE) ? p.getPhenotypeName() : resourceMap.getString("baselinePhenotype.text"); //$NON-NLS-1$
 
@@ -395,7 +389,7 @@ public class MedicalViewDialog extends JDialog {
             .filter(e -> !e.getValue().isEmpty())
             .sorted(Map.Entry.comparingByKey())
             .forEachOrdered(e -> {
-                if(e.getValue().size() > 1) {
+                if (e.getValue().size() > 1) {
                     panel.add(genWrittenText(e.getKey()));
                     e.getValue().forEach(entry -> {
                         JPanel wrapper = new JPanel();
@@ -472,17 +466,20 @@ public class MedicalViewDialog extends JDialog {
                     JLabel injLabel;
                     if (inj.getType().isPermanent()) {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesText.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
+                            inj.getType().getSimpleName(), inj.getStart().format(DateTimeFormatter.ofPattern(
+                                        c.getCampaignOptions().getDisplayDateFormat()))));
                     } else if (inj.isPermanent() || (inj.getTime() <= 0)) {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesPermanent.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
+                            inj.getType().getSimpleName(), inj.getStart().format(DateTimeFormatter.ofPattern(
+                                        c.getCampaignOptions().getDisplayDateFormat()))));
                     } else {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesTextAndDuration.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER),
+                            inj.getType().getSimpleName(), inj.getStart().format(DateTimeFormatter.ofPattern(
+                                    c.getCampaignOptions().getDisplayDateFormat())),
                                 genTimePeriod(inj.getTime())));
                     }
 
-                    if (campaign.isGM()) {
+                    if (c.isGM()) {
                         injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, p, inj));
                     }
 
@@ -555,13 +552,13 @@ public class MedicalViewDialog extends JDialog {
     }
 
     private String genTimePeriod(int days) {
-        if(days <= 1) {
+        if (days <= 1) {
             return resourceMap.getString("durationOneDay.text"); //$NON-NLS-1$
-        } else if(days < 21) {
+        } else if (days < 21) {
             return String.format(resourceMap.getString("durationDays.format"), days); //$NON-NLS-1$
-        } else if(days <= 12 * 7) {
+        } else if (days <= 12 * 7) {
             return String.format(resourceMap.getString("durationWeeks.format"), days * 1.0 / 7.0); //$NON-NLS-1$
-        } else if(days <= 2 * 365) {
+        } else if (days <= 2 * 365) {
             return String.format(resourceMap.getString("durationMonths.format"), days * 12.0 / 365.0); //$NON-NLS-1$
         } else {
             return String.format(resourceMap.getString("durationYears.format"), days * 1.0 / 365.0); //$NON-NLS-1$
@@ -599,7 +596,7 @@ public class MedicalViewDialog extends JDialog {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            if(e.getButton() == MouseEvent.BUTTON1) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
                 JPopupMenu popup = new JPopupMenu();
                 JLabel header = new JLabel(injury.getFluff());
                 header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD)); //$NON-NLS-1$

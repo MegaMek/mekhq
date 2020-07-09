@@ -18,16 +18,13 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -45,6 +42,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
@@ -146,7 +144,6 @@ public class ImageChoiceDialog extends JDialog {
                 categoryModel.addElement(name);
                 if (category.equals(name)) {
                     match = name;
-                    break;
                 }
             }
         }
@@ -201,6 +198,17 @@ public class ImageChoiceDialog extends JDialog {
             gbc.weightx = 1.0;
             gbc.weighty = 1.0;
 
+            // We need to ensure that the state that it comes into is saved, as we need to add the
+            // default frame icon otherwise
+            final boolean emptyInitialIconMap = iconMap.isEmpty();
+
+            // Add the default frame icon
+            if (emptyInitialIconMap) {
+                Vector<String> initFrame = new Vector<>();
+                initFrame.add("Frame.png");
+                iconMap.put(LayeredForceIcon.FRAME.getLayerPath(), initFrame);
+            }
+
             LayeredForceIcon[] layeredForceIcons = LayeredForceIcon.values();
             layeredTables = new JTable[layeredForceIcons.length];
 
@@ -229,8 +237,9 @@ public class ImageChoiceDialog extends JDialog {
                 }
                 layerTabs.addTab(layeredForceIcons[i].toString(), panel);
 
-                // Initialize Initial Values, provided the Icon Map is not empty
-                if (!iconMap.isEmpty()) {
+                // Initialize Initial Values, provided the Icon Map is not empty on input or it
+                // is the frame (as we set that value otherwise)
+                if (!emptyInitialIconMap || (layeredForceIcons[i] == LayeredForceIcon.FRAME)) {
                     if (iconMap.containsKey(layeredForceIcons[i].getLayerPath())) {
                         if (layeredForceIcons[i].getListSelectionModel() == ListSelectionModel.SINGLE_SELECTION) {
                             // Determine the current selected value
@@ -257,14 +266,6 @@ public class ImageChoiceDialog extends JDialog {
                 }
             }
 
-            // Then trigger the initial refresh
-            refreshLayeredPreview();
-
-            // And add the missing ListSelectionListeners, which must be done after the initial refresh
-            for (JTable table : layeredTables) {
-                table.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
-            }
-
             // Put it all together nice and pretty on the layerPanel
             layerPanel.setLayout(new GridBagLayout());
             layerPanel.add(layerTabs, gbc);
@@ -283,7 +284,7 @@ public class ImageChoiceDialog extends JDialog {
             tabbedPane.addTab(resourceMap.getString("Force.layered"), layerPanel);
 
             // Set currently selected tab based on the initial category
-            if (!iconMap.isEmpty()) {
+            if (!emptyInitialIconMap) {
                 tabbedPane.setSelectedComponent(layerPanel);
             }
 
@@ -298,14 +299,13 @@ public class ImageChoiceDialog extends JDialog {
             gbc.anchor = GridBagConstraints.NORTHWEST;
             getContentPane().add(tabbedPane, gbc);
 
-            // Add the tableImages List Selection Listener now that the values have been
-            // initialized for Layered Icons
-            tableImages.getSelectionModel().addListSelectionListener(event -> {
-                // Clear selections on the layered tables
-                for (JTable table : layeredTables) {
-                    table.clearSelection();
-                }
-            });
+            // Then trigger the initial refresh
+            refreshLayeredPreview();
+
+            // And add the missing ListSelectionListeners, which must be done after the initial refresh
+            for (JTable table : layeredTables) {
+                table.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
+            }
         } else {
             // Add the image panel to the content pane
             gbc = new GridBagConstraints();
@@ -390,7 +390,7 @@ public class ImageChoiceDialog extends JDialog {
     }
 
     private void refreshLayeredPreview() {
-        // Add the image frame
+        // Clear the icon map
         iconMap.clear();
 
         // Check each table for what is, or is not, selected
@@ -551,7 +551,7 @@ public class ImageChoiceDialog extends JDialog {
         }
     }
 
-    public static class ImagePanel extends JPanel {
+    public class ImagePanel extends JPanel {
         private static final long serialVersionUID = -3724175393116586310L;
         private DirectoryItems items;
         private JLabel lblImage;
@@ -585,7 +585,15 @@ public class ImageChoiceDialog extends JDialog {
         }
 
         public void setImage(String category, String name) {
-            if ((null == category) || name.equals(Crew.PORTRAIT_NONE)) {
+            if ((null == category) || name.equals(Force.ICON_NONE)) {
+                int width = force ? 110 : 76;
+                int height = 76;
+
+                BufferedImage noImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D graphics = noImage.createGraphics();
+                graphics.setComposite(AlphaComposite.Clear);
+                graphics.fillRect(0, 0, width, height);
+                lblImage.setIcon(new ImageIcon(noImage));
                 return;
             }
 

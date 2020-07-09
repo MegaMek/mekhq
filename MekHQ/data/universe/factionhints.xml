@@ -230,7 +230,7 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 	</war>
 
 	<!-- Taurian-Canopian War -->
-	<war name="The Taurian-Canopian War" start="2813-07-01" end="2814-02-30">
+	<war name="The Taurian-Canopian War" start="2813-07-01" end="2814-02-28">
 		<parties>TC,MOC</parties>
 	</war>
 	

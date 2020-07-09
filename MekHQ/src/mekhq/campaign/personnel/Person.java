@@ -40,7 +40,6 @@ import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.enums.*;
-import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -144,7 +143,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private static final IntSupplier PREGNANCY_SIZE = () -> {
         int children = 1;
         // Hellin's law says it's 1:89 chance, to not make it appear too seldom, we use 1:50
-        while(Compute.randomInt(50) == 0) {
+        while (Compute.randomInt(50) == 0) {
             ++ children;
         }
         return Math.min(children, 10); // Limit to decuplets, for the sake of sanity
@@ -164,13 +163,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // provided that they are not married, are old enough, etc.
     private boolean tryingToMarry;
     //endregion Marriage
-
-    //region Divorce Variables
-    public static final String OPT_SELECTED_CHANGE_SURNAME = "selected_change_surname";
-    public static final String OPT_SPOUSE_CHANGE_SURNAME = "spouse_change_surname";
-    public static final String OPT_BOTH_CHANGE_SURNAME = "both_change_surname";
-    public static final String OPT_KEEP_SURNAME = "keep_surname";
-    //endregion Divorce Variables
     //endregion Family Variables
 
     protected UUID id;
@@ -507,9 +499,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @param log whether to log the change or not
      */
     public void setPrisonerStatus(PrisonerStatus prisonerStatus, boolean log) {
-        if (getPrisonerStatus() == prisonerStatus) {
-            return;
-        }
+        // This must be processed completely, as the unchanged prisoner status of Free to Free is
+        // used during recruitment
 
         final boolean freed = !getPrisonerStatus().isFree();
         final boolean isPrisoner = prisonerStatus.isPrisoner();
@@ -1169,7 +1160,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getRecruitmentAsString(Campaign campaign) {
         if (getRecruitment() == null) {
-            return null;
+            return "";
         } else {
             return getRecruitment().format(DateTimeFormatter.ofPattern(
                     campaign.getCampaignOptions().getDisplayDateFormat()));
@@ -1186,9 +1177,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getLastRankChangeDateAsString(Campaign campaign) {
         if (getLastRankChangeDate() == null) {
-            return null;
+            return "";
         } else {
-            return getRecruitment().format(DateTimeFormatter.ofPattern(
+            return getLastRankChangeDate().format(DateTimeFormatter.ofPattern(
                     campaign.getCampaignOptions().getDisplayDateFormat()));
         }
     }
@@ -1341,34 +1332,51 @@ public class Person implements Serializable, MekHqXmlSerializable {
         extraData.set(PREGNANCY_FATHER_DATA, null);
     }
 
+    /**
+     * This method is how a person gives birth to a number of babies and have them added to the campaign
+     * @param campaign the campaign to add the baby in question to
+     */
     public void birth(Campaign campaign) {
         int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
+
+        // Determine father information
         String fatherIdString = extraData.get(PREGNANCY_FATHER_DATA);
         UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
         fatherId = campaign.getCampaignOptions().determineFatherAtBirth()
                 ? Utilities.nonNull(getSpouseId(), fatherId) : fatherId;
 
+        // Determine Ancestry
         Ancestors anc = campaign.getAncestors(fatherId, id);
         if (anc == null) {
             anc = campaign.createAncestors(fatherId, id);
         }
         final UUID ancId = anc.getId();
 
-        // Cleanup
-        removePregnancy();
+        // Determine Prisoner Status
+        PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
+                ? PrisonerStatus.FREE : getPrisonerStatus();
 
+        // Output a specific report to the campaign if they are giving birth to multiple children
+        if (PREGNANCY_MULTIPLE_NAMES[size] != null) {
+            campaign.addReport(String.format("%s has given birth to %s!", getHyperlinkedName(),
+                    PREGNANCY_MULTIPLE_NAMES[size]));
+        }
+
+        // Create Babies
         for (int i = 0; i < size; i++) {
+            // Create the specific baby
             Person baby = campaign.newDependent(T_NONE, true);
+            baby.setId(UUID.randomUUID());
             String surname = campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
             baby.setSurname(surname);
             baby.setBirthday(campaign.getLocalDate());
-
-            baby.setId(UUID.randomUUID());
             baby.setAncestorsId(ancId);
 
-            campaign.recruitPerson(baby, baby.getPrisonerStatus(), baby.isDependent(), true, false);
+            // Recruit the baby
+            campaign.recruitPerson(baby, prisonerStatus, baby.isDependent(), true, true);
 
+            // Create reports and log the birth
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             if (campaign.getCampaignOptions().logConception()) {
@@ -1378,6 +1386,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             }
         }
+
+        // Cleanup Data
+        removePregnancy();
     }
     //endregion Pregnancy
 
@@ -1467,71 +1478,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return (ageDifference <= campaign.getCampaignOptions().getMarriageAgeRange());
     }
     //endregion Marriage
-
-    //region Divorce
-    public void divorce(String divorceOption) {
-        Person spouse = getSpouse();
-        int reason = FormerSpouse.REASON_WIDOWED;
-
-        switch (divorceOption) {
-            case OPT_SELECTED_CHANGE_SURNAME:
-                if (getMaidenName() != null) {
-                    setSurname(getMaidenName());
-                }
-                break;
-            case OPT_SPOUSE_CHANGE_SURNAME:
-                if (spouse.getMaidenName() != null) {
-                    spouse.setSurname(spouse.getMaidenName());
-                }
-                break;
-            case OPT_BOTH_CHANGE_SURNAME:
-                if (getMaidenName() != null) {
-                    setSurname(getMaidenName());
-                }
-                if (spouse.getMaidenName() != null) {
-                    spouse.setSurname(spouse.getMaidenName());
-                }
-                break;
-            case OPT_KEEP_SURNAME:
-            default:
-                break;
-        }
-
-        if (!(spouse.isDeadOrMIA() && isDeadOrMIA())) {
-            reason = FormerSpouse.REASON_DIVORCE;
-
-            PersonalLogger.divorcedFrom(this, spouse, getCampaign().getDate());
-            PersonalLogger.divorcedFrom(spouse, this, getCampaign().getDate());
-
-            campaign.addReport(String.format("%s has divorced %s!", getHyperlinkedName(),
-                    spouse.getHyperlinkedName()));
-
-            spouse.setMaidenName(null);
-            setMaidenName(null);
-
-            spouse.setSpouseId(null);
-            setSpouseId(null);
-        } else if (spouse.isDeadOrMIA()) {
-            setMaidenName(null);
-            setSpouseId(null);
-        } else if (isDeadOrMIA()) {
-            spouse.setMaidenName(null);
-            spouse.setSpouseId(null);
-        }
-
-        // Output a message for Spouses who are KIA
-        if (reason == FormerSpouse.REASON_WIDOWED) {
-            PersonalLogger.spouseKia(spouse, this, getCampaign().getDate());
-        }
-
-        // Add to former spouse list
-        spouse.addFormerSpouse(new FormerSpouse(getId(), getCampaign().getLocalDate(), reason));
-        addFormerSpouse(new FormerSpouse(spouse.getId(), getCampaign().getLocalDate(), reason));
-
-        MekHQ.triggerEvent(new PersonChangedEvent(this));
-        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
-    }
-    //endregion Divorce
 
     public int getXp() {
         return xp;
@@ -2160,7 +2106,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
                     }
-                    DateTime now = new DateTime(c.getCalendar());
+                    LocalDate now = c.getLocalDate();
                     retVal.injuries.stream().filter(inj -> (null == inj.getStart()))
                         .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
@@ -3305,11 +3251,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setMinutesLeft(int m) {
         this.minutesLeft = m;
-        if(engineer && null != getUnitId()) {
+        if (engineer && null != getUnitId()) {
             //set minutes for all crewmembers
             Unit u = campaign.getUnit(getUnitId());
-            if(null != u) {
-                for(Person p : u.getActiveCrew()) {
+            if (null != u) {
+                for (Person p : u.getActiveCrew()) {
                     p.setMinutesLeft(m);
                 }
             }
@@ -3322,11 +3268,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setOvertimeLeft(int m) {
         this.overtimeLeft = m;
-        if(engineer && null != getUnitId()) {
+        if (engineer && null != getUnitId()) {
             //set minutes for all crewmembers
             Unit u = campaign.getUnit(getUnitId());
-            if(null != u) {
-                for(Person p : u.getActiveCrew()) {
+            if (null != u) {
+                for (Person p : u.getActiveCrew()) {
                     p.setMinutesLeft(m);
                 }
             }

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.dialog;
 
 import java.awt.Component;
@@ -10,7 +28,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -30,12 +52,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import megamek.common.EquipmentType;
 import megamek.common.util.EncodeControl;
@@ -68,14 +85,13 @@ public class NewPlanetaryEventDialog extends JDialog {
     private static final String FIELD_POPULATION = "population"; //$NON-NLS-1$
     private static final String FIELD_GOVERNMENT = "government"; //$NON-NLS-1$
 
-    private final static DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd"); //$NON-NLS-1$
     private final static SocioIndustrialDataAdapter SOCIO_INDUSTRIAL_ADAPTER = new SocioIndustrialDataAdapter();
 
     ResourceBundle resourceMap;
 
     private final Planet planet;
 
-    private DateTime date;
+    private LocalDate date;
 
     private List<Planet.PlanetaryEvent> changedEvents = null;
 
@@ -107,8 +123,8 @@ public class NewPlanetaryEventDialog extends JDialog {
         super(parent, modal);
         this.planet = new Planet(Objects.requireNonNull(planet).getId());
         this.planet.copyDataFrom(planet);
-        this.date = Utilities.getDateTimeDay(campaign.getCalendar());
-        initComponents();
+        this.date = campaign.getLocalDate();
+        initComponents(campaign);
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
@@ -117,7 +133,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         return changedEvents;
     }
 
-    protected void initComponents() {
+    protected void initComponents(Campaign campaign) {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.NewPlanetaryEventDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("form"); //$NON-NLS-1$
@@ -146,14 +162,14 @@ public class NewPlanetaryEventDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if((e.getModifiers() & ActionEvent.ALT_MASK) > 0) {
+                if ((e.getModifiers() & ActionEvent.ALT_MASK) > 0) {
                     date = date.minusYears(1);
-                } else if((e.getModifiers() & ActionEvent.CTRL_MASK) > 0) {
+                } else if ((e.getModifiers() & ActionEvent.CTRL_MASK) > 0) {
                     date = date.minusMonths(1);
                 } else {
                     date = date.minusDays(1);
                 }
-                updateDate();
+                updateDate(campaign);
             }
         }), gbc);
 
@@ -167,10 +183,12 @@ public class NewPlanetaryEventDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                DateChooser dc = new DateChooser((content instanceof Frame) ? (Frame) content : null, date.toGregorianCalendar());
+                GregorianCalendar day = GregorianCalendar.from(date.atStartOfDay(
+                        ZoneId.systemDefault()));
+                DateChooser dc = new DateChooser((content instanceof Frame) ? (Frame) content : null, day);
                 if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-                    date = Utilities.getDateTimeDay(dc.getDate());
-                    updateDate();
+                    date = dc.getDate().toZonedDateTime().toLocalDate();
+                    updateDate(campaign);
                 }
             }
         });
@@ -189,14 +207,14 @@ public class NewPlanetaryEventDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if((e.getModifiers() & ActionEvent.ALT_MASK) > 0) {
+                if ((e.getModifiers() & ActionEvent.ALT_MASK) > 0) {
                     date = date.plusYears(1);
-                } else if((e.getModifiers() & ActionEvent.CTRL_MASK) > 0) {
+                } else if ((e.getModifiers() & ActionEvent.CTRL_MASK) > 0) {
                     date = date.plusMonths(1);
                 } else {
                     date = date.plusDays(1);
                 }
-                updateDate();
+                updateDate(campaign);
             }
         }), gbc);
 
@@ -214,7 +232,7 @@ public class NewPlanetaryEventDialog extends JDialog {
             BorderFactory.createEmptyBorder(1, 5, 1, 5)));
         content.add(data, gbc);
 
-        preparaDataPane(data);
+        prepareDataPane(data, campaign);
 
         gbc.gridy = 3;
         gbc.gridwidth = 1;
@@ -242,11 +260,11 @@ public class NewPlanetaryEventDialog extends JDialog {
             }
         }), gbc);
 
-        updateDate();
+        updateDate(campaign);
         pack();
     }
 
-    private void preparaDataPane(JPanel pane) {
+    private void prepareDataPane(JPanel pane, Campaign campaign) {
         GridBagConstraints gbc = new GridBagConstraints();
 
         Action changeValueAction = new AbstractAction() {
@@ -255,16 +273,13 @@ public class NewPlanetaryEventDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateEvent((Component) e.getSource(), planet.getOrCreateEvent(date));
-                updateDate();
+                updateDate(campaign);
             }
         };
 
-        ChangeListener changeListener = new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                updateEvent((Component) e.getSource(), planet.getOrCreateEvent(date));
-                updateDate();
-            }
+        ChangeListener changeListener = e -> {
+            updateEvent((Component) e.getSource(), planet.getOrCreateEvent(date));
+            updateDate(campaign);
         };
 
         Action noChangeAction = new AbstractAction() {
@@ -274,9 +289,9 @@ public class NewPlanetaryEventDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 JCheckBox check = ((JCheckBox) e.getSource());
                 String field = check.getName();
-                if(check.isSelected()) {
+                if (check.isSelected()) {
                     cleanEventField(getCurrentEvent(), field);
-                    updateDate();
+                    updateDate(campaign);
                 }
             }
         };
@@ -291,8 +306,7 @@ public class NewPlanetaryEventDialog extends JDialog {
             @Override
             public void focusLost(FocusEvent e) {
                 super.focusLost(e);
-                if(e.getSource() instanceof JTextField)
-                {
+                if (e.getSource() instanceof JTextField) {
                     final JTextField source = (JTextField) e.getSource();
                     source.dispatchEvent(new KeyEvent(source, KeyEvent.KEY_PRESSED,
                             System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, '\n'));
@@ -380,11 +394,11 @@ public class NewPlanetaryEventDialog extends JDialog {
                 Planet.PlanetaryEvent event = planet.getOrCreateEvent(date);
                 ChooseFactionsDialog chooser = new ChooseFactionsDialog(null, date, event.faction);
                 chooser.setVisible(true);
-                if(chooser.isChanged()) {
+                if (chooser.isChanged()) {
                     event.faction = chooser.getResult();
                     event.custom = true;
                     planet.refreshEvents();
-                    updateDate();
+                    updateDate(campaign);
                 }
             }
         });
@@ -417,7 +431,7 @@ public class NewPlanetaryEventDialog extends JDialog {
                 String text = ((JTextField) input).getText();
                 try {
                     SOCIO_INDUSTRIAL_ADAPTER.unmarshal(text);
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     return false;
                 }
                 return true;
@@ -440,7 +454,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         pane.add(new JLabel(resourceMap.getString("hpg.text")), gbc); //$NON-NLS-1$
 
         gbc.gridx = 1;
-        hpgField = new JComboBox<HPGChoice>(new HPGChoice[]{
+        hpgField = new JComboBox<>(new HPGChoice[]{
                 new HPGChoice(null, resourceMap.getString("hpg.undefined.text")), //$NON-NLS-1$
                 new HPGChoice(EquipmentType.RATING_A, resourceMap.getString("hpg.a.text")), new HPGChoice(EquipmentType.RATING_B, resourceMap.getString("hpg.b.text")), //$NON-NLS-1$ //$NON-NLS-2$
                 new HPGChoice(EquipmentType.RATING_C, resourceMap.getString("hpg.c.text")), new HPGChoice(EquipmentType.RATING_D, resourceMap.getString("hpg.d.text")), //$NON-NLS-1$ //$NON-NLS-2$
@@ -459,8 +473,6 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.gridx = 3;
         hpgCombined = new JLabel();
         pane.add(hpgCombined, gbc);
-
-
     }
 
     private void setUserPreferences() {
@@ -474,17 +486,17 @@ public class NewPlanetaryEventDialog extends JDialog {
         return planet.getEvent(date);
     }
 
-    private void updateDate() {
-        dateButton.setText(date.toString(DATE_FORMATTER));
+    private void updateDate(Campaign campaign) {
+        dateButton.setText(date.format(DateTimeFormatter.ofPattern(campaign.getCampaignOptions().getDisplayDateFormat())));
         Planet.PlanetaryEvent event = getCurrentEvent();
 
         messageField.setText((null != event) ? event.message : null);
         nameField.setText((null != event) ? event.name : null);
         shortNameField.setText((null != event) ? event.shortName : null);
         Set<Faction> factionSet = null;
-        if((null != event) && (null != event.faction)) {
+        if ((null != event) && (null != event.faction)) {
             factionSet = new HashSet<>();
-            for(String f : event.faction) {
+            for (String f : event.faction) {
                 factionSet.add(Faction.getFaction(f));
             }
         }
@@ -509,7 +521,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         String socioIndustrialText = "";
         try {
             socioIndustrialText= SOCIO_INDUSTRIAL_ADAPTER.marshal(planet.getSocioIndustrial(date));
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             // Do nothing
         }
         socioindustrialCombined.setText(socioIndustrialText);
@@ -517,16 +529,27 @@ public class NewPlanetaryEventDialog extends JDialog {
     }
 
     private void cleanEventField(Planet.PlanetaryEvent event, String field) {
-        if((null == event) || (null == field)) {
+        if ((null == event) || (null == field)) {
             return;
         }
-        switch(field) {
-            case FIELD_NAME: event.name = null; break;
-            case FIELD_SHORTNAME: event.shortName = null; break;
-            case FIELD_FACTION: event.faction = null; break;
-            case FIELD_SOCIO_INDUSTRIAL: event.socioIndustrial = null; break;
-            case FIELD_HPG: event.hpg = null; break;
-            default: break;
+        switch (field) {
+            case FIELD_NAME:
+                event.name = null;
+                break;
+            case FIELD_SHORTNAME:
+                event.shortName = null;
+                break;
+            case FIELD_FACTION:
+                event.faction = null;
+                break;
+            case FIELD_SOCIO_INDUSTRIAL:
+                event.socioIndustrial = null;
+                break;
+            case FIELD_HPG:
+                event.hpg = null;
+                break;
+            default:
+                break;
         }
         event.custom = true;
         planet.refreshEvents();
@@ -538,23 +561,33 @@ public class NewPlanetaryEventDialog extends JDialog {
     }
 
     private void updateEvent(Component source, Planet.PlanetaryEvent event) {
-        switch(source.getName()) {
-            case FIELD_MESSAGE: event.message = nullEmptyText(messageField); break;
-            case FIELD_NAME: event.name = nullEmptyText(nameField); break;
-            case FIELD_SHORTNAME: event.shortName = nullEmptyText(shortNameField); break;
+        switch (source.getName()) {
+            case FIELD_MESSAGE:
+                event.message = nullEmptyText(messageField);
+                break;
+            case FIELD_NAME:
+                event.name = nullEmptyText(nameField);
+                break;
+            case FIELD_SHORTNAME:
+                event.shortName = nullEmptyText(shortNameField);
+                break;
             case FIELD_SOCIO_INDUSTRIAL:
                 String socioindustrialText = nullEmptyText(socioindustrialField);
                 try {
                     event.socioIndustrial = SOCIO_INDUSTRIAL_ADAPTER.unmarshal(socioindustrialText);
                     String newText = SOCIO_INDUSTRIAL_ADAPTER.marshal(event.socioIndustrial);
-                    if(!socioindustrialText.equals(newText)) {
+                    if (!socioindustrialText.equals(newText)) {
                         socioindustrialField.setText(newText);
                     }
-                } catch (Exception ex) {
+                } catch (Exception ignored) {
+
                 }
                 break;
-            case FIELD_HPG: event.hpg = ((HPGChoice) hpgField.getSelectedItem()).hpg; break;
-            default: return;
+            case FIELD_HPG:
+                event.hpg = ((HPGChoice) hpgField.getSelectedItem()).hpg;
+                break;
+            default:
+                return;
         }
         event.custom = true;
         planet.refreshEvents();
@@ -581,10 +614,10 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         @Override
         public boolean equals(Object obj) {
-            if(this == obj) {
+            if (this == obj) {
                 return true;
             }
-            if((null == obj) || (getClass() != obj.getClass())) {
+            if ((null == obj) || (getClass() != obj.getClass())) {
                 return false;
             }
             final HPGChoice other = (HPGChoice) obj;
