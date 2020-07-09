@@ -145,7 +145,7 @@ public class AutosaveService implements IAutosaveService {
                         "Autosave-%d-%s-%s.cpnx.gz",
                         index++,
                         campaign.getName(),
-                        campaign.getShortDateAsString());
+                        campaign.getCampaignOptions().getDisplayFormattedDate(campaign.getLocalDate()));
 
                 repeatedName = false;
                 for (File file : autosaveFiles) {

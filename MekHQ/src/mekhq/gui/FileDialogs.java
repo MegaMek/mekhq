@@ -65,7 +65,7 @@ public class FileDialogs {
         String fileName = String.format(
                 "%s%s_ExportedPersonnel.prsx", //$NON-NLS-1$
                 campaign.getName(),
-                campaign.getShortDateAsString() );
+                campaign.getCampaignOptions().getDisplayFormattedDate(campaign.getLocalDate()));
 
         Optional<File> value = GUI.fileDialogSave(
                 frame,
@@ -136,7 +136,7 @@ public class FileDialogs {
         String fileName = String.format(
                 "%s%s_ExportedParts.parts", //$NON-NLS-1$
                 campaign.getName(),
-                campaign.getShortDateAsString() );
+                campaign.getCampaignOptions().getDisplayFormattedDate(campaign.getLocalDate()));
 
         Optional<File> value =  GUI.fileDialogSave(
                 frame,
@@ -204,11 +204,10 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
-
         String fileName = String.format(
                 "%s%s.%s", //$NON-NLS-1$
                 campaign.getName(),
-                campaign.getShortDateAsString(),
+                campaign.getCampaignOptions().getDisplayFormattedDate(campaign.getLocalDate()),
                 campaign.getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
 
         Optional<File> value = GUI.fileDialogSave( frame,
