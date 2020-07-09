@@ -1114,7 +1114,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getRecruitmentAsString(Campaign campaign) {
         if (getRecruitment() == null) {
-            return null;
+            return "";
         } else {
             return getRecruitment().format(DateTimeFormatter.ofPattern(
                     campaign.getCampaignOptions().getDisplayDateFormat()));
@@ -1131,7 +1131,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getLastRankChangeDateAsString(Campaign campaign) {
         if (getLastRankChangeDate() == null) {
-            return null;
+            return "";
         } else {
             return getLastRankChangeDate().format(DateTimeFormatter.ofPattern(
                     campaign.getCampaignOptions().getDisplayDateFormat()));

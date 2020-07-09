@@ -767,7 +767,7 @@ public class CampaignOptions implements Serializable {
         opforLocalUnitChance = 5;
         adjustPlayerVehicles = false;
         regionalMechVariations = false;
-        attachedPlayerCamouflage = false;
+        attachedPlayerCamouflage = true;
         useDropShips = false;
         useWeatherConditions = true;
         useLightConditions = true;

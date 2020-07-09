@@ -29,6 +29,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import megamek.client.generator.RandomGenderGenerator;
+import megamek.common.IPlayer;
 import megamek.common.enums.Gender;
 import megamek.common.util.StringUtil;
 
@@ -493,13 +494,14 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
 
             if (forceTemplate != null && forceTemplate.isAlliedPlayerForce()) {
+
                 for (Entity en : botForce.getEntityList()) {
                     scenario.getAlliesPlayer().add(en);
                     scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
 
-                    if (campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
-                        en.setCamoCategory(campaign.getCamoCategory());
-                        en.setCamoFileName(campaign.getCamoFileName());
+                    if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
+                        en.setCamoCategory(IPlayer.NO_CAMO);
+                        en.setCamoFileName(IPlayer.colorNames[scenario.getContract(campaign).getAllyColorIndex()]);
                     }
                 }
 
