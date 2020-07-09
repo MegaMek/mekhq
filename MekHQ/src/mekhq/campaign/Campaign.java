@@ -215,7 +215,6 @@ public class Campaign implements Serializable, ITechManager {
     private GregorianCalendar calendar;
     private LocalDate currentDay;
     private String dateFormat;
-    private String shortDateFormat;
 
     private String factionCode;
     private int techFactionCode;
@@ -294,7 +293,6 @@ public class Campaign implements Serializable, ITechManager {
         currentReportHTML = "";
         newReports = new ArrayList<>();
         dateFormat = "EEEE, MMMM d yyyy";
-        shortDateFormat = "yyyyMMdd";
         name = "My Campaign";
         overtime = false;
         gmMode = false;
@@ -651,10 +649,6 @@ public class Campaign implements Serializable, ITechManager {
         setShipSearchType(unitType);
     }
 
-    public void endShipSearch() {
-        setShipSearchStart(null);
-    }
-
     private void processShipSearch() {
         if (getShipSearchStart() == null) {
             return;
@@ -665,28 +659,28 @@ public class Campaign implements Serializable, ITechManager {
                     .append(" deducted for ship search.");
         } else {
             addReport("<font color=\"red\">Insufficient funds for ship search.</font>");
-            shipSearchStart = null;
+            setShipSearchStart(null);
             return;
         }
-        long numDays = ChronoUnit.DAYS.between(getLocalDate(), getShipSearchStart());
+        long numDays = ChronoUnit.DAYS.between(getShipSearchStart(), getLocalDate());
         if (numDays > 21) {
             int roll = Compute.d6(2);
             TargetRoll target = getAtBConfig().shipSearchTargetRoll(shipSearchType, this);
-            shipSearchStart = null;
+            setShipSearchStart(null);
             report.append("<br/>Ship search target: ").append(target.getValueAsString()).append(" roll: ")
                     .append(roll);
             // TODO: mos zero should make ship available on retainer
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
-                MechSummary ms = unitGenerator.generate(factionCode, shipSearchType, -1,
+                MechSummary ms = unitGenerator.generate(getFactionCode(), shipSearchType, -1,
                         getGameYear(), getUnitRatingMod());
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
                 if (ms != null) {
-                    shipSearchResult = ms.getName();
-                    setShipSearchExpiration(getLocalDate().plusMonths(1));
-                    report.append(shipSearchResult).append(" is available for purchase for ")
+                    setShipSearchResult(ms.getName());
+                    setShipSearchExpiration(getLocalDate().plusDays(31));
+                    report.append(getShipSearchResult()).append(" is available for purchase for ")
                             .append(Money.of(ms.getCost()).toAmountAndSymbolString())
                             .append(" until ")
                             .append(getCampaignOptions().getDisplayFormattedDate(getShipSearchExpiration()));
@@ -3456,7 +3450,7 @@ public class Campaign implements Serializable, ITechManager {
         if ((getShipSearchExpiration() != null) && !getShipSearchExpiration().isAfter(getLocalDate())) {
             setShipSearchExpiration(null);
             if (getShipSearchResult() != null) {
-                addReport("Opportunity for purchase of " + shipSearchResult + " has expired.");
+                addReport("Opportunity for purchase of " + getShipSearchResult() + " has expired.");
                 setShipSearchResult(null);
             }
         }
