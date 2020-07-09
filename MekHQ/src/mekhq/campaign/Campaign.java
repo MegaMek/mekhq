@@ -8276,7 +8276,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void initAtB(boolean newCampaign) {
-        getRetirementDefectionTracker().setLastRetirementRoll(getCalendar());
+        getRetirementDefectionTracker().setLastRetirementRoll(getLocalDate());
 
         if (!newCampaign) {
             /*
@@ -8285,7 +8285,7 @@ public class Campaign implements Serializable, ITechManager {
             for (Map.Entry<Integer, Mission> me : missions.entrySet()) {
                 Mission m = me.getValue();
                 if (m instanceof Contract && !(m instanceof AtBContract)) {
-                    me.setValue(new AtBContract((Contract)m, this));
+                    me.setValue(new AtBContract((Contract) m, this));
                 }
             }
 
@@ -8398,8 +8398,8 @@ public class Campaign implements Serializable, ITechManager {
 
     public boolean checkYearlyRetirements() {
         if (getCampaignOptions().getUseAtB()
-                && Utilities.getDaysBetween(getRetirementDefectionTracker()
-                        .getLastRetirementRoll().getTime(), getDate()) == 365) {
+                && (Math.toIntExact(ChronoUnit.YEARS.between(getRetirementDefectionTracker()
+                .getLastRetirementRoll(), getLocalDate())) == 1)) {
             Object[] options = { "Show Retirement Dialog", "Not Now" };
             return JOptionPane.YES_OPTION == JOptionPane
                     .showOptionDialog(
