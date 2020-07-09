@@ -23,7 +23,6 @@ import java.awt.Dialog.ModalityType;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Image;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -639,8 +638,6 @@ public class PersonViewPanel extends ScrollablePanel {
         firsty++;
 
         if (person.isPregnant()) {
-            String dueDate;
-
             lblDueDate1.setName("lblDueDate1");
             lblDueDate1.setText(resourceMap.getString("lblDueDate1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -650,13 +647,10 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblDueDate1, gridBagConstraints);
 
-            if (campaign.getCampaignOptions().getDisplayTrueDueDate()) {
-                dueDate = person.getDueDate().format(DateTimeFormatter.ofPattern(campaign
-                        .getCampaignOptions().getDisplayDateFormat()));
-            } else {
-                dueDate = person.getExpectedDueDate().format(DateTimeFormatter.ofPattern(campaign
-                        .getCampaignOptions().getDisplayDateFormat()));
-            }
+            String dueDate = campaign.getCampaignOptions().getDisplayFormattedDate(
+                    campaign.getCampaignOptions().getDisplayTrueDueDate()
+                            ? person.getDueDate()
+                            : person.getExpectedDueDate());
 
             lblDueDate2.setName("lblDueDate2");
             lblDueDate2.setText(dueDate);
@@ -866,9 +860,9 @@ public class PersonViewPanel extends ScrollablePanel {
                 lblFormerSpouses2 = new JLabel();
                 lblFormerSpouses2.setName("lblFormerSpouses2"); // NOI18N //$NON-NLS-1$
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>", ex.getFullName(),
-                        formerSpouse.getReasonString(), formerSpouse.getDateAsString(
-                                campaign.getCampaignOptions().getDisplayDateFormat())));
+                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
+                        ex.getFullName(), formerSpouse.getReasonString(),
+                        campaign.getCampaignOptions().getDisplayFormattedDate(formerSpouse.getDate())));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
