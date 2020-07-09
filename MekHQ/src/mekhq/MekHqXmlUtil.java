@@ -19,7 +19,6 @@
 package mekhq;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -56,7 +55,6 @@ import megamek.common.Tank;
 import megamek.common.logging.LogLevel;
 
 public class MekHqXmlUtil extends MegaMekXmlUtil {
-
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
     private static XPath XPATH_INSTANCE;
 
