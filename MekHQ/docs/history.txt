@@ -11,6 +11,7 @@ VERSION HISTORY:
 + Issue #1816: Fixing Portrait Changing in the Same Category
 + Issues #1797 and #1820: DateTime to LocalDate Switchover and Date Fixes
 + Issue #1840: Properly Implementing the Attached Camo Option
++ Issue #1847: Fixing Time in Service
 
 0.47.7 (2020-06-22 2330 UTC)
 + PR #1811: Fix advance multiple days reports not showing
