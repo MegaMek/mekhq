@@ -29,6 +29,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -222,6 +223,15 @@ public final class BatchXPDialog extends JDialog {
         DefaultComboBoxModel<String> personSkillModel = new DefaultComboBoxModel<>();
         personSkillModel.addElement(choiceNoSkill);
         for(String skill : SkillType.getSkillList()) {
+            if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                if (SkillType.isSingleGunnery(skill)) {
+                    continue;
+                }
+            } else {
+                if (SkillType.isSpecificRPGGunnery(skill)) {
+                    continue;
+                }
+            }
             personSkillModel.addElement(skill);
         }
         choiceSkill.setModel(personSkillModel);

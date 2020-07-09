@@ -997,9 +997,19 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         c.gridx = 0;
 
         for(int i = 0; i < SkillType.getSkillList().length; i++) {
+            final String type = SkillType.getSkillList()[i];
+            if (campaign.getGameOptions().booleanOption(OptionsConstants.RPG_RPG_GUNNERY)) {
+                if (SkillType.isSingleGunnery(type)) {
+                    continue;
+                }
+            } else {
+                if (SkillType.isSpecificRPGGunnery(type)) {
+                    continue;
+                }
+            }
+            
             c.gridy = i;
             c.gridx = 0;
-            final String type = SkillType.getSkillList()[i];
             chkSkill = new JCheckBox();
             chkSkill.setSelected(person.hasSkill(type));
             skillChks.put(type, chkSkill);
@@ -1064,14 +1074,16 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void setSkills() {
-        for (int i = 0; i < SkillType.getSkillList().length; i++) {
+    	for (int i = 0; i < SkillType.getSkillList().length; i++) {
             final String type = SkillType.getSkillList()[i];
-            if (skillChks.get(type).isSelected()) {
-                int lvl = (Integer)skillLvls.get(type).getModel().getValue();
-                int b = (Integer)skillBonus.get(type).getModel().getValue();
-                person.addSkill(type, lvl, b);
-            } else {
-                person.removeSkill(type);
+            if (skillChks.containsKey(type)) {
+                if (skillChks.get(type).isSelected()) {
+                    int lvl = (Integer) skillLvls.get(type).getModel().getValue();
+                    int b = (Integer) skillBonus.get(type).getModel().getValue();
+                    person.addSkill(type, lvl, b);
+                } else {
+                    person.removeSkill(type);
+                }
             }
         }
         IOption option;
@@ -1279,26 +1291,40 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         clearAllPhenotypeBonuses();
         if (clanner) {
             switch(pheno) {
-                case Person.PHENOTYPE_MW:
-                    skillBonus.get(SkillType.S_GUN_MECH).setValue(1);
-                    skillBonus.get(SkillType.S_PILOT_MECH).setValue(1);
-                    break;
-                case Person.PHENOTYPE_AERO:
-                    skillBonus.get(SkillType.S_GUN_AERO).setValue(1);
-                    skillBonus.get(SkillType.S_PILOT_AERO).setValue(1);
-                    skillBonus.get(SkillType.S_GUN_JET).setValue(1);
-                    skillBonus.get(SkillType.S_PILOT_JET).setValue(1);
-                    skillBonus.get(SkillType.S_GUN_PROTO).setValue(1);
-                    break;
-                case Person.PHENOTYPE_BA:
-                    skillBonus.get(SkillType.S_GUN_BA).setValue(1);
-                    break;
-                case Person.PHENOTYPE_VEE:
-                    skillBonus.get(SkillType.S_GUN_VEE).setValue(1);
-                    skillBonus.get(SkillType.S_PILOT_GVEE).setValue(1);
-                    skillBonus.get(SkillType.S_PILOT_NVEE).setValue(1);
-                    skillBonus.get(SkillType.S_PILOT_VTOL).setValue(1);
-                    break;
+            case Person.PHENOTYPE_MW:
+                skillBonus.get(SkillType.S_GUN_MECH).setValue(1);
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    skillBonus.get(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType)).setValue(1);
+                }
+                skillBonus.get(SkillType.S_PILOT_MECH).setValue(1);
+                break;
+            case Person.PHENOTYPE_AERO:
+                skillBonus.get(SkillType.S_GUN_AERO).setValue(1);
+                skillBonus.get(SkillType.S_PILOT_AERO).setValue(1);
+                skillBonus.get(SkillType.S_GUN_JET).setValue(1);
+                skillBonus.get(SkillType.S_PILOT_JET).setValue(1);
+                skillBonus.get(SkillType.S_GUN_PROTO).setValue(1);
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    skillBonus.get(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, gunneryType)).setValue(1);
+                    skillBonus.get(SkillType.getRPGSkillName(SkillType.S_GUN_JET, gunneryType)).setValue(1);
+                    skillBonus.get(SkillType.getRPGSkillName(SkillType.S_GUN_PROTO, gunneryType)).setValue(1);
+                }
+                break;
+            case Person.PHENOTYPE_BA:
+                skillBonus.get(SkillType.S_GUN_BA).setValue(1);
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    skillBonus.get(SkillType.getRPGSkillName(SkillType.S_GUN_BA, gunneryType)).setValue(1);
+                }
+                break;
+            case Person.PHENOTYPE_VEE:
+                skillBonus.get(SkillType.S_GUN_VEE).setValue(1);
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    skillBonus.get(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType)).setValue(1);
+                }
+                skillBonus.get(SkillType.S_PILOT_GVEE).setValue(1);
+                skillBonus.get(SkillType.S_PILOT_NVEE).setValue(1);
+                skillBonus.get(SkillType.S_PILOT_VTOL).setValue(1);
+                break;
             }
             choicePheno.setEnabled(true);
         } else {
@@ -1320,6 +1346,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         skillBonus.get(SkillType.S_PILOT_GVEE).setValue(0);
         skillBonus.get(SkillType.S_PILOT_NVEE).setValue(0);
         skillBonus.get(SkillType.S_PILOT_VTOL).setValue(0);
+        for (String gunnerySkill : SkillType.rpgGunnerySkillList) {
+            for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                skillBonus.get(SkillType.getRPGSkillName(gunnerySkill, gunneryType)).setValue(0);
+            }
+        }
     }
 
     public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {

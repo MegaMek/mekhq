@@ -156,11 +156,12 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         try {
             statement.execute("TRUNCATE TABLE " + table + ".skilltypes");
             for(int i = 0; i < SkillType.skillList.length; i++) {
+                final String skill = SkillType.skillList[i];
                 preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skilltypes (name, shortname) VALUES (?, ?)");
-                preparedStatement.setString(1, truncateString(SkillType.skillList[i], 60));
-                preparedStatement.setString(2, truncateString(getShortSkillName(SkillType.skillList[i]), 60));
+                preparedStatement.setString(1, truncateString(skill, 60));
+                preparedStatement.setString(2, truncateString(getShortSkillName(skill), 60));
                 preparedStatement.executeUpdate();
-                skillHash.put(SkillType.skillList[i], i+1);
+                skillHash.put(skill, i + 1);
                 progressTicker++;
                 determineProgress();
             }
@@ -187,6 +188,12 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_MECH));
                     preparedStatement.setInt(2, i);
                     preparedStatement.executeUpdate();
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType)));
+                        preparedStatement.setInt(2, i);
+                        preparedStatement.executeUpdate();
+                    }
                     equipment = 1;
                     break;
                 case Person.T_AERO_PILOT:
@@ -198,6 +205,12 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_AERO));
                     preparedStatement.setInt(2, i);
                     preparedStatement.executeUpdate();
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.getRPGSkillName(SkillType.S_GUN_AERO, gunneryType)));
+                        preparedStatement.setInt(2, i);
+                        preparedStatement.executeUpdate();
+                    }
                     equipment = 1;
                     break;
                 case Person.T_GVEE_DRIVER:
@@ -226,6 +239,12 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_VEE));
                     preparedStatement.setInt(2, i);
                     preparedStatement.executeUpdate();
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType)));
+                        preparedStatement.setInt(2, i);
+                        preparedStatement.executeUpdate();
+                    }
                     equipment = 1;
                     break;
                 case Person.T_BA:
@@ -233,6 +252,12 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_BA));
                     preparedStatement.setInt(2, i);
                     preparedStatement.executeUpdate();
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.getRPGSkillName(SkillType.S_GUN_BA, gunneryType)));
+                        preparedStatement.setInt(2, i);
+                        preparedStatement.executeUpdate();
+                    }
                     equipment = 1;
                     break;
                 case Person.T_INFANTRY:
@@ -240,6 +265,12 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setInt(1, skillHash.get(SkillType.S_SMALL_ARMS));
                     preparedStatement.setInt(2, i);
                     preparedStatement.executeUpdate();
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.getRPGSkillName(SkillType.S_GUN_BA, gunneryType)));
+                        preparedStatement.setInt(2, i);
+                        preparedStatement.executeUpdate();
+                    }
                     equipment = 1;
                     break;
                 case Person.T_CONV_PILOT:
@@ -251,6 +282,12 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_JET));
                     preparedStatement.setInt(2, i);
                     preparedStatement.executeUpdate();
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.getRPGSkillName(SkillType.S_GUN_JET, gunneryType)));
+                        preparedStatement.setInt(2, i);
+                        preparedStatement.executeUpdate();
+                    }
                     equipment = 1;
                     break;
                 case Person.T_SPACE_PILOT:
@@ -265,6 +302,12 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_SPACE));
                     preparedStatement.setInt(2, i);
                     preparedStatement.executeUpdate();
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                        preparedStatement.setInt(1, skillHash.get(SkillType.getRPGSkillName(SkillType.S_GUN_SPACE, gunneryType)));
+                        preparedStatement.setInt(2, i);
+                        preparedStatement.executeUpdate();
+                    }
                     equipment = 1;
                     break;
                 case Person.T_SPACE_CREW:
@@ -516,7 +559,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                         Skill skill = p.getSkill(SkillType.skillList[i]);
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skills (person, skill, value) VALUES (?, ?, ?)");
                         preparedStatement.setInt(1, id);
-                        preparedStatement.setInt(2, i+1);
+                        preparedStatement.setInt(2, i + 1);
                         preparedStatement.setInt(3, skill.getFinalSkillValue());
                         preparedStatement.executeUpdate();
                     }

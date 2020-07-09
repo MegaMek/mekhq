@@ -151,6 +151,9 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 switch (p.getPrimaryRole()) {
                 case Person.T_MECHWARRIOR:
                     adjustSkill(p, SkillType.S_GUN_MECH, gunneryMod);
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        adjustSkill(p, SkillType.getRPGSkillName(SkillType.S_GUN_MECH, gunneryType), gunneryMod);
+                    }
                     adjustSkill(p, SkillType.S_PILOT_MECH, pilotingMod);
                     break;
                 case Person.T_GVEE_DRIVER:
@@ -164,21 +167,36 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                     break;
                 case Person.T_VEE_GUNNER:
                     adjustSkill(p, SkillType.S_GUN_VEE, gunneryMod);
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        adjustSkill(p, SkillType.getRPGSkillName(SkillType.S_GUN_VEE, gunneryType), gunneryMod);
+                    }
                     break;
                 case Person.T_AERO_PILOT:
                     adjustSkill(p, SkillType.S_GUN_AERO, gunneryMod);
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        adjustSkill(p, SkillType.getRPGSkillName(SkillType.S_GUN_AERO, gunneryType), gunneryMod);
+                    }
                     adjustSkill(p, SkillType.S_PILOT_AERO, pilotingMod);
                     break;
                 case Person.T_INFANTRY:
                     adjustSkill(p, SkillType.S_SMALL_ARMS, gunneryMod);
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        adjustSkill(p, SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType), gunneryMod);
+                    }
                     adjustSkill(p, SkillType.S_ANTI_MECH, pilotingMod);
                     break;
                 case Person.T_BA:
                     adjustSkill(p, SkillType.S_GUN_BA, gunneryMod);
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        adjustSkill(p, SkillType.getRPGSkillName(SkillType.S_GUN_BA, gunneryType), gunneryMod);
+                    }
                     adjustSkill(p, SkillType.S_ANTI_MECH, pilotingMod);
                     break;
                 case Person.T_PROTO_PILOT:
                     adjustSkill(p, SkillType.S_GUN_PROTO, gunneryMod);
+                    for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                        adjustSkill(p, SkillType.getRPGSkillName(SkillType.S_GUN_PROTO, gunneryType), gunneryMod);
+                    }
                     break;
                 }
             }

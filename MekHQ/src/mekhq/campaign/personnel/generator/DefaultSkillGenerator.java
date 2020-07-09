@@ -54,7 +54,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         bonus = getPhenotypeBonus(person);
 
         // roll small arms skill
-        if (!person.getSkills().hasSkill(SkillType.S_SMALL_ARMS)) {
+        if (!person.hasSkillOrRPGGunnerySkills(SkillType.S_SMALL_ARMS)) {
             int sarmsLvl = -12;
             if (Person.isSupportRole(type) || Person.isSupportRole(secondary)) {
                 sarmsLvl = Utilities.generateExpLevel(rskillPrefs.getSupportSmallArmsBonus());
@@ -62,8 +62,15 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 sarmsLvl = Utilities.generateExpLevel(rskillPrefs.getCombatSmallArmsBonus());
             }
             if (sarmsLvl > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_SMALL_ARMS, sarmsLvl,
-                        rskillPrefs.randomizeSkill(), bonus);
+                int levelInfantrySmArmTotal = 0;
+                for (String gunneryType : SkillType.rpgGunneryTypeList) {
+                    addSkill(person, SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType),
+                            sarmsLvl, rskillPrefs.randomizeSkill(), bonus, mod);
+                    levelInfantrySmArmTotal += person.getSkill(
+                            SkillType.getRPGSkillName(SkillType.S_SMALL_ARMS, gunneryType)).getLevel();
+                }
+                addSkill(person, SkillType.S_SMALL_ARMS, levelInfantrySmArmTotal / SkillType.rpgGunneryTypeList.length,
+                        rskillPrefs.randomizeSkill(), bonus, mod);
             }
         }
 
