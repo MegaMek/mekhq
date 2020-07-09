@@ -499,9 +499,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @param log whether to log the change or not
      */
     public void setPrisonerStatus(PrisonerStatus prisonerStatus, boolean log) {
-        if (getPrisonerStatus() == prisonerStatus) {
-            return;
-        }
+        // This must be processed completely, as the unchanged prisoner status of Free to Free is
+        // used during recruitment
 
         final boolean freed = !getPrisonerStatus().isFree();
         final boolean isPrisoner = prisonerStatus.isPrisoner();
@@ -1372,11 +1371,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
             baby.setSurname(surname);
             baby.setBirthday(campaign.getLocalDate());
-            baby.setPrisonerStatus(prisonerStatus);
             baby.setAncestorsId(ancId);
 
             // Recruit the baby
-            campaign.recruitPerson(baby, baby.getPrisonerStatus(), baby.isDependent(), true, false);
+            campaign.recruitPerson(baby, prisonerStatus, baby.isDependent(), true, true);
 
             // Create reports and log the birth
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
