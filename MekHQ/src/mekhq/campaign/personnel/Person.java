@@ -644,27 +644,36 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.maidenName = n;
     }
 
+    /**
+     * return a full last name which may be a bloodname or a surname with or without honorifics.
+     * A bloodname will overrule a surname but we do not disallow surnames for clanners, if the
+     * player wants to input them
+     * @return a String of the person's last name
+     */
+    public String getLastName() {
+        String lastName = "";
+        if (!StringUtil.isNullOrEmpty(bloodname)) {
+            lastName = bloodname;
+        }
+        else if (!StringUtil.isNullOrEmpty(surname)) {
+            lastName = surname;
+        }
+        if (!StringUtil.isNullOrEmpty(honorific)) {
+            lastName += " " + honorific;
+        }
+        return lastName;
+    }
+
     public String getFullName() {
         return fullName;
     }
 
     public void setFullName() {
-        if (isClanner()) {
-            if (!StringUtil.isNullOrEmpty(bloodname)) {
-                fullName = givenName + " " + bloodname;
-            } else {
-                fullName = givenName;
-            }
+        String lastName = getLastName();
+        if (!StringUtil.isNullOrEmpty(lastName)) {
+            fullName = givenName + " " + lastName;
         } else {
-            if (!StringUtil.isNullOrEmpty(surname)) {
-                fullName = givenName + " " + surname;
-            } else {
-                fullName = givenName;
-            }
-        }
-
-        if (!StringUtil.isNullOrEmpty(honorific)) {
-            fullName += " " + honorific;
+            fullName = givenName;
         }
     }
 
