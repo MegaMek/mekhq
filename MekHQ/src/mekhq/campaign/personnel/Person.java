@@ -1146,6 +1146,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return dateOfDeath;
     }
 
+    public String getDeathDateAsString(Campaign campaign) {
+        if(getDateOfDeath() == null) {
+            return "";
+        } else {
+            return getDateOfDeath().format(DateTimeFormatter.ofPattern(
+                    campaign.getCampaignOptions().getDisplayDateFormat()));
+        }
+    }
+
     public void setDateOfDeath(LocalDate date) {
         this.dateOfDeath = date;
     }

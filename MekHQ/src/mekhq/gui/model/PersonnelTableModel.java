@@ -112,7 +112,9 @@ public class PersonnelTableModel extends DataTableModel {
     public static final int COL_XP              = 41;
     public static final int COL_ORIGIN_FACTION  = 42;
     public static final int COL_ORIGIN_PLANET   = 43;
-    public static final int N_COL               = 44;
+    public static final int COL_RECRUIT_DATE    = 44;
+    public static final int COL_DEATH_DATE      = 45;
+    public static final int N_COL               = 46;
 
     private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.PersonnelTableModel", new EncodeControl());
     //endregion Variable Declarations
@@ -239,6 +241,10 @@ public class PersonnelTableModel extends DataTableModel {
                 return resources.getString("col_origin_faction.text");
             case COL_ORIGIN_PLANET:
                 return resources.getString("col_origin_planet.text");
+            case COL_RECRUIT_DATE:
+                return resources.getString("col_recruit_date.text");
+            case COL_DEATH_DATE:
+                return resources.getString("col_death_date.text");
             default:
                 return resources.getString("col_unknown.text");
         }
@@ -649,6 +655,10 @@ public class PersonnelTableModel extends DataTableModel {
                     return originPlanet.getName(getCampaign().getLocalDate());
                 }
                 break;
+            case COL_RECRUIT_DATE:
+                return p.getRecruitmentAsString(getCampaign());
+            case COL_DEATH_DATE:
+                return p.getDeathDateAsString(getCampaign());
             case COL_TOUGH:
             default:
                return resources.getString("col_unknown.text");
