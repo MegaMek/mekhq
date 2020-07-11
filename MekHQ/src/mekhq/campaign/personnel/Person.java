@@ -187,6 +187,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected LocalDate dateOfDeath;
     protected LocalDate recruitment;
     protected LocalDate lastRankChangeDate;
+    private LocalDate retirement;
     protected List<LogEntry> personnelLog;
     protected List<LogEntry> missionLog;
 
@@ -396,6 +397,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         dateOfDeath = null;
         recruitment = null;
         lastRankChangeDate = null;
+        retirement = null;
         skills = new Skills();
         options = new PersonnelOptions();
         currentEdge = 0;
@@ -1150,6 +1152,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.dateOfDeath = date;
     }
 
+    public int getAge(LocalDate today) {
+        // Get age based on year
+        if (getDateOfDeath() != null) {
+            //use date of death instead of birthday
+            today = getDateOfDeath();
+        }
+
+        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
+    }
+
     public void setRecruitment(LocalDate date) {
         this.recruitment = date;
     }
@@ -1165,33 +1177,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return getRecruitment().format(DateTimeFormatter.ofPattern(
                     campaign.getCampaignOptions().getDisplayDateFormat()));
         }
-    }
-
-    public void setLastRankChangeDate(LocalDate date) {
-        this.lastRankChangeDate = date;
-    }
-
-    public LocalDate getLastRankChangeDate() {
-        return lastRankChangeDate;
-    }
-
-    public String getLastRankChangeDateAsString(Campaign campaign) {
-        if (getLastRankChangeDate() == null) {
-            return "";
-        } else {
-            return getLastRankChangeDate().format(DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
-        }
-    }
-
-    public int getAge(LocalDate today) {
-        // Get age based on year
-        if (getDateOfDeath() != null) {
-            //use date of death instead of birthday
-            today = getDateOfDeath();
-        }
-
-        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
     }
 
     public String getTimeInService(Campaign campaign) {
@@ -1211,6 +1196,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         return campaign.getCampaignOptions().getTimeInServiceDisplayFormat()
                 .getDisplayFormattedOutput(getRecruitment(), today);
+    }
+
+    public void setLastRankChangeDate(LocalDate date) {
+        this.lastRankChangeDate = date;
+    }
+
+    public LocalDate getLastRankChangeDate() {
+        return lastRankChangeDate;
+    }
+
+    public String getLastRankChangeDateAsString(Campaign campaign) {
+        if (getLastRankChangeDate() == null) {
+            return "";
+        } else {
+            return getLastRankChangeDate().format(DateTimeFormatter.ofPattern(
+                    campaign.getCampaignOptions().getDisplayDateFormat()));
+        }
     }
 
     public String getTimeInRank(Campaign campaign) {
