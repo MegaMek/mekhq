@@ -30,7 +30,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -216,7 +215,6 @@ public class Campaign implements Serializable, ITechManager {
     private GregorianCalendar calendar;
     private LocalDate currentDay;
     private String dateFormat;
-    private String shortDateFormat;
 
     private String factionCode;
     private int techFactionCode;
@@ -268,10 +266,10 @@ public class Campaign implements Serializable, ITechManager {
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
     private AtBEventProcessor atbEventProcessor; //AtB
-    private Calendar shipSearchStart; //AtB
+    private LocalDate shipSearchStart; //AtB
     private int shipSearchType;
     private String shipSearchResult; //AtB
-    private Calendar shipSearchExpiration; //AtB
+    private LocalDate shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
     private CampaignSummary campaignSummary;
@@ -295,7 +293,6 @@ public class Campaign implements Serializable, ITechManager {
         currentReportHTML = "";
         newReports = new ArrayList<>();
         dateFormat = "EEEE, MMMM d yyyy";
-        shortDateFormat = "yyyyMMdd";
         name = "My Campaign";
         overtime = false;
         gmMode = false;
@@ -442,11 +439,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     @Deprecated
-    public DateFormat getShortDateFormatter() {
-        return new SimpleDateFormat(shortDateFormat);
-    }
-
-    @Deprecated
     public Date getDate() {
         return calendar.getTime();
     }
@@ -454,11 +446,6 @@ public class Campaign implements Serializable, ITechManager {
     @Deprecated
     public String getDateAsString() {
         return getDateFormatter().format(calendar.getTime());
-    }
-
-    @Deprecated
-    public String getShortDateAsString() {
-        return getShortDateFormatter().format(calendar.getTime());
     }
 
     public String getCurrentSystemName() {
@@ -610,18 +597,18 @@ public class Campaign implements Serializable, ITechManager {
         return atbConfig;
     }
 
+    //region Ship Search
     /**
      * Sets the date a ship search was started, or null if no search is in progress.
      */
-    public void setShipSearchStart(@Nullable Calendar c) {
-        shipSearchStart = c;
+    public void setShipSearchStart(@Nullable LocalDate shipSearchStart) {
+        this.shipSearchStart = shipSearchStart;
     }
 
     /**
-     *
      * @return The date a ship search was started, or null if none is in progress.
      */
-    public Calendar getShipSearchStart() {
+    public LocalDate getShipSearchStart() {
         return shipSearchStart;
     }
 
@@ -633,7 +620,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     *
      * @return The lookup name of the available ship, or null if none is available
      */
     public String getShipSearchResult() {
@@ -641,15 +627,14 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     *
      * @return The date the ship is no longer available, if there is one.
      */
-    public Calendar getShipSearchExpiration() {
+    public LocalDate getShipSearchExpiration() {
         return shipSearchExpiration;
     }
 
-    public void setShipSearchExpiration(Calendar c) {
-        shipSearchExpiration = c;
+    public void setShipSearchExpiration(LocalDate shipSearchExpiration) {
+        this.shipSearchExpiration = shipSearchExpiration;
     }
 
     /**
@@ -660,16 +645,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void startShipSearch(int unitType) {
-        shipSearchStart = (Calendar) calendar.clone();
+        setShipSearchStart(getLocalDate());
         setShipSearchType(unitType);
     }
 
-    public void endShipSearch() {
-        shipSearchStart = null;
-    }
-
     private void processShipSearch() {
-        if (shipSearchStart == null) {
+        if (getShipSearchStart() == null) {
             return;
         }
         StringBuilder report = new StringBuilder();
@@ -678,33 +659,31 @@ public class Campaign implements Serializable, ITechManager {
                     .append(" deducted for ship search.");
         } else {
             addReport("<font color=\"red\">Insufficient funds for ship search.</font>");
-            shipSearchStart = null;
+            setShipSearchStart(null);
             return;
         }
-        long numDays = TimeUnit.MILLISECONDS.toDays(calendar.getTimeInMillis() - shipSearchStart.getTimeInMillis());
+        long numDays = ChronoUnit.DAYS.between(getShipSearchStart(), getLocalDate());
         if (numDays > 21) {
             int roll = Compute.d6(2);
             TargetRoll target = getAtBConfig().shipSearchTargetRoll(shipSearchType, this);
-            shipSearchStart = null;
+            setShipSearchStart(null);
             report.append("<br/>Ship search target: ").append(target.getValueAsString()).append(" roll: ")
                     .append(roll);
             // TODO: mos zero should make ship available on retainer
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
-                MechSummary ms = unitGenerator.generate(factionCode, shipSearchType, -1,
+                MechSummary ms = unitGenerator.generate(getFactionCode(), shipSearchType, -1,
                         getGameYear(), getUnitRatingMod());
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
                 if (ms != null) {
-                    DateFormat df = getShortDateFormatter();
-                    shipSearchResult = ms.getName();
-                    shipSearchExpiration = (Calendar) getCalendar().clone();
-                    shipSearchExpiration.add(Calendar.DAY_OF_MONTH, 31);
-                    report.append(shipSearchResult).append(" is available for purchase for ")
+                    setShipSearchResult(ms.getName());
+                    setShipSearchExpiration(getLocalDate().plusDays(31));
+                    report.append(getShipSearchResult()).append(" is available for purchase for ")
                             .append(Money.of(ms.getCost()).toAmountAndSymbolString())
                             .append(" until ")
-                            .append(df.format(shipSearchExpiration.getTime()));
+                            .append(getCampaignOptions().getDisplayFormattedDate(getShipSearchExpiration()));
                 } else {
                     report.append(" <font color=\"red\">Could not determine ship type.</font>");
                 }
@@ -716,11 +695,11 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void purchaseShipSearchResult() {
-        final String METHOD_NAME = "purchaseShipSearchResult()"; //$NON-NLS-1$
-        MechSummary ms = MechSummaryCache.getInstance().getMech(shipSearchResult);
+        final String METHOD_NAME = "purchaseShipSearchResult()";
+        MechSummary ms = MechSummaryCache.getInstance().getMech(getShipSearchResult());
         if (ms == null) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Cannot find entry for " + shipSearchResult); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), METHOD_NAME,
+                    "Cannot find entry for " + getShipSearchResult());
             return;
         }
 
@@ -731,13 +710,13 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
 
-        MechFileParser mechFileParser = null;
+        MechFileParser mechFileParser;
         try {
             mechFileParser = new MechFileParser(ms.getSourceFile(),
                     ms.getEntryName());
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Unable to load unit: " + ms.getEntryName()); //$NON-NLS-1$
+                    "Unable to load unit: " + ms.getEntryName());
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             return;
         }
@@ -751,9 +730,10 @@ public class Campaign implements Serializable, ITechManager {
         if (!getCampaignOptions().getInstantUnitMarketDelivery()) {
             addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
         }
-        shipSearchResult = null;
-        shipSearchExpiration = null;
+        setShipSearchResult(null);
+        setShipSearchExpiration(null);
     }
+    //endregion Ship Search
 
     /**
      * Process retirements for retired personnel, if any.
@@ -3467,11 +3447,11 @@ public class Campaign implements Serializable, ITechManager {
         contractMarket.generateContractOffers(this);
         unitMarket.generateUnitOffers(this);
 
-        if (shipSearchExpiration != null && !shipSearchExpiration.after(calendar)) {
-            shipSearchExpiration = null;
-            if (shipSearchResult != null) {
-                addReport("Opportunity for purchase of " + shipSearchResult + " has expired.");
-                shipSearchResult = null;
+        if ((getShipSearchExpiration() != null) && !getShipSearchExpiration().isAfter(getLocalDate())) {
+            setShipSearchExpiration(null);
+            if (getShipSearchResult() != null) {
+                addReport("Opportunity for purchase of " + getShipSearchResult() + " has expired.");
+                setShipSearchResult(null);
             }
         }
 
@@ -4785,7 +4765,6 @@ public class Campaign implements Serializable, ITechManager {
 
         // Against the Bot
         if (getCampaignOptions().getUseAtB()) {
-            DateFormat sdf = getShortDateFormatter();
             contractMarket.writeToXml(pw1, 1);
             unitMarket.writeToXml(pw1, 1);
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
@@ -4801,13 +4780,13 @@ public class Campaign implements Serializable, ITechManager {
             retirementDefectionTracker.writeToXml(pw1, 1);
             if (shipSearchStart != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchStart",
-                        sdf.format(shipSearchStart.getTime()));
+                        MekHqXmlUtil.saveFormattedDate(getShipSearchStart()));
             }
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchType", shipSearchType);
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchResult", shipSearchResult);
             if (shipSearchExpiration != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchExpiration",
-                        sdf.format(shipSearchExpiration.getTime()));
+                        MekHqXmlUtil.saveFormattedDate(getShipSearchExpiration()));
             }
         }
 
@@ -8507,7 +8486,7 @@ public class Campaign implements Serializable, ITechManager {
 
     @Override
     public int getTechIntroYear() {
-        if (campaignOptions.limitByYear()) {
+        if (getCampaignOptions().limitByYear()) {
             return getGameYear();
         } else {
             return Integer.MAX_VALUE;
