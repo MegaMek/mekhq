@@ -786,6 +786,10 @@ public class PersonViewPanel extends ScrollablePanel {
             }
         }
 
+        if (person.getRetirement() != null) {
+
+        }
+
         return pnlInfo;
     }
 

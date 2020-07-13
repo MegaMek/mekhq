@@ -1232,6 +1232,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 .getDisplayFormattedOutput(getLastRankChangeDate(), today);
     }
 
+    public void setRetirement(LocalDate date) {
+        this.retirement = date;
+    }
+
+    public LocalDate getRetirement() {
+        return retirement;
+    }
+
+    public String getRetirementAsString(Campaign campaign) {
+        if (getRetirement() == null) {
+            return "";
+        } else {
+            return getRetirement().format(DateTimeFormatter.ofPattern(
+                    campaign.getCampaignOptions().getDisplayDateFormat()));
+        }
+    }
+
     public void setId(UUID id) {
         this.id = id;
     }
