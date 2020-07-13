@@ -18,19 +18,17 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
 
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generators.RandomCallsignGenerator;
 import megamek.common.enums.Gender;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
@@ -240,31 +238,26 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             panDemog.add(lblBloodname, gridBagConstraints);
 
-            textBloodname.setMinimumSize(new java.awt.Dimension(150, 28));
-            textBloodname.setName("textBloodname"); // NOI18N
-            textBloodname.setPreferredSize(new java.awt.Dimension(150, 28));
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            textBloodname.setMinimumSize(new Dimension(150, 28));
+            textBloodname.setName("textBloodname");
+            textBloodname.setPreferredSize(new Dimension(150, 28));
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
             textBloodname.setText(person.getBloodname());
             panDemog.add(textBloodname, gridBagConstraints);
 
-            btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text")); // NOI18N
-            btnRandomBloodname.setName("btnRandomBloodname"); // NOI18N
+            btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text"));
+            btnRandomBloodname.setName("btnRandomBloodname");
             btnRandomBloodname.addActionListener(evt -> randomBloodname());
-            gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
             panDemog.add(btnRandomBloodname, gridBagConstraints);
         } else {
-            lblNickname.setText(resourceMap.getString("lblNickname.text")); // NOI18N
-            lblNickname.setName("lblNickname"); // NOI18N
+            lblNickname.setText(resourceMap.getString("lblNickname.text"));
+            lblNickname.setName("lblNickname");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -273,7 +266,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             panDemog.add(lblNickname, gridBagConstraints);
 
             textNickname.setText(person.getCallsign());
-            textNickname.setName("textNickname"); // NOI18N
+            textNickname.setName("textNickname");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
@@ -281,6 +274,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
             panDemog.add(textNickname, gridBagConstraints);
+
+            JButton btnRandomCallsign = new JButton(resourceMap.getString("btnRandomCallsign.text"));
+            btnRandomCallsign.setName("btnRandomCallsign");
+            btnRandomCallsign.addActionListener(e -> textNickname.setText(RandomCallsignGenerator.getInstance().generate()));
+            gridBagConstraints.gridx = 2;
+            panDemog.add(btnRandomCallsign, gridBagConstraints);
         }
 
         y++;
