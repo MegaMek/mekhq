@@ -402,7 +402,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             //assume primary planet for now
             Planet p = psystem.getPrimaryPlanet();
             if (null != p) {
-                atmosphere = Utilities.nonNull(p.getPressure(Utilities.getDateTimeDay(campaign.getCalendar())), atmosphere);
+                atmosphere = Utilities.nonNull(p.getPressure(campaign.getLocalDate()), atmosphere);
                 gravity = Utilities.nonNull(p.getGravity(), gravity).floatValue();
             }
         }
@@ -700,6 +700,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 alliesPlayer.add(en);
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
                 externalIDLookup.put(en.getExternalIdAsString(), en);
+
+                if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
+                    en.setCamoCategory(IPlayer.NO_CAMO);
+                    en.setCamoFileName(IPlayer.colorNames[getContract(campaign).getAllyColorIndex()]);
+                }
             } else {
                 MekHQ.getLogger().error(AtBScenario.class, "setStandardMissionForces", "Entity for player-controlled allies is null");
             }
@@ -1296,8 +1301,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         AtBContract contract = getContract(campaign);
 
-        boolean opForOwnsPlanet = contract.getSystem().getFactions(Utilities.getDateTimeDay(campaign.getCalendar()))
-                                    .contains(contract.getEnemyCode());
+        boolean opForOwnsPlanet = contract.getSystem().getFactions(campaign.getLocalDate())
+                .contains(contract.getEnemyCode());
 
         boolean spawnConventional = opForOwnsPlanet && Compute.d6() >=
                 CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance();
@@ -1365,7 +1370,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         AtBContract contract = getContract(campaign);
 
-        boolean opForOwnsPlanet = contract.getSystem().getFactions(Utilities.getDateTimeDay(campaign.getCalendar()))
+        boolean opForOwnsPlanet = contract.getSystem().getFactions(campaign.getLocalDate())
                                     .contains(contract.getEnemyCode());
         boolean spawnTurrets = opForOwnsPlanet &&
                 Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();

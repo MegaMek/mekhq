@@ -27,7 +27,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Collections;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -42,7 +41,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.ReportEvent;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
-import mekhq.gui.ReportHyperlinkListener;
 import mekhq.gui.preferences.JIntNumberSpinnerPreference;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
@@ -55,6 +53,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
 
     private JSpinner spnDays;
     private JButton btnStart;
+    private JButton btnNextWeek;
     private JButton btnNextMonth;
     private JButton btnNextYear;
     private DailyReportLogPanel logPanel;
@@ -90,6 +89,10 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
         btnStart = new JButton(resourceMap.getString("dlgStartAdvancement.text"));
         btnStart.addActionListener(this);
         pnlNumDays.add(btnStart);
+
+        btnNextWeek = new JButton(resourceMap.getString("dlgAdvanceNextWeek.text"));
+        btnNextWeek.addActionListener(this);
+        pnlNumDays.add(btnNextWeek);
 
         btnNextMonth = new JButton(resourceMap.getString("dlgAdvanceNextMonth.text"));
         btnNextMonth.addActionListener(this);
@@ -129,52 +132,53 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent event) {
-        if (event.getSource().equals(btnStart) || event.getSource().equals(btnNextMonth)
-                || event.getSource().equals(btnNextYear)) {
+        if (event.getSource().equals(btnStart) || event.getSource().equals(btnNextWeek)
+                || event.getSource().equals(btnNextMonth) || event.getSource().equals(btnNextYear)) {
             int days = (int) spnDays.getValue();
             boolean firstDay = true;
             MekHQ.registerHandler(this);
-            if (event.getSource().equals(btnNextMonth)) {
-                LocalDate today = gui.getCampaign().getLocalDate();
+
+            LocalDate today = gui.getCampaign().getLocalDate();
+            if (btnNextWeek.equals(event.getSource())) {
+                // The number of days till the next monday is eight days (a week and a day) minus
+                // the current day of the week. The additional one is added to ensure we get the next
+                // Monday instead of the Sunday
+                days = 8 - today.getDayOfWeek().getValue();
+            } else if (btnNextMonth.equals(event.getSource())) {
                 // The number of days till the next month is the length of the month plus one minus
                 // the current day, with the one added because otherwise we get the last day of the same
                 // month
                 days = today.lengthOfMonth() + 1 - today.getDayOfMonth();
-            } else if (event.getSource().equals(btnNextYear)) {
-                LocalDate today = gui.getCampaign().getLocalDate();
+            } else if (btnNextYear.equals(event.getSource())) {
                 // The number of days till the next year is the length of the year plus one minus
                 // the current day, with the one added because otherwise we get the last day of the same
                 // year
                 days = today.lengthOfYear() + 1 - today.getDayOfYear();
             }
 
-            List<String> reports = new ArrayList<String>();
+            List<String> reports = new ArrayList<>();
             for (; days > 0; days--) {
                 if (gui.getCampaign().checkOverDueLoans()
                         || gui.nagShortMaintenance()
                         || (gui.getCampaign().getCampaignOptions().getUseAtB())
                         && (gui.nagShortDeployments() || gui.nagOutstandingScenarios())) {
                     break;
-                }
-                if (gui.getCampaign().checkRetirementDefections()
+                } else if (gui.getCampaign().checkRetirementDefections()
                         || gui.getCampaign().checkYearlyRetirements()) {
                     gui.showRetirementDefectionDialog();
                     break;
-                }
-                if (!gui.getCampaign().newDay()) {
+                } else if (!gui.getCampaign().newDay()) {
                     break;
                 }
+                String report = gui.getCampaign().getCurrentReportHTML();
                 if (firstDay) {
-                    String report = gui.getCampaign().getCurrentReportHTML();
                     logPanel.refreshLog(report);
                     firstDay = false;
-                    gui.getCampaign().fetchAndClearNewReports();
                 } else {
-                    String report = gui.getCampaign().getCurrentReportHTML();
                     reports.add("<hr/>");
                     reports.add(report);
-                    gui.getCampaign().fetchAndClearNewReports();
                 }
+                gui.getCampaign().fetchAndClearNewReports();
             }
             logPanel.appendLog(reports);
 

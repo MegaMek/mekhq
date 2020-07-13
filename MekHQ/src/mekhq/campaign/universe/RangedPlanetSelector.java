@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 MegaMek team
+ * Copyright (C) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,23 +10,21 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.universe;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.joda.time.DateTime;
-
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction.Tag;
 
@@ -35,7 +33,6 @@ import mekhq.campaign.universe.Faction.Tag;
  * a planet from a range of planets and a {@link Faction}.
  */
 public class RangedPlanetSelector extends AbstractPlanetSelector {
-
     /**
      * The range around {@link Campaign#getCurrentSystem()} to search
      * for planets.
@@ -46,7 +43,7 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
      * The current date of the {@link Campaign} when the values were
      * cached.
      */
-    private DateTime cachedDate;
+    private LocalDate cachedDate;
 
     /**
      * The current {@link PlanetarySystem} of the {@link Campaign} when
@@ -56,7 +53,7 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
 
     /**
      * This map stores cached weights for a planet keyed by faction.
-     * Each weight should be cummulative. That is, if two planets have
+     * Each weight should be cumulative. That is, if two planets have
      * equal weights, you could express this with weights of 1.0 and 2.0
      * or 5.0 and 10.0. This way, when selecting a planet at random using
      * the weights you can create a random double between 0.0 and the largest
@@ -152,10 +149,10 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
 
     @Override
     public Planet selectPlanet(Campaign campaign, Faction faction) {
-        if (cachedPlanets == null
-            || !cachedPlanets.containsKey(faction)
-            || !cachedSystem.equals(campaign.getCurrentSystem())
-            || Utilities.getDateTimeDay(campaign.getDate()).isAfter(cachedDate)) {
+        if ((cachedPlanets == null)
+                || !cachedPlanets.containsKey(faction)
+                || !cachedSystem.equals(campaign.getCurrentSystem())
+                || campaign.getLocalDate().isAfter(cachedDate)) {
             createLookupMap(campaign, faction);
         }
 
@@ -176,7 +173,7 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     }
 
     private void createLookupMap(Campaign campaign, Faction faction) {
-        DateTime now = Utilities.getDateTimeDay(campaign.getDate());
+        LocalDate now = campaign.getLocalDate();
 
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
 
@@ -190,15 +187,15 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
                 if (!isExtraRandom) {
                     Planet planet = system.getPrimaryPlanet();
                     Long pop = planet.getPopulation(now);
-                    if (pop != null && (long)pop > 0) {
-                        total += 100.0 * Math.log10((long)pop) / (1 + distance * distanceScale);
+                    if (pop != null && pop > 0) {
+                        total += 100.0 * Math.log10(pop) / (1 + distance * distanceScale);
                         planets.put(total, planet);
                     }
                 } else {
                     for (Planet planet : system.getPlanets()) {
                         Long pop = planet.getPopulation(now);
-                        if (pop != null && (long)pop > 0) {
-                            total += 100.0 * Math.log10((long)pop) / (1 + distance * distanceScale);
+                        if (pop != null && pop > 0) {
+                            total += 100.0 * Math.log10(pop) / (1 + distance * distanceScale);
                             planets.put(total, planet);
                         }
                     }

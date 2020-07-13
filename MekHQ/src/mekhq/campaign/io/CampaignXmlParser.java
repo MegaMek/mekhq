@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team
+ * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.io;
 
@@ -28,14 +28,12 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -317,17 +315,13 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
-                    Calendar c = new GregorianCalendar();
-                    c.setTime(parseDate(retVal.getShortDateFormatter(), wn.getTextContent()));
-                    retVal.setShipSearchStart(c);
+                    retVal.setShipSearchStart(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {
                     retVal.setShipSearchType(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("shipSearchResult")) {
                     retVal.setShipSearchResult(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
-                    Calendar c = new GregorianCalendar();
-                    c.setTime(parseDate(retVal.getShortDateFormatter(), wn.getTextContent()));
-                    retVal.setShipSearchExpiration(c);
+                    retVal.setShipSearchExpiration(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
                 }
@@ -889,6 +883,7 @@ public class CampaignXmlParser {
                             .getInstance();
                     c.setTime(parseDate(df, wn.getTextContent().trim()));
                     retVal.setCalendar(c);
+                    retVal.setLocalDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("camoCategory")) {
                     String val = wn.getTextContent().trim();
 

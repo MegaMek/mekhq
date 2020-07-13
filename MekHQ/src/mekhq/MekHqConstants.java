@@ -1,7 +1,7 @@
 /*
  * MekHqConstants.java
  *
- * Copyright (c) 2019 MekHQ Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq;
 
@@ -31,4 +31,7 @@ public final class MekHqConstants {
     public static final String MAXIMUM_NUMBER_SAVES_KEY = "maximumNumberAutoSaves";
 
     public static final int DEFAULT_NUMBER_SAVES = 5;
+
+    /** This is used in creating the name of save files, e.g. the MekHQ campaign file */
+    public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
 }

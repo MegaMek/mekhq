@@ -25,7 +25,6 @@ import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.IntSupplier;
@@ -40,7 +39,6 @@ import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.enums.*;
-import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -144,7 +142,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private static final IntSupplier PREGNANCY_SIZE = () -> {
         int children = 1;
         // Hellin's law says it's 1:89 chance, to not make it appear too seldom, we use 1:50
-        while(Compute.randomInt(50) == 0) {
+        while (Compute.randomInt(50) == 0) {
             ++ children;
         }
         return Math.min(children, 10); // Limit to decuplets, for the sake of sanity
@@ -500,9 +498,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @param log whether to log the change or not
      */
     public void setPrisonerStatus(PrisonerStatus prisonerStatus, boolean log) {
-        if (getPrisonerStatus() == prisonerStatus) {
-            return;
-        }
+        // This must be processed completely, as the unchanged prisoner status of Free to Free is
+        // used during recruitment
 
         final boolean freed = !getPrisonerStatus().isFree();
         final boolean isPrisoner = prisonerStatus.isPrisoner();
@@ -1162,10 +1159,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getRecruitmentAsString(Campaign campaign) {
         if (getRecruitment() == null) {
-            return null;
+            return "";
         } else {
-            return getRecruitment().format(DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getRecruitment());
         }
     }
 
@@ -1179,10 +1175,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getLastRankChangeDateAsString(Campaign campaign) {
         if (getLastRankChangeDate() == null) {
-            return null;
+            return "";
         } else {
-            return getRecruitment().format(DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getLastRankChangeDate());
         }
     }
 
@@ -1373,11 +1368,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
             baby.setSurname(surname);
             baby.setBirthday(campaign.getLocalDate());
-            baby.setPrisonerStatus(prisonerStatus);
             baby.setAncestorsId(ancId);
 
             // Recruit the baby
-            campaign.recruitPerson(baby, baby.getPrisonerStatus(), baby.isDependent(), true, false);
+            campaign.recruitPerson(baby, prisonerStatus, baby.isDependent(), true, true);
 
             // Create reports and log the birth
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
@@ -2109,7 +2103,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
                     }
-                    DateTime now = new DateTime(c.getCalendar());
+                    LocalDate now = c.getLocalDate();
                     retVal.injuries.stream().filter(inj -> (null == inj.getStart()))
                         .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
@@ -3254,11 +3248,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setMinutesLeft(int m) {
         this.minutesLeft = m;
-        if(engineer && null != getUnitId()) {
+        if (engineer && null != getUnitId()) {
             //set minutes for all crewmembers
             Unit u = campaign.getUnit(getUnitId());
-            if(null != u) {
-                for(Person p : u.getActiveCrew()) {
+            if (null != u) {
+                for (Person p : u.getActiveCrew()) {
                     p.setMinutesLeft(m);
                 }
             }
@@ -3271,11 +3265,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setOvertimeLeft(int m) {
         this.overtimeLeft = m;
-        if(engineer && null != getUnitId()) {
+        if (engineer && null != getUnitId()) {
             //set minutes for all crewmembers
             Unit u = campaign.getUnit(getUnitId());
-            if(null != u) {
-                for(Person p : u.getActiveCrew()) {
+            if (null != u) {
+                for (Person p : u.getActiveCrew()) {
                     p.setMinutesLeft(m);
                 }
             }
