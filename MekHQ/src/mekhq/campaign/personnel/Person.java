@@ -1732,6 +1732,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastRankChangeDate",
                         MekHqXmlUtil.saveFormattedDate(lastRankChangeDate));
             }
+            if (getRetirement() != null) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirement",
+                        MekHqXmlUtil.saveFormattedDate(getRetirement()));
+            }
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXml(pw1, indent + 1);
             }
@@ -1991,6 +1995,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.recruitment = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
                     retVal.lastRankChangeDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
+                    retVal.setRetirement(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {

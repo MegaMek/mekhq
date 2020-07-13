@@ -200,6 +200,7 @@ public class CampaignOptions implements Serializable {
     private TimeInDisplayFormat timeInServiceDisplayFormat;
     private boolean useTimeInRank;
     private TimeInDisplayFormat timeInRankDisplayFormat;
+    private boolean useRetirementDateTracking;
     private boolean trackTotalEarnings;
     private boolean showOriginFaction;
     private boolean randomizeOrigin;
@@ -531,6 +532,7 @@ public class CampaignOptions implements Serializable {
         timeInServiceDisplayFormat = TimeInDisplayFormat.YEARS;
         useTimeInRank = false;
         timeInRankDisplayFormat = TimeInDisplayFormat.MONTHS_YEARS;
+        useRetirementDateTracking = false;
         trackTotalEarnings = false;
         showOriginFaction = true;
         randomizeOrigin = false;
@@ -1072,6 +1074,20 @@ public class CampaignOptions implements Serializable {
      */
     public void setTimeInRankDisplayFormat(TimeInDisplayFormat timeInRankDisplayFormat) {
         this.timeInRankDisplayFormat = timeInRankDisplayFormat;
+    }
+
+    /**
+     * @return whether or not to track retirement dates
+     */
+    public boolean useRetirementDateTracking() {
+        return useRetirementDateTracking;
+    }
+
+    /**
+     * @param b the new value for whether or not to track retirement dates
+     */
+    public void setUseRetirementDateTracking(boolean b) {
+        useRetirementDateTracking = b;
     }
 
     /**
