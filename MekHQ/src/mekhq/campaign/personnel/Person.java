@@ -25,7 +25,6 @@ import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.IntSupplier;
@@ -1174,8 +1173,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (getRecruitment() == null) {
             return "";
         } else {
-            return getRecruitment().format(DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getRecruitment());
         }
     }
 
@@ -1210,8 +1208,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (getLastRankChangeDate() == null) {
             return "";
         } else {
-            return getLastRankChangeDate().format(DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getLastRankChangeDate());
         }
     }
 
@@ -1244,8 +1241,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (getRetirement() == null) {
             return "";
         } else {
-            return getRetirement().format(DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getRetirement());
         }
     }
 

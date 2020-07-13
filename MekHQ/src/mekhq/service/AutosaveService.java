@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
@@ -145,7 +146,8 @@ public class AutosaveService implements IAutosaveService {
                         "Autosave-%d-%s-%s.cpnx.gz",
                         index++,
                         campaign.getName(),
-                        campaign.getShortDateAsString());
+                        campaign.getLocalDate().format(DateTimeFormatter.ofPattern(
+                                MekHqConstants.FILENAME_DATE_FORMAT)));
 
                 repeatedName = false;
                 for (File file : autosaveFiles) {

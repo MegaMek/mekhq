@@ -21,6 +21,8 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -786,6 +788,10 @@ public class CampaignOptions implements Serializable {
     //region General Tab
     public String getDisplayDateFormat() {
         return displayDateFormat;
+    }
+
+    public String getDisplayFormattedDate(LocalDate date) {
+        return date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()));
     }
 
     public void setDisplayDateFormat(String s) {

@@ -30,7 +30,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -487,7 +486,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     }
 
     private void updateDate(Campaign campaign) {
-        dateButton.setText(date.format(DateTimeFormatter.ofPattern(campaign.getCampaignOptions().getDisplayDateFormat())));
+        dateButton.setText(campaign.getCampaignOptions().getDisplayFormattedDate(date));
         Planet.PlanetaryEvent event = getCurrentEvent();
 
         messageField.setText((null != event) ? event.message : null);
