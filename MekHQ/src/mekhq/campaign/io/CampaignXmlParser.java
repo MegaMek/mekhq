@@ -1885,7 +1885,7 @@ public class CampaignXmlParser {
     /**
      * This method is used to add people to the ancestry migration map that is used to migrate
      * from the old Ancestors setup to {@link mekhq.campaign.personnel.familyTree.Genealogy} starting
-     * from 0.47.7
+     * from 0.47.8
      * @param ancestorsId the Person's Ancestor Id
      * @param person the person to add the the above HashMap
      */
@@ -1894,6 +1894,12 @@ public class CampaignXmlParser {
         ancestryMigrationMap.get(ancestorsId).add(person);
     }
 
+    /**
+     * This method is used to migrate from Ancestry nodes to
+     * {@link mekhq.campaign.personnel.familyTree.Genealogy} since the swap-over in 0.47.8
+     * @param retVal the campaign to load the ancestor nodes for
+     * @param wn the node containing the saved ancestry
+     */
     private static void migrateAncestorNodes(Campaign retVal, Node wn) {
         NodeList wList = wn.getChildNodes();
 
