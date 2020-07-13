@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel.familyTree;
 
@@ -211,62 +211,57 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @param person the person to check if they are related or not
      * @param campaign the campaign the two people are a part of
      * @return true if they have mutual ancestors, otherwise false
-     * @note this is a recursive search to ensure it goes to a specified depth of relation
      */
     public boolean checkMutualAncestors(Person person, Campaign campaign) {
-        return checkMutualAncestors(person.getGenealogy(), campaign,
-                campaign.getCampaignOptions().checkMutualAncestorsDepth());
-    }
+        if (getOrigin().equals(person.getId())) {
+            // Same person will always return true, to prevent any weirdness
+            return true;
+        }
 
-    /**
-     * @param secondaryGenealogy the other genealogy to check using
-     * @param campaign the campaign the two people are a part of
-     * @param remainingDepth the remaining depth to check for
-     * @return true if they have mutual ancestors, otherwise false
-     */
-    public boolean checkMutualAncestors(Genealogy secondaryGenealogy, Campaign campaign, int remainingDepth) {
-        // We don't need to go any deeper if:
-        // 1. the remaining depth is less than or equal to 0
-        // 2. This genealogy does not have parents
-        // 3. The secondary genealogy does not have parents
-        if ((remainingDepth <= 0) || !hasParents() || !secondaryGenealogy.hasParents()) {
+        final int depth = campaign.getCampaignOptions().checkMutualAncestorsDepth();
+        if (depth == 0) {
+            // Check is disabled, return false for no mutual ancestors
             return false;
         }
 
-        // Update the remaining depth to check
-        remainingDepth--;
+        Set<UUID> originAncestors = getAncestors(depth, campaign);
+        Set<UUID> checkAncestors = person.getGenealogy().getAncestors(depth, campaign);
 
-        // First, we check if there are any shared parents
-        for (UUID id : getParents()) {
-            if (secondaryGenealogy.getParents().contains(id)) {
-                return true;
-            }
-        }
-
-        // Then, we check based on mutual ancestry
-        for (UUID id : getParents()) {
-            Person person = campaign.getPerson(id);
-            for (UUID secondaryId : secondaryGenealogy.getParents()) {
-                Person secondaryPerson = campaign.getPerson(secondaryId);
-                if (person.getGenealogy().checkMutualAncestors(secondaryPerson.getGenealogy(),
-                        campaign, remainingDepth)) {
-                    return true;
-                }
-                if (secondaryPerson.getGenealogy().checkMutualAncestors(person.getGenealogy(),
-                        campaign, remainingDepth)) {
-                    return true;
-                }
-                if (checkMutualAncestors(secondaryPerson.getGenealogy(), campaign, remainingDepth)) {
-                    return true;
-                }
-            }
-
-            if (checkMutualAncestors(person.getGenealogy(), campaign, remainingDepth)) {
+        for (UUID id : checkAncestors) {
+            if (originAncestors.contains(id)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * @param depth the depth of ancestors to get
+     * @param campaign the campaign the person is part of
+     * @return a set of all unique ancestors of a person back depth generations
+     * @note this is a recursive search to ensure it goes to a specified depth of relation
+     */
+    public Set<UUID> getAncestors(int depth, Campaign campaign) {
+        // Create the return value
+        Set<UUID> ancestors = new HashSet<>();
+
+        // Add this person to the return set
+        ancestors.add(getOrigin());
+
+        // Then check if we need to continue down the tree
+        if (depth > 0) {
+            // If so, decrease remaining search depth
+            depth--;
+            // Then parse through the parents
+            for (UUID parent : getParents()) {
+                // And add all of their returned ancestors to the list
+                ancestors.addAll(campaign.getPerson(parent).getGenealogy().getAncestors(depth, campaign));
+            }
+        }
+
+        // Finally, return the ancestors
+        return ancestors;
     }
     //endregion Boolean Checks
 
@@ -333,7 +328,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * Siblings are defined as sharing either parent, or any stepsiblings. Inlaws are not counted.
+     * Siblings are defined as sharing either parent. Inlaws are not counted.
      * @return the siblings of the current person
      */
     public List<UUID> getSiblings(Campaign campaign) {
