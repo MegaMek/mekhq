@@ -700,6 +700,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 alliesPlayer.add(en);
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
                 externalIDLookup.put(en.getExternalIdAsString(), en);
+
+                if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
+                    en.setCamoCategory(IPlayer.NO_CAMO);
+                    en.setCamoFileName(IPlayer.colorNames[getContract(campaign).getAllyColorIndex()]);
+                }
             } else {
                 MekHQ.getLogger().error(AtBScenario.class, "setStandardMissionForces", "Entity for player-controlled allies is null");
             }

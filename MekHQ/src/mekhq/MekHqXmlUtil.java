@@ -1,39 +1,44 @@
+/*
+ * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq;
 
-import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringEscapeUtils;
+import megamek.utils.MegaMekXmlUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
-import org.xml.sax.XMLReader;
 
 import megamek.common.Aero;
 import megamek.common.BombType;
@@ -49,60 +54,17 @@ import megamek.common.MULParser;
 import megamek.common.Tank;
 import megamek.common.logging.LogLevel;
 
-public class MekHqXmlUtil {
-
-    private static DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
+public class MekHqXmlUtil extends MegaMekXmlUtil {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
-    private static SAXParserFactory SAX_PARSER_FACTORY;
     private static XPath XPATH_INSTANCE;
 
     public static XPath getXPathInstance() {
-        if(XPATH_INSTANCE == null) {
+        if (XPATH_INSTANCE == null) {
             XPathFactory xpf = XPathFactory.newInstance();
             XPATH_INSTANCE = xpf.newXPath();
         }
 
         return XPATH_INSTANCE;
-    }
-
-    /**
-     * Creates a DocumentBuilder safe from XML external entities
-     * attacks, and XML entity expansion attacks.
-     * @return A DocumentBuilder safe to use to read untrusted XML.
-     */
-    public static DocumentBuilder newSafeDocumentBuilder() throws ParserConfigurationException {
-        DocumentBuilderFactory dbf = DOCUMENT_BUILDER_FACTORY;
-        if (null == dbf) {
-            // At worst we may do this twice if multiple threads
-            // hit this method. It is Ok to have more than one
-            // instance of the builder factory, as long as it is
-            // XXE safe.
-            dbf = DocumentBuilderFactory.newInstance();
-
-            //
-            // Adapted from: https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet#JAXP_DocumentBuilderFactory.2C_SAXParserFactory_and_DOM4J
-            //
-            // "...The JAXP DocumentBuilderFactory setFeature method allows a
-            // developer to control which implementation-specific XML processor
-            // features are enabled or disabled. The features can either be set
-            // on the factory or the underlying XMLReader setFeature method.
-            // Each XML processor implementation has its own features that
-            // govern how DTDs and external entities are processed."
-            //
-            // "[disable] these as well, per Timothy Morgan's 2014 paper: 'XML
-            // Schema, DTD, and Entity Attacks'"
-            dbf.setXIncludeAware(false);
-            dbf.setExpandEntityReferences(false);
-
-            // "This is the PRIMARY defense. If DTDs (doctypes) are disallowed,
-            // almost all XML entity attacks are prevented"
-            String FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
-            dbf.setFeature(FEATURE, true);
-
-            DOCUMENT_BUILDER_FACTORY = dbf;
-        }
-
-        return dbf.newDocumentBuilder();
     }
 
     /**
@@ -136,140 +98,16 @@ public class MekHqXmlUtil {
 
             // Disable external parameters
             FEATURE = "http://xml.org/sax/features/external-parameter-entities";
-               dbf.setFeature(FEATURE, false);
+            dbf.setFeature(FEATURE, false);
 
-               // Disable external DTDs as well
-               FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-               dbf.setFeature(FEATURE, false);
+            // Disable external DTDs as well
+            FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+            dbf.setFeature(FEATURE, false);
 
             UNSAFE_DOCUMENT_BUILDER_FACTORY = dbf;
         }
 
         return dbf.newDocumentBuilder();
-    }
-
-    /**
-     * @return a SAX {@linkplain XMLReader} that is safe from external entities and entity expansion attacks.
-     *
-     * @see "https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet#JAXB_Unmarshaller"
-     */
-    @SuppressWarnings("nls")
-    public static XMLReader createSafeXMLReader() {
-        if (SAX_PARSER_FACTORY == null) {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            try {
-                spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-                spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-                spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
-                throw new AssertionError("SAX implementation does not recognize or support the features we want to disable", e);
-            } catch (ParserConfigurationException e) {
-                throw new AssertionError(e); // Only if we messed up the CFG above
-            }
-            SAX_PARSER_FACTORY = spf;
-        }
-        try {
-            return SAX_PARSER_FACTORY.newSAXParser().getXMLReader();
-        } catch (ParserConfigurationException e) {
-            throw new AssertionError(e); // Only if we messed up the CFG above
-        } catch (SAXException e) {
-            throw new AssertionError(e); // Whatever - just blow up. :-)
-                                         // As of 2018-11, Xerces does not throw generic SAXExceptions.
-                                         // Yes, SAX was designed when checked exception were all the rage.
-        }
-    }
-
-    /**
-     * @return a {@linkplain Source} for the provided input stream that is safe
-     * from external entities and entity expansion attacks.
-     *
-     * @see "https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet#JAXB_Unmarshaller"
-     */
-    public static Source createSafeXmlSource(InputStream inputStream) {
-        return new SAXSource(createSafeXMLReader(), new InputSource(inputStream));
-    }
-
-    public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, String val) {
-        for (int x=0; x<indent; x++) {
-            pw1.print("\t");
-        }
-
-        pw1.print("<"+name+">");
-        pw1.print(escape(val));
-        pw1.println("</"+name+">");
-    }
-
-    public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, int val) {
-        for (int x=0; x<indent; x++) {
-            pw1.print("\t");
-        }
-
-        pw1.print("<"+name+">");
-        pw1.print(val);
-        pw1.println("</"+name+">");
-    }
-
-    public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, boolean val) {
-        for (int x=0; x<indent; x++) {
-            pw1.print("\t");
-        }
-
-        pw1.print("<"+name+">");
-        pw1.print(val);
-        pw1.println("</"+name+">");
-    }
-
-    public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, long val) {
-        for (int x=0; x<indent; x++) {
-            pw1.print("\t");
-        }
-
-        pw1.print("<"+name+">");
-        pw1.print(val);
-        pw1.println("</"+name+">");
-    }
-
-    public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, double val) {
-        for (int x=0; x<indent; x++) {
-            pw1.print("\t");
-        }
-
-        pw1.print("<"+name+">");
-        pw1.print(val);
-        pw1.println("</"+name+">");
-    }
-
-    public static void writeSimpleXMLOpenIndentedLine(PrintWriter pw1, int indent, String name) {
-        writeIndents(pw1, indent);
-        pw1.println("<" + name + ">");
-    }
-
-    public static void writeSimpleXMLCloseIndentedLine(PrintWriter pw1, int indent, String name) {
-        writeIndents(pw1, indent);
-        pw1.println("</" + name + ">");
-    }
-
-    private static void writeIndents(PrintWriter pw1, int indent) {
-        for (int x = 0; x < indent; x++) {
-            pw1.print("\t");
-        }
-    }
-
-    private static final String[] INDENTS = new String[] {
-        "",
-        "\t",
-        "\t\t",
-        "\t\t\t",
-        "\t\t\t\t",
-        "\t\t\t\t\t",
-        "\t\t\t\t\t\t"
-    };
-
-    public static String indentStr(int level) {
-        if (level < INDENTS.length) {
-            return INDENTS[level];
-        }
-        return StringUtils.repeat('\t', level);
     }
 
     public static String xmlToString(Node node) throws TransformerException {
@@ -300,56 +138,48 @@ public class MekHqXmlUtil {
             return "";
         }
 
-        String retVal = "";
+        StringBuilder retVal = new StringBuilder();
 
         // Start writing this entity to the file.
-        retVal += MekHqXmlUtil.indentStr(indentLvl) + "<entity chassis=\""
-                + escape(tgtEnt.getChassis())
-                + "\" model=\"" + escape(tgtEnt.getModel())
-                + "\" type=\"" + escape(tgtEnt.getMovementModeAsString())
-                + "\" commander=\"" + String.valueOf(tgtEnt.isCommander());
-
-        retVal += "\" externalId=\"";
-        retVal += tgtEnt.getExternalIdAsString();
+        retVal.append(MekHqXmlUtil.indentStr(indentLvl))
+                .append("<entity chassis=\"").append(escape(tgtEnt.getChassis()))
+                .append("\" model=\"").append(escape(tgtEnt.getModel()))
+                .append("\" type=\"").append(escape(tgtEnt.getMovementModeAsString()))
+                .append("\" commander=\"").append(tgtEnt.isCommander())
+                .append("\" externalId=\"").append(tgtEnt.getExternalIdAsString());
 
         if (tgtEnt.countQuirks() > 0) {
-            retVal += "\" quirks=\"";
-            retVal += String.valueOf(escape(tgtEnt.getQuirkList("::")));
+            retVal.append("\" quirks=\"").append(escape(tgtEnt.getQuirkList("::")));
         }
         if (tgtEnt.getC3Master() != null) {
-            retVal += "\" c3MasterIs=\"";
-            retVal += tgtEnt.getGame()
-                .getEntity(tgtEnt.getC3Master().getId())
-                .getC3UUIDAsString();
+            retVal.append("\" c3MasterIs=\"")
+                    .append(tgtEnt.getGame().getEntity(tgtEnt.getC3Master().getId()).getC3UUIDAsString());
         }
         if (tgtEnt.hasC3() || tgtEnt.hasC3i() || tgtEnt.hasNavalC3()) {
-            retVal += "\" c3UUID=\"";
-            retVal += tgtEnt.getC3UUIDAsString();
+            retVal.append("\" c3UUID=\"").append(tgtEnt.getC3UUIDAsString());
         }
 
          if ((null != tgtEnt.getCamoCategory())
                  && !IPlayer.NO_CAMO.equals(tgtEnt.getCamoCategory())
                  && !tgtEnt.getCamoCategory().isEmpty()) {
-             retVal += "\" camoCategory=\"";
-             retVal += String.valueOf(escape(tgtEnt.getCamoCategory()));
+             retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamoCategory()));
          }
 
          if ((null != tgtEnt.getCamoFileName())
                  && !IPlayer.NO_CAMO.equals(tgtEnt.getCamoFileName())
                  && !tgtEnt.getCamoFileName().isEmpty()) {
-             retVal += "\" camoFileName=\"";
-             retVal += String.valueOf(escape(tgtEnt.getCamoFileName()));
+             retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamoFileName()));
          }
 
-         if(tgtEnt.getDeployRound() > 0) {
-             retVal += String.format("\" %s=\"%d", MULParser.DEPLOYMENT, tgtEnt.getDeployRound());
+         if (tgtEnt.getDeployRound() > 0) {
+             retVal.append(String.format("\" %s=\"%d", MULParser.DEPLOYMENT, tgtEnt.getDeployRound()));
          }
 
-         if(tgtEnt instanceof Infantry) {
-             retVal += String.format("\" %s=\"%d", MULParser.INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadN());
+         if (tgtEnt instanceof Infantry) {
+             retVal.append(String.format("\" %s=\"%d", MULParser.INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadN()));
          }
 
-        retVal += "\">\n";
+        retVal.append("\">\n");
 
         // If it's a tank, add a movement tag.
         // Since tank movement can be affected by damage other than equipment
@@ -357,14 +187,14 @@ public class MekHqXmlUtil {
         // And thus can't necessarily be calculated.
         if (tgtEnt instanceof Tank) {
             Tank tentity = (Tank) tgtEnt;
-            retVal += getMovementString(tentity, indentLvl+1);
+            retVal.append(getMovementString(tentity, indentLvl + 1));
 
             if (tentity.isTurretLocked(Tank.LOC_TURRET)) {
-                retVal += getTurretLockedString(tentity, indentLvl+1);
+                retVal.append(getTurretLockedString(tentity, indentLvl + 1));
             }
 
             // Crits
-            retVal += getTankCritString(tentity, indentLvl+1);
+            retVal.append(getTankCritString(tentity, indentLvl + 1));
         }
 
         // add a bunch of stuff for aeros
@@ -372,16 +202,13 @@ public class MekHqXmlUtil {
             Aero a = (Aero) tgtEnt;
 
             // SI
-            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<structural integrity=\""
-                    + String.valueOf(a.getSI()) + "\"/>\n";
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<structural integrity=\"").append(a.getSI()).append("\"/>\n");
 
             // Heat sinks
-            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<heat sinks=\"" + String.valueOf(a.getHeatSinks())
-                    + "\"/>\n";
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<heat sinks=\"").append(a.getHeatSinks()).append("\"/>\n");
 
             // Fuel
-            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<fuel left=\"" + String.valueOf(a.getFuel())
-                    + "\"/>\n";
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<fuel left=\"").append(a.getFuel()).append("\"/>\n");
 
             // TODO: dropship docking collars, bays
 
@@ -390,95 +217,95 @@ public class MekHqXmlUtil {
                 Jumpship j = (Jumpship) a;
 
                 // KF integrity
-                retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<KF integrity=\""
-                        + String.valueOf(j.getKFIntegrity()) + "\"/>\n";
+                retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1))
+                        .append("<KF integrity=\"").append(j.getKFIntegrity()).append("\"/>\n");
 
                 // KF sail integrity
-                retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<sail integrity=\""
-                        + String.valueOf(j.getSailIntegrity()) + "\"/>\n";
+                retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1))
+                        .append("<sail integrity=\"").append(j.getSailIntegrity()).append("\"/>\n");
             }
 
             // Crits
-            retVal += getAeroCritString(a, indentLvl+1);
+            retVal.append(getAeroCritString(a, indentLvl + 1));
         }
 
         // If the entity carries bombs, write those out
-        if(tgtEnt instanceof IBomber) {
-            retVal += getBombChoiceString((IBomber) tgtEnt, indentLvl);
+        if (tgtEnt instanceof IBomber) {
+            retVal.append(getBombChoiceString((IBomber) tgtEnt, indentLvl));
         }
 
         // Add the locations of this entity (if any are needed).
         String loc = EntityListFile.getLocString(tgtEnt, indentLvl+1);
 
         if (null != loc) {
-            retVal += loc;
+            retVal.append(loc);
         }
 
         // Write the Naval C3 Data if needed
         if (tgtEnt.hasNavalC3()) {
-            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<nc3set>";
-            retVal += CommonConstants.NL;
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<nc3set>");
+            retVal.append(CommonConstants.NL);
             Iterator<Entity> nc3List = list.iterator();
             while (nc3List.hasNext()) {
                 final Entity nc3Entity = nc3List.next();
 
                 if (nc3Entity.onSameC3NetworkAs(tgtEnt, true)) {
-                    retVal += MekHqXmlUtil.indentStr(indentLvl+2) + "<nc3_link link=\"";
-                    retVal += nc3Entity.getC3UUIDAsString();
-                    retVal += "\"/>";
-                    retVal += CommonConstants.NL;
+                    retVal.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<nc3_link link=\"");
+                    retVal.append(nc3Entity.getC3UUIDAsString());
+                    retVal.append("\"/>");
+                    retVal.append(CommonConstants.NL);
                 }
             }
-            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "</nc3set>";
-            retVal += CommonConstants.NL;
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</nc3set>");
+            retVal.append(CommonConstants.NL);
         }
 
         // Write the C3i Data if needed
         if (tgtEnt.hasC3i()) {
-            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<c3iset>";
-            retVal += CommonConstants.NL;
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<c3iset>");
+            retVal.append(CommonConstants.NL);
             Iterator<Entity> c3iList = list.iterator();
             while (c3iList.hasNext()) {
                 final Entity C3iEntity = c3iList.next();
 
                 if (C3iEntity.onSameC3NetworkAs(tgtEnt, true)) {
-                    retVal += MekHqXmlUtil.indentStr(indentLvl+2) + "<c3i_link link=\"";
-                    retVal += C3iEntity.getC3UUIDAsString();
-                    retVal += "\"/>";
-                    retVal += CommonConstants.NL;
+                    retVal.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<c3i_link link=\"");
+                    retVal.append(C3iEntity.getC3UUIDAsString());
+                    retVal.append("\"/>");
+                    retVal.append(CommonConstants.NL);
                 }
             }
-            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "</c3iset>";
-            retVal += CommonConstants.NL;
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</c3iset>");
+            retVal.append(CommonConstants.NL);
         }
 
         // Finish writing this entity to the file.
-        retVal += MekHqXmlUtil.indentStr(indentLvl) + "</entity>";
+        retVal.append(MekHqXmlUtil.indentStr(indentLvl)).append("</entity>");
 
         // Okay, return whatever we've got!
-        return retVal;
+        return retVal.toString();
     }
 
     private static String getBombChoiceString(IBomber bomber, int indentLvl) {
-        String retVal = "";
+        StringBuilder retVal = new StringBuilder();
 
         int[] bombChoices = bomber.getBombChoices();
         if (bombChoices.length > 0) {
-            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<bombs>\n";
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<bombs>\n");
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if (bombChoices[type] > 0) {
                     String typeName = BombType.getBombInternalName(type);
-                    retVal += MekHqXmlUtil.indentStr(indentLvl+2) + "<bomb type=\"";
-                    retVal += typeName;
-                    retVal += "\" load=\"";
-                    retVal += String.valueOf(bombChoices[type]);
-                    retVal += "\"/>\n";
+                    retVal.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<bomb type=\"");
+                    retVal.append(typeName);
+                    retVal.append("\" load=\"");
+                    retVal.append(bombChoices[type]);
+                    retVal.append("\"/>\n");
                 }
             }
-            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "</bombs>\n";
+            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</bombs>\n");
         }
 
-        return retVal;
+        return retVal.toString();
     }
 
     /**
@@ -703,46 +530,6 @@ public class MekHqXmlUtil {
             default:
                 throw new IllegalArgumentException("More than one entity contained in XML string!  Expecting a single entity.");
         }
-    }
-
-    /**
-     * Parse a date from an XML node's content.
-     * @param value The date from an XML node's content.
-     * @return The Date retrieved from the XML node content.
-     */
-    public static LocalDate parseDate(String value) throws DateTimeParseException {
-        // Accept (truncates): uuuu-MM-dd HH:mm:ss
-        // Accept: uuuu-MM-dd
-        int firstSpace = value.indexOf(' ');
-        if (firstSpace < 0) {
-            return LocalDate.parse(value);
-        } else {
-            return LocalDate.parse(value.substring(0, firstSpace));
-        }
-    }
-
-    /**
-     * Formats a Date suitable for writing to an XML node.
-     * @param date The date to format for XML.
-     * @return A String suitable for writing a date to an XML node.
-     */
-    public static String saveFormattedDate(LocalDate date) {
-        return date.toString(); // ISO-8601
-    }
-
-    /** Escapes a string to store in an XML element.
-      * @param string The string to be encoded
-      * @return An encoded copy of the string
-      */
-    public static String escape(String string) {
-        return StringEscapeUtils.escapeXml10(string);
-    }
-
-    /**
-     * Unescape...well, it reverses escaping...
-     */
-    public static String unEscape(String string) {
-      return StringEscapeUtils.unescapeXml(string);
     }
 
     public static String getEntityNameFromXmlString(Node node) {
