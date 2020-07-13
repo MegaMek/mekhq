@@ -1,9 +1,21 @@
 /*
- * PersonViewPanel
+ * Copyright (C) 2013-2020 - The MegaMek Team. All Rights Reserved.
  *
- * Created on July 26, 2009, 11:32 PM
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.view;
 
 import java.awt.*;
@@ -11,7 +23,6 @@ import java.awt.Dialog.ModalityType;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Image;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +42,6 @@ import javax.swing.table.TableColumn;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.FormerSpouse;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import org.joda.time.DateTime;
 
 import megamek.common.Crew;
 import megamek.common.options.PilotOptions;
@@ -526,9 +536,9 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlInfo.add(lblOrigin1, gridBagConstraints);
 
             lblOrigin2.setName("lblOrigin2"); // NOI18N
-            String factionName = person.getOriginFaction().getFullName(person.getCampaign().getGameYear());
+            String factionName = person.getOriginFaction().getFullName(campaign.getGameYear());
             if (person.getOriginPlanet() != null) {
-                String planetName = person.getOriginPlanet().getName(new DateTime(person.getCampaign().getCalendar()));
+                String planetName = person.getOriginPlanet().getName(campaign.getLocalDate());
                 lblOrigin2.setText(String.format("<html><a href='#'>%s</a> (%s)</html>", planetName, factionName));
                 lblOrigin2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblOrigin2.addMouseListener(new MouseAdapter() {
@@ -628,8 +638,6 @@ public class PersonViewPanel extends ScrollablePanel {
         firsty++;
 
         if (person.isPregnant()) {
-            String dueDate;
-
             lblDueDate1.setName("lblDueDate1");
             lblDueDate1.setText(resourceMap.getString("lblDueDate1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -639,13 +647,10 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblDueDate1, gridBagConstraints);
 
-            if (campaign.getCampaignOptions().getDisplayTrueDueDate()) {
-                dueDate = person.getDueDate().format(DateTimeFormatter.ofPattern(campaign
-                        .getCampaignOptions().getDisplayDateFormat()));
-            } else {
-                dueDate = person.getExpectedDueDate().format(DateTimeFormatter.ofPattern(campaign
-                        .getCampaignOptions().getDisplayDateFormat()));
-            }
+            String dueDate = campaign.getCampaignOptions().getDisplayFormattedDate(
+                    campaign.getCampaignOptions().getDisplayTrueDueDate()
+                            ? person.getDueDate()
+                            : person.getExpectedDueDate());
 
             lblDueDate2.setName("lblDueDate2");
             lblDueDate2.setText(dueDate);
@@ -851,9 +856,9 @@ public class PersonViewPanel extends ScrollablePanel {
                 lblFormerSpouses2 = new JLabel();
                 lblFormerSpouses2.setName("lblFormerSpouses2"); // NOI18N //$NON-NLS-1$
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>", ex.getFullName(),
-                        formerSpouse.getReasonString(), formerSpouse.getDateAsString(
-                                campaign.getCampaignOptions().getDisplayDateFormat())));
+                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
+                        ex.getFullName(), formerSpouse.getReasonString(),
+                        campaign.getCampaignOptions().getDisplayFormattedDate(formerSpouse.getDate())));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {

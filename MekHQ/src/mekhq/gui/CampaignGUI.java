@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui;
 
@@ -26,7 +26,9 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.DayOfWeek;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 import javax.swing.*;
@@ -35,6 +37,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.dialog.*;
 import mekhq.gui.preferences.JWindowPreference;
@@ -1015,7 +1018,7 @@ public class CampaignGUI extends JPanel {
     private void initTopButtons() {
         GridBagConstraints gridBagConstraints;
 
-        lblLocation = new JLabel(getCampaign().getLocation().getReport(getCampaign().getCalendar().getTime())); // NOI18N
+        lblLocation = new JLabel(getCampaign().getLocation().getReport(getCampaign().getLocalDate())); // NOI18N
 
         btnPanel = new JPanel(new GridBagLayout());
 
@@ -1171,7 +1174,7 @@ public class CampaignGUI extends JPanel {
     public void showNews(int id) {
         NewsItem news = getCampaign().getNews().getNewsItem(id);
         if (null != news) {
-            NewsReportDialog nrd = new NewsReportDialog(frame, news);
+            NewsReportDialog nrd = new NewsReportDialog(frame, news, getCampaign());
             nrd.setVisible(true);
         }
     }
@@ -1507,12 +1510,14 @@ public class CampaignGUI extends JPanel {
     }
 
     private void miExportOptionsActionPerformed(java.awt.event.ActionEvent evt) {
-        saveOptionsFile(FileType.XML, resourceMap.getString("dlgSaveCampaignXML.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedCampaignSettings");
+        saveOptionsFile(FileType.XML, resourceMap.getString("dlgSaveCampaignXML.text"),
+                getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedCampaignSettings");
     }
 
     private void miExportPlanetsXMLActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-            exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedPlanets");
+            exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
+                    getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPlanets");
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
@@ -1520,7 +1525,8 @@ public class CampaignGUI extends JPanel {
 
     private void miExportFinancesCSVActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-            exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedFinances");
+            exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
+                    getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedFinances");
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
@@ -1528,7 +1534,8 @@ public class CampaignGUI extends JPanel {
 
     private void miExportPersonnelCSVActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-            exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedPersonnel");
+            exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
+                    getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPersonnel");
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
@@ -1536,7 +1543,8 @@ public class CampaignGUI extends JPanel {
 
     private void miExportUnitCSVActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-            exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedUnits");
+            exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
+                    getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedUnits");
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
@@ -1585,9 +1593,13 @@ public class CampaignGUI extends JPanel {
         } else if (getCampaign().getTechs().size() > 0) {
             String name;
             Map<String, Person> techHash = new HashMap<>();
+            List<String> techList = new ArrayList<>();
             String skillLvl;
             int TimePerDay;
-            for (Person tech : getCampaign().getTechs()) {
+
+            List<Person> techs = getCampaign().getTechs();
+            techs.sort(Comparator.comparingInt(Person::getPrimaryRole));
+            for (Person tech : techs) {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
@@ -1609,19 +1621,17 @@ public class CampaignGUI extends JPanel {
                         + tech.getMinutesLeft() + "/" + TimePerDay
                         + " minutes";
                 techHash.put(name, tech);
+                techList.add(name);
             }
-            String[] techNames = new String[techHash.keySet().size()];
-            int i = 0;
-            for (String n : techHash.keySet()) {
-                techNames[i] = n;
-                i++;
-            }
+
             String s = (String) JOptionPane.showInputDialog(frame,
                     "Which tech should work on the refit?", "Select Tech",
-                    JOptionPane.PLAIN_MESSAGE, null, techNames, techNames[0]);
+                    JOptionPane.PLAIN_MESSAGE, null, techList.toArray(), techList.get(0));
+
             if (null == s) {
                 return;
             }
+
             r.setTeamId(techHash.get(s).getId());
         } else {
             JOptionPane.showMessageDialog(frame,
@@ -2637,8 +2647,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshLocation() {
-        lblLocation.setText(getCampaign().getLocation().getReport(
-                getCampaign().getCalendar().getTime()));
+        lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
     }
 
     protected MekHQ getApplication() {

@@ -39,7 +39,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 
 import mekhq.MekHQ;
@@ -112,10 +111,6 @@ public class ExtraData {
         ADAPTERS.put(Boolean.class, new StringAdapter<Boolean>() {
             @Override
             public Boolean adapt(String str) { return Boolean.valueOf(str); }
-        });
-        ADAPTERS.put(DateTime.class, new StringAdapter<DateTime>() {
-            @Override
-            public DateTime adapt(String str) { return new DateTime(str); }
         });
     }
 
@@ -417,13 +412,6 @@ public class ExtraData {
     public static class BooleanKey extends Key<Boolean> {
         public BooleanKey(String name) {
             super(name, Boolean.class);
-        }
-    }
-
-    /** A key referencing a joda-time DateTime value */
-    public static class DateKey extends Key<DateTime> {
-        public DateKey(String name) {
-            super(name, DateTime.class);
         }
     }
 }

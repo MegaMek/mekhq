@@ -1,19 +1,29 @@
 /*
- * JumpPathViewPanel
+ * Copyright (C) 2009-2020 - The MegaMek Team. All Rights Reserved.
  *
- * Created on July 26, 2009, 11:32 PM
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.view;
 
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
-import org.joda.time.DateTime;
-
 import megamek.common.util.EncodeControl;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -92,15 +102,15 @@ public class JumpPathViewPanel extends ScrollablePanel {
         pnlPath.setLayout(new java.awt.GridBagLayout());
         int i = 0;
         javax.swing.JLabel lblPlanet;
-        DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
-        for(PlanetarySystem system : path.getSystems()) {
+        LocalDate currentDate = campaign.getLocalDate();
+        for (PlanetarySystem system : path.getSystems()) {
             lblPlanet = new javax.swing.JLabel(system.getPrintableName(currentDate) + " (" + system.getRechargeTimeText(currentDate) + ")");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.weightx = 1.0;
-            if(i >= (path.getSystems().size()-1)) {
+            if (i >= (path.getSystems().size() - 1)) {
                 gridBagConstraints.weighty = 1.0;
             }
             gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
@@ -112,7 +122,6 @@ public class JumpPathViewPanel extends ScrollablePanel {
     }
 
     private void fillStats() {
-
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel", new EncodeControl()); //$NON-NLS-1$
 
         lblJumps = new javax.swing.JLabel();
@@ -128,7 +137,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         lblCost = new javax.swing.JLabel();
         txtCost = new javax.swing.JLabel();
 
-        DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
+        LocalDate currentDate = campaign.getLocalDate();
         String startName = (path.getFirstSystem() == null) ? "?" : path.getFirstSystem().getPrintableName(currentDate);
         String endName = (path.getLastSystem() == null) ? "?" : path.getLastSystem().getPrintableName(currentDate);
 
@@ -235,7 +244,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTotalTime, gridBagConstraints);
 
-        if(campaign.getCampaignOptions().payForTransport()) {
+        if (campaign.getCampaignOptions().payForTransport()) {
             lblCost.setName("lblCost1"); // NOI18N
             lblCost.setText(resourceMap.getString("lblCost1.text"));
             gridBagConstraints = new java.awt.GridBagConstraints();

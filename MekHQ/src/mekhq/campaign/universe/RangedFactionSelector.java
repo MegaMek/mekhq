@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 MegaMek team
+ * Copyright (C) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,14 +10,15 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.universe;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,9 +26,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.joda.time.DateTime;
-
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -38,7 +36,6 @@ import mekhq.campaign.universe.Faction.Tag;
  * a faction from a defined range of planets.
  */
 public class RangedFactionSelector extends AbstractFactionSelector {
-
     /**
      * The range around {@link Campaign#getCurrentSystem()} to search
      * for factions.
@@ -49,7 +46,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
      * The current date of the {@link Campaign} when the values were
      * cached.
      */
-    private DateTime cachedDate;
+    private LocalDate cachedDate;
 
     /**
      * The current {@link PlanetarySystem} of the {@link Campaign} when
@@ -59,7 +56,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
 
     /**
      * This map stores weights for a faction. Each weight should
-     * be cummulative. That is, if two factions have equal weights,
+     * be cumulative. That is, if two factions have equal weights,
      * you could express this with weights of 1.0 and 2.0 or 5.0 and 10.0.
      * This way, when selecting a faction at random using the weights
      * you can create a random double between 0.0 and the largest value
@@ -105,9 +102,9 @@ public class RangedFactionSelector extends AbstractFactionSelector {
 
     @Override
     public Faction selectFaction(Campaign campaign) {
-        if (cachedFactions == null
-            || !cachedSystem.equals(campaign.getCurrentSystem())
-            || Utilities.getDateTimeDay(campaign.getDate()).isAfter(cachedDate)) {
+        if ((cachedFactions == null)
+                || !cachedSystem.equals(campaign.getCurrentSystem())
+                || campaign.getLocalDate().isAfter(cachedDate)) {
             createLookupMap(campaign);
         }
 
@@ -131,13 +128,13 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     private void createLookupMap(Campaign campaign) {
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
 
-        DateTime now = Utilities.getDateTimeDay(campaign.getDate());
+        LocalDate now = campaign.getLocalDate();
 
         Map<Faction, Double> weights = new HashMap<>();
         Systems.getInstance().visitNearbySystems(currentSystem, range, planetarySystem -> {
             Planet planet = planetarySystem.getPrimaryPlanet();
             Long pop = planet.getPopulation(now);
-            if (pop == null || (long)pop <= 0) {
+            if ((pop == null) || (pop <= 0)) {
                 return;
             }
 
@@ -146,7 +143,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             // Weight the faction by the planet's population divided by its
             // distance from our current system. The scaling factor is used
             // to affect the 'spread'.
-            double delta = Math.log10((long)pop) / (1 + distance * distanceScale);
+            double delta = Math.log10(pop) / (1 + distance * distanceScale);
             for (Faction faction : planetarySystem.getFactionSet(now)) {
                 if (faction.is(Tag.ABANDONED) || faction.is(Tag.HIDDEN) || faction.is(Tag.INACTIVE)
                     || faction.is(Tag.MERC)) {
@@ -166,7 +163,6 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         Faction mercenaries = Faction.getFaction("MERC");
         TreeMap<Double, Faction> factions = new TreeMap<>();
         if (weights.isEmpty()) {
-
             // If we have no valid factions, we can always
             // have mercs and the campaign's faction.
             factions.put(1.0, mercenaries);

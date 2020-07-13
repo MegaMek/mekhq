@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.Dimension;
@@ -46,7 +45,6 @@ import javax.swing.event.ChangeListener;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
@@ -61,7 +59,6 @@ import mekhq.gui.view.ContractPaymentBreakdown;
 import mekhq.preferences.PreferencesNode;
 
 /**
- *
  * @author  Taharqa
  */
 public class NewContractDialog extends javax.swing.JDialog {
@@ -771,7 +768,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     protected void doUpdateContract(Object source) {
         if (suggestPlanet.equals(source)) {
             contract.setSystemId((Systems.getInstance().getSystemByName(suggestPlanet.getText(),
-                    Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
+                    campaign.getLocalDate())).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);
         } else if (choiceOverhead.equals(source)) {

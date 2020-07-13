@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.io;
 
@@ -28,7 +28,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -316,17 +315,13 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
-                    Calendar c = new GregorianCalendar();
-                    c.setTime(parseDate(retVal.getShortDateFormatter(), wn.getTextContent()));
-                    retVal.setShipSearchStart(c);
+                    retVal.setShipSearchStart(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {
                     retVal.setShipSearchType(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("shipSearchResult")) {
                     retVal.setShipSearchResult(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
-                    Calendar c = new GregorianCalendar();
-                    c.setTime(parseDate(retVal.getShortDateFormatter(), wn.getTextContent()));
-                    retVal.setShipSearchExpiration(c);
+                    retVal.setShipSearchExpiration(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
                 }
@@ -430,13 +425,13 @@ public class CampaignXmlParser {
                     }
                 }
                 //if the type is a BayWeapon, remove
-                if(prt instanceof EquipmentPart
+                if (prt instanceof EquipmentPart
                         && ((EquipmentPart) prt).getType() instanceof BayWeapon) {
                     removeParts.add(prt);
                     continue;
                 }
 
-                if(prt instanceof MissingEquipmentPart
+                if (prt instanceof MissingEquipmentPart
                         && ((MissingEquipmentPart) prt).getType() instanceof BayWeapon) {
                     removeParts.add(prt);
                     continue;
@@ -580,7 +575,7 @@ public class CampaignXmlParser {
         timestamp = System.currentTimeMillis();
 
         // Okay, Units, need their pilot references fixed.
-        for(Unit unit : retVal.getUnits()) {
+        for (Unit unit : retVal.getUnits()) {
             // Also, the unit should have its campaign set.
             unit.setCampaign(retVal);
 
@@ -637,15 +632,15 @@ public class CampaignXmlParser {
             }
 
             //get rid of BA parts before 0.3.4
-            if(unit.getEntity() instanceof BattleArmor
+            if (unit.getEntity() instanceof BattleArmor
                     && version.getMajorVersion() == 0
                     && (version.getMinorVersion() <= 2 ||
                             (version.getMinorVersion() <= 3 && version.getSnapshot() < 16))) {
-                for(Part p : unit.getParts()) {
+                for (Part p : unit.getParts()) {
                     retVal.removePart(p);
                 }
                 unit.resetParts();
-                if(version.getSnapshot() < 4) {
+                if (version.getSnapshot() < 4) {
                     for (int loc = 0; loc < unit.getEntity().locations(); loc++) {
                         unit.getEntity().setInternal(0, loc);
                     }
@@ -658,7 +653,7 @@ public class CampaignXmlParser {
                         System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
-        for(Unit unit : retVal.getUnits()) {
+        for (Unit unit : retVal.getUnits()) {
             // Some units have been incorrectly assigned a null C3UUID as a string. This should correct that by setting a new C3UUID
             if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i() || unit.getEntity().hasNavalC3())
                     && (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
@@ -732,12 +727,12 @@ public class CampaignXmlParser {
 
         //unload any ammo bins in the warehouse
         ArrayList<AmmoBin> binsToUnload = new ArrayList<AmmoBin>();
-        for(Part prt : retVal.getSpareParts()) {
+        for (Part prt : retVal.getSpareParts()) {
             if (prt instanceof AmmoBin && !prt.isReservedForRefit() && ((AmmoBin) prt).getShotsNeeded() == 0) {
                 binsToUnload.add((AmmoBin) prt);
             }
         }
-        for(AmmoBin bin : binsToUnload) {
+        for (AmmoBin bin : binsToUnload) {
             bin.unload();
         }
 
@@ -749,7 +744,7 @@ public class CampaignXmlParser {
 
         //Check all parts that are reserved for refit and if the refit id unit
         //is not refitting or is gone then unreserve
-        for(Part part : retVal.getParts()) {
+        for (Part part : retVal.getParts()) {
             if (part.isReservedForRefit()) {
                 Unit u = retVal.getUnit(part.getRefitId());
                 if (null == u || !u.isRefitting()) {
@@ -767,7 +762,7 @@ public class CampaignXmlParser {
         //for a variety of reasons
         List<Part> partsToRemove = new ArrayList<>();
         List<Part> partsToKeep = new ArrayList<>();
-        for(Part part : retVal.getParts()) {
+        for (Part part : retVal.getParts()) {
             if (part.isSpare() && part.isPresent()) {
                 for (Part oPart : partsToKeep) {
                     if (part.isSamePartTypeAndStatus(oPart)) {
@@ -797,7 +792,7 @@ public class CampaignXmlParser {
                 partsToKeep.add(part);
             }
         }
-        for(Part toRemove : partsToRemove) {
+        for (Part toRemove : partsToRemove) {
             retVal.removePart(toRemove);
         }
 
@@ -888,6 +883,7 @@ public class CampaignXmlParser {
                             .getInstance();
                     c.setTime(parseDate(df, wn.getTextContent().trim()));
                     retVal.setCalendar(c);
+                    retVal.setLocalDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("camoCategory")) {
                     String val = wn.getTextContent().trim();
 
@@ -1040,7 +1036,7 @@ public class CampaignXmlParser {
         // Everything's new
         List<String> newReports = new ArrayList<String>(retVal.getCurrentReport().size() * 2);
         boolean firstReport = true;
-        for(String report : retVal.getCurrentReport()) {
+        for (String report : retVal.getCurrentReport()) {
             if (firstReport) {
                 firstReport = false;
             } else {
@@ -1710,7 +1706,7 @@ public class CampaignXmlParser {
             }
 
             //if for some reason we couldn't find a type for equipment part, then remove it
-            if((p instanceof EquipmentPart && null == ((EquipmentPart)p).getType())
+            if ((p instanceof EquipmentPart && null == ((EquipmentPart)p).getType())
                     || (p instanceof MissingEquipmentPart && null == ((MissingEquipmentPart) p).getType())) {
                 p = null;
             }
@@ -1802,44 +1798,44 @@ public class CampaignXmlParser {
                 String systemId = null;
                 List<PlanetarySystem.PlanetarySystemEvent> sysEvents = new ArrayList<>();
                 eventsMap.clear();
-                for(int n = 0; n < systemNodes.getLength(); ++n) {
+                for (int n = 0; n < systemNodes.getLength(); ++n) {
                     Node systemNode = systemNodes.item(n);
-                    if(systemNode.getNodeType() != Node.ELEMENT_NODE) {
+                    if (systemNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
                     }
-                    if(systemNode.getNodeName().equalsIgnoreCase("id")) {
+                    if (systemNode.getNodeName().equalsIgnoreCase("id")) {
                         systemId = systemNode.getTextContent();
-                    } else if(systemNode.getNodeName().equalsIgnoreCase("event")) {
+                    } else if (systemNode.getNodeName().equalsIgnoreCase("event")) {
                         PlanetarySystem.PlanetarySystemEvent event = Systems.getInstance().readPlanetarySystemEvent(systemNode);
-                        if(null != event) {
+                        if (null != event) {
                         	event.custom = true;
                         	sysEvents.add(event);
                         }
-                    } else if(systemNode.getNodeName().equalsIgnoreCase("planet")) {
+                    } else if (systemNode.getNodeName().equalsIgnoreCase("planet")) {
                     	NodeList planetNodes = systemNode.getChildNodes();
                         int sysPos = 0;
                         events = new ArrayList<>();
-                        for(int j = 0; j < planetNodes.getLength(); ++j) {
+                        for (int j = 0; j < planetNodes.getLength(); ++j) {
                         	Node planetNode = planetNodes.item(j);
-                            if(planetNode.getNodeType() != Node.ELEMENT_NODE) {
+                            if (planetNode.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             }
-                            if(planetNode.getNodeName().equalsIgnoreCase("sysPos")) {
+                            if (planetNode.getNodeName().equalsIgnoreCase("sysPos")) {
                                 sysPos = Integer.parseInt(planetNode.getTextContent());
-                            } else if(planetNode.getNodeName().equalsIgnoreCase("event")) {
+                            } else if (planetNode.getNodeName().equalsIgnoreCase("event")) {
                                 Planet.PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
-                                if(null != event) {
+                                if (null != event) {
                                     event.custom = true;
                                     events.add(event);
                                 }
                             }
                         }
-                        if(sysPos > 0 && !events.isEmpty()) {
+                        if (sysPos > 0 && !events.isEmpty()) {
                         	eventsMap.put(sysPos, events);
                         }
                     }
                 }
-                if(null != systemId) {
+                if (null != systemId) {
                 	//iterate through events hash and assign events to planets
                 	Iterator<Map.Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();
                     while (it.hasNext()) {
@@ -1847,7 +1843,7 @@ public class CampaignXmlParser {
                         Systems.getInstance().updatePlanetaryEvents(systemId, pair.getValue(), true, pair.getKey());
                     }
                     //check for system-wide events
-                    if(!sysEvents.isEmpty()) {
+                    if (!sysEvents.isEmpty()) {
                     	Systems.getInstance().updatePlanetarySystemEvents(systemId, sysEvents, true);
                     }
                 }
@@ -1858,22 +1854,23 @@ public class CampaignXmlParser {
                 NodeList planetNodes = wn2.getChildNodes();
                 String planetId = null;
                 events = new ArrayList<>();
-                for(int n = 0; n < planetNodes.getLength(); ++n) {
+                for (int n = 0; n < planetNodes.getLength(); ++n) {
                     Node planetNode = planetNodes.item(n);
-                    if(planetNode.getNodeType() != Node.ELEMENT_NODE) {
+                    if (planetNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
                     }
-                    if(planetNode.getNodeName().equalsIgnoreCase("id")) {
+
+                    if (planetNode.getNodeName().equalsIgnoreCase("id")) {
                         planetId = planetNode.getTextContent();
-                    } else if(planetNode.getNodeName().equalsIgnoreCase("event")) {
+                    } else if (planetNode.getNodeName().equalsIgnoreCase("event")) {
                         Planet.PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
-                        if(null != event) {
+                        if (null != event) {
                             event.custom = true;
                             events.add(event);
                         }
                     }
                 }
-                if(null != planetId) {
+                if (null != planetId) {
                     Systems.getInstance().updatePlanetaryEvents(planetId, events, true);
                 }
             }

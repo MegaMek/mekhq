@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.mission;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,9 +29,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import megamek.client.generator.RandomGenderGenerator;
+import megamek.common.IPlayer;
 import megamek.common.enums.Gender;
 import megamek.common.util.StringUtil;
-import org.joda.time.DateTime;
 
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
@@ -277,7 +278,7 @@ public class AtBDynamicScenarioFactory {
         int skill = 0;
         int quality = 0;
         int generatedLanceCount = 0;
-        DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
+        LocalDate currentDate = campaign.getLocalDate();
         ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
 
         // planet owner logic requires some special handling
@@ -493,13 +494,14 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
 
             if (forceTemplate != null && forceTemplate.isAlliedPlayerForce()) {
+
                 for (Entity en : botForce.getEntityList()) {
                     scenario.getAlliesPlayer().add(en);
                     scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
 
-                    if (campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
-                        en.setCamoCategory(campaign.getCamoCategory());
-                        en.setCamoFileName(campaign.getCamoFileName());
+                    if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
+                        en.setCamoCategory(IPlayer.NO_CAMO);
+                        en.setCamoFileName(IPlayer.colorNames[scenario.getContract(campaign).getAllyColorIndex()]);
                     }
                 }
 
@@ -754,7 +756,7 @@ public class AtBDynamicScenarioFactory {
             PlanetarySystem pSystem = Systems.getInstance().getSystemById(mission.getSystemId());
             Planet p = pSystem.getPrimaryPlanet();
             if (null != p) {
-                int atmosphere = Utilities.nonNull(p.getPressure(Utilities.getDateTimeDay(campaign.getCalendar())), scenario.getAtmosphere());
+                int atmosphere = Utilities.nonNull(p.getPressure(campaign.getLocalDate()), scenario.getAtmosphere());
                 float gravity = Utilities.nonNull(p.getGravity(), scenario.getGravity()).floatValue();
 
                 scenario.setAtmosphere(atmosphere);
@@ -2329,7 +2331,7 @@ public class AtBDynamicScenarioFactory {
      * @param currentDate Current date.
      * @return Faction code.
      */
-    private static String getPlanetOwnerFaction(AtBContract contract, DateTime currentDate) {
+    private static String getPlanetOwnerFaction(AtBContract contract, LocalDate currentDate) {
         String factionCode = "MERC";
 
         // planet owner is the first of the factions that owns the current planet.
@@ -2354,7 +2356,7 @@ public class AtBDynamicScenarioFactory {
      * @param currentDate Current date.
      * @return ForceAlignment.
      */
-    private static ForceAlignment getPlanetOwnerAlignment(AtBContract contract, String factionCode, DateTime currentDate) {
+    private static ForceAlignment getPlanetOwnerAlignment(AtBContract contract, String factionCode, LocalDate currentDate) {
         // if the faction is one of the planet owners, see if it's either the employer or opfor. If it's not, third-party.
         if (contract.getSystem().getFactions(currentDate).contains(factionCode)) {
             if (factionCode.equals(contract.getEmployerCode())) {

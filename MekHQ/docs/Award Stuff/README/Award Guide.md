@@ -526,6 +526,6 @@ The automation for the Gameplay and New Personnel is NYI.  In the interim, you c
 _____________
 Award Tracker
 -------------
-In the future, MekHQ will automatically calculate eligibilities for awards and present their recommendations at the appropriate times.  Until then, I have created `\docs\Award Stuff\AwardTracker.xlsx` with a PowerPivot Table that can be used to import campaign info saved to `\docs\Award Stuff\CampaignDataForAwards.cpnx` to see what kill-based awards have been earned for individuals, lances, companies, and battalions, as long as your TO&E is arranged by battalions, companies, lances, and units.
+In the future, MekHQ will automatically calculate eligibilities for awards and present their recommendations at the appropriate times.  Until then, I have created `\docs\Award Stuff\AwardTracker.xlsx` with a PowerPivot Table that can be used to import campaign info saved to `\docs\Award Stuff\CampaignDataForAwards.cpnx` to see what kill-based awards have been earned for individuals, lances, companies, and battalions, as long as your TO&E is arranged by battalions, companies, lances, and units. This requires Excel 2016 or newer to run, and your results may vary if you use any other software to run this.
 
 It also includes a _RANDOM ORIGIN GENERATOR_ to quickly create back stories for new personnel as well as _ASSIGNMENT AWARD TABLES_ to determine appropriate awards based on their previous assignments.  This will also be automated into MekHQ somewhere down the line.

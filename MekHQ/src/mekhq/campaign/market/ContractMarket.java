@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.market;
 
 import java.io.PrintWriter;
@@ -28,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -37,7 +35,6 @@ import megamek.common.Compute;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -58,13 +55,8 @@ import mekhq.campaign.universe.Systems;
  * Based on PersonnelMarket
  *
  * @author Neoancient
- *
  */
 public class ContractMarket implements Serializable {
-
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 1303462872220110093L;
 
 	public static int TYPE_ATBMONTHLY = 0;
@@ -93,10 +85,10 @@ public class ContractMarket implements Serializable {
 	private HashMap<Integer, Integer> followupContracts;
 
 	public ContractMarket() {
-		contracts = new ArrayList<Contract>();
-		contractIds = new HashMap<Integer, Contract>();
-		clauseMods = new HashMap<Integer, ClauseMods>();
-		followupContracts = new HashMap<Integer, Integer>();
+		contracts = new ArrayList<>();
+		contractIds = new HashMap<>();
+		clauseMods = new HashMap<>();
+		followupContracts = new HashMap<>();
 	}
 
 	public ArrayList<Contract> getContracts() {
@@ -169,9 +161,7 @@ public class ContractMarket implements Serializable {
 
 			int numContracts = Compute.d6() - 4 + unitRatingMod;
 
-			DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
-			Set<Faction> currentFactions =
-					campaign.getCurrentSystem().getFactionSet(currentDate);
+			Set<Faction> currentFactions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
 			boolean inMinorFaction = true;
 			for (Faction f : currentFactions) {
 				if (RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(f) ||
@@ -198,8 +188,8 @@ public class ContractMarket implements Serializable {
                 Faction onlyFaction = currentFactions.iterator().next();
                 if( !onlyFaction.isPeriphery() ) {
                     for (PlanetarySystem key : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(), 30)) {
-                        for (Faction f : key.getFactionSet(currentDate)) {
-                            if( !onlyFaction.equals(f) ) {
+                        for (Faction f : key.getFactionSet(campaign.getLocalDate())) {
+                            if (!onlyFaction.equals(f)) {
                                 inBackwater = false;
                                 break;
                             }
@@ -235,7 +225,7 @@ public class ContractMarket implements Serializable {
 			/* If located on a faction's capital (interpreted as the starting planet for that faction),
 			 * generate one contract offer for that faction.
 			 */
-			for (Faction f : campaign.getCurrentSystem().getFactionSet(currentDate)) {
+			for (Faction f : campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate())) {
 				try {
 					if (f.getStartingPlanet(campaign.getGameYear()).equals(campaign.getCurrentSystem().getId())
 							&& RandomFactionGenerator.getInstance().getEmployerSet().contains(f.getShortName())) {
@@ -266,8 +256,7 @@ public class ContractMarket implements Serializable {
 		}
 	}
 
-	private void checkForSubcontracts(Campaign campaign,
-			AtBContract contract, int unitRatingMod) {
+	private void checkForSubcontracts(Campaign campaign, AtBContract contract, int unitRatingMod) {
 		if (contract.getMissionType() == AtBContract.MT_GARRISONDUTY) {
 			int numSubcontracts = 0;
 			for (Mission m : campaign.getMissions()) {
@@ -360,7 +349,7 @@ public class ContractMarket implements Serializable {
 		 */
 		if (RandomFactionGenerator.getInstance().getFactionHints().isNeutral(Faction.getFaction(employer)) &&
 				!RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(Faction.getFaction(employer),
-						Faction.getFaction(contract.getEnemyCode()), campaign.getDate())) {
+						Faction.getFaction(contract.getEnemyCode()), campaign.getLocalDate())) {
 			if (contract.getMissionType() == AtBContract.MT_PLANETARYASSAULT) {
 				contract.setMissionType(AtBContract.MT_GARRISONDUTY);
 			} else if (contract.getMissionType() == AtBContract.MT_RELIEFDUTY) {
@@ -468,7 +457,7 @@ public class ContractMarket implements Serializable {
         	boolean factionValid = false;
         	for (PlanetarySystem p : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(), 30)) {
         		if (factionValid) break;
-        		for (Faction f : p.getFactionSet(Utilities.getDateTimeDay(campaign.getCalendar()))) {
+        		for (Faction f : p.getFactionSet(campaign.getLocalDate())) {
         			if (f.getShortName().equals(contract.getEnemyCode())) {
         				factionValid = true;
         				break;
