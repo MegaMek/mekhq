@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -338,8 +337,7 @@ public class MedicalViewDialog extends JDialog {
             surname = p.getBloodname();
         }
 
-        String birthdayString = p.getBirthday().format(DateTimeFormatter.ofPattern(
-                c.getCampaignOptions().getDisplayDateFormat()));
+        String birthdayString = campaign.getCampaignOptions().getDisplayFormattedDate(p.getBirthday());
 
         Period age = Period.between(p.getBirthday(), c.getLocalDate());
 
@@ -465,17 +463,17 @@ public class MedicalViewDialog extends JDialog {
                 .forEachOrdered(inj -> {
                     JLabel injLabel;
                     if (inj.getType().isPermanent()) {
-                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesText.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().format(DateTimeFormatter.ofPattern(
-                                        c.getCampaignOptions().getDisplayDateFormat()))));
+                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesText.format"),
+                                inj.getType().getSimpleName(),
+                                c.getCampaignOptions().getDisplayFormattedDate(inj.getStart())));
                     } else if (inj.isPermanent() || (inj.getTime() <= 0)) {
-                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesPermanent.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().format(DateTimeFormatter.ofPattern(
-                                        c.getCampaignOptions().getDisplayDateFormat()))));
+                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesPermanent.format"),
+                                inj.getType().getSimpleName(),
+                                c.getCampaignOptions().getDisplayFormattedDate(inj.getStart())));
                     } else {
-                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesTextAndDuration.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().format(DateTimeFormatter.ofPattern(
-                                    c.getCampaignOptions().getDisplayDateFormat())),
+                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesTextAndDuration.format"),
+                                inj.getType().getSimpleName(),
+                                c.getCampaignOptions().getDisplayFormattedDate(inj.getStart()),
                                 genTimePeriod(inj.getTime())));
                     }
 

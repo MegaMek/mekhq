@@ -25,7 +25,6 @@ import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.IntSupplier;
@@ -187,6 +186,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected LocalDate dateOfDeath;
     protected LocalDate recruitment;
     protected LocalDate lastRankChangeDate;
+    private LocalDate retirement;
     protected List<LogEntry> personnelLog;
     protected List<LogEntry> missionLog;
 
@@ -396,6 +396,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         dateOfDeath = null;
         recruitment = null;
         lastRankChangeDate = null;
+        retirement = null;
         skills = new Skills();
         options = new PersonnelOptions();
         currentEdge = 0;
@@ -1150,6 +1151,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.dateOfDeath = date;
     }
 
+    public int getAge(LocalDate today) {
+        // Get age based on year
+        if (getDateOfDeath() != null) {
+            //use date of death instead of birthday
+            today = getDateOfDeath();
+        }
+
+        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
+    }
+
     public void setRecruitment(LocalDate date) {
         this.recruitment = date;
     }
@@ -1162,36 +1173,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (getRecruitment() == null) {
             return "";
         } else {
-            return getRecruitment().format(DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getRecruitment());
         }
-    }
-
-    public void setLastRankChangeDate(LocalDate date) {
-        this.lastRankChangeDate = date;
-    }
-
-    public LocalDate getLastRankChangeDate() {
-        return lastRankChangeDate;
-    }
-
-    public String getLastRankChangeDateAsString(Campaign campaign) {
-        if (getLastRankChangeDate() == null) {
-            return "";
-        } else {
-            return getLastRankChangeDate().format(DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
-        }
-    }
-
-    public int getAge(LocalDate today) {
-        // Get age based on year
-        if (getDateOfDeath() != null) {
-            //use date of death instead of birthday
-            today = getDateOfDeath();
-        }
-
-        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
     }
 
     public String getTimeInService(Campaign campaign) {
@@ -1213,6 +1196,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 .getDisplayFormattedOutput(getRecruitment(), today);
     }
 
+    public void setLastRankChangeDate(LocalDate date) {
+        this.lastRankChangeDate = date;
+    }
+
+    public LocalDate getLastRankChangeDate() {
+        return lastRankChangeDate;
+    }
+
+    public String getLastRankChangeDateAsString(Campaign campaign) {
+        if (getLastRankChangeDate() == null) {
+            return "";
+        } else {
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getLastRankChangeDate());
+        }
+    }
+
     public String getTimeInRank(Campaign campaign) {
         if (getLastRankChangeDate() == null) {
             return "";
@@ -1228,6 +1227,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         return campaign.getCampaignOptions().getTimeInRankDisplayFormat()
                 .getDisplayFormattedOutput(getLastRankChangeDate(), today);
+    }
+
+    public void setRetirement(LocalDate date) {
+        this.retirement = date;
+    }
+
+    public LocalDate getRetirement() {
+        return retirement;
+    }
+
+    public String getRetirementAsString(Campaign campaign) {
+        if (getRetirement() == null) {
+            return "";
+        } else {
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getRetirement());
+        }
     }
 
     public void setId(UUID id) {
@@ -1630,6 +1645,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "formerSpouses");
             }
+            if (!isTryingToMarry()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToMarry", false);
+            }
+            if (!isTryingToConceive()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToConceive", false);
+            }
             if (dueDate != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dueDate",
                         MekHqXmlUtil.saveFormattedDate(dueDate));
@@ -1712,6 +1733,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (lastRankChangeDate != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastRankChangeDate",
                         MekHqXmlUtil.saveFormattedDate(lastRankChangeDate));
+            }
+            if (getRetirement() != null) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirement",
+                        MekHqXmlUtil.saveFormattedDate(getRetirement()));
             }
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXml(pw1, indent + 1);
@@ -1972,6 +1997,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.recruitment = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
                     retVal.lastRankChangeDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
+                    retVal.setRetirement(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {

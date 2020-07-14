@@ -10,21 +10,22 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import java.io.File;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import javax.swing.JFrame;
 
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -63,9 +64,9 @@ public class FileDialogs {
     public static Optional<File> savePersonnel(JFrame frame, Campaign campaign) {
 
         String fileName = String.format(
-                "%s%s_ExportedPersonnel.prsx", //$NON-NLS-1$
+                "%s%s_ExportedPersonnel.prsx",
                 campaign.getName(),
-                campaign.getShortDateAsString() );
+                campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)));
 
         Optional<File> value = GUI.fileDialogSave(
                 frame,
@@ -134,9 +135,9 @@ public class FileDialogs {
      */
     public static Optional<File> saveParts(JFrame frame, Campaign campaign) {
         String fileName = String.format(
-                "%s%s_ExportedParts.parts", //$NON-NLS-1$
+                "%s%s_ExportedParts.parts",
                 campaign.getName(),
-                campaign.getShortDateAsString() );
+                campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)));
 
         Optional<File> value =  GUI.fileDialogSave(
                 frame,
@@ -204,11 +205,10 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
-
         String fileName = String.format(
                 "%s%s.%s", //$NON-NLS-1$
                 campaign.getName(),
-                campaign.getShortDateAsString(),
+                campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)),
                 campaign.getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
 
         Optional<File> value = GUI.fileDialogSave( frame,

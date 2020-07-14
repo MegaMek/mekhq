@@ -21,7 +21,6 @@ package mekhq.campaign.personnel;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -272,8 +271,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     public List<String> getFormattedDates(Campaign campaign) {
         List<String> formattedDates = new ArrayList<>();
         for (LocalDate date : dates) {
-            formattedDates.add(date.format(DateTimeFormatter.ofPattern(campaign.getCampaignOptions()
-                    .getDisplayDateFormat())));
+            formattedDates.add(campaign.getCampaignOptions().getDisplayFormattedDate(date));
         }
         return formattedDates;
     }
