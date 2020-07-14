@@ -35,6 +35,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generators.RandomCallsignGenerator;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
 import megamek.common.logging.LogLevel;
@@ -158,6 +159,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 }
             }
             RandomNameGenerator.getInstance();
+            RandomCallsignGenerator.getInstance();
             setProgress(1);
             try {
                 QuirksHandler.initQuirksList();

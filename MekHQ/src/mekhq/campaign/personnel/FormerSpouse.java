@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
@@ -27,17 +27,17 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class FormerSpouse implements Serializable, MekHqXmlSerializable {
     //region Variables
+    private static final long serialVersionUID = 3700554959779939695L;
+
     //mutable private variables
     private UUID formerSpouseId;
     private LocalDate date;
     private int reason; //why the spouse became a former spouse
     //constants
-    private final static long serialVersionUID = 19161521195L; //spouse in a letter-number cypher
     public final static int REASON_WIDOWED = 0;
     public final static int REASON_DIVORCE = 1;
     public final static int REASON_UNKNOWN = 2;
@@ -63,10 +63,6 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
 
     public LocalDate getDate() {
         return date;
-    }
-
-    public String getDateAsString(String dateFormat) {
-        return date.format(DateTimeFormatter.ofPattern(dateFormat));
     }
 
     public void setDate(LocalDate date) {

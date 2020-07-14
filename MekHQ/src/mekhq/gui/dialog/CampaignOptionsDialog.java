@@ -249,6 +249,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
     private JCheckBox chkUseTimeInRank;
     private JComboBox<TimeInDisplayFormat> comboTimeInRankDisplayFormat;
+    private JCheckBox chkUseRetirementDateTracking;
     private JCheckBox chkTrackTotalEarnings;
     private JCheckBox chkShowOriginFaction;
     private JCheckBox chkRandomizeOrigin;
@@ -1764,6 +1765,11 @@ public class CampaignOptionsDialog extends JDialog {
         pnlTimeInRankDisplayFormat.add(new JLabel(resourceMap.getString("timeInRankDisplayFormat.text")));
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(pnlTimeInRankDisplayFormat, gridBagConstraints);
+
+        chkUseRetirementDateTracking = new JCheckBox(resourceMap.getString("useRetirementDateTracking.text"));
+        chkUseRetirementDateTracking.setSelected(options.useRetirementDateTracking());
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkUseRetirementDateTracking, gridBagConstraints);
 
         chkTrackTotalEarnings = new JCheckBox(resourceMap.getString("trackTotalEarnings.text"));
         chkTrackTotalEarnings.setToolTipText(resourceMap.getString("trackTotalEarnings.toolTipText"));
@@ -4921,6 +4927,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setTimeInServiceDisplayFormat((TimeInDisplayFormat) comboTimeInServiceDisplayFormat.getSelectedItem());
         options.setUseTimeInRank(chkUseTimeInRank.isSelected());
         options.setTimeInRankDisplayFormat((TimeInDisplayFormat) comboTimeInRankDisplayFormat.getSelectedItem());
+        options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
         options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
         options.setShowOriginFaction(chkShowOriginFaction.isSelected());
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());

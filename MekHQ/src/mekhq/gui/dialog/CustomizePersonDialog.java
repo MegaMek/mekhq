@@ -18,19 +18,17 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
 
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generators.RandomCallsignGenerator;
 import megamek.common.enums.Gender;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
@@ -78,12 +76,14 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private LocalDate birthdate;
     private LocalDate recruitment;
     private LocalDate lastRankChangeDate;
-    private String dateFormat = "MMMM d yyyy";
+    private LocalDate retirement;
+    private String dateFormat = "MMMM d yyyy"; // TODO : LocalDate : Remove inline date format
     private Frame frame;
 
     private JButton btnDate;
     private JButton btnServiceDate;
     private JButton btnRankDate;
+    private JButton btnRetirementDate;
     private JComboBox<Gender> choiceGender;
     private javax.swing.JLabel lblAge;
     private javax.swing.JPanel panSkills;
@@ -123,14 +123,19 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void initializePilotAndOptions () {
-        this.birthdate = person.getBirthday();
-        if (campaign.getCampaignOptions().getUseTimeInService() && (person.getRecruitment() != null)) {
-            this.recruitment = person.getRecruitment();
+        birthdate = person.getBirthday();
+        if (person.getRecruitment() != null) {
+            recruitment = person.getRecruitment();
         }
-        if (campaign.getCampaignOptions().getUseTimeInRank() && (person.getLastRankChangeDate() != null)) {
-            this.lastRankChangeDate = person.getLastRankChangeDate();
+
+        if (person.getLastRankChangeDate() != null) {
+            lastRankChangeDate = person.getLastRankChangeDate();
         }
-        this.options = person.getOptions();
+
+        if (person.getRetirement() != null) {
+            retirement = person.getRetirement();
+        }
+        options = person.getOptions();
         initComponents();
     }
 
@@ -241,31 +246,26 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             panDemog.add(lblBloodname, gridBagConstraints);
 
-            textBloodname.setMinimumSize(new java.awt.Dimension(150, 28));
-            textBloodname.setName("textBloodname"); // NOI18N
-            textBloodname.setPreferredSize(new java.awt.Dimension(150, 28));
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-            textBloodname.setText(person.getBloodname());
-            panDemog.add(textBloodname, gridBagConstraints);
-
-            btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text")); // NOI18N
-            btnRandomBloodname.setName("btnRandomBloodname"); // NOI18N
-            btnRandomBloodname.addActionListener(evt -> randomBloodname());
+            textBloodname.setMinimumSize(new Dimension(150, 28));
+            textBloodname.setName("textBloodname");
+            textBloodname.setPreferredSize(new Dimension(150, 28));
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.BOTH;
+            textBloodname.setText(person.getBloodname());
+            panDemog.add(textBloodname, gridBagConstraints);
+
+            btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text"));
+            btnRandomBloodname.setName("btnRandomBloodname");
+            btnRandomBloodname.addActionListener(evt -> randomBloodname());
+            gridBagConstraints.gridx = 2;
             panDemog.add(btnRandomBloodname, gridBagConstraints);
         } else {
-            lblNickname.setText(resourceMap.getString("lblNickname.text")); // NOI18N
-            lblNickname.setName("lblNickname"); // NOI18N
+            lblNickname.setText(resourceMap.getString("lblNickname.text"));
+            lblNickname.setName("lblNickname");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -274,7 +274,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             panDemog.add(lblNickname, gridBagConstraints);
 
             textNickname.setText(person.getCallsign());
-            textNickname.setName("textNickname"); // NOI18N
+            textNickname.setName("textNickname");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
@@ -282,6 +282,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
             panDemog.add(textNickname, gridBagConstraints);
+
+            JButton btnRandomCallsign = new JButton(resourceMap.getString("btnRandomCallsign.text"));
+            btnRandomCallsign.setName("btnRandomCallsign");
+            btnRandomCallsign.addActionListener(e -> textNickname.setText(RandomCallsignGenerator.getInstance().generate()));
+            gridBagConstraints.gridx = 2;
+            panDemog.add(btnRandomCallsign, gridBagConstraints);
         }
 
         y++;
@@ -579,6 +585,28 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             panDemog.add(btnRankDate, gridBagConstraints);
+
+            y++;
+        }
+
+        if (campaign.getCampaignOptions().useRetirementDateTracking() && (retirement != null)) {
+            JLabel lblRetirement = new JLabel(resourceMap.getString("lblRetirement.text"));
+            lblRetirement.setName("lblRetirement");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+            panDemog.add(lblRetirement, gridBagConstraints);
+
+            btnRetirementDate = new JButton(retirement.format(DateTimeFormatter.ofPattern(dateFormat)));
+            btnRetirementDate.setName("btnRetirementDate");
+            btnRetirementDate.addActionListener(e -> btnRetirementDateActionPerformed());
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            panDemog.add(btnRetirementDate, gridBagConstraints);
 
             y++;
         }
@@ -914,6 +942,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setBirthday(birthdate);
         person.setRecruitment(recruitment);
         person.setLastRankChangeDate(lastRankChangeDate);
+        person.setRetirement(retirement);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
         if (choiceSystem.getSelectedItem() != null && choicePlanet.getSelectedItem() != null) {
             person.setOriginPlanet((Planet)choicePlanet.getSelectedItem());
@@ -1245,6 +1274,18 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             lastRankChangeDate = dc.getDate().toZonedDateTime().toLocalDate();
             btnRankDate.setText(lastRankChangeDate.format(DateTimeFormatter.ofPattern(dateFormat)));
+        }
+    }
+
+    private void btnRetirementDateActionPerformed() {
+        // show the date chooser
+        GregorianCalendar retirement = GregorianCalendar.from(this.retirement.atStartOfDay(
+                ZoneId.systemDefault()));
+        DateChooser dc = new DateChooser(frame, retirement);
+        // user can either choose a date or cancel by closing
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+            this.retirement = dc.getDate().toZonedDateTime().toLocalDate();
+            btnRetirementDate.setText(this.retirement.format(DateTimeFormatter.ofPattern(dateFormat)));
         }
     }
 

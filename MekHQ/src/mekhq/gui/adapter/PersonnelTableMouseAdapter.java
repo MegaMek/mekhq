@@ -644,7 +644,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 try {
                     PrisonerStatus status = PrisonerStatus.valueOf(data[1]);
                     for (Person person : people) {
-                        person.setPrisonerStatus(status);
+                        if (person.getPrisonerStatus() != status) {
+                            person.setPrisonerStatus(status);
+                        }
                     }
                 } catch (Exception e) {
                     MekHQ.getLogger().error(getClass(), "actionPerformed",

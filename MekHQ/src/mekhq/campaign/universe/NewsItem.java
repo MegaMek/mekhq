@@ -182,7 +182,7 @@ public class NewsItem {
 
     public String getFullDescription(Campaign campaign) {
         return "<html><h1>" + getHeadline() + "</h1>("
-                + date.format(DateTimeFormatter.ofPattern(campaign.getCampaignOptions().getDisplayDateFormat()))
+                + campaign.getCampaignOptions().getDisplayFormattedDate(date)
                 + ")<br><p>" + getPrefix() + description + "</p></html>";
     }
 

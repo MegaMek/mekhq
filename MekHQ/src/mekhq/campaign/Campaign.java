@@ -30,7 +30,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -217,7 +216,6 @@ public class Campaign implements Serializable, ITechManager {
     private GregorianCalendar calendar;
     private LocalDate currentDay;
     private String dateFormat;
-    private String shortDateFormat;
 
     private String factionCode;
     private int techFactionCode;
@@ -269,10 +267,10 @@ public class Campaign implements Serializable, ITechManager {
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
     private AtBEventProcessor atbEventProcessor; //AtB
-    private Calendar shipSearchStart; //AtB
+    private LocalDate shipSearchStart; //AtB
     private int shipSearchType;
     private String shipSearchResult; //AtB
-    private Calendar shipSearchExpiration; //AtB
+    private LocalDate shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
     private CampaignSummary campaignSummary;
@@ -296,7 +294,6 @@ public class Campaign implements Serializable, ITechManager {
         currentReportHTML = "";
         newReports = new ArrayList<>();
         dateFormat = "EEEE, MMMM d yyyy";
-        shortDateFormat = "yyyyMMdd";
         name = "My Campaign";
         overtime = false;
         gmMode = false;
@@ -443,11 +440,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     @Deprecated
-    public DateFormat getShortDateFormatter() {
-        return new SimpleDateFormat(shortDateFormat);
-    }
-
-    @Deprecated
     public Date getDate() {
         return calendar.getTime();
     }
@@ -455,11 +447,6 @@ public class Campaign implements Serializable, ITechManager {
     @Deprecated
     public String getDateAsString() {
         return getDateFormatter().format(calendar.getTime());
-    }
-
-    @Deprecated
-    public String getShortDateAsString() {
-        return getShortDateFormatter().format(calendar.getTime());
     }
 
     public String getCurrentSystemName() {
@@ -611,18 +598,18 @@ public class Campaign implements Serializable, ITechManager {
         return atbConfig;
     }
 
+    //region Ship Search
     /**
      * Sets the date a ship search was started, or null if no search is in progress.
      */
-    public void setShipSearchStart(@Nullable Calendar c) {
-        shipSearchStart = c;
+    public void setShipSearchStart(@Nullable LocalDate shipSearchStart) {
+        this.shipSearchStart = shipSearchStart;
     }
 
     /**
-     *
      * @return The date a ship search was started, or null if none is in progress.
      */
-    public Calendar getShipSearchStart() {
+    public LocalDate getShipSearchStart() {
         return shipSearchStart;
     }
 
@@ -634,7 +621,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     *
      * @return The lookup name of the available ship, or null if none is available
      */
     public String getShipSearchResult() {
@@ -642,15 +628,14 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     *
      * @return The date the ship is no longer available, if there is one.
      */
-    public Calendar getShipSearchExpiration() {
+    public LocalDate getShipSearchExpiration() {
         return shipSearchExpiration;
     }
 
-    public void setShipSearchExpiration(Calendar c) {
-        shipSearchExpiration = c;
+    public void setShipSearchExpiration(LocalDate shipSearchExpiration) {
+        this.shipSearchExpiration = shipSearchExpiration;
     }
 
     /**
@@ -661,16 +646,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void startShipSearch(int unitType) {
-        shipSearchStart = (Calendar) calendar.clone();
+        setShipSearchStart(getLocalDate());
         setShipSearchType(unitType);
     }
 
-    public void endShipSearch() {
-        shipSearchStart = null;
-    }
-
     private void processShipSearch() {
-        if (shipSearchStart == null) {
+        if (getShipSearchStart() == null) {
             return;
         }
         StringBuilder report = new StringBuilder();
@@ -679,33 +660,31 @@ public class Campaign implements Serializable, ITechManager {
                     .append(" deducted for ship search.");
         } else {
             addReport("<font color=\"red\">Insufficient funds for ship search.</font>");
-            shipSearchStart = null;
+            setShipSearchStart(null);
             return;
         }
-        long numDays = TimeUnit.MILLISECONDS.toDays(calendar.getTimeInMillis() - shipSearchStart.getTimeInMillis());
+        long numDays = ChronoUnit.DAYS.between(getShipSearchStart(), getLocalDate());
         if (numDays > 21) {
             int roll = Compute.d6(2);
             TargetRoll target = getAtBConfig().shipSearchTargetRoll(shipSearchType, this);
-            shipSearchStart = null;
+            setShipSearchStart(null);
             report.append("<br/>Ship search target: ").append(target.getValueAsString()).append(" roll: ")
                     .append(roll);
             // TODO: mos zero should make ship available on retainer
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
-                MechSummary ms = unitGenerator.generate(factionCode, shipSearchType, -1,
+                MechSummary ms = unitGenerator.generate(getFactionCode(), shipSearchType, -1,
                         getGameYear(), getUnitRatingMod());
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
                 if (ms != null) {
-                    DateFormat df = getShortDateFormatter();
-                    shipSearchResult = ms.getName();
-                    shipSearchExpiration = (Calendar) getCalendar().clone();
-                    shipSearchExpiration.add(Calendar.DAY_OF_MONTH, 31);
-                    report.append(shipSearchResult).append(" is available for purchase for ")
+                    setShipSearchResult(ms.getName());
+                    setShipSearchExpiration(getLocalDate().plusDays(31));
+                    report.append(getShipSearchResult()).append(" is available for purchase for ")
                             .append(Money.of(ms.getCost()).toAmountAndSymbolString())
                             .append(" until ")
-                            .append(df.format(shipSearchExpiration.getTime()));
+                            .append(getCampaignOptions().getDisplayFormattedDate(getShipSearchExpiration()));
                 } else {
                     report.append(" <font color=\"red\">Could not determine ship type.</font>");
                 }
@@ -717,11 +696,11 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void purchaseShipSearchResult() {
-        final String METHOD_NAME = "purchaseShipSearchResult()"; //$NON-NLS-1$
-        MechSummary ms = MechSummaryCache.getInstance().getMech(shipSearchResult);
+        final String METHOD_NAME = "purchaseShipSearchResult()";
+        MechSummary ms = MechSummaryCache.getInstance().getMech(getShipSearchResult());
         if (ms == null) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Cannot find entry for " + shipSearchResult); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), METHOD_NAME,
+                    "Cannot find entry for " + getShipSearchResult());
             return;
         }
 
@@ -732,13 +711,13 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
 
-        MechFileParser mechFileParser = null;
+        MechFileParser mechFileParser;
         try {
             mechFileParser = new MechFileParser(ms.getSourceFile(),
                     ms.getEntryName());
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Unable to load unit: " + ms.getEntryName()); //$NON-NLS-1$
+                    "Unable to load unit: " + ms.getEntryName());
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             return;
         }
@@ -752,9 +731,10 @@ public class Campaign implements Serializable, ITechManager {
         if (!getCampaignOptions().getInstantUnitMarketDelivery()) {
             addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
         }
-        shipSearchResult = null;
-        shipSearchExpiration = null;
+        setShipSearchResult(null);
+        setShipSearchExpiration(null);
     }
+    //endregion Ship Search
 
     /**
      * Process retirements for retired personnel, if any.
@@ -3457,11 +3437,11 @@ public class Campaign implements Serializable, ITechManager {
         contractMarket.generateContractOffers(this);
         unitMarket.generateUnitOffers(this);
 
-        if (shipSearchExpiration != null && !shipSearchExpiration.after(calendar)) {
-            shipSearchExpiration = null;
-            if (shipSearchResult != null) {
-                addReport("Opportunity for purchase of " + shipSearchResult + " has expired.");
-                shipSearchResult = null;
+        if ((getShipSearchExpiration() != null) && !getShipSearchExpiration().isAfter(getLocalDate())) {
+            setShipSearchExpiration(null);
+            if (getShipSearchResult() != null) {
+                addReport("Opportunity for purchase of " + getShipSearchResult() + " has expired.");
+                setShipSearchResult(null);
             }
         }
 
@@ -4775,7 +4755,6 @@ public class Campaign implements Serializable, ITechManager {
 
         // Against the Bot
         if (getCampaignOptions().getUseAtB()) {
-            DateFormat sdf = getShortDateFormatter();
             contractMarket.writeToXml(pw1, 1);
             unitMarket.writeToXml(pw1, 1);
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
@@ -4791,13 +4770,13 @@ public class Campaign implements Serializable, ITechManager {
             retirementDefectionTracker.writeToXml(pw1, 1);
             if (shipSearchStart != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchStart",
-                        sdf.format(shipSearchStart.getTime()));
+                        MekHqXmlUtil.saveFormattedDate(getShipSearchStart()));
             }
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchType", shipSearchType);
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchResult", shipSearchResult);
             if (shipSearchExpiration != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchExpiration",
-                        sdf.format(shipSearchExpiration.getTime()));
+                        MekHqXmlUtil.saveFormattedDate(getShipSearchExpiration()));
             }
         }
 
@@ -6045,6 +6024,9 @@ public class Campaign implements Serializable, ITechManager {
         }
         if (status == PersonnelStatus.RETIRED) {
             ServiceLogger.retired(person, getDate());
+            if (getCampaignOptions().useRetirementDateTracking()) {
+                person.setRetirement(getLocalDate());
+            }
         }
         if ((status == PersonnelStatus.ACTIVE) && (person.getStatus() == PersonnelStatus.MIA)) {
             ServiceLogger.recoveredMia(person, getDate());
@@ -6959,7 +6941,7 @@ public class Campaign implements Serializable, ITechManager {
      * computation. This method does not calculate an exact jump path but rather determines the number of jumps
      * crudely by dividing distance in light years by 30 and then rounding up. Total part time is determined by
      * several by adding the following:
-     * - (number of jumps - 1)*7 days with a minimum value of zero.
+     * - (number of jumps - 1) * 7 days with a minimum value of zero.
      * - transit times from current planet and planet of supply origins in cases where the supply planet is not the same as current planet.
      * - a random 1d6 days for each jump plus 1d6 to simulate all of the other logistics of delivery.
      * @param system - A <code>PlanetarySystem</code> object where the supplies are shipping from
@@ -6968,84 +6950,81 @@ public class Campaign implements Serializable, ITechManager {
     public int calculatePartTransitTime(PlanetarySystem system) {
         //calculate number of jumps by light year distance as the crow flies divided by 30
         //the basic formula assumes 7 days per jump + system transit time on each side + random days equal
-        //to (1+number of jumps)d6
+        //to (1 + number of jumps) d6
         double distance = system.getDistanceTo(getCurrentSystem());
         //calculate number of jumps by dividing by 30
-        int jumps = (int)Math.ceil(distance/30.0);
+        int jumps = (int) Math.ceil(distance / 30.0);
         //you need a recharge except for the first jump
         int recharges = Math.max(jumps - 1, 0);
         //if you are delivering from the same planet then no transit times
-        int currentTransitTime = (distance>0) ? (int)Math.ceil(getCurrentSystem().getTimeToJumpPoint(1.0)) : 0;
-        int originTransitTime = (distance>0) ? (int)Math.ceil(system.getTimeToJumpPoint(1.0)) : 0;
-        int amazonFreeShipping = Compute.d6(1+jumps);
-        return recharges*7+currentTransitTime+originTransitTime+amazonFreeShipping;
+        int currentTransitTime = (distance > 0) ? (int) Math.ceil(getCurrentSystem().getTimeToJumpPoint(1.0)) : 0;
+        int originTransitTime = (distance > 0) ? (int) Math.ceil(system.getTimeToJumpPoint(1.0)) : 0;
+        int amazonFreeShipping = Compute.d6(1 + jumps);
+        return (recharges * 7) + currentTransitTime+originTransitTime + amazonFreeShipping;
     }
 
     /***
-     * Calculate transit times based on the margin of success from an acquisition roll. The values here are
-     * all based on what the user entered for the campaign options.
+     * Calculate transit times based on the margin of success from an acquisition roll. The values here
+     * are all based on what the user entered for the campaign options.
      * @param mos - an integer of the margin of success of an acquisition roll
      * @return the number of days that supplies will take to arrive.
      */
     public int calculatePartTransitTime(int mos) {
-
         int nDice = getCampaignOptions().getNDiceTransitTime();
         int time = getCampaignOptions().getConstantTransitTime();
         if (nDice > 0) {
             time += Compute.d6(nDice);
         }
         // now step forward through the calendar
-        GregorianCalendar arrivalDate = (GregorianCalendar) calendar.clone();
+        LocalDate arrivalDate = getLocalDate();
         switch (getCampaignOptions().getUnitTransitTime()) {
             case CampaignOptions.TRANSIT_UNIT_MONTH:
-                arrivalDate.add(Calendar.MONTH, time);
+                arrivalDate = arrivalDate.plusMonths(time);
                 break;
             case CampaignOptions.TRANSIT_UNIT_WEEK:
-                arrivalDate.add(Calendar.WEEK_OF_YEAR, time);
+                arrivalDate = arrivalDate.plusWeeks(time);
                 break;
             case CampaignOptions.TRANSIT_UNIT_DAY:
             default:
-                arrivalDate.add(Calendar.DAY_OF_MONTH, time);
+                arrivalDate = arrivalDate.plusDays(time);
+                break;
         }
 
         // now adjust for MoS and minimums
         int mosBonus = getCampaignOptions().getAcquireMosBonus() * mos;
         switch (getCampaignOptions().getAcquireMosUnit()) {
             case CampaignOptions.TRANSIT_UNIT_MONTH:
-                arrivalDate.add(Calendar.MONTH, -1 * mosBonus);
+                arrivalDate = arrivalDate.minusMonths(mosBonus);
                 break;
             case CampaignOptions.TRANSIT_UNIT_WEEK:
-                arrivalDate.add(Calendar.WEEK_OF_YEAR, -1 * mosBonus);
+                arrivalDate = arrivalDate.minusWeeks(mosBonus);
                 break;
             case CampaignOptions.TRANSIT_UNIT_DAY:
             default:
-                arrivalDate.add(Calendar.DAY_OF_MONTH, -1 * mosBonus);
+                arrivalDate = arrivalDate.minusDays(mosBonus);
+                break;
         }
+
         // now establish minimum date and if this is before
-        GregorianCalendar minimumDate = (GregorianCalendar) calendar.clone();
+        LocalDate minimumDate = getLocalDate();
         switch (getCampaignOptions().getAcquireMinimumTimeUnit()) {
             case CampaignOptions.TRANSIT_UNIT_MONTH:
-                minimumDate.add(Calendar.MONTH, getCampaignOptions()
-                        .getAcquireMinimumTime());
+                minimumDate = minimumDate.plusMonths(getCampaignOptions().getAcquireMinimumTime());
                 break;
             case CampaignOptions.TRANSIT_UNIT_WEEK:
-                minimumDate.add(Calendar.WEEK_OF_YEAR, getCampaignOptions()
-                        .getAcquireMinimumTime());
+                minimumDate = minimumDate.plusWeeks(getCampaignOptions().getAcquireMinimumTime());
                 break;
             case CampaignOptions.TRANSIT_UNIT_DAY:
             default:
-                minimumDate.add(Calendar.DAY_OF_MONTH, getCampaignOptions()
-                        .getAcquireMinimumTime());
+                minimumDate = minimumDate.plusDays(getCampaignOptions().getAcquireMinimumTime());
+                break;
         }
 
-        if (arrivalDate.before(minimumDate)) {
-            return Utilities.getDaysBetween(calendar.getTime(),
-                    minimumDate.getTime());
+        if (arrivalDate.isBefore(minimumDate)) {
+            return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), minimumDate));
         } else {
-            return Utilities.getDaysBetween(calendar.getTime(),
-                    arrivalDate.getTime());
+            return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), arrivalDate));
         }
-
     }
 
     /**
@@ -8215,22 +8194,23 @@ public class Campaign implements Serializable, ITechManager {
 
     public void initTimeInService() {
         for (Person p : getPersonnel()) {
-            Date join = null;
-            for (LogEntry e : p.getPersonnelLog()) {
-                if (join == null) {
-                    // If by some nightmare there is no Joined date just use the first entry.
-                    join = e.getDate();
-                }
-                if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")) {
-                    join = e.getDate();
-                    break;
-                }
-            }
             if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
+                Date join = null;
+                for (LogEntry e : p.getPersonnelLog()) {
+                    if (join == null) {
+                        // If by some nightmare there is no Joined date just use the first entry.
+                        join = e.getDate();
+                    }
+                    if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")) {
+                        join = e.getDate();
+                        break;
+                    }
+                }
+
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {
-                    date = getLocalDate().minus(1, ChronoUnit.YEARS);
+                    date = getLocalDate().minusYears(1);
                 } else {
                     date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 }
@@ -8241,26 +8221,55 @@ public class Campaign implements Serializable, ITechManager {
 
     public void initTimeInRank() {
         for (Person p : getPersonnel()) {
-            Date join = null;
-            for (LogEntry e : p.getPersonnelLog()) {
-                if (join == null) {
-                    // If by some nightmare there is no date from the below, just use the first entry.
-                    join = e.getDate();
-                }
-                if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")
-                        || e.getDesc().startsWith("Promoted ") || e.getDesc().startsWith("Demoted ")) {
-                    join = e.getDate();
-                }
-            }
             if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
+
+                Date join = null;
+                for (LogEntry e : p.getPersonnelLog()) {
+                    if (join == null) {
+                        // If by some nightmare there is no date from the below, just use the first entry.
+                        join = e.getDate();
+                    }
+
+                    if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")
+                            || e.getDesc().startsWith("Promoted ") || e.getDesc().startsWith("Demoted ")) {
+                        join = e.getDate();
+                    }
+                }
+
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {
-                    date = getLocalDate().minus(1, ChronoUnit.YEARS);
+                    date = getLocalDate().minusYears(1);
                 } else {
                     date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 }
                 p.setLastRankChangeDate(date);
+            }
+        }
+    }
+
+    public void initRetirementDateTracking() {
+        for (Person person : getPersonnel()) {
+            if (person.getStatus() == PersonnelStatus.RETIRED) {
+                Date retired = null;
+                Date lastLoggedDate = null;
+                for (LogEntry entry : person.getPersonnelLog()) {
+                    lastLoggedDate = entry.getDate();
+                    if (entry.getDesc().startsWith("Retired")) {
+                        retired = entry.getDate();
+                    }
+                }
+
+                if (retired == null) {
+                    retired = lastLoggedDate;
+                }
+
+                if (retired == null) {
+                    // For that one in a billion chance the log is empty. Clone today's date and subtract a year
+                    person.setRetirement(getLocalDate().minusYears(1));
+                } else {
+                    person.setRetirement(retired.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                }
             }
         }
     }
@@ -8500,7 +8509,7 @@ public class Campaign implements Serializable, ITechManager {
 
     @Override
     public int getTechIntroYear() {
-        if (campaignOptions.limitByYear()) {
+        if (getCampaignOptions().limitByYear()) {
             return getGameYear();
         } else {
             return Integer.MAX_VALUE;
