@@ -202,6 +202,7 @@ public class CampaignOptions implements Serializable {
     private TimeInDisplayFormat timeInServiceDisplayFormat;
     private boolean useTimeInRank;
     private TimeInDisplayFormat timeInRankDisplayFormat;
+    private boolean useRetirementDateTracking;
     private boolean trackTotalEarnings;
     private boolean showOriginFaction;
     private boolean randomizeOrigin;
@@ -533,6 +534,7 @@ public class CampaignOptions implements Serializable {
         timeInServiceDisplayFormat = TimeInDisplayFormat.YEARS;
         useTimeInRank = false;
         timeInRankDisplayFormat = TimeInDisplayFormat.MONTHS_YEARS;
+        useRetirementDateTracking = false;
         trackTotalEarnings = false;
         showOriginFaction = true;
         randomizeOrigin = false;
@@ -1078,6 +1080,20 @@ public class CampaignOptions implements Serializable {
      */
     public void setTimeInRankDisplayFormat(TimeInDisplayFormat timeInRankDisplayFormat) {
         this.timeInRankDisplayFormat = timeInRankDisplayFormat;
+    }
+
+    /**
+     * @return whether or not to track retirement dates
+     */
+    public boolean useRetirementDateTracking() {
+        return useRetirementDateTracking;
+    }
+
+    /**
+     * @param b the new value for whether or not to track retirement dates
+     */
+    public void setUseRetirementDateTracking(boolean b) {
+        useRetirementDateTracking = b;
     }
 
     /**
@@ -3178,6 +3194,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "timeInServiceDisplayFormat", timeInServiceDisplayFormat.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInRank", useTimeInRank);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "timeInRankDisplayFormat", timeInRankDisplayFormat.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRetirementDateTracking", useRetirementDateTracking);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackTotalEarnings", trackTotalEarnings);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus.name());
@@ -3697,6 +3714,8 @@ public class CampaignOptions implements Serializable {
                 retVal.useTimeInRank = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("timeInRankDisplayFormat")) {
                 retVal.timeInRankDisplayFormat = TimeInDisplayFormat.valueOf(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
+                retVal.useRetirementDateTracking = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
                 retVal.trackTotalEarnings = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {

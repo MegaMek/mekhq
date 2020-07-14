@@ -5993,6 +5993,9 @@ public class Campaign implements Serializable, ITechManager {
         }
         if (status == PersonnelStatus.RETIRED) {
             ServiceLogger.retired(person, getDate());
+            if (getCampaignOptions().useRetirementDateTracking()) {
+                person.setRetirement(getLocalDate());
+            }
         }
         if ((status == PersonnelStatus.ACTIVE) && (person.getStatus() == PersonnelStatus.MIA)) {
             ServiceLogger.recoveredMia(person, getDate());
@@ -8160,22 +8163,23 @@ public class Campaign implements Serializable, ITechManager {
 
     public void initTimeInService() {
         for (Person p : getPersonnel()) {
-            Date join = null;
-            for (LogEntry e : p.getPersonnelLog()) {
-                if (join == null) {
-                    // If by some nightmare there is no Joined date just use the first entry.
-                    join = e.getDate();
-                }
-                if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")) {
-                    join = e.getDate();
-                    break;
-                }
-            }
             if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
+                Date join = null;
+                for (LogEntry e : p.getPersonnelLog()) {
+                    if (join == null) {
+                        // If by some nightmare there is no Joined date just use the first entry.
+                        join = e.getDate();
+                    }
+                    if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")) {
+                        join = e.getDate();
+                        break;
+                    }
+                }
+
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {
-                    date = getLocalDate().minus(1, ChronoUnit.YEARS);
+                    date = getLocalDate().minusYears(1);
                 } else {
                     date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 }
@@ -8186,26 +8190,55 @@ public class Campaign implements Serializable, ITechManager {
 
     public void initTimeInRank() {
         for (Person p : getPersonnel()) {
-            Date join = null;
-            for (LogEntry e : p.getPersonnelLog()) {
-                if (join == null) {
-                    // If by some nightmare there is no date from the below, just use the first entry.
-                    join = e.getDate();
-                }
-                if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")
-                        || e.getDesc().startsWith("Promoted ") || e.getDesc().startsWith("Demoted ")) {
-                    join = e.getDate();
-                }
-            }
             if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
+
+                Date join = null;
+                for (LogEntry e : p.getPersonnelLog()) {
+                    if (join == null) {
+                        // If by some nightmare there is no date from the below, just use the first entry.
+                        join = e.getDate();
+                    }
+
+                    if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")
+                            || e.getDesc().startsWith("Promoted ") || e.getDesc().startsWith("Demoted ")) {
+                        join = e.getDate();
+                    }
+                }
+
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {
-                    date = getLocalDate().minus(1, ChronoUnit.YEARS);
+                    date = getLocalDate().minusYears(1);
                 } else {
                     date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 }
                 p.setLastRankChangeDate(date);
+            }
+        }
+    }
+
+    public void initRetirementDateTracking() {
+        for (Person person : getPersonnel()) {
+            if (person.getStatus() == PersonnelStatus.RETIRED) {
+                Date retired = null;
+                Date lastLoggedDate = null;
+                for (LogEntry entry : person.getPersonnelLog()) {
+                    lastLoggedDate = entry.getDate();
+                    if (entry.getDesc().startsWith("Retired")) {
+                        retired = entry.getDate();
+                    }
+                }
+
+                if (retired == null) {
+                    retired = lastLoggedDate;
+                }
+
+                if (retired == null) {
+                    // For that one in a billion chance the log is empty. Clone today's date and subtract a year
+                    person.setRetirement(getLocalDate().minusYears(1));
+                } else {
+                    person.setRetirement(retired.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                }
             }
         }
     }
