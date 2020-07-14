@@ -1627,6 +1627,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "formerSpouses");
             }
+            if (!isTryingToMarry()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToMarry", false);
+            }
+            if (!isTryingToConceive()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToConceive", false);
+            }
             if (dueDate != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dueDate",
                         MekHqXmlUtil.saveFormattedDate(dueDate));
