@@ -184,8 +184,8 @@ public class RetirementDefectionDialog extends JDialog {
             }
             if (null == contract) {
                 instructions += "\n\nDays since last retirement roll: "
-                        + Math.toIntExact(ChronoUnit.DAYS.between(rdTracker.getLastRetirementRoll(),
-                        hqView.getCampaign().getLocalDate()));
+                        + ChronoUnit.DAYS.between(rdTracker.getLastRetirementRoll(),
+                        hqView.getCampaign().getLocalDate());
             }
             txtInstructions.setText(instructions);
         } else {
