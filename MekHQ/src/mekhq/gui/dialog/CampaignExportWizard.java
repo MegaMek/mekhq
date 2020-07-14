@@ -278,7 +278,9 @@ public class CampaignExportWizard extends JDialog {
     private void setupPersonList() {
         personList = new JList<>();
         DefaultListModel<Person> personListModel = new DefaultListModel<>();
-        for (Person person : sourceCampaign.getActivePersonnel()) {
+        List<Person> people = sourceCampaign.getActivePersonnel();
+        people.sort(Comparator.comparingInt(Person::getPrimaryRole));
+        for (Person person : people) {
             personListModel.addElement(person);
         }
         personList.setModel(personListModel);

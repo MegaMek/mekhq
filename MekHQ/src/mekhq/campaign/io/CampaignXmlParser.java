@@ -28,7 +28,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -316,17 +315,13 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
-                    Calendar c = new GregorianCalendar();
-                    c.setTime(parseDate(retVal.getShortDateFormatter(), wn.getTextContent()));
-                    retVal.setShipSearchStart(c);
+                    retVal.setShipSearchStart(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {
                     retVal.setShipSearchType(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("shipSearchResult")) {
                     retVal.setShipSearchResult(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
-                    Calendar c = new GregorianCalendar();
-                    c.setTime(parseDate(retVal.getShortDateFormatter(), wn.getTextContent()));
-                    retVal.setShipSearchExpiration(c);
+                    retVal.setShipSearchExpiration(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
                 }
