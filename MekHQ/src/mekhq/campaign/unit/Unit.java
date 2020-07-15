@@ -3537,12 +3537,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
             //For crew-served units, let's look at the abilities of the group. If more than half the crew
             //(gunners and pilots only, for spacecraft) have an ability, grant the benefit to the unit
+            //If getUnitCommanderForSkill is checked, except for Tripod mech only the abilities and 
+            //implants of unit commander are applied, as if it does not have any other crew member.
             //TODO: Mobile structures, large naval support vehicles
-            if (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)
+            if (entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MECH) ||
+                (!campaign.getCampaignOptions().getUnitCommanderForSkill()
+                 && (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)
                     || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)
                     || entity.hasETypeFlag(Entity.ETYPE_TANK)
-                    || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)
-                    || entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MECH)) {
+                    || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)))) {
                 //Find the unit commander
                 Person commander = getCommander();
                 // If there is no crew, there's nothing left to do here.
@@ -3779,13 +3782,32 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 ((Tank)entity).setUsingConsoleCommander(true);
             }
         }
+        
+        //If getUnitCommanderForSkill is checked, except for Tripod mech only the skills
+        //of unit commander is applied, and ignore the other crew's skills.
+        if (campaign.getCampaignOptions().getUnitCommanderForSkill()
+            && (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)
+            || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)
+            || entity.hasETypeFlag(Entity.ETYPE_TANK)
+            || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
+                
+            Person commander = getCommander();
+            if(commander == null){
+                return;
+            }
+            piloting = commander.getSkill(driveType).getFinalSkillValue();
+            gunnery = commander.getSkill(gunType).getFinalSkillValue();
 
-        if(nDrivers > 0) {
-            piloting = (int)Math.round(((double)sumPiloting)/nDrivers);
+        } else {
+            if(nDrivers > 0) {
+                piloting = (int)Math.round(((double)sumPiloting)/nDrivers);
+            }
+            
+            if(nGunners > 0) {
+                gunnery = (int)Math.round(((double)sumGunnery)/nGunners);
+            }
         }
-        if(nGunners > 0) {
-            gunnery = (int)Math.round(((double)sumGunnery)/nGunners);
-        }
+        
         if(entity instanceof Infantry) {
             if(entity instanceof BattleArmor) {
                 int ntroopers = 0;
