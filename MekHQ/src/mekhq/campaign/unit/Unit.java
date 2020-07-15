@@ -3789,7 +3789,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             && (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)
             || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)
             || entity.hasETypeFlag(Entity.ETYPE_TANK)
-            || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
+            || entity.hasETypeFlag(Entity.ETYPE_INFANTRY))) {
                 
             Person commander = getCommander();
             if(commander == null){
