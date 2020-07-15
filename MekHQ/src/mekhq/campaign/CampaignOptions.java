@@ -186,6 +186,7 @@ public class CampaignOptions implements Serializable {
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
+    private boolean unitCommanderForSkill;
     private boolean capturePrisoners; // TODO : Merge me with the AtB option useAtBCapture
     private PrisonerStatus defaultPrisonerStatus;
     private boolean prisonerBabyStatus;
@@ -518,6 +519,7 @@ public class CampaignOptions implements Serializable {
         useEdge = false;
         useSupportEdge = false;
         useImplants = false;
+        unitCommanderForSkill = false;
         capturePrisoners = true;
         defaultPrisonerStatus = PrisonerStatus.PRISONER;
         prisonerBabyStatus = true;
@@ -928,6 +930,14 @@ public class CampaignOptions implements Serializable {
 
     public void setImplants(boolean b) {
         this.useImplants = b;
+    }
+    
+    public boolean getUnitCommanderForSkill(){
+	    return unitCommanderForSkill;
+    }
+
+    public void setUnitCommanderForSkill(boolean unitCommanderForSkill){
+	    this.unitCommanderForSkill = unitCommanderForSkill;
     }
 
     public boolean capturePrisoners() {
@@ -3131,6 +3141,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
 
         //region Personnel Tab
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitCommanderForSkill", unitCommanderForSkill);
         //region family
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
@@ -3591,6 +3602,9 @@ public class CampaignOptions implements Serializable {
                 retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
 
             //region Personnel Tab
+            } else if (wn2.getNodeName().equalsIgnoreCase("unitCommanderForSkill")) {
+                retVal.unitCommanderForSkill = Boolean.parseBoolean(wn2.getTextContent().trim());
+
             //region Family
             } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
                 retVal.minimumMarriageAge = Integer.parseInt(wn2.getTextContent().trim());
