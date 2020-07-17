@@ -3285,7 +3285,7 @@ public class Campaign implements Serializable, ITechManager {
         if (!contract.isActive()) {
             // Inactive contracts have no deficits.
             return 0;
-        } else if (contract.getStartDate().compareTo(getDate()) >= 0) {
+        } else if (contract.getStartDate().compareTo(getLocalDate()) >= 0) {
             // Do not check for deficits if the contract has not started or
             // it is the first day of the contract, as players won't have
             // had time to assign forces to the contract yet
@@ -3296,7 +3296,7 @@ public class Campaign implements Serializable, ITechManager {
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
         for (Lance l : lances.values()) {
-            if (l.getMissionId() == contract.getId() && l.getRole() != Lance.ROLE_UNASSIGNED) {
+            if ((l.getMissionId() == contract.getId()) && (l.getRole() != Lance.ROLE_UNASSIGNED)) {
                 total++;
                 if (l.getRole() == contract.getRequiredLanceType()) {
                     role++;
@@ -3312,7 +3312,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private void processNewDayATBScenarios() {
         for (Mission m : getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract) || getDate().before(((Contract) m).getStartDate())) {
+            if (!m.isActive() || !(m instanceof AtBContract) || getLocalDate().isBefore(((Contract) m).getStartDate())) {
                 continue;
             }
             /*
@@ -3325,17 +3325,10 @@ public class Campaign implements Serializable, ITechManager {
             if (!getLocation().isOnPlanet() &&
                     !getLocation().getJumpPath().isEmpty() &&
                     getLocation().getJumpPath().getLastSystem().getId().equals(m.getSystemId())) {
-                /*
-                 * transitTime is measured in days; round up to the next whole day, then convert
-                 * to milliseconds
-                 */
-                GregorianCalendar cal = (GregorianCalendar) calendar.clone();
-                cal.add(Calendar.DATE, (int) Math.ceil(getLocation().getTransitTime()));
-                ((AtBContract) m).getStartDate().setTime(cal.getTimeInMillis());
-                cal.add(Calendar.MONTH, ((AtBContract) m).getLength());
-                ((AtBContract) m).getEndingDate().setTime(cal.getTimeInMillis());
-                addReport(
-                        "The start and end dates of " + m.getName() + " have been shifted to reflect the current ETA.");
+
+                // transitTime is measured in days; so we round up to the next whole day
+                ((AtBContract) m).setStartAndEndDate(getLocalDate().plusDays((int) Math.ceil(getLocation().getTransitTime())));
+                addReport("The start and end dates of " + m.getName() + " have been shifted to reflect the current ETA.");
                 continue;
             }
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -3351,8 +3344,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
                     continue;
                 }
-                if (s.getDate() != null &&
-                        s.getDate().before(calendar.getTime())) {
+                if ((s.getDate() != null) && s.getDate().isBefore(getLocalDate())) {
                     s.setStatus(Scenario.S_DEFEAT);
                     s.clearAllForcesAndPersonnel(this);
                     ((AtBContract) m).addPlayerMinorBreach();
@@ -3368,23 +3360,24 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         for (Mission m : getMissions()) {
-            if (m.isActive() && m instanceof AtBContract && !((AtBContract) m).getStartDate().after(getDate())) {
+            if (m.isActive() && (m instanceof AtBContract)
+                    && !((AtBContract) m).getStartDate().isAfter(getLocalDate())) {
                 ((AtBContract) m).checkEvents(this);
             }
             /*
              * If there is a standard battle set for today, deploy the lance.
              */
             for (Scenario s : m.getScenarios()) {
-                if (s.getDate() != null && s.getDate().equals(calendar.getTime())) {
+                if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
                     int forceId = ((AtBScenario) s).getLanceForceId();
-                    if (null != lances.get(forceId) && !forceIds.get(forceId).isDeployed()) {
+                    if ((lances.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
 
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
                         for (UUID uid : forceIds.get(forceId).getAllUnits()) {
                             Unit u = getUnit(uid);
-                            if (null != u && u.isUnderRepair()) {
+                            if ((u != null) && u.isUnderRepair()) {
                                 forceUnderRepair = true;
                                 break;
                             }
@@ -3410,7 +3403,8 @@ public class Campaign implements Serializable, ITechManager {
     private void processNewDayATBFatigue() {
         boolean inContract = false;
         for (Mission m : getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract) || getDate().before(((Contract) m).getStartDate())) {
+            if (!m.isActive() || !(m instanceof AtBContract)
+                    || getLocalDate().isBefore(((Contract) m).getStartDate())) {
                 continue;
             }
             switch (((AtBContract) m).getMissionType()) {
@@ -3505,10 +3499,11 @@ public class Campaign implements Serializable, ITechManager {
             rating.reInitialize();
 
             for (Mission m : getMissions()) {
-                if (m.isActive() && m instanceof AtBContract && !((AtBContract) m).getStartDate().after(getDate())) {
-                    ((AtBContract) m).checkMorale(calendar, getUnitRatingMod());
-                    addReport("Enemy morale is now " + ((AtBContract) m).getMoraleLevelName() + " on contract "
-                            + m.getName());
+                if (m.isActive() && (m instanceof AtBContract)
+                        && !((AtBContract) m).getStartDate().isAfter(getLocalDate())) {
+                    ((AtBContract) m).checkMorale(getLocalDate(), getUnitRatingMod());
+                    addReport("Enemy morale is now " + ((AtBContract) m).getMoraleLevelName()
+                            + " on contract " + m.getName());
                 }
             }
 
@@ -3768,8 +3763,8 @@ public class Campaign implements Serializable, ITechManager {
             }
             Contract contract = (Contract) mission;
             if (contract.isActive()
-                    && !getCalendar().getTime().after(contract.getEndingDate())
-                    && !getCalendar().getTime().before(contract.getStartDate())) {
+                    && !getLocalDate().isAfter(contract.getEndingDate())
+                    && !getLocalDate().isBefore(contract.getStartDate())) {
                 active.add(contract);
             }
         }
@@ -3796,8 +3791,8 @@ public class Campaign implements Serializable, ITechManager {
             Contract contract = (Contract) mission;
 
             if (contract.isActive()
-                    && !getCalendar().getTime().after(contract.getEndingDate())
-                    && !getCalendar().getTime().before(contract.getStartDate())) {
+                    && !getLocalDate().isAfter(contract.getEndingDate())
+                    && !getLocalDate().isBefore(contract.getStartDate())) {
                 hasActiveContract = true;
                 break;
             }
@@ -6927,10 +6922,10 @@ public class Campaign implements Serializable, ITechManager {
             // check for money in escrow
             // According to FMM(r) pg 179, both failure and breach lead to no
             // further payment even though this seems stupid
-            if (contract.getStatus() == Mission.S_SUCCESS
-                    && contract.getMonthsLeft(getDate()) > 0) {
+            if ((contract.getStatus() == Mission.S_SUCCESS)
+                    && contract.getMonthsLeft(getLocalDate()) > 0) {
                 Money remainingMoney = contract.getMonthlyPayOut()
-                        .multipliedBy(contract.getMonthsLeft(getDate()));
+                        .multipliedBy(contract.getMonthsLeft(getLocalDate()));
                 finances.credit(remainingMoney, Transaction.C_CONTRACT,
                         "Remaining payment for " + contract.getName(), calendar.getTime());
                 addReport("Your account has been credited for "

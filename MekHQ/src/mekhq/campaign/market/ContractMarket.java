@@ -269,7 +269,7 @@ public class ContractMarket implements Serializable {
 				int roll = Compute.d6(2);
 				if (roll >= 10) {
 					AtBContract sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
-					if (sub.getEndingDate().before(contract.getEndingDate())) {
+					if (sub.getEndingDate().isBefore(contract.getEndingDate())) {
 						contracts.add(sub);
 					}
 				}

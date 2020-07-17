@@ -23,10 +23,8 @@ package mekhq.campaign.mission;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import mekhq.campaign.finances.Money;
 import org.apache.commons.text.CharacterPredicate;
@@ -38,7 +36,6 @@ import megamek.common.BattleArmor;
 import megamek.common.Infantry;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.unit.Unit;
@@ -47,14 +44,9 @@ import mekhq.campaign.unit.Unit;
  * Contracts - we need to track static amounts here because changes in the
  * underlying campaign don't change the figures once the ink is dry
  *
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Contract extends Mission implements Serializable, MekHqXmlSerializable {
-
-    /**
-     *
-     */
     private static final long serialVersionUID   = 4606932545119410453L;
 
     public final static int   OH_NONE            = 0;
@@ -70,8 +62,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 
     public final static int   MRBC_FEE_PERCENTAGE = 5;
 
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private int nMonths;
 
     private String employer;
@@ -174,16 +166,30 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         nMonths = m;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date d) {
+    public void setStartDate(LocalDate d) {
         startDate = d;
     }
 
-    public Date getEndingDate() {
+    public LocalDate getEndingDate() {
         return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    /**
+     * This sets the Start Date and End Date of the Contract based on the length of the contract and
+     * the starting date provided
+     * @param startDate the date the contract starts at
+     */
+    public void setStartAndEndDate(LocalDate startDate) {
+        this.startDate = startDate;
+        this.endDate = startDate.plusMonths(getLength());
     }
 
     public double getMultiplier() {
@@ -514,7 +520,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @return the total (2-way) estimated transportation fee from the player's current location to this contract's planet
      */
     public Money getTotalTransportationFees(Campaign c){
-        if(null != getSystem() && c.getCampaignOptions().payForTransport()) {
+        if ((null != getSystem()) && c.getCampaignOptions().payForTransport()) {
             JumpPath jumpPath = getJumpPath(c);
 
             boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
@@ -537,7 +543,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         return getTotalAdvanceAmount()
                 .plus(getTotalMonthlyPayOut(c))
                 .minus(getTotalTransportationFees(c));
-	}
+    }
 
     /**
      * Get the number of months left in this contract after the given date. Partial months are counted as
@@ -546,25 +552,21 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @param date the date to use in the calculation
      * @return the number of months left
      */
-	public int getMonthsLeft(Date date) {
-		GregorianCalendar cal = new GregorianCalendar();
-		cal.setTime(date);
-		cal.add(Calendar.MONTH, 1);
-		date = cal.getTime();
-		int monthsLeft = 0;
-		while(date.before(endDate) || date.equals(endDate)) {
-			monthsLeft++;
-			cal.add(Calendar.MONTH, 1);
-			date = cal.getTime();
-		}
-		return monthsLeft;
-	}
+    public int getMonthsLeft(LocalDate date) {
+        int monthsLeft = Math.toIntExact(ChronoUnit.MONTHS.between(date, endDate));
+        // Ensure partial months are counted based on the current day of the month, as the above only
+        // counts full months
+        if (date.getDayOfMonth() != endDate.getDayOfMonth()) {
+            monthsLeft++;
+        }
+        return monthsLeft;
+    }
 
-	/**
-	 * Only do this at the time the contract is set up, otherwise amounts may change after
-	 * the ink is signed, which is a no-no.
-	 * @param c current campaign
-	 */
+    /**
+     * Only do this at the time the contract is set up, otherwise amounts may change after
+     * the ink is signed, which is a no-no.
+     * @param c current campaign
+     */
     public void calculateContract(Campaign c) {
         //calculate base amount
         baseAmount = c.getContractBase()
@@ -661,66 +663,57 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 
         // only adjust the start date for travel if the start date is currently null
         boolean adjustStartDate = false;
-        if (null == startDate) {
-            startDate = c.getCalendar().getTime();
+        LocalDate startDate = getStartDate();
+        if (startDate == null) {
+            startDate = c.getLocalDate();
             adjustStartDate = true;
         }
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTime(startDate);
-        if (adjustStartDate && null != c.getSystemByName(systemId)) {
+
+        if (adjustStartDate && (c.getSystemByName(systemId) != null)) {
             int days = (int) Math.ceil(getJumpPath(c).getTotalTime(c.getLocalDate(),
                     c.getLocation().getTransitTime()));
-            while (days > 0) {
-                cal.add(Calendar.DAY_OF_YEAR, 1);
-                days--;
-            }
-            startDate = cal.getTime();
+            startDate = startDate.plusDays(days);
         }
-        int months = getLength();
-        while (months > 0) {
-            cal.add(Calendar.MONTH, 1);
-            months--;
-        }
-        endDate = cal.getTime();
+
+        setStartAndEndDate(startDate);
     }
 
     @Override
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
         super.writeToXmlBegin(pw1, indent);
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<nMonths>" + nMonths + "</nMonths>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<startDate>" + df.format(startDate) + "</startDate>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<endDate>" + df.format(endDate) + "</endDate>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<employer>" + MekHqXmlUtil.escape(employer) + "</employer>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<paymentMultiplier>" + paymentMultiplier
-                + "</paymentMultiplier>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<commandRights>" + commandRights + "</commandRights>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<overheadComp>" + overheadComp + "</overheadComp>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<salvagePct>" + salvagePct + "</salvagePct>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<salvageExchange>" + salvageExchange + "</salvageExchange>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<straightSupport>" + straightSupport + "</straightSupport>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<battleLossComp>" + battleLossComp + "</battleLossComp>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<transportComp>" + transportComp + "</transportComp>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<mrbcFee>" + mrbcFee + "</mrbcFee>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<advancePct>" + advancePct + "</advancePct>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<signBonus>" + signBonus + "</signBonus>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<advanceAmount>" +  advanceAmount.toXmlString() + "</advanceAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<signingAmount>" +  signingAmount.toXmlString() + "</signingAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<transportAmount>" +  transportAmount.toXmlString() + "</transportAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<transitAmount>" +  transitAmount.toXmlString() + "</transitAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<overheadAmount>" +  overheadAmount.toXmlString() + "</overheadAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<supportAmount>" +  supportAmount.toXmlString() + "</supportAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<baseAmount>" +  baseAmount.toXmlString() + "</baseAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<feeAmount>" +  feeAmount.toXmlString() + "</feeAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<salvagedByUnit>" +  salvagedByUnit.toXmlString() + "</salvagedByUnit>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<salvagedByEmployer>" + salvagedByEmployer.toXmlString() + "</salvagedByEmployer>");
+        indent++;
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "nMonths", nMonths);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startDate", MekHqXmlUtil.saveFormattedDate(startDate));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "endDate", MekHqXmlUtil.saveFormattedDate(endDate));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "employer", employer);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "paymentMultiplier", paymentMultiplier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "commandRights", commandRights);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "overheadComp", overheadComp);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salvagePct", salvagePct);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salvageExchange", salvageExchange);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "straightSupport", straightSupport);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "battleLossComp", battleLossComp);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "transportComp", transportComp);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mrbcFee", mrbcFee);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "advancePct", advancePct);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "signBonus", signBonus);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "advanceAmount", advanceAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "signingAmount", signingAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "transportAmount", transportAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "transitAmount", transitAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "overheadAmount", overheadAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "supportAmount", supportAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "baseAmount", baseAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "feeAmount", feeAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salvagedByUnit", salvagedByUnit.toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salvagedByEmployer", salvagedByEmployer.toXmlString());
+        indent--; //just in case this ends up being used here in the future
     }
 
     @Override
     public void loadFieldsFromXmlNode(Node wn) throws ParseException {
         // Okay, now load mission-specific fields!
         NodeList nl = wn.getChildNodes();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -728,9 +721,9 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
             if (wn2.getNodeName().equalsIgnoreCase("employer")) {
                 employer = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("startDate")) {
-                startDate = df.parse(wn2.getTextContent().trim());
+                startDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("endDate")) {
-                endDate = df.parse(wn2.getTextContent().trim());
+                endDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("nMonths")) {
                 nMonths = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("paymentMultiplier")) {

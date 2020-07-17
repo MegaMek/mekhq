@@ -273,12 +273,10 @@ public class CampaignGUI extends JPanel {
 
         //check to see if we just selected the command center tab
         //and if so change its color to standard
-        tabMain.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (tabMain.getSelectedIndex() == 0) {
-                    tabMain.setBackgroundAt(0, null);
-                    logNagActive = false;
-                }
+        tabMain.addChangeListener(e -> {
+            if (tabMain.getSelectedIndex() == 0) {
+                tabMain.setBackgroundAt(0, null);
+                logNagActive = false;
             }
         });
 
@@ -1250,7 +1248,7 @@ public class CampaignGUI extends JPanel {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
                     continue;
                 }
-                if (getCampaign().getDate().equals(s.getDate())) {
+                if (getCampaign().getLocalDate().equals(s.getDate())) {
                     return 0 != JOptionPane
                             .showConfirmDialog(
                                     null,
