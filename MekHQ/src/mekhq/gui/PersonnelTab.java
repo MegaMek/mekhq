@@ -43,6 +43,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
@@ -223,12 +224,19 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelTable.createDefaultColumnsFromModel();
         personnelSorter = new TableRowSorter<>(personModel);
         personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter(getCampaign()));
+        personnelSorter.setComparator(PersonnelTableModel.COL_GIVEN_NAME, new NaturalOrderComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_SURNAME, new NaturalOrderComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_HONORIFIC, new NaturalOrderComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_CALL, new NaturalOrderComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_BLOODNAME, new NaturalOrderComparator());
         personnelSorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
         for (int i = PersonnelTableModel.COL_MECH; i < PersonnelTableModel.N_COL; i++) {
             personnelSorter.setComparator(i, new BonusSorter());
         }
         personnelSorter.setComparator(PersonnelTableModel.COL_SALARY, new FormattedNumberSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_AGE, new FormattedNumberSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_ORIGIN_FACTION, new NaturalOrderComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_ORIGIN_PLANET, new NaturalOrderComparator());
         personnelTable.setRowSorter(personnelSorter);
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
