@@ -43,6 +43,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
@@ -229,6 +230,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         }
         personnelSorter.setComparator(PersonnelTableModel.COL_SALARY, new FormattedNumberSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_AGE, new FormattedNumberSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_ORIGIN_FACTION, new NaturalOrderComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_ORIGIN_PLANET, new NaturalOrderComparator());
         personnelTable.setRowSorter(personnelSorter);
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
