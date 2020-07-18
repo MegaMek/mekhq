@@ -224,11 +224,6 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelTable.createDefaultColumnsFromModel();
         personnelSorter = new TableRowSorter<>(personModel);
         personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter(getCampaign()));
-        personnelSorter.setComparator(PersonnelTableModel.COL_GIVEN_NAME, new NaturalOrderComparator());
-        personnelSorter.setComparator(PersonnelTableModel.COL_SURNAME, new NaturalOrderComparator());
-        personnelSorter.setComparator(PersonnelTableModel.COL_HONORIFIC, new NaturalOrderComparator());
-        personnelSorter.setComparator(PersonnelTableModel.COL_CALL, new NaturalOrderComparator());
-        personnelSorter.setComparator(PersonnelTableModel.COL_BLOODNAME, new NaturalOrderComparator());
         personnelSorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
         for (int i = PersonnelTableModel.COL_MECH; i < PersonnelTableModel.N_COL; i++) {
             personnelSorter.setComparator(i, new BonusSorter());
