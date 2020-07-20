@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission;
 
 import mekhq.campaign.Campaign;
@@ -31,8 +30,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
 
 import static org.mockito.Mockito.spy;
 
@@ -94,13 +92,13 @@ public class ContractTest {
     }
 
     @Test
-    public void testGetTotalAmountPlusFees(){
+    public void testGetTotalAmountPlusFees() {
         initializeTest();
         Assert.assertEquals(Money.of(190), contract.getTotalAmountPlusFees());
     }
 
     @Test
-    public void testGetAdvanceAmount(){
+    public void testGetAdvanceAmount() {
         initializeTest();
         Assert.assertEquals(Money.of(19), contract.getAdvanceAmount());
     }
@@ -112,7 +110,7 @@ public class ContractTest {
     }
 
     @Test
-    public void testGetMonthlyPayout(){
+    public void testGetMonthlyPayout() {
         initializeTest();
         Assert.assertEquals(Money.of(17.10), contract.getMonthlyPayOut());
     }
@@ -123,7 +121,7 @@ public class ContractTest {
         contract.calculateContract(mockCampaign);
     }
 
-    private void initContract(){
+    private void initContract() {
         contract = spy(new Contract());
 
         contract.setOverheadComp(2); // Full overhead compensation
@@ -163,6 +161,6 @@ public class ContractTest {
         Mockito.when(mockCampaign.getContractBase()).thenReturn(contractBase);
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         Mockito.when(mockCampaign.getPeacetimeCost()).thenReturn(peacetimeCost);
-        Mockito.when(mockCampaign.getCalendar()).thenReturn(new GregorianCalendar(3067, Calendar.JANUARY, 1));
+        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
     }
 }

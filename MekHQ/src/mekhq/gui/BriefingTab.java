@@ -78,7 +78,6 @@ import mekhq.gui.dialog.NewAtBContractDialog;
 import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.sorter.ScenarioStatusComparator;
@@ -854,7 +853,7 @@ public final class BriefingTab extends CampaignGuiTab {
         boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits().size() > 0;
         boolean canStartGame = scenario.isCurrent() && unitsAssigned;
         if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
-            canStartGame = canStartGame && getCampaign().getDate().equals(scenario.getDate());
+            canStartGame = canStartGame && getCampaign().getLocalDate().equals(scenario.getDate());
         }
         btnStartGame.setEnabled(canStartGame);
         btnJoinGame.setEnabled(canStartGame);
