@@ -95,19 +95,18 @@ public class AtBDynamicScenarioFactory {
      */
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
-    private static final int[] validBotBombs = {BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE};
-    private static final int[] validBotAABombs = {BombType.B_RL};
+    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE };
+    private static final int[] validBotAABombs = { BombType.B_RL };
 
-    private static final int[] minimumBVPercentage = {50, 60, 70, 80, 90, 100};
+    private static final int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
     // target number for 2d6 roll of infantry being upgraded to battle armor, indexed by dragoons rating
-    private static final int[] infantryToBAUpgradeTNs = {12, 10, 8, 6, 4, 2};
+    private static final int[] infantryToBAUpgradeTNs = { 12, 10, 8, 6, 4, 2 };
 
     private static final int IS_LANCE_SIZE = 4;
     private static final int CLAN_MH_LANCE_SIZE = 5;
     private static final int COMSTAR_LANCE_SIZE = 6;
 
     private static final int REINFORCEMENT_ARRIVAL_SCALE = 30;
-
 
     /**
      * Method that sets some initial scenario parameters from the given template, prior to force generation and such.
@@ -304,7 +303,7 @@ public class AtBDynamicScenarioFactory {
                 break;
             case Opposing:
                 factionCode = contract.getEnemyCode();
-                // intentional fall-through: "third" parties have already had their faction code set.
+            // intentional fall-through: "third" parties have already had their faction code set.
             case Third:
                 skill = scenario.getEffectiveOpforSkill();
                 quality = scenario.getEffectiveOpforQuality();
@@ -368,10 +367,10 @@ public class AtBDynamicScenarioFactory {
             // gun emplacements use a separate set of rats
             if (actualUnitType == UnitType.GUN_EMPLACEMENT) {
                 generatedLance = generateTurrets(4, skill, quality, campaign);
-                // atb civilians use a separate rat
+            // atb civilians use a separate rat
             } else if (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
                 generatedLance = generateCivilianUnits(4, campaign);
-                // meks, asf and tanks support weight class specification, as does the "standard atb mix"
+            // meks, asf and tanks support weight class specification, as does the "standard atb mix"
             } else if (IUnitGenerator.unitTypeSupportsWeightClass(actualUnitType) ||
                     (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) {
                 List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, quality, factionCode, campaign);
@@ -389,7 +388,7 @@ public class AtBDynamicScenarioFactory {
                     generatedLance = generateLance(factionCode, skill,
                             quality, unitTypes, true, campaign);
                 }
-                // everything else doesn't support weight class specification
+            // everything else doesn't support weight class specification
             } else {
                 List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, quality, factionCode, campaign);
                 generatedLance = generateLance(factionCode, skill, quality, unitTypes, forceTemplate.getUseArtillery(), campaign);
@@ -703,13 +702,19 @@ public class AtBDynamicScenarioFactory {
             else if (r2 < 6) wind = PlanetaryConditions.WI_MOD_GALE;
             else wind = PlanetaryConditions.WI_STRONG_GALE;
         } else if (roll == 9) {
-            if (r2 == 1) wind = PlanetaryConditions.WI_STORM;
-            else if (r2 == 2) weather = PlanetaryConditions.WE_DOWNPOUR;
-            else if (r2 == 3) weather = PlanetaryConditions.WE_SLEET;
-            else if (r2 == 4) weather = PlanetaryConditions.WE_ICE_STORM;
-            else if (r2 == 5)
+            if (r2 == 1) {
+                wind = PlanetaryConditions.WI_STORM;
+            } else if (r2 == 2) {
+                weather = PlanetaryConditions.WE_DOWNPOUR;
+            } else if (r2 == 3) {
+                weather = PlanetaryConditions.WE_SLEET;
+            } else if (r2 == 4) {
+                weather = PlanetaryConditions.WE_ICE_STORM;
+            } else if (r2 == 5) {
                 wind = PlanetaryConditions.WI_TORNADO_F13; // tornadoes are classified as wind rather than weather.
-            else if (r2 == 6) wind = PlanetaryConditions.WI_TORNADO_F4;
+            } else if (r2 == 6) {
+                wind = PlanetaryConditions.WI_TORNADO_F4;
+            }
         } else {
             if (r2 < 5) fog = PlanetaryConditions.FOG_LIGHT;
             else fog = PlanetaryConditions.FOG_HEAVY;
