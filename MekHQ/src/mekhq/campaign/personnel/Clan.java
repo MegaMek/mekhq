@@ -60,6 +60,10 @@ public class Clan {
         nameChanges = new ArrayList<>();
     }
 
+    /**
+     * @param o the object to compare to
+     * @return true if they are equal, otherwise false
+     */
     @Override
     public boolean equals(Object o) {
         if (o instanceof Clan) {
@@ -76,18 +80,31 @@ public class Clan {
         return Objects.hashCode(getCode());
     }
 
+    /**
+     * @param code The code to get a Clan for
+     * @return the Clan object for the code, or null if there isn't a Clan with that code
+     */
     public static Clan getClan(String code) {
         return allClans.get(code);
     }
 
+    /**
+     * @return a Collection of all Clan objects
+     */
     public static Collection<Clan> getClans() {
         return allClans.values();
     }
 
+    /**
+     * @return the Clan's code
+     */
     public String getCode() {
         return code;
     }
 
+    /**
+     * @return the code that the Clan uses to generate Bloodnames
+     */
     public String getGenerationCode() {
         if (!StringUtil.isNullOrEmpty(generationCode)) {
             return generationCode;
@@ -96,6 +113,10 @@ public class Clan {
         }
     }
 
+    /**
+     * @param year the year to get the Clan's name for
+     * @return the full name of the Clan at the specified year
+     */
     public String getFullName(int year) {
         for (DatedRecord r : nameChanges) {
             if (r.isActive(year)) {
@@ -105,18 +126,32 @@ public class Clan {
         return fullName;
     }
 
+    /**
+     * @param year the year to determine if the Clan is active in
+     * @return whether the Clan is active or not in the specified year
+     */
     public boolean isActive(int year) {
         return ((startDate < year) && ((endDate == 0) || (endDate > year)));
     }
 
+    /**
+     * @return the date the Clan starts
+     */
     public int getStartDate() {
         return startDate;
     }
 
+    /**
+     * @return the date the Clan ends
+     */
     public int getEndDate() {
         return endDate;
     }
 
+    /**
+     * @param year the year to determine if the Clan has been abjured by
+     * @return whether or not the Clan has been abjured
+     */
     public boolean isAbjured(int year) {
         if (abjurationDate == 0) {
             return false;
@@ -125,6 +160,10 @@ public class Clan {
         }
     }
 
+    /**
+     * @param year the year to get the Clan's rivals in
+     * @return a list of all of the Clan's rivals in the specified year
+     */
     public List<Clan> getRivals(int year) {
         List<Clan> retVal = new ArrayList<>();
         for (DatedRecord r : rivals) {
@@ -138,23 +177,35 @@ public class Clan {
         return retVal;
     }
 
+    /**
+     * @return whether or not the Clan is a Home Clan
+     */
     public boolean isHomeClan() {
         return homeClan;
     }
 
+    /**
+     * @param year the year to get a single rival clan in
+     * @return a rival clan to the current Clan
+     */
     public Clan getRivalClan(int year) {
         List<Clan> rivals = getRivals(year);
         int roll = Compute.randomInt(rivals.size() + 1);
         if (roll > rivals.size() - 1) {
-            return randomClan(year, homeClan);
+            return randomClan(year, isHomeClan());
         }
         return rivals.get(roll);
     }
 
+    /**
+     * @param year the year to get a random Clan for
+     * @param homeClan whether or not the Clan is a Home Clan
+     * @return a random Clan
+     */
     public static Clan randomClan(int year, boolean homeClan) {
         List<Clan> list = new ArrayList<>();
-        for (Clan c : allClans.values()) {
-            if ((year > 3075) && (homeClan != c.homeClan)) {
+        for (Clan c : getClans()) {
+            if ((year > 3075) && (homeClan != c.isHomeClan())) {
                 continue;
             }
             if (c.isActive(year)) {
@@ -251,6 +302,9 @@ public class Clan {
         return retVal;
     }
 
+    /**
+     * This holds dated records for Clan events
+     */
     private static class DatedRecord {
         private int startDate;
         private int endDate;
