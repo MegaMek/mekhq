@@ -1123,13 +1123,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
             case CMD_BLOODNAME: {
                 for (Person p : people) {
-                    if (!p.isClanner()) {
-                        continue;
-                    }
-                    gui.getCampaign()
-                            .checkBloodnameAdd(p, p.getPrimaryRole(), true);
+                    gui.getCampaign().checkBloodnameAdd(p, true);
                 }
-                gui.getCampaign().personUpdated(selectedPerson);
                 break;
             }
             case CMD_EDIT_SALARY: {

@@ -226,11 +226,7 @@ public class CampaignGUI extends JPanel {
 
     public void randomizeAllBloodnames() {
         for (Person p : getCampaign().getPersonnel()) {
-            if (!p.isClanner()) {
-                continue;
-            }
-            getCampaign().checkBloodnameAdd(p, p.getPrimaryRole());
-            getCampaign().personUpdated(p);
+            getCampaign().checkBloodnameAdd(p, false);
         }
     }
 
@@ -240,10 +236,10 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showBloodnameDialog() {
-        BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame());
-        bloodnameDialog.setFaction(getCampaign().getFactionCode());
-        bloodnameDialog.setYear(getCampaign().getCalendar().get(
-                java.util.Calendar.YEAR));
+        final int year = getCampaign().getGameYear();
+        BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame(),
+                getCampaign().getFaction().getFullName(year), year);
+
         bloodnameDialog.setVisible(true);
     }
 
