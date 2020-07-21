@@ -162,9 +162,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private List<JCheckBox> lootBoxes;
     private List<Loot> loots;
 
-    /*
-     * Preview Panel components
-     */
+    //region Preview Panel components
     private JComboBox<String> choiceStatus;
     private JScrollPane scrRecoveredUnits;
     private JScrollPane scrRecoveredPilots;
@@ -181,6 +179,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JTextArea txtSalvage;
     private JTextArea txtRewards;
     private JLabel lblStatus;
+    //endregion Preview Panel components
+
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog", new EncodeControl());
     //endregion Variable Declarations
 
     public ResolveScenarioWizardDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {
@@ -216,7 +217,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private void initComponents() {
         // Initialize Local Variables
         GridBagConstraints gridBagConstraints;
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog", new EncodeControl()); //$NON-NLS-1$
         int gridy = 0;
         int gridx = 0;
         int i = 2;
@@ -231,7 +231,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        setName("Form"); // NOI18N
+        setName("Form");
 
         getContentPane().setLayout(new BorderLayout());
 
@@ -769,7 +769,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             statusModel.addElement(Scenario.getStatusName(k));
         }
         choiceStatus.setModel(statusModel);
-        choiceStatus.setName("choiceStatus"); // NOI18N
+        choiceStatus.setName("choiceStatus");
 
         // dynamically update victory/defeat dropdown based on objective checkboxes
         int scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
@@ -957,8 +957,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         panButtons.setName("panButtons");
         panButtons.setLayout(new GridBagLayout());
 
-        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnClose"); // NOI18N
+        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
+        btnCancel.setName("btnClose");
         btnCancel.setMnemonic(KeyEvent.VK_C);
         btnCancel.addActionListener(evt -> cancel());
 
@@ -971,23 +971,23 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panButtons.add(btnCancel, gridBagConstraints);
 
-        btnBack = new JButton(resourceMap.getString("btnBack.text")); // NOI18N
-        btnBack.setName("btnBack"); // NOI18N
+        btnBack = new JButton(resourceMap.getString("btnBack.text"));
+        btnBack.setName("btnBack");
         btnBack.setMnemonic(KeyEvent.VK_B);
         btnBack.addActionListener(evt -> back());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 0.0;
         panButtons.add(btnBack, gridBagConstraints);
 
-        btnNext = new JButton(resourceMap.getString("btnNext.text")); // NOI18N
-        btnNext.setName("btnNext"); // NOI18N
+        btnNext = new JButton(resourceMap.getString("btnNext.text"));
+        btnNext.setName("btnNext");
         btnNext.setMnemonic(KeyEvent.VK_N);
         btnNext.addActionListener(evt -> next());
         gridBagConstraints.gridx = 2;
         panButtons.add(btnNext, gridBagConstraints);
 
-        btnFinish = new JButton(resourceMap.getString("btnFinish.text")); // NOI18N
-        btnFinish.setName("btnFinish"); // NOI18N
+        btnFinish = new JButton(resourceMap.getString("btnFinish.text"));
+        btnFinish.setName("btnFinish");
         btnFinish.setMnemonic(KeyEvent.VK_F);
         btnFinish.addActionListener(evt -> finish());
         gridBagConstraints.gridx = 3;
@@ -1129,7 +1129,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     private void switchInstructions() {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog", new EncodeControl()); //$NON-NLS-1$
         switch (currentPanel) {
             case UNITSPANEL:
                 txtInstructions.setText(resourceMap.getString("txtInstructions.text.missingunits"));
@@ -1548,22 +1547,23 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     private void showUnit(UUID id, boolean salvage) {
-        //TODO: I am not sure I like the pop up dialog, might just make this a view on this
-        //dialog
+        // TODO : I am not sure I like the pop up dialog, might just make this a view on this
+        // TODO : dialog
         UnitStatus ustatus;
         if (salvage) {
             ustatus = tracker.getSalvageStatus().get(id);
         } else {
             ustatus = tracker.getUnitsStatus().get(id);
         }
+
         if (null == ustatus || null == ustatus.getEntity()) {
             return;
         }
         Entity entity = ustatus.getEntity();
-        final JDialog dialog = new JDialog(frame, "Unit View", true); //$NON-NLS-1$
+        final JDialog dialog = new JDialog(frame, "Unit View", true);
         MechViewPanel mvp = new MechViewPanel();
         mvp.setMech(entity, true);
-        JButton btn = new JButton(Messages.getString("Okay")); //$NON-NLS-1$
+        JButton btn = new JButton(Messages.getString("Okay"));
         btn.addActionListener(e -> dialog.setVisible(false));
 
         dialog.getContentPane().setLayout(new GridBagLayout());
@@ -1644,7 +1644,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         dialog.getContentPane().add(scrollPersonnelView, gridBagConstraints);
 
         //Okay button
-        JButton btn = new JButton(Messages.getString("Okay")); //$NON-NLS-1$
+        JButton btn = new JButton(Messages.getString("Okay"));
         btn.addActionListener(e -> dialog.setVisible(false));
         dialog.getRootPane().setDefaultButton(btn);
         gridBagConstraints.gridy = 1;
