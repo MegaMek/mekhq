@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.finances;
 
@@ -37,7 +37,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Transaction implements Serializable {
@@ -59,7 +58,8 @@ public class Transaction implements Serializable {
     public final static int C_LOAN_PRINCIPAL = 13;
     public final static int C_LOAN_PAYMENT   = 14;
     public final static int C_REPAIRS        = 15;
-    public final static int C_NUM            = 16;
+    public static final int C_RANSOM         = 16;
+    public final static int C_NUM            = 17;
 
     public static Vector<String> getCategoryList() {
         Vector<String> out = new Vector<>();
@@ -73,40 +73,42 @@ public class Transaction implements Serializable {
 
     public static String getCategoryName(int cat) {
         switch(cat) {
-        case C_MISC:
-            return "Miscellaneous";
-        case C_EQUIP:
-            return "Equipment Purchases";
-        case C_UNIT:
-            return "Unit Purchases";
-        case C_SALARY:
-            return "Salary Payments";
-        case C_OVERHEAD:
-            return "Overhead Expenses";
-        case C_MAINTAIN:
-            return "Maintenance Expenses";
-        case C_UNIT_SALE:
-            return "Unit Sales";
-        case C_EQUIP_SALE:
-            return "Equipment Sales";
-        case C_CONTRACT:
-            return "Contract payments";
-        case C_BLC:
-            return "Battle Loss Compensation";
-        case C_SALVAGE:
-            return "Salvage Exchange";
-        case C_START:
-            return "Starting Capital";
-        case C_TRANSPORT:
-            return "Transportation";
-        case C_LOAN_PRINCIPAL:
-            return "Loan Principal";
-        case C_LOAN_PAYMENT:
-            return "Loan Payment";
-        case C_REPAIRS:
-            return "Repairs";
-        default:
-            return "Unknown category";
+            case C_MISC:
+                return "Miscellaneous";
+            case C_EQUIP:
+                return "Equipment Purchases";
+            case C_UNIT:
+                return "Unit Purchases";
+            case C_SALARY:
+                return "Salary Payments";
+            case C_OVERHEAD:
+                return "Overhead Expenses";
+            case C_MAINTAIN:
+                return "Maintenance Expenses";
+            case C_UNIT_SALE:
+                return "Unit Sales";
+            case C_EQUIP_SALE:
+                return "Equipment Sales";
+            case C_CONTRACT:
+                return "Contract payments";
+            case C_BLC:
+                return "Battle Loss Compensation";
+            case C_SALVAGE:
+                return "Salvage Exchange";
+            case C_START:
+                return "Starting Capital";
+            case C_TRANSPORT:
+                return "Transportation";
+            case C_LOAN_PRINCIPAL:
+                return "Loan Principal";
+            case C_LOAN_PAYMENT:
+                return "Loan Payment";
+            case C_REPAIRS:
+                return "Repairs";
+            case C_RANSOM:
+                return "Ransom";
+            default:
+                return "Unknown category";
         }
     }
 
@@ -145,11 +147,7 @@ public class Transaction implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-                getAmount(),
-                getCategory(),
-                getDate(),
-                getDescription());
+        return Objects.hash(getAmount(), getCategory(), getDate(), getDescription());
     }
 
     @Override
