@@ -3961,13 +3961,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         int minutesLeft = TECH_WORK_DAY;
         int overtimeLeft = TECH_WORK_DAY / 2;
-        int edgeLeft = 0;
         boolean breakpartreroll = true;
         boolean failrefitreroll = true;
         if (null != engineer) {
             minutesLeft = engineer.getMinutesLeft();
             overtimeLeft = engineer.getOvertimeLeft();
-            edgeLeft = engineer.getEdge();
         } else {
             //then get the number based on the least amount available to crew members
             //in the case of Edge, everyone must have the same triggers set for Edge to work
@@ -3975,11 +3973,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if (p.getMinutesLeft() < minutesLeft) {
                     minutesLeft = p.getMinutesLeft();
                 }
+
                 if (p.getOvertimeLeft() < overtimeLeft) {
                     overtimeLeft = p.getOvertimeLeft();
-                }
-                if (p.getEdge() < edgeLeft) {
-                    edgeLeft = p.getEdge();
                 }
             }
         }
@@ -4023,7 +4019,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                             }
                         }
                         //If the engineer gained XP, add it for each crewman
-                        p.awardXP(engineer.getEngineerXP());
+                        p.awardXP(engineer.getXP());
 
                         //Update each crewman's successful task count too
                         p.setNTasks(p.getNTasks() + engineer.getNTasks());

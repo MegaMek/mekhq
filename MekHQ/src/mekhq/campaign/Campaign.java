@@ -3119,9 +3119,9 @@ public class Campaign implements Serializable, ITechManager {
                 tech.setOvertimeLeft(tech.getOvertimeLeft() - overtimeUsed);
                 int helpMod = getShorthandedMod(
                         getAvailableAstechs(minutesUsed, usedOvertime), false);
-                if (null != partWork.getUnit()
-                        && (partWork.getUnit().getEntity() instanceof Dropship
-                                || partWork.getUnit().getEntity() instanceof Jumpship)) {
+                if ((null != partWork.getUnit())
+                        && ((partWork.getUnit().getEntity() instanceof Dropship)
+                                || (partWork.getUnit().getEntity() instanceof Jumpship))) {
                     helpMod = 0;
                 }
                 if (partWork.getShorthandedMod() < helpMod) {
@@ -3204,7 +3204,7 @@ public class Campaign implements Serializable, ITechManager {
                         " worth of parts.";
                 finances.debit(cost, Transaction.C_REPAIRS, "Repair of " + partWork.getPartName(), calendar.getTime());
             }
-            if (roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+            if ((roll == 12) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 xpGained += getCampaignOptions().getSuccessXP();
             }
             if (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
@@ -3230,16 +3230,13 @@ public class Campaign implements Serializable, ITechManager {
             }
             report = report + partWork.fail(effectiveSkillLvl);
 
-            if (roll == 2 && target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
+            if ((roll == 2) && (target.getValue() != TargetRoll.AUTOMATIC_FAIL)) {
                 xpGained += getCampaignOptions().getMistakeXP();
             }
         }
         if (xpGained > 0) {
             tech.awardXP(xpGained);
             report += " (" + xpGained + "XP gained) ";
-            if (tech.isEngineer()) {
-                tech.setXP(xpGained);
-            }
         }
         report += wrongType;
         partWork.resetTimeSpent();
@@ -3629,7 +3626,7 @@ public class Campaign implements Serializable, ITechManager {
             Part part = getPart(pid);
             if (null != part) {
                 Person tech;
-                if (part.getUnit() != null && part.getUnit().getEngineer() != null) {
+                if ((part.getUnit() != null) && (part.getUnit().getEngineer() != null)) {
                     tech = part.getUnit().getEngineer();
                 } else {
                     tech = getPerson(part.getTeamId());
