@@ -109,7 +109,7 @@ public class PersonAwardController {
             award = AwardsFactory.getInstance().generateNew(setName, awardName);
             awards.add(award);
         }
-        person.setXp(person.getXp() + award.getXPReward());
+        person.awardXP(award.getXPReward());
         person.setEdge(person.getEdge() + award.getEdgeReward());
         person.resetCurrentEdge(); //Reset the person's edge points
 

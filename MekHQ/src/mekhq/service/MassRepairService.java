@@ -1,7 +1,25 @@
+/*
+ * Copyright (c) 2017-2020 - The MegaMek Team. All Rights Reserved
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -59,9 +77,7 @@ public class MassRepairService {
         List<MassRepairOption> mroList = campaignGUI.getCampaign().getCampaignOptions().getMassRepairOptions();
 
         if (null != mroList) {
-            for (int i = 0; i < mroList.size(); i++) {
-                MassRepairOption mro = mroList.get(i);
-
+            for (MassRepairOption mro : mroList) {
                 if (mro.isActive()) {
                     activeMROs.add(mro);
                 }
@@ -84,10 +100,10 @@ public class MassRepairService {
         if (techs.isEmpty()) {
             campaign.addReport("No available techs to repairs parts.");
         } else {
-            Map<Integer, MassRepairOption> mroByTypeMap = new HashMap<Integer, MassRepairOption>();
+            Map<Integer, MassRepairOption> mroByTypeMap = new HashMap<>();
 
-            for (int i = 0; i < mroList.size(); i++) {
-                mroByTypeMap.put(mroList.get(i).getType(), mroList.get(i));
+            for (MassRepairOption massRepairOption : mroList) {
+                mroByTypeMap.put(massRepairOption.getType(), massRepairOption);
             }
 
             /*
@@ -189,7 +205,7 @@ public class MassRepairService {
     }
 
     public static void massRepairSalvageAllUnits(CampaignGUI campaignGUI) {
-        List<Unit> units = new ArrayList<Unit>();
+        List<Unit> units = new ArrayList<>();
 
         for (Unit unit : campaignGUI.getCampaign().getServiceableUnits()) {
             if (!isValidMRMSUnit(unit)) {
@@ -200,20 +216,17 @@ public class MassRepairService {
         }
 
         // Sort the list status fixing the least damaged first
-        Collections.sort(units, new Comparator<Unit>() {
-            @Override
-            public int compare(Unit o1, Unit o2) {
-                int damageIdx1 = UnitStatusSorter.getDamageStateIndex(Unit.getDamageStateName(o1.getDamageState()));
-                int damageIdx2 = UnitStatusSorter.getDamageStateIndex(Unit.getDamageStateName(o2.getDamageState()));
+        units.sort((o1, o2) -> {
+            int damageIdx1 = UnitStatusSorter.getDamageStateIndex(Unit.getDamageStateName(o1.getDamageState()));
+            int damageIdx2 = UnitStatusSorter.getDamageStateIndex(Unit.getDamageStateName(o2.getDamageState()));
 
-                if (damageIdx2 == damageIdx1) {
-                    return 0;
-                } else if (damageIdx2 < damageIdx1) {
-                    return -1;
-                }
-
-                return 1;
+            if (damageIdx2 == damageIdx1) {
+                return 0;
+            } else if (damageIdx2 < damageIdx1) {
+                return -1;
             }
+
+            return 1;
         });
 
         List<MassRepairOption> activeMROs = createActiveMROsFromConfiguration(campaignGUI);
@@ -233,12 +246,7 @@ public class MassRepairService {
             MassRepairUnitAction unitAction = performUnitMassRepairOrSalvage(campaignGUI, unit, unit.isSalvage(),
                     activeMROs, configuredOptions);
 
-            List<MassRepairUnitAction> list = unitActionsByStatus.get(unitAction.getStatus());
-
-            if (null == list) {
-                list = new ArrayList<MassRepairUnitAction>();
-                unitActionsByStatus.put(unitAction.getStatus(), list);
-            }
+            List<MassRepairUnitAction> list = unitActionsByStatus.computeIfAbsent(unitAction.getStatus(), k -> new ArrayList<>());
 
             list.add(unitAction);
         }
@@ -330,8 +338,7 @@ public class MassRepairService {
             }
         }
 
-        // Remove any units which after mass repair/salvage are no longer
-        // useable.
+        // Remove any units which after mass repair/salvage are no longer usable.
         for (Unit u : units) {
             if (!u.isRepairable() && !u.hasSalvageableParts()) {
                 campaignGUI.getCampaign().removeUnit(u.getId());
@@ -368,7 +375,7 @@ public class MassRepairService {
         List<MassRepairUnitAction> unitsByStatus = unitActionsByStatus.get(status);
 
         for (MassRepairUnitAction mrua : unitsByStatus) {
-            sbMsg.append("<br/>- " + mrua.getUnit().getName());
+            sbMsg.append("<br/>- ").append(mrua.getUnit().getName());
         }
 
         campaignGUI.getCampaign().addReport(sbMsg.toString());
@@ -396,10 +403,10 @@ public class MassRepairService {
             }
         }
 
-        Map<Integer, MassRepairOption> mroByTypeMap = new HashMap<Integer, MassRepairOption>();
+        Map<Integer, MassRepairOption> mroByTypeMap = new HashMap<>();
 
-        for (int i = 0; i < mroList.size(); i++) {
-            mroByTypeMap.put(mroList.get(i).getType(), mroList.get(i));
+        for (MassRepairOption massRepairOption : mroList) {
+            mroByTypeMap.put(massRepairOption.getType(), massRepairOption);
         }
 
         /*
@@ -485,8 +492,8 @@ public class MassRepairService {
 
             for (IPartWork p : parts) {
                 if ((p instanceof Part) && ((Part) p).isOmniPodded()) {
-                    if (!(p instanceof AmmoBin) || ((p instanceof AmmoBin) && salvaging)) {
-                        MissingPart m = ((Part) p).getMissingPart();
+                    if (!(p instanceof AmmoBin) || salvaging) {
+                        MissingPart m = p.getMissingPart();
 
                         if (m != null && m.isReplacementAvailable()) {
                             continue;
@@ -521,7 +528,7 @@ public class MassRepairService {
          */
 
         if ((unit.getEntity() instanceof Mech)) {
-            Map<Integer, Part> locationMap = new HashMap<Integer, Part>();
+            Map<Integer, Part> locationMap = new HashMap<>();
 
             for (IPartWork partWork : parts) {
                 if ((partWork instanceof MekLocation) && ((MekLocation) partWork).onBadHipOrShoulder()) {
@@ -714,7 +721,7 @@ public class MassRepairService {
 
         debugLog("Starting with %s techs on %s", "repairPart", techs.size(), partWork.getPartName());
 
-        boolean canChangeWorkTime = (partWork instanceof Part) && ((Part) partWork).canChangeWorkMode();
+        boolean canChangeWorkTime = (partWork instanceof Part) && partWork.canChangeWorkMode();
 
         for (int i = techs.size() - 1; i >= 0; i--) {
             long time = System.nanoTime();
@@ -1031,11 +1038,7 @@ public class MassRepairService {
             return true;
         }
 
-        if ((part instanceof Armor) && !((Armor) part).isInSupply()) {
-            return false;
-        }
-
-        return true;
+        return (!(part instanceof Armor)) || ((Armor) part).isInSupply();
     }
 
     private static WorkTimeCalculation calculateNewMassRepairWorktime(IPartWork partWork, Person tech,
@@ -1059,7 +1062,7 @@ public class MassRepairService {
         }
 
         WorkTime newWorkTime = partWork.getMode();
-        WorkTime previousNewWorkTime = newWorkTime;
+        WorkTime previousNewWorkTime;
 
         Skill skill = tech.getSkillForWorkingOn(partWork);
 
@@ -1182,8 +1185,9 @@ public class MassRepairService {
         }
     }
 
-    private static class TechSorter implements Comparator<Person> {
-        private IPartWork partWork = null;
+    private static class TechSorter implements Comparator<Person>, Serializable {
+        private static final long serialVersionUID = -245317085907167454L;
+        private IPartWork partWork;
 
         public TechSorter(IPartWork _part) {
             this.partWork = _part;
@@ -1198,16 +1202,15 @@ public class MassRepairService {
              * put the one with the lesser XP in the front. If we have techs
              * with the same XP, put the one with the more time ahead.
              */
-
             Skill skill1 = tech1.getSkillForWorkingOn(partWork);
             Skill skill2 = tech2.getSkillForWorkingOn(partWork);
 
             if (skill1.getExperienceLevel() == skill2.getExperienceLevel()) {
-                if ((tech1.getXp() == tech2.getXp()) || (skill1.getLevel() == SkillType.EXP_ELITE)) {
+                if ((tech1.getXP() == tech2.getXP()) || (skill1.getLevel() == SkillType.EXP_ELITE)) {
                     return tech1.getMinutesLeft() - tech2.getMinutesLeft();
+                } else {
+                    return (tech1.getXP() < tech2.getXP()) ? -1 : 1;
                 }
-
-                return tech1.getXp() < tech2.getXp() ? -1 : 1;
             }
 
             return skill1.getExperienceLevel() < skill2.getExperienceLevel() ? -1 : 1;
@@ -1315,12 +1318,7 @@ public class MassRepairService {
                 return;
             }
 
-            List<MassRepairPartAction> list = partActionsByStatus.get(partAction.getStatus());
-
-            if (null == list) {
-                list = new ArrayList<MassRepairPartAction>();
-                partActionsByStatus.put(partAction.getStatus(), list);
-            }
+            List<MassRepairPartAction> list = partActionsByStatus.computeIfAbsent(partAction.getStatus(), k -> new ArrayList<>());
 
             list.add(partAction);
         }
@@ -1346,11 +1344,7 @@ public class MassRepairService {
                 return false;
             }
 
-            if (partActionsByStatus.size() > 1) {
-                return false;
-            }
-
-            return true;
+            return partActionsByStatus.size() <= 1;
         }
     }
 

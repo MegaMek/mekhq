@@ -404,9 +404,8 @@ public final class BriefingTab extends CampaignGuiTab {
                                         for (int role : admins) {
                                             Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
                                             if (admin != null) {
-                                                admin.setXp(admin.getXp() + 1);
-                                                getCampaign()
-                                                        .addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
+                                                admin.awardXP(1);
+                                                getCampaign().addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
                                             }
                                         }
                                     }
@@ -418,11 +417,10 @@ public final class BriefingTab extends CampaignGuiTab {
                         }
                     }
 
-                    if(mission.getStatus() != Mission.S_ACTIVE) {
+                    if (mission.getStatus() != Mission.S_ACTIVE) {
                         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
                     }
                 }
-
 
                 if (!mission.isActive()) {
                     if (getCampaign().getCampaignOptions().getUseAtB() && mission instanceof AtBContract) {

@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
@@ -1447,11 +1447,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
     //endregion Marriage
 
-    public int getXp() {
+    //region Experience
+    public int getXP() {
         return xp;
     }
 
-    public void setXp(int xp) {
+    public void setXP(int xp) {
         this.xp = xp;
     }
 
@@ -1459,13 +1460,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.xp += xp;
     }
 
-    public int getEngineerXp() {
+    public int getEngineerXP() {
         return engXp;
     }
-
-    public void setEngineerXp(int xp) {
-        engXp = xp;
-    }
+    //endregion Experience
 
     public int getAcquisitions() {
         return acquisitions;

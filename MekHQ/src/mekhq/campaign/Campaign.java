@@ -2319,7 +2319,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         if (xpGained > 0) {
-            doctor.setXp(doctor.getXp() + xpGained);
+            doctor.awardXP(xpGained);
             report += " (" + xpGained + "XP gained) ";
         }
         medWork.setDaysToWaitForHealing(getCampaignOptions()
@@ -2815,7 +2815,7 @@ public class Campaign implements Serializable, ITechManager {
             person.incrementAcquisition();
 
             if (xpGained > 0) {
-                person.setXp(person.getXp() + xpGained);
+                person.setXP(xpGained);
                 report += " (" + xpGained + "XP gained) ";
             }
         }
@@ -3235,7 +3235,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         if (xpGained > 0) {
-            tech.setXp(tech.getXp() + xpGained);
+            tech.awardXP(xpGained);
             report += " (" + xpGained + "XP gained) ";
             if (tech.isEngineer()) {
                 tech.setEngineerXp(xpGained);
@@ -3558,7 +3558,7 @@ public class Campaign implements Serializable, ITechManager {
                 p.setIdleMonths(p.getIdleMonths() + 1);
                 if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
-                        p.setXp(p.getXp() + getCampaignOptions().getIdleXP());
+                        p.setXP(getCampaignOptions().getIdleXP());
                         addReport(p.getHyperlinkedFullTitle() + " has gained "
                                 + getCampaignOptions().getIdleXP() + " XP");
                     }
@@ -3971,7 +3971,7 @@ public class Campaign implements Serializable, ITechManager {
                                             : SkillType.EXP_ELITE);
                             if (experienceLevel >= 0 && experienceLevel < SkillType.EXP_REGULAR) {
                                 // ...add one XP.
-                                p.setXp(p.getXp() + 1);
+                                p.awardXP(1);
                                 addReport(p.getHyperlinkedName() + " has gained 1 XP from training.");
                             }
                         }
@@ -5088,10 +5088,7 @@ public class Campaign implements Serializable, ITechManager {
         Map<String, Double> scoreG = new HashMap<>();
 
         for (String key : Systems.getInstance().getSystems().keySet()) {
-            scoreH.put(
-                    key,
-                    end.getDistanceTo(Systems.getInstance().getSystems()
-                            .get(key)));
+            scoreH.put(key, end.getDistanceTo(Systems.getInstance().getSystems().get(key)));
         }
         scoreG.put(current, 0.0);
         closed.add(current);
@@ -6121,13 +6118,11 @@ public class Campaign implements Serializable, ITechManager {
     public void addKill(Kill k) {
         importKill(k);
 
-        if (getCampaignOptions().getKillsForXP() > 0
-                && getCampaignOptions().getKillXPAward() > 0) {
-            if ((getKillsFor(k.getPilotId()).size() % getCampaignOptions()
-                    .getKillsForXP()) == 0) {
+        if ((getCampaignOptions().getKillsForXP() > 0) && (getCampaignOptions().getKillXPAward() > 0)) {
+            if ((getKillsFor(k.getPilotId()).size() % getCampaignOptions().getKillsForXP()) == 0) {
                 Person p = getPerson(k.getPilotId());
                 if (null != p) {
-                    p.setXp(p.getXp() + getCampaignOptions().getKillXPAward());
+                    p.awardXP(getCampaignOptions().getKillXPAward());
                     MekHQ.triggerEvent(new PersonChangedEvent(p));
                 }
             }
@@ -6136,7 +6131,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public List<Kill> getKills() {
         List<Kill> flattenedKills = new ArrayList<>();
-        for(List<Kill> personKills : kills.values()) {
+        for (List<Kill> personKills : kills.values()) {
             flattenedKills.addAll(personKills);
         }
 
@@ -6146,7 +6141,7 @@ public class Campaign implements Serializable, ITechManager {
     public List<Kill> getKillsFor(UUID pid) {
         List<Kill> personalKills = kills.get(pid);
 
-        if(personalKills == null) {
+        if (personalKills == null) {
             return Collections.emptyList();
         }
 
