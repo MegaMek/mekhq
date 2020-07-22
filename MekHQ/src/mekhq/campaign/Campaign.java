@@ -2815,7 +2815,7 @@ public class Campaign implements Serializable, ITechManager {
             person.incrementAcquisition();
 
             if (xpGained > 0) {
-                person.setXP(xpGained);
+                person.awardXP(xpGained);
                 report += " (" + xpGained + "XP gained) ";
             }
         }
@@ -3558,7 +3558,7 @@ public class Campaign implements Serializable, ITechManager {
                 p.setIdleMonths(p.getIdleMonths() + 1);
                 if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
-                        p.setXP(getCampaignOptions().getIdleXP());
+                        p.awardXP(getCampaignOptions().getIdleXP());
                         addReport(p.getHyperlinkedFullTitle() + " has gained "
                                 + getCampaignOptions().getIdleXP() + " XP");
                     }
