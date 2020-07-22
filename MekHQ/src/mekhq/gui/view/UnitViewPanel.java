@@ -15,7 +15,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import megamek.client.ui.swing.MechTileset;
+import megamek.client.ui.swing.tileset.MechTileset;
 import megamek.client.ui.swing.util.FluffImageHelper;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Entity;
