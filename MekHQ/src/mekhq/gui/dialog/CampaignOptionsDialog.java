@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -83,6 +83,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
@@ -448,11 +449,8 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner spnBaseStrategyDeployment;
     private JSpinner spnAdditionalStrategyDeployment;
     private JCheckBox chkAdjustPaymentForStrategy;
-    private JSpinner spnIntensity;
-    private JLabel lblFightPct;
-    private JLabel lblDefendPct;
-    private JLabel lblScoutPct;
-    private JLabel lblTrainingPct;
+    private JSpinner spnAtBBattleIntensity;
+    private JSpinner[] spnAtBBattleChance;
     private JCheckBox chkGenerateChases;
 
     //RATs
@@ -4221,15 +4219,19 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = 11;
         panSubAtBContract.add(lblIntensity, gridBagConstraints);
 
-        spnIntensity = new JSpinner(new SpinnerNumberModel(options.getIntensity(), 0.0, 5.0, 0.1));
+        double atbBattleIntensity = 0.0;
+
+
+
+        spnAtBBattleIntensity = new JSpinner(new SpinnerNumberModel(options.getIntensity(), 0.0, 5.0, 0.1));
+        // TODO : Windchild migrate me
         spnIntensity.setToolTipText(resourceMap.getString("spnIntensity.toolTipText"));
-        spnIntensity.setValue(options.getIntensity());
+        spnAtBBattleIntensity.addChangeListener(evt -> updateBattleChances());
         spnIntensity.setMinimumSize(new Dimension(60, 25));
         spnIntensity.setPreferredSize(new Dimension(60, 25));
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 11;
-        panSubAtBContract.add(spnIntensity, gridBagConstraints);
-        spnIntensity.addChangeListener(arg0 -> updateBattleChances());
+        panSubAtBContract.add(spnAtBBattleIntensity, gridBagConstraints);
 
         JLabel lblBattleFrequency = new JLabel(resourceMap.getString("lblBattleFrequency.text"));
         gridBagConstraints.gridx = 0;
@@ -4237,51 +4239,47 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(lblBattleFrequency, gridBagConstraints);
 
-        JLabel lblFightChance = new JLabel(resourceMap.getString("lblFightChance.text"));
-        gridBagConstraints.gridx = 0;
+        spnAtBBattleChance = new JSpinner[AtBLanceRole.values().length];
+
+        JLabel lblFightChance = new JLabel(resourceMap.getString(AtBLanceRole.FIGHTING.toString() + ":"));
         gridBagConstraints.gridy = 13;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblFightChance, gridBagConstraints);
 
-        lblFightPct = new JLabel();
+        JSpinner atbBattleChance = new JSpinner(new SpinnerNumberModel(options.getAtBBattleChance(AtBLanceRole.FIGHTING), 0.0, 100.0, 0.1));
+        spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 13;
-        panSubAtBContract.add(lblFightPct, gridBagConstraints);
+        panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblDefendChance = new JLabel(resourceMap.getString("lblDefendChance.text"));
+        JLabel lblDefendChance = new JLabel(resourceMap.getString(AtBLanceRole.DEFENCE + ":"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 14;
-        gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblDefendChance, gridBagConstraints);
 
-        lblDefendPct = new JLabel();
+        atbBattleChance = new JSpinner(new SpinnerNumberModel(options.getAtBBattleChance(AtBLanceRole.DEFENCE), 0.0, 100.0, 0.1));
+        spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 14;
-        panSubAtBContract.add(lblDefendPct, gridBagConstraints);
+        panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblScoutChance = new JLabel(resourceMap.getString("lblScoutChance.text"));
+        JLabel lblScoutChance = new JLabel(resourceMap.getString(AtBLanceRole.SCOUTING.toString() + ":"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 15;
-        gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblScoutChance, gridBagConstraints);
 
-        lblScoutPct = new JLabel();
+        atbBattleChance = new JSpinner(new SpinnerNumberModel(options.getAtBBattleChance(AtBLanceRole.SCOUTING), 0.0, 100.0, 0.1));
+        spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 15;
-        panSubAtBContract.add(lblScoutPct, gridBagConstraints);
+        panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblTrainingChance = new JLabel(resourceMap.getString("lblTrainingChance.text"));
+        JLabel lblTrainingChance = new JLabel(resourceMap.getString(AtBLanceRole.TRAINING.toString() + ":"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 16;
-        gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblTrainingChance, gridBagConstraints);
 
-        lblTrainingPct = new JLabel();
+        atbBattleChance = new JSpinner(new SpinnerNumberModel(options.getAtBBattleChance(AtBLanceRole.TRAINING), 0.0, 100.0, 0.1));
+        spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 16;
-        panSubAtBContract.add(lblTrainingPct, gridBagConstraints);
-
-        updateBattleChances();
+        panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
         chkGenerateChases = new JCheckBox(resourceMap.getString("chkGenerateChases.text"));
         chkGenerateChases.setName("chkGenerateChases");
@@ -5033,7 +5031,7 @@ public class CampaignOptionsDialog extends JDialog {
         }
         options.setRATs(ratList);
         options.setSearchRadius((Integer) spnSearchRadius.getValue());
-        options.setIntensity((Double) spnIntensity.getValue());
+        options.setAtBBattleChance();
         options.setGenerateChases(chkGenerateChases.isSelected());
         options.setVariableContractLength(chkVariableContractLength.isSelected());
         options.setMercSizeLimited(chkMercSizeLimited.isSelected());
@@ -5359,12 +5357,12 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void updateBattleChances() {
-        double intensity = (Double) spnIntensity.getValue();
+        double intensity = (Double) spnAtBBattleIntensity.getValue();
         if (intensity >= AtBContract.MINIMUM_INTENSITY) {
-            lblFightPct.setText((int)(40.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) + "%");
-            lblDefendPct.setText((int)(20.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) + "%");
-            lblScoutPct.setText((int)(60.0 * intensity / (60.0 * intensity + 40.0) * 100.0 + 0.5) + "%");
-            lblTrainingPct.setText((int)(10.0 * intensity / (10.0 * intensity + 90.0) * 100.0 + 0.5) + "%");
+            lblFightPct.setText((int) (40.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) + "%");
+            lblDefendPct.setText((int) (20.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) + "%");
+            lblScoutPct.setText((int) (60.0 * intensity / (60.0 * intensity + 40.0) * 100.0 + 0.5) + "%");
+            lblTrainingPct.setText((int) (10.0 * intensity / (10.0 * intensity + 90.0) * 100.0 + 0.5) + "%");
         } else {
             lblFightPct.setText("Disabled");
             lblDefendPct.setText("Disabled");

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -363,7 +364,7 @@ public class CampaignOptions implements Serializable {
     private int baseStrategyDeployment;
     private int additionalStrategyDeployment;
     private boolean adjustPaymentForStrategy;
-    private double intensity;
+    private double[] atbBattleChance;
     private boolean generateChases;
 
     // RATs
@@ -751,7 +752,11 @@ public class CampaignOptions implements Serializable {
         baseStrategyDeployment = 3;
         additionalStrategyDeployment = 1;
         adjustPaymentForStrategy = false;
-        intensity = 1.0;
+        atbBattleChance = new double[AtBLanceRole.values().length];
+        atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = 0.4;
+        atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = 0.2;
+        atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = 0.6;
+        atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = 0.1;
         generateChases = true;
 
         // RATs
@@ -2712,7 +2717,7 @@ public class CampaignOptions implements Serializable {
         return rats;
     }
 
-    public void setRATs (String[] rats) {
+    public void setRATs(String[] rats) {
         this.rats = rats;
     }
 
@@ -2748,12 +2753,26 @@ public class CampaignOptions implements Serializable {
         instantUnitMarketDelivery = instant;
     }
 
-    public double getIntensity() {
-        return intensity;
+    /**
+     * @param role the {@link AtBLanceRole} to get the battle chance for
+     * @return the chance of having a battle for the specified role
+     */
+    public double getAtBBattleChance(AtBLanceRole role) {
+        return atbBattleChance[role.ordinal()];
     }
 
-    public void setIntensity(double intensity) {
-        this.intensity = intensity;
+    /**
+     * @param role      the {@link AtBLanceRole} ordinal value
+     * @param frequency the frequency to set the generation to (chance from 0 to 1)
+     */
+    public void setAtBBattleChance(int role, Double frequency) {
+        if (frequency < 0.0) {
+            frequency = 0.0;
+        } else if (frequency > 1.0) {
+            frequency = 1.0;
+        }
+
+        this.atbBattleChance[role] = frequency;
     }
 
     public boolean generateChases() {
@@ -3228,7 +3247,10 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "regionalMechVariations", regionalMechVariations);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "attachedPlayerCamouflage", attachedPlayerCamouflage);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "searchRadius", searchRadius);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "intensity", intensity);
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                + "<atbBattleChance>"
+                + StringUtils.join(atbBattleChance, ',')
+                + "</atbBattleChance>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "generateChases", generateChases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableContractLength", variableContractLength);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "instantUnitMarketDelivery", instantUnitMarketDelivery);
@@ -3333,10 +3355,10 @@ public class CampaignOptions implements Serializable {
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-        final String METHOD_NAME = "generateCampaignOptionsFromXml(Node)"; //$NON-NLS-1$
+        final String METHOD_NAME = "generateCampaignOptionsFromXml(Node)";
 
         MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                "Loading Campaign Options from XML..."); //$NON-NLS-1$
+                "Loading Campaign Options from XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3702,20 +3724,15 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
                 retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
-                // This cannot use PrisonerStatus::parseFromString due to former save format differences
+                String prisonerStatus = wn2.getTextContent().trim();
+
                 try {
-                    retVal.defaultPrisonerStatus = PrisonerStatus.valueOf(wn2.getTextContent().trim());
+                    prisonerStatus = String.valueOf(Integer.parseInt(prisonerStatus) + 1);
                 } catch (Exception ignored) {
-                    switch (wn2.getTextContent().trim()) {
-                        case "1":
-                            retVal.defaultPrisonerStatus = PrisonerStatus.BONDSMAN;
-                            break;
-                        case "0":
-                        default:
-                            retVal.defaultPrisonerStatus = PrisonerStatus.PRISONER;
-                            break;
-                    }
+
                 }
+
+                retVal.setDefaultPrisonerStatus(PrisonerStatus.parseFromString(prisonerStatus));
             } else if (wn2.getNodeName().equalsIgnoreCase("prisonerBabyStatus")) {
                 retVal.prisonerBabyStatus = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
@@ -3820,8 +3837,14 @@ public class CampaignOptions implements Serializable {
                 retVal.attachedPlayerCamouflage = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("searchRadius")) {
                 retVal.searchRadius = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
                 retVal.intensity = Double.parseDouble(wn2.getTextContent().trim());
+                // TODO : Windchild migrate me
+            } else if (wn2.getNodeName().equalsIgnoreCase("atbBattleChance")) {
+                String[] values = wn2.getTextContent().split(",");
+                for (int i = 0; i < values.length; i++) {
+                    retVal.atbBattleChance[i] = Double.parseDouble(values[i]);
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("generateChases")) {
                 retVal.setGenerateChases(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {
