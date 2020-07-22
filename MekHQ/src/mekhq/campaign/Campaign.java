@@ -3238,7 +3238,7 @@ public class Campaign implements Serializable, ITechManager {
             tech.awardXP(xpGained);
             report += " (" + xpGained + "XP gained) ";
             if (tech.isEngineer()) {
-                tech.setEngineerXp(xpGained);
+                tech.setXP(xpGained);
             }
         }
         report += wrongType;
