@@ -19,6 +19,8 @@
 package mekhq.campaign.againstTheBot.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 
 import java.util.ResourceBundle;
 
@@ -27,7 +29,8 @@ public enum AtBLanceRole {
     FIGHTING("AtBLanceRole.FIGHTING.text"),
     DEFENCE("AtBLanceRole.DEFENCE.text"),
     SCOUTING("AtBLanceRole.SCOUTING.text"),
-    TRAINING("AtBLanceRole.TRAINING.text");
+    TRAINING("AtBLanceRole.TRAINING.text"),
+    UNASSIGNED("AtBLanceRole.UNASSIGNED.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -43,5 +46,36 @@ public enum AtBLanceRole {
     @Override
     public String toString() {
         return roleName;
+    }
+
+    public static AtBLanceRole parseFromString(String text) {
+        try {
+            return valueOf(text);
+        } catch (Exception ignored) {
+
+        }
+
+        // Magic Number Save Format
+        try {
+            switch (Integer.parseInt(text)) {
+                case 0:
+                    return UNASSIGNED;
+                case 1:
+                    return FIGHTING;
+                case 2:
+                    return DEFENCE;
+                case 3:
+                    return SCOUTING;
+                case 4:
+                    return TRAINING;
+            }
+        } catch (Exception ignored) {
+
+        }
+
+        MekHQ.getLogger().error(AtBLanceRole.class, "parseFromString",
+                "Unable to parse " + text + " into an AtBLanceRole. Returning FIGHTING.");
+
+        return FIGHTING;
     }
 }

@@ -752,11 +752,11 @@ public class CampaignOptions implements Serializable {
         baseStrategyDeployment = 3;
         additionalStrategyDeployment = 1;
         adjustPaymentForStrategy = false;
-        atbBattleChance = new double[AtBLanceRole.values().length];
-        atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = 0.4;
-        atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = 0.2;
-        atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = 0.6;
-        atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = 0.1;
+        atbBattleChance = new double[AtBLanceRole.values().length - 1];
+        atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = 40;
+        atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = 20;
+        atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = 60;
+        atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = 10;
         generateChases = true;
 
         // RATs
@@ -3838,8 +3838,12 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("searchRadius")) {
                 retVal.searchRadius = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
-                retVal.intensity = Double.parseDouble(wn2.getTextContent().trim());
-                // TODO : Windchild migrate me
+                double intensity = Double.parseDouble(wn2.getTextContent().trim());
+
+                retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = ((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5;
+                retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = ((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5;
+                retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = ((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5;
+                retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = ((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5;
             } else if (wn2.getNodeName().equalsIgnoreCase("atbBattleChance")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
