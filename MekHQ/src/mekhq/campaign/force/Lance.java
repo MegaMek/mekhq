@@ -459,27 +459,12 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<lance type=\""
-                +this.getClass().getName()
-                +"\">");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<forceId>"
-                + forceId
-                +"</forceId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<missionId>"
-                + missionId
-                +"</missionId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<role>"
-                + role
-                +"</role>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<commanderId>"
-                + commanderId
-                +"</commanderId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</lance>");
-
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<lance type=\"" + getClass().getName() + "\">");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "forceId", forceId);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "missionId", missionId);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "role", role.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commanderId", commanderId.toString());
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "lance");
     }
 
     public static Lance generateInstanceFromXML(Node wn) {
