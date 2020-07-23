@@ -105,14 +105,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // This value should always be +1 of the last defined role
     public static final int T_NUM = 28;
 
-    // Phenotypes
-    public static final int PHENOTYPE_NONE = 0;
-    public static final int PHENOTYPE_MW = 1;
-    public static final int PHENOTYPE_BA = 2;
-    public static final int PHENOTYPE_AERO = 3;
-    public static final int PHENOTYPE_VEE = 4;
-    public static final int PHENOTYPE_NUM = 5;
-
     private static final Map<Integer, Money> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
@@ -211,7 +203,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     int currentEdge;
 
     //phenotype and background
-    private int phenotype;
+    private Phenotype phenotype;
     private boolean clan;
     private String bloodname;
     private Faction originFaction;
@@ -360,7 +352,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         originFaction = Faction.getFaction(factionCode);
         originPlanet = null;
         clan = originFaction.isClan();
-        phenotype = PHENOTYPE_NONE;
+        phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
         idleMonths = -1;
@@ -419,12 +411,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return campaign;
     }
 
-    public int getPhenotype() {
+    public Phenotype getPhenotype() {
         return phenotype;
     }
 
-    public void setPhenotype(int i) {
-        phenotype = i;
+    public void setPhenotype(Phenotype phenotype) {
+        this.phenotype = phenotype;
     }
 
     public boolean isClanner() {
@@ -564,45 +556,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region Text Getters
     public String pregnancyStatus() {
         return isPregnant() ? " (Pregnant)" : "";
-    }
-
-    public String getPhenotypeName() {
-        return getPhenotypeName(phenotype);
-    }
-
-    public static String getPhenotypeName(int pheno) {
-        switch (pheno) {
-            case PHENOTYPE_NONE:
-                return "Freeborn";
-            case PHENOTYPE_MW:
-                return "Trueborn Mechwarrior";
-            case PHENOTYPE_AERO:
-                return "Trueborn Pilot";
-            case PHENOTYPE_VEE:
-                return "Trueborn Vehicle Crew";
-            case PHENOTYPE_BA:
-                return "Trueborn Elemental";
-            default:
-                return "?";
-        }
-    }
-
-    public String getPhenotypeShortName() {
-        return getPhenotypeShortName(phenotype);
-    }
-
-    public static String getPhenotypeShortName(int pheno) {
-        switch (pheno) {
-            case PHENOTYPE_NONE:
-                return "Freeborn";
-            case PHENOTYPE_MW:
-            case PHENOTYPE_AERO:
-            case PHENOTYPE_VEE:
-            case PHENOTYPE_BA:
-                return "Trueborn";
-            default:
-                return "?";
-        }
     }
     //endregion Text Getters
 
@@ -991,7 +944,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getRoleDesc() {
         String role = getPrimaryRoleDesc();
-        if (secondaryRole != T_NONE && secondaryRole != -1) {
+        if ((getSecondaryRole() != T_NONE) && (getSecondaryRole() != -1)) {
             role += "/" + getSecondaryRoleDesc();
         }
         return role;
@@ -1000,13 +953,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public String getPrimaryRoleDesc() {
         String bgPrefix = "";
         if (isClanner()) {
-            bgPrefix = getPhenotypeShortName() + " ";
+            bgPrefix = getPhenotype().getShortName() + " ";
         }
-        return bgPrefix + getRoleDesc(primaryRole, campaign.getFaction().isClan());
+        return bgPrefix + getRoleDesc(getPrimaryRole(), isClanner());
     }
 
     public String getSecondaryRoleDesc() {
-        return getRoleDesc(secondaryRole, campaign.getFaction().isClan());
+        return getRoleDesc(getSecondaryRole(), isClanner());
     }
 
     public static int getRoleMnemonic(int type) {
@@ -1625,8 +1578,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             // Always save whether or not someone is a clanner
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clan", clan);
-            if (phenotype != PHENOTYPE_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype);
+            if (phenotype != Phenotype.NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype.name());
             }
             if (!StringUtil.isNullOrEmpty(bloodname)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bloodname", bloodname);
@@ -1862,7 +1815,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
                     retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
-                    retVal.phenotype = Integer.parseInt(wn2.getTextContent());
+                    retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
                     retVal.bloodname = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
@@ -2132,6 +2085,36 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (version.isLowerThan("0.47.5") && (retVal.getExpectedDueDate() == null)
                     && (retVal.getDueDate() != null)) {
                 retVal.setExpectedDueDate(retVal.getDueDate());
+            }
+
+            //versions before 0.3.4 did not have proper clan phenotypes
+            if (version.isLowerThan("0.3.4") && c.getFaction().isClan()) {
+                //assume personnel are clan and trueborn if the right role
+                retVal.setClanner(true);
+                switch (retVal.getPrimaryRole()) {
+                    case Person.T_MECHWARRIOR:
+                        retVal.setPhenotype(Phenotype.MECHWARRIOR);
+                        break;
+                    case Person.T_AERO_PILOT:
+                    case Person.T_CONV_PILOT:
+                        retVal.setPhenotype(Phenotype.AEROSPACE);
+                        break;
+                    case Person.T_BA:
+                        retVal.setPhenotype(Phenotype.ELEMENTAL);
+                        break;
+                    case Person.T_VEE_GUNNER:
+                    case Person.T_GVEE_DRIVER:
+                    case Person.T_NVEE_DRIVER:
+                    case Person.T_VTOL_PILOT:
+                        retVal.setPhenotype(Phenotype.VEHICLE);
+                        break;
+                    case Person.T_PROTO_PILOT:
+                        retVal.setPhenotype(Phenotype.PROTOMECH);
+                        break;
+                    default:
+                        retVal.setPhenotype(Phenotype.NONE);
+                        break;
+                }
             }
 
             if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {

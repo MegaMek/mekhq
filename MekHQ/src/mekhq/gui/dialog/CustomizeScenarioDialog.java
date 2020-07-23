@@ -28,10 +28,11 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
@@ -76,8 +77,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private Mission mission;
     private Campaign campaign;
     private boolean newScenario;
-    private Date date;
-    private SimpleDateFormat dateFormatter;
+    private LocalDate date;
 
     private LootTableModel lootModel;
 
@@ -116,9 +116,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         campaign = c;
         date = scenario.getDate();
         if (null == date) {
-            date = campaign.getCalendar().getTime();
+            date = campaign.getLocalDate();
         }
-        dateFormatter = new SimpleDateFormat("MM/dd/yyyy"); // TODO : Remove inline date format
         loots = new ArrayList<>();
         for (Loot loot : scenario.getLoot()) {
             loots.add((Loot)loot.clone());
@@ -191,9 +190,9 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
             panMain.add(choiceStatus, gridBagConstraints);
         }
-        if (!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario)) {
+        if (!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))) {
             btnDate = new javax.swing.JButton();
-            btnDate.setText(dateFormatter.format(date));
+            btnDate.setText(date.format(DateTimeFormatter.ofPattern(campaign.getCampaignOptions().getDisplayDateFormat())));
             btnDate.addActionListener(evt -> changeDate());
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
@@ -237,7 +236,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(txtDesc, gridBagConstraints);
 
-        if (scenario instanceof AtBDynamicScenario && scenario.isCurrent()) {
+        if ((scenario instanceof AtBDynamicScenario) && scenario.isCurrent()) {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
             gridBagConstraints.gridwidth = 1;
@@ -279,7 +278,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             JButton btnLoad = new JButton("Generate From Template");
             btnLoad.addActionListener(this::btnLoadActionPerformed);
             panBtn.add(btnLoad);
-        } else if (mission instanceof AtBContract && scenario instanceof AtBDynamicScenario) {
+        } else if ((mission instanceof AtBContract) && (scenario instanceof AtBDynamicScenario)) {
             JButton btnFinalize = new JButton();
 
             if (((AtBDynamicScenario) scenario).getNumBots() > 0) {
@@ -322,7 +321,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private void btnOKActionPerformed(ActionEvent evt) {
         scenario.setName(txtName.getText());
         scenario.setDesc(txtDesc.getText());
-        if (!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario)) {
+        if (!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))) {
             if (txtReport != null) {
                 scenario.setReport(txtReport.getText());
             }
@@ -376,13 +375,12 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 
     private void changeDate() {
         // show the date chooser
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        DateChooser dc = new DateChooser(frame, cal);
+        GregorianCalendar day = GregorianCalendar.from(date.atStartOfDay(ZoneId.systemDefault()));
+        DateChooser dc = new DateChooser(frame, day);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             if (scenario.isCurrent()) {
-                if (dc.getDate().getTime().before(campaign.getCalendar().getTime())) {
+                if (dc.getDate().getTime().before(campaign.getDate())) {
                     JOptionPane.showMessageDialog(frame,
                             "You cannot choose a date before the current date for a pending battle.",
                             "Invalid date",
@@ -396,7 +394,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                     while (nextMonday.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
                         nextMonday.add(Calendar.DAY_OF_MONTH, 1);
                     }
-                    //
+
                     if (!dc.getDate().getTime().before(nextMonday.getTime())) {
                         JOptionPane.showMessageDialog(frame,
                                 "You cannot choose a date beyond the current week.",
@@ -412,8 +410,9 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            date = dc.getDate().getTime();
-            btnDate.setText(dateFormatter.format(date));
+            date = dc.getDate().toZonedDateTime().toLocalDate();
+            btnDate.setText(date.format(DateTimeFormatter.ofPattern(campaign.getCampaignOptions()
+                    .getDisplayDateFormat())));
         }
     }
 

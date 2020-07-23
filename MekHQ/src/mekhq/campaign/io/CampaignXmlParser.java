@@ -533,40 +533,9 @@ public class CampaignXmlParser {
                         System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
-        // All personnel need the rank reference fixed
         for (Person psn : retVal.getPersonnel()) {
             // skill types might need resetting
             psn.resetSkillTypes();
-
-            //versions before 0.3.4 did not have proper clan phenotypes
-            if (version.getMajorVersion() == 0
-                    && (version.getMinorVersion() <= 2 ||
-                            (version.getMinorVersion() <= 3 && version.getSnapshot() < 4))
-                    && retVal.getFaction().isClan()) {
-                //assume personnel are clan and trueborn if the right role
-                psn.setClanner(true);
-                switch (psn.getPrimaryRole()) {
-                    case Person.T_MECHWARRIOR:
-                        psn.setPhenotype(Person.PHENOTYPE_MW);
-                        break;
-                    case Person.T_AERO_PILOT:
-                    case Person.T_CONV_PILOT:
-                        psn.setPhenotype(Person.PHENOTYPE_AERO);
-                        break;
-                    case Person.T_BA:
-                        psn.setPhenotype(Person.PHENOTYPE_BA);
-                        break;
-                    case Person.T_VEE_GUNNER:
-                    case Person.T_GVEE_DRIVER:
-                    case Person.T_NVEE_DRIVER:
-                    case Person.T_VTOL_PILOT:
-                        psn.setPhenotype(Person.PHENOTYPE_VEE);
-                        break;
-                    default:
-                        psn.setPhenotype(Person.PHENOTYPE_NONE);
-                        break;
-                }
-            }
         }
 
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,

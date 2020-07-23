@@ -25,6 +25,7 @@ import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.Phenotype;
 
 /**
  * Represents a class which can generate new {@link Skill} objects
@@ -197,31 +198,41 @@ public abstract class AbstractSkillGenerator {
         if (person.isClanner()) {
             // apply phenotype bonus only to primary skills
             switch (person.getPrimaryRole()) {
-                case (Person.T_MECHWARRIOR):
-                    if (person.getPhenotype() == Person.PHENOTYPE_MW) {
+                case Person.T_MECHWARRIOR:
+                    if (person.getPhenotype() == Phenotype.MECHWARRIOR) {
                         return 1;
                     }
                     break;
-                case (Person.T_GVEE_DRIVER):
-                case (Person.T_NVEE_DRIVER):
-                case (Person.T_VTOL_PILOT):
-                case (Person.T_VEE_GUNNER):
-                    if (person.getPhenotype() == Person.PHENOTYPE_VEE) {
+                case Person.T_BA:
+                    if (person.getPhenotype() == Phenotype.ELEMENTAL) {
                         return 1;
                     }
                     break;
-                case (Person.T_CONV_PILOT):
-                case (Person.T_AERO_PILOT):
-                case (Person.T_PROTO_PILOT):
-                    if (person.getPhenotype() == Person.PHENOTYPE_AERO) {
+                case Person.T_CONV_PILOT:
+                case Person.T_AERO_PILOT:
+                    if (person.getPhenotype() == Phenotype.AEROSPACE) {
                         return 1;
                     }
                     break;
-                case (Person.T_BA):
-                    if (person.getPhenotype() == Person.PHENOTYPE_BA) {
+                case Person.T_GVEE_DRIVER:
+                case Person.T_NVEE_DRIVER:
+                case Person.T_VTOL_PILOT:
+                case Person.T_VEE_GUNNER:
+                    if (person.getPhenotype() == Phenotype.VEHICLE) {
                         return 1;
                     }
                     break;
+                case Person.T_PROTO_PILOT:
+                    if (person.getPhenotype() == Phenotype.PROTOMECH) {
+                        return 1;
+                    }
+                case Person.T_SPACE_CREW:
+                case Person.T_SPACE_GUNNER:
+                case Person.T_SPACE_PILOT:
+                case Person.T_NAVIGATOR:
+                    if (person.getPhenotype() == Phenotype.NAVAL) {
+                        return 1;
+                    }
                 default:
                     break;
             }

@@ -24,8 +24,7 @@ package mekhq.gui.view;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
-import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
@@ -121,9 +120,6 @@ public class ContractSummaryPanel extends JPanel {
 
     private void fillStats() {
         //region Variable Initialization
-        // TODO : LocalDate : Remove Inline date
-        SimpleDateFormat shortDateFormat = new SimpleDateFormat("yyyy/MM/dd");
-
         // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
         String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         // TODO : Switch me to use IUnitRating
@@ -227,8 +223,7 @@ public class ContractSummaryPanel extends JPanel {
 
             JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
 
-            int days = (int) Math.ceil(path.getTotalTime(
-                    contract.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+            int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
                     campaign.getLocation().getTransitTime()));
             int jumps = path.getJumps();
             if (campaign.getCurrentSystem().getId().equals(contract.getSystemId())
@@ -271,7 +266,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblStartDate, gridBagConstraintsLabels);
 
-        JLabel txtStartDate = new JLabel(shortDateFormat.format(contract.getStartDate()));
+        JLabel txtStartDate = new JLabel(contract.getStartDate().format(DateTimeFormatter
+                .ofPattern(campaign.getCampaignOptions().getDisplayDateFormat())));
         txtStartDate.setName("txtStartDate");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtStartDate, gridBagConstraintsText);

@@ -75,7 +75,7 @@ public class ResolveScenarioTracker {
     ArrayList<TestUnit> leftoverSalvage;
     ArrayList<TestUnit> devastatedEnemyUnits;
     ArrayList<Unit> units;
-    ArrayList<Loot> potentialLoot;
+    List<Loot> potentialLoot;
     ArrayList<Loot> actualLoot;
     Hashtable<UUID, PersonStatus> peopleStatus;
     Hashtable<UUID, OppositionPersonnelStatus> oppositionPersonnel;
@@ -1570,7 +1570,7 @@ public class ResolveScenarioTracker {
         //lets reset the network ids from the c3UUIDs
         campaign.reloadGameEntities();
         campaign.refreshNetworks();
-        scenario.setDate(campaign.getCalendar().getTime());
+        scenario.setDate(campaign.getLocalDate());
         client = null;
     }
 
@@ -1636,7 +1636,7 @@ public class ResolveScenarioTracker {
         return entities;
     }
 
-    public ArrayList<Loot> getPotentialLoot() {
+    public List<Loot> getPotentialLoot() {
         return potentialLoot;
     }
 

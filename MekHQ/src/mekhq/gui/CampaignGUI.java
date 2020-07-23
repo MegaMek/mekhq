@@ -226,11 +226,7 @@ public class CampaignGUI extends JPanel {
 
     public void randomizeAllBloodnames() {
         for (Person p : getCampaign().getPersonnel()) {
-            if (!p.isClanner()) {
-                continue;
-            }
-            getCampaign().checkBloodnameAdd(p, p.getPrimaryRole());
-            getCampaign().personUpdated(p);
+            getCampaign().checkBloodnameAdd(p, false);
         }
     }
 
@@ -240,10 +236,10 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showBloodnameDialog() {
-        BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame());
-        bloodnameDialog.setFaction(getCampaign().getFactionCode());
-        bloodnameDialog.setYear(getCampaign().getCalendar().get(
-                java.util.Calendar.YEAR));
+        final int year = getCampaign().getGameYear();
+        BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame(),
+                getCampaign().getFaction().getFullName(year), year);
+
         bloodnameDialog.setVisible(true);
     }
 
@@ -273,12 +269,10 @@ public class CampaignGUI extends JPanel {
 
         //check to see if we just selected the command center tab
         //and if so change its color to standard
-        tabMain.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (tabMain.getSelectedIndex() == 0) {
-                    tabMain.setBackgroundAt(0, null);
-                    logNagActive = false;
-                }
+        tabMain.addChangeListener(e -> {
+            if (tabMain.getSelectedIndex() == 0) {
+                tabMain.setBackgroundAt(0, null);
+                logNagActive = false;
             }
         });
 
@@ -1250,7 +1244,7 @@ public class CampaignGUI extends JPanel {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
                     continue;
                 }
-                if (getCampaign().getDate().equals(s.getDate())) {
+                if (getCampaign().getLocalDate().equals(s.getDate())) {
                     return 0 != JOptionPane
                             .showConfirmDialog(
                                     null,

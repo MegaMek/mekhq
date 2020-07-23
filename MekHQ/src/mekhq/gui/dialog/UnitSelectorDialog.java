@@ -40,7 +40,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.AdvancedSearchDialog;
-import megamek.client.ui.swing.MechTileset;
+import megamek.client.ui.swing.tileset.MechTileset;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Configuration;
 import megamek.common.Entity;
