@@ -50,7 +50,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.campaign.AtBConfiguration;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;

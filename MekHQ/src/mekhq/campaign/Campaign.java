@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import javax.swing.JOptionPane;
 
 import mekhq.*;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;

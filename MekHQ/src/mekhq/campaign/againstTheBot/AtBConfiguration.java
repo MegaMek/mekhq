@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign;
+package mekhq.campaign.againstTheBot;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,6 +36,7 @@ import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -76,7 +77,7 @@ public class AtBConfiguration implements Serializable {
     public static final String ORG_IS = "IS";
     public static final String ORG_CLAN = "CLAN";
     public static final String ORG_CS = "CS";
-    
+
     public static final char WEIGHT_ULTRA_LIGHT = 'U';
     public static final char WEIGHT_LIGHT = 'L';
     public static final char WEIGHT_MEDIUM = 'M';
