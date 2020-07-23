@@ -3171,7 +3171,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     infantryArmor = new EquipmentPart(0, eq, 0, 1.0, false, getCampaign());
                 } else {
                     infantryArmor = new InfantryArmorPart(0, getCampaign(),
-                            ((Infantry) entity).getArmorDamageDivisor(), ((Infantry) entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
+                            ((Infantry) entity).getArmorDamageDivisor(), ((Infantry) entity).isArmorEncumbering(), ((Infantry) entity).hasDEST(), ((Infantry) entity).hasSneakCamo(), ((Infantry) entity).hasSneakECM(), ((Infantry) entity).hasSneakIR(), ((Infantry) entity).hasSpaceSuit());
                 }
                 if (infantryArmor.getStickerPrice().isPositive()) {
                     int number = entity.getOInternal(Infantry.LOC_INFANTRY);
