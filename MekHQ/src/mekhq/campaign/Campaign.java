@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import javax.swing.JOptionPane;
 
 import mekhq.*;
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
@@ -3286,7 +3287,7 @@ public class Campaign implements Serializable, ITechManager {
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
         for (Lance l : lances.values()) {
-            if ((l.getMissionId() == contract.getId()) && (l.getRole() != Lance.ROLE_UNASSIGNED)) {
+            if ((l.getMissionId() == contract.getId()) && (l.getRole() != AtBLanceRole.UNASSIGNED)) {
                 total++;
                 if (l.getRole() == contract.getRequiredLanceType()) {
                     role++;

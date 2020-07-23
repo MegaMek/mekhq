@@ -45,6 +45,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
@@ -65,12 +66,6 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
  */
 public class LanceAssignmentView extends JPanel {
     private static final long serialVersionUID = 7280552346074838142L;
-    public static final int ROLE_NONE = 0;
-    public static final int ROLE_FIGHT = 1;
-    public static final int ROLE_DEFEND = 2;
-    public static final int ROLE_SCOUT = 3;
-    public static final int ROLE_TRAINING = 4;
-    public static final int ROLE_NUM = 5;
 
     private final Campaign campaign;
     private final MekHqColors colors = new MekHqColors();
@@ -80,25 +75,24 @@ public class LanceAssignmentView extends JPanel {
     private JPanel panRequiredLances;
     private JPanel panAssignments;
     private JComboBox<AtBContract> cbContract;
-    private JComboBox<String> cbRole;
+    private JComboBox<AtBLanceRole> cbRole;
 
     public LanceAssignmentView(Campaign c) {
         campaign = c;
         initComponents();
     }
 
-    @SuppressWarnings("serial")
-     private void initComponents() {
+    private void initComponents() {
         cbContract = new JComboBox<>();
         cbContract.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                                                           boolean isSelected, boolean cellHasFocus) {
-                return new JLabel((null == value)?"None":((AtBContract)value).getName());
+                return new JLabel((null == value) ? "None" : ((AtBContract) value).getName());
             }
         });
 
-        cbRole = new JComboBox<>(Lance.roleNames);
+        cbRole = new JComboBox<>(AtBLanceRole.values());
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -117,10 +111,10 @@ public class LanceAssignmentView extends JPanel {
                                                                boolean isSelected, boolean hasFocus,
                                                                int row, int column) {
                     super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                    setHorizontalAlignment(((RequiredLancesTableModel)table.getModel()).
+                    setHorizontalAlignment(((RequiredLancesTableModel) table.getModel()).
                             getAlignment(table.convertColumnIndexToModel(column)));
                     if (table.convertColumnIndexToModel(column) > RequiredLancesTableModel.COL_CONTRACT) {
-                        if (((String)value).indexOf('/') >= 0) {
+                        if (((String) value).indexOf('/') >= 0) {
                             colors.getBelowContractMinimum().getAlternateColor().ifPresent(this::setForeground);
                         }
                     }
@@ -161,8 +155,7 @@ public class LanceAssignmentView extends JPanel {
                             }
                             break;
                         default:
-                            super.getTableCellRendererComponent(table, value, isSelected,
-                                    hasFocus, row, column);
+                            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                    }
                     return this;
                 }
@@ -359,8 +352,8 @@ class RequiredLancesTableModel extends DataTableModel {
             if (column == COL_TOTAL) {
                 int t = 0;
                 for (Lance l : campaign.getLanceList()) {
-                    if (l.getContract(campaign) == data.get(row)
-                            && l.getRole() > Lance.ROLE_UNASSIGNED
+                    if ((l.getContract(campaign) == data.get(row))
+                            && (l.getRole() != AtBLanceRole.UNASSIGNED)
                             && l.isEligible(campaign)) {
                         t++;
                     }
@@ -369,7 +362,7 @@ class RequiredLancesTableModel extends DataTableModel {
                     return t + "/" + contract.getRequiredLances();
                 }
                 return Integer.toString(contract.getRequiredLances());
-            } else if (contract.getRequiredLanceType() == column - 1) {
+            } else if (contract.getRequiredLanceType().ordinal() == column - 1) {
                 int t = 0;
                 for (Lance l : campaign.getLanceList()) {
                     if (l.getContract(campaign) == data.get(row)
@@ -465,7 +458,7 @@ class LanceAssignmentTableModel extends DataTableModel {
             case COL_CONTRACT:
                 return campaign.getMission(((Lance) data.get(row)).getMissionId());
             case COL_ROLE:
-                return Lance.roleNames[((Lance) data.get(row)).getRole()];
+                return ((Lance) data.get(row)).getRole();
             default:
                 return "?";
         }
@@ -474,12 +467,10 @@ class LanceAssignmentTableModel extends DataTableModel {
     @Override
     public void setValueAt(Object value, int row, int col) {
         if (col == COL_CONTRACT) {
-            ((Lance) data.get(row)).setContract((AtBContract)value);
+            ((Lance) data.get(row)).setContract((AtBContract) value);
         } else if (col == COL_ROLE) {
-            for (int i = 0; i < Lance.ROLE_NUM; i++) {
-                if (value.equals(Lance.roleNames[i])) {
-                    ((Lance) data.get(row)).setRole(i);
-                }
+            if (value instanceof AtBLanceRole) {
+                ((Lance) data.get(row)).setRole((AtBLanceRole) value);
             }
         }
         fireTableDataChanged();
