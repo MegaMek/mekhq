@@ -136,11 +136,10 @@ public abstract class AbstractPersonnelGenerator {
      * Generates the starting XP for a {@link Person}.
      * @param campaign The {@link Campaign} which tracks the person.
      * @param person The {@link Person} being generated.
-     * @param expLvl The experience level of {@code person}.
      */
-    protected void generateXp(Campaign campaign, Person person, int expLvl) {
+    protected void generateXp(Campaign campaign, Person person) {
         if (campaign.getCampaignOptions().useDylansRandomXp()) {
-            person.setXp(Utilities.generateRandomExp());
+            person.setXP(Utilities.generateRandomExp());
         }
     }
 

@@ -623,7 +623,7 @@ public class PersonnelTableModel extends DataTableModel {
                 }
                 break;
             case COL_XP:
-                return Integer.toString(p.getXp());
+                return Integer.toString(p.getXP());
             case COL_DEPLOY:
                 Unit u = getCampaign().getUnit(p.getUnitId());
                 if ((null != u) && u.isDeployed()) {

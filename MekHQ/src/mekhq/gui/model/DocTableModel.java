@@ -41,7 +41,7 @@ public class DocTableModel extends DataTableModel {
                     .append(" " + SkillType.S_DOCTOR);
         }
 
-        toReturn.append(String.format(" (%d XP)", doc.getXp()));
+        toReturn.append(String.format(" (%d XP)", doc.getXP()));
 
         if (campaign.getMedicsPerDoctor() < 4) {
             toReturn.append("</font><font size='2' color='red'>, ")
