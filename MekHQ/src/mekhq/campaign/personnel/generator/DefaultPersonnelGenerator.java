@@ -85,7 +85,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         int expLvl = generateExperienceLevel(campaign, person);
 
-        generateXp(campaign, person, expLvl);
+        generateXp(campaign, person);
 
         generatePhenotype(campaign, person);
 

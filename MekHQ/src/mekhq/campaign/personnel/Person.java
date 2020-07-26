@@ -187,7 +187,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     private PersonnelStatus status;
     private int xp;
-    private int engXp;
     private int acquisitions;
     private Money salary;
     private Money totalEarnings;
@@ -1452,25 +1451,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
     //endregion Marriage
 
-    public int getXp() {
+    //region Experience
+    public int getXP() {
         return xp;
     }
 
-    public void setXp(int xp) {
+    public void setXP(int xp) {
         this.xp = xp;
     }
 
     public void awardXP(int xp) {
         this.xp += xp;
     }
-
-    public int getEngineerXp() {
-        return engXp;
-    }
-
-    public void setEngineerXp(int xp) {
-        engXp = xp;
-    }
+    //endregion Experience
 
     public int getAcquisitions() {
         return acquisitions;
