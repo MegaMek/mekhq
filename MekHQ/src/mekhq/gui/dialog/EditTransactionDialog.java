@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2013, 2020 - The MegaMek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -11,9 +29,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.JButton;
@@ -27,26 +43,21 @@ import javax.swing.SwingUtilities;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.finances.Money;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JMoneyTextField;
 import mekhq.preferences.PreferencesNode;
 
 public class EditTransactionDialog extends JDialog implements ActionListener, FocusListener, MouseListener {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -8742160448355293487L;
 
-    private final DateFormat LONG_DATE = DateFormat.getDateInstance(DateFormat.LONG);
-
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditTransactionDialog", new EncodeControl()); //$NON-NLS-1$
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditTransactionDialog", new EncodeControl());
 
     private Transaction oldTransaction;
     private Transaction newTransaction;
     private JFrame parent;
+    private Campaign campaign;
 
     private JMoneyTextField amountField;
     private JTextField descriptionField;
@@ -56,12 +67,13 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
     private JButton saveButton;
     private JButton cancelButton;
 
-    public EditTransactionDialog(Transaction transaction, JFrame parent, boolean modal) {
+    public EditTransactionDialog(JFrame parent, Campaign campaign, Transaction transaction, boolean modal) {
         super(parent, modal);
         //we need to make a copy of the object since objects are referenced by passing it to the dialog
         oldTransaction = new Transaction(transaction);
         newTransaction = transaction;
         this.parent = parent;
+        this.campaign = campaign;
 
         initGUI();
         setTitle(resourceMap.getString("dialog.title"));
@@ -71,13 +83,9 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
     }
 
     private void initGUI() {
-        try {
-            setLayout(new BorderLayout());
-            add(buildMainPanel(), BorderLayout.CENTER);
-            add(buildButtonPanel(), BorderLayout.SOUTH);
-        } catch (ParseException e) {
-            MekHQ.getLogger().error(getClass(), "initGUI()", e);
-        }
+        setLayout(new BorderLayout());
+        add(buildMainPanel(), BorderLayout.CENTER);
+        add(buildButtonPanel(), BorderLayout.SOUTH);
     }
 
     private void setUserPreferences() {
@@ -87,7 +95,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         preferences.manage(new JWindowPreference(this));
     }
 
-    private JPanel buildMainPanel() throws ParseException {
+    private JPanel buildMainPanel() {
         JPanel panel = new JPanel();
 
         GridBagConstraints c = new GridBagConstraints();
@@ -135,7 +143,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         panel.add(amountField);
 
         c.gridx++;
-        dateButton = new JButton(LONG_DATE.format(newTransaction.getDate()));
+        dateButton = new JButton(campaign.getCampaignOptions().getDisplayFormattedDate(newTransaction.getDate()));
         dateButton.addActionListener(this);
         l.setConstraints(dateButton, c);
         panel.add(dateButton);

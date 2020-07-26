@@ -655,7 +655,7 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
         StringBuilder report = new StringBuilder();
-        if (getFinances().debit(getAtBConfig().shipSearchCostPerWeek(), Transaction.C_UNIT, "Ship search", getDate())) {
+        if (getFinances().debit(getAtBConfig().shipSearchCostPerWeek(), Transaction.C_UNIT, "Ship search", getLocalDate())) {
             report.append(getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString())
                     .append(" deducted for ship search.");
         } else {
@@ -726,7 +726,7 @@ public class Campaign implements Serializable, ITechManager {
         int transitDays = getCampaignOptions().getInstantUnitMarketDelivery() ? 0
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
-        getFinances().debit(cost, Transaction.C_UNIT, "Purchased " + en.getShortName(), getCalendar().getTime());
+        getFinances().debit(cost, Transaction.C_UNIT, "Purchased " + en.getShortName(), getLocalDate());
         addUnit(en, true, transitDays);
         if (!getCampaignOptions().getInstantUnitMarketDelivery()) {
             addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
@@ -743,9 +743,9 @@ public class Campaign implements Serializable, ITechManager {
      * @return False if there were payments AND they were unable to be processed, true otherwise.
      */
     public boolean applyRetirement(Money totalPayout, HashMap<UUID, UUID> unitAssignments) {
-        if ((totalPayout.isPositive()) ||
-            (null != getRetirementDefectionTracker().getRetirees())) {
-            if (getFinances().debit(totalPayout, Transaction.C_SALARY, "Final Payout", getDate())) {
+        if ((totalPayout.isPositive())
+                || (null != getRetirementDefectionTracker().getRetirees())) {
+            if (getFinances().debit(totalPayout, Transaction.C_SALARY, "Final Payout", getLocalDate())) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
                     if (getPerson(pid).isActive()) {
                         changeStatus(getPerson(pid), PersonnelStatus.RETIRED);
@@ -1384,7 +1384,7 @@ public class Campaign implements Serializable, ITechManager {
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
         if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && prisonerStatus.isFree()) {
             if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
-                    "recruitment of " + p.getFullName(), getCalendar().getTime())) {
+                    "recruitment of " + p.getFullName(), getLocalDate())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
                         + p.getFullName() + "</b></font>");
                 return false;
@@ -3202,7 +3202,7 @@ public class Campaign implements Serializable, ITechManager {
                 report += "<br>Repairs cost " +
                         cost.toAmountAndSymbolString() +
                         " worth of parts.";
-                finances.debit(cost, Transaction.C_REPAIRS, "Repair of " + partWork.getPartName(), calendar.getTime());
+                finances.debit(cost, Transaction.C_REPAIRS, "Repair of " + partWork.getPartName(), getLocalDate());
             }
             if ((roll == 12) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 xpGained += getCampaignOptions().getSuccessXP();
@@ -4451,7 +4451,7 @@ public class Campaign implements Serializable, ITechManager {
         if (category == -1) {
             category = Transaction.C_MISC;
         }
-        finances.credit(quantity, category, description, calendar.getTime());
+        finances.credit(quantity, category, description, getLocalDate());
         String quantityString = quantity.toAmountAndSymbolString();
         addReport("Funds added : " + quantityString + " (" + description + ")");
     }
@@ -4464,7 +4464,7 @@ public class Campaign implements Serializable, ITechManager {
         Money cost = new Unit(en, this).getBuyCost();
         if (campaignOptions.payForUnits()) {
             if (finances.debit(cost, Transaction.C_UNIT,
-                    "Purchased " + en.getShortName(), calendar.getTime())) {
+                    "Purchased " + en.getShortName(), getLocalDate())) {
                 addUnit(en, false, days);
                 return true;
             } else {
@@ -4480,7 +4480,7 @@ public class Campaign implements Serializable, ITechManager {
         Unit unit = getUnit(id);
         Money sellValue = unit.getSellValue();
         finances.credit(sellValue, Transaction.C_UNIT_SALE,
-                "Sale of " + unit.getName(), calendar.getTime());
+                "Sale of " + unit.getName(), getLocalDate());
         removeUnit(id);
         MekHQ.triggerEvent(new UnitRemovedEvent(unit));
     }
@@ -4500,7 +4500,7 @@ public class Campaign implements Serializable, ITechManager {
             plural = "s";
         }
         finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + quantity
-                + " " + part.getName() + plural, calendar.getTime());
+                + " " + part.getName() + plural, getLocalDate());
         while (quantity > 0 && part.getQuantity() > 0) {
             part.decrementQuantity();
             quantity--;
@@ -4518,7 +4518,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + shots
-                + " " + ammo.getName(), calendar.getTime());
+                + " " + ammo.getName(), getLocalDate());
         if (sellingAllAmmo) {
             ammo.decrementQuantity();
         } else {
@@ -4537,7 +4537,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         Money cost = armor.getActualValue().multipliedBy(proportion);
         finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + points
-                + " " + armor.getName(), calendar.getTime());
+                + " " + armor.getName(), getLocalDate());
         if (sellingAllArmor) {
             armor.decrementQuantity();
         } else {
@@ -4563,7 +4563,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public boolean buyRefurbishment(Part part) {
         if (getCampaignOptions().payForParts()) {
-            return finances.debit(part.getStickerPrice(), Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime());
+            return finances.debit(part.getStickerPrice(), Transaction.C_EQUIP, "Purchase of " + part.getName(), getLocalDate());
         } else {
             return true;
         }
@@ -4576,7 +4576,7 @@ public class Campaign implements Serializable, ITechManager {
     public boolean buyPart(Part part, double multiplier, int transitDays) {
         if (getCampaignOptions().payForParts()) {
             if (finances.debit(part.getStickerPrice().multipliedBy(multiplier),
-                    Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime())) {
+                    Transaction.C_EQUIP, "Purchase of " + part.getName(), getLocalDate())) {
                 if (part instanceof Refit) {
                     ((Refit) part).addRefitKitParts(transitDays);
                 } else {
@@ -6909,7 +6909,7 @@ public class Campaign implements Serializable, ITechManager {
                 Money remainingMoney = contract.getMonthlyPayOut()
                         .multipliedBy(contract.getMonthsLeft(getLocalDate()));
                 finances.credit(remainingMoney, Transaction.C_CONTRACT,
-                        "Remaining payment for " + contract.getName(), calendar.getTime());
+                        "Remaining payment for " + contract.getName(), getLocalDate());
                 addReport("Your account has been credited for "
                         + remainingMoney.toAmountAndSymbolString()
                         + " for the remaining payout from contract "
@@ -7180,12 +7180,12 @@ public class Campaign implements Serializable, ITechManager {
         finances.addLoan(loan);
         MekHQ.triggerEvent(new LoanNewEvent(loan));
         finances.credit(loan.getPrincipal(), Transaction.C_LOAN_PRINCIPAL,
-                "loan principal for " + loan.getDescription(), calendar.getTime());
+                "loan principal for " + loan.getDescription(), getLocalDate());
     }
 
     public void payOffLoan(Loan loan) {
         if (finances.debit(loan.getRemainingValue(),
-                Transaction.C_LOAN_PAYMENT, "loan payoff for " + loan.getDescription(), calendar.getTime())) {
+                Transaction.C_LOAN_PAYMENT, "loan payoff for " + loan.getDescription(), getLocalDate())) {
             addReport("You have paid off the remaining loan balance of "
                     + loan.getRemainingValue().toAmountAndSymbolString()
                     + "on " + loan.getDescription());
@@ -7983,7 +7983,7 @@ public class Campaign implements Serializable, ITechManager {
             // maybe use the money
             if (campaignOptions.payForMaintain()) {
                 if (!(finances.debit(u.getMaintenanceCost(), Transaction.C_MAINTAIN, "Maintenance for "
-                                + u.getName(), calendar.getTime()))) {
+                                + u.getName(), getLocalDate()))) {
                     addReport("<font color='red'><b>You cannot afford to pay maintenance costs for "
                             + u.getHyperlinkedName() + "!</b></font>");
                     paidMaintenance = false;

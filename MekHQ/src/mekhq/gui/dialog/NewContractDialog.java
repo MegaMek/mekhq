@@ -665,7 +665,8 @@ public class NewContractDialog extends javax.swing.JDialog {
     	contract.setType(txtType.getText());
     	contract.setDesc(txtDesc.getText());
     	contract.setCommandRights(choiceCommand.getSelectedIndex());
-    	campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT, "Advance monies for " + contract.getName(), campaign.getCalendar().getTime());
+    	campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
+                "Advance monies for " + contract.getName(), campaign.getLocalDate());
     	campaign.addMission(contract);
 
     	// Negotiator XP
@@ -692,8 +693,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         	}
             contract.setStartDate(dc.getDate().toZonedDateTime().toLocalDate());
             contract.calculateContract(campaign);
-            btnDate.setText(contract.getStartDate().format(DateTimeFormatter.ofPattern(campaign
-                    .getCampaignOptions().getDisplayDateFormat())));
+            btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(contract.getStartDate()));
         }
     }
 

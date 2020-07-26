@@ -1474,7 +1474,8 @@ public class ResolveScenarioTracker {
                 //missing unit
                 if (blc > 0) {
                     Money value = unitValue.multipliedBy(blc);
-                    campaign.getFinances().credit(value, Transaction.C_BLC, "Battle loss compensation for " + unit.getName(), campaign.getCalendar().getTime());
+                    campaign.getFinances().credit(value, Transaction.C_BLC,
+                            "Battle loss compensation for " + unit.getName(), campaign.getLocalDate());
                     campaign.addReport(value.toAmountAndSymbolString() + " in battle loss compensation for " + unit.getName() + " has been credited to your account.");
                 }
                 campaign.removeUnit(unit.getId());
@@ -1514,13 +1515,13 @@ public class ResolveScenarioTracker {
                     }
                 }
                 blcValue = blcValue.plus(repairBLC);
-                if (blc > 0 && blcValue.isPositive()) {
+                if ((blc > 0) && blcValue.isPositive()) {
                     Money finalValue = blcValue.multipliedBy(blc);
                     campaign.getFinances().credit(
                             finalValue,
                             Transaction.C_BLC,
                             blcString.substring(0, 1).toUpperCase() + blcString.substring(1),
-                            campaign.getCalendar().getTime());
+                            campaign.getLocalDate());
                     campaign.addReport( finalValue.toAmountAndSymbolString() + " in " + blcString + " has been credited to your account.");
                 }
             }
@@ -1537,7 +1538,7 @@ public class ResolveScenarioTracker {
             campaign.addTestUnit(salvageUnit);
             //if this is a contract, add to the salvaged value
             if (getMission() instanceof Contract) {
-                ((Contract)getMission()).addSalvageByUnit(salvageUnit.getSellValue());
+                ((Contract) getMission()).addSalvageByUnit(salvageUnit.getSellValue());
             }
         }
         if (getMission() instanceof Contract) {
@@ -1545,22 +1546,23 @@ public class ResolveScenarioTracker {
             for (Unit salvageUnit : leftoverSalvage) {
                 value = value.plus(salvageUnit.getSellValue());
             }
-            if (((Contract)getMission()).isSalvageExchange()) {
-                value = value.multipliedBy(((Contract)getMission()).getSalvagePct()).dividedBy(100);
-                campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for " + scenario.getName(),  campaign.getCalendar().getTime());
+            if (((Contract) getMission()).isSalvageExchange()) {
+                value = value.multipliedBy(((Contract) getMission()).getSalvagePct()).dividedBy(100);
+                campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for "
+                        + scenario.getName(),  campaign.getLocalDate());
                 campaign.addReport(value.toAmountAndSymbolString() + " have been credited to your account for salvage exchange.");
             } else {
-                ((Contract)getMission()).addSalvageByEmployer(value);
+                ((Contract) getMission()).addSalvageByEmployer(value);
             }
         }
 
-        if (campaign.getCampaignOptions().getUseAtB() && getMission() instanceof AtBContract) {
+        if (campaign.getCampaignOptions().getUseAtB() && (getMission() instanceof AtBContract)) {
             int unitRatingMod = campaign.getUnitRatingMod();
             for (Unit unit : units) {
-                unit.setSite(((AtBContract)getMission()).getRepairLocation(unitRatingMod));
+                unit.setSite(((AtBContract) getMission()).getRepairLocation(unitRatingMod));
             }
             for (Unit unit : actualSalvage) {
-                unit.setSite(((AtBContract)getMission()).getRepairLocation(unitRatingMod));
+                unit.setSite(((AtBContract) getMission()).getRepairLocation(unitRatingMod));
             }
         }
 

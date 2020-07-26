@@ -2,6 +2,7 @@
  * Loan.java
  *
  * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,22 +22,16 @@
 package mekhq.campaign.finances;
 
 import java.io.PrintWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
 
 import megamek.common.Compute;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -44,7 +39,6 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Loan implements MekHqXmlSerializable {
-
     // If you add more Canon institutions, please add them at the beginning and change the next line.
     // The first four of these are Canon, the rest are made up.
     private static final List<String> madeUpInstitutions = Arrays.asList("Southern Bank and Trust" /* Canon */, "The Alliance Reserve Bank" /* Canon */,
@@ -59,7 +53,7 @@ public class Loan implements MekHqXmlSerializable {
     private String refNumber;
     private Money principal;
     private int rate;
-    private GregorianCalendar nextPayment;
+    private LocalDate nextPayment;
     private int years;
     private int schedule;
     private int collateral;
@@ -69,20 +63,20 @@ public class Loan implements MekHqXmlSerializable {
     private boolean overdue;
 
     public Loan() {
-        //dont do anything, this is for loading
+        //don't do anything, this is for loading
     }
 
-    public Loan(Money p, int r, int c, int y, int s, GregorianCalendar today) {
+    public Loan(Money p, int r, int c, int y, int s, LocalDate today) {
         this(p, r, c, y, s, today, Utilities.getRandomItem(madeUpInstitutions), randomRefNumber());
     }
 
-    public Loan(Money p, int r, int c, int y, int s, GregorianCalendar today, String i, String ref) {
+    public Loan(Money p, int r, int c, int y, int s, LocalDate today, String i, String ref) {
         this.principal = p;
         this.rate = r;
         this.collateral = c;
         this.years = y;
         this.schedule = s;
-        nextPayment = (GregorianCalendar)today.clone();
+        nextPayment = today;
         setFirstPaymentDate();
         calculateAmortization();
         institution = i;
@@ -91,63 +85,46 @@ public class Loan implements MekHqXmlSerializable {
     }
 
     public void setFirstPaymentDate() {
-        boolean keepGoing = true;
         //We are going to assume a standard grace period, so you have to go
         //through the first full time length (not partial) before your first
         //payment
-        int grace = 1;
+
+        // First, we need to increase the number of days by one
+        nextPayment = nextPayment.plusDays(1);
+
+        // Then, we create a variable to hold temporary difference values
+        int temp;
+
+        // Finally, we use that and the schedule type to determine the length including the grace period
         switch (schedule) {
             case Finances.SCHEDULE_BIWEEKLY:
-                grace = 2;
+                temp = 8 - nextPayment.getDayOfWeek().getValue();
+                if (temp != 7) {
+                    nextPayment = nextPayment.plusDays(temp);
+                }
+                nextPayment = nextPayment.plusWeeks(2);
+                break;
+            case Finances.SCHEDULE_MONTHLY:
+                temp = nextPayment.getDayOfMonth();
+                if (temp != 1) {
+                    nextPayment = nextPayment.plusDays(nextPayment.lengthOfMonth() - temp);
+                }
+                nextPayment = nextPayment.plusMonths(1);
                 break;
             case Finances.SCHEDULE_QUARTERLY:
-                grace = 3;
+                temp = nextPayment.getDayOfMonth();
+                if (temp != 1) {
+                    nextPayment = nextPayment.plusDays(nextPayment.lengthOfMonth() - temp);
+                }
+                nextPayment = nextPayment.plusMonths(3);
                 break;
-        }
-        while (keepGoing) {
-            nextPayment.add(GregorianCalendar.DAY_OF_YEAR, 1);
-            switch (schedule) {
-                case Finances.SCHEDULE_BIWEEKLY:
-                    if (nextPayment.get(Calendar.DAY_OF_WEEK) == 1) {
-                        if (grace > 0) {
-                            grace--;
-                        } else {
-                            keepGoing = false;
-                        }
-                    }
-                    break;
-                case Finances.SCHEDULE_MONTHLY:
-                    if (nextPayment.get(Calendar.DAY_OF_MONTH) == 1) {
-                        if (grace > 0) {
-                            grace--;
-                        } else {
-                            keepGoing = false;
-                        }
-                    }
-                    break;
-                case Finances.SCHEDULE_QUARTERLY:
-                    if (nextPayment.get(Calendar.DAY_OF_MONTH) == 1) {
-                        if (grace > 0) {
-                            grace--;
-                        } else {
-                            keepGoing = false;
-                        }
-                    }
-                    break;
-                case Finances.SCHEDULE_YEARLY:
-                    if (nextPayment.get(Calendar.DAY_OF_YEAR) == 1) {
-                        if (grace > 0) {
-                            grace--;
-                        } else {
-                            keepGoing = false;
-                        }
-                    }
-                    break;
-                default:
-                    //shouldn't get here but kill the loop just in case
-                    keepGoing = false;
-                    break;
-            }
+            case Finances.SCHEDULE_YEARLY:
+                temp = nextPayment.getDayOfYear();
+                if (temp != 1) {
+                    nextPayment = nextPayment.plusDays(nextPayment.lengthOfYear() - temp);
+                }
+                nextPayment = nextPayment.plusYears(1);
+                break;
         }
     }
 
@@ -218,8 +195,8 @@ public class Loan implements MekHqXmlSerializable {
         return rate;
     }
 
-    public boolean checkLoanPayment(GregorianCalendar today) {
-        return (today.equals(nextPayment) || today.after(nextPayment)) && (nPayments > 0);
+    public boolean checkLoanPayment(LocalDate today) {
+        return (today.equals(nextPayment) || (today.isAfter(nextPayment)) && (nPayments > 0));
     }
 
     public Money getPaymentAmount() {
@@ -230,23 +207,19 @@ public class Loan implements MekHqXmlSerializable {
         return payAmount.multipliedBy(nPayments);
     }
 
-    public Date getNextPayDate() {
-        return nextPayment.getTime();
-    }
-
     public void paidLoan() {
         switch (schedule) {
             case Finances.SCHEDULE_BIWEEKLY:
-                nextPayment.add(GregorianCalendar.WEEK_OF_YEAR, 2);
+                setNextPayment(getNextPayment().plusWeeks(2));
                 break;
             case Finances.SCHEDULE_MONTHLY:
-                nextPayment.add(GregorianCalendar.MONTH, 1);
+                setNextPayment(getNextPayment().plusMonths(1));
                 break;
             case Finances.SCHEDULE_QUARTERLY:
-                nextPayment.add(GregorianCalendar.MONTH, 3);
+                setNextPayment(getNextPayment().plusMonths(3));
                 break;
             case Finances.SCHEDULE_YEARLY:
-                nextPayment.add(GregorianCalendar.YEAR, 1);
+                setNextPayment(getNextPayment().plusYears(1));
                 break;
         }
         nPayments--;
@@ -261,11 +234,11 @@ public class Loan implements MekHqXmlSerializable {
         return institution + " " + refNumber;
     }
 
-    public GregorianCalendar getNextPayment() {
+    public LocalDate getNextPayment() {
         return nextPayment;
     }
 
-    public void setNextPayment(GregorianCalendar nextPayment) {
+    public void setNextPayment(LocalDate nextPayment) {
         this.nextPayment = nextPayment;
     }
 
@@ -335,8 +308,6 @@ public class Loan implements MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "loan");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "institution", institution);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "refNumber", refNumber);
@@ -349,7 +320,8 @@ public class Loan implements MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payAmount", payAmount.toXmlString());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "collateralValue", collateralValue.toXmlString());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "overdue", overdue);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nextPayment", df.format(nextPayment.getTime()));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nextPayment",
+                MekHqXmlUtil.saveFormattedDate(getNextPayment()));
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "loan");
     }
 
@@ -380,13 +352,7 @@ public class Loan implements MekHqXmlSerializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("nPayments")) {
                 retVal.nPayments = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("nextPayment")) {
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                retVal.nextPayment = (GregorianCalendar) GregorianCalendar.getInstance();
-                try {
-                    retVal.nextPayment.setTime(df.parse(wn2.getTextContent().trim()));
-                } catch (DOMException | ParseException e) {
-                    MekHQ.getLogger().error(Loan.class, "generateInstanceFromXML", e);
-                }
+                retVal.setNextPayment(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
                 retVal.overdue = wn2.getTextContent().equalsIgnoreCase("true");
             }
@@ -394,19 +360,19 @@ public class Loan implements MekHqXmlSerializable {
         return retVal;
     }
 
-    public static Loan getBaseLoanFor(int rating, GregorianCalendar cal) {
+    public static Loan getBaseLoanFor(int rating, LocalDate date) {
         //we are going to treat the score from StellarOps the same as dragoons score
         //TODO: pirates and government forces
         if (rating <= 0) {
-            return new Loan(Money.of(10000000), 35, 80, 1, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 35, 80, 1, Finances.SCHEDULE_MONTHLY, date);
         } else if (rating < 5) {
-            return new Loan(Money.of(10000000), 20, 60, 1, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 20, 60, 1, Finances.SCHEDULE_MONTHLY, date);
         } else if (rating < 10) {
-            return new Loan(Money.of(10000000), 15, 40, 2, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 15, 40, 2, Finances.SCHEDULE_MONTHLY, date);
         } else if (rating < 14) {
-            return new Loan(Money.of(10000000), 10, 25, 3, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 10, 25, 3, Finances.SCHEDULE_MONTHLY, date);
         } else {
-            return new Loan(Money.of(10000000), 7, 15, 5, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 7, 15, 5, Finances.SCHEDULE_MONTHLY, date);
         }
     }
 
@@ -522,7 +488,7 @@ public class Loan implements MekHqXmlSerializable {
                 && this.getInterestRate() == loan.getInterestRate()
                 && this.getCollateralAmount().equals(loan.getCollateralAmount())
                 && this.getCollateralPercent() == loan.getCollateralPercent()
-                && this.getNextPayDate().equals(loan.getNextPayDate())
+                && this.getNextPayment().equals(loan.getNextPayment())
                 && this.getYears() == loan.getYears()
                 && this.getPrincipal().equals(loan.getPrincipal())
                 && this.getPaymentSchedule() == loan.getPaymentSchedule()
@@ -533,14 +499,14 @@ public class Loan implements MekHqXmlSerializable {
     @Override
     public int hashCode() {
         return Objects.hash(getDescription(),
-            getInterestRate(),
-            getCollateralAmount(),
-            getCollateralPercent(),
-            getNextPayDate(),
-            getYears(),
-            getPrincipal(),
-            getPaymentSchedule(),
-            getRemainingPayments(),
-            getRemainingValue());
+                getInterestRate(),
+                getCollateralAmount(),
+                getCollateralPercent(),
+                getNextPayment(),
+                getYears(),
+                getPrincipal(),
+                getPaymentSchedule(),
+                getRemainingPayments(),
+                getRemainingValue());
     }
 }

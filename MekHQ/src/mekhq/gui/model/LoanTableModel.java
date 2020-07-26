@@ -98,7 +98,7 @@ public class LoanTableModel extends DataTableModel {
         }
 
         if(col == COL_NEXT_PAY) {
-            return DateFormat.getDateInstance().format(loan.getNextPayDate());
+            return DateFormat.getDateInstance().format(loan.getNextPayment());
         }
         return "?";
     }

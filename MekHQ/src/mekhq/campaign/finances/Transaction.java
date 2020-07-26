@@ -2,6 +2,7 @@
  * Transaction.java
  *
  * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,17 +23,14 @@ package mekhq.campaign.finances;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Objects;
 import java.util.Vector;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -111,14 +109,14 @@ public class Transaction implements Serializable {
 
     private Money amount;
     private String description;
-    private Date date;
+    private LocalDate date;
     private int category;
 
     public Transaction() {
         this(Money.zero(),-1,"",null);
     }
 
-    public Transaction(Money a, int c, String d, Date dt) {
+    public Transaction(Money a, int c, String d, LocalDate dt) {
         amount = a;
         category = c;
         description = d;
@@ -209,22 +207,20 @@ public class Transaction implements Serializable {
         return getCategoryName(getCategory());
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
     protected void writeToXml(PrintWriter pw1, int indent) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "transaction");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "amount", amount.toXmlString());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "description", description);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "category", category);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "date", df.format(date));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "date", MekHqXmlUtil.saveFormattedDate(date));
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "transaction");
     }
 
@@ -232,7 +228,7 @@ public class Transaction implements Serializable {
         Transaction retVal = new Transaction();
 
         NodeList nl = wn.getChildNodes();
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("amount")) {
                 retVal.amount = Money.fromXmlString(wn2.getTextContent().trim());
@@ -241,28 +237,24 @@ public class Transaction implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("description")) {
                 retVal.description = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                try {
-                    retVal.date = df.parse(wn2.getTextContent().trim());
-                } catch (DOMException | ParseException e) {
-                    MekHQ.getLogger().error(Transaction.class, "generateInstanceFromXml", e);
-                }
+                retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
             }
         }
         return retVal;
     }
 
-    public String updateTransaction(Transaction previousTransaction) {
-        return  "Edited Transaction: {" +
-                "Previous = " + previousTransaction.toText() +
-                "} -> {New = " + toText() + "}";
+    public String updateTransaction(Campaign campaign, Transaction previousTransaction) {
+        return "Edited Transaction: {" +
+               "Previous = " + previousTransaction.toText(campaign) +
+               "} -> {New = " + toText(campaign) + "}";
     }
 
-    public String voidTransaction() {
-        return "Deleted Transaction: " + toText();
+    public String voidTransaction(Campaign campaign) {
+        return "Deleted Transaction: " + toText(campaign);
     }
 
-    public String toText() {
-        return new SimpleDateFormat("MM/dd/yyyy").format(getDate()) + ", " + getCategoryName() + ", " + getDescription() + ", " + getAmount();
+    public String toText(Campaign campaign) {
+        return campaign.getCampaignOptions().getDisplayFormattedDate(getDate()) + ", "
+                + getCategoryName() + ", " + getDescription() + ", " + getAmount();
     }
 }

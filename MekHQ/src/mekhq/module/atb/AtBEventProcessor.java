@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.module.atb;
 
@@ -55,7 +55,6 @@ import mekhq.campaign.universe.UnitGeneratorParameters;
  * @author Neoancient
  */
 public class AtBEventProcessor {
-
     private final Campaign campaign;
 
     public AtBEventProcessor(Campaign campaign) {
@@ -73,7 +72,7 @@ public class AtBEventProcessor {
         if (!ev.getCampaign().hasActiveContract() && ev.getCampaign().getPersonnelMarket().getPaidRecruitment()
                 && (ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
             if (ev.getCampaign().getFinances().debit(Money.of(100000), Transaction.C_MISC,
-                    "Paid recruitment roll", ev.getCampaign().getDate())) {
+                    "Paid recruitment roll", ev.getCampaign().getLocalDate())) {
                 doPaidRecruitment(ev.getCampaign());
             } else {
                 ev.getCampaign().addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");
