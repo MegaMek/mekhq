@@ -608,10 +608,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         String lastName = "";
         if (!StringUtil.isNullOrEmpty(bloodname)) {
             lastName = bloodname;
-        }
-        else if (!StringUtil.isNullOrEmpty(surname)) {
+        } else if (!StringUtil.isNullOrEmpty(surname)) {
             lastName = surname;
         }
+
         if (!StringUtil.isNullOrEmpty(honorific)) {
             lastName += " " + honorific;
         }
@@ -1110,7 +1110,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public String getDeathDateAsString(Campaign campaign) {
-        if(getDateOfDeath() == null) {
+        if (getDateOfDeath() == null) {
             return "";
         } else {
             return getDateOfDeath().format(DateTimeFormatter.ofPattern(
