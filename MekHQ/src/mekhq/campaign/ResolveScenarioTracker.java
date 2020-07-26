@@ -1322,17 +1322,23 @@ public class ResolveScenarioTracker {
     }
 
     public void salvageUnit(int i) {
-        TestUnit salvageUnit = getPotentialSalvage().get(i);
-        getActualSalvage().add(salvageUnit);
+        if (i < getPotentialSalvage().size()) {
+            TestUnit salvageUnit = getPotentialSalvage().get(i);
+            getActualSalvage().add(salvageUnit);
+        }
     }
 
     public void ransomUnit(int i) {
-        TestUnit ransomUnit = potentialSalvage.get(i);
-        getRansomedSalvage().add(ransomUnit);
+        if (i < getPotentialSalvage().size()) {
+            TestUnit ransomUnit = getPotentialSalvage().get(i);
+            getRansomedSalvage().add(ransomUnit);
+        }
     }
 
     public void doNotSalvageUnit(int i) {
-        getLeftoverSalvage().add(getPotentialSalvage().get(i));
+        if (i < getPotentialSalvage().size()) {
+            getLeftoverSalvage().add(getPotentialSalvage().get(i));
+        }
     }
 
     public void setContractBreaches(int i) {
