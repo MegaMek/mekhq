@@ -11,11 +11,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.finances;
 
@@ -55,11 +55,11 @@ import mekhq.campaign.mission.Contract;
 public class Finances implements Serializable {
     private static final long serialVersionUID = 8533117455496219692L;
 
-    private ResourceBundle resourceMap;
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances", new EncodeControl());;
 
-    private ArrayList<Transaction> transactions;
-    private ArrayList<Loan> loans;
-    private ArrayList<Asset> assets;
+    private List<Transaction> transactions;
+    private List<Loan> loans;
+    private List<Asset> assets;
     private int loanDefaults;
     private int failCollateral;
     private Date wentIntoDebt;
@@ -71,7 +71,7 @@ public class Finances implements Serializable {
     public static final int SCHEDULE_NUM       = 4;
 
     public static String getScheduleName(int schedule) {
-        switch(schedule) {
+        switch (schedule) {
             case Finances.SCHEDULE_BIWEEKLY:
                 return "Bi-Weekly";
             case Finances.SCHEDULE_MONTHLY:
@@ -92,9 +92,6 @@ public class Finances implements Serializable {
         loanDefaults = 0;
         failCollateral = 0;
         wentIntoDebt = null;
-
-        // Init the resource map
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances", new EncodeControl()); //$NON-NLS-1$
     }
 
     public Money getBalance() {
@@ -112,17 +109,19 @@ public class Finances implements Serializable {
     }
 
     public int getFullYearsInDebt(GregorianCalendar cal) {
-        if (null == wentIntoDebt) {
+        if (wentIntoDebt == null) {
             return 0;
+        } else {
+            return Utilities.getDiffFullYears(wentIntoDebt, cal);
         }
-        return Utilities.getDiffFullYears(wentIntoDebt, cal);
     }
 
     public int getPartialYearsInDebt(GregorianCalendar cal) {
         if (wentIntoDebt == null) {
             return 0;
+        } else {
+            return Utilities.getDiffPartialYears(wentIntoDebt, cal);
         }
-        return Utilities.getDiffPartialYears(wentIntoDebt, cal);
     }
 
     public boolean debit(Money amount, int category, String reason, Date date) {
@@ -131,7 +130,7 @@ public class Finances implements Serializable {
         }
         Transaction t = new Transaction(amount.multipliedBy(-1), category, reason, date);
         transactions.add(t);
-        if (null != wentIntoDebt && !isInDebt()) {
+        if ((wentIntoDebt != null) && !isInDebt()) {
             wentIntoDebt = null;
         }
         MekHQ.triggerEvent(new TransactionDebitEvent(t));
@@ -141,7 +140,7 @@ public class Finances implements Serializable {
     public void credit(Money amount, int category, String reason, Date date) {
         Transaction t = new Transaction(amount, category, reason, date);
         transactions.add(t);
-        if (null == wentIntoDebt && isInDebt()) {
+        if ((wentIntoDebt == null) && isInDebt()) {
             wentIntoDebt = date;
         }
         MekHQ.triggerEvent(new TransactionCreditEvent(t));
@@ -165,38 +164,35 @@ public class Finances implements Serializable {
         credit(carryover, Transaction.C_START, resourceMap.getString("Carryover.text"), campaign.getDate());
     }
 
-    public ArrayList<Transaction> getAllTransactions() {
+    public List<Transaction> getAllTransactions() {
         return transactions;
     }
 
-    public ArrayList<Loan> getAllLoans() {
+    public List<Loan> getAllLoans() {
         return loans;
     }
 
-    public ArrayList<Asset> getAllAssets() {
+    public List<Asset> getAllAssets() {
         return assets;
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<finances>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                +"<loanDefaults>"
-                +loanDefaults
-                +"</loanDefaults>");
-        for (Transaction trans : transactions) {
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "finances");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "loanDefaults", loanDefaults);
+        for (Transaction trans : getAllTransactions()) {
             trans.writeToXml(pw1, indent + 1);
         }
-        for (Loan loan : loans) {
-            loan.writeToXml(pw1, indent+1);
+        for (Loan loan : getAllLoans()) {
+            loan.writeToXml(pw1, indent + 1);
         }
-        for (Asset asset : assets) {
-            asset.writeToXml(pw1, indent+1);
+        for (Asset asset : getAllAssets()) {
+            asset.writeToXml(pw1, indent + 1);
         }
-        if (null != wentIntoDebt) {
+        if (wentIntoDebt != null) {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //TODO : Remove inline date format
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "wentIntoDebt", df.format(wentIntoDebt));
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "wentIntoDebt", df.format(wentIntoDebt));
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</finances>");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "finances");
     }
 
     public static Finances generateInstanceFromXML(Node wn) {
@@ -360,7 +356,7 @@ public class Finances implements Serializable {
             }
         }
 
-        ArrayList<Loan> newLoans = new ArrayList<>();
+        List<Loan> newLoans = new ArrayList<>();
         for (Loan loan : loans) {
             if (loan.checkLoanPayment(campaign.getCalendar())) {
                 if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
@@ -384,7 +380,7 @@ public class Finances implements Serializable {
                 campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan.getDescription()));
             }
         }
-        if (null != wentIntoDebt && !isInDebt()) {
+        if ((wentIntoDebt != null) && !isInDebt()) {
             wentIntoDebt = null;
         }
         loans = newLoans;
@@ -419,8 +415,7 @@ public class Finances implements Serializable {
                  * This should not happen, as the shares payment should be less than the contract
                  * payment that has just been made.
                  */
-                campaign.addReport(
-                        String.format(resourceMap.getString("NotImplemented.text"), "shares"));
+                campaign.addReport(String.format(resourceMap.getString("NotImplemented.text"), "shares"));
                 MekHQ.getLogger().error(getClass(), "payoutShares",
                         "Attempted to payout share amount larger than the payment of the contract");
             }
@@ -428,10 +423,10 @@ public class Finances implements Serializable {
     }
 
     public Money checkOverdueLoanPayments(Campaign campaign) {
-        ArrayList<Loan> newLoans = new ArrayList<>();
+        List<Loan> newLoans = new ArrayList<>();
         Money overdueAmount = Money.zero();
         for (Loan loan : loans) {
-            if(loan.isOverdue()) {
+            if (loan.isOverdue()) {
                 if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
                         String.format(resourceMap.getString("Loan.title"), loan.getDescription()),
                         campaign.getCalendar().getTime())) {
@@ -444,14 +439,14 @@ public class Finances implements Serializable {
                     overdueAmount = overdueAmount.plus(loan.getPaymentAmount());
                 }
             }
-            if(loan.getRemainingPayments() > 0) {
+            if (loan.getRemainingPayments() > 0) {
                 newLoans.add(loan);
             } else {
                 campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan.getDescription()));
             }
         }
         loans = newLoans;
-        if (null != wentIntoDebt && !isInDebt()) {
+        if ((wentIntoDebt != null) && !isInDebt()) {
             wentIntoDebt = null;
         }
         return overdueAmount;
@@ -459,14 +454,14 @@ public class Finances implements Serializable {
 
     public void removeLoan(Loan loan) {
         loans.remove(loan);
-        if (null != wentIntoDebt && !isInDebt()) {
+        if ((wentIntoDebt != null) && !isInDebt()) {
             wentIntoDebt = null;
         }
     }
 
     public void defaultOnLoan(Loan loan, boolean paidCollateral) {
         loanDefaults++;
-        if(!paidCollateral) {
+        if (!paidCollateral) {
             failCollateral++;
         }
         removeLoan(loan);
@@ -491,7 +486,7 @@ public class Finances implements Serializable {
         return amount.plus(assets.stream().map(Asset::getValue).collect(Collectors.toList()));
     }
 
-    public void setAssets(ArrayList<Asset> newAssets) {
+    public void setAssets(List<Asset> newAssets) {
         assets = newAssets;
     }
 
@@ -511,7 +506,7 @@ public class Finances implements Serializable {
             SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd"); //TODO : Remove inline date format
 
             Money runningTotal = Money.zero();
-            for (Transaction transaction : transactions) {
+            for (Transaction transaction : getAllTransactions()) {
                 runningTotal = runningTotal.plus(transaction.getAmount());
                 csvPrinter.printRecord(
                         df.format(transaction.getDate()),

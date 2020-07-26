@@ -293,7 +293,7 @@ public class Campaign implements Serializable, ITechManager {
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
-        dateFormat = "EEEE, MMMM d yyyy";
+        dateFormat = "EEEE, MMMM d yyyy"; // TODO : LocalDate Remove Inline Date Format
         name = "My Campaign";
         overtime = false;
         gmMode = false;

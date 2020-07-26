@@ -1,7 +1,7 @@
 /*
  * Transaction.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.finances;
 
@@ -37,7 +37,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Transaction implements Serializable {
@@ -72,41 +71,41 @@ public class Transaction implements Serializable {
     }
 
     public static String getCategoryName(int cat) {
-        switch(cat) {
-        case C_MISC:
-            return "Miscellaneous";
-        case C_EQUIP:
-            return "Equipment Purchases";
-        case C_UNIT:
-            return "Unit Purchases";
-        case C_SALARY:
-            return "Salary Payments";
-        case C_OVERHEAD:
-            return "Overhead Expenses";
-        case C_MAINTAIN:
-            return "Maintenance Expenses";
-        case C_UNIT_SALE:
-            return "Unit Sales";
-        case C_EQUIP_SALE:
-            return "Equipment Sales";
-        case C_CONTRACT:
-            return "Contract payments";
-        case C_BLC:
-            return "Battle Loss Compensation";
-        case C_SALVAGE:
-            return "Salvage Exchange";
-        case C_START:
-            return "Starting Capital";
-        case C_TRANSPORT:
-            return "Transportation";
-        case C_LOAN_PRINCIPAL:
-            return "Loan Principal";
-        case C_LOAN_PAYMENT:
-            return "Loan Payment";
-        case C_REPAIRS:
-            return "Repairs";
-        default:
-            return "Unknown category";
+        switch (cat) {
+            case C_MISC:
+                return "Miscellaneous";
+            case C_EQUIP:
+                return "Equipment Purchases";
+            case C_UNIT:
+                return "Unit Purchases";
+            case C_SALARY:
+                return "Salary Payments";
+            case C_OVERHEAD:
+                return "Overhead Expenses";
+            case C_MAINTAIN:
+                return "Maintenance Expenses";
+            case C_UNIT_SALE:
+                return "Unit Sales";
+            case C_EQUIP_SALE:
+                return "Equipment Sales";
+            case C_CONTRACT:
+                return "Contract payments";
+            case C_BLC:
+                return "Battle Loss Compensation";
+            case C_SALVAGE:
+                return "Salvage Exchange";
+            case C_START:
+                return "Starting Capital";
+            case C_TRANSPORT:
+                return "Transportation";
+            case C_LOAN_PRINCIPAL:
+                return "Loan Principal";
+            case C_LOAN_PAYMENT:
+                return "Loan Payment";
+            case C_REPAIRS:
+                return "Repairs";
+            default:
+                return "Unknown category";
         }
     }
 
@@ -154,22 +153,27 @@ public class Transaction implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        } else if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        } else if (getClass() != obj.getClass()) {
             return false;
+        }
+
         Transaction other = (Transaction) obj;
-        if (amount != other.amount)
+        if (amount != other.amount) {
             return false;
-        if (category != other.category)
+        } else if (category != other.category) {
             return false;
-        if (date == null) {
-            if (other.date != null)
+        } else if (date == null) {
+            if (other.date != null) {
                 return false;
-        } else if (!date.equals(other.date))
+            }
+        } else if (!date.equals(other.date)) {
             return false;
+        }
+
         if (description == null) {
             return other.description == null;
         } else {
@@ -214,25 +218,14 @@ public class Transaction implements Serializable {
     }
 
     protected void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<transaction>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<amount>"
-                +amount.toXmlString()
-                +"</amount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<description>"
-                +MekHqXmlUtil.escape(description)
-                +"</description>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<category>"
-                +category
-                +"</category>");
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<date>"
-                +df.format(date)
-                +"</date>");
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</transaction>");
+
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "transaction");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "amount", amount.toXmlString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "description", description);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "category", category);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "date", df.format(date));
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "transaction");
     }
 
     public static Transaction generateInstanceFromXML(Node wn) {
