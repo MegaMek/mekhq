@@ -48,17 +48,17 @@ public class Loan implements MekHqXmlSerializable {
     // If you add more Canon institutions, please add them at the beginning and change the next line.
     // The first four of these are Canon, the rest are made up.
     private static final List<String> madeUpInstitutions = Arrays.asList("Southern Bank and Trust" /* Canon */, "The Alliance Reserve Bank" /* Canon */,
-    	"Capellan Commonality Bank" /* Canon */, "Potwin Bank and Trust" /* Canon */, "ComStar Reserve", "Federated Employees Union",
-    	"Bank of Oriente", "New Avalon Interstellar Bank", "Federated Boeing Credit Union", "First Commonwealth Bank",
-    	"Donegal Bank and Trust", "Defiance Industries Credit Union", "Superior Bank of Sarna", "St. Ives Bank and Trust",
-    	"Luthien Bank of the Dragon", "Golden Bank of Sian", "Rasalhague National Bank", "Canopus Federal Reserve",
-    	"Concordat Bank and Trust", "Outworlds Alliance National Bank", "Hegemony Bank and Trust",
-    	"Andurien First National Bank");
+        "Capellan Commonality Bank" /* Canon */, "Potwin Bank and Trust" /* Canon */, "ComStar Reserve", "Federated Employees Union",
+        "Bank of Oriente", "New Avalon Interstellar Bank", "Federated Boeing Credit Union", "First Commonwealth Bank",
+        "Donegal Bank and Trust", "Defiance Industries Credit Union", "Superior Bank of Sarna", "St. Ives Bank and Trust",
+        "Luthien Bank of the Dragon", "Golden Bank of Sian", "Rasalhague National Bank", "Canopus Federal Reserve",
+        "Concordat Bank and Trust", "Outworlds Alliance National Bank", "Hegemony Bank and Trust",
+        "Andurien First National Bank");
 
     private String institution;
     private String refNumber;
     private Money principal;
-	private int rate;
+    private int rate;
     private GregorianCalendar nextPayment;
     private int years;
     private int schedule;
@@ -178,9 +178,9 @@ public class Loan implements MekHqXmlSerializable {
         return principal;
     }
 
-	public void setPrincipal(Money principal) {
-		this.principal = principal;
-	}
+    public void setPrincipal(Money principal) {
+        this.principal = principal;
+    }
 
     public String getInstitution() {
         return institution;
@@ -207,12 +207,12 @@ public class Loan implements MekHqXmlSerializable {
     }
 
     public int getRate() {
-		return rate;
-	}
+        return rate;
+    }
 
-	public void setRate(int rate) {
-		this.rate = rate;
-	}
+    public void setRate(int rate) {
+        this.rate = rate;
+    }
 
     public int getInterestRate() {
         return rate;
@@ -261,77 +261,77 @@ public class Loan implements MekHqXmlSerializable {
         return institution + " " + refNumber;
     }
 
-	public GregorianCalendar getNextPayment() {
-		return nextPayment;
-	}
+    public GregorianCalendar getNextPayment() {
+        return nextPayment;
+    }
 
-	public void setNextPayment(GregorianCalendar nextPayment) {
-		this.nextPayment = nextPayment;
-	}
+    public void setNextPayment(GregorianCalendar nextPayment) {
+        this.nextPayment = nextPayment;
+    }
 
     public int getPaymentSchedule() {
         return schedule;
     }
 
-	public int getSchedule() {
-		return schedule;
-	}
+    public int getSchedule() {
+        return schedule;
+    }
 
-	public void setSchedule(int schedule) {
-		this.schedule = schedule;
-	}
+    public void setSchedule(int schedule) {
+        this.schedule = schedule;
+    }
 
     public int getCollateralPercent() {
         return collateral;
     }
 
-	public int getCollateral() {
-		return collateral;
-	}
+    public int getCollateral() {
+        return collateral;
+    }
 
-	public void setCollateral(int collateral) {
-		this.collateral = collateral;
-	}
+    public void setCollateral(int collateral) {
+        this.collateral = collateral;
+    }
 
-	public int getnPayments() {
-		return nPayments;
-	}
+    public int getnPayments() {
+        return nPayments;
+    }
 
-	public void setnPayments(int nPayments) {
-		this.nPayments = nPayments;
-	}
+    public void setnPayments(int nPayments) {
+        this.nPayments = nPayments;
+    }
 
-	public Money getPayAmount() {
-		return payAmount;
-	}
+    public Money getPayAmount() {
+        return payAmount;
+    }
 
-	public void setPayAmount(Money payAmount) {
-		this.payAmount = payAmount;
-	}
+    public void setPayAmount(Money payAmount) {
+        this.payAmount = payAmount;
+    }
 
     public Money getCollateralAmount() {
         return collateralValue;
     }
 
-	public Money getCollateralValue() {
-		return collateralValue;
-	}
+    public Money getCollateralValue() {
+        return collateralValue;
+    }
 
-	public void setCollateralValue(Money collateralValue) {
-		this.collateralValue = collateralValue;
-	}
+    public void setCollateralValue(Money collateralValue) {
+        this.collateralValue = collateralValue;
+    }
 
-	public static List<String> getMadeupInstitutions() {
-		return madeUpInstitutions;
-	}
+    public static List<String> getMadeupInstitutions() {
+        return madeUpInstitutions;
+    }
 
     public int getYears() {
         return years;
     }
 
-	public void setYears(int years) {
-		this.years = years;
-	}
+    public void setYears(int years) {
+        this.years = years;
+    }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
