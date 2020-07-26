@@ -29,7 +29,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 import javax.swing.JButton;
@@ -198,21 +199,16 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
             newTransaction.setAmount(amountField.getMoney());
             newTransaction.setCategory(Transaction.getCategoryIndex((String) categoryCombo.getSelectedItem()));
             newTransaction.setDescription(descriptionField.getText());
-            try {
-                newTransaction.setDate(LONG_DATE.parse(dateButton.getText()));
-            } catch (ParseException ex) {
-                MekHQ.getLogger().error(getClass(), "actionPerformed", ex);
-            }
+            newTransaction.setDate(LocalDate.parse(dateButton.getText(),
+                    DateTimeFormatter.ofPattern(campaign.getCampaignOptions().getDisplayDateFormat())));
             setVisible(false);
         } else if (cancelButton.equals(e.getSource())) {
             setVisible(false);
         } else if (dateButton.equals(e.getSource())) {
-            GregorianCalendar calendar = new GregorianCalendar();
-            calendar.setTime(newTransaction.getDate());
-            DateChooser chooser = new DateChooser(parent, calendar);
-            chooser.showDateChooser();
-            dateButton.setText(LONG_DATE.format(chooser.getDate().getTime()));
-            chooser.dispose();
+            DateChooser chooser = new DateChooser(parent, newTransaction.getDate());
+            if (chooser.showDateChooser() == DateChooser.OK_OPTION) {
+                dateButton.setText(campaign.getCampaignOptions().getDisplayFormattedDate(chooser.getDate()));
+            }
         }
     }
 
@@ -226,7 +222,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
     }
 
     private void selectAllTextInField(final JTextField field) {
-        SwingUtilities.invokeLater(() -> field.selectAll());
+        SwingUtilities.invokeLater(field::selectAll);
     }
 
     @Override

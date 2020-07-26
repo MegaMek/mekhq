@@ -1,7 +1,7 @@
 /*
  * NewContractDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,27 +21,15 @@
 package mekhq.gui.dialog;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemListener;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 import megamek.common.util.EncodeControl;
@@ -60,11 +48,11 @@ import mekhq.gui.view.ContractPaymentBreakdown;
 import mekhq.preferences.PreferencesNode;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class NewContractDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
-    protected Frame frame;
+    protected JFrame frame;
     protected Contract contract;
     protected Campaign campaign;
     private JComboBox<Person> cboNegotiator;
@@ -72,7 +60,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
     /** Creates new form NewTeamDialog */
-    public NewContractDialog(java.awt.Frame parent, boolean modal, Campaign c) {
+    public NewContractDialog(JFrame parent, boolean modal, Campaign c) {
         super(parent, modal);
         this.frame = parent;
         campaign = c;
@@ -86,7 +74,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     protected void initComponents() {
     	java.awt.GridBagConstraints gridBagConstraints;
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));
@@ -680,18 +668,17 @@ public class NewContractDialog extends javax.swing.JDialog {
 
     private void changeStartDate() {
         // show the date chooser
-    	GregorianCalendar cal = GregorianCalendar.from(contract.getStartDate().atStartOfDay(ZoneId.systemDefault()));
-        DateChooser dc = new DateChooser(frame, cal);
+        DateChooser dc = new DateChooser(frame, contract.getStartDate());
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-        	if (campaign.getDate().after(dc.getDate().getTime())) {
+        	if (campaign.getLocalDate().isAfter(dc.getDate())) {
         		JOptionPane.showMessageDialog(frame,
         			    "You cannot choose a start date before the current date.",
         			    "Invalid date",
         			    JOptionPane.ERROR_MESSAGE);
         		return;
         	}
-            contract.setStartDate(dc.getDate().toZonedDateTime().toLocalDate());
+            contract.setStartDate(dc.getDate());
             contract.calculateContract(campaign);
             btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(contract.getStartDate()));
         }

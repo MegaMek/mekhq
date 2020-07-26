@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,27 +10,25 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogEntry;
-import mekhq.campaign.personnel.Person;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
 import javax.swing.*;
-import javax.swing.text.html.Option;
 import java.awt.*;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Optional;
@@ -43,9 +41,8 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
-    private Frame frame;
+    private JFrame frame;
     private int operationType;
-    private Person person;
     private LogEntry entry;
     private Date originalDate;
     private String originalDescription;
@@ -58,15 +55,15 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     private JButton btnOK;
     private JButton btnClose;
 
-    public AddOrEditMissionEntryDialog(Frame parent, boolean modal, Date entryDate) {
+    public AddOrEditMissionEntryDialog(JFrame parent, boolean modal, Date entryDate) {
         this(parent, modal, ADD_OPERATION, new ServiceLogEntry(entryDate, ""));
     }
 
-    public AddOrEditMissionEntryDialog(Frame parent, boolean modal, LogEntry entry) {
+    public AddOrEditMissionEntryDialog(JFrame parent, boolean modal, LogEntry entry) {
         this(parent, modal, EDIT_OPERATION, entry);
     }
 
-    private AddOrEditMissionEntryDialog(Frame parent, boolean modal, int operationType, LogEntry entry) {
+    private AddOrEditMissionEntryDialog(JFrame parent, boolean modal, int operationType, LogEntry entry) {
         super(parent, modal);
 
         assert entry != null;
@@ -89,7 +86,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditMissionEntryDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditMissionEntryDialog", new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         panMain = new JPanel();
@@ -101,7 +98,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
         btnClose = new JButton();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         if (this.operationType == ADD_OPERATION) {
             setTitle(resourceMap.getString("dialogAdd.title"));
         } else {
@@ -165,9 +162,9 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     private void changeDate() {
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(newDate);
-        DateChooser dc = new DateChooser(frame, cal);
+        DateChooser dc = new DateChooser(frame, cal.toZonedDateTime().toLocalDate());
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            newDate = dc.getDate().getTime();
+            newDate = GregorianCalendar.from(dc.getDate().atStartOfDay(ZoneId.systemDefault())).getTime();
             btnDate.setText(getDateAsString(newDate));
         }
     }

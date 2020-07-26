@@ -1,7 +1,7 @@
 /*
  * NewAtBContractDialog.java
  *
- * Copyright (c) 2014 Carl Spain. All rights reserved.
+ * Copyright (c) 2014 - Carl Spain. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,12 +28,7 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -74,7 +69,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
     int dragoonRating;
 
-    public NewAtBContractDialog(java.awt.Frame parent, boolean modal, Campaign c) {
+    public NewAtBContractDialog(JFrame parent, boolean modal, Campaign c) {
         super(parent, modal, c);
         setUserPreferences();
     }
@@ -545,7 +540,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         removeAllListeners();
 
         boolean needUpdatePayment = false;
-        AtBContract contract = (AtBContract)this.contract;
+        AtBContract contract = (AtBContract) this.contract;
         if (cbPlanets.equals(source) && null != cbPlanets.getSelectedItem()) {
             contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
                     campaign.getLocalDate())).getId());
