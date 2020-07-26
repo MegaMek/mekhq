@@ -22,8 +22,6 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.NumberFormat;
@@ -49,8 +47,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import megamek.common.AmmoType;
 import megamek.common.UnitType;
@@ -76,9 +72,6 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
 
 public class CampaignExportWizard extends JDialog {
-    /**
-     *
-     */
     private static final long serialVersionUID = -7171621116865584010L;
 
     private JList<Force> forceList;

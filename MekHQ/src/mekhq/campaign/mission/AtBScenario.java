@@ -23,9 +23,9 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -247,7 +247,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         rerollsRemaining = 0;
     }
 
-    public void initialize(Campaign c, Lance lance, boolean attacker, Date date) {
+    public void initialize(Campaign c, Lance lance, boolean attacker, LocalDate date) {
         setAttacker(attacker);
 
         alliesPlayer = new ArrayList<>();
