@@ -69,14 +69,15 @@ public class ResolveScenarioTracker {
     Hashtable<UUID, UnitStatus> salvageStatus;
     Hashtable<UUID, Crew> pilots;
     Hashtable<UUID, Crew> mia;
-    ArrayList<TestUnit> potentialSalvage;
-    ArrayList<TestUnit> alliedUnits;
-    ArrayList<TestUnit> actualSalvage;
-    ArrayList<TestUnit> leftoverSalvage;
-    ArrayList<TestUnit> devastatedEnemyUnits;
-    ArrayList<Unit> units;
+    List<TestUnit> potentialSalvage;
+    List<TestUnit> alliedUnits;
+    List<TestUnit> actualSalvage;
+    List<TestUnit> ransomedSalvage;
+    List<TestUnit> leftoverSalvage;
+    List<TestUnit> devastatedEnemyUnits;
+    List<Unit> units;
     List<Loot> potentialLoot;
-    ArrayList<Loot> actualLoot;
+    List<Loot> actualLoot;
     Hashtable<UUID, PersonStatus> peopleStatus;
     Hashtable<UUID, OppositionPersonnelStatus> oppositionPersonnel;
     Hashtable<String, String> killCredits;
@@ -103,6 +104,7 @@ public class ResolveScenarioTracker {
         potentialSalvage = new ArrayList<>();
         alliedUnits = new ArrayList<>();
         actualSalvage = new ArrayList<>();
+        ransomedSalvage = new ArrayList<>();
         leftoverSalvage = new ArrayList<>();
         devastatedEnemyUnits = new ArrayList<>();
         pilots = new Hashtable<>();
@@ -1299,25 +1301,44 @@ public class ResolveScenarioTracker {
         }
     }
 
-    public ArrayList<TestUnit> getAlliedUnits() {
+    public List<TestUnit> getAlliedUnits() {
         return alliedUnits;
     }
 
-    public ArrayList<TestUnit> getPotentialSalvage() {
+    public List<TestUnit> getPotentialSalvage() {
         return potentialSalvage;
     }
 
-    public ArrayList<TestUnit> getActualSalvage() {
+    public List<TestUnit> getActualSalvage() {
         return actualSalvage;
     }
 
-    public void salvageUnit(int i) {
-        TestUnit salvageUnit = potentialSalvage.get(i);
-        actualSalvage.add(salvageUnit);
+    public List<TestUnit> getRansomedSalvage() {
+        return ransomedSalvage;
     }
 
-    public void dontSalvageUnit(int i) {
-        leftoverSalvage.add(potentialSalvage.get(i));
+    public List<TestUnit> getLeftoverSalvage() {
+        return leftoverSalvage;
+    }
+
+    public void salvageUnit(int i) {
+        if (i < getPotentialSalvage().size()) {
+            TestUnit salvageUnit = getPotentialSalvage().get(i);
+            getActualSalvage().add(salvageUnit);
+        }
+    }
+
+    public void ransomUnit(int i) {
+        if (i < getPotentialSalvage().size()) {
+            TestUnit ransomUnit = getPotentialSalvage().get(i);
+            getRansomedSalvage().add(ransomUnit);
+        }
+    }
+
+    public void doNotSalvageUnit(int i) {
+        if (i < getPotentialSalvage().size()) {
+            getLeftoverSalvage().add(getPotentialSalvage().get(i));
+        }
     }
 
     public void setContractBreaches(int i) {
@@ -1344,7 +1365,7 @@ public class ResolveScenarioTracker {
         return killCredits;
     }
 
-    public ArrayList<Unit> getUnits() {
+    public List<Unit> getUnits() {
         return units;
     }
 
@@ -1352,13 +1373,16 @@ public class ResolveScenarioTracker {
         //lets start by generating a stub file for our records
         scenario.generateStub(campaign);
 
-        //ok lets do the whole enchilada and go ahead and update campaign
+        // and create trackers for ransomed prisoners and units
+        Money prisonerRansoms = Money.zero();
+        Money unitRansoms = Money.zero();
 
+        //ok lets do the whole enchilada and go ahead and update campaign
         //first figure out if we need any battle loss comp
         double blc = 0;
         Mission m = campaign.getMission(scenario.getMissionId());
         if (m instanceof Contract) {
-            blc = ((Contract)m).getBattleLossComp()/100.0;
+            blc = ((Contract) m).getBattleLossComp() / 100.0;
         }
 
         //now lets update personnel
@@ -1399,7 +1423,8 @@ public class ResolveScenarioTracker {
                 campaign.removePerson(pid, false);
             }
         }
-        // update prisoners
+
+        //region Prisoners
         for (UUID pid : oppositionPersonnel.keySet()) {
             OppositionPersonnelStatus status = oppositionPersonnel.get(pid);
             Person person = status.getPerson();
@@ -1409,8 +1434,10 @@ public class ResolveScenarioTracker {
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
             if (status.isDead()) {
                 continue;
-            }
-            if (status.isCaptured()) {
+            } else if (status.isRansomed()) {
+                prisonerRansoms = prisonerRansoms.plus(person.getRansomValue());
+                continue;
+            } else if (status.isCaptured()) {
                 PrisonerStatus prisonerStatus = getCampaign().getCampaignOptions().getDefaultPrisonerStatus();
 
                 // Then, we need to determine if they are a defector
@@ -1441,25 +1468,22 @@ public class ResolveScenarioTracker {
                 campaign.addKill(k);
             }
 
-            if (status.isMissing()) {
-                campaign.changeStatus(person, PersonnelStatus.MIA);
-            } else if (status.isDead()) {
-                campaign.changeStatus(person, PersonnelStatus.KIA);
-                if (campaign.getCampaignOptions().getUseAtB() && (m instanceof AtBContract)) {
-                    campaign.getRetirementDefectionTracker().removeFromCampaign(person,
-                            true, campaign.getCampaignOptions().getUseShareSystem()
-                                    ? person.getNumShares(campaign.getCampaignOptions().getSharesForAll())
-                                    : 0,
-                            campaign, (AtBContract)m);
-                }
-            }
             if (campaign.getCampaignOptions().useAdvancedMedical()) {
                 person.diagnose(status.getHits());
             }
         }
 
+        if (prisonerRansoms.isGreaterThan(Money.zero())) {
+            getCampaign().getFinances().credit(prisonerRansoms, Transaction.C_RANSOM,
+                    "Prisoner ransoms for " + getScenario().getName(), getCampaign().getDate());
+            getCampaign().addReport(prisonerRansoms.toAmountAndNameString()
+                    + " has been credited to your account for prisoner ransoms following "
+                    + getScenario().getName() + ".");
+        }
+        //endregion Prisoners
+
         //now lets update all units
-        for (Unit unit : units) {
+        for (Unit unit : getUnits()) {
             UnitStatus ustatus = unitsStatus.get(unit.getId());
             if (null == ustatus) {
                 //shouldn't happen
@@ -1527,40 +1551,56 @@ public class ResolveScenarioTracker {
         }
 
         //now lets take care of salvage
-        for (TestUnit salvageUnit : actualSalvage) {
+        for (TestUnit salvageUnit : getActualSalvage()) {
             UnitStatus salstatus = new UnitStatus(salvageUnit);
             // FIXME: Need to implement a "fuel" part just like the "armor" part
             if (salvageUnit.getEntity() instanceof Aero) {
-                ((Aero)salvageUnit.getEntity()).setFuelTonnage(((Aero)salstatus.getBaseEntity()).getFuelTonnage());
+                ((Aero) salvageUnit.getEntity()).setFuelTonnage(((Aero) salstatus.getBaseEntity()).getFuelTonnage());
             }
             campaign.clearGameData(salvageUnit.getEntity());
             campaign.addTestUnit(salvageUnit);
             //if this is a contract, add to the salvaged value
             if (getMission() instanceof Contract) {
-                ((Contract)getMission()).addSalvageByUnit(salvageUnit.getSellValue());
+                ((Contract) getMission()).addSalvageByUnit(salvageUnit.getSellValue());
             }
         }
+
+        // And any ransomed salvaged units
+        if (!getRansomedSalvage().isEmpty()) {
+            for (Unit ransomedUnit : getRansomedSalvage()) {
+                unitRansoms = unitRansoms.plus(ransomedUnit.getSellValue());
+            }
+
+            if (unitRansoms.isGreaterThan(Money.zero())) {
+                getCampaign().getFinances().credit(unitRansoms, Transaction.C_SALVAGE,
+                        "Unit ransoms for " + getScenario().getName(), getCampaign().getDate());
+                getCampaign().addReport(unitRansoms.toAmountAndNameString()
+                        + " has been credited to your account from unit ransoms following "
+                        + getScenario().getName() + ".");
+            }
+        }
+
         if (getMission() instanceof Contract) {
             Money value = Money.zero();
-            for (Unit salvageUnit : leftoverSalvage) {
+            for (Unit salvageUnit : getLeftoverSalvage()) {
                 value = value.plus(salvageUnit.getSellValue());
             }
-            if (((Contract)getMission()).isSalvageExchange()) {
-                value = value.multipliedBy(((Contract)getMission()).getSalvagePct()).dividedBy(100);
-                campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for " + scenario.getName(),  campaign.getCalendar().getTime());
+            if (((Contract) getMission()).isSalvageExchange()) {
+                value = value.multipliedBy(((Contract) getMission()).getSalvagePct()).dividedBy(100);
+                campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for " + scenario.getName(),  campaign.getDate());
                 campaign.addReport(value.toAmountAndSymbolString() + " have been credited to your account for salvage exchange.");
             } else {
-                ((Contract)getMission()).addSalvageByEmployer(value);
+                ((Contract) getMission()).addSalvageByEmployer(value);
             }
         }
 
         if (campaign.getCampaignOptions().getUseAtB() && getMission() instanceof AtBContract) {
             int unitRatingMod = campaign.getUnitRatingMod();
-            for (Unit unit : units) {
-                unit.setSite(((AtBContract)getMission()).getRepairLocation(unitRatingMod));
+            for (Unit unit : getUnits()) {
+                unit.setSite(((AtBContract) getMission()).getRepairLocation(unitRatingMod));
             }
-            for (Unit unit : actualSalvage) {
-                unit.setSite(((AtBContract)getMission()).getRepairLocation(unitRatingMod));
+            for (Unit unit : getActualSalvage()) {
+                unit.setSite(((AtBContract) getMission()).getRepairLocation(unitRatingMod));
             }
         }
 
@@ -1821,8 +1861,9 @@ public class ResolveScenarioTracker {
      */
     public static class OppositionPersonnelStatus extends PersonStatus {
         //for prisoners we have to track a whole person
-        Person person;
+        private Person person;
         private boolean captured;
+        private boolean ransomed = false;
 
         public OppositionPersonnelStatus(String n, String u, Person p) {
             super(n, u, 0, p.getId());
@@ -1841,6 +1882,13 @@ public class ResolveScenarioTracker {
             captured = set;
         }
 
+        public boolean isRansomed() {
+            return ransomed;
+        }
+
+        public void setRansomed(boolean ransomed) {
+            this.ransomed = ransomed;
+        }
     }
 
     /**
