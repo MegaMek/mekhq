@@ -22,7 +22,6 @@ package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -71,8 +70,8 @@ import mekhq.preferences.PreferencesNode;
  * @author  Taharqa
  */
 public class CustomizeScenarioDialog extends javax.swing.JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-    private Frame frame;
+	private static final long serialVersionUID = -8038099101234445018L;
+    private JFrame frame;
     private Scenario scenario;
     private Mission mission;
     private Campaign campaign;
@@ -102,7 +101,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private javax.swing.JLabel lblStatus;
     private javax.swing.JButton btnDate;
 
-    public CustomizeScenarioDialog(java.awt.Frame parent, boolean modal, Scenario s, Mission m, Campaign c) {
+    public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario s, Mission m, Campaign c) {
         super(parent, modal);
         this.frame = parent;
         this.mission = m;
@@ -203,7 +202,6 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
             panMain.add(btnDate, gridBagConstraints);
-
         }
         if (scenario.isCurrent()) {
             initLootPanel();
@@ -218,8 +216,6 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                     BorderFactory.createTitledBorder("Potential Rewards"),
                     BorderFactory.createEmptyBorder(5,5,5,5)));
             panMain.add(panLoot, gridBagConstraints);
-
-
         }
 
         txtDesc = new MarkdownEditorPanel("Description");
