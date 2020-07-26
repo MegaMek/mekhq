@@ -70,6 +70,7 @@ import megamek.common.enums.Gender;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
+import mekhq.campaign.personnel.enums.Phenotype;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -955,7 +956,7 @@ public class Utilities {
 
                 String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
                 if (phenotype != null) {
-                    p.setPhenotype(Integer.parseInt(phenotype));
+                    p.setPhenotype(Phenotype.parseFromString(phenotype));
                 }
 
                 p.setBloodname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME));

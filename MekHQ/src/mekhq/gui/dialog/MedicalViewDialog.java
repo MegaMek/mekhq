@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -59,7 +58,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
-
 import megamek.common.util.EncodeControl;
 
 import mekhq.campaign.log.LogEntryType;
@@ -73,9 +71,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.campaign.personnel.enums.InjuryLevel;
+import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 
@@ -338,12 +337,12 @@ public class MedicalViewDialog extends JDialog {
             surname = p.getBloodname();
         }
 
-        String birthdayString = p.getBirthday().format(DateTimeFormatter.ofPattern(
-                c.getCampaignOptions().getDisplayDateFormat()));
+        String birthdayString = campaign.getCampaignOptions().getDisplayFormattedDate(p.getBirthday());
 
         Period age = Period.between(p.getBirthday(), c.getLocalDate());
 
-        String phenotype = (p.getPhenotype() != Person.PHENOTYPE_NONE) ? p.getPhenotypeName() : resourceMap.getString("baselinePhenotype.text"); //$NON-NLS-1$
+        String phenotype = (p.getPhenotype() != Phenotype.NONE) ? p.getPhenotype().toString()
+                : resourceMap.getString("baselinePhenotype.text");
 
         Force f = c.getForceFor(p);
         String force = (null != f) ? f.getFullName() : "-"; //$NON-NLS-1$
@@ -465,17 +464,17 @@ public class MedicalViewDialog extends JDialog {
                 .forEachOrdered(inj -> {
                     JLabel injLabel;
                     if (inj.getType().isPermanent()) {
-                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesText.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().format(DateTimeFormatter.ofPattern(
-                                        c.getCampaignOptions().getDisplayDateFormat()))));
+                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesText.format"),
+                                inj.getType().getSimpleName(),
+                                c.getCampaignOptions().getDisplayFormattedDate(inj.getStart())));
                     } else if (inj.isPermanent() || (inj.getTime() <= 0)) {
-                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesPermanent.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().format(DateTimeFormatter.ofPattern(
-                                        c.getCampaignOptions().getDisplayDateFormat()))));
+                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesPermanent.format"),
+                                inj.getType().getSimpleName(),
+                                c.getCampaignOptions().getDisplayFormattedDate(inj.getStart())));
                     } else {
-                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesTextAndDuration.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().format(DateTimeFormatter.ofPattern(
-                                    c.getCampaignOptions().getDisplayDateFormat())),
+                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesTextAndDuration.format"),
+                                inj.getType().getSimpleName(),
+                                c.getCampaignOptions().getDisplayFormattedDate(inj.getStart()),
                                 genTimePeriod(inj.getTime())));
                     }
 

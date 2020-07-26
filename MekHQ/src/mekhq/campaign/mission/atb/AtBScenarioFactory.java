@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.mission.atb;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import megamek.common.logging.LogLevel;
@@ -78,13 +79,14 @@ public class AtBScenarioFactory {
     }
 
     private AtBScenarioFactory() {
+
     }
 
     public static List<Class<IAtBScenario>> getScenarios(int type) {
         return scenarioMap.get(type);
     }
 
-    public static AtBScenario createScenario(Campaign c, Lance lance, int type, boolean attacker, Date date) {
+    public static AtBScenario createScenario(Campaign c, Lance lance, int type, boolean attacker, LocalDate date) {
         List<Class<IAtBScenario>> classList = getScenarios(type);
         Class<IAtBScenario> selectedClass;
 
@@ -209,7 +211,7 @@ public class AtBScenarioFactory {
                     if (assignedLances.contains(lance.getForceId()) || (lance.getContract(c) == null)
                             || !lance.isEligible(c) || !lance.getContract(c).isActive()
                             || (lance.getMissionId() != atbContract.getId())
-                            || c.getDate().before(lance.getContract(c).getStartDate())) {
+                            || c.getLocalDate().isBefore(lance.getContract(c).getStartDate())) {
                         continue;
                     }
 
@@ -280,7 +282,7 @@ public class AtBScenarioFactory {
                 if (lList.size() > 0) {
                     Lance lance = Utilities.getRandomItem(lList);
                     AtBScenario atbScenario = AtBScenarioFactory.createScenario(c, lance,
-                            AtBScenario.BASEATTACK, false, Lance.getBattleDate(c.getCalendar()));
+                            AtBScenario.BASEATTACK, false, Lance.getBattleDate(c.getLocalDate()));
                     if (atbScenario != null) {
                         if ((lance.getMissionId() == atbScenario.getMissionId())
                                 || (lance.getMissionId() == Lance.NO_MISSION)) {

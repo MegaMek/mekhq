@@ -1,5 +1,3 @@
-/*********************  DateChooser.java **************************/
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -63,7 +61,7 @@ import mekhq.preferences.PreferencesNode;
  *
  * // show the date chooser DateChooser dc = new DateChooser(owner, date);
  *
- * // user can eiter choose a date or cancel by closing if (dc.showDateChooser()
+ * // user can either choose a date or cancel by closing if (dc.showDateChooser()
  * == DateChooser.OK_OPTION) { date = dc.getDate(); }
  */
 
@@ -77,7 +75,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
     private static final ArrayList<String> monthNames;
     static {
-        monthNames = new ArrayList<String>(12);
+        monthNames = new ArrayList<>(12);
         monthNames.add("January");
         monthNames.add("February");
         monthNames.add("March");

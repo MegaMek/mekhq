@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import megamek.client.ui.swing.MechTileset;
+import megamek.client.ui.swing.tileset.MechTileset;
 import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.Configuration;
 import megamek.common.Crew;

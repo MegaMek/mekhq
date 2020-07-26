@@ -30,7 +30,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,6 +44,7 @@ import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Divorce;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
@@ -216,7 +216,6 @@ public class Campaign implements Serializable, ITechManager {
     private GregorianCalendar calendar;
     private LocalDate currentDay;
     private String dateFormat;
-    private String shortDateFormat;
 
     private String factionCode;
     private int techFactionCode;
@@ -268,10 +267,10 @@ public class Campaign implements Serializable, ITechManager {
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
     private AtBEventProcessor atbEventProcessor; //AtB
-    private Calendar shipSearchStart; //AtB
+    private LocalDate shipSearchStart; //AtB
     private int shipSearchType;
     private String shipSearchResult; //AtB
-    private Calendar shipSearchExpiration; //AtB
+    private LocalDate shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
     private CampaignSummary campaignSummary;
@@ -295,7 +294,6 @@ public class Campaign implements Serializable, ITechManager {
         currentReportHTML = "";
         newReports = new ArrayList<>();
         dateFormat = "EEEE, MMMM d yyyy";
-        shortDateFormat = "yyyyMMdd";
         name = "My Campaign";
         overtime = false;
         gmMode = false;
@@ -442,11 +440,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     @Deprecated
-    public DateFormat getShortDateFormatter() {
-        return new SimpleDateFormat(shortDateFormat);
-    }
-
-    @Deprecated
     public Date getDate() {
         return calendar.getTime();
     }
@@ -454,11 +447,6 @@ public class Campaign implements Serializable, ITechManager {
     @Deprecated
     public String getDateAsString() {
         return getDateFormatter().format(calendar.getTime());
-    }
-
-    @Deprecated
-    public String getShortDateAsString() {
-        return getShortDateFormatter().format(calendar.getTime());
     }
 
     public String getCurrentSystemName() {
@@ -610,18 +598,18 @@ public class Campaign implements Serializable, ITechManager {
         return atbConfig;
     }
 
+    //region Ship Search
     /**
      * Sets the date a ship search was started, or null if no search is in progress.
      */
-    public void setShipSearchStart(@Nullable Calendar c) {
-        shipSearchStart = c;
+    public void setShipSearchStart(@Nullable LocalDate shipSearchStart) {
+        this.shipSearchStart = shipSearchStart;
     }
 
     /**
-     *
      * @return The date a ship search was started, or null if none is in progress.
      */
-    public Calendar getShipSearchStart() {
+    public LocalDate getShipSearchStart() {
         return shipSearchStart;
     }
 
@@ -633,7 +621,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     *
      * @return The lookup name of the available ship, or null if none is available
      */
     public String getShipSearchResult() {
@@ -641,15 +628,14 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     *
      * @return The date the ship is no longer available, if there is one.
      */
-    public Calendar getShipSearchExpiration() {
+    public LocalDate getShipSearchExpiration() {
         return shipSearchExpiration;
     }
 
-    public void setShipSearchExpiration(Calendar c) {
-        shipSearchExpiration = c;
+    public void setShipSearchExpiration(LocalDate shipSearchExpiration) {
+        this.shipSearchExpiration = shipSearchExpiration;
     }
 
     /**
@@ -660,16 +646,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void startShipSearch(int unitType) {
-        shipSearchStart = (Calendar) calendar.clone();
+        setShipSearchStart(getLocalDate());
         setShipSearchType(unitType);
     }
 
-    public void endShipSearch() {
-        shipSearchStart = null;
-    }
-
     private void processShipSearch() {
-        if (shipSearchStart == null) {
+        if (getShipSearchStart() == null) {
             return;
         }
         StringBuilder report = new StringBuilder();
@@ -678,33 +660,31 @@ public class Campaign implements Serializable, ITechManager {
                     .append(" deducted for ship search.");
         } else {
             addReport("<font color=\"red\">Insufficient funds for ship search.</font>");
-            shipSearchStart = null;
+            setShipSearchStart(null);
             return;
         }
-        long numDays = TimeUnit.MILLISECONDS.toDays(calendar.getTimeInMillis() - shipSearchStart.getTimeInMillis());
+        long numDays = ChronoUnit.DAYS.between(getShipSearchStart(), getLocalDate());
         if (numDays > 21) {
             int roll = Compute.d6(2);
             TargetRoll target = getAtBConfig().shipSearchTargetRoll(shipSearchType, this);
-            shipSearchStart = null;
+            setShipSearchStart(null);
             report.append("<br/>Ship search target: ").append(target.getValueAsString()).append(" roll: ")
                     .append(roll);
             // TODO: mos zero should make ship available on retainer
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
-                MechSummary ms = unitGenerator.generate(factionCode, shipSearchType, -1,
+                MechSummary ms = unitGenerator.generate(getFactionCode(), shipSearchType, -1,
                         getGameYear(), getUnitRatingMod());
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
                 if (ms != null) {
-                    DateFormat df = getShortDateFormatter();
-                    shipSearchResult = ms.getName();
-                    shipSearchExpiration = (Calendar) getCalendar().clone();
-                    shipSearchExpiration.add(Calendar.DAY_OF_MONTH, 31);
-                    report.append(shipSearchResult).append(" is available for purchase for ")
+                    setShipSearchResult(ms.getName());
+                    setShipSearchExpiration(getLocalDate().plusDays(31));
+                    report.append(getShipSearchResult()).append(" is available for purchase for ")
                             .append(Money.of(ms.getCost()).toAmountAndSymbolString())
                             .append(" until ")
-                            .append(df.format(shipSearchExpiration.getTime()));
+                            .append(getCampaignOptions().getDisplayFormattedDate(getShipSearchExpiration()));
                 } else {
                     report.append(" <font color=\"red\">Could not determine ship type.</font>");
                 }
@@ -716,11 +696,11 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void purchaseShipSearchResult() {
-        final String METHOD_NAME = "purchaseShipSearchResult()"; //$NON-NLS-1$
-        MechSummary ms = MechSummaryCache.getInstance().getMech(shipSearchResult);
+        final String METHOD_NAME = "purchaseShipSearchResult()";
+        MechSummary ms = MechSummaryCache.getInstance().getMech(getShipSearchResult());
         if (ms == null) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Cannot find entry for " + shipSearchResult); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), METHOD_NAME,
+                    "Cannot find entry for " + getShipSearchResult());
             return;
         }
 
@@ -731,13 +711,13 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
 
-        MechFileParser mechFileParser = null;
+        MechFileParser mechFileParser;
         try {
             mechFileParser = new MechFileParser(ms.getSourceFile(),
                     ms.getEntryName());
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Unable to load unit: " + ms.getEntryName()); //$NON-NLS-1$
+                    "Unable to load unit: " + ms.getEntryName());
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             return;
         }
@@ -751,9 +731,10 @@ public class Campaign implements Serializable, ITechManager {
         if (!getCampaignOptions().getInstantUnitMarketDelivery()) {
             addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
         }
-        shipSearchResult = null;
-        shipSearchExpiration = null;
+        setShipSearchResult(null);
+        setShipSearchExpiration(null);
     }
+    //endregion Ship Search
 
     /**
      * Process retirements for retired personnel, if any.
@@ -1440,70 +1421,34 @@ public class Campaign implements Serializable, ITechManager {
      * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
      * appropriate to the person's phenotype and the player's faction.
      *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
+     * @param person     The Bloodname candidate
+     * @param ignoreDice If true, skips the random roll and assigns a Bloodname automatically
      */
-    public void checkBloodnameAdd(Person person, int type) {
-        checkBloodnameAdd(person, type, false, this.factionCode);
-    }
+    public void checkBloodnameAdd(Person person, boolean ignoreDice) {
+        // if a non-clanner or a clanner without a phenotype is here, we can just return
+        if (!person.isClanner() || (person.getPhenotype() == Phenotype.NONE)) {
+            return;
+        }
 
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to Clan and phenotype.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     * @param factionCode  The shortName of the faction the person belongs to. Note that there
-     *                     is a chance of having a Bloodname that is unique to a different Clan
-     *                     as this person could have been captured.
-     */
-    public void checkBloodnameAdd(Person person, int type, String factionCode) {
-        checkBloodnameAdd(person, type, false, factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to the person's phenotype and the player's faction.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
-     */
-    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
-        checkBloodnameAdd(person, type, ignoreDice, this.factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to Clan and phenotype.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
-     * @param factionCode  The shortName of the faction the person belongs to. Note that there
-     *                     is a chance of having a Bloodname that is unique to a different Clan
-     *                     as this person could have been captured.
-     */
-    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice, String factionCode) {
-        // Person already has a bloodname?
+        // Person already has a bloodname, we open up the dialog to ask if they want to keep the
+        // current bloodname or assign a new one
         if (person.getBloodname().length() > 0) {
             int result = JOptionPane.showConfirmDialog(null,
-                    person.getFullName() + " already has the bloodname " + person.getBloodname()
+                    person.getFullTitle() + " already has the bloodname " + person.getBloodname()
                             + "\nDo you wish to remove that bloodname and generate a new one?",
                     "Already Has Bloodname", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (result == JOptionPane.NO_OPTION) {
                 return;
+            } else {
+                ignoreDice = true;
             }
         }
 
         // Go ahead and generate a new bloodname
-        if (person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE) {
-            int bloodnameTarget = 6;
+        int bloodnameTarget = 6;
+        if (!ignoreDice) {
             switch (person.getPhenotype()) {
-                case Person.PHENOTYPE_MW:
+                case MECHWARRIOR: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_MECH)
                             ? person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
@@ -1511,22 +1456,17 @@ public class Campaign implements Serializable, ITechManager {
                             ? person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
                     break;
-                case Person.PHENOTYPE_AERO:
-                    if (type == Person.T_PROTO_PILOT) {
-                        bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_PROTO)
-                                ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL);
-
-                    } else {
-                        bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO)
-                                ? person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL;
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO)
-                                ? person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL;
-                    }
+                }
+                case AEROSPACE: {
+                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO)
+                            ? person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
+                    bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO)
+                            ? person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
                     break;
-                case Person.PHENOTYPE_BA:
+                }
+                case ELEMENTAL: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA)
                             ? person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
@@ -1534,79 +1474,109 @@ public class Campaign implements Serializable, ITechManager {
                             ? person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
                     break;
-                case Person.PHENOTYPE_VEE:
+                }
+                case VEHICLE: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)
                             ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
-                    if (type == Person.T_VTOL_PILOT) {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
-                                ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL;
-                    } else if (type == Person.T_NVEE_DRIVER) {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
-                                ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL;
-                    } else {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
-                                ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL;
+                    switch (person.getPrimaryRole()) {
+                        case Person.T_VTOL_PILOT:
+                            bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
+                                    ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
+                                    : TargetRoll.AUTOMATIC_FAIL;
+                            break;
+                        case Person.T_NVEE_DRIVER:
+                            bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
+                                    ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
+                                    : TargetRoll.AUTOMATIC_FAIL;
+                            break;
+                        case Person.T_GVEE_DRIVER:
+                            bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
+                                    ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
+                                    : TargetRoll.AUTOMATIC_FAIL;
+                            break;
                     }
                     break;
+                }
+                case PROTOMECH: {
+                    bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_PROTO)
+                            ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL);
+                    break;
+                }
+                case NAVAL: {
+                    switch (person.getPrimaryRole()) {
+                        case Person.T_SPACE_CREW:
+                            bloodnameTarget += 2 * (person.hasSkill(SkillType.S_TECH_VESSEL)
+                                    ? person.getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue()
+                                    : TargetRoll.AUTOMATIC_FAIL);
+                            break;
+                        case Person.T_SPACE_GUNNER:
+                            bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_SPACE)
+                                    ? person.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue()
+                                    : TargetRoll.AUTOMATIC_FAIL);
+                            break;
+                        case Person.T_SPACE_PILOT:
+                            bloodnameTarget += 2 * (person.hasSkill(SkillType.S_PILOT_SPACE)
+                                    ? person.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue()
+                                    : TargetRoll.AUTOMATIC_FAIL);
+                            break;
+                        case Person.T_NAVIGATOR:
+                            bloodnameTarget += 2 * (person.hasSkill(SkillType.S_NAV)
+                                    ? person.getSkill(SkillType.S_NAV).getFinalSkillValue()
+                                    : TargetRoll.AUTOMATIC_FAIL);
+                            break;
+                    }
+                    break;
+                }
+                default: {
+                    break;
+                }
             }
             // Higher rated units are more likely to have Bloodnamed
-            if (campaignOptions.useDragoonRating()) {
+            if (getCampaignOptions().useDragoonRating()) {
                 IUnitRating rating = getUnitRating();
-                bloodnameTarget += IUnitRating.DRAGOON_C - (campaignOptions.getUnitRatingMethod().equals(
-                        mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV) ? rating.getUnitRatingAsInteger()
-                        : rating.getModifier());
+                bloodnameTarget += IUnitRating.DRAGOON_C - (getCampaignOptions().getUnitRatingMethod().equals(
+                        mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV)
+                        ? rating.getUnitRatingAsInteger() : rating.getModifier());
             }
+
             // Reavings diminish the number of available Bloodrights in later eras
             int year = getGameYear();
-            if (year <= 2950)
+            if (year <= 2950) {
                 bloodnameTarget--;
-            if (year > 3055)
+            }
+
+            if (year > 3055) {
                 bloodnameTarget++;
-            if (year > 3065)
+            }
+
+            if (year > 3065) {
                 bloodnameTarget++;
-            if (year > 3080)
+            }
+
+            if (year > 3080) {
                 bloodnameTarget++;
+            }
+
             // Officers have better chance; no penalty for non-officer
             bloodnameTarget += Math.min(0, ranks.getOfficerCut() - person.getRankNumeric());
+        }
 
-            if (Compute.d6(2) >= bloodnameTarget || ignoreDice) {
-                /*
-                 * The Bloodname generator has slight differences in categories that do not map
-                 * easily onto Person constants
-                 */
-                int phenotype = Bloodname.P_GENERAL;
-                switch (type) {
-                    case Person.T_MECHWARRIOR:
-                        phenotype = Bloodname.P_MECHWARRIOR;
-                        break;
-                    case Person.T_BA:
-                        phenotype = Bloodname.P_ELEMENTAL;
-                        break;
-                    case Person.T_AERO_PILOT:
-                    case Person.T_CONV_PILOT:
-                        phenotype = Bloodname.P_AEROSPACE;
-                        break;
-                    case Person.T_SPACE_CREW:
-                    case Person.T_NAVIGATOR:
-                    case Person.T_SPACE_GUNNER:
-                    case Person.T_SPACE_PILOT:
-                        phenotype = Bloodname.P_NAVAL;
-                        break;
-                    case Person.T_PROTO_PILOT:
-                        phenotype = Bloodname.P_PROTOMECH;
-                        break;
-                }
-                Bloodname bloodname = Bloodname.randomBloodname(factionCode, phenotype, getGameYear());
-                if (null != bloodname) {
-                    person.setBloodname(bloodname.getName());
-                }
+        if (ignoreDice || (Compute.d6(2) >= bloodnameTarget)) {
+            Phenotype phenotype = person.getPhenotype();
+            if (phenotype == Phenotype.NONE) {
+                phenotype = Phenotype.GENERAL;
+            }
+
+            Bloodname bloodname = Bloodname.randomBloodname(
+                    (getFaction().isClan() ? getFaction() : person.getOriginFaction()).getShortName(),
+                    phenotype, getGameYear());
+            if (bloodname != null) {
+                person.setBloodname(bloodname.getName());
+                personUpdated(person);
             }
         }
-        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
     //endregion Bloodnames
 
@@ -3305,7 +3275,7 @@ public class Campaign implements Serializable, ITechManager {
         if (!contract.isActive()) {
             // Inactive contracts have no deficits.
             return 0;
-        } else if (contract.getStartDate().compareTo(getDate()) >= 0) {
+        } else if (contract.getStartDate().compareTo(getLocalDate()) >= 0) {
             // Do not check for deficits if the contract has not started or
             // it is the first day of the contract, as players won't have
             // had time to assign forces to the contract yet
@@ -3316,7 +3286,7 @@ public class Campaign implements Serializable, ITechManager {
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
         for (Lance l : lances.values()) {
-            if (l.getMissionId() == contract.getId() && l.getRole() != Lance.ROLE_UNASSIGNED) {
+            if ((l.getMissionId() == contract.getId()) && (l.getRole() != Lance.ROLE_UNASSIGNED)) {
                 total++;
                 if (l.getRole() == contract.getRequiredLanceType()) {
                     role++;
@@ -3332,7 +3302,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private void processNewDayATBScenarios() {
         for (Mission m : getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract) || getDate().before(((Contract) m).getStartDate())) {
+            if (!m.isActive() || !(m instanceof AtBContract) || getLocalDate().isBefore(((Contract) m).getStartDate())) {
                 continue;
             }
             /*
@@ -3345,17 +3315,10 @@ public class Campaign implements Serializable, ITechManager {
             if (!getLocation().isOnPlanet() &&
                     !getLocation().getJumpPath().isEmpty() &&
                     getLocation().getJumpPath().getLastSystem().getId().equals(m.getSystemId())) {
-                /*
-                 * transitTime is measured in days; round up to the next whole day, then convert
-                 * to milliseconds
-                 */
-                GregorianCalendar cal = (GregorianCalendar) calendar.clone();
-                cal.add(Calendar.DATE, (int) Math.ceil(getLocation().getTransitTime()));
-                ((AtBContract) m).getStartDate().setTime(cal.getTimeInMillis());
-                cal.add(Calendar.MONTH, ((AtBContract) m).getLength());
-                ((AtBContract) m).getEndingDate().setTime(cal.getTimeInMillis());
-                addReport(
-                        "The start and end dates of " + m.getName() + " have been shifted to reflect the current ETA.");
+
+                // transitTime is measured in days; so we round up to the next whole day
+                ((AtBContract) m).setStartAndEndDate(getLocalDate().plusDays((int) Math.ceil(getLocation().getTransitTime())));
+                addReport("The start and end dates of " + m.getName() + " have been shifted to reflect the current ETA.");
                 continue;
             }
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -3371,8 +3334,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
                     continue;
                 }
-                if (s.getDate() != null &&
-                        s.getDate().before(calendar.getTime())) {
+                if ((s.getDate() != null) && s.getDate().isBefore(getLocalDate())) {
                     s.setStatus(Scenario.S_DEFEAT);
                     s.clearAllForcesAndPersonnel(this);
                     ((AtBContract) m).addPlayerMinorBreach();
@@ -3388,23 +3350,24 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         for (Mission m : getMissions()) {
-            if (m.isActive() && m instanceof AtBContract && !((AtBContract) m).getStartDate().after(getDate())) {
+            if (m.isActive() && (m instanceof AtBContract)
+                    && !((AtBContract) m).getStartDate().isAfter(getLocalDate())) {
                 ((AtBContract) m).checkEvents(this);
             }
             /*
              * If there is a standard battle set for today, deploy the lance.
              */
             for (Scenario s : m.getScenarios()) {
-                if (s.getDate() != null && s.getDate().equals(calendar.getTime())) {
+                if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
                     int forceId = ((AtBScenario) s).getLanceForceId();
-                    if (null != lances.get(forceId) && !forceIds.get(forceId).isDeployed()) {
+                    if ((lances.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
 
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
                         for (UUID uid : forceIds.get(forceId).getAllUnits()) {
                             Unit u = getUnit(uid);
-                            if (null != u && u.isUnderRepair()) {
+                            if ((u != null) && u.isUnderRepair()) {
                                 forceUnderRepair = true;
                                 break;
                             }
@@ -3430,7 +3393,8 @@ public class Campaign implements Serializable, ITechManager {
     private void processNewDayATBFatigue() {
         boolean inContract = false;
         for (Mission m : getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract) || getDate().before(((Contract) m).getStartDate())) {
+            if (!m.isActive() || !(m instanceof AtBContract)
+                    || getLocalDate().isBefore(((Contract) m).getStartDate())) {
                 continue;
             }
             switch (((AtBContract) m).getMissionType()) {
@@ -3467,11 +3431,11 @@ public class Campaign implements Serializable, ITechManager {
         contractMarket.generateContractOffers(this);
         unitMarket.generateUnitOffers(this);
 
-        if (shipSearchExpiration != null && !shipSearchExpiration.after(calendar)) {
-            shipSearchExpiration = null;
-            if (shipSearchResult != null) {
-                addReport("Opportunity for purchase of " + shipSearchResult + " has expired.");
-                shipSearchResult = null;
+        if ((getShipSearchExpiration() != null) && !getShipSearchExpiration().isAfter(getLocalDate())) {
+            setShipSearchExpiration(null);
+            if (getShipSearchResult() != null) {
+                addReport("Opportunity for purchase of " + getShipSearchResult() + " has expired.");
+                setShipSearchResult(null);
             }
         }
 
@@ -3525,10 +3489,11 @@ public class Campaign implements Serializable, ITechManager {
             rating.reInitialize();
 
             for (Mission m : getMissions()) {
-                if (m.isActive() && m instanceof AtBContract && !((AtBContract) m).getStartDate().after(getDate())) {
-                    ((AtBContract) m).checkMorale(calendar, getUnitRatingMod());
-                    addReport("Enemy morale is now " + ((AtBContract) m).getMoraleLevelName() + " on contract "
-                            + m.getName());
+                if (m.isActive() && (m instanceof AtBContract)
+                        && !((AtBContract) m).getStartDate().isAfter(getLocalDate())) {
+                    ((AtBContract) m).checkMorale(getLocalDate(), getUnitRatingMod());
+                    addReport("Enemy morale is now " + ((AtBContract) m).getMoraleLevelName()
+                            + " on contract " + m.getName());
                 }
             }
 
@@ -3788,8 +3753,8 @@ public class Campaign implements Serializable, ITechManager {
             }
             Contract contract = (Contract) mission;
             if (contract.isActive()
-                    && !getCalendar().getTime().after(contract.getEndingDate())
-                    && !getCalendar().getTime().before(contract.getStartDate())) {
+                    && !getLocalDate().isAfter(contract.getEndingDate())
+                    && !getLocalDate().isBefore(contract.getStartDate())) {
                 active.add(contract);
             }
         }
@@ -3816,8 +3781,8 @@ public class Campaign implements Serializable, ITechManager {
             Contract contract = (Contract) mission;
 
             if (contract.isActive()
-                    && !getCalendar().getTime().after(contract.getEndingDate())
-                    && !getCalendar().getTime().before(contract.getStartDate())) {
+                    && !getLocalDate().isAfter(contract.getEndingDate())
+                    && !getLocalDate().isBefore(contract.getStartDate())) {
                 hasActiveContract = true;
                 break;
             }
@@ -4785,7 +4750,6 @@ public class Campaign implements Serializable, ITechManager {
 
         // Against the Bot
         if (getCampaignOptions().getUseAtB()) {
-            DateFormat sdf = getShortDateFormatter();
             contractMarket.writeToXml(pw1, 1);
             unitMarket.writeToXml(pw1, 1);
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
@@ -4801,13 +4765,13 @@ public class Campaign implements Serializable, ITechManager {
             retirementDefectionTracker.writeToXml(pw1, 1);
             if (shipSearchStart != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchStart",
-                        sdf.format(shipSearchStart.getTime()));
+                        MekHqXmlUtil.saveFormattedDate(getShipSearchStart()));
             }
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchType", shipSearchType);
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchResult", shipSearchResult);
             if (shipSearchExpiration != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchExpiration",
-                        sdf.format(shipSearchExpiration.getTime()));
+                        MekHqXmlUtil.saveFormattedDate(getShipSearchExpiration()));
             }
         }
 
@@ -6055,6 +6019,9 @@ public class Campaign implements Serializable, ITechManager {
         }
         if (status == PersonnelStatus.RETIRED) {
             ServiceLogger.retired(person, getDate());
+            if (getCampaignOptions().useRetirementDateTracking()) {
+                person.setRetirement(getLocalDate());
+            }
         }
         if ((status == PersonnelStatus.ACTIVE) && (person.getStatus() == PersonnelStatus.MIA)) {
             ServiceLogger.recoveredMia(person, getDate());
@@ -6945,10 +6912,10 @@ public class Campaign implements Serializable, ITechManager {
             // check for money in escrow
             // According to FMM(r) pg 179, both failure and breach lead to no
             // further payment even though this seems stupid
-            if (contract.getStatus() == Mission.S_SUCCESS
-                    && contract.getMonthsLeft(getDate()) > 0) {
+            if ((contract.getStatus() == Mission.S_SUCCESS)
+                    && contract.getMonthsLeft(getLocalDate()) > 0) {
                 Money remainingMoney = contract.getMonthlyPayOut()
-                        .multipliedBy(contract.getMonthsLeft(getDate()));
+                        .multipliedBy(contract.getMonthsLeft(getLocalDate()));
                 finances.credit(remainingMoney, Transaction.C_CONTRACT,
                         "Remaining payment for " + contract.getName(), calendar.getTime());
                 addReport("Your account has been credited for "
@@ -8222,22 +8189,23 @@ public class Campaign implements Serializable, ITechManager {
 
     public void initTimeInService() {
         for (Person p : getPersonnel()) {
-            Date join = null;
-            for (LogEntry e : p.getPersonnelLog()) {
-                if (join == null) {
-                    // If by some nightmare there is no Joined date just use the first entry.
-                    join = e.getDate();
-                }
-                if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")) {
-                    join = e.getDate();
-                    break;
-                }
-            }
             if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
+                Date join = null;
+                for (LogEntry e : p.getPersonnelLog()) {
+                    if (join == null) {
+                        // If by some nightmare there is no Joined date just use the first entry.
+                        join = e.getDate();
+                    }
+                    if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")) {
+                        join = e.getDate();
+                        break;
+                    }
+                }
+
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {
-                    date = getLocalDate().minus(1, ChronoUnit.YEARS);
+                    date = getLocalDate().minusYears(1);
                 } else {
                     date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 }
@@ -8248,26 +8216,55 @@ public class Campaign implements Serializable, ITechManager {
 
     public void initTimeInRank() {
         for (Person p : getPersonnel()) {
-            Date join = null;
-            for (LogEntry e : p.getPersonnelLog()) {
-                if (join == null) {
-                    // If by some nightmare there is no date from the below, just use the first entry.
-                    join = e.getDate();
-                }
-                if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")
-                        || e.getDesc().startsWith("Promoted ") || e.getDesc().startsWith("Demoted ")) {
-                    join = e.getDate();
-                }
-            }
             if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
+
+                Date join = null;
+                for (LogEntry e : p.getPersonnelLog()) {
+                    if (join == null) {
+                        // If by some nightmare there is no date from the below, just use the first entry.
+                        join = e.getDate();
+                    }
+
+                    if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")
+                            || e.getDesc().startsWith("Promoted ") || e.getDesc().startsWith("Demoted ")) {
+                        join = e.getDate();
+                    }
+                }
+
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {
-                    date = getLocalDate().minus(1, ChronoUnit.YEARS);
+                    date = getLocalDate().minusYears(1);
                 } else {
                     date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 }
                 p.setLastRankChangeDate(date);
+            }
+        }
+    }
+
+    public void initRetirementDateTracking() {
+        for (Person person : getPersonnel()) {
+            if (person.getStatus() == PersonnelStatus.RETIRED) {
+                Date retired = null;
+                Date lastLoggedDate = null;
+                for (LogEntry entry : person.getPersonnelLog()) {
+                    lastLoggedDate = entry.getDate();
+                    if (entry.getDesc().startsWith("Retired")) {
+                        retired = entry.getDate();
+                    }
+                }
+
+                if (retired == null) {
+                    retired = lastLoggedDate;
+                }
+
+                if (retired == null) {
+                    // For that one in a billion chance the log is empty. Clone today's date and subtract a year
+                    person.setRetirement(getLocalDate().minusYears(1));
+                } else {
+                    person.setRetirement(retired.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                }
             }
         }
     }
@@ -8507,7 +8504,7 @@ public class Campaign implements Serializable, ITechManager {
 
     @Override
     public int getTechIntroYear() {
-        if (campaignOptions.limitByYear()) {
+        if (getCampaignOptions().limitByYear()) {
             return getGameYear();
         } else {
             return Integer.MAX_VALUE;

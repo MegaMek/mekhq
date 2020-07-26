@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign;
 
@@ -75,7 +75,7 @@ public class ResolveScenarioTracker {
     ArrayList<TestUnit> leftoverSalvage;
     ArrayList<TestUnit> devastatedEnemyUnits;
     ArrayList<Unit> units;
-    ArrayList<Loot> potentialLoot;
+    List<Loot> potentialLoot;
     ArrayList<Loot> actualLoot;
     Hashtable<UUID, PersonStatus> peopleStatus;
     Hashtable<UUID, OppositionPersonnelStatus> oppositionPersonnel;
@@ -1574,7 +1574,7 @@ public class ResolveScenarioTracker {
         //lets reset the network ids from the c3UUIDs
         campaign.reloadGameEntities();
         campaign.refreshNetworks();
-        scenario.setDate(campaign.getCalendar().getTime());
+        scenario.setDate(campaign.getLocalDate());
         client = null;
     }
 
@@ -1640,7 +1640,7 @@ public class ResolveScenarioTracker {
         return entities;
     }
 
-    public ArrayList<Loot> getPotentialLoot() {
+    public List<Loot> getPotentialLoot() {
         return potentialLoot;
     }
 

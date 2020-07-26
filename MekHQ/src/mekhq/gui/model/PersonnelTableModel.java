@@ -153,7 +153,7 @@ public class PersonnelTableModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch(column) {
+        switch (column) {
             case COL_RANK:
                 return resources.getString("col_rank.text");
             case COL_GIVEN_NAME:
@@ -254,7 +254,7 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch(c) {
+        switch (c) {
             case COL_GIVEN_NAME:
             case COL_RANK:
             case COL_DEPLOY:
@@ -277,7 +277,7 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public int getAlignment(int col) {
-        switch(col) {
+        switch (col) {
             case COL_SALARY:
                 return SwingConstants.RIGHT;
             case COL_RANK:
@@ -300,27 +300,27 @@ public class PersonnelTableModel extends DataTableModel {
 
     public String getTooltip(int row, int col) {
         Person p = getPerson(row);
-        switch(col) {
-        case COL_NABIL:
-            return p.getAbilityList(PilotOptions.LVL3_ADVANTAGES);
-        case COL_NIMP:
-            return p.getAbilityList(PilotOptions.MD_ADVANTAGES);
-        case COL_ASSIGN:
-            if ((p.getTechUnitIDs().size() > 1) && !loadAssignmentFromMarket) {
-                StringBuilder toReturn = new StringBuilder("<html>");
-                for (UUID id : p.getTechUnitIDs()) {
-                    Unit u = getCampaign().getUnit(id);
-                    if (null != u) {
-                        toReturn.append(u.getName()).append("<br>");
+        switch (col) {
+            case COL_NABIL:
+                return p.getAbilityList(PilotOptions.LVL3_ADVANTAGES);
+            case COL_NIMP:
+                return p.getAbilityList(PilotOptions.MD_ADVANTAGES);
+            case COL_ASSIGN:
+                if ((p.getTechUnitIDs().size() > 1) && !loadAssignmentFromMarket) {
+                    StringBuilder toReturn = new StringBuilder("<html>");
+                    for (UUID id : p.getTechUnitIDs()) {
+                        Unit u = getCampaign().getUnit(id);
+                        if (null != u) {
+                            toReturn.append(u.getName()).append("<br>");
+                        }
                     }
+                    toReturn.append("</html>");
+                    return toReturn.toString();
+                } else {
+                    return null;
                 }
-                toReturn.append("</html>");
-                return toReturn.toString();
-            } else {
+            default:
                 return null;
-            }
-        default:
-            return null;
         }
     }
 
@@ -335,10 +335,11 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public Person getPerson(int i) {
-        if( i >= data.size()) {
+        if (i >= data.size()) {
             return null;
+        } else {
+            return (Person) data.get(i);
         }
-        return (Person)data.get(i);
     }
 
     public boolean isDeployed(int row) {

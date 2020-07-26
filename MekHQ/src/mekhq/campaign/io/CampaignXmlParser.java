@@ -28,7 +28,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -316,17 +315,13 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
-                    Calendar c = new GregorianCalendar();
-                    c.setTime(parseDate(retVal.getShortDateFormatter(), wn.getTextContent()));
-                    retVal.setShipSearchStart(c);
+                    retVal.setShipSearchStart(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {
                     retVal.setShipSearchType(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("shipSearchResult")) {
                     retVal.setShipSearchResult(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
-                    Calendar c = new GregorianCalendar();
-                    c.setTime(parseDate(retVal.getShortDateFormatter(), wn.getTextContent()));
-                    retVal.setShipSearchExpiration(c);
+                    retVal.setShipSearchExpiration(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
                 }
@@ -538,40 +533,9 @@ public class CampaignXmlParser {
                         System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
-        // All personnel need the rank reference fixed
         for (Person psn : retVal.getPersonnel()) {
             // skill types might need resetting
             psn.resetSkillTypes();
-
-            //versions before 0.3.4 did not have proper clan phenotypes
-            if (version.getMajorVersion() == 0
-                    && (version.getMinorVersion() <= 2 ||
-                            (version.getMinorVersion() <= 3 && version.getSnapshot() < 4))
-                    && retVal.getFaction().isClan()) {
-                //assume personnel are clan and trueborn if the right role
-                psn.setClanner(true);
-                switch (psn.getPrimaryRole()) {
-                    case Person.T_MECHWARRIOR:
-                        psn.setPhenotype(Person.PHENOTYPE_MW);
-                        break;
-                    case Person.T_AERO_PILOT:
-                    case Person.T_CONV_PILOT:
-                        psn.setPhenotype(Person.PHENOTYPE_AERO);
-                        break;
-                    case Person.T_BA:
-                        psn.setPhenotype(Person.PHENOTYPE_BA);
-                        break;
-                    case Person.T_VEE_GUNNER:
-                    case Person.T_GVEE_DRIVER:
-                    case Person.T_NVEE_DRIVER:
-                    case Person.T_VTOL_PILOT:
-                        psn.setPhenotype(Person.PHENOTYPE_VEE);
-                        break;
-                    default:
-                        psn.setPhenotype(Person.PHENOTYPE_NONE);
-                        break;
-                }
-            }
         }
 
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,

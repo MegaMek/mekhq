@@ -25,7 +25,6 @@ import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.IntSupplier;
@@ -104,14 +103,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // This value should always be +1 of the last defined role
     public static final int T_NUM = 28;
 
-    // Phenotypes
-    public static final int PHENOTYPE_NONE = 0;
-    public static final int PHENOTYPE_MW = 1;
-    public static final int PHENOTYPE_BA = 2;
-    public static final int PHENOTYPE_AERO = 3;
-    public static final int PHENOTYPE_VEE = 4;
-    public static final int PHENOTYPE_NUM = 5;
-
     private static final Map<Integer, Money> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
@@ -187,6 +178,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected LocalDate dateOfDeath;
     protected LocalDate recruitment;
     protected LocalDate lastRankChangeDate;
+    private LocalDate retirement;
     protected List<LogEntry> personnelLog;
     protected List<LogEntry> missionLog;
 
@@ -212,7 +204,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     int currentEdge;
 
     //phenotype and background
-    private int phenotype;
+    private Phenotype phenotype;
     private boolean clan;
     private String bloodname;
     private Faction originFaction;
@@ -361,7 +353,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         originFaction = Faction.getFaction(factionCode);
         originPlanet = null;
         clan = originFaction.isClan();
-        phenotype = PHENOTYPE_NONE;
+        phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
         idleMonths = -1;
@@ -396,6 +388,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         dateOfDeath = null;
         recruitment = null;
         lastRankChangeDate = null;
+        retirement = null;
         skills = new Skills();
         options = new PersonnelOptions();
         currentEdge = 0;
@@ -421,12 +414,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return campaign;
     }
 
-    public int getPhenotype() {
+    public Phenotype getPhenotype() {
         return phenotype;
     }
 
-    public void setPhenotype(int i) {
-        phenotype = i;
+    public void setPhenotype(Phenotype phenotype) {
+        this.phenotype = phenotype;
     }
 
     public boolean isClanner() {
@@ -566,45 +559,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region Text Getters
     public String pregnancyStatus() {
         return isPregnant() ? " (Pregnant)" : "";
-    }
-
-    public String getPhenotypeName() {
-        return getPhenotypeName(phenotype);
-    }
-
-    public static String getPhenotypeName(int pheno) {
-        switch (pheno) {
-            case PHENOTYPE_NONE:
-                return "Freeborn";
-            case PHENOTYPE_MW:
-                return "Trueborn Mechwarrior";
-            case PHENOTYPE_AERO:
-                return "Trueborn Pilot";
-            case PHENOTYPE_VEE:
-                return "Trueborn Vehicle Crew";
-            case PHENOTYPE_BA:
-                return "Trueborn Elemental";
-            default:
-                return "?";
-        }
-    }
-
-    public String getPhenotypeShortName() {
-        return getPhenotypeShortName(phenotype);
-    }
-
-    public static String getPhenotypeShortName(int pheno) {
-        switch (pheno) {
-            case PHENOTYPE_NONE:
-                return "Freeborn";
-            case PHENOTYPE_MW:
-            case PHENOTYPE_AERO:
-            case PHENOTYPE_VEE:
-            case PHENOTYPE_BA:
-                return "Trueborn";
-            default:
-                return "?";
-        }
     }
     //endregion Text Getters
 
@@ -1002,7 +956,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getRoleDesc() {
         String role = getPrimaryRoleDesc();
-        if (secondaryRole != T_NONE && secondaryRole != -1) {
+        if ((getSecondaryRole() != T_NONE) && (getSecondaryRole() != -1)) {
             role += "/" + getSecondaryRoleDesc();
         }
         return role;
@@ -1011,13 +965,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public String getPrimaryRoleDesc() {
         String bgPrefix = "";
         if (isClanner()) {
-            bgPrefix = getPhenotypeShortName() + " ";
+            bgPrefix = getPhenotype().getShortName() + " ";
         }
-        return bgPrefix + getRoleDesc(primaryRole, campaign.getFaction().isClan());
+        return bgPrefix + getRoleDesc(getPrimaryRole(), isClanner());
     }
 
     public String getSecondaryRoleDesc() {
-        return getRoleDesc(secondaryRole, campaign.getFaction().isClan());
+        return getRoleDesc(getSecondaryRole(), isClanner());
     }
 
     public static int getRoleMnemonic(int type) {
@@ -1168,6 +1122,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.dateOfDeath = date;
     }
 
+    public int getAge(LocalDate today) {
+        // Get age based on year
+        if (getDateOfDeath() != null) {
+            //use date of death instead of birthday
+            today = getDateOfDeath();
+        }
+
+        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
+    }
+
     public void setRecruitment(LocalDate date) {
         this.recruitment = date;
     }
@@ -1180,36 +1144,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (getRecruitment() == null) {
             return "";
         } else {
-            return getRecruitment().format(DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getRecruitment());
         }
-    }
-
-    public void setLastRankChangeDate(LocalDate date) {
-        this.lastRankChangeDate = date;
-    }
-
-    public LocalDate getLastRankChangeDate() {
-        return lastRankChangeDate;
-    }
-
-    public String getLastRankChangeDateAsString(Campaign campaign) {
-        if (getLastRankChangeDate() == null) {
-            return "";
-        } else {
-            return getLastRankChangeDate().format(DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
-        }
-    }
-
-    public int getAge(LocalDate today) {
-        // Get age based on year
-        if (getDateOfDeath() != null) {
-            //use date of death instead of birthday
-            today = getDateOfDeath();
-        }
-
-        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
     }
 
     public String getTimeInService(Campaign campaign) {
@@ -1231,6 +1167,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 .getDisplayFormattedOutput(getRecruitment(), today);
     }
 
+    public void setLastRankChangeDate(LocalDate date) {
+        this.lastRankChangeDate = date;
+    }
+
+    public LocalDate getLastRankChangeDate() {
+        return lastRankChangeDate;
+    }
+
+    public String getLastRankChangeDateAsString(Campaign campaign) {
+        if (getLastRankChangeDate() == null) {
+            return "";
+        } else {
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getLastRankChangeDate());
+        }
+    }
+
     public String getTimeInRank(Campaign campaign) {
         if (getLastRankChangeDate() == null) {
             return "";
@@ -1246,6 +1198,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         return campaign.getCampaignOptions().getTimeInRankDisplayFormat()
                 .getDisplayFormattedOutput(getLastRankChangeDate(), today);
+    }
+
+    public void setRetirement(LocalDate date) {
+        this.retirement = date;
+    }
+
+    public LocalDate getRetirement() {
+        return retirement;
+    }
+
+    public String getRetirementAsString(Campaign campaign) {
+        if (getRetirement() == null) {
+            return "";
+        } else {
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getRetirement());
+        }
     }
 
     public void setId(UUID id) {
@@ -1623,8 +1591,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             // Always save whether or not someone is a clanner
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clan", clan);
-            if (phenotype != PHENOTYPE_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype);
+            if (phenotype != Phenotype.NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype.name());
             }
             if (!StringUtil.isNullOrEmpty(bloodname)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bloodname", bloodname);
@@ -1647,6 +1615,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     ex.writeToXml(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "formerSpouses");
+            }
+            if (!isTryingToMarry()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToMarry", false);
+            }
+            if (!isTryingToConceive()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToConceive", false);
             }
             if (dueDate != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dueDate",
@@ -1730,6 +1704,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (lastRankChangeDate != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastRankChangeDate",
                         MekHqXmlUtil.saveFormattedDate(lastRankChangeDate));
+            }
+            if (getRetirement() != null) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirement",
+                        MekHqXmlUtil.saveFormattedDate(getRetirement()));
             }
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXml(pw1, indent + 1);
@@ -1860,7 +1838,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
                     retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
-                    retVal.phenotype = Integer.parseInt(wn2.getTextContent());
+                    retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
                     retVal.bloodname = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
@@ -1990,6 +1968,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.recruitment = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
                     retVal.lastRankChangeDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
+                    retVal.setRetirement(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
@@ -2145,6 +2125,36 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (version.isLowerThan("0.47.5") && (retVal.getExpectedDueDate() == null)
                     && (retVal.getDueDate() != null)) {
                 retVal.setExpectedDueDate(retVal.getDueDate());
+            }
+
+            //versions before 0.3.4 did not have proper clan phenotypes
+            if (version.isLowerThan("0.3.4") && c.getFaction().isClan()) {
+                //assume personnel are clan and trueborn if the right role
+                retVal.setClanner(true);
+                switch (retVal.getPrimaryRole()) {
+                    case Person.T_MECHWARRIOR:
+                        retVal.setPhenotype(Phenotype.MECHWARRIOR);
+                        break;
+                    case Person.T_AERO_PILOT:
+                    case Person.T_CONV_PILOT:
+                        retVal.setPhenotype(Phenotype.AEROSPACE);
+                        break;
+                    case Person.T_BA:
+                        retVal.setPhenotype(Phenotype.ELEMENTAL);
+                        break;
+                    case Person.T_VEE_GUNNER:
+                    case Person.T_GVEE_DRIVER:
+                    case Person.T_NVEE_DRIVER:
+                    case Person.T_VTOL_PILOT:
+                        retVal.setPhenotype(Phenotype.VEHICLE);
+                        break;
+                    case Person.T_PROTO_PILOT:
+                        retVal.setPhenotype(Phenotype.PROTOMECH);
+                        break;
+                    default:
+                        retVal.setPhenotype(Phenotype.NONE);
+                        break;
+                }
             }
 
             if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {

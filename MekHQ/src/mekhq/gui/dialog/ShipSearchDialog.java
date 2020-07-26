@@ -12,30 +12,22 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
+import javax.swing.*;
 
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
@@ -51,36 +43,31 @@ import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
 /**
- * Manages searches for Dropships or Jumpships for Against the Bot.
- * 
- * @author Neoancient
+ * Manages searches for DropShips or JumpShips for Against the Bot.
  *
+ * @author Neoancient
  */
 public class ShipSearchDialog extends JDialog {
+    private static final long serialVersionUID = -5200817760228732045L;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5200817760228732045L;
-	
-	private JRadioButton btnDropship = new JRadioButton();
-	private JRadioButton btnJumpship = new JRadioButton();
-	private JRadioButton btnWarship = new JRadioButton();
-	
-	private JLabel lblDropshipTarget = new JLabel();
-	private JLabel lblJumpshipTarget = new JLabel();
-	private JLabel lblWarshipTarget = new JLabel();
-	
-	CampaignGUI gui;
-	
-	public ShipSearchDialog(Frame frame, CampaignGUI gui) {
-		super(frame, true);
-		this.gui = gui;
-		
-		init();
-		setUserPreferences();
-	}
-	
+    private JRadioButton btnDropship = new JRadioButton();
+    private JRadioButton btnJumpship = new JRadioButton();
+    private JRadioButton btnWarship = new JRadioButton();
+
+    private JLabel lblDropshipTarget = new JLabel();
+    private JLabel lblJumpshipTarget = new JLabel();
+    private JLabel lblWarshipTarget = new JLabel();
+
+    CampaignGUI gui;
+
+    public ShipSearchDialog(JFrame frame, CampaignGUI gui) {
+        super(frame, true);
+        this.gui = gui;
+
+        init();
+        setUserPreferences();
+    }
+
     private void init() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ShipSearchDialog",
                 new EncodeControl()); //$NON-NLS-1$
@@ -189,9 +176,9 @@ public class ShipSearchDialog extends JDialog {
         if (gui.getCampaign().getShipSearchResult() != null) {
             MechSummary ms = MechSummaryCache.getInstance().getMech(gui.getCampaign().getShipSearchResult());
 
-            if (ms != null || gui.getCampaign().getShipSearchResult() != null) {
+            if ((ms != null) || (gui.getCampaign().getShipSearchResult() != null)) {
                 JLabel lblAvailable = new JLabel();
-                if (ms == null && gui.getCampaign().getShipSearchResult() != null) {
+                if ((ms == null) && (gui.getCampaign().getShipSearchResult() != null)) {
                     lblAvailable.setText("Cannot find entry for " + gui.getCampaign().getShipSearchResult());
                 } else {
                     lblAvailable.setText(resourceMap.getString("lblAvailable.text")
@@ -212,7 +199,6 @@ public class ShipSearchDialog extends JDialog {
             button = new JButton(resourceMap.getString("btnEndSearch.text"));
             button.setToolTipText(resourceMap.getString("btnEndSearch.toolTipText"));
             button.addActionListener(ev -> endSearch());
-            panButtons.add(button);
         } else {
             button = new JButton(resourceMap.getString("btnStartSearch.text"));
             button.setToolTipText(String.format(resourceMap.getString("btnStartSearch.toolTipText"),
@@ -220,8 +206,8 @@ public class ShipSearchDialog extends JDialog {
                     gui.getCampaign().getAtBConfig().getShipSearchLengthWeeks()));
             button.addActionListener(ev -> startSearch());
             button.setEnabled(!isInContract());
-            panButtons.add(button);
         }
+        panButtons.add(button);
 
         button = new JButton(resourceMap.getString("btnCancel.text"));
         button.addActionListener(ev -> setVisible(false));
@@ -252,51 +238,50 @@ public class ShipSearchDialog extends JDialog {
 		return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP,
 				gui.getCampaign());
 	}
-	
+
 	public TargetRoll getJSTarget() {
 		return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.JUMPSHIP,
 				gui.getCampaign());
 	}
-	
+
 	public TargetRoll getWSTarget() {
 		return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.WARSHIP,
 				gui.getCampaign());
 	}
-	
+
 	private int getUnitType() {
 		if (btnJumpship.isSelected()) {
 			return UnitType.JUMPSHIP;
 		} else if (btnWarship.isSelected()) {
 			return UnitType.WARSHIP;
 		} else {
-			return UnitType.DROPSHIP;			
+			return UnitType.DROPSHIP;
 		}
 	}
-	
+
 	private boolean isInContract() {
 		return gui.getCampaign().getMissions().stream().anyMatch(m ->
-			m.isActive()
-			&& m instanceof Contract
-			&& ((Contract)m).getStartDate().before(gui.getCampaign().getDate())
+                m.isActive() && (m instanceof Contract)
+                        && ((Contract) m).getStartDate().isBefore(gui.getCampaign().getLocalDate())
 		);
 	}
 
 	private boolean isInSearch() {
 		return gui.getCampaign().getShipSearchStart() != null;
 	}
-	
+
 	private void startSearch() {
 		gui.getCampaign().startShipSearch(getUnitType());
 		setVisible(false);
 	}
-	
-	private void endSearch() {
-		gui.getCampaign().endShipSearch();
-		setVisible(false);
-	}
-	
-	private void purchase() {
-		gui.getCampaign().purchaseShipSearchResult();
-		setVisible(false);
-	}
+
+    private void endSearch() {
+        gui.getCampaign().setShipSearchStart(null);
+        setVisible(false);
+    }
+
+    private void purchase() {
+        gui.getCampaign().purchaseShipSearchResult();
+        setVisible(false);
+    }
 }
