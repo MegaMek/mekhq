@@ -1,5 +1,20 @@
-/**
+/*
+ * Copyright (c) 2014, 2020 - The MegaMek Team. All rights reserved.
  *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -10,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -51,7 +67,6 @@ import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
@@ -76,12 +91,8 @@ import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Neoancient
- *
  */
 public class RetirementDefectionDialog extends JDialog {
-    /**
-     *
-     */
     private static final long serialVersionUID = -5551772461081092679L;
 
     private static final String PAN_OVERVIEW = "PanOverview";
@@ -173,8 +184,8 @@ public class RetirementDefectionDialog extends JDialog {
             }
             if (null == contract) {
                 instructions += "\n\nDays since last retirement roll: "
-                        + Utilities.countDaysBetween(rdTracker.getLastRetirementRoll().getTime(),
-                                hqView.getCampaign().getDate());
+                        + ChronoUnit.DAYS.between(rdTracker.getLastRetirementRoll(),
+                        hqView.getCampaign().getLocalDate());
             }
             txtInstructions.setText(instructions);
         } else {

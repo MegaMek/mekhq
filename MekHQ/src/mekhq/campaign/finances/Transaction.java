@@ -56,7 +56,8 @@ public class Transaction implements Serializable {
     public final static int C_LOAN_PRINCIPAL = 13;
     public final static int C_LOAN_PAYMENT   = 14;
     public final static int C_REPAIRS        = 15;
-    public final static int C_NUM            = 16;
+    public static final int C_RANSOM         = 16;
+    public final static int C_NUM            = 17;
 
     public static Vector<String> getCategoryList() {
         Vector<String> out = new Vector<>();
@@ -102,6 +103,8 @@ public class Transaction implements Serializable {
                 return "Loan Payment";
             case C_REPAIRS:
                 return "Repairs";
+            case C_RANSOM:
+                return "Ransom";
             default:
                 return "Unknown category";
         }
@@ -142,11 +145,7 @@ public class Transaction implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-                getAmount(),
-                getCategory(),
-                getDate(),
-                getDescription());
+        return Objects.hash(getAmount(), getCategory(), getDate(), getDescription());
     }
 
     @Override

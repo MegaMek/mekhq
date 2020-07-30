@@ -12,21 +12,19 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,13 +57,8 @@ import mekhq.campaign.mission.Mission;
  * Utility class that handles retirement/defection rolls and final payments
  * to personnel who retire/defect/get sacked and families of those killed
  * in battle.
- *
  */
 public class RetirementDefectionTracker implements Serializable, MekHqXmlSerializable{
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 7245317499458320654L;
 
     /* In case the dialog is closed after making the retirement rolls
@@ -75,18 +68,17 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     private HashSet<Integer> rollRequired;
     private HashMap<Integer, HashSet<UUID>> unresolvedPersonnel;
     private HashMap<UUID, Payout> payouts;
-    private GregorianCalendar lastRetirementRoll;
+    private LocalDate lastRetirementRoll;
 
     public RetirementDefectionTracker() {
         rollRequired = new HashSet<>();
         unresolvedPersonnel = new HashMap<>();
         payouts = new HashMap<>();
-        lastRetirementRoll = new GregorianCalendar();
+        lastRetirementRoll = LocalDate.now();
     }
 
     /**
-     *
-     * @param campaign
+     * @param campaign the campaign to get share values for
      * @return The value of each share in C-bills
      */
     public static Money getShareValue(Campaign campaign) {
@@ -114,18 +106,16 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     }
 
     /**
-     *
      * Computes the target for retirement rolls for all eligible personnel; this includes
      * all active personnel who are not dependents, prisoners, or bondsmen.
      *
      * @param contract	The contract that is being resolved; if the retirement roll is not
      * 					due to contract resolutions (e.g. > 12 months since last roll), this
      * 					can be null.
-     * @param campaign
+     * @param campaign  The campaign to calculate target numbers for
      * @return			A map with person ids as key and calculated target roll as value.
      */
-    public HashMap<UUID, TargetRoll> calculateTargetNumbers(AtBContract contract,
-            Campaign campaign) {
+    public HashMap<UUID, TargetRoll> calculateTargetNumbers(AtBContract contract, Campaign campaign) {
         HashMap <UUID, TargetRoll> targets = new HashMap<>();
         int combatLeadershipMod = 0;
         int supportLeadershipMod = 0;
@@ -139,14 +129,14 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             int proto = 0;
             int support = 0;
             for (Person p : campaign.getPersonnel()) {
-                if (!p.isActive() || p.getPrimaryRole() == Person.T_NONE || p.isDependent()
+                if (!p.isActive() || (p.getPrimaryRole() == Person.T_NONE) || p.isDependent()
                         || !p.getPrisonerStatus().isFree()) {
                     continue;
                 }
                 if (p.getPrimaryRole() >= Person.T_MECH_TECH) {
                     support++;
-                } else if (null == p.getUnitId() ||
-                        (null != campaign.getUnit(p.getUnitId()) && campaign.getUnit(p.getUnitId()).isCommander(p))) {
+                } else if ((null == p.getUnitId()) ||
+                        ((null != campaign.getUnit(p.getUnitId())) && campaign.getUnit(p.getUnitId()).isCommander(p))) {
                     /* The AtB rules do not state that crews count as a
                      * single person for leadership purposes, but to do otherwise
                      * would tax all but the most exceptional commanders of
@@ -161,8 +151,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             }
             combat += proto / 5;
             int max = 12;
-            if (null != campaign.getFlaggedCommander() &&
-                    null != campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER)) {
+            if ((null != campaign.getFlaggedCommander()) &&
+                    (null != campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER))) {
                 max += 6 * campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER).getLevel();
             }
             if (combat > 2 * max) {
@@ -275,7 +265,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
      * @param campaign
      */
     public void rollRetirement(AtBContract contract, HashMap<UUID, TargetRoll> targets, Money shareValue, Campaign campaign) {
-        if (null != contract && !unresolvedPersonnel.keySet().contains(contract.getId())) {
+        if (null != contract && !unresolvedPersonnel.containsKey(contract.getId())) {
             unresolvedPersonnel.put(contract.getId(), new HashSet<>());
         }
         for (UUID id : targets.keySet()) {
@@ -290,15 +280,15 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         if (null != contract) {
             rollRequired.remove(contract.getId());
         }
-        lastRetirementRoll.setTime(campaign.getDate());
+        lastRetirementRoll = campaign.getLocalDate();
     }
 
-    public GregorianCalendar getLastRetirementRoll() {
+    public LocalDate getLastRetirementRoll() {
         return lastRetirementRoll;
     }
 
-    public void setLastRetirementRoll(GregorianCalendar cal) {
-        lastRetirementRoll.setTime(cal.getTime());
+    public void setLastRetirementRoll(LocalDate lastRetirementRoll) {
+        this.lastRetirementRoll = lastRetirementRoll;
     }
 
     /**
@@ -342,7 +332,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     public void removePerson(Person person) {
         payouts.remove(person.getId());
 
-        for(int contractID : unresolvedPersonnel.keySet()) {
+        for (int contractID : unresolvedPersonnel.keySet()) {
             unresolvedPersonnel.get(contractID).remove(person.getId());
         }
     }
@@ -353,20 +343,20 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     public void cleanupOrphans(Campaign campaign) {
         Iterator<UUID> payoutIterator = payouts.keySet().iterator();
 
-        while(payoutIterator.hasNext()) {
+        while (payoutIterator.hasNext()) {
             UUID personID = payoutIterator.next();
-            if(campaign.getPerson(personID) == null) {
+            if (campaign.getPerson(personID) == null) {
                 payoutIterator.remove();
             }
         }
 
-        for(int contractID : unresolvedPersonnel.keySet()) {
+        for (int contractID : unresolvedPersonnel.keySet()) {
             Iterator<UUID> personIterator = unresolvedPersonnel.get(contractID).iterator();
 
-            while(personIterator.hasNext()) {
+            while (personIterator.hasNext()) {
                 UUID personID = personIterator.next();
 
-                if(campaign.getPerson(personID) == null) {
+                if (campaign.getPerson(personID) == null) {
                     personIterator.remove();
                 }
             }
@@ -378,7 +368,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     }
 
     public boolean isOutstanding(int id) {
-        return unresolvedPersonnel.keySet().contains(id);
+        return unresolvedPersonnel.containsKey(id);
     }
 
     /* Called by when all payouts have been resolved for the contract.
@@ -427,31 +417,28 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     }
 
     /**
-     *
      * @param person
      * @return	The amount in C-bills required to get a bonus to the retirement/defection roll
      */
     public static Money getBonusCost(Person person) {
         switch (person.getExperienceLevel(false)) {
-        case SkillType.EXP_ELITE:
-            return Money.of((person.getProfession() == Ranks.RPROF_MW)?300000:150000);
-        case SkillType.EXP_VETERAN:
-            return Money.of((person.getProfession() == Ranks.RPROF_MW)?150000:50000);
-        case SkillType.EXP_REGULAR:
-            return Money.of((person.getProfession() == Ranks.RPROF_MW)?50000:20000);
-        case SkillType.EXP_GREEN:
-        default:
-            return Money.of((person.getProfession() == Ranks.RPROF_MW)?20000:10000);
+            case SkillType.EXP_ELITE:
+                return Money.of((person.getProfession() == Ranks.RPROF_MW)?300000:150000);
+            case SkillType.EXP_VETERAN:
+                return Money.of((person.getProfession() == Ranks.RPROF_MW)?150000:50000);
+            case SkillType.EXP_REGULAR:
+                return Money.of((person.getProfession() == Ranks.RPROF_MW)?50000:20000);
+            case SkillType.EXP_GREEN:
+            default:
+                return Money.of((person.getProfession() == Ranks.RPROF_MW)?20000:10000);
         }
     }
 
     /**
-     *
      * Class used to record the required payout to each retired/defected/killed/sacked
      * person.
-     *
      */
-    public class Payout {
+    public static class Payout {
         int weightClass = 0;
         int dependents = 0;
         Money payoutAmount = Money.zero();
@@ -461,7 +448,9 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         boolean stolenUnit = false;
         UUID stolenUnitId = null;
 
-        public Payout() {}
+        public Payout() {
+
+        }
 
         public Payout(Person p, Money shareValue, boolean killed, boolean sharesForAll) {
             calculatePayout(p, killed, shareValue.isPositive());
@@ -470,22 +459,22 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             }
             if (killed) {
                 switch (Compute.d6()) {
-                case 1:
-                    /* No effects */
-                    break;
-                case 2:
-                    dependents = 1;
-                    break;
-                case 3:
-                    dependents = Compute.d6();
-                    break;
-                case 4:
-                case 5:
-                    recruit = true;
-                    break;
-                case 6:
-                    heir = true;
-                    break;
+                    case 1:
+                        /* No effects */
+                        break;
+                    case 2:
+                        dependents = 1;
+                        break;
+                    case 3:
+                        dependents = Compute.d6();
+                        break;
+                    case 4:
+                    case 5:
+                        recruit = true;
+                        break;
+                    case 6:
+                        heir = true;
+                        break;
                 }
             }
         }
@@ -516,11 +505,9 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     }
                 }
                 if (!shareSystem &&
-                        (p.getProfession() == Ranks.RPROF_MW ||
-                        p.getProfession() == Ranks.RPROF_ASF) &&
-                        p.getOriginalUnitWeight() > 0) {
-                    weightClass = p.getOriginalUnitWeight() +
-                            p.getOriginalUnitTech();
+                        ((p.getProfession() == Ranks.RPROF_MW) || (p.getProfession() == Ranks.RPROF_ASF))
+                        && (p.getOriginalUnitWeight() > 0)) {
+                    weightClass = p.getOriginalUnitWeight() + p.getOriginalUnitTech();
                     if (roll <= 1) {
                         weightClass--;
                     }
@@ -646,9 +633,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "</payouts>");
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1,
-                "lastRetirementRoll", df.format(lastRetirementRoll.getTime()));
+                "lastRetirementRoll", MekHqXmlUtil.saveFormattedDate(lastRetirementRoll));
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</retirementDefectionTracker>");
     }
 
@@ -684,7 +670,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE){
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
                         if (wn3.getNodeName().equalsIgnoreCase("contract")) {
@@ -701,12 +687,12 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE){
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
                         if (wn3.getNodeName().equalsIgnoreCase("payout")) {
                             UUID pid = UUID.fromString(wn3.getAttributes().getNamedItem("id").getTextContent());
-                            Payout payout = retVal.new Payout();
+                            Payout payout = new Payout();
                             NodeList nl3 = wn3.getChildNodes();
                             for (int z = 0; z < nl3.getLength(); z++) {
                                 Node wn4 = nl3.item(z);
@@ -733,8 +719,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRetirementRoll")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                    retVal.lastRetirementRoll.setTime(df.parse(wn2.getTextContent().trim()));
+                    retVal.setLastRetirementRoll(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 }
             }
         } catch (Exception ex) {
@@ -744,7 +729,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             MekHQ.getLogger().error(RetirementDefectionTracker.class, METHOD_NAME, ex);
         }
 
-        if(retVal != null) {
+        if (retVal != null) {
             // sometimes, a campaign may be loaded with orphan records in the retirement/defection tracker
             // let's clean those up here.
             retVal.cleanupOrphans(c);
