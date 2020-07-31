@@ -1113,8 +1113,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (getDateOfDeath() == null) {
             return "";
         } else {
-            return getDateOfDeath().format(DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getDateOfDeath());
         }
     }
 
