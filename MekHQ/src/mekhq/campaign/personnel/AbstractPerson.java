@@ -27,6 +27,7 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -43,7 +44,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     private UUID id;
 
     //region Name
-    protected transient String fullName; // this is a runtime variable, and shouldn't be saved
+    private transient String fullName; // this is a runtime variable, and shouldn't be saved
     private String preNominal;
     private String givenName;
     private String surname;
@@ -57,6 +58,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     private PersonnelStatus status;
     private LocalDate birthday;
     private LocalDate dateOfDeath;
+    private Genealogy genealogy;
     private String biography;
     //endregion Personal Information
 
@@ -95,6 +97,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
         status = PersonnelStatus.ACTIVE;
         birthday = null;
         dateOfDeath = null;
+        genealogy = new Genealogy(getId());
         biography = "";
         //endregion Personal Information
 
@@ -136,7 +139,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     }
 
     /**
-     * @return a String containing the person's first name including their prenominal
+     * @return a String containing the person's first name including their pre-nominal
      */
     public String getFirstName() {
         return getPreNominal() + " " + getGivenName();
@@ -342,6 +345,10 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
         return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
     }
 
+    public Genealogy getGenealogy() {
+        return genealogy;
+    }
+
     /**
      * @return the person's biography
      */
@@ -450,62 +457,6 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
 
     //region Read/Write from XML
     /**
-     * This is used to parse the AbstractPerson fields
-     * @param wn        The node to parse from
-     * @param retVal    The initialized class that inherits AbstractPerson
-     * @return an AbstractPerson that has all AbstractPerson fields loaded
-     */
-    public static AbstractPerson generateInstanceFromXML(Node wn, AbstractPerson retVal) {
-        try {
-            // Okay, now load AbstractPerson-specific fields!
-            NodeList nl = wn.getChildNodes();
-
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-                if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    try {
-                        retVal.id = UUID.fromString(wn2.getTextContent().trim());
-                    } catch (Exception ignored) {
-
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("preNominal")) {
-                    retVal.preNominal = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
-                    retVal.givenName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("surname")) {
-                    retVal.surname = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("postNominal")) {
-                    retVal.postNominal = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("maidenName")) {
-                    retVal.maidenName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
-                    retVal.callsign = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
-                    retVal.gender = Gender.parseFromString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    retVal.status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
-                    retVal.birthday = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
-                    retVal.dateOfDeath = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
-                    retVal.biography = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
-                    retVal.setPortraitCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
-                    retVal.setPortraitFileName(wn2.getTextContent().trim());
-                }
-            }
-        } catch (Exception e) {
-            MekHQ.getLogger().error(AbstractPerson.class, "generateInstanceFromXML",
-                    "Failed to load AbstractPerson, because of " + e.getMessage(), e);
-            retVal = null;
-        }
-
-        return retVal;
-    }
-
-    /**
      * This is to be called by the individual methods that implement AbstractPerson, as it does not
      * create a start or end tag.
      * @param pw1       The PrintWriter to print to
@@ -549,6 +500,10 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
                     MekHqXmlUtil.saveFormattedDate(getDateOfDeath()));
         }
 
+        if (!getGenealogy().isEmpty()) {
+            getGenealogy().writeToXml(pw1, indent);
+        }
+
         if (!StringUtil.isNullOrEmpty(getBiography())) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "biography", getBiography());
         }
@@ -563,6 +518,64 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "portraitFile", getPortraitFileNameDirect());
         }
         //endregion Portraits
+    }
+
+    /**
+     * This is used to parse the AbstractPerson fields
+     * @param wn        The node to parse from
+     * @param retVal    The initialized class that inherits AbstractPerson
+     * @return an AbstractPerson that has all AbstractPerson fields loaded
+     */
+    public static AbstractPerson generateInstanceFromXML(Node wn, AbstractPerson retVal) {
+        try {
+            // Okay, now load AbstractPerson-specific fields!
+            NodeList nl = wn.getChildNodes();
+
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+                if (wn2.getNodeName().equalsIgnoreCase("id")) {
+                    try {
+                        retVal.id = UUID.fromString(wn2.getTextContent().trim());
+                    } catch (Exception ignored) {
+
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("preNominal")) {
+                    retVal.preNominal = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
+                    retVal.givenName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("surname")) {
+                    retVal.surname = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("postNominal")) {
+                    retVal.postNominal = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("maidenName")) {
+                    retVal.maidenName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
+                    retVal.callsign = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
+                    retVal.gender = Gender.parseFromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
+                    retVal.status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
+                    retVal.birthday = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
+                    retVal.dateOfDeath = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
+                    retVal.genealogy = Genealogy.generateInstanceFromXML(wn2.getChildNodes());
+                } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
+                    retVal.biography = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
+                    retVal.setPortraitCategory(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
+                    retVal.setPortraitFileName(wn2.getTextContent().trim());
+                }
+            }
+        } catch (Exception e) {
+            MekHQ.getLogger().error(AbstractPerson.class, "generateInstanceFromXML",
+                    "Failed to load AbstractPerson, because of " + e.getMessage(), e);
+            retVal = null;
+        }
+
+        return retVal;
     }
     //endregion Read/Write from XML
 }

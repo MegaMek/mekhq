@@ -109,9 +109,6 @@ public class Person extends AbstractPerson {
     private PersonAwardController awardController;
 
     //region Family Variables
-    // Lineage
-    private Genealogy genealogy;
-
     //region Procreation
     // this is a flag used in random procreation to determine whether or not to attempt to procreate
     private boolean tryingToConceive;
@@ -326,7 +323,6 @@ public class Person extends AbstractPerson {
         phenotype = Phenotype.NONE;
         bloodname = "";
         idleMonths = -1;
-        genealogy = new Genealogy(getId());
         tryingToMarry = true;
         tryingToConceive = true;
         dueDate = null;
@@ -1055,10 +1051,6 @@ public class Person extends AbstractPerson {
         }
     }
 
-    public Genealogy getGenealogy() {
-        return genealogy;
-    }
-
     //region Pregnancy
     public boolean isTryingToConceive() {
         return tryingToConceive;
@@ -1412,9 +1404,7 @@ public class Person extends AbstractPerson {
             if (idleMonths > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleMonths", idleMonths);
             }
-            if (!genealogy.isEmpty()) {
-                genealogy.writeToXml(pw1, indent + 1);
-            }
+
             if (!isTryingToMarry()) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToMarry", false);
             }
@@ -1637,11 +1627,9 @@ public class Person extends AbstractPerson {
                 } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) { // legacy - 0.47.6 removal
                     CampaignXmlParser.addToAncestryMigrationMap(UUID.fromString(wn2.getTextContent().trim()), retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) { // legacy - 0.47.6 removal
-                    retVal.genealogy.setSpouse(UUID.fromString(wn2.getTextContent().trim()));
+                    retVal.getGenealogy().setSpouse(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) { // legacy - 0.47.6 removal
-                    Genealogy.loadFormerSpouses(retVal.genealogy, wn2.getChildNodes());
-                } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
-                    retVal.genealogy = Genealogy.generateInstanceFromXML(wn2.getChildNodes());
+                    Genealogy.loadFormerSpouses(retVal.getGenealogy(), wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) {
                     retVal.tryingToMarry = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {
