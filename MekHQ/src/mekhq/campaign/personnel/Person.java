@@ -419,6 +419,12 @@ public class Person extends AbstractPerson {
         commander = tf;
     }
 
+    @Override
+    public boolean isAncestor() {
+        return false;
+    }
+
+    @Override
     public boolean isDependent() {
         return dependent;
     }

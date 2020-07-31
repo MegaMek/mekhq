@@ -37,6 +37,9 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
+/**
+ * This class is the Minimum Viable Product for a Person in MekHQ.
+ */
 public abstract class AbstractPerson implements Serializable, MekHqXmlSerializable {
     //region Variable Declarations
     private static final long serialVersionUID = 2190101430016271321L;
@@ -80,7 +83,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      * @param surname           the person's surname
      * @param postNominal       the person's post-nominal
      */
-    public AbstractPerson(String preNominal, String givenName, String surname, String postNominal) {
+    protected AbstractPerson(String preNominal, String givenName, String surname, String postNominal) {
         id = UUID.randomUUID();
 
         //region Name
@@ -454,6 +457,18 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
         return (getAge(today) < 14);
     }
     //endregion Boolean Information Methods
+
+    //region Abstract Methods
+    /**
+     * @return Whether or not this AbstractPerson is an Ancestor
+     */
+    public abstract boolean isAncestor();
+
+    /**
+     * @return whether or not this AbstractPerson is a Dependent
+     */
+    public abstract boolean isDependent();
+    //endregion Abstract Methods
 
     //region Read/Write from XML
     /**
