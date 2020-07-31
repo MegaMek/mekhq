@@ -19,7 +19,9 @@ VERSION HISTORY:
 + PR #1850: Phenotype Rework Implementing Vehicle, ProtoMech, and Naval Phenotypes
 + PR #1669: Implementing the MegaMek Unit Selector in MekHQ
 + Issue #198: Adding Ransom Mech and Ransom Prisoner Options for Scenario Resolution
- + Issue #1881: Outer planets in Weldry system can now be clicked
++ Issue #1881: Outer planets in Weldry system can now be clicked
++ Issues #1569 and #1570 Phase 1: Genealogy
++ PR #1857: Personnel biographical view and last name simplification
 
 0.47.7 (2020-06-22 2330 UTC)
 + PR #1811: Fix advance multiple days reports not showing
