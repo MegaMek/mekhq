@@ -8384,8 +8384,8 @@ public class Campaign implements Serializable, ITechManager {
 
     public boolean checkYearlyRetirements() {
         if (getCampaignOptions().getUseAtB()
-                && (ChronoUnit.YEARS.between(getRetirementDefectionTracker()
-                .getLastRetirementRoll(), getLocalDate()) == 1L)) {
+                && (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(),
+                getLocalDate()) == getRetirementDefectionTracker().getLastRetirementRoll().lengthOfYear())) {
             Object[] options = { "Show Retirement Dialog", "Not Now" };
             return JOptionPane.YES_OPTION == JOptionPane
                     .showOptionDialog(
