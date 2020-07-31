@@ -105,7 +105,6 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("rehired.text")));
     }
 
-
     public static void promotedTo(Person person, Date date) {
         String message = logEntriesResourceMap.getString("promotedTo.text");
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, person.getRankName())));

@@ -487,14 +487,14 @@ public final class InjuryTypes {
 
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
-            final String METHOD_NAME = "genStressEffect(Campaign,Person,Injury,int)"; //$NON-NLS-1$
+            final String METHOD_NAME = "genStressEffect(Campaign,Person,Injury,int)";
 
             return Collections.singletonList(new GameEffect(
                     "1% chance of death; 9% chance of puncturing a lung",
                     rnd -> {
                         int rib = rnd.applyAsInt(100);
                         if (rib < 1) {
-                            p.changeStatus(c, PersonnelStatus.KIA);
+                            p.changeStatus(c, PersonnelStatus.WOUNDS);
                             MedicalLogEntry entry = MedicalLogger.brokenRibPunctureDead(p, c.getDate());
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                         } else if (rib < 10) {

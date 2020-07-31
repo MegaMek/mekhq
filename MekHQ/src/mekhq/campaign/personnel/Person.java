@@ -892,6 +892,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 break;
             case RETIRED:
                 ServiceLogger.retired(this, campaign.getDate());
+                if (campaign.getCampaignOptions().useRetirementDateTracking()) {
+                    setRetirement(campaign.getLocalDate());
+                }
                 break;
             case MIA:
                 ServiceLogger.mia(this, campaign.getDate());
@@ -922,7 +925,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (status.isDead()) {
             setDateOfDeath(campaign.getLocalDate());
             // Don't forget to tell the spouse
-            if (getGenealogy().hasSpouse()) {
+            if (getGenealogy().hasSpouse() && !getGenealogy().getSpouse(campaign).getStatus().isDeadOrMIA()) {
                 Divorce divorceType = campaign.getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
                         ? Divorce.ORIGIN_CHANGE_SURNAME : Divorce.SPOUSE_CHANGE_SURNAME;
                 divorceType.divorce(this, campaign);
