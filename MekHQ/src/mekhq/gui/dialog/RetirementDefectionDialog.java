@@ -72,7 +72,6 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
@@ -680,11 +679,12 @@ public class RetirementDefectionDialog extends JDialog {
                     (nGroup == PersonnelTab.PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
                     (nGroup == PersonnelTab.PG_ADMIN && type > Person.T_MEDIC)
                         ) {
-                    return person.isActive() || results;
+                    return person.getStatus().isActive() || results;
                 }
-                return ((nGroup == PersonnelTab.PG_MIA) && (person.getStatus() == PersonnelStatus.MIA))
-                        || ((nGroup == PersonnelTab.PG_KIA) && (person.getStatus() == PersonnelStatus.KIA))
-                        || ((nGroup == PersonnelTab.PG_RETIRE) && (person.getStatus() == PersonnelStatus.RETIRED));
+                return ((nGroup == PersonnelTab.PG_MIA) && person.getStatus().isMIA())
+                        || ((nGroup == PersonnelTab.PG_KIA) && (person.getStatus().isKIA()))
+                        || ((nGroup == PersonnelTab.PG_RETIRE) && person.getStatus().isRetired())
+                        || ((nGroup == PersonnelTab.PG_DEAD) && person.getStatus().isDead());
             }
         };
         sorter.setRowFilter(personTypeFilter);
@@ -713,7 +713,7 @@ public class RetirementDefectionDialog extends JDialog {
                         unit.getEntity().getUnitType() == UnitType.INFANTRY) {
                     return false;
                 }
-                if (unitAssignments.values().contains(unit.getId())) {
+                if (unitAssignments.containsValue(unit.getId())) {
                     return false;
                 }
                 if (nGroup < 0) {

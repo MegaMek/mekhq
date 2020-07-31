@@ -394,7 +394,7 @@ public final class BatchXPDialog extends JDialog {
         @Override
         public boolean include(RowFilter.Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
             Person p = entry.getModel().getPerson(entry.getIdentifier().intValue());
-            if (!p.isActive()) {
+            if (!p.getStatus().isActive()) {
                 return false;
             }
             if (!prisoners && !p.getPrisonerStatus().isFree()) {

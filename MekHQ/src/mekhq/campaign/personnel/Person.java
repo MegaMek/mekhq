@@ -39,6 +39,7 @@ import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.log.*;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.w3c.dom.Node;
@@ -294,6 +295,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(25000));
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
+
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            new EncodeControl());
 
     //region Reverse Compatibility
     // Unknown version
@@ -863,6 +867,99 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return status;
     }
 
+    /**
+     * This is used to change the person's PersonnelStatus
+     * @param campaign the campaign the person is part of
+     * @param status the person's new PersonnelStatus
+     */
+    public void changeStatus(Campaign campaign, PersonnelStatus status) {
+        if (status == getStatus()) { // no change means we don't need to process anything
+            return;
+        } else if (getStatus().isKIA()) {
+            // remove date of death for resurrection
+            setDateOfDeath(null);
+        }
+
+        switch (status) {
+            case ACTIVE:
+                if (getStatus().isMIA()) {
+                    ServiceLogger.recoveredMia(this, campaign.getDate());
+                } else if (getStatus().isDead()) {
+                    ServiceLogger.resurrected(this, campaign.getDate());
+                } else {
+                    ServiceLogger.rehired(this, campaign.getDate());
+                }
+                break;
+            case RETIRED:
+                ServiceLogger.retired(this, campaign.getDate());
+                break;
+            case MIA:
+                ServiceLogger.mia(this, campaign.getDate());
+                break;
+            case KIA:
+                ServiceLogger.kia(this, campaign.getDate());
+                break;
+            case NATURAL_CAUSES:
+                MedicalLogger.diedOfNaturalCauses(this, campaign.getDate());
+                ServiceLogger.passedAway(this, campaign.getDate(), status.toString());
+                break;
+            case WOUNDS:
+                MedicalLogger.diedFromWounds(this, campaign.getDate());
+                ServiceLogger.passedAway(this, campaign.getDate(), status.toString());
+                break;
+            case DISEASE:
+                MedicalLogger.diedFromDisease(this, campaign.getDate());
+                ServiceLogger.passedAway(this, campaign.getDate(), status.toString());
+                break;
+            case OLD_AGE:
+                MedicalLogger.diedOfOldAge(this, campaign.getDate());
+                ServiceLogger.passedAway(this, campaign.getDate(), status.toString());
+                break;
+        }
+
+        setStatus(status);
+
+        if (status.isDead()) {
+            setDateOfDeath(campaign.getLocalDate());
+            // Don't forget to tell the spouse
+            if (getGenealogy().hasSpouse()) {
+                Divorce divorceType = campaign.getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
+                        ? Divorce.ORIGIN_CHANGE_SURNAME : Divorce.SPOUSE_CHANGE_SURNAME;
+                divorceType.divorce(this, campaign);
+            }
+        }
+
+        if (!status.isActive()) {
+            setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+            // If we're assigned to a unit, remove us from it
+            Unit unit = campaign.getUnit(getUnitId());
+            if (unit != null) {
+                unit.remove(this, true);
+            }
+
+            // If we're assigned as a tech for any unit, remove us from it/them
+            List<UUID> techIds = getTechUnitIDs();
+            if (!techIds.isEmpty()) {
+                for (UUID tUUID : techIds) {
+                    unit = campaign.getUnit(tUUID);
+                    unit.remove(this, true);
+                }
+            }
+            // If we're assigned to any repairs or refits, remove that assignment
+            for (Part part : campaign.getParts()) {
+                if (getId().equals(part.getTeamId())) {
+                    part.cancelAssignment();
+                }
+            }
+        }
+
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * This is used to directly set the Person's PersonnelStatus without any processing
+     * @param status the person's new status
+     */
     public void setStatus(PersonnelStatus status) {
         this.status = status;
     }
@@ -1271,7 +1368,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             boolean conceived = false;
             if (getGenealogy().hasSpouse()) {
                 Person spouse = getGenealogy().getSpouse(campaign);
-                if (!spouse.isDeployed() && !spouse.isDeadOrMIA() && !spouse.isChild()
+                if (!spouse.isDeployed() && !spouse.getStatus().isDeadOrMIA() && !spouse.isChild()
                         && !(spouse.getGender() == getGender())) {
                     // setting is the decimal chance that this procreation attempt will create a child, base is 0.05%
                     conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()));
@@ -1413,8 +1510,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 && person.isTryingToMarry()
                 && person.oldEnoughToMarry(campaign)
                 && (!person.getPrisonerStatus().isPrisoner() || getPrisonerStatus().isPrisoner())
-                && !person.isDeadOrMIA()
-                && person.isActive()
+                && !person.getStatus().isDeadOrMIA()
+                && person.getStatus().isActive()
                 && !getGenealogy().checkMutualAncestors(person, getCampaign())
         );
     }
@@ -1528,14 +1625,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setBiography(String s) {
         this.biography = s;
-    }
-
-    public boolean isActive() {
-        return getStatus() == PersonnelStatus.ACTIVE;
-    }
-
-    public boolean isInActive() {
-        return getStatus() != PersonnelStatus.ACTIVE;
     }
 
     public ExtraData getExtraData() {
@@ -2322,7 +2411,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * This is used to pay a person their salary
      */
     public void payPersonSalary() {
-        if (isActive()) {
+        if (getStatus().isActive()) {
             payPerson(getSalary());
         }
     }
@@ -2936,7 +3025,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean needsFixing() {
-        return ((hits > 0) || needsAMFixing()) && (status == PersonnelStatus.ACTIVE);
+        return ((hits > 0) || needsAMFixing()) && getStatus().isActive();
     }
 
     public String succeed() {
@@ -3575,36 +3664,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         setHits(0);
     }
 
-    public void changeStatus(PersonnelStatus status) {
-        if (status == getStatus()) {
-            return;
-        }
-        Unit u = campaign.getUnit(getUnitId());
-        if (status == PersonnelStatus.KIA) {
-            MedicalLogger.diedFromWounds(this, campaign.getDate());
-            //set the date of death
-            setDateOfDeath(getCampaign().getLocalDate());
-        }
-        if (status == PersonnelStatus.RETIRED) {
-            ServiceLogger.retireDueToWounds(this, campaign.getDate());
-        }
-        setStatus(status);
-        if (status != PersonnelStatus.ACTIVE) {
-            setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
-            // If we're assigned to a unit, remove us from it
-            if (null != u) {
-                u.remove(this, true);
-            }
-            // If we're assigned as a tech for any unit, remove us from it/them
-            if (!techUnitIds.isEmpty()) {
-                for (UUID tuuid : techUnitIds) {
-                    Unit t = campaign.getUnit(tuuid);
-                    t.remove(this, true);
-                }
-            }
-        }
-    }
-
     public int getAbilityTimeModifier() {
         int modifier = 100;
         if (campaign.getCampaignOptions().useToughness()) {
@@ -3792,7 +3851,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return the number of shares the person has
      */
     public int getNumShares(boolean sharesForAll) {
-        if (!isActive() || !getPrisonerStatus().isFree() || (!sharesForAll && !hasRole(T_MECHWARRIOR))) {
+        if (!getStatus().isActive() || !getPrisonerStatus().isFree()
+                || (!sharesForAll && !hasRole(T_MECHWARRIOR))) {
             return 0;
         }
         int shares = 1;
@@ -3821,10 +3881,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         shares += getOriginalUnitTech();
 
         return shares;
-    }
-
-    public boolean isDeadOrMIA() {
-        return (status == PersonnelStatus.KIA) || (status == PersonnelStatus.MIA);
     }
 
     public boolean isEngineer() {

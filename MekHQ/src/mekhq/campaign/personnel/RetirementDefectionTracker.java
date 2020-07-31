@@ -1,7 +1,7 @@
 /*
  * RetirementDefectionTracker.java
  *
- * Copyright (c) 2014 Carl Spain. All rights reserved.
+ * Copyright (c) 2014 - Carl Spain. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -128,9 +128,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             int combat = 0;
             int proto = 0;
             int support = 0;
-            for (Person p : campaign.getPersonnel()) {
-                if (!p.isActive() || (p.getPrimaryRole() == Person.T_NONE) || p.isDependent()
-                        || !p.getPrisonerStatus().isFree()) {
+            for (Person p : campaign.getActivePersonnel()) {
+                if ((p.getPrimaryRole() == Person.T_NONE) || p.isDependent() || !p.getPrisonerStatus().isFree()) {
                     continue;
                 }
                 if (p.getPrimaryRole() >= Person.T_MECH_TECH) {
@@ -167,8 +166,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             }
         }
 
-        for (Person p : campaign.getPersonnel()) {
-            if (!p.isActive() || p.isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed()
+        for (Person p : campaign.getActivePersonnel()) {
+            if (p.isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed()
                     || (p.isFounder() && campaign.getCampaignOptions().getFoundersNeverRetire())) {
                 continue;
             }

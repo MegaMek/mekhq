@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.rating;
 
@@ -45,7 +45,6 @@ import megamek.common.SmallCraftBay;
 import megamek.common.UnitType;
 
 import megamek.common.logging.LogLevel;
-import megamek.common.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -58,7 +57,7 @@ import mekhq.campaign.unit.Unit;
  * @version %Id%
  * @since 3/15/2012
  */
-@SuppressWarnings("SameParameterValue")
+@SuppressWarnings(value = "SameParameterValue")
 public abstract class AbstractUnitRating implements IUnitRating {
 
     static final int HEADER_LENGTH = 19;
@@ -132,15 +131,18 @@ public abstract class AbstractUnitRating implements IUnitRating {
         AbstractUnitRating.initialized = initialized;
     }
 
+    @Override
     public void reInitialize() {
         setInitialized(false);
         initValues();
     }
 
+    @Override
     public String getAverageExperience() {
         return getExperienceLevelName(calcAverageExperience());
     }
 
+    @Override
     public int getCombatRecordValue() {
         setSuccessCount(0);
         setFailCount(0);
@@ -191,6 +193,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     /**
      * Returns the commander (highest ranking person) for this force.
      */
+    @Override
     public Person getCommander() {
         if ((commander == null)) {
 
@@ -212,9 +215,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
             // Whoever has the highest rank is the commander
             commanderList.sort((p1, p2) -> {
                 // Active personnel outrank inactive personnel
-                if (p1.isActive() && !p2.isActive()) {
+                if (p1.getStatus().isActive() && !p2.getStatus().isActive()) {
                     return -1;
-                } else if (!p1.isActive() && p2.isActive()) {
+                } else if (!p1.getStatus().isActive() && p2.getStatus().isActive()) {
                     return 1;
                 }
 
@@ -309,10 +312,12 @@ public abstract class AbstractUnitRating implements IUnitRating {
     /**
      * Returns the overall percentage of fully supported units.
      */
+    @Override
     public BigDecimal getSupportPercent() {
         return supportPercent;
     }
 
+    @Override
     public int getTransportValue() {
         int value = 0;
 
@@ -346,6 +351,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return value;
     }
 
+    @Override
     public int getUnitRating(int score) {
         if (score < 0) {
             return DRAGOON_F;
@@ -362,6 +368,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         }
     }
 
+    @Override
     public String getUnitRatingName(int rating) {
         switch (rating) {
             case DRAGOON_F:
@@ -381,19 +388,23 @@ public abstract class AbstractUnitRating implements IUnitRating {
         }
     }
 
+    @Override
     public String getUnitRating() {
         int score = calculateUnitRatingScore();
         return getUnitRatingName(getUnitRating(score)) + " (" + score + ")";
     }
 
+    @Override
     public int getUnitRatingAsInteger() {
         return getUnitRating(calculateUnitRatingScore());
     }
 
+    @Override
     public int getScore() {
         return calculateUnitRatingScore();
     }
 
+    @Override
     public int getModifier() {
         return (calculateUnitRatingScore() / 10);
     }
