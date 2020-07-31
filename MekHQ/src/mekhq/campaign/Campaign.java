@@ -5958,7 +5958,8 @@ public class Campaign implements Serializable, ITechManager {
             // set the date of death
             person.setDateOfDeath(getLocalDate());
             // Don't forget to tell the spouse
-            if (person.getGenealogy().hasSpouse() && !person.getGenealogy().getSpouse(this).isDeadOrMIA()) {
+            if (person.getGenealogy().hasSpouse()
+                    && !person.getGenealogy().getSpouse(this).getStatus().isDeadOrMIA()) {
                 Divorce divorceType = getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
                         ? Divorce.ORIGIN_CHANGE_SURNAME : Divorce.SPOUSE_CHANGE_SURNAME;
                 divorceType.divorce(person, this);

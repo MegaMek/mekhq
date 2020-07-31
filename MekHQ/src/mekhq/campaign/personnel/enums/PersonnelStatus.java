@@ -42,12 +42,25 @@ public enum PersonnelStatus {
     }
     //endregion Constructors
 
+    //region Getters
     /**
      * @return the name of the status
      */
     public String getStatusName() {
         return statusName;
     }
+    //endregion Getters
+
+    //region Boolean Information Methods
+    public boolean isActive() {
+        return this == ACTIVE;
+    }
+
+    public boolean isDeadOrMIA() {
+        return (this == KIA) || (this == PersonnelStatus.MIA);
+    }
+    //endregion Boolean Information Methods
+
 
     /**
      * @param text containing the PersonnelStatus

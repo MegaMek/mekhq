@@ -19,6 +19,7 @@
 package mekhq.gui.dialog;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -89,11 +90,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private javax.swing.JPanel panSkills;
     private javax.swing.JPanel panOptions;
     private javax.swing.JTextField textToughness;
-    private javax.swing.JTextField textGivenName;
-    private javax.swing.JTextField textSurname;
-    private javax.swing.JTextField textHonorific;
-    private javax.swing.JTextField textNickname;
-    private javax.swing.JTextField textBloodname;
+    private JTextField textPreNominal;
+    private JTextField textGivenName;
+    private JTextField textSurname;
+    private JTextField textPostNominal;
+    private JTextField textNickname;
+    private JTextField textBloodname;
     private MarkdownEditorPanel txtBio;
     private JComboBox<Faction> choiceFaction;
     private JComboBox<PlanetarySystem> choiceSystem;
@@ -152,9 +154,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JLabel lblNickname = new JLabel();
         JLabel lblBloodname = new JLabel();
         JPanel panName = new javax.swing.JPanel(new java.awt.GridBagLayout());
-        textGivenName = new javax.swing.JTextField();
-        textSurname = new javax.swing.JTextField();
-        textHonorific = new javax.swing.JTextField();
         textNickname = new javax.swing.JTextField();
         textBloodname = new javax.swing.JTextField();
         textToughness = new javax.swing.JTextField();
@@ -189,31 +188,39 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblName, gridBagConstraints);
 
-        textGivenName.setMinimumSize(new java.awt.Dimension(100, 28));
-        textGivenName.setName("textGivenName"); // NOI18N
-        textGivenName.setPreferredSize(new java.awt.Dimension(100, 28));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        textGivenName.setText(person.getGivenName());
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+
+        textPreNominal = new JTextField(person.getPreNominal());
+        textPreNominal.setName("textPreNominal");
+        textPreNominal.setMinimumSize(new Dimension(50, 28));
+        textPreNominal.setPreferredSize(new Dimension(50, 28));
+        panName.add(textPreNominal, gridBagConstraints);
+
+        textGivenName = new JTextField(person.getGivenName());
+        textGivenName.setName("textGivenName");
+        textGivenName.setMinimumSize(new Dimension(100, 28));
+        textGivenName.setPreferredSize(new Dimension(100, 28));
+        gridBagConstraints.gridx = 2;
         panName.add(textGivenName, gridBagConstraints);
 
-        textSurname.setMinimumSize(new java.awt.Dimension(100, 28));
-        textSurname.setName("textSurname"); // NOI18N
-        textSurname.setPreferredSize(new java.awt.Dimension(100, 28));
-        gridBagConstraints.gridx = 2;
-        textSurname.setText(person.getSurname());
+        textSurname = new JTextField(person.getSurname());
+        textSurname.setName("textSurname");
+        textSurname.setMinimumSize(new Dimension(100, 28));
+        textSurname.setPreferredSize(new Dimension(100, 28));
+        gridBagConstraints.gridx = 3;
         panName.add(textSurname, gridBagConstraints);
 
-        textHonorific.setMinimumSize(new java.awt.Dimension(50, 28));
-        textHonorific.setName("textHonorific"); // NOI18N
-        textHonorific.setPreferredSize(new java.awt.Dimension(50, 28));
-        gridBagConstraints.gridx = 3;
-        textHonorific.setText(person.getHonorific());
-        panName.add(textHonorific, gridBagConstraints);
+        textPostNominal = new JTextField(person.getPostNominal());
+        textPostNominal.setName("textPostNominal");
+        textPostNominal.setMinimumSize(new Dimension(50, 28));
+        textPostNominal.setPreferredSize(new Dimension(50, 28));
+        gridBagConstraints.gridx = 4;
+        panName.add(textPostNominal, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -923,14 +930,15 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
     }
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(ActionEvent evt) {
         setVisible(false);
-    }// GEN-LAST:event_btnCloseActionPerformed
+    }
 
-    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOkActionPerformed
+    private void btnOkActionPerformed(ActionEvent evt) {
+        person.setPreNominal(textPreNominal.getText());
         person.setGivenName(textGivenName.getText());
         person.setSurname(textSurname.getText());
-        person.setHonorific(textHonorific.getText());
+        person.setPostNominal(textPostNominal.getText());
         person.setCallsign(textNickname.getText());
         person.setBloodname(textBloodname.getText());
         person.setBiography(txtBio.getText());

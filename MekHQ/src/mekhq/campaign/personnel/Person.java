@@ -23,7 +23,6 @@ package mekhq.campaign.personnel;
 
 import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -50,7 +49,6 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
@@ -64,7 +62,7 @@ import mekhq.campaign.universe.Planet;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Person implements Serializable, MekHqXmlSerializable {
+public class Person extends AbstractPerson {
     //region Variable Declarations
     private static final long serialVersionUID = -847642980395311152L;
 
@@ -156,25 +154,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Marriage
     //endregion Family Variables
 
-    private UUID id;
-
-    private String fullName;
-    private String givenName;
-    private String surname;
-    private String honorific;
-    private String maidenName;
-    private String callsign;
-    private Gender gender;
-
     private int primaryRole;
     private int secondaryRole;
 
     private ROMDesignation primaryDesignator;
     private ROMDesignation secondaryDesignator;
 
-    private String biography;
-    private LocalDate birthday;
-    private LocalDate dateOfDeath;
     private LocalDate recruitment;
     private LocalDate lastRankChangeDate;
     private LocalDate retirement;
@@ -185,7 +170,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private PersonnelOptions options;
     private int toughness;
 
-    private PersonnelStatus status;
     private int xp;
     private int acquisitions;
     private Money salary;
@@ -216,14 +200,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //days of rest
     private int idleMonths;
     private int daysToWaitForHealing;
-
-    //region portrait
-    private String portraitCategory;
-    private String portraitFile;
-    // runtime override (not saved)
-    private transient String portraitCategoryOverride = null;
-    private transient String portraitFileOverride = null;
-    //endregion portrait
 
     // Our rank
     private int rank;
@@ -318,30 +294,26 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public Person(String givenName, String surname, Campaign campaign, String factionCode) {
-        this(givenName, surname, "", campaign, factionCode);
+        this("", givenName, surname, "", campaign, factionCode);
     }
 
     /**
      * Primary Person constructor, variables are initialized in the exact same order as they are
      * saved to the XML file
-     * @param givenName     the person's given name
-     * @param surname       the person's surname
-     * @param honorific     the person's honorific
+     * @param preNominal        the person's pre-nominal
+     * @param givenName         the person's given name
+     * @param surname           the person's surname
+     * @param postNominal       the person's post-nominal
      * @param campaign      the campaign this person is a part of
      * @param factionCode   the faction this person was borne into
      */
-    public Person(String givenName, String surname, String honorific, Campaign campaign,
-                  String factionCode) {
+    public Person(String preNominal, String givenName, String surname, String postNominal,
+                  Campaign campaign, String factionCode) {
+        super(preNominal, givenName, surname, postNominal);
         // First, we assign campaign
         this.campaign = campaign;
 
         // Then, we assign the variables in XML file order
-        id = UUID.randomUUID();
-        this.givenName = givenName;
-        this.surname = surname;
-        this.honorific = honorific;
-        maidenName = null; // this is set to null to handle divorce cases
-        callsign = "";
         primaryRole = T_NONE;
         secondaryRole = T_NONE;
         primaryDesignator = ROMDesignation.NONE;
@@ -353,18 +325,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
         clan = originFaction.isClan();
         phenotype = Phenotype.NONE;
         bloodname = "";
-        biography = "";
         idleMonths = -1;
         genealogy = new Genealogy(getId());
         tryingToMarry = true;
         tryingToConceive = true;
         dueDate = null;
         expectedDueDate = null;
-        portraitCategory = Crew.ROOT_PORTRAIT;
-        portraitFile = Crew.PORTRAIT_NONE;
         xp = 0;
         daysToWaitForHealing = 0;
-        gender = Gender.MALE;
         rank = 0;
         rankLevel = 0;
         rankSystem = -1;
@@ -375,13 +343,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         unitId = null;
         salary = Money.of(-1);
         totalEarnings = Money.of(0);
-        status = PersonnelStatus.ACTIVE;
         prisonerStatus = PrisonerStatus.FREE;
         hits = 0;
         toughness = 0;
         resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
-        birthday = null;
-        dateOfDeath = null;
         recruitment = null;
         lastRankChangeDate = null;
         retirement = null;
@@ -559,73 +524,28 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Text Getters
 
     //region Names
-    public String getGivenName() {
-        return givenName;
-    }
-
-    public void setGivenName(String n) {
-        this.givenName = n;
-        setFullName();
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String n) {
-        this.surname = n;
-        setFullName();
-    }
-
-    public String getHonorific() {
-        return honorific;
-    }
-
-    public void setHonorific(String n) {
-        this.honorific = n;
-        setFullName();
-    }
-
-    public String getMaidenName() {
-        return maidenName;
-    }
-
-    public void setMaidenName(String n) {
-        this.maidenName = n;
-    }
-
     /**
      * return a full last name which may be a bloodname or a surname with or without honorifics.
      * A bloodname will overrule a surname but we do not disallow surnames for clanners, if the
      * player wants to input them
      * @return a String of the person's last name
      */
+    @Override
     public String getLastName() {
         String lastName = "";
-        if (!StringUtil.isNullOrEmpty(bloodname)) {
-            lastName = bloodname;
-        } else if (!StringUtil.isNullOrEmpty(surname)) {
-            lastName = surname;
+
+        if (!StringUtil.isNullOrEmpty(getBloodname())) {
+            lastName += getBloodname();
+        } else if (!StringUtil.isNullOrEmpty(getSurname())) {
+            lastName += getSurname();
         }
 
-        if (!StringUtil.isNullOrEmpty(honorific)) {
-            lastName += " " + honorific;
+        if (!StringUtil.isNullOrEmpty(getPostNominal())) {
+            lastName += " " + getPostNominal();
         }
         return lastName;
     }
 
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName() {
-        String lastName = getLastName();
-        if (!StringUtil.isNullOrEmpty(lastName)) {
-            fullName = givenName + " " + lastName;
-        } else {
-            fullName = givenName;
-        }
-    }
 
     /**
      * This method is used to migrate names from being a joined name to split between given name and surname,
@@ -649,7 +569,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Then, the full name is set
         String[] name = n.trim().split("\\s+");
 
-        givenName = name[0];
+        String givenName = name[0];
+        String surname = "";
 
         if (isClanner()) {
             if (name.length > 1) {
@@ -681,45 +602,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
             surname = "";
         }
 
-        setFullName();
-    }
-
-    public String getHyperlinkedName() {
-        return String.format("<a href='PERSON:%s'>%s</a>", getId().toString(), getFullName());
-    }
-
-    public String getCallsign() {
-        return callsign;
-    }
-
-    public void setCallsign(String n) {
-        this.callsign = n;
+        setGivenName(givenName);
+        setSurname(surname);
     }
     //endregion Names
-
-    public String getPortraitCategory() {
-        return Utilities.nonNull(portraitCategoryOverride, portraitCategory);
-    }
-
-    public String getPortraitFileName() {
-        return Utilities.nonNull(portraitFileOverride, portraitFile);
-    }
-
-    public void setPortraitCategory(String s) {
-        this.portraitCategory = s;
-    }
-
-    public void setPortraitFileName(String s) {
-        this.portraitFile = s;
-    }
-
-    public void setPortraitCategoryOverride(String s) {
-        this.portraitCategoryOverride = s;
-    }
-
-    public void setPortraitFileNameOverride(String s) {
-        this.portraitFileOverride = s;
-    }
 
     //region Personnel Roles
     // TODO : Move me into an enum with checks for hasAdministratorRole, hasTechRole, hasMedicalRole, etc.
@@ -858,14 +744,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return (role >= T_MECH_TECH) && (role < T_LAM_PILOT);
     }
     //endregion Personnel Roles
-
-    public PersonnelStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(PersonnelStatus status) {
-        this.status = status;
-    }
 
     public int getIdleMonths() {
         return idleMonths;
@@ -1085,46 +963,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setBirthday(LocalDate date) {
-        this.birthday = date;
-    }
-
-    public LocalDate getBirthday() {
-        return birthday;
-    }
-
-    public LocalDate getDateOfDeath() {
-        return dateOfDeath;
-    }
-
     public String getDeathDateAsString(Campaign campaign) {
         if (getDateOfDeath() == null) {
             return "";
         } else {
             return campaign.getCampaignOptions().getDisplayFormattedDate(getDateOfDeath());
         }
-    }
-
-    public void setDateOfDeath(LocalDate date) {
-        this.dateOfDeath = date;
-    }
-
-    public int getAge(LocalDate today) {
-        // Get age based on year
-        if (getDateOfDeath() != null) {
-            //use date of death instead of birthday
-            today = getDateOfDeath();
-        }
-
-        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
     }
 
     public void setRecruitment(LocalDate date) {
@@ -1211,18 +1055,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public boolean isChild() {
-        return (getAge(getCampaign().getLocalDate()) <= 13);
-    }
-
     public Genealogy getGenealogy() {
         return genealogy;
     }
@@ -1263,7 +1095,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public boolean canProcreate(Campaign campaign) {
         return getGender().isFemale() && isTryingToConceive() && !isPregnant() && !isDeployed()
-                && !isChild() && (getAge(campaign.getLocalDate()) < 51);
+                && !isChild(campaign.getLocalDate()) && (getAge(campaign.getLocalDate()) < 51);
     }
 
     public void procreate(Campaign campaign) {
@@ -1271,7 +1103,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             boolean conceived = false;
             if (getGenealogy().hasSpouse()) {
                 Person spouse = getGenealogy().getSpouse(campaign);
-                if (!spouse.isDeployed() && !spouse.isDeadOrMIA() && !spouse.isChild()
+                if (!spouse.isDeployed() && !spouse.getStatus().isDeadOrMIA()
+                        && !spouse.isChild(campaign.getLocalDate())
                         && !(spouse.getGender() == getGender())) {
                     // setting is the decimal chance that this procreation attempt will create a child, base is 0.05%
                     conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()));
@@ -1413,7 +1246,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 && person.isTryingToMarry()
                 && person.oldEnoughToMarry(campaign)
                 && (!person.getPrisonerStatus().isPrisoner() || getPrisonerStatus().isPrisoner())
-                && !person.isDeadOrMIA()
+                && !person.getStatus().isDeadOrMIA()
                 && person.isActive()
                 && !getGenealogy().checkMutualAncestors(person, getCampaign())
         );
@@ -1522,14 +1355,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return false;
     }
 
-    public String getBiography() {
-        return biography;
-    }
-
-    public void setBiography(String s) {
-        this.biography = s;
-    }
-
     public boolean isActive() {
         return getStatus() == PersonnelStatus.ACTIVE;
     }
@@ -1544,21 +1369,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id.toString()
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + getId().toString()
                 + "\" type=\"" + this.getClass().getName() + "\">");
+        super.writeToXml(pw1, indent + 1);
         try {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "id", id.toString());
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", givenName);
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", surname);
-            if (!StringUtil.isNullOrEmpty(honorific)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "honorific", honorific);
-            }
-            if (maidenName != null) { // this is only a != null comparison because empty is a use case for divorce
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", maidenName);
-            }
-            if (!StringUtil.isNullOrEmpty(callsign)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", callsign);
-            }
             // Always save the primary role
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "primaryRole", primaryRole);
             if (secondaryRole != T_NONE) {
@@ -1594,9 +1408,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (!StringUtil.isNullOrEmpty(bloodname)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bloodname", bloodname);
             }
-            if (!StringUtil.isNullOrEmpty(biography)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "biography", biography);
-            }
+
             if (idleMonths > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleMonths", idleMonths);
             }
@@ -1617,19 +1429,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "expectedDueDate",
                         MekHqXmlUtil.saveFormattedDate(expectedDueDate));
             }
-            if (!portraitCategory.equals(Crew.ROOT_PORTRAIT)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", portraitCategory);
-            }
-            if (!portraitFile.equals(Crew.PORTRAIT_NONE)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", portraitFile);
-            }
             // Always save the current XP
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", xp);
             if (daysToWaitForHealing != 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWaitForHealing", daysToWaitForHealing);
             }
-            // Always save the person's gender, as it would otherwise get confusing fast
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", gender.name());
             // Always save a person's rank
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rank", rank);
             if (rankLevel != 0) {
@@ -1659,8 +1463,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (!totalEarnings.equals(Money.of(0))) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "totalEarnings", totalEarnings.toXmlString());
             }
-            // Always save a person's status, to make it easy to parse the personnel saved data
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "status", status.name());
+
             if (prisonerStatus != PrisonerStatus.FREE) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerStatus", prisonerStatus.name());
             }
@@ -1676,14 +1479,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (overtimeLeft > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "overtimeLeft", overtimeLeft);
             }
-            if (birthday != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "birthday",
-                        MekHqXmlUtil.saveFormattedDate(birthday));
-            }
-            if (dateOfDeath != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "deathday",
-                        MekHqXmlUtil.saveFormattedDate(dateOfDeath));
-            }
+
             if (recruitment != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "recruitment",
                         MekHqXmlUtil.saveFormattedDate(recruitment));
@@ -1777,9 +1573,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)";
 
         Person retVal = new Person(c);
+
+        retVal = (Person) AbstractPerson.generateInstanceFromXML(wn, retVal);
+
+        if (retVal == null) {
+            return null;
+        }
 
         try {
             // Okay, now load Person-specific fields!
@@ -1802,16 +1604,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) { // legacy - 0.47.5 removal
                     retVal.migrateName(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
-                    retVal.givenName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("surname")) {
-                    retVal.surname = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) {
-                    retVal.honorific = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("maidenName")) {
-                    retVal.maidenName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
-                    retVal.callsign = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
                     retVal.commander = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) {
@@ -1828,8 +1620,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
                     retVal.bloodname = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
-                    retVal.biography = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
                     retVal.primaryRole = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryRole")) {
@@ -1844,12 +1634,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
                     retVal.idleMonths = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        retVal.id = UUID.fromString(wn2.getTextContent());
-                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) { // legacy - 0.47.6 removal
                     CampaignXmlParser.addToAncestryMigrationMap(UUID.fromString(wn2.getTextContent().trim()), retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) { // legacy - 0.47.6 removal
@@ -1866,18 +1650,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.dueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
                     retVal.expectedDueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
-                    retVal.setPortraitCategory(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
-                    retVal.setPortraitFileName(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
                     retVal.xp = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("nTasks")) {
                     retVal.nTasks = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
                     retVal.hits = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
-                    retVal.gender = Gender.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                     if (version.isLowerThan("0.3.4-r1782")) {
                         RankTranslator rt = new RankTranslator(c);
@@ -1914,8 +1692,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                             retVal.unitId = UUID.fromString(wn2.getTextContent());
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    retVal.status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerStatus")) {
                     retVal.prisonerStatus = PrisonerStatus.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) { // Legacy
@@ -1930,10 +1706,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.minutesLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
                     retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
-                    retVal.birthday = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
-                    retVal.dateOfDeath = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
                     retVal.recruitment = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
@@ -2087,6 +1859,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
                     retVal.extraData = ExtraData.createFromXml(wn2);
+                } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) { //Legacy, removed in 0.47.9
+                    retVal.setPostNominal(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
+                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
+                        retVal.oldId = Integer.parseInt(wn2.getTextContent());
+                    }
                 }
             }
 
@@ -2936,7 +2714,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean needsFixing() {
-        return ((hits > 0) || needsAMFixing()) && (status == PersonnelStatus.ACTIVE);
+        return ((hits > 0) || needsAMFixing()) && getStatus().isActive();
     }
 
     public String succeed() {
@@ -3821,10 +3599,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         shares += getOriginalUnitTech();
 
         return shares;
-    }
-
-    public boolean isDeadOrMIA() {
-        return (status == PersonnelStatus.KIA) || (status == PersonnelStatus.MIA);
     }
 
     public boolean isEngineer() {
