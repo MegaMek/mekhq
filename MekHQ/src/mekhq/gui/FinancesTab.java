@@ -98,7 +98,7 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private enum GraphType {
-        BALANCE_AMOUNT, MONTHLY_FINANCES;
+        BALANCE_AMOUNT, MONTHLY_FINANCES
     }
 
     /*
@@ -108,7 +108,7 @@ public final class FinancesTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab", new EncodeControl());
 
         GridBagConstraints gridBagConstraints;
 
@@ -116,13 +116,13 @@ public final class FinancesTab extends CampaignGuiTab {
         ChartPanel financeAmountPanel = (ChartPanel) createGraphPanel(GraphType.BALANCE_AMOUNT);
         ChartPanel financeMonthlyPanel = (ChartPanel) createGraphPanel(GraphType.MONTHLY_FINANCES);
 
-        financeModel = new FinanceTableModel();
+        financeModel = new FinanceTableModel(getCampaign());
         financeTable = new JTable(financeModel);
         financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         financeTable.addMouseListener(new FinanceTableMouseAdapter(getCampaignGui(),
                 financeTable, financeModel));
         financeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < FinanceTableModel.N_COL; i++) {
             column = financeTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(financeModel.getColumnWidth(i));
@@ -131,7 +131,7 @@ public final class FinancesTab extends CampaignGuiTab {
         financeTable.setIntercellSpacing(new Dimension(0, 0));
         financeTable.setShowGrid(false);
 
-        loanModel = new LoanTableModel();
+        loanModel = new LoanTableModel(getCampaign());
         loanTable = new JTable(loanModel);
         loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         loanTable.addMouseListener(new LoanTableMouseAdapter(getCampaignGui(),
