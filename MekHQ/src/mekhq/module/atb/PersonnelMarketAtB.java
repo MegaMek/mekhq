@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018  - The MegaMek Team
+ * Copyright (c) 2018  - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,18 +10,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.module.atb;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
@@ -33,7 +32,6 @@ import mekhq.module.api.PersonnelMarketMethod;
  * Method for generating market personnel according to AtB rules.
  *
  * @author Neoancient
- *
  */
 public class PersonnelMarketAtB implements PersonnelMarketMethod {
 
@@ -104,8 +102,6 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
             }
 
             if (null != p) {
-                UUID id = UUID.randomUUID();
-                p.setId(id);
                 retVal.add(p);
 
                 if (p.getPrimaryRole() == Person.T_GVEE_DRIVER) {
@@ -113,10 +109,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                      * chances of being drivers or gunners */
                     retVal.remove(p);
                     for (int i = 0; i < Compute.d6(); i++) {
-                        p = c.newPerson((Compute.d6() < 4) ? Person.T_GVEE_DRIVER : Person.T_VEE_GUNNER);
-                        id = UUID.randomUUID();
-                        p.setId(id);
-                        retVal.add(p);
+                        retVal.add(c.newPerson((Compute.d6() < 4) ? Person.T_GVEE_DRIVER : Person.T_VEE_GUNNER));
                     }
                 }
 

@@ -480,7 +480,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
             case CMD_ADD_PREGNANCY: {
                 if (selectedPerson.getGender().isFemale()) {
-                    selectedPerson.addPregnancy();
+                    selectedPerson.addPregnancy(gui.getCampaign());
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
@@ -494,7 +494,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
             case CMD_REMOVE_SPOUSE: {
                 for (Person person : people) {
-                    if (person.hasSpouse()) {
+                    if (person.getGenealogy().hasSpouse()) {
                         Divorce.valueOf(data[1]).divorce(person, gui.getCampaign());
                     }
                 }
@@ -727,8 +727,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         JOptionPane.YES_NO_OPTION)) {
                     for (Person person : people) {
                         gui.getCampaign().removePerson(person.getId());
-                        if (person.hasSpouse()) {
-                            person.getSpouse().setSpouseId(null);
+                        if (person.getGenealogy().hasSpouse()) {
+                            person.getGenealogy().getSpouse(gui.getCampaign()).getGenealogy().setSpouse(null);
                         }
                     }
                 }
@@ -1806,7 +1806,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
 
             if (oneSelected && person.isActive()) {
-                if (person.oldEnoughToMarry(gui.getCampaign()) && (!person.hasSpouse())) {
+                if (person.oldEnoughToMarry(gui.getCampaign()) && (!person.getGenealogy().hasSpouse())) {
                     menu = new JMenu(resourceMap.getString("chooseSpouse.text")); //$NON-NLS-1$
                     JMenu maleMenu = new JMenu(resourceMap.getString("spouseMenuMale.text"));
                     JMenu femaleMenu = new JMenu(resourceMap.getString("spouseMenuFemale.text"));
@@ -1859,7 +1859,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         popup.add(menu);
                     }
                 }
-                if (person.hasSpouse()) {
+                if (person.getGenealogy().hasSpouse()) {
                     menu = new JMenu(resourceMap.getString("removeSpouse.text"));
 
                     for (Divorce divorceType : Divorce.values()) {
@@ -2712,7 +2712,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 }
 
                 if (oneSelected) {
-                    if (person.canProcreate()) {
+                    if (person.canProcreate(gui.getCampaign())) {
                         menuItem = new JMenuItem(resourceMap.getString("addPregnancy.text"));
                         menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                         menuItem.addActionListener(this);

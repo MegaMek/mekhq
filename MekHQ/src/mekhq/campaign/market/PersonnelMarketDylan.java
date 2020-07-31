@@ -1,11 +1,25 @@
-/**
- * 
+/*
+ * Copyright (c) 2018, 2020 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.market;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -13,11 +27,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 
 /**
- * Personnel market generation method that uses the 
- *
+ * Personnel market generation method that uses Dylan's method
  */
 public class PersonnelMarketDylan extends PersonnelMarketRandom {
-    
+
     @Override
     public String getModuleName() {
         return "Dylan's Method";
@@ -29,7 +42,7 @@ public class PersonnelMarketDylan extends PersonnelMarketRandom {
         List<Person> retVal = new ArrayList<>();
         int q = generateRandomQuantity();
 
-        ArrayList<Long> mtf = new ArrayList<Long>();
+        ArrayList<Long> mtf = new ArrayList<>();
         long mostTypes = PersonnelMarket.getUnitMainForceTypes(c);
         if ((mostTypes & Entity.ETYPE_MECH) != 0) {
             mtf.add(Entity.ETYPE_MECH);
@@ -94,12 +107,8 @@ public class PersonnelMarketDylan extends PersonnelMarketRandom {
                 }
                 p = c.newPerson(roll);
             }
-            UUID id = UUID.randomUUID();
-            p.setId(id);
             retVal.add(p);
         }
         return retVal;
     }
-   
-
 }
