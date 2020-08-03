@@ -22,8 +22,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.List;
+import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
@@ -237,12 +237,12 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             setProgress(4);
             if (newCampaign) {
                 // show the date chooser
-                DateChooser dc = new DateChooser(frame, campaign.getCalendar());
+                DateChooser dc = new DateChooser(frame, campaign.getLocalDate());
                 // user can either choose a date or cancel by closing
                 if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-                    campaign.setCalendar(dc.getDate());
-                    campaign.setLocalDate(LocalDate.ofYearDay(dc.getDate().get(Calendar.YEAR),
-                            dc.getDate().get(Calendar.DAY_OF_YEAR)));
+                    LocalDate date = dc.getDate();
+                    campaign.setCalendar(new GregorianCalendar(date.getYear(), date.getMonth().ordinal(), date.getDayOfYear()));
+                    campaign.setLocalDate(date);
                     // Ensure that the MegaMek year GameOption matches the campaign year
                     GameOptions gameOpts = campaign.getGameOptions();
                     int campaignYear = campaign.getGameYear();

@@ -1,7 +1,7 @@
 /*
  * AddOrEditPersonnelEntryDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,27 +12,26 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import javax.swing.BorderFactory;
+import javax.swing.*;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -42,7 +41,6 @@ import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
 /**
- *
  * @author  Taharqa
  */
 public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
@@ -50,7 +48,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
-    private Frame frame;
+    private JFrame frame;
     private int operationType;
     private LogEntry entry;
     private Date date;
@@ -64,15 +62,15 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     private javax.swing.JPanel panBtn;
     private javax.swing.JPanel panMain;
 
-    public AddOrEditPersonnelEntryDialog(Frame parent, boolean modal, Date entryDate) {
+    public AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, Date entryDate) {
         this(parent, modal, ADD_OPERATION, new PersonalLogEntry(entryDate, ""));
     }
 
-    public AddOrEditPersonnelEntryDialog(Frame parent, boolean modal, LogEntry entry) {
+    public AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, LogEntry entry) {
         this(parent, modal, EDIT_OPERATION, entry);
     }
 
-    private AddOrEditPersonnelEntryDialog(Frame parent, boolean modal, int operationType, LogEntry entry) {
+    private AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, int operationType, LogEntry entry) {
         super(parent, modal);
 
         assert entry != null;
@@ -95,7 +93,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditPersonnelEntryDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditPersonnelEntryDialog", new EncodeControl());
     	java.awt.GridBagConstraints gridBagConstraints;
 
         panMain = new javax.swing.JPanel();
@@ -116,7 +114,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
         getContentPane().setLayout(new BorderLayout());
         panBtn.setLayout(new GridLayout(0,2));
         panMain.setLayout(new GridBagLayout());
-        
+
         btnDate = new javax.swing.JButton();
         btnDate.setText(getDateAsString());
         btnDate.addActionListener(evt -> changeDate());
@@ -129,7 +127,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(btnDate, gridBagConstraints);
-        
+
         txtDesc.setText(entry.getDesc());
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(true);
@@ -149,7 +147,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(txtDesc, gridBagConstraints);
-        
+
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(this::btnOKActionPerformed);
@@ -185,15 +183,15 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     }
 
     private void changeDate() {
-    	GregorianCalendar cal = new GregorianCalendar();
-    	cal.setTime(date);
-        DateChooser dc = new DateChooser(frame, cal);
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        DateChooser dc = new DateChooser(frame, cal.toZonedDateTime().toLocalDate());
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = dc.getDate().getTime();
+            date = GregorianCalendar.from(dc.getDate().atStartOfDay(ZoneId.systemDefault())).getTime();
             btnDate.setText(getDateAsString());
         }
     }
-    
+
     private String getDateAsString() {
     	SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
         return dateFormat.format(date);

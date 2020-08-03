@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui;
 
@@ -26,9 +26,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
@@ -98,7 +98,7 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private enum GraphType {
-        BALANCE_AMOUNT, MONTHLY_FINANCES;
+        BALANCE_AMOUNT, MONTHLY_FINANCES
     }
 
     /*
@@ -108,7 +108,7 @@ public final class FinancesTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab", new EncodeControl());
 
         GridBagConstraints gridBagConstraints;
 
@@ -116,13 +116,13 @@ public final class FinancesTab extends CampaignGuiTab {
         ChartPanel financeAmountPanel = (ChartPanel) createGraphPanel(GraphType.BALANCE_AMOUNT);
         ChartPanel financeMonthlyPanel = (ChartPanel) createGraphPanel(GraphType.MONTHLY_FINANCES);
 
-        financeModel = new FinanceTableModel();
+        financeModel = new FinanceTableModel(getCampaign());
         financeTable = new JTable(financeModel);
         financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         financeTable.addMouseListener(new FinanceTableMouseAdapter(getCampaignGui(),
                 financeTable, financeModel));
         financeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < FinanceTableModel.N_COL; i++) {
             column = financeTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(financeModel.getColumnWidth(i));
@@ -131,7 +131,7 @@ public final class FinancesTab extends CampaignGuiTab {
         financeTable.setIntercellSpacing(new Dimension(0, 0));
         financeTable.setShowGrid(false);
 
-        loanModel = new LoanTableModel();
+        loanModel = new LoanTableModel(getCampaign());
         loanTable = new JTable(loanModel);
         loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         loanTable.addMouseListener(new LoanTableMouseAdapter(getCampaignGui(),
@@ -227,20 +227,17 @@ public final class FinancesTab extends CampaignGuiTab {
 
     private XYDataset setupFinanceDataset() {
         TimeSeries s1 = new TimeSeries("C-Bills"); // NOI18N
-        ArrayList<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
-        Calendar cal = Calendar.getInstance();
+        List<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
 
         Money balance = Money.zero();
-        for (int i = 0; i < transactions.size(); i++) {
-            balance = balance.plus(transactions.get(i).getAmount());
-            cal.setTime(transactions.get(i).getDate());
+        for (Transaction transaction : transactions) {
+            balance = balance.plus(transaction.getAmount());
+            LocalDate date = transaction.getDate();
             // since there may be more than one entry per day and the dataset for the graph can only have one entry per day
             // we use addOrUpdate() which assumes transactions are in sequential order by date so we always have the most
             // up-to-date entry for each day
-            s1.addOrUpdate(new Day(cal.get(Calendar.DAY_OF_MONTH),
-                            cal.get(Calendar.MONTH)+1, // Gregorian and Julian calendars start at 0: https://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html#MONTH
-                                   cal.get(Calendar.YEAR)),
-                            balance.getAmount().doubleValue());
+            s1.addOrUpdate(new Day(date.getDayOfMonth(), date.getMonth().getValue(), date.getYear()),
+                    balance.getAmount().doubleValue());
         }
 
         TimeSeriesCollection dataset = new TimeSeriesCollection();
@@ -250,18 +247,17 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private CategoryDataset setupMonthlyDataset() {
-        SimpleDateFormat df = new SimpleDateFormat("MMM-yyyy");
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyy"); // TOOD : LocalDate : Remove Inline Date Format
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        ArrayList<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
-        Calendar cal = Calendar.getInstance();
+        List<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
 
         String pastMonthYear = "";
         Money monthlyRevenue = Money.zero();
         Money monthlyExpenditures = Money.zero();
         for (int i = 0; i < transactions.size(); i++) {
-            cal.setTime(transactions.get(i).getDate());
+            LocalDate date = transactions.get(i).getDate();
 
-            if (pastMonthYear.equals(df.format(cal.getTime()))) {
+            if (pastMonthYear.equals(df.format(date))) {
                 if (transactions.get(i).getAmount().isPositive()) {
                     monthlyRevenue = monthlyRevenue.plus(transactions.get(i).getAmount());
                 } else {
@@ -275,7 +271,7 @@ public final class FinancesTab extends CampaignGuiTab {
                     monthlyRevenue = Money.zero();
                     monthlyExpenditures = Money.zero();
                 }
-                pastMonthYear = df.format(cal.getTime());
+                pastMonthYear = df.format(date);
                 if (transactions.get(i).getAmount().isPositive()) {
                     monthlyRevenue = transactions.get(i).getAmount();
                 } else {
@@ -284,7 +280,7 @@ public final class FinancesTab extends CampaignGuiTab {
             }
 
             // if we're at the last transaction, save it off
-            if (i == transactions.size()-1) {
+            if (i == transactions.size() - 1) {
                 dataset.addValue(monthlyRevenue.getAmount().doubleValue(), resourceMap.getString("graphMonthlyRevenue.text"), pastMonthYear);
                 dataset.addValue(monthlyExpenditures.getAmount().doubleValue(), resourceMap.getString("graphMonthlyExpenditures.text"), pastMonthYear);
             }

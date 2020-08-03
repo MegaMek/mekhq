@@ -371,7 +371,7 @@ public class PersonnelMarketDialog extends JDialog {
 		}
 		if (pay && !campaign.getFinances().debit(unitCost, Transaction.C_UNIT,
 				"Purchased " + en.getShortName(),
-				campaign.getCalendar().getTime())) {
+				campaign.getLocalDate())) {
 			return;
 		}
 		campaign.addUnit(en, false, 0);

@@ -1471,7 +1471,7 @@ public class ResolveScenarioTracker {
 
         if (prisonerRansoms.isGreaterThan(Money.zero())) {
             getCampaign().getFinances().credit(prisonerRansoms, Transaction.C_RANSOM,
-                    "Prisoner ransoms for " + getScenario().getName(), getCampaign().getDate());
+                    "Prisoner ransoms for " + getScenario().getName(), getCampaign().getLocalDate());
             getCampaign().addReport(prisonerRansoms.toAmountAndNameString()
                     + " has been credited to your account for prisoner ransoms following "
                     + getScenario().getName() + ".");
@@ -1494,7 +1494,8 @@ public class ResolveScenarioTracker {
                 //missing unit
                 if (blc > 0) {
                     Money value = unitValue.multipliedBy(blc);
-                    campaign.getFinances().credit(value, Transaction.C_BLC, "Battle loss compensation for " + unit.getName(), campaign.getCalendar().getTime());
+                    campaign.getFinances().credit(value, Transaction.C_BLC,
+                            "Battle loss compensation for " + unit.getName(), campaign.getLocalDate());
                     campaign.addReport(value.toAmountAndSymbolString() + " in battle loss compensation for " + unit.getName() + " has been credited to your account.");
                 }
                 campaign.removeUnit(unit.getId());
@@ -1534,13 +1535,13 @@ public class ResolveScenarioTracker {
                     }
                 }
                 blcValue = blcValue.plus(repairBLC);
-                if (blc > 0 && blcValue.isPositive()) {
+                if ((blc > 0) && blcValue.isPositive()) {
                     Money finalValue = blcValue.multipliedBy(blc);
                     campaign.getFinances().credit(
                             finalValue,
                             Transaction.C_BLC,
                             blcString.substring(0, 1).toUpperCase() + blcString.substring(1),
-                            campaign.getCalendar().getTime());
+                            campaign.getLocalDate());
                     campaign.addReport( finalValue.toAmountAndSymbolString() + " in " + blcString + " has been credited to your account.");
                 }
             }
@@ -1569,7 +1570,7 @@ public class ResolveScenarioTracker {
 
             if (unitRansoms.isGreaterThan(Money.zero())) {
                 getCampaign().getFinances().credit(unitRansoms, Transaction.C_SALVAGE,
-                        "Unit ransoms for " + getScenario().getName(), getCampaign().getDate());
+                        "Unit ransoms for " + getScenario().getName(), getCampaign().getLocalDate());
                 getCampaign().addReport(unitRansoms.toAmountAndNameString()
                         + " has been credited to your account from unit ransoms following "
                         + getScenario().getName() + ".");
@@ -1583,14 +1584,15 @@ public class ResolveScenarioTracker {
             }
             if (((Contract) getMission()).isSalvageExchange()) {
                 value = value.multipliedBy(((Contract) getMission()).getSalvagePct()).dividedBy(100);
-                campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for " + scenario.getName(),  campaign.getDate());
+                campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for "
+                        + scenario.getName(),  campaign.getLocalDate());
                 campaign.addReport(value.toAmountAndSymbolString() + " have been credited to your account for salvage exchange.");
             } else {
                 ((Contract) getMission()).addSalvageByEmployer(value);
             }
         }
 
-        if (campaign.getCampaignOptions().getUseAtB() && getMission() instanceof AtBContract) {
+        if (campaign.getCampaignOptions().getUseAtB() && (getMission() instanceof AtBContract)) {
             int unitRatingMod = campaign.getUnitRatingMod();
             for (Unit unit : getUnits()) {
                 unit.setSite(((AtBContract) getMission()).getRepairLocation(unitRatingMod));
