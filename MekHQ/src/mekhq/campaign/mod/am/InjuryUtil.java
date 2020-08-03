@@ -39,7 +39,6 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 
 /**

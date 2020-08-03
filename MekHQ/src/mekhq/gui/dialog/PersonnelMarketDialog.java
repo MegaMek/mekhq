@@ -50,7 +50,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;

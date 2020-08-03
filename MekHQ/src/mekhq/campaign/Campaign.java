@@ -8105,7 +8105,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void initRetirementDateTracking() {
         for (Person person : getPersonnel()) {
-            if (person.getStatus() == PersonnelStatus.RETIRED) {
+            if (person.getStatus().isRetired()) {
                 Date retired = null;
                 Date lastLoggedDate = null;
                 for (LogEntry entry : person.getPersonnelLog()) {

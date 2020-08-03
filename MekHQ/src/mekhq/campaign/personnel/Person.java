@@ -889,6 +889,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else {
                     ServiceLogger.rehired(this, campaign.getDate());
                 }
+                setRetirement(null);
                 break;
             case RETIRED:
                 ServiceLogger.retired(this, campaign.getDate());
