@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+0.47.9-SNAPSHOT
+
 0.47.8 (2020-08-02 2300 UTC)
 + PR #1825: Adding Advance to Next Monday to the AdvanceDaysDialog
 + Issue #1828: Rolling over to the next month when using AtB and your current faction goes extinct will no longer cause an error
