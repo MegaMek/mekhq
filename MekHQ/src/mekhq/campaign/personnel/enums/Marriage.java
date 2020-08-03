@@ -201,8 +201,8 @@ public enum Marriage {
         origin.setMaidenName(surname);
         spouse.setMaidenName(spouseSurname);
 
-        origin.setSpouseId(spouse.getId());
-        spouse.setSpouseId(origin.getId());
+        origin.getGenealogy().setSpouse(spouse.getId());
+        spouse.getGenealogy().setSpouse(origin.getId());
 
         // Then we do the logging
         PersonalLogger.marriage(origin, spouse, campaign.getDate());

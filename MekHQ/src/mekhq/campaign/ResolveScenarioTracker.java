@@ -958,10 +958,6 @@ public class ResolveScenarioTracker {
                 casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
             }
             for (Person p : crew) {
-                // We need to assign them a UUID now to place them into the oppositionPersonnel hash
-                UUID id = (p.getId() == null) ? UUID.randomUUID() : p.getId();
-                p.setId(id);
-
                 OppositionPersonnelStatus status = new OppositionPersonnelStatus(p.getFullName(), u.getEntity().getDisplayName(), p);
                 if (en instanceof Mech
                         || en instanceof Protomech
@@ -1050,7 +1046,7 @@ public class ResolveScenarioTracker {
                 }
                 status.setCaptured(Utilities.isLikelyCapture(en) || pickedUp);
                 status.setXP(campaign.getCampaignOptions().getScenarioXP());
-                oppositionPersonnel.put(id, status);
+                oppositionPersonnel.put(p.getId(), status);
             }
         }
     }
