@@ -2007,7 +2007,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    retVal.status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
+                    retVal.setStatus(PersonnelStatus.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerStatus")) {
                     retVal.prisonerStatus = PrisonerStatus.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) { // Legacy
