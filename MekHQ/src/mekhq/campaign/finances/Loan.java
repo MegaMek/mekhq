@@ -94,9 +94,6 @@ public class Loan implements MekHqXmlSerializable {
         // First, we need to increase the number of days by one
         nextPayment = nextPayment.plusDays(1);
 
-        // Then, we create a variable to hold temporary difference values
-        int temp;
-
         // Finally, we use that and the schedule type to determine the length including the grace period
         switch (schedule) {
             case Finances.SCHEDULE_BIWEEKLY:
