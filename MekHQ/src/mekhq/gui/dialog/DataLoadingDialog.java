@@ -22,8 +22,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
@@ -38,7 +38,6 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generators.RandomCallsignGenerator;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
-import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -91,7 +90,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         tracker.addImage(imgSplash, 0);
         try {
             tracker.waitForID(0);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
             // really should never come here
         }
         // make splash image panel
@@ -125,7 +124,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
         @Override
         public Void doInBackground() {
-            final String METHOD_NAME = "doInBackground()"; //$NON-NLS-1$
+            final String METHOD_NAME = "doInBackground()";
 
             //Initialize progress property.
             setProgress(0);
@@ -134,7 +133,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             } catch (Exception e) {
                 MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
             }
-            try{
+            try {
                 CurrencyManager.getInstance().loadCurrencies();
             } catch (Exception e) {
                 MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
@@ -179,7 +178,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             app.getIconPackage().loadDirectories();
             setProgress(3);
             boolean newCampaign = false;
-            if(null == fileCampaign) {
+            if (null == fileCampaign) {
                 try {
                     newCampaign = true;
                     campaign = new Campaign();
@@ -190,11 +189,10 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                 }
             } else {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
-                        "Loading campaign file from XML..."); //$NON-NLS-1$
+                MekHQ.getLogger().info(getClass(), METHOD_NAME, "Loading campaign file from XML...");
 
                 // And then load the campaign object from it.
-                FileInputStream fis = null;
+                FileInputStream fis;
 
                 try {
                     fis = new FileInputStream(fileCampaign);
@@ -257,28 +255,28 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 setVisible(false);
 
                 // Game Presets
-                ArrayList<GamePreset> presets = GamePreset.getGamePresetsIn(MekHQ.PRESET_DIR);
-                if(!presets.isEmpty()) {
+                List<GamePreset> presets = GamePreset.getGamePresetsIn(MekHQ.PRESET_DIR);
+                if (!presets.isEmpty()) {
                     ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(frame, true, presets);
                     cgpd.setVisible(true);
                     /* This code causes the new campaign process to abort after the campaign
                      * options dialog if the user cancels the preset dialog instead of choosing
                      * one. Since a preset is not necessary, I don't think it should abort the
                      * process -- Neoancient */
-                    //if(cgpd.wasCancelled()) {
+                    //if (cgpd.wasCancelled()) {
                         //FIXME: why is this not working?
                         //cancelled = true;
                         //cancel(true);
                     //}
                     //else
-                    if(null != cgpd.getSelectedPreset()) {
+                    if (null != cgpd.getSelectedPreset()) {
                         cgpd.getSelectedPreset().apply(campaign);
                     }
                 }
                 CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getIconPackage().getCamos(),
                         app.getIconPackage().getForceIcons());
                 optionsDialog.setVisible(true);
-                if(optionsDialog.wasCancelled()) {
+                if (optionsDialog.wasCancelled()) {
                     cancelled = true;
                     cancel(true);
                 } else {
@@ -318,19 +316,19 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     public void propertyChange(PropertyChangeEvent arg0) {
         int progress = task.getProgress();
         progressBar.setValue(progress);
-        switch(progress) {
-        case(0):
-            progressBar.setString(resourceMap.getString("loadPlanet.text"));
-            break;
-        case(1):
-            progressBar.setString(resourceMap.getString("loadUnits.text"));
-            break;
-        case(2):
-            progressBar.setString(resourceMap.getString("loadImages.text"));
-            break;
-        case(3):
-            progressBar.setString(resourceMap.getString("loadCampaign.text"));
-            break;
+        switch (progress) {
+            case(0):
+                progressBar.setString(resourceMap.getString("loadPlanet.text"));
+                break;
+            case(1):
+                progressBar.setString(resourceMap.getString("loadUnits.text"));
+                break;
+            case(2):
+                progressBar.setString(resourceMap.getString("loadImages.text"));
+                break;
+            case(3):
+                progressBar.setString(resourceMap.getString("loadCampaign.text"));
+                break;
         }
     }
 }
