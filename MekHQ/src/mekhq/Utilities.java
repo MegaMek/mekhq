@@ -1374,27 +1374,6 @@ public class Utilities {
         return (endTime - startTime) / MILLISECONDS_IN_DAY;
     }
 
-    public static int getDiffFullYears(Date date, GregorianCalendar b) {
-        GregorianCalendar a = new GregorianCalendar();
-        a.setTime(date);
-        int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
-        if (a.get(GregorianCalendar.MONTH) > b.get(GregorianCalendar.MONTH) ||
-                (a.get(GregorianCalendar.MONTH) == b.get(GregorianCalendar.MONTH) && a.get(GregorianCalendar.DATE) > b.get(GregorianCalendar.DATE))) {
-            diff--;
-        }
-        return diff;
-    }
-
-    public static int getDiffPartialYears(Date date, GregorianCalendar b) {
-        GregorianCalendar a = new GregorianCalendar();
-        a.setTime(date);
-        int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
-        if (diff == 0 && countDaysBetween(a.getTime(), b.getTime()) > 0) {
-            return 1;
-        }
-        return diff;
-    }
-
     /**
      * Export a JTable to a CSV file
      * @param table     the table to save to csv

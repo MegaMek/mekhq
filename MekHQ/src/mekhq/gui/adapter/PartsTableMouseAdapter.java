@@ -98,7 +98,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                 }
             }
             gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
-                    "refund for cancelled equipment sale", gui.getCampaign().getDate());
+                    "refund for cancelled equipment sale", gui.getCampaign().getLocalDate());
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             for (Part p : parts) {
                 if (null != p) {
@@ -245,7 +245,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
         }
         return true;
     }
-    
+
     public boolean areAllPartsPodded(Part[] parts) {
         for (Part p : parts) {
             if (!p.isOmniPodded()) {
@@ -325,7 +325,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                 }
                 popup.add(menu);
             }
-            
+
             // also add the ability to order one or many parts, if we have at least one part selected
             if(rows.length > 0) {
 	            menu = new JMenu("Buy");
@@ -333,17 +333,17 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
 	        	menuItem.setActionCommand("BUY");
 	        	menuItem.addActionListener(this);
 	        	menu.add(menuItem);
-	        	
+
 	        	if(oneSelected) {
 		        	menuItem = new JMenuItem ("Buy # Parts of This Type...");
 		        	menuItem.setActionCommand("BUY_N");
 		        	menuItem.addActionListener(this);
 		        	menu.add(menuItem);
 	        	}
-	        	
+
 	        	popup.add(menu);
             }
-            
+
             if (oneSelected && part.needsFixing() && part.isPresent()) {
                 menu = new JMenu("Repair Mode");
                 for (WorkTime wt : WorkTime.DEFAULT_TIMES) {
@@ -374,7 +374,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             menuItem.addActionListener(ev -> gui.miExportPartsActionPerformed(ev));
             menuItem.setEnabled(true);
             popup.add(menuItem);
-            
+
             // remove from omnipods
             if (areAllPartsPodded(parts)) {
                 menu = new JMenu("Remove Pod");

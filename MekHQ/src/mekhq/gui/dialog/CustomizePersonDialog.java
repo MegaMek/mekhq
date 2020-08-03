@@ -19,6 +19,7 @@
 package mekhq.gui.dialog;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -78,7 +79,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private LocalDate lastRankChangeDate;
     private LocalDate retirement;
     private String dateFormat = "MMMM d yyyy"; // TODO : LocalDate : Remove inline date format
-    private Frame frame;
+    private JFrame frame;
 
     private JButton btnDate;
     private JButton btnServiceDate;
@@ -112,7 +113,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private Campaign campaign;
 
     /** Creates new form CustomizePilotDialog */
-    public CustomizePersonDialog(java.awt.Frame parent, boolean modal, Person person, Campaign campaign) {
+    public CustomizePersonDialog(JFrame parent, boolean modal, Person person, Campaign campaign) {
         super(parent, modal);
         this.campaign = campaign;
         this.frame = parent;
@@ -1239,53 +1240,46 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         skillBonus.get(type).setEnabled(skillChks.get(type).isSelected());
     }
 
-    private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog", new EncodeControl()); //$NON-NLS-1$
+    private void btnDateActionPerformed(ActionEvent evt) {
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog", new EncodeControl());
         // show the date chooser
-        GregorianCalendar birthdate = GregorianCalendar.from(this.birthdate.atStartOfDay(
-                ZoneId.systemDefault()));
         DateChooser dc = new DateChooser(frame, birthdate);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            this.birthdate = dc.getDate().toZonedDateTime().toLocalDate();
-            btnDate.setText(this.birthdate.format(DateTimeFormatter.ofPattern(dateFormat)));
-            lblAge.setText(getAge() + " " + resourceMap.getString("age")); // NOI18N
+            birthdate = dc.getDate();
+            btnDate.setText(birthdate.format(DateTimeFormatter.ofPattern(dateFormat)));
+            lblAge.setText(getAge() + " " + resourceMap.getString("age"));
         }
     }
 
-    private void btnServiceDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServiceDateActionPerformed
+    private void btnServiceDateActionPerformed(ActionEvent evt) {
         // show the date chooser
-        GregorianCalendar recruitment = GregorianCalendar.from(this.recruitment.atStartOfDay(
-                ZoneId.systemDefault()));
+
         DateChooser dc = new DateChooser(frame, recruitment);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            this.recruitment = dc.getDate().toZonedDateTime().toLocalDate();
-            btnServiceDate.setText(this.recruitment.format(DateTimeFormatter.ofPattern(dateFormat)));
+            recruitment = dc.getDate();
+            btnServiceDate.setText(recruitment.format(DateTimeFormatter.ofPattern(dateFormat)));
         }
     }
 
     private void btnRankDateActionPerformed() {
         // show the date chooser
-        GregorianCalendar rank = GregorianCalendar.from(lastRankChangeDate.atStartOfDay(
-                ZoneId.systemDefault()));
-        DateChooser dc = new DateChooser(frame, rank);
+        DateChooser dc = new DateChooser(frame, lastRankChangeDate);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            lastRankChangeDate = dc.getDate().toZonedDateTime().toLocalDate();
+            lastRankChangeDate = dc.getDate();
             btnRankDate.setText(lastRankChangeDate.format(DateTimeFormatter.ofPattern(dateFormat)));
         }
     }
 
     private void btnRetirementDateActionPerformed() {
         // show the date chooser
-        GregorianCalendar retirement = GregorianCalendar.from(this.retirement.atStartOfDay(
-                ZoneId.systemDefault()));
         DateChooser dc = new DateChooser(frame, retirement);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            this.retirement = dc.getDate().toZonedDateTime().toLocalDate();
-            btnRetirementDate.setText(this.retirement.format(DateTimeFormatter.ofPattern(dateFormat)));
+            retirement = dc.getDate();
+            btnRetirementDate.setText(retirement.format(DateTimeFormatter.ofPattern(dateFormat)));
         }
     }
 

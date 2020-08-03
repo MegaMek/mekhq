@@ -214,7 +214,7 @@ public class CurrentLocation implements Serializable {
                             Transaction.C_TRANSPORT,
                             "jump from " + currentSystem.getName(campaign.getLocalDate())
                                     + " to " + jumpPath.get(1).getName(campaign.getLocalDate()),
-                            campaign.getDate())) {
+                            campaign.getLocalDate())) {
                         campaign.addReport("<font color='red'><b>You cannot afford to make the jump!</b></font>");
                         return;
                     }

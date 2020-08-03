@@ -38,19 +38,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.InputVerifier;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 import megamek.common.EquipmentType;
@@ -182,11 +170,9 @@ public class NewPlanetaryEventDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                GregorianCalendar day = GregorianCalendar.from(date.atStartOfDay(
-                        ZoneId.systemDefault()));
-                DateChooser dc = new DateChooser((content instanceof Frame) ? (Frame) content : null, day);
+                DateChooser dc = new DateChooser((content instanceof JFrame) ? (JFrame) content : null, date);
                 if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-                    date = dc.getDate().toZonedDateTime().toLocalDate();
+                    date = dc.getDate();
                     updateDate(campaign);
                 }
             }

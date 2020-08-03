@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.control;
 
 import megamek.common.util.EncodeControl;
@@ -32,7 +31,7 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 public class EditKillLogControl extends JPanel {
-    private Frame parent;
+    private JFrame parent;
     private Campaign campaign;
     private Person person;
     private KillTableModel killModel;
@@ -43,7 +42,7 @@ public class EditKillLogControl extends JPanel {
     private JTable killTable;
     private JScrollPane scrollKillTable;
 
-    public EditKillLogControl(Frame parent, Campaign campaign, Person person) {
+    public EditKillLogControl(JFrame parent, Campaign campaign, Person person) {
         this.parent = parent;
         this.campaign = campaign;
         this.person = person;
@@ -54,7 +53,7 @@ public class EditKillLogControl extends JPanel {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditKillLogControl", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditKillLogControl", new EncodeControl());
 
         setName(resourceMap.getString("control.name")); // NOI18N
         this.setLayout(new java.awt.BorderLayout());
@@ -110,7 +109,7 @@ public class EditKillLogControl extends JPanel {
     private void addKill() {
         AddOrEditKillEntryDialog dialog = new AddOrEditKillEntryDialog(parent, true, person.getId(), "", campaign.getDate());
         dialog.setVisible(true);
-        if(dialog.getKill().isPresent()) {
+        if (dialog.getKill().isPresent()) {
             campaign.addKill(dialog.getKill().get());
         }
         refreshTable();
@@ -118,7 +117,7 @@ public class EditKillLogControl extends JPanel {
 
     private void editKill() {
         Kill kill = killModel.getKillAt(killTable.getSelectedRow());
-        if(null != kill) {
+        if (null != kill) {
             AddOrEditKillEntryDialog dialog = new AddOrEditKillEntryDialog(parent, true, kill);
             dialog.setVisible(true);
             refreshTable();
@@ -134,9 +133,9 @@ public class EditKillLogControl extends JPanel {
     private void refreshTable() {
         int selectedRow = killTable.getSelectedRow();
         killModel.setData(campaign.getKillsFor(person.getId()));
-        if(selectedRow != -1) {
-            if(killTable.getRowCount() > 0) {
-                if(killTable.getRowCount() == selectedRow) {
+        if (selectedRow != -1) {
+            if (killTable.getRowCount() > 0) {
+                if (killTable.getRowCount() == selectedRow) {
                     killTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
                 } else {
                     killTable.setRowSelectionInterval(selectedRow, selectedRow);

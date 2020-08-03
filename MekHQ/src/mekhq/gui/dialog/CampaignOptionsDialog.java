@@ -23,7 +23,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -44,6 +43,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -122,7 +122,7 @@ public class CampaignOptionsDialog extends JDialog {
     private RandomSkillPreferences rSkillPrefs;
     private GregorianCalendar date;
     private SimpleDateFormat dateFormat;
-    private Frame frame;
+    private JFrame frame;
     private String camoCategory;
     private String camoFileName;
     private int colorIndex;
@@ -502,7 +502,7 @@ public class CampaignOptionsDialog extends JDialog {
     /**
      * Creates new form CampaignOptionsDialog
      */
-    public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos,
+    public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c, DirectoryItems camos,
                                  DirectoryItems forceIcons) {
         super(parent, modal);
         this.campaign = c;
@@ -5104,21 +5104,21 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
 
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+    private void btnCancelActionPerformed(ActionEvent evt) {
         cancelled = true;
         this.setVisible(false);
-    }//GEN-LAST:event_btnCancelActionPerformed
+    }
 
     public boolean wasCancelled() {
         return cancelled;
     }
 
-    private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
+    private void btnDateActionPerformed(ActionEvent evt) {
         // show the date chooser
-        DateChooser dc = new DateChooser(frame, date);
+        DateChooser dc = new DateChooser(frame, date.toZonedDateTime().toLocalDate());
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = dc.getDate();
+            date = GregorianCalendar.from(dc.getDate().atStartOfDay(ZoneId.systemDefault()));
             btnDate.setText(getDateAsString());
             factionModel = new SortedComboBoxModel<>();
             for (String sname : Faction.choosableFactionCodes) {
@@ -5130,9 +5130,9 @@ public class CampaignOptionsDialog extends JDialog {
             factionModel.setSelectedItem(campaign.getFaction().getFullName(date.get(Calendar.YEAR)));
             comboFaction.setModel(factionModel);
         }
-    }//GEN-LAST:event_btnDateActionPerformed
+    }
 
-    private void btnIconActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnIconActionPerformed(ActionEvent evt) {
         ImageChoiceDialog pcd = new ImageChoiceDialog(frame, true, iconCategory, iconFileName, forceIcons);
         pcd.setVisible(true);
         if (pcd.isChanged()) {
