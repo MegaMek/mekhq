@@ -481,6 +481,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkAdjustPlayerVehicles;
     private JCheckBox chkRegionalMechVariations;
     private JCheckBox chkAttachedPlayerCamouflage;
+    private JCheckBox chkPlayerControlsAttachedUnits;
     private JCheckBox chkUseDropShips;
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
@@ -4405,10 +4406,10 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = yTablePosition++;
         panSubAtBScenario.add(chkAttachedPlayerCamouflage, gridBagConstraints);
 
-        chkAttachedPlayerCamouflage = new JCheckBox(resourceMap.getString("chkAttachedPlayerCamouflage.text"));
-        chkAttachedPlayerCamouflage.setSelected(options.getAttachedPlayerCamouflage());
+        chkPlayerControlsAttachedUnits = new JCheckBox(resourceMap.getString("chkPlayerControlsAttachedUnits.text"));
+        chkPlayerControlsAttachedUnits.setSelected(options.getPlayerControlsAttachedUnits());
         gridBagConstraints.gridy = yTablePosition++;
-        panSubAtBScenario.add(chkAttachedPlayerCamouflage, gridBagConstraints);
+        panSubAtBScenario.add(chkPlayerControlsAttachedUnits, gridBagConstraints);
 
         chkUseDropShips = new JCheckBox(resourceMap.getString("chkUseDropShips.text"));
         chkUseDropShips.setToolTipText(resourceMap.getString("chkUseDropShips.toolTipText"));
@@ -5045,6 +5046,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
         options.setRegionalMechVariations(chkRegionalMechVariations.isSelected());
         options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
+        options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
         options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
