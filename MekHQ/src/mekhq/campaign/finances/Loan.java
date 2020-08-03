@@ -22,7 +22,9 @@
 package mekhq.campaign.finances;
 
 import java.io.PrintWriter;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -98,30 +100,23 @@ public class Loan implements MekHqXmlSerializable {
         // Finally, we use that and the schedule type to determine the length including the grace period
         switch (schedule) {
             case Finances.SCHEDULE_BIWEEKLY:
-                temp = 8 - nextPayment.getDayOfWeek().getValue();
-                if (temp != 7) {
-                    nextPayment = nextPayment.plusDays(temp);
-                }
-                nextPayment = nextPayment.plusWeeks(2);
+                nextPayment = nextPayment.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY)).plusWeeks(2);
                 break;
             case Finances.SCHEDULE_MONTHLY:
-                temp = nextPayment.getDayOfMonth();
-                if (temp != 1) {
-                    nextPayment = nextPayment.plusDays(nextPayment.lengthOfMonth() - temp);
+                if (nextPayment.getDayOfMonth() != 1) {
+                    nextPayment = nextPayment.with(TemporalAdjusters.firstDayOfNextMonth());
                 }
                 nextPayment = nextPayment.plusMonths(1);
                 break;
             case Finances.SCHEDULE_QUARTERLY:
-                temp = nextPayment.getDayOfMonth();
-                if (temp != 1) {
-                    nextPayment = nextPayment.plusDays(nextPayment.lengthOfMonth() - temp);
+                if (nextPayment.getDayOfMonth() != 1) {
+                    nextPayment = nextPayment.with(TemporalAdjusters.firstDayOfNextMonth());
                 }
                 nextPayment = nextPayment.plusMonths(3);
                 break;
             case Finances.SCHEDULE_YEARLY:
-                temp = nextPayment.getDayOfYear();
-                if (temp != 1) {
-                    nextPayment = nextPayment.plusDays(nextPayment.lengthOfYear() - temp);
+                if (nextPayment.getDayOfYear() != 1) {
+                    nextPayment = nextPayment.with(TemporalAdjusters.firstDayOfNextYear());
                 }
                 nextPayment = nextPayment.plusYears(1);
                 break;

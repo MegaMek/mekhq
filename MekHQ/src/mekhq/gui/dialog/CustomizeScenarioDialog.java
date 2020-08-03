@@ -27,8 +27,10 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -381,8 +383,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 } else {
-                    LocalDate nextMonday = campaign.getLocalDate()
-                            .plusDays(8 - campaign.getLocalDate().getDayOfWeek().getValue());
+                    LocalDate nextMonday = campaign.getLocalDate().with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
 
                     if (!dc.getDate().isBefore(nextMonday)) {
                         JOptionPane.showMessageDialog(frame,
