@@ -632,9 +632,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             case CMD_CHANGE_STATUS: {
                 PersonnelStatus status = PersonnelStatus.valueOf(data[1]);
                 for (Person person : people) {
-                    if (status.isActive() || (0 == JOptionPane.showConfirmDialog(null,
+                    if (status.isActive() || (JOptionPane.showConfirmDialog(null,
                             String.format(resourceMap.getString("confirmRetireQ.format"), person.getFullTitle()),
-                            resourceMap.getString("kiaQ.text"), JOptionPane.YES_NO_OPTION))) {
+                            status.toString(), JOptionPane.YES_NO_OPTION) == 0)) {
                         person.changeStatus(gui.getCampaign(), status);
                     }
                 }
