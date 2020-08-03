@@ -4405,6 +4405,11 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = yTablePosition++;
         panSubAtBScenario.add(chkAttachedPlayerCamouflage, gridBagConstraints);
 
+        chkAttachedPlayerCamouflage = new JCheckBox(resourceMap.getString("chkAttachedPlayerCamouflage.text"));
+        chkAttachedPlayerCamouflage.setSelected(options.getAttachedPlayerCamouflage());
+        gridBagConstraints.gridy = yTablePosition++;
+        panSubAtBScenario.add(chkAttachedPlayerCamouflage, gridBagConstraints);
+
         chkUseDropShips = new JCheckBox(resourceMap.getString("chkUseDropShips.text"));
         chkUseDropShips.setToolTipText(resourceMap.getString("chkUseDropShips.toolTipText"));
         chkUseDropShips.setSelected(options.getUseDropShips());
