@@ -529,7 +529,7 @@ public class RetirementDefectionDialog extends JDialog {
                 }
                 if (getTotalBonus().isPositive()) {
                     hqView.getCampaign().getFinances().debit(getTotalBonus(), Transaction.C_SALARY, "Bonus Payments",
-                            hqView.getCampaign().getDate());
+                            hqView.getCampaign().getLocalDate());
                 }
             } else if (ev.getSource().equals(btnDone)) {
                 for (UUID pid : ((RetirementTableModel)retireeTable.getModel()).getAltPayout().keySet()) {

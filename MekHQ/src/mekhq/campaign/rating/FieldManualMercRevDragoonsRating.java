@@ -655,8 +655,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private int getYearsInDebt() {
-        int yearsInDebt = getCampaign().getFinances().getFullYearsInDebt(getCampaign().getCalendar());
-        yearsInDebt += getCampaign().getFinances().getPartialYearsInDebt(getCampaign().getCalendar());
+        int yearsInDebt = getCampaign().getFinances().getFullYearsInDebt(getCampaign().getLocalDate());
+        yearsInDebt += getCampaign().getFinances().getPartialYearsInDebt(getCampaign().getLocalDate());
         return yearsInDebt;
     }
 

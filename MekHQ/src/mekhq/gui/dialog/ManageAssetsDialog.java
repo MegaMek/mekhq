@@ -1,24 +1,23 @@
 /*
  * ManageAssetsDialog.java
- * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -26,7 +25,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.JButton;
@@ -52,7 +51,6 @@ import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
 /**
- *
  * @author  Taharqa
  */
 public class ManageAssetsDialog extends JDialog {
@@ -62,14 +60,14 @@ public class ManageAssetsDialog extends JDialog {
     private Frame frame;
     private Campaign campaign;
     private AssetTableModel assetModel;
-    
+
     private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDelete;
     private JButton btnOK;
     private JTable assetTable;
     private JScrollPane scrollAssetTable;
-    
+
     /** Creates new form EditPersonnelLogDialog */
     public ManageAssetsDialog(Frame parent, Campaign c) {
         super(parent, true);
@@ -90,7 +88,7 @@ public class ManageAssetsDialog extends JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("dialogTitle.text"));
         getContentPane().setLayout(new java.awt.BorderLayout());
-        
+
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAdd.setText(resourceMap.getString("btnAddAsset.text")); // NOI18N
         btnAdd.addActionListener(evt -> addAsset());
@@ -104,7 +102,7 @@ public class ManageAssetsDialog extends JDialog {
         btnDelete.addActionListener(evt -> deleteAsset());
         panBtns.add(btnDelete);
         getContentPane().add(panBtns, BorderLayout.PAGE_START);
-        
+
         assetTable = new JTable(assetModel);
         TableColumn column;
         for (int i = 0; i <AssetTableModel.N_COL; i++) {
@@ -115,13 +113,13 @@ public class ManageAssetsDialog extends JDialog {
         assetTable.setIntercellSpacing(new Dimension(0, 0));
         assetTable.setShowGrid(false);
         assetTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        assetTable.getSelectionModel().addListSelectionListener(evt -> assetTableValueChanged(evt));
+        assetTable.getSelectionModel().addListSelectionListener(this::assetTableValueChanged);
         scrollAssetTable = new JScrollPane(assetTable);
         getContentPane().add(scrollAssetTable, BorderLayout.CENTER);
 
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(evt -> btnOKActionPerformed(evt));
+        btnOK.addActionListener(this::btnOKActionPerformed);
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 
         pack();
@@ -138,13 +136,13 @@ public class ManageAssetsDialog extends JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
         this.setVisible(false);
     }
-    
+
     private void assetTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
         int row = assetTable.getSelectedRow();
         btnDelete.setEnabled(row != -1);
         btnEdit.setEnabled(row != -1);
     }
-    
+
     private void addAsset() {
         Asset a = new Asset();
         EditAssetDialog ead = new EditAssetDialog(frame, a);
@@ -158,7 +156,7 @@ public class ManageAssetsDialog extends JDialog {
 
         ead.dispose();
     }
-    
+
     private void editAsset() {
         // TODO: fix this to use a cloned asset and the user has to confirm edits with OK
         Asset a = assetModel.getAssetAt(assetTable.getSelectedRow());
@@ -170,13 +168,13 @@ public class ManageAssetsDialog extends JDialog {
             refreshTable();
         }
     }
-    
+
     private void deleteAsset() {
         campaign.getFinances().getAllAssets().remove(assetTable.getSelectedRow());
         MekHQ.triggerEvent(new AssetRemovedEvent(assetModel.getAssetAt(assetTable.getSelectedRow())));
         refreshTable();
     }
-    
+
     private void refreshTable() {
         int selectedRow = assetTable.getSelectedRow();
         assetModel.setData(campaign.getFinances().getAllAssets());
@@ -190,11 +188,11 @@ public class ManageAssetsDialog extends JDialog {
             }
         }
     }
-    
+
     /**
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
-    public class AssetTableModel extends DataTableModel {
+    public static class AssetTableModel extends DataTableModel {
         private static final long serialVersionUID = 534443424190075264L;
 
         public final static int COL_NAME    =    0;
@@ -202,11 +200,12 @@ public class ManageAssetsDialog extends JDialog {
         public final static int COL_SCHEDULE =   2;
         public final static int COL_INCOME   =   3;
         public final static int N_COL          = 4;
-        
-        public AssetTableModel(ArrayList<Asset> assets) {
+
+        public AssetTableModel(List<Asset> assets) {
             data = assets;
         }
-        
+
+        @Override
         public int getRowCount() {
             return data.size();
         }
@@ -218,7 +217,7 @@ public class ManageAssetsDialog extends JDialog {
 
         @Override
         public String getColumnName(int column) {
-            switch(column) {
+            switch (column) {
                 case COL_NAME:
                     return "Name";
                 case COL_VALUE:
@@ -232,28 +231,29 @@ public class ManageAssetsDialog extends JDialog {
             }
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
             Asset asset;
-            if(data.isEmpty()) {
+            if (data.isEmpty()) {
                 return "";
             } else {
                 asset = getAssetAt(row);
             }
-            if(col == COL_NAME) {
+            if (col == COL_NAME) {
                 return asset.getName();
             }
-            if(col == COL_VALUE) {
+            if (col == COL_VALUE) {
                 return asset.getValue().toAmountAndSymbolString();
             }
-            if(col == COL_INCOME) {
+            if (col == COL_INCOME) {
                 return asset.getIncome().toAmountAndSymbolString();
             }
-            if(col == COL_SCHEDULE) {
+            if (col == COL_SCHEDULE) {
                 return Finances.getScheduleName(asset.getSchedule());
             }
             return "?";
         }
-        
+
         @Override
         public boolean isCellEditable(int row, int col) {
             return false;
@@ -262,27 +262,27 @@ public class ManageAssetsDialog extends JDialog {
         public Asset getAssetAt(int row) {
             return (Asset) data.get(row);
         }
-        
+
         public int getColumnWidth(int c) {
-            switch(c) {
-            default:
-                return 10;
+            switch (c) {
+                default:
+                    return 10;
             }
         }
 
         public int getAlignment(int col) {
-            switch(col) {
-            case COL_NAME:
-                return SwingConstants.LEFT;
-            default:
-                return SwingConstants.RIGHT;
+            switch (col) {
+                case COL_NAME:
+                    return SwingConstants.LEFT;
+                default:
+                    return SwingConstants.RIGHT;
             }
         }
 
         public String getTooltip(int row, int col) {
-            switch(col) {
-            default:
-                return null;
+            switch (col) {
+                default:
+                    return null;
             }
         }
 
@@ -291,14 +291,13 @@ public class ManageAssetsDialog extends JDialog {
         }
 
         public class Renderer extends DefaultTableCellRenderer {
-
             private static final long serialVersionUID = 9054581142945717303L;
 
-            public Component getTableCellRendererComponent(JTable table,
-                    Object value, boolean isSelected, boolean hasFocus,
-                    int row, int column) {
-                super.getTableCellRendererComponent(table, value, isSelected,
-                        hasFocus, row, column);
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus,
+                                                           int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);
                 int actualRow = table.convertRowIndexToModel(row);
