@@ -1,9 +1,21 @@
 /*
- * ForceViewPanel
+ * Copyright (c) 2011, 2020 - The MegaMek Team. All Rights Reserved.
  *
- * Created on May 2, 2011
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.view;
 
 import java.awt.Component;
@@ -22,6 +34,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import megamek.client.ui.Messages;
+import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import megamek.common.Entity;
@@ -34,7 +47,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.EntityImage;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
@@ -42,10 +54,6 @@ import mekhq.gui.utilities.MarkdownRenderer;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ForceViewPanel extends ScrollablePanel {
-
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 7004741688464105277L;
 
 	private Force force;
@@ -525,13 +533,12 @@ public class ForceViewPanel extends ScrollablePanel {
     }
 
     private Image getImageFor(Unit u, Component c) {
-
-		if(null == icons.getMechTiles()) {
+		if (null == icons.getMechTiles()) {
 			return null;
 		}
         Image base = icons.getMechTiles().imageFor(u.getEntity(), c, -1);
         int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
-        EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c);
+        EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c, u.getEntity());
         return entityImage.loadPreviewImage();
     }
 
