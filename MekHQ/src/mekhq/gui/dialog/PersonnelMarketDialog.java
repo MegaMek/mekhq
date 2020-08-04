@@ -444,9 +444,9 @@ public class PersonnelMarketDialog extends JDialog {
                             (nGroup == PersonnelTab.PG_ADMIN && type > Person.T_MEDIC)
                             ) {
                         return person.isActive();
-                    } else if (nGroup == PG_DEPENDENT) {
-                        return person.isDependent(); 
-                    } else if (nGroup == PG_FOUNDER) {
+                    } else if (nGroup == PersonnelTab.PG_DEPENDENT) {
+                        return person.isDependent();
+                    } else if (nGroup == PersonnelTab.PG_FOUNDER) {
                         return person.isFounder();
                     } else if(nGroup == PersonnelTab.PG_RETIRE) {
                         return person.getStatus() == PersonnelStatus.RETIRED;
