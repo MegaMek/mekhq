@@ -361,12 +361,12 @@ public class UnitMarketDialog extends JDialog {
 			if (offer.market == UnitMarket.MARKET_BLACK && roll <= 2) {
 				campaign.getFinances().debit(cost.dividedBy(roll), Transaction.C_UNIT,
 						"Purchased " + selectedEntity.getShortName() + " (lost on black market)",
-						campaign.getCalendar().getTime());
+						campaign.getLocalDate());
 				campaign.addReport("<font color='red'>Swindled! money was paid, but no unit delivered.</font>");
 			} else {
 				campaign.getFinances().debit(cost, Transaction.C_UNIT,
 						"Purchased " + selectedEntity.getShortName(),
-						campaign.getCalendar().getTime());
+						campaign.getLocalDate());
 				campaign.addUnit(selectedEntity, false, transitDays);
 				if (!campaign.getCampaignOptions().getInstantUnitMarketDelivery()) {
 					campaign.addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
@@ -382,9 +382,9 @@ public class UnitMarketDialog extends JDialog {
 	private void addUnit() {
 		if (null != selectedEntity) {
 			campaign.addUnit(selectedEntity, false, 0);
-        	UnitMarket.MarketOffer selected = ((UnitMarketTableModel)tableUnits.getModel()).getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
+        	UnitMarket.MarketOffer selected = ((UnitMarketTableModel) tableUnits.getModel()).getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
 	    	unitMarket.removeOffer(selected);
-	    	((UnitMarketTableModel)tableUnits.getModel()).setData(unitMarket.getOffers());
+	    	((UnitMarketTableModel) tableUnits.getModel()).setData(unitMarket.getOffers());
 			refreshOfferView();
 		}
 	}
@@ -395,13 +395,13 @@ public class UnitMarketDialog extends JDialog {
 	}
 
     private void filterOffers() {
-    	RowFilter<UnitMarketTableModel, Integer> unitTypeFilter = null;
+    	RowFilter<UnitMarketTableModel, Integer> unitTypeFilter;
     	unitTypeFilter = new RowFilter<UnitMarketTableModel,Integer>() {
     		@Override
     		public boolean include(Entry<? extends UnitMarketTableModel, ? extends Integer> entry) {
     			UnitMarket.MarketOffer offer = marketModel.getOffer(entry.getIdentifier());
     			boolean underThreshold = !chkPctThreshold.isSelected() ||
-    					offer.pct <= (Integer)spnThreshold.getValue();
+    					offer.pct <= (Integer) spnThreshold.getValue();
     			if (offer.unitType == UnitType.MEK) {
     				return underThreshold && chkShowMeks.isSelected();
     			}

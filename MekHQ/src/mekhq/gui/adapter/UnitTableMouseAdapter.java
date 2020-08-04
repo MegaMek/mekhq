@@ -153,6 +153,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
         this.unitModel = unitModel;
     }
 
+    @Override
     public void actionPerformed(ActionEvent action) {
         // First make sure we actually get a row of data
         int[] rows = unitTable.getSelectedRows();
@@ -399,7 +400,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 Money refundAmount = u.getBuyCost().multipliedBy(refund);
                 gui.getCampaign().removeUnit(u.getId());
                 gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
-                        "refund for cancelled equipment sale", gui.getCampaign().getDate());
+                        "refund for cancelled equipment sale", gui.getCampaign().getLocalDate());
             }
         } else if (command.equals(COMMAND_ARRIVE)) {
             for (Unit u : units) {
