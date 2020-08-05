@@ -167,7 +167,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
             @Override
             public Object stringToValue(String text) {
-                return MMDDYYYY.parse(text);
+                return parseDate(text);
             }
 
             @Override
