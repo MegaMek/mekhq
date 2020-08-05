@@ -158,7 +158,6 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
         //Set up the date input text field with the current campaign date.
         dateField = new JFormattedTextField(date);
-        dateField.setToolTipText("Date of the transaction.");
         dateField.setName("dateField");
         dateField.addFocusListener(this);
         dateField.addKeyListener(this);
