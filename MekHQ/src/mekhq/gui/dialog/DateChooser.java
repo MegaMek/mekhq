@@ -11,7 +11,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -495,7 +494,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     private void updateDateFromDateField() {
         LocalDate newDate = parseDate(dateField.getText());
         if (newDate == null) {
-            JOptionPane.showMessageDialog(this, "Invalid Date Format\nTry: MM/DD/YYYY or YYYY-MM-DD", "Date Format", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Invalid Date Format\nTry: DD/MM/YYYY or YYYY-MM-DD", "Date Format", JOptionPane.WARNING_MESSAGE);
             return;
         }
         setDate(newDate);
