@@ -20,7 +20,6 @@ package mekhq.campaign.log;
 
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 
 import java.io.PrintWriter;

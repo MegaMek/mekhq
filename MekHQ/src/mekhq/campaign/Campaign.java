@@ -305,7 +305,6 @@ public class Campaign implements Serializable, ITechManager {
         lances = new Hashtable<>();
         finances = new Finances();
         SkillType.initializeTypes();
-
         SpecialAbility.initializeSPA();
         astechPool = 0;
         medicPool = 0;
