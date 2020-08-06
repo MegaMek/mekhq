@@ -3,6 +3,9 @@ VERSION HISTORY:
 0.47.9-SNAPSHOT
 + Issue #1894: Adding additional legacy date format
 + PR #1897: Genealogy: Adding a contains map check
++ PR #1900: Adding Battle Damage to MekHQ Sprites
++ Issue #1902: Fixing DateChooser NPEs
++ Issue #1904: Updating Portrait documentation for role name changes
 
 0.47.8 (2020-08-02 2300 UTC)
 + PR #1825: Adding Advance to Next Monday to the AdvanceDaysDialog
