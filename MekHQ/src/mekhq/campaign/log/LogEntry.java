@@ -86,15 +86,11 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
         pw.println(sb.toString());
     }
 
-    /**
-     * This is a modified toString Method that requires Campaign to parse the Date of the LogEntry
-     * @param campaign the campaign to determine the contents of the LogEntry's display format with.
-     * @return A String containing the contents of the LogEntry
-     */
-    public String toString(Campaign campaign) {
+    @Override
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         if (null != date) {
-            sb.append("[").append(campaign.getCampaignOptions().getDisplayFormattedDate(date)).append("] ");
+            sb.append("[").append(date.toString()).append("] ");
         }
         sb.append(desc);
         if (null != type) {
