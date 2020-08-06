@@ -584,6 +584,10 @@ public class PersonnelMarketDialog extends JDialog {
             return "Medical Staff";
         case PersonnelTab.PG_ADMIN:
             return "Administrators";
+        case PersonnelTab.PG_DEPENDENT:
+            return "Dependents";
+        case PersonnelTab.PG_FOUNDER:
+            return "Founders";
         case PersonnelTab.PG_RETIRE:
             return "Retired Personnel";
         case PersonnelTab.PG_MIA:
