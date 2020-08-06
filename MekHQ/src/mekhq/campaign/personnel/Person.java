@@ -508,10 +508,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 setLastRankChangeDate(null);
                 if (log) {
                     if (isPrisoner) {
-                        ServiceLogger.madePrisoner(this, getCampaign().getDate(),
+                        ServiceLogger.madePrisoner(this, getCampaign().getLocalDate(),
                                 getCampaign().getName(), "");
                     } else {
-                        ServiceLogger.madeBondsman(this, getCampaign().getDate(),
+                        ServiceLogger.madeBondsman(this, getCampaign().getLocalDate(),
                                 getCampaign().getName(), "");
                     }
                 }
@@ -530,10 +530,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
                 if (log) {
                     if (freed) {
-                        ServiceLogger.freed(this, getCampaign().getDate(),
+                        ServiceLogger.freed(this, getCampaign().getLocalDate(),
                                 getCampaign().getName(), "");
                     } else {
-                        ServiceLogger.joined(this, getCampaign().getDate(),
+                        ServiceLogger.joined(this, getCampaign().getLocalDate(),
                                 getCampaign().getName(), "");
                     }
                 }
@@ -1303,10 +1303,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         campaign.addReport(getHyperlinkedName() + " has conceived" + (sizeString == null ? "" : (" " + sizeString)));
         if (campaign.getCampaignOptions().logConception()) {
-            MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
+            MedicalLogger.hasConceived(this, campaign.getLocalDate(), sizeString);
             if (getGenealogy().hasSpouse()) {
                 PersonalLogger.spouseConceived(getGenealogy().getSpouse(campaign),
-                        getFullName(), getCampaign().getDate(), sizeString);
+                        getFullName(), getCampaign().getLocalDate(), sizeString);
             }
         }
     }
@@ -1370,10 +1370,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             if (campaign.getCampaignOptions().logConception()) {
-                MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
+                MedicalLogger.deliveredBaby(this, baby, campaign.getLocalDate());
                 if (fatherId != null) {
                     PersonalLogger.ourChildBorn(campaign.getPerson(fatherId), baby, getFullName(),
-                            campaign.getDate());
+                            campaign.getLocalDate());
                 }
             }
         }
@@ -3581,12 +3581,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         Unit u = campaign.getUnit(getUnitId());
         if (status == PersonnelStatus.KIA) {
-            MedicalLogger.diedFromWounds(this, campaign.getDate());
+            MedicalLogger.diedFromWounds(this, campaign.getLocalDate());
             //set the date of death
             setDateOfDeath(getCampaign().getLocalDate());
         }
         if (status == PersonnelStatus.RETIRED) {
-            ServiceLogger.retireDueToWounds(this, campaign.getDate());
+            ServiceLogger.retireDueToWounds(this, campaign.getLocalDate());
         }
         setStatus(status);
         if (status != PersonnelStatus.ACTIVE) {

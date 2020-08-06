@@ -78,8 +78,8 @@ public enum Divorce {
         if ((spouse.isDeadOrMIA() && origin.isDeadOrMIA()) || (!spouse.isDeadOrMIA() && !origin.isDeadOrMIA())) {
             reason = FormerSpouse.REASON_DIVORCE;
 
-            PersonalLogger.divorcedFrom(origin, spouse, campaign.getDate());
-            PersonalLogger.divorcedFrom(spouse, origin, campaign.getDate());
+            PersonalLogger.divorcedFrom(origin, spouse, campaign.getLocalDate());
+            PersonalLogger.divorcedFrom(spouse, origin, campaign.getLocalDate());
 
             campaign.addReport(String.format("%s has divorced %s!", origin.getHyperlinkedName(),
                     spouse.getHyperlinkedName()));
@@ -90,12 +90,12 @@ public enum Divorce {
             spouse.getGenealogy().setSpouse(null);
             origin.getGenealogy().setSpouse(null);
         } else if (spouse.isDeadOrMIA()) {
-            PersonalLogger.spouseKia(origin, spouse, campaign.getDate());
+            PersonalLogger.spouseKia(origin, spouse, campaign.getLocalDate());
 
             origin.setMaidenName(null);
             origin.getGenealogy().setSpouse(null);
         } else if (origin.isDeadOrMIA()) {
-            PersonalLogger.spouseKia(spouse, origin, campaign.getDate());
+            PersonalLogger.spouseKia(spouse, origin, campaign.getLocalDate());
 
             spouse.setMaidenName(null);
             spouse.getGenealogy().setSpouse(null);

@@ -149,7 +149,7 @@ public class PersonAwardController {
                     awards.remove(award);
                 }
                 // TODO : LocalDate : Replace me with direct LocalDate usage
-                AwardLogger.removedAward(person, Date.from(currentDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()), award);
+                AwardLogger.removedAward(person, currentDate, award);
                 MekHQ.triggerEvent(new PersonChangedEvent(person));
                 return;
             }
@@ -162,7 +162,7 @@ public class PersonAwardController {
      */
     public void logAward(Award award, LocalDate date) {
         // TODO : LocalDate : Replace me with direct LocalDate usage
-        AwardLogger.award(person, Date.from(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()), award);
+        AwardLogger.award(person, date, award);
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 

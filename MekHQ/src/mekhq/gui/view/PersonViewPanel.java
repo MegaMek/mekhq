@@ -1332,7 +1332,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         JPanel pnlLog = new JPanel(new GridBagLayout());
 
-        PersonnelEventLogModel eventModel = new PersonnelEventLogModel();
+        PersonnelEventLogModel eventModel = new PersonnelEventLogModel(campaign);
         eventModel.setData(logs);
         JTable eventTable = new JTable(eventModel);
         eventTable.setRowSelectionAllowed(false);
@@ -1369,7 +1369,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         JPanel pnlMissionsLog = new JPanel(new GridBagLayout());
 
-        JLabel lblMissions = new JLabel(String.format(resourceMap.getString("format.missions"), missionLog.size())); //$NON-NLS-1$
+        JLabel lblMissions = new JLabel(String.format(resourceMap.getString("format.missions"), missionLog.size()));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -1379,17 +1379,17 @@ public class PersonViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlMissionsLog.add(lblMissions, gridBagConstraints);
 
-        PersonnelEventLogModel eventModel = new PersonnelEventLogModel();
+        PersonnelEventLogModel eventModel = new PersonnelEventLogModel(campaign);
         eventModel.setData(missionLog);
         JTable missionsTable = new JTable(eventModel);
         missionsTable.setRowSelectionAllowed(false);
         missionsTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column;
-        for(int i = 0; i < eventModel.getColumnCount(); ++ i) {
+        for (int i = 0; i < eventModel.getColumnCount(); ++i) {
             column = missionsTable.getColumnModel().getColumn(i);
             column.setCellRenderer(eventModel.getRenderer());
             column.setPreferredWidth(eventModel.getPreferredWidth(i));
-            if(eventModel.hasConstantWidth(i)) {
+            if (eventModel.hasConstantWidth(i)) {
                 column.setMinWidth(eventModel.getPreferredWidth(i));
                 column.setMaxWidth(eventModel.getPreferredWidth(i));
             }

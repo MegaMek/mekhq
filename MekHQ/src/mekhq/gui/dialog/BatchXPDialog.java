@@ -360,10 +360,10 @@ public final class BatchXPDialog extends JDialog {
                         if (null == spa) {
                             if (campaign.getCampaignOptions().useEdge()) {
                                 p.getOptions().acquireAbility(PilotOptions.EDGE_ADVANTAGES, "edge", p.getEdge() + 1);
-                                PersonalLogger.gainedEdge(p, campaign.getDate());
+                                PersonalLogger.gainedEdge(p, campaign.getLocalDate());
                             }
                         } else {
-                            PersonalLogger.gained(p, campaign.getDate(), spa);
+                            PersonalLogger.gained(p, campaign.getLocalDate(), spa);
                         }
                     }
                 }

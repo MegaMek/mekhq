@@ -1,7 +1,7 @@
 /*
  * HistoricalDailyReportDialog.java
  *
- * Copyright (c) 2018
+ * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -25,12 +25,10 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
-import java.util.Date;
 import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -45,7 +43,6 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
-
 
 public class HistoricalDailyReportDialog extends JDialog {
     private static final long serialVersionUID = -4373796917722483042L;
@@ -63,7 +60,6 @@ public class HistoricalDailyReportDialog extends JDialog {
     private DailyReportLogPanel logPanel;
     private JButton closeBtn;
     private JLabel cacheInfoLabel;
-    private DateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
 
     /**
      * HistoricalDailyReportDialog - opens a dialog that shows a history of the daily log
@@ -95,9 +91,9 @@ public class HistoricalDailyReportDialog extends JDialog {
             closeBtn = new JButton(resourceMap.getString("closeBtn.text"));
             cacheInfoLabel = new JLabel(resourceMap.getString("cachedInformationMessage.text"));
 
-            updateLogPanel((Integer)pickTime.getSelectedItem());
+            updateLogPanel((Integer) pickTime.getSelectedItem());
 
-            pickTime.addActionListener(event -> updateLogPanel((Integer)pickTime.getSelectedItem()));
+            pickTime.addActionListener(event -> updateLogPanel((Integer) pickTime.getSelectedItem()));
 
             closeBtn.addActionListener(event -> setVisible(false));
 
@@ -153,14 +149,14 @@ public class HistoricalDailyReportDialog extends JDialog {
 
     private void updateLogPanel(Integer days) {
         logPanel.clearLogPanel();
-        Date trackDay = null;
-        long currentTime = gui.getCampaign().getDate().getTime();
+        LocalDate trackDay = null;
         for (LogEntry log : gui.getCampaign().inMemoryLogHistory) {
-            long diff = currentTime - log.getDate().getTime();
-            if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) < days) {
+            if (ChronoUnit.DAYS.between(log.getDate(), gui.getCampaign().getLocalDate()) < days) {
                 if (!log.getDate().equals(trackDay)) {
                     logPanel.appendLog(Collections.singletonList("<hr>"));
-                    logPanel.appendLog(Collections.singletonList("<b>"+dateFormat.format(log.getDate())+"</b>"));
+                    logPanel.appendLog(Collections.singletonList("<b>"
+                            + gui.getCampaign().getCampaignOptions().getDisplayFormattedDate(log.getDate())
+                            + "</b>"));
                     logPanel.appendLog(Collections.singletonList("<br><br>"));
                     trackDay = log.getDate();
                 }

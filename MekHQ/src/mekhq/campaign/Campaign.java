@@ -4271,12 +4271,9 @@ public class Campaign implements Serializable, ITechManager {
 
     private void addInMemoryLogHistory(LogEntry le) {
         if (inMemoryLogHistory.size() != 0) {
-            long diff = le.getDate().getTime() - inMemoryLogHistory.get(0).getDate().getTime();
-            while ((diff / (1000 * 60 * 60 * 24)) > HistoricalDailyReportDialog.MAX_DAYS_HISTORY) {
-                //we've hit the max size for the in-memory based on the UI display limit
-                //prune the oldest entry
+            while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) > HistoricalDailyReportDialog.MAX_DAYS_HISTORY) {
+                //we've hit the max size for the in-memory based on the UI display limit prune the oldest entry
                 inMemoryLogHistory.remove(0);
-                diff = le.getDate().getTime() - inMemoryLogHistory.get(0).getDate().getTime();
             }
         }
         inMemoryLogHistory.add(le);
@@ -4289,7 +4286,7 @@ public class Campaign implements Serializable, ITechManager {
     public void beginReport(String r) {
         if (this.getCampaignOptions().historicalDailyLog()) {
             //add the new items to our in-memory cache
-            addInMemoryLogHistory(new HistoricalLogEntry(getDate(), ""));
+            addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), ""));
         }
         addReportInternal(r);
     }
@@ -4300,7 +4297,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void addReport(String r) {
         if (this.getCampaignOptions().historicalDailyLog()) {
-            addInMemoryLogHistory(new HistoricalLogEntry(getDate(), r));
+            addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), r));
         }
         addReportInternal(r);
     }
@@ -5954,7 +5951,7 @@ public class Campaign implements Serializable, ITechManager {
     public void changeStatus(Person person, PersonnelStatus status) {
         Unit u = getUnit(person.getUnitId());
         if (status == PersonnelStatus.KIA) {
-            ServiceLogger.kia(person, getDate());
+            ServiceLogger.kia(person, getLocalDate());
             // set the date of death
             person.setDateOfDeath(getLocalDate());
             // Don't forget to tell the spouse
@@ -5968,16 +5965,16 @@ public class Campaign implements Serializable, ITechManager {
             person.setDateOfDeath(null);
         }
         if (status == PersonnelStatus.MIA) {
-            ServiceLogger.mia(person, getDate());
+            ServiceLogger.mia(person, getLocalDate());
         }
         if (status == PersonnelStatus.RETIRED) {
-            ServiceLogger.retired(person, getDate());
+            ServiceLogger.retired(person, getLocalDate());
             if (getCampaignOptions().useRetirementDateTracking()) {
                 person.setRetirement(getLocalDate());
             }
         }
         if ((status == PersonnelStatus.ACTIVE) && (person.getStatus() == PersonnelStatus.MIA)) {
-            ServiceLogger.recoveredMia(person, getDate());
+            ServiceLogger.recoveredMia(person, getLocalDate());
         }
         person.setStatus(status);
         if (status != PersonnelStatus.ACTIVE) {
@@ -6026,9 +6023,9 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonChangedEvent(person));
         if (report) {
             if (rank > oldRank || ((rank == oldRank) && (rankLevel > oldRankLevel))) {
-                ServiceLogger.promotedTo(person, getDate());
+                ServiceLogger.promotedTo(person, getLocalDate());
             } else if ((rank < oldRank) || (rankLevel < oldRankLevel)) {
-                ServiceLogger.demotedTo(person, getDate());
+                ServiceLogger.demotedTo(person, getLocalDate());
             }
         }
     }
@@ -8141,7 +8138,7 @@ public class Campaign implements Serializable, ITechManager {
     public void initTimeInService() {
         for (Person p : getPersonnel()) {
             if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
-                Date join = null;
+                LocalDate join = null;
                 for (LogEntry e : p.getPersonnelLog()) {
                     if (join == null) {
                         // If by some nightmare there is no Joined date just use the first entry.
@@ -8153,14 +8150,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
 
-                LocalDate date;
-                // For that one in a billion chance the log is empty. Clone today's date and subtract a year
-                if (join == null) {
-                    date = getLocalDate().minusYears(1);
-                } else {
-                    date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                }
-                p.setRecruitment(date);
+                p.setRecruitment((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
     }
@@ -8169,7 +8159,7 @@ public class Campaign implements Serializable, ITechManager {
         for (Person p : getPersonnel()) {
             if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
 
-                Date join = null;
+                LocalDate join = null;
                 for (LogEntry e : p.getPersonnelLog()) {
                     if (join == null) {
                         // If by some nightmare there is no date from the below, just use the first entry.
@@ -8182,14 +8172,8 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
 
-                LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
-                if (join == null) {
-                    date = getLocalDate().minusYears(1);
-                } else {
-                    date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                }
-                p.setLastRankChangeDate(date);
+                p.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
     }
@@ -8197,8 +8181,8 @@ public class Campaign implements Serializable, ITechManager {
     public void initRetirementDateTracking() {
         for (Person person : getPersonnel()) {
             if (person.getStatus() == PersonnelStatus.RETIRED) {
-                Date retired = null;
-                Date lastLoggedDate = null;
+                LocalDate retired = null;
+                LocalDate lastLoggedDate = null;
                 for (LogEntry entry : person.getPersonnelLog()) {
                     lastLoggedDate = entry.getDate();
                     if (entry.getDesc().startsWith("Retired")) {
@@ -8210,12 +8194,8 @@ public class Campaign implements Serializable, ITechManager {
                     retired = lastLoggedDate;
                 }
 
-                if (retired == null) {
-                    // For that one in a billion chance the log is empty. Clone today's date and subtract a year
-                    person.setRetirement(getLocalDate().minusYears(1));
-                } else {
-                    person.setRetirement(retired.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                }
+                // For that one in a billion chance the log is empty. Clone today's date and subtract a year
+                person.setRetirement((retired != null) ? retired : getLocalDate().minusYears(1));
             }
         }
     }
@@ -8238,10 +8218,10 @@ public class Campaign implements Serializable, ITechManager {
             * Go through all the personnel records and assume the earliest date is the date
             * the unit was founded.
             */
-            Date founding = null;
+            LocalDate founding = null;
             for (Person p : getPersonnel()) {
                 for (LogEntry e : p.getPersonnelLog()) {
-                    if (null == founding || e.getDate().before(founding)) {
+                    if ((founding == null) || e.getDate().isBefore(founding)) {
                         founding = e.getDate();
                     }
                 }
@@ -8253,14 +8233,14 @@ public class Campaign implements Serializable, ITechManager {
             * that 'Mech (which is a less certain assumption)
             */
             for (Person p : getPersonnel()) {
-                Date join = null;
+                LocalDate join = null;
                 for (LogEntry e : p.getPersonnelLog()) {
                     if (e.getDesc().startsWith("Joined ")) {
                         join = e.getDate();
                         break;
                     }
                 }
-                if (null != join && join.equals(founding)) {
+                if ((join != null) && join.equals(founding)) {
                     p.setFounder(true);
                 }
                 if (p.getPrimaryRole() == Person.T_MECHWARRIOR

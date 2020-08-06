@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 MegaMek team
+ * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.mod.am;
 
@@ -53,7 +53,7 @@ public final class InjuryUtil {
     private static AMEventHandler eventHandler = null;
 
     public synchronized static void registerEventHandler(Campaign c) {
-        if(null != eventHandler) {
+        if (null != eventHandler) {
             MekHQ.EVENT_BUS.unregister(eventHandler);
         }
         MekHQ.EVENT_BUS.register(eventHandler = new AMEventHandler(c));
@@ -64,8 +64,8 @@ public final class InjuryUtil {
     public static void resolveDailyHealing(Campaign c, Person p) {
         Person doc = c.getPerson(p.getDoctorId());
         // TODO: Reporting
-        if((null != doc) && doc.isDoctor()) {
-            if(p.getDaysToWaitForHealing() <= 0) {
+        if ((null != doc) && doc.isDoctor()) {
+            if (p.getDaysToWaitForHealing() <= 0) {
                 genMedicalTreatment(c, p, doc).stream().forEach(GameEffect::apply);
             }
         } else {
@@ -93,12 +93,12 @@ public final class InjuryUtil {
         Collection<Injury> newInjuries = genInjuries(c, person, hits);
         newInjuries.forEach(person::addInjury);
         if (newInjuries.size() > 0) {
-            MedicalLogger.returnedWithInjuries(person, c.getDate(), newInjuries);
+            MedicalLogger.returnedWithInjuries(person, c.getLocalDate(), newInjuries);
         }
     }
 
     private static void addHitToAccumulator(Map<BodyLocation, Integer> acc, BodyLocation loc) {
-        if(!acc.containsKey(loc)) {
+        if (!acc.containsKey(loc)) {
             acc.put(loc, 1);
         } else {
             acc.put(loc, acc.get(loc) + 1);
@@ -125,12 +125,12 @@ public final class InjuryUtil {
             addHitToAccumulator(hitAccumulator, location);
             // critical hits add to the amount
             int roll = Compute.d6(2);
-            if(roll + hits + critMod > 12) {
+            if (roll + hits + critMod > 12) {
                 addHitToAccumulator(hitAccumulator, location);
             }
         }
         List<Injury> newInjuries = new ArrayList<>();
-        for(Entry<BodyLocation, Integer> accEntry : hitAccumulator.entrySet()) {
+        for (Entry<BodyLocation, Integer> accEntry : hitAccumulator.entrySet()) {
             newInjuries.addAll(genInjuries(c, p, accEntry.getKey(), accEntry.getValue()));
         }
         return newInjuries;
@@ -141,10 +141,16 @@ public final class InjuryUtil {
         List<Injury> newInjuries = new ArrayList<>();
         final BiFunction<InjuryType, Integer, Injury> gen = (it, severity) -> it.newInjury(c, p, loc, severity);
 
-        switch(loc) {
-            case LEFT_ARM: case LEFT_HAND: case LEFT_LEG: case LEFT_FOOT:
-            case RIGHT_ARM: case RIGHT_HAND: case RIGHT_LEG: case RIGHT_FOOT:
-                switch(hits) {
+        switch (loc) {
+            case LEFT_ARM:
+            case LEFT_HAND:
+            case LEFT_LEG:
+            case LEFT_FOOT:
+            case RIGHT_ARM:
+            case RIGHT_HAND:
+            case RIGHT_LEG:
+            case RIGHT_FOOT:
+                switch (hits) {
                     case 1:
                         newInjuries.add(gen.apply(
                             Compute.randomInt(2) == 0 ? InjuryTypes.CUT : InjuryTypes.BRUISE, 1));
@@ -161,7 +167,7 @@ public final class InjuryUtil {
                 }
                 break;
             case HEAD:
-                switch(hits) {
+                switch (hits) {
                     case 1:
                         newInjuries.add(gen.apply(InjuryTypes.LACERATION, 1));
                         break;
@@ -177,7 +183,7 @@ public final class InjuryUtil {
                 }
                 break;
             case CHEST:
-                switch(hits) {
+                switch (hits) {
                     case 1:
                         newInjuries.add(gen.apply(
                             Compute.randomInt(2) == 0 ? InjuryTypes.CUT : InjuryTypes.BRUISE, 1));
@@ -193,14 +199,14 @@ public final class InjuryUtil {
                         break;
                     default:
                         newInjuries.add(gen.apply(InjuryTypes.BROKEN_BACK, 1));
-                        if(Compute.randomInt(100) < 15) {
+                        if (Compute.randomInt(100) < 15) {
                             newInjuries.add(gen.apply(InjuryTypes.SEVERED_SPINE, 1));
                         }
                         break;
                 }
                 break;
             case ABDOMEN:
-                switch(hits) {
+                switch (hits) {
                     case 1:
                         newInjuries.add(gen.apply(
                             Compute.randomInt(2) == 0 ? InjuryTypes.CUT : InjuryTypes.BRUISE, 1));
@@ -232,16 +238,16 @@ public final class InjuryUtil {
     public static int genHealingTime(Campaign c, Person p, InjuryType itype, int severity) {
         int mod = 100;
         int rand = Compute.randomInt(100);
-        if(rand < 5) {
+        if (rand < 5) {
             mod += (Compute.d6() < 4) ? rand : -rand;
         }
 
         int time = itype.getRecoveryTime(severity);
-        if(itype == InjuryTypes.LACERATION) {
+        if (itype == InjuryTypes.LACERATION) {
             time += Compute.d6();
         }
 
-        time = (int)Math.round((time * mod * p.getAbilityTimeModifier()) / 10000.0);
+        time = (int) Math.round((time * mod * p.getAbilityTimeModifier()) / 10000.0);
         return time;
     }
 
@@ -261,8 +267,8 @@ public final class InjuryUtil {
 
         List<GameEffect> result = new ArrayList<>();
 
-        for(Injury i : p.getInjuries()) {
-            if(!i.isWorkedOn()) {
+        for (Injury i : p.getInjuries()) {
+            if (!i.isWorkedOn()) {
                 int roll = Compute.randomInt(100);
                 // Determine XP, if any
                 if (roll < Math.max(1, fumbleLimit / 10)) {
@@ -282,7 +288,7 @@ public final class InjuryUtil {
                     doc.setCurrentEdge(doc.getCurrentEdge() - 1);
                     roll = Compute.randomInt(100);
                 }
-                if(roll < fumbleLimit) {
+                if (roll < fumbleLimit) {
                     result.add(new GameEffect(
                         String.format("%s made a mistake in the treatment of %s and caused %s %s to worsen.",
                             doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
@@ -290,7 +296,7 @@ public final class InjuryUtil {
                         rnd -> {
                             int time = i.getTime();
                             i.setTime((int) Math.max(Math.ceil(time * 1.2), time + 5));
-                            MedicalLogger.docMadeAMistake(doc, p, i, c.getDate());
+                            MedicalLogger.docMadeAMistake(doc, p, i, c.getLocalDate());
 
                             // TODO: Add in special handling of the critical
                             //if (rnd.applyAsInt(100) < (fumbleLimit / 4)) {
@@ -299,13 +305,13 @@ public final class InjuryUtil {
                                 // bleeding (death chance)
                             //}
                         }));
-                } else if((roll > critLimit) && (critTimeReduction > 0)) {
+                } else if ((roll > critLimit) && (critTimeReduction > 0)) {
                     result.add(new GameEffect(
                         String.format("%s performed some amazing work in treating %s of %s (%d fewer day(s) to heal).",
                                 doc.getHyperlinkedFullTitle(), i.getName(), p.getHyperlinkedName(), critTimeReduction),
                         rnd -> {
                             i.setTime(i.getTime() - critTimeReduction);
-                            MedicalLogger.docAmazingWork(doc, p, i, c.getDate(), critTimeReduction);
+                            MedicalLogger.docAmazingWork(doc, p, i, c.getLocalDate(), critTimeReduction);
                         }));
                 } else {
                     final int xpChance = (int) Math.round(100.0 / c.getCampaignOptions().getNTasksXP());
@@ -319,12 +325,12 @@ public final class InjuryUtil {
                                 doc.awardXP(taskXP);
                                 doc.setNTasks(0);
 
-                                ServiceLogger.gainedXpFromMedWork(doc, c.getDate(), taskXP);
+                                ServiceLogger.gainedXpFromMedWork(doc, c.getLocalDate(), taskXP);
                             } else {
                                 doc.setNTasks(doc.getNTasks() + 1);
                             }
                             i.setWorkedOn(true);
-                            MedicalLogger.successfullyTreated(doc, p, c.getDate(), i);
+                            MedicalLogger.successfullyTreated(doc, p, c.getLocalDate(), i);
                             Unit u = c.getUnit(p.getUnitId());
                             if (null != u) {
                                 u.resetPilotAndEntity();
@@ -362,9 +368,9 @@ public final class InjuryUtil {
                 rnd -> {
                     if (xp > 0) {
                         doc.awardXP(xp);
-                        ServiceLogger.successfullyTreatedWithXp(doc, p, c.getDate(), injuries, xp);
+                        ServiceLogger.successfullyTreatedWithXp(doc, p, c.getLocalDate(), injuries, xp);
                     } else {
-                        ServiceLogger.successfullyTreated(doc, p, c.getDate(), injuries);
+                        ServiceLogger.successfullyTreated(doc, p, c.getLocalDate(), injuries);
                     }
                     p.setDaysToWaitForHealing(c.getCampaignOptions().getHealingWaitingPeriod());
                 }));
@@ -397,10 +403,10 @@ public final class InjuryUtil {
                             i.setTime(0);
                             if (rnd.applyAsInt(6) == 0) {
                                 i.setPermanent(true);
-                                MedicalLogger.injuryDidntHealProperly(p, c.getDate(), i);
+                                MedicalLogger.injuryDidntHealProperly(p, c.getLocalDate(), i);
                             } else {
                                 p.removeInjury(i);
-                                MedicalLogger.injuryHealed(p, c.getDate(), i);
+                                MedicalLogger.injuryHealed(p, c.getLocalDate(), i);
                             }
                         }));
                 } else {
@@ -409,7 +415,7 @@ public final class InjuryUtil {
                         rnd -> {
                             i.setTime(0);
                             p.removeInjury(i);
-                            MedicalLogger.injuryHealed(p, c.getDate(), i);
+                            MedicalLogger.injuryHealed(p, c.getLocalDate(), i);
                         }));
                 }
             } else if (i.getTime() > 1) {
@@ -421,7 +427,7 @@ public final class InjuryUtil {
                     String.format("%s becomes permanent", i.getName()),
                     rnd -> {
                         i.setTime(0);
-                        MedicalLogger.injuryBecamePermanent(p, c.getDate(), i);
+                        MedicalLogger.injuryBecamePermanent(p, c.getLocalDate(), i);
                     }));
             }
         });
@@ -431,17 +437,17 @@ public final class InjuryUtil {
                     boolean dismissed = false;
                     if (p.getStatus() == PersonnelStatus.KIA) {
                         dismissed = true;
-                        MedicalLogger.diedInInfirmary(p, c.getDate());
+                        MedicalLogger.diedInInfirmary(p, c.getLocalDate());
                     } else if (p.getStatus() == PersonnelStatus.MIA) {
                         // What? How?
                         dismissed = true;
-                        MedicalLogger.abductedFromInfirmary(p, c.getDate());
+                        MedicalLogger.abductedFromInfirmary(p, c.getLocalDate());
                     } else if (p.getStatus() == PersonnelStatus.RETIRED) {
                         dismissed = true;
-                        MedicalLogger.retiredAndTransferredFromInfirmary(p, c.getDate());
+                        MedicalLogger.retiredAndTransferredFromInfirmary(p, c.getLocalDate());
                     } else if (!p.needsFixing()) {
                         dismissed = true;
-                        MedicalLogger.dismissedFromInfirmary(p, c.getDate());
+                        MedicalLogger.dismissedFromInfirmary(p, c.getLocalDate());
                     }
 
                     if (dismissed) {

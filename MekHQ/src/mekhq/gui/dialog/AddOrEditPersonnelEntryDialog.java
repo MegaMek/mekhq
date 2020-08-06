@@ -24,10 +24,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -35,6 +32,7 @@ import javax.swing.*;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PersonalLogEntry;
 import mekhq.gui.preferences.JWindowPreference;
@@ -51,9 +49,10 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     private JFrame frame;
     private int operationType;
     private LogEntry entry;
-    private Date date;
-    private Date originalDate;
+    private LocalDate date;
+    private LocalDate originalDate;
     private String originalDescription;
+    private Campaign campaign;
 
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOK;
@@ -62,15 +61,15 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     private javax.swing.JPanel panBtn;
     private javax.swing.JPanel panMain;
 
-    public AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, Date entryDate) {
-        this(parent, modal, ADD_OPERATION, new PersonalLogEntry(entryDate, ""));
+    public AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, Campaign campaign, LocalDate entryDate) {
+        this(parent, modal, campaign, ADD_OPERATION, new PersonalLogEntry(entryDate, ""));
     }
 
-    public AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, LogEntry entry) {
-        this(parent, modal, EDIT_OPERATION, entry);
+    public AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, Campaign campaign, LogEntry entry) {
+        this(parent, modal, campaign, EDIT_OPERATION, entry);
     }
 
-    private AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, int operationType, LogEntry entry) {
+    private AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, Campaign campaign, int operationType, LogEntry entry) {
         super(parent, modal);
 
         assert entry != null;
@@ -78,6 +77,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
         this.frame = parent;
         this.operationType = operationType;
         this.entry = entry;
+        this.campaign = campaign;
 
         this.date = this.entry.getDate();
         this.originalDate = this.entry.getDate();
@@ -116,7 +116,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
         panMain.setLayout(new GridBagLayout());
 
         btnDate = new javax.swing.JButton();
-        btnDate.setText(getDateAsString());
+        btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(evt -> changeDate());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -183,17 +183,10 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     }
 
     private void changeDate() {
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        DateChooser dc = new DateChooser(frame, cal.toZonedDateTime().toLocalDate());
+        DateChooser dc = new DateChooser(frame, date);
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = GregorianCalendar.from(dc.getDate().atStartOfDay(ZoneId.systemDefault())).getTime();
-            btnDate.setText(getDateAsString());
+            date = dc.getDate();
+            btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(date));
         }
-    }
-
-    private String getDateAsString() {
-    	SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
-        return dateFormat.format(date);
     }
 }
