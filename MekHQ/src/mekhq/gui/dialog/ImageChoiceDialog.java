@@ -44,7 +44,7 @@ import javax.swing.table.TableCellRenderer;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
-import megamek.common.util.DirectoryItems;
+import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
