@@ -1,6 +1,6 @@
 Windchild's Guide to Loading Portraits in MekHQ
-Written 08-Feb-2020
-MekHQ version 0.47.3
+Written 08-Feb-2020, Updated 05-Aug-2020
+MekHQ version 0.47.8
 
 How Portrait Loading Works:
 The basic structure for loading a portrait is that it first determines the gender of the person, then looks for a folder located under the gender for a folder with the exact name of the primary role (see below for a list of possible primary roles). If that folder doesn't exist, is empty, or contains only pictures which are already assigned, the system continues with the next round of checking.
@@ -29,14 +29,14 @@ Female Portraits:				/Female
 
 Primary Role Folders:
 None: 							/None
-Mechwarrior:					/Mechwarrior
+Mechwarrior:					/MechWarrior
 Vehicle Driver:					/Vehicle Driver
 Naval Driver:					/Naval Driver
 VTOL Pilot:						/VTOL Pilot
 Vehicle Gunner:					/Vehicle Gunner
 Conventional Aircraft Pilot:	/Conventional Aircraft Pilot
-Aero Pilot:						/Aero Pilot
-Proto Pilot:					/Proto Pilot
+Aero Pilot:						/Aerospace Pilot
+Proto Pilot:					/ProtoMech Pilot
 Battle Armor (Clan):			/Elemental
 Battle Armour:					/Battle Armor Pilot
 Soldier:						/Soldier
