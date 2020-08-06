@@ -233,6 +233,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox useEdgeBox;
     private JCheckBox useSupportEdgeBox;
     private JCheckBox useImplantsBox;
+    private JCheckBox chkUnitCommanderForSkill;
     private JCheckBox chkCapturePrisoners;
     private JComboBox<PrisonerStatus> comboPrisonerStatus;
     private JCheckBox chkPrisonerBabyStatus;
@@ -1652,6 +1653,12 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(useImplantsBox, gridBagConstraints);
 
+        chkUnitCommanderForSkill = new JCheckBox(resourceMap.getString("chkUnitCommanderForSkill.text"));
+        chkUnitCommanderForSkill.setToolTipText(resourceMap.getString("chkUnitCommanderForSkill.toolTipText"));
+        chkUnitCommanderForSkill.setSelected(options.getUnitCommanderForSkill());
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkUnitCommanderForSkill, gridBagConstraints);
+        
         chkCapturePrisoners.setText(resourceMap.getString("chkCapturePrisoners.text"));
         chkCapturePrisoners.setToolTipText(resourceMap.getString("chkCapturePrisoners.toolTipText"));
         gridBagConstraints.gridy = ++gridy;
@@ -4909,6 +4916,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setSupportEdge(useSupportEdgeBox.isSelected());
         options.setImplants(useImplantsBox.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
+        options.setUnitCommanderForSkill(chkUnitCommanderForSkill.isSelected());
         options.setCapturePrisoners(chkCapturePrisoners.isSelected());
         options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
         options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
