@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-0.47.9-SNAPSHOT
+0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
 + PR #1897: Genealogy: Adding a contains map check
 + PR #1900: Adding Battle Damage to MekHQ Sprites
