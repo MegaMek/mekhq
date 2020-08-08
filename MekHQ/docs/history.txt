@@ -1,6 +1,8 @@
 VERSION HISTORY:
 ----------------
 0.47.10-SNAPSHOT
++ PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
++ Issue #1888: Founder Filter in Personnel Tab
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
