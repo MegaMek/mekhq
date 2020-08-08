@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,6 +72,11 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
 
+/**
+ * This class manages the GUI and logic for the campaign subset export wizard.
+ * May Knuth forgive me.
+ * @author NickAragua
+ */
 public class CampaignExportWizard extends JDialog {
     private static final long serialVersionUID = -7171621116865584010L;
 
@@ -524,7 +528,7 @@ public class CampaignExportWizard extends JDialog {
             }
 
             destinationCampaign.importUnit(unit);
-            destinationCampaign.getUnit(unit.getId()).setForceId(Force.FORCE_NONE);
+
             // Reset any transport assignments, as the export may not contain all transports and cargo units
             if (unit.hasTransportShipId()) {
                 unit.getTransportShipId().clear();
@@ -655,8 +659,12 @@ public class CampaignExportWizard extends JDialog {
         
         // first thing we will try is to identify a force with the same name and tree structure in the destination campaign
         // if we find one, add the unit to it
-        // otherwise,
-        Force destForce = findForce(sourceForce.getFullName(), destinationCampaign.getForces());
+        // otherwise, chain-add forces
+
+        // hack: the root forces are irrelevant, so we replace the source root force name with the destination root force name
+        String sourceForceFullName = getDestinationFullName(sourceForce, sourceCampaign, destinationCampaign);
+        
+        Force destForce = findForce(sourceForceFullName, destinationCampaign.getForces());
         if(destForce != null) {
             destForce.addUnit(unit.getId());
         } else {
@@ -665,7 +673,8 @@ public class CampaignExportWizard extends JDialog {
             
             for(int x = parentForces.size() - 1; x >= 0; x--) {
                 Force nextSourceForce = parentForces.get(x);
-                Force nextDestinationForce = findForce(nextSourceForce.getFullName(), currentDestinationForce);
+                String nextSourceForceFullName = getDestinationFullName(nextSourceForce, sourceCampaign, destinationCampaign);
+                Force nextDestinationForce = findForce(nextSourceForceFullName, currentDestinationForce);
                 
                 // if this level doesn't exist yet, add it to where we currently are
                 if(nextDestinationForce == null) {
@@ -680,6 +689,14 @@ public class CampaignExportWizard extends JDialog {
             
             currentDestinationForce.addUnit(unit.getId());
         }
+    }
+    
+    /**
+     * Helper function that returns a full force name with the 
+     * source campaign root force name swapped out for the destination campaign root force name
+     */
+    private String getDestinationFullName(Force sourceForce, Campaign sourceCampaign, Campaign destinationCampaign) {
+        return sourceForce.getFullName().replace(sourceCampaign.getForces().getName(), destinationCampaign.getForces().getName());
     }
     
     /**
