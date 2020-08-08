@@ -812,7 +812,7 @@ public class CampaignExportWizard extends JDialog {
             Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             Person person = (Person) value;
             String callsign = "";
-            if((person.getCallsign() != null) && (person.getCallsign().trim().length() > 0)) {
+            if ((person.getCallsign() != null) && (person.getCallsign().trim().length() > 0)) {
                 callsign = String.format("\"%s\" ", person.getCallsign());
             }
             
