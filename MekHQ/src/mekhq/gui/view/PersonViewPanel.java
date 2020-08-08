@@ -45,7 +45,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 
 import megamek.common.Crew;
 import megamek.common.options.PilotOptions;
-import megamek.common.util.DirectoryItems;
+import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.MekHQ;

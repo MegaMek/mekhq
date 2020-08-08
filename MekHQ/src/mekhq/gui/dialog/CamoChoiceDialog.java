@@ -25,7 +25,7 @@ import javax.swing.table.TableCellRenderer;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
-import megamek.common.util.DirectoryItems;
+import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.gui.preferences.JWindowPreference;
