@@ -648,12 +648,12 @@ public class CampaignExportWizard extends JDialog {
     
     private void attemptToAssignToForce(Unit unit, int sourceForceID, Campaign sourceCampaign, Campaign destinationCampaign) {
         Force sourceForce = sourceCampaign.getForce(sourceForceID);
-        if(sourceForce == null) {
+        if (sourceForce == null) {
             return;
         }
         
         // this indicates a unit assigned to the root-level force
-        if(sourceForce.getParentForce() == null) {
+        if (sourceForce.getParentForce() == null) {
             destinationCampaign.getForces().addUnit(unit.getId());
         }
         
@@ -662,22 +662,22 @@ public class CampaignExportWizard extends JDialog {
         // otherwise, chain-add forces
 
         // hack: the root forces are irrelevant, so we replace the source root force name with the destination root force name
-        String sourceForceFullName = getDestinationFullName(sourceForce, sourceCampaign, destinationCampaign);
+        String sourceForceFullName = getDestinationFullName (sourceForce, sourceCampaign, destinationCampaign);
         
         Force destForce = findForce(sourceForceFullName, destinationCampaign.getForces());
-        if(destForce != null) {
+        if (destForce != null) {
             destForce.addUnit(unit.getId());
         } else {
             List<Force> parentForces = getForceAndParents(sourceForce);
             Force currentDestinationForce = destinationCampaign.getForces();
             
-            for(int x = parentForces.size() - 1; x >= 0; x--) {
+            for (int x = parentForces.size() - 1; x >= 0; x--) {
                 Force nextSourceForce = parentForces.get(x);
                 String nextSourceForceFullName = getDestinationFullName(nextSourceForce, sourceCampaign, destinationCampaign);
                 Force nextDestinationForce = findForce(nextSourceForceFullName, currentDestinationForce);
                 
                 // if this level doesn't exist yet, add it to where we currently are
-                if(nextDestinationForce == null) {
+                if (nextDestinationForce == null) {
                     Force forceCopy = new Force(nextSourceForce.getName());
                     destinationCampaign.addForce(forceCopy, currentDestinationForce);
                     currentDestinationForce = forceCopy;
@@ -703,7 +703,7 @@ public class CampaignExportWizard extends JDialog {
      * Recurses through a Force structure to look for a force with the given "full force name"
      */
     private Force findForce(String forceName, Force force) {
-        if(force.getFullName().equals(forceName)) {
+        if (force.getFullName().equals(forceName)) {
             return force;
         } else {
             for(Force subForce : force.getSubForces()) {
@@ -727,11 +727,11 @@ public class CampaignExportWizard extends JDialog {
         retval.add(force);
         
         Force ancestorForce;
-        while(force.getParentForce() != null) {
+        while (force.getParentForce() != null) {
             ancestorForce = force.getParentForce();
             
             // we don't want the top-level force
-            if(ancestorForce.getParentForce() != null) {
+            if (ancestorForce.getParentForce() != null) {
                 retval.add(ancestorForce);
             }
             
