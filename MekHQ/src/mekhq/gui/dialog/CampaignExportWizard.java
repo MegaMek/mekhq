@@ -706,10 +706,10 @@ public class CampaignExportWizard extends JDialog {
         if (force.getFullName().equals(forceName)) {
             return force;
         } else {
-            for(Force subForce : force.getSubForces()) {
+            for (Force subForce : force.getSubForces()) {
                 Force foundForce = findForce(forceName, subForce);
                 
-                if(foundForce != null) {
+                if (foundForce != null) {
                     return foundForce;
                 }
             }
