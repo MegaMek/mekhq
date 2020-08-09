@@ -1,25 +1,19 @@
 package mekhq.campaign.stratcon;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlTransient;
 
-import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 
 /**
  * Class that handles scenario metadata and interaction at the StratCon level
@@ -55,9 +49,9 @@ public class StratconScenario implements IStratconDisplayable {
     private ScenarioState currentState = ScenarioState.UNRESOLVED;
     private int requiredPlayerLances;
     private boolean requiredScenario;
-    private Date deploymentDate;
-    private Date actionDate;
-    private Date returnDate;
+    private LocalDate deploymentDate;
+    private LocalDate actionDate;
+    private LocalDate returnDate;
 
     /**
      * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the scenario template.
@@ -201,28 +195,28 @@ public class StratconScenario implements IStratconDisplayable {
         return backingScenario;
     }
 
-    public Date getDeploymentDate() {
+    public LocalDate getDeploymentDate() {
         return deploymentDate;
     }
 
-    public void setDeploymentDate(Date deploymentDate) {
+    public void setDeploymentDate(LocalDate deploymentDate) {
         this.deploymentDate = deploymentDate;
     }
 
-    public Date getActionDate() {
+    public LocalDate getActionDate() {
         return actionDate;
     }
 
-    public void setActionDate(Date actionDate) {
+    public void setActionDate(LocalDate actionDate) {
         this.actionDate = actionDate;
         backingScenario.setDate(actionDate);
     }
 
-    public Date getReturnDate() {
+    public LocalDate getReturnDate() {
         return returnDate;
     }
 
-    public void setReturnDate(Date returnDate) {
+    public void setReturnDate(LocalDate returnDate) {
         this.returnDate = returnDate;
     }
     

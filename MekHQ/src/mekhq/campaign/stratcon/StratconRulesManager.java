@@ -1,18 +1,16 @@
 package mekhq.campaign.stratcon;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import megamek.common.Board;
 import megamek.common.Compute;
-import megamek.common.Coords;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
@@ -25,16 +23,13 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconFacility.FacilityType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Planet;
 
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
@@ -335,7 +330,7 @@ public class StratconRulesManager {
                 for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
                     for(StratconScenario scenario : track.getScenarios().values()) {
                         if(scenario.getCurrentState() == ScenarioState.UNRESOLVED &&
-                                campaign.getCalendar().getTime().equals(scenario.getDeploymentDate())) {
+                                campaign.getLocalDate().equals(scenario.getDeploymentDate())) {
                             // "scenario name, track name"
                             sb.append(String.format("%s, %s\n", scenario.getName(), track.getDisplayableName()));
                         }
@@ -546,16 +541,16 @@ public class StratconRulesManager {
         int battleDay = deploymentDay + (track.getDeploymentTime() > 0 ? Compute.randomInt(track.getDeploymentTime()) : 0);
         int returnDay = deploymentDay + track.getDeploymentTime();
         
-        GregorianCalendar deploymentDate = (GregorianCalendar) campaign.getCalendar().clone();
-        deploymentDate.add(Calendar.DAY_OF_MONTH, deploymentDay);
-        GregorianCalendar battleDate = (GregorianCalendar) campaign.getCalendar().clone();
-        battleDate.add(Calendar.DAY_OF_MONTH, battleDay);
-        GregorianCalendar returnDate = (GregorianCalendar) campaign.getCalendar().clone();
-        returnDate.add(Calendar.DAY_OF_MONTH, returnDay);
+        LocalDate deploymentDate = campaign.getLocalDate();
+        deploymentDate.plusDays(deploymentDay);
+        LocalDate battleDate = campaign.getLocalDate();
+        deploymentDate.plusDays(battleDay);
+        LocalDate returnDate = campaign.getLocalDate();
+        returnDate.plusDays(returnDay);
         
-        scenario.setDeploymentDate(deploymentDate.getTime());
-        scenario.setActionDate(battleDate.getTime());
-        scenario.setReturnDate(returnDate.getTime());
+        scenario.setDeploymentDate(deploymentDate);
+        scenario.setActionDate(battleDate);
+        scenario.setReturnDate(returnDate);
     }
     
     /**
@@ -732,7 +727,7 @@ public class StratconRulesManager {
     
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
-        if(ev.getCampaign().getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+        if(ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             // run scenario generation routine for every track attached to an active contract
             for(Contract contract : ev.getCampaign().getActiveContracts()) {
                 if(contract instanceof AtBContract) {
