@@ -90,11 +90,12 @@ public final class PersonnelTab extends CampaignGuiTab {
     public static final int PG_DOC = 12;
     public static final int PG_ADMIN = 13;
     public static final int PG_DEPENDENT = 14;
-    public static final int PG_PRISONER = 15;
-    public static final int PG_RETIRE = 16;
-    public static final int PG_MIA = 17;
-    public static final int PG_KIA = 18;
-    public static final int PG_NUM = 19;
+    public static final int PG_FOUNDER = 15;
+    public static final int PG_PRISONER = 16;
+    public static final int PG_RETIRE = 17;
+    public static final int PG_MIA = 18;
+    public static final int PG_KIA = 19;
+    public static final int PG_NUM = 20;
 
     // personnel views
     private static final int PV_GRAPHIC = 0;
@@ -356,6 +357,8 @@ public final class PersonnelTab extends CampaignGuiTab {
             return "Administrators";
         case PG_DEPENDENT:
             return "Dependents";
+        case PG_FOUNDER:
+            return "Founders";
         case PG_RETIRE:
             return "Retired Personnel";
         case PG_MIA:
@@ -422,6 +425,8 @@ public final class PersonnelTab extends CampaignGuiTab {
                     return person.isActive();
                 } else if (nGroup == PG_DEPENDENT) {
                     return person.isDependent();
+                } else if (nGroup == PG_FOUNDER) {
+                    return person.isFounder();
                 } else if (nGroup == PG_RETIRE) {
                     return person.getStatus() == PersonnelStatus.RETIRED;
                 } else if (nGroup == PG_MIA) {

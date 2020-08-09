@@ -41,7 +41,7 @@ import javax.swing.table.TableRowSorter;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.util.DirectoryItems;
+import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
@@ -444,6 +444,10 @@ public class PersonnelMarketDialog extends JDialog {
                             (nGroup == PersonnelTab.PG_ADMIN && type > Person.T_MEDIC)
                             ) {
                         return person.isActive();
+                    } else if (nGroup == PersonnelTab.PG_DEPENDENT) {
+                        return person.isDependent();
+                    } else if (nGroup == PersonnelTab.PG_FOUNDER) {
+                        return person.isFounder();
                     } else if(nGroup == PersonnelTab.PG_RETIRE) {
                         return person.getStatus() == PersonnelStatus.RETIRED;
                     } else if(nGroup == PersonnelTab.PG_MIA) {
@@ -580,6 +584,10 @@ public class PersonnelMarketDialog extends JDialog {
             return "Medical Staff";
         case PersonnelTab.PG_ADMIN:
             return "Administrators";
+        case PersonnelTab.PG_DEPENDENT:
+            return "Dependents";
+        case PersonnelTab.PG_FOUNDER:
+            return "Founders";
         case PersonnelTab.PG_RETIRE:
             return "Retired Personnel";
         case PersonnelTab.PG_MIA:
