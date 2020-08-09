@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui;
 
 import java.awt.GridBagConstraints;
@@ -14,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
+import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import mekhq.IconPackage;
@@ -27,13 +46,8 @@ import mekhq.campaign.unit.Unit;
  * allowing for a visual image and html coded text
  *
  * @author Jay Lawson
- *
  */
 public class BasicInfo extends JPanel {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -7337823041775639463L;
 
     private JLabel lblImage;
@@ -120,7 +134,6 @@ public class BasicInfo extends JPanel {
     }
 
     protected Image getImageFor(Unit u) {
-
         if (null == icons.getMechTiles()) {
             return null;
         }
@@ -129,7 +142,7 @@ public class BasicInfo extends JPanel {
             return null;
         }
         int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
-        EntityImage entityImage = new EntityImage(base, tint, getCamo(u), this);
+        EntityImage entityImage = new EntityImage(base, tint, getCamo(u), this, u.getEntity());
         return entityImage.loadPreviewImage();
     }
 

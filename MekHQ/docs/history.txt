@@ -1,6 +1,17 @@
 VERSION HISTORY:
 ----------------
-0.47.8-SNAPSHOT
+0.47.10-SNAPSHOT
++ PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
++ Issue #1888: Founder Filter in Personnel Tab
+
+0.47.9 (2020-08-07 1830 UTC)
++ Issue #1894: Adding additional legacy date format
++ PR #1897: Genealogy: Adding a contains map check
++ PR #1900: Adding Battle Damage to MekHQ Sprites
++ Issue #1902: Fixing DateChooser NPEs
++ Issue #1904: Updating Portrait documentation for role name changes
+
+0.47.8 (2020-08-02 2300 UTC)
 + PR #1825: Adding Advance to Next Monday to the AdvanceDaysDialog
 + Issue #1828: Rolling over to the next month when using AtB and your current faction goes extinct will no longer cause an error
 + Issue #1827: Adding documentation comment for required Excel version for Awards Tracker

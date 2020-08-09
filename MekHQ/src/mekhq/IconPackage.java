@@ -35,7 +35,7 @@ import megamek.client.ui.swing.tileset.MechTileset;
 import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.Configuration;
 import megamek.common.Crew;
-import megamek.common.util.DirectoryItems;
+import megamek.common.util.fileUtils.DirectoryItems;
 import mekhq.campaign.force.Force;
 import mekhq.gui.enums.LayeredForceIcon;
 import mekhq.gui.utilities.PortraitFileFactory;

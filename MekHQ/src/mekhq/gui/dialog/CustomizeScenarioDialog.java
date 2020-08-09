@@ -1,7 +1,7 @@
 /*
  * CustomizeScenarioDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,9 +27,10 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -371,27 +372,20 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 
     private void changeDate() {
         // show the date chooser
-        GregorianCalendar day = GregorianCalendar.from(date.atStartOfDay(ZoneId.systemDefault()));
-        DateChooser dc = new DateChooser(frame, day);
+        DateChooser dc = new DateChooser(frame, date);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             if (scenario.isCurrent()) {
-                if (dc.getDate().getTime().before(campaign.getDate())) {
+                if (dc.getDate().isBefore(campaign.getLocalDate())) {
                     JOptionPane.showMessageDialog(frame,
                             "You cannot choose a date before the current date for a pending battle.",
                             "Invalid date",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 } else {
-                    //Calendar math necessitated by variations in locales
-                    GregorianCalendar nextMonday = new GregorianCalendar();
-                    nextMonday.setTime(campaign.getDate());
-                    nextMonday.add(Calendar.DAY_OF_MONTH, 1);
-                    while (nextMonday.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
-                        nextMonday.add(Calendar.DAY_OF_MONTH, 1);
-                    }
+                    LocalDate nextMonday = campaign.getLocalDate().with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
 
-                    if (!dc.getDate().getTime().before(nextMonday.getTime())) {
+                    if (!dc.getDate().isBefore(nextMonday)) {
                         JOptionPane.showMessageDialog(frame,
                                 "You cannot choose a date beyond the current week.",
                                 "Invalid date",
@@ -399,16 +393,15 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                         return;
                     }
                 }
-            } else if (dc.getDate().getTime().after(campaign.getDate())) {
+            } else if (dc.getDate().isAfter(campaign.getLocalDate())) {
                 JOptionPane.showMessageDialog(frame,
                         "You cannot choose a date after the current date.",
                         "Invalid date",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            date = dc.getDate().toZonedDateTime().toLocalDate();
-            btnDate.setText(date.format(DateTimeFormatter.ofPattern(campaign.getCampaignOptions()
-                    .getDisplayDateFormat())));
+            date = dc.getDate();
+            btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(date));
         }
     }
 

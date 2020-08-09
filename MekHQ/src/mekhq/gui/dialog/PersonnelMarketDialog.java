@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2013, 2020  - The MegaMek Team
+ * Copyright (c) 2009, 2013, 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,17 +10,16 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -42,7 +41,7 @@ import javax.swing.table.TableRowSorter;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.util.DirectoryItems;
+import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
@@ -50,10 +49,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
@@ -69,7 +66,6 @@ import mekhq.gui.view.PersonViewPanel;
 import mekhq.preferences.PreferencesNode;
 
 /**
- *
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  * (code borrowed heavily from MegaMekLab UnitSelectorDialog
  */
@@ -376,7 +372,7 @@ public class PersonnelMarketDialog extends JDialog {
 		}
 		if (pay && !campaign.getFinances().debit(unitCost, Transaction.C_UNIT,
 				"Purchased " + en.getShortName(),
-				campaign.getCalendar().getTime())) {
+				campaign.getLocalDate())) {
 			return;
 		}
 		campaign.addUnit(en, false, 0);
@@ -448,6 +444,10 @@ public class PersonnelMarketDialog extends JDialog {
                             (nGroup == PersonnelTab.PG_ADMIN && type > Person.T_MEDIC)
                             ) {
                         return person.isActive();
+                    } else if (nGroup == PersonnelTab.PG_DEPENDENT) {
+                        return person.isDependent();
+                    } else if (nGroup == PersonnelTab.PG_FOUNDER) {
+                        return person.isFounder();
                     } else if(nGroup == PersonnelTab.PG_RETIRE) {
                         return person.getStatus() == PersonnelStatus.RETIRED;
                     } else if(nGroup == PersonnelTab.PG_MIA) {
@@ -584,6 +584,10 @@ public class PersonnelMarketDialog extends JDialog {
             return "Medical Staff";
         case PersonnelTab.PG_ADMIN:
             return "Administrators";
+        case PersonnelTab.PG_DEPENDENT:
+            return "Dependents";
+        case PersonnelTab.PG_FOUNDER:
+            return "Founders";
         case PersonnelTab.PG_RETIRE:
             return "Retired Personnel";
         case PersonnelTab.PG_MIA:

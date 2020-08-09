@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -250,39 +249,39 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public static String getQualityName(int quality, boolean reverse) {
-        switch(quality) {
-        case QUALITY_A:
-            if(reverse) {
-                return "F";
-            }
-            return "A";
-        case QUALITY_B:
-            if(reverse) {
-                return "E";
-            }
-            return "B";
-        case QUALITY_C:
-            if(reverse) {
-                return "D";
-            }
-            return "C";
-        case QUALITY_D:
-            if(reverse) {
-                return "C";
-            }
-            return "D";
-        case QUALITY_E:
-            if(reverse) {
-                return "B";
-            }
-            return "E";
-        case QUALITY_F:
-            if(reverse) {
+        switch (quality) {
+            case QUALITY_A:
+                if (reverse) {
+                    return "F";
+                }
                 return "A";
-            }
-            return "F";
-        default:
-            return "?";
+            case QUALITY_B:
+                if (reverse) {
+                    return "E";
+                }
+                return "B";
+            case QUALITY_C:
+                if (reverse) {
+                    return "D";
+                }
+                return "C";
+            case QUALITY_D:
+                if (reverse) {
+                    return "C";
+                }
+                return "D";
+            case QUALITY_E:
+                if (reverse) {
+                    return "B";
+                }
+                return "E";
+            case QUALITY_F:
+                if (reverse) {
+                    return "A";
+                }
+                return "F";
+            default:
+                return "?";
         }
     }
 
@@ -343,17 +342,17 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     protected Money adjustCostsForCampaignOptions(Money cost) {
         // if the part doesn't cost anything, no amount of multiplication will change it
-        if(cost.isZero()) {
+        if (cost.isZero()) {
             return cost;
         }
 
-        if(getTechBase() == T_CLAN) {
+        if (getTechBase() == T_CLAN) {
             cost = cost.multipliedBy(campaign.getCampaignOptions().getClanPriceModifier());
         }
-        if(needsFixing() && !isPriceAdjustedForAmount()) {
+        if (needsFixing() && !isPriceAdjustedForAmount()) {
             cost = cost.multipliedBy(campaign.getCampaignOptions().getDamagedPartsValue());
             //TODO: parts that cant be fixed should also be further reduced in price
-        } else if(!isBrandNew()) {
+        } else if (!isBrandNew()) {
             cost = cost.multipliedBy(campaign.getCampaignOptions().getUsedPartsValue(getQuality()));
         }
 
@@ -388,7 +387,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public void setUnit(Unit u) {
         this.unit = u;
-        if(null != unit) {
+        if (null != unit) {
             unitId = unit.getId();
             unitTonnage = (int) unit.getEntity().getWeight();
         } else {
@@ -398,22 +397,22 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public String getStatus() {
         String toReturn = "Functional";
-        if(needsFixing()) {
+        if (needsFixing()) {
             toReturn = "Damaged";
         }
-        if(isReservedForRefit()) {
+        if (isReservedForRefit()) {
             toReturn = "Reserved for Refit";
         }
-        if(isReservedForReplacement()) {
+        if (isReservedForReplacement()) {
             toReturn = "Reserved for Repair";
         }
-        if(isBeingWorkedOn()) {
+        if (isBeingWorkedOn()) {
             toReturn = "Being worked on";
         }
-        if(!isPresent()) {
+        if (!isPresent()) {
             //toReturn = "" + getDaysToArrival() + " days to arrival";
             String dayName = "day";
-            if(getDaysToArrival() > 1) {
+            if (getDaysToArrival() > 1) {
                 dayName += "s";
             }
             toReturn = "In transit (" + getDaysToArrival() + " " + dayName + ")";
@@ -433,7 +432,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         bonus = "(" + bonus + ")";
         String toReturn = "<html><font size='2'";
         String action = "Repair ";
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             action = "Salvage ";
         }
         String scheduled = "";
@@ -444,11 +443,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         toReturn += ">";
         toReturn += "<b>" + action + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
-        if(getSkillMin() > SkillType.EXP_ELITE) {
+        if (getSkillMin() > SkillType.EXP_ELITE) {
             toReturn += "<font color='red'>Impossible</font>";
         } else {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-            if(!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+            if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
                 toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
             }
             toReturn += " " + bonus;
@@ -462,7 +461,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public String getRepairDesc() {
         String toReturn = "";
-        if(needsFixing()) {
+        if (needsFixing()) {
             String scheduled = "";
             if (getTeamId() != null) {
                 scheduled = " (scheduled) ";
@@ -487,17 +486,17 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public static String getTechBaseName(int base) {
-        switch(base) {
-        case T_BOTH:
-            return "IS/Clan";
-        case T_CLAN:
-            return "Clan";
-        case T_IS:
-            return "IS";
-        case T_UNKNOWN:
-            return "UNKNOWN";
-        default:
-            return "??";
+        switch (base) {
+            case T_BOTH:
+                return "IS/Clan";
+            case T_CLAN:
+                return "Clan";
+            case T_IS:
+                return "IS";
+            case T_UNKNOWN:
+                return "UNKNOWN";
+            default:
+                return "??";
         }
     }
 
@@ -556,7 +555,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public boolean isSameStatus(Part part) {
         //parts that are reserved for refit or being worked on are never the same status
-        if(isReservedForRefit() || isBeingWorkedOn() || isReservedForReplacement() || hasParentPart()
+        if (isReservedForRefit() || isBeingWorkedOn() || isReservedForReplacement() || hasParentPart()
                 || part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || part.hasParentPart()) {
             return false;
         }
@@ -567,6 +566,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return getTechBase() == TECH_BASE_CLAN;
     }
 
+    @Override
     public abstract void writeToXml(PrintWriter pw1, int indent);
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
@@ -589,7 +589,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             .append(level1)
             .append("<name>")
             .append(MekHqXmlUtil.escape(name))
-            .append("</name>");
+            .append("</name>")
+            .append(NL);
         if (omniPodded) {
             builder.append(level1)
                 .append("<omniPodded/>")
@@ -615,7 +616,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             .append(mode)
             .append("</mode>")
             .append(NL);
-        if(null != teamId) {
+        if (null != teamId) {
             builder.append(level1)
                 .append("<teamId>")
                 .append(teamId)
@@ -627,7 +628,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             .append(skillMin)
             .append("</skillMin>")
             .append(NL);
-        if(null != unitId) {
+        if (null != unitId) {
             builder.append(level1)
                 .append("<unitId>")
                 .append(unitId)
@@ -689,7 +690,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             .append(parentPartId)
             .append("</parentPartId>")
             .append(NL);
-        for(int childId : childPartIds) {
+        for (int childId : childPartIds) {
             builder.append(level1)
                 .append("<childPartId>")
                 .append(childId)
@@ -711,34 +712,25 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         String className = classNameNode.getTextContent();
 
         //reverse compatibility checks
-        if(className.equalsIgnoreCase("mekhq.campaign.parts.MekEngine")) {
+        if (className.equalsIgnoreCase("mekhq.campaign.parts.MekEngine")) {
             className = "mekhq.campaign.parts.EnginePart";
-        }
-        else if(className.equalsIgnoreCase("mekhq.campaign.parts.MissingMekEngine")) {
+        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingMekEngine")) {
             className = "mekhq.campaign.parts.MissingEnginePart";
-        }
-        else if(className.equalsIgnoreCase("mekhq.campaign.parts.EquipmentPart")) {
+        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.EquipmentPart")) {
             className = "mekhq.campaign.parts.equipment.EquipmentPart";
-        }
-        else if(className.equalsIgnoreCase("mekhq.campaign.parts.MissingEquipmentPart")) {
+        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingEquipmentPart")) {
             className = "mekhq.campaign.parts.equipment.MissingEquipmentPart";
-        }
-        else if(className.equalsIgnoreCase("mekhq.campaign.parts.AmmoBin")) {
+        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.AmmoBin")) {
             className = "mekhq.campaign.parts.equipment.AmmoBin";
-        }
-        else if(className.equalsIgnoreCase("mekhq.campaign.parts.MissingAmmoBin")) {
+        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingAmmoBin")) {
             className = "mekhq.campaign.parts.equipment.MissingAmmoBin";
-        }
-        else if(className.equalsIgnoreCase("mekhq.campaign.parts.JumpJet")) {
+        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.JumpJet")) {
             className = "mekhq.campaign.parts.equipment.JumpJet";
-        }
-        else if(className.equalsIgnoreCase("mekhq.campaign.parts.MissingJumpJet")) {
+        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingJumpJet")) {
             className = "mekhq.campaign.parts.equipment.MissingJumpJet";
-        }
-        else if(className.equalsIgnoreCase("mekhq.campaign.parts.HeatSink")) {
+        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.HeatSink")) {
             className = "mekhq.campaign.parts.equipment.HeatSink";
-        }
-        else if(className.equalsIgnoreCase("mekhq.campaign.parts.MissingHeatSink")) {
+        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingHeatSink")) {
             className = "mekhq.campaign.parts.equipment.MissingHeatSink";
         }
 
@@ -751,10 +743,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                 if (wn2.getNodeName().equalsIgnoreCase("id")) {
+                if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.id = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
@@ -778,7 +770,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                     if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
                         retVal.oldTeamId = Integer.parseInt(wn2.getTextContent());
                     } else {
-                        if(!wn2.getTextContent().equals("null")) {
+                        if (!wn2.getTextContent().equals("null")) {
                             retVal.teamId = UUID.fromString(wn2.getTextContent());
                         }
                     }
@@ -786,7 +778,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                     if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
                         retVal.oldUnitId = Integer.parseInt(wn2.getTextContent());
                     } else {
-                        if(!wn2.getTextContent().equals("null")) {
+                        if (!wn2.getTextContent().equals("null")) {
                             retVal.unitId = UUID.fromString(wn2.getTextContent());
                         }
                     }
@@ -796,7 +788,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                     if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
                         retVal.oldRefitId = Integer.parseInt(wn2.getTextContent());
                     } else {
-                        if(!wn2.getTextContent().equals("null")) {
+                        if (!wn2.getTextContent().equals("null")) {
                             retVal.refitId = UUID.fromString(wn2.getTextContent());
                         }
                     }
@@ -818,142 +810,142 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 } else if (wn2.getNodeName().equalsIgnoreCase("childPartId")) {
                     retVal.childPartIds.add(Integer.parseInt(wn2.getTextContent()));
                 }
-			}
+            }
 
-			// Refit protection of unit id
-			if (retVal.unitId != null && retVal.refitId != null) {
-				retVal.setUnit(null);
-			}
-		} catch (Exception ex) {
-			// Errrr, apparently either the class name was invalid...
-			// Or the listed name doesn't exist.
-			// Doh!
-		    MekHQ.getLogger().error(Part.class, METHOD_NAME, ex);
-		}
+            // Refit protection of unit id
+            if (retVal.unitId != null && retVal.refitId != null) {
+                retVal.setUnit(null);
+            }
+        } catch (Exception ex) {
+            // Errrr, apparently either the class name was invalid...
+            // Or the listed name doesn't exist.
+            // Doh!
+            MekHQ.getLogger().error(Part.class, METHOD_NAME, ex);
+        }
 
-		return retVal;
-	}
+        return retVal;
+    }
 
-	protected abstract void loadFieldsFromXmlNode(Node wn);
+    protected abstract void loadFieldsFromXmlNode(Node wn);
 
-	@Override
-	public int getActualTime() {
-	    return (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
-	}
+    @Override
+    public int getActualTime() {
+        return (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
+    }
 
-	@Override
-	public int getTimeLeft() {
-		// Cannot be less than 0 time left.
-		return Math.max(0, getActualTime() - getTimeSpent());
-	}
+    @Override
+    public int getTimeLeft() {
+        // Cannot be less than 0 time left.
+        return Math.max(0, getActualTime() - getTimeSpent());
+    }
 
-	@Override
-	public int getTimeSpent() {
-		return timeSpent;
-	}
+    @Override
+    public int getTimeSpent() {
+        return timeSpent;
+    }
 
-	public void addTimeSpent(int m) {
-		this.timeSpent += m;
-	}
+    public void addTimeSpent(int m) {
+        this.timeSpent += m;
+    }
 
-	public void resetTimeSpent() {
-		this.timeSpent = 0;
-	}
+    public void resetTimeSpent() {
+        this.timeSpent = 0;
+    }
 
-	public void resetOvertime() {
-		this.workingOvertime = false;
-	}
+    public void resetOvertime() {
+        this.workingOvertime = false;
+    }
 
-	@Override
-	public int getSkillMin() {
-		return skillMin;
-	}
+    @Override
+    public int getSkillMin() {
+        return skillMin;
+    }
 
-	public void setSkillMin(int i) {
-		this.skillMin = i;
-	}
+    public void setSkillMin(int i) {
+        this.skillMin = i;
+    }
 
-	public WorkTime getMode() {
-		return mode;
-	}
+    public WorkTime getMode() {
+        return mode;
+    }
 
-	public void setMode(WorkTime wt) {
-	    if (canChangeWorkMode()) {
-	        this.mode = wt;
-	    } else {
-	        this.mode = WorkTime.NORMAL;
-	    }
-	}
+    public void setMode(WorkTime wt) {
+        if (canChangeWorkMode()) {
+            this.mode = wt;
+        } else {
+            this.mode = WorkTime.NORMAL;
+        }
+    }
 
-	/*
-	 * Reset our WorkTime back to normal so that we can adjust as
-	 * necessary
-	 */
-	public void resetModeToNormal() {
-		setMode(WorkTime.NORMAL);
-	}
+    /*
+     * Reset our WorkTime back to normal so that we can adjust as
+     * necessary
+     */
+    public void resetModeToNormal() {
+        setMode(WorkTime.NORMAL);
+    }
 
-	@Override
-	public boolean canChangeWorkMode() {
-	    return !(isOmniPodded() && isSalvaging());
-	}
+    @Override
+    public boolean canChangeWorkMode() {
+        return !(isOmniPodded() && isSalvaging());
+    }
 
-	@Override
-	public TargetRoll getAllMods(Person tech) {
-	    int difficulty = getDifficulty();
+    @Override
+    public TargetRoll getAllMods(Person tech) {
+        int difficulty = getDifficulty();
 
-	    if (isOmniPodded() && (isSalvaging() || this instanceof MissingPart)
-	            && (null != unit) && !(unit.getEntity() instanceof Tank)) {
-	        difficulty -= 2;
-	    }
+        if (isOmniPodded() && (isSalvaging() || this instanceof MissingPart)
+                && (null != unit) && !(unit.getEntity() instanceof Tank)) {
+            difficulty -= 2;
+        }
 
-	    if (null == mode) {
-	    	mode = WorkTime.NORMAL;
-	    }
+        if (null == mode) {
+            mode = WorkTime.NORMAL;
+        }
 
-		TargetRoll mods = new TargetRoll(difficulty, "difficulty");
-		int modeMod = mode.getMod(campaign.getCampaignOptions().isDestroyByMargin());
-		if (modeMod != 0) {
-			mods.addModifier(modeMod, getCurrentModeName());
-		}
-		if(null != unit) {
-			mods.append(unit.getSiteMod());
-	        if(unit.getEntity().hasQuirk("easy_maintain")) {
-	            mods.addModifier(-1, "easy to maintain");
-	        }
-	        else if(unit.getEntity().hasQuirk("difficult_maintain")) {
-	            mods.addModifier(1, "difficult to maintain");
-	        }
-		}
-		if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
-			if (null != tech && !tech.isClanner()
-			        && !tech.getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
-				mods.addModifier(2, "Clan tech");
-			}
-		}
-		if(null != tech
-				&& tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
-				&& (IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.WEAPON
-				|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON)) {
-			mods.addModifier(-1, "Weapon specialist");
-		}
-		if(null != tech
-				&& tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
-						&& IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.ARMOR) {
-			mods.addModifier(-1, "Armor specialist");
-		}
-		if(null != tech
-				&& tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
-				&& (IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.ACTUATOR
-			 	|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.ELECTRONICS
-			 	|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.ENGINE
-			 	|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.GYRO
-			 	|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.MEK_LOCATION
-			 	|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.GENERAL_LOCATION)) {
-			mods.addModifier(-1, "Internal specialist");
-		}
+        TargetRoll mods = new TargetRoll(difficulty, "difficulty");
+        int modeMod = mode.getMod(campaign.getCampaignOptions().isDestroyByMargin());
+        if (modeMod != 0) {
+            mods.addModifier(modeMod, getCurrentModeName());
+        }
+        if (null != unit) {
+            mods.append(unit.getSiteMod());
+            if (unit.getEntity().hasQuirk("easy_maintain")) {
+                mods.addModifier(-1, "easy to maintain");
+            }
+            else if (unit.getEntity().hasQuirk("difficult_maintain")) {
+                mods.addModifier(1, "difficult to maintain");
+            }
+        }
+        if (isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
+            if (null != tech && !tech.isClanner()
+                    && !tech.getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
+                mods.addModifier(2, "Clan tech");
+            }
+        }
+        if (null != tech
+                && tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
+                && (IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.WEAPON
+                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON)) {
+            mods.addModifier(-1, "Weapon specialist");
+        }
+        if (null != tech
+                && tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
+                        && IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.ARMOR) {
+            mods.addModifier(-1, "Armor specialist");
+        }
+        if (null != tech
+                && tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
+                && (IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.ACTUATOR
+                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.ELECTRONICS
+                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.ENGINE
+                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.GYRO
+                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.MEK_LOCATION
+                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.GENERAL_LOCATION)) {
+            mods.addModifier(-1, "Internal specialist");
+        }
 
-		mods = getQualityMods(mods, tech);
+        mods = getQualityMods(mods, tech);
 
         return mods;
     }
@@ -983,7 +975,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             }
         }
 
-        if(campaign.getCampaignOptions().useQualityMaintenance()) {
+        if (campaign.getCampaignOptions().useQualityMaintenance()) {
             mods = getQualityMods(mods, getUnit().getTech());
         }
         return mods;
@@ -1024,7 +1016,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             //fixers can ignore the first point of penalty for poor quality
             mods.addModifier(-1, "Mr/Ms Fix-it");
         }
-	    return mods;
+        return mods;
     }
 
     public String getCurrentModeName() {
@@ -1040,9 +1032,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public void setTeamId(UUID i) {
         //keep track of whether this was a salvage operation
         //because the entity may change
-        if(null == i) {
+        if (null == i) {
             this.isTeamSalvaging = false;
-        } else if(null == teamId) {
+        } else if (null == teamId) {
             this.isTeamSalvaging = isSalvaging();
         }
         this.teamId = i;
@@ -1096,7 +1088,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     @Override
     public String succeed() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             remove(true);
             return " <font color='green'><b> salvaged.</b></font>";
         } else {
@@ -1162,7 +1154,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     @Override
     public boolean isSalvaging() {
-        if(null != unit) {
+        if (null != unit) {
             return unit.isSalvage() || isMountedOnDestroyedLocation() || isTeamSalvaging();
         }
         return false;
@@ -1253,7 +1245,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public boolean checkArrival() {
-        if(daysToArrival > 0) {
+        if (daysToArrival > 0) {
             daysToArrival--;
             return (daysToArrival == 0);
         }
@@ -1276,7 +1268,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     /*
     public void resetRepairStatus() {
-        if(null != unit) {
+        if (null != unit) {
             setSalvaging(unit.isSalvage());
             updateConditionFromEntity(false);
         }
@@ -1309,10 +1301,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public void decrementQuantity() {
         quantity--;
-        if(quantity <= 0) {
-            for(int childId : childPartIds) {
+        if (quantity <= 0) {
+            for (int childId : childPartIds) {
                 Part p = campaign.getPart(childId);
-                if(null != p) {
+                if (null != p) {
                     campaign.removePart(p);
                 }
             }
@@ -1326,10 +1318,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
      */
     public void setQuantity(int number) {
         quantity = number;
-        if(quantity <= 0) {
-            for(int childId : childPartIds) {
+        if (quantity <= 0) {
+            for (int childId : childPartIds) {
                 Part p = campaign.getPart(childId);
-                if(null != p) {
+                if (null != p) {
                     campaign.removePart(p);
                 }
             }
@@ -1358,7 +1350,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public void decrementDaysToWait() {
-        if(daysToWait > 0) {
+        if (daysToWait > 0) {
             daysToWait--;
         }
     }
@@ -1373,7 +1365,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public String getQuantityName(int quantity) {
         String answer = "" + quantity + " " + getName();
-        if(quantity > 1) {
+        if (quantity > 1) {
             answer += "s";
         }
         return answer;
@@ -1445,10 +1437,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public void removeChildPart(int childId) {
         ArrayList<Integer> tempArray = new ArrayList<>();
-        for(int cid : childPartIds) {
-            if(cid == childId) {
+        for (int cid : childPartIds) {
+            if (cid == childId) {
                 Part part = campaign.getPart(childId);
-                if(null != part) {
+                if (null != part) {
                     part.setParentPartId(-1);
                 }
             } else {
@@ -1459,9 +1451,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public void removeAllChildParts() {
-        for(int childId : childPartIds) {
+        for (int childId : childPartIds) {
             Part part = campaign.getPart(childId);
-            if(null != part) {
+            if (null != part) {
                 part.setParentPartId(-1);
             }
         }
@@ -1502,7 +1494,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         sb.append(getDetails());
         sb.append(", q: "); //$NON-NLS-1$
         sb.append(quantity);
-        if(null != unit) {
+        if (null != unit) {
             sb.append(", mounted: "); //$NON-NLS-1$
             sb.append(unit);
         }
@@ -1513,28 +1505,20 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         switch (type) {
             case Part.REPAIR_PART_TYPE.ARMOR:
                 return "Armor";
-
             case Part.REPAIR_PART_TYPE.AMMO:
                 return "Ammo";
-
             case Part.REPAIR_PART_TYPE.WEAPON:
                 return "Weapons";
-
             case Part.REPAIR_PART_TYPE.GENERAL_LOCATION:
                 return "Locations";
-
             case Part.REPAIR_PART_TYPE.ENGINE:
                 return "Engines";
-
             case Part.REPAIR_PART_TYPE.GYRO:
                 return "Gyros";
-
             case Part.REPAIR_PART_TYPE.ACTUATOR:
                 return "Actuators";
-
             case Part.REPAIR_PART_TYPE.ELECTRONICS:
                 return "Cockpit/Life Support/Sensors";
-
             default:
                 return "Other Items";
         }
