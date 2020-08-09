@@ -1896,7 +1896,7 @@ public class CampaignXmlParser {
                 }
             }
 
-            if (id == null) {
+            if ((id == null) || !ancestryMigrationMap.containsKey(id)) {
                 continue;
             }
 

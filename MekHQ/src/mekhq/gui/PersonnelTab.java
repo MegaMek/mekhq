@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017, 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui;
 
@@ -89,12 +89,13 @@ public final class PersonnelTab extends CampaignGuiTab {
     public static final int PG_DOC = 12;
     public static final int PG_ADMIN = 13;
     public static final int PG_DEPENDENT = 14;
-    public static final int PG_PRISONER = 15;
-    public static final int PG_RETIRE = 16;
-    public static final int PG_MIA = 17;
-    public static final int PG_KIA = 18;
-    public static final int PG_DEAD = 19;
-    public static final int PG_NUM = 20;
+    public static final int PG_FOUNDER = 15;
+    public static final int PG_PRISONER = 16;
+    public static final int PG_RETIRE = 17;
+    public static final int PG_MIA = 18;
+    public static final int PG_KIA = 19;
+    public static final int PG_DEAD = 20;
+    public static final int PG_NUM = 21;
 
     // personnel views
     private static final int PV_GRAPHIC = 0;
@@ -331,7 +332,7 @@ public final class PersonnelTab extends CampaignGuiTab {
             case PG_COMBAT:
                 return "Combat Personnel";
             case PG_MW:
-                return "Mechwarriors";
+                return "MechWarriors";
             case PG_CREW:
                 return "Vehicle Crews";
             case PG_PILOT:
@@ -339,7 +340,7 @@ public final class PersonnelTab extends CampaignGuiTab {
             case PG_CPILOT:
                 return "Conventional Pilots";
             case PG_PROTO:
-                return "Protomech Pilots";
+                return "ProtoMech Pilots";
             case PG_BA:
                 return "Battle Armor Infantry";
             case PG_SOLDIER:
@@ -356,6 +357,8 @@ public final class PersonnelTab extends CampaignGuiTab {
                 return "Administrators";
             case PG_DEPENDENT:
                 return "Dependents";
+            case PG_FOUNDER:
+                return "Founders";
             case PG_RETIRE:
                 return "Retired Personnel";
             case PG_MIA:
@@ -424,6 +427,8 @@ public final class PersonnelTab extends CampaignGuiTab {
                     return person.getStatus().isActive();
                 } else if (nGroup == PG_DEPENDENT) {
                     return person.isDependent();
+                } else if (nGroup == PG_FOUNDER) {
+                    return person.isFounder();
                 } else if (nGroup == PG_RETIRE) {
                     return person.getStatus().isRetired();
                 } else if (nGroup == PG_MIA) {
