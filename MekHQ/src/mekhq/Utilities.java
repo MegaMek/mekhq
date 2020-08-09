@@ -70,6 +70,7 @@ import megamek.common.enums.Gender;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
+import mekhq.campaign.personnel.enums.Phenotype;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -955,7 +956,7 @@ public class Utilities {
 
                 String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
                 if (phenotype != null) {
-                    p.setPhenotype(Integer.parseInt(phenotype));
+                    p.setPhenotype(Phenotype.parseFromString(phenotype));
                 }
 
                 p.setBloodname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME));
@@ -1371,27 +1372,6 @@ public class Utilities {
         long endTime = endCal.getTimeInMillis();
 
         return (endTime - startTime) / MILLISECONDS_IN_DAY;
-    }
-
-    public static int getDiffFullYears(Date date, GregorianCalendar b) {
-        GregorianCalendar a = new GregorianCalendar();
-        a.setTime(date);
-        int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
-        if (a.get(GregorianCalendar.MONTH) > b.get(GregorianCalendar.MONTH) ||
-                (a.get(GregorianCalendar.MONTH) == b.get(GregorianCalendar.MONTH) && a.get(GregorianCalendar.DATE) > b.get(GregorianCalendar.DATE))) {
-            diff--;
-        }
-        return diff;
-    }
-
-    public static int getDiffPartialYears(Date date, GregorianCalendar b) {
-        GregorianCalendar a = new GregorianCalendar();
-        a.setTime(date);
-        int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
-        if (diff == 0 && countDaysBetween(a.getTime(), b.getTime()) > 0) {
-            return 1;
-        }
-        return diff;
     }
 
     /**

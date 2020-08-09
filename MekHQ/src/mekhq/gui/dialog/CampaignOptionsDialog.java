@@ -23,7 +23,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -44,6 +43,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -75,7 +75,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
-import megamek.common.util.DirectoryItems;
+import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -92,6 +92,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.Marriage;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
@@ -121,7 +122,7 @@ public class CampaignOptionsDialog extends JDialog {
     private RandomSkillPreferences rSkillPrefs;
     private GregorianCalendar date;
     private SimpleDateFormat dateFormat;
-    private Frame frame;
+    private JFrame frame;
     private String camoCategory;
     private String camoFileName;
     private int colorIndex;
@@ -248,6 +249,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
     private JCheckBox chkUseTimeInRank;
     private JComboBox<TimeInDisplayFormat> comboTimeInRankDisplayFormat;
+    private JCheckBox chkUseRetirementDateTracking;
     private JCheckBox chkTrackTotalEarnings;
     private JCheckBox chkShowOriginFaction;
     private JCheckBox chkRandomizeOrigin;
@@ -355,10 +357,7 @@ public class CampaignOptionsDialog extends JDialog {
     //region Skill Randomization Tab
     private JPanel panRandomSkill;
     private JCheckBox chkExtraRandom;
-    private JSpinner spnProbPhenoMW;
-    private JSpinner spnProbPhenoAero;
-    private JSpinner spnProbPhenoBA;
-    private JSpinner spnProbPhenoVee;
+    private JSpinner[] phenotypeSpinners;
     private JSpinner spnProbAntiMek;
     private JSpinner spnOverallRecruitBonus;
     private JSpinner[] spnTypeRecruitBonus;
@@ -503,7 +502,7 @@ public class CampaignOptionsDialog extends JDialog {
     /**
      * Creates new form CampaignOptionsDialog
      */
-    public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos,
+    public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c, DirectoryItems camos,
                                  DirectoryItems forceIcons) {
         super(parent, modal);
         this.campaign = c;
@@ -1767,6 +1766,11 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(pnlTimeInRankDisplayFormat, gridBagConstraints);
 
+        chkUseRetirementDateTracking = new JCheckBox(resourceMap.getString("useRetirementDateTracking.text"));
+        chkUseRetirementDateTracking.setSelected(options.useRetirementDateTracking());
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkUseRetirementDateTracking, gridBagConstraints);
+
         chkTrackTotalEarnings = new JCheckBox(resourceMap.getString("trackTotalEarnings.text"));
         chkTrackTotalEarnings.setToolTipText(resourceMap.getString("trackTotalEarnings.toolTipText"));
         chkTrackTotalEarnings.setSelected(options.trackTotalEarnings());
@@ -3029,48 +3033,34 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panRandomSkill.add(chkExtraRandom, gridBagConstraints);
 
-        JPanel panClanPheno = new JPanel(new GridLayout(2, 2));
-        spnProbPhenoMW = new JSpinner(new SpinnerNumberModel(options.getProbPhenoMW(), 0, 100, 5));
-        ((JSpinner.DefaultEditor) spnProbPhenoMW.getEditor()).getTextField().setEditable(false);
-        JPanel panPhenoMW = new JPanel();
-        panPhenoMW.add(spnProbPhenoMW);
-        panPhenoMW.add(new JLabel("Mechwarrior"));
-        panPhenoMW.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
-        panClanPheno.add(panPhenoMW);
-        spnProbPhenoAero = new JSpinner(new SpinnerNumberModel(options.getProbPhenoAero(), 0, 100, 5));
-        ((JSpinner.DefaultEditor) spnProbPhenoAero.getEditor()).getTextField().setEditable(false);
-        JPanel panPhenoAero = new JPanel();
-        panPhenoAero.add(spnProbPhenoAero);
-        panPhenoAero.add(new JLabel("Aero Pilot"));
-        panPhenoAero.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
-        panClanPheno.add(panPhenoAero);
-        spnProbPhenoBA = new JSpinner(new SpinnerNumberModel(options.getProbPhenoBA(), 0, 100, 5));
-        ((JSpinner.DefaultEditor) spnProbPhenoBA.getEditor()).getTextField().setEditable(false);
-        JPanel panPhenoBA = new JPanel();
-        panPhenoBA.add(spnProbPhenoBA);
-        panPhenoBA.add(new JLabel("Elemental"));
-        panPhenoBA.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
-        panClanPheno.add(panPhenoBA);
-        spnProbPhenoVee = new JSpinner(new SpinnerNumberModel(options.getProbPhenoVee(), 0, 100, 5));
-        ((JSpinner.DefaultEditor) spnProbPhenoVee.getEditor()).getTextField().setEditable(false);
-        JPanel panPhenoVee = new JPanel();
-        panPhenoVee.add(spnProbPhenoVee);
-        panPhenoVee.add(new JLabel("Vehicle"));
-        panPhenoVee.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
-        panClanPheno.add(panPhenoVee);
+        // Phenotype Percentage Generation
+        List<Phenotype> phenotypes = Phenotype.getExternalPhenotypes();
+        int[] phenotypeProbabilities = options.getPhenotypeProbabilities();
+        phenotypeSpinners = new JSpinner[phenotypeProbabilities.length];
 
-        panClanPheno.setBorder(BorderFactory.createTitledBorder("Trueborn Phenotype Probabilites"));
+        JPanel phenotypesPanel = new JPanel(new GridLayout((int) Math.ceil(phenotypeProbabilities.length / 2.0), 2));
+        phenotypesPanel.setBorder(BorderFactory.createTitledBorder("Trueborn Phenotype Probabilities"));
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        for (int i = 0; i < phenotypeProbabilities.length; i++) {
+            JSpinner phenotypeSpinner = new JSpinner(new SpinnerNumberModel(phenotypeProbabilities[i], 0, 100, 1));
+            phenotypeSpinners[i] = phenotypeSpinner;
+            JPanel phenotypePanel = new JPanel();
+            phenotypePanel.add(phenotypeSpinner);
+            phenotypePanel.add(new JLabel(phenotypes.get(i).getName()));
+            phenotypePanel.setToolTipText(phenotypes.get(i).getToolTip());
+            phenotypesPanel.add(phenotypePanel);
+        }
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panRandomSkill.add(panClanPheno, gridBagConstraints);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panRandomSkill.add(phenotypesPanel, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 3;
@@ -4901,13 +4891,11 @@ public class CampaignOptionsDialog extends JDialog {
         rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_VETERAN, (Integer) spnAbilVet.getModel().getValue());
         rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer) spnAbilElite.getModel().getValue());
 
-        options.setProbPhenoMW((Integer) spnProbPhenoMW.getModel().getValue());
-        options.setProbPhenoAero((Integer) spnProbPhenoAero.getModel().getValue());
-        options.setProbPhenoBA((Integer) spnProbPhenoBA.getModel().getValue());
-        options.setProbPhenoVee((Integer) spnProbPhenoVee.getModel().getValue());
+        for (int i = 0; i < phenotypeSpinners.length; i++) {
+            options.setPhenotypeProbability(i, (Integer) phenotypeSpinners[i].getValue());
+        }
 
         //region Personnel Tab
-
         options.setInitBonus(useInitBonusBox.isSelected());
         campaign.getGameOptions().getOption("individual_initiative").setValue(useInitBonusBox.isSelected());
         options.setToughness(useToughnessBox.isSelected());
@@ -4939,6 +4927,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setTimeInServiceDisplayFormat((TimeInDisplayFormat) comboTimeInServiceDisplayFormat.getSelectedItem());
         options.setUseTimeInRank(chkUseTimeInRank.isSelected());
         options.setTimeInRankDisplayFormat((TimeInDisplayFormat) comboTimeInRankDisplayFormat.getSelectedItem());
+        options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
         options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
         options.setShowOriginFaction(chkShowOriginFaction.isSelected());
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
@@ -5115,21 +5104,21 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
 
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+    private void btnCancelActionPerformed(ActionEvent evt) {
         cancelled = true;
         this.setVisible(false);
-    }//GEN-LAST:event_btnCancelActionPerformed
+    }
 
     public boolean wasCancelled() {
         return cancelled;
     }
 
-    private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
+    private void btnDateActionPerformed(ActionEvent evt) {
         // show the date chooser
-        DateChooser dc = new DateChooser(frame, date);
+        DateChooser dc = new DateChooser(frame, date.toZonedDateTime().toLocalDate());
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = dc.getDate();
+            date = GregorianCalendar.from(dc.getDate().atStartOfDay(ZoneId.systemDefault()));
             btnDate.setText(getDateAsString());
             factionModel = new SortedComboBoxModel<>();
             for (String sname : Faction.choosableFactionCodes) {
@@ -5141,9 +5130,9 @@ public class CampaignOptionsDialog extends JDialog {
             factionModel.setSelectedItem(campaign.getFaction().getFullName(date.get(Calendar.YEAR)));
             comboFaction.setModel(factionModel);
         }
-    }//GEN-LAST:event_btnDateActionPerformed
+    }
 
-    private void btnIconActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnIconActionPerformed(ActionEvent evt) {
         ImageChoiceDialog pcd = new ImageChoiceDialog(frame, true, iconCategory, iconFileName, forceIcons);
         pcd.setVisible(true);
         if (pcd.isChanged()) {

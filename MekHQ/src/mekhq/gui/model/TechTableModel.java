@@ -111,7 +111,7 @@ public class TechTableModel extends DataTableModel {
             first = false;
         }
 
-        toReturn.append(String.format(" (%d XP)<br/>", tech.getXp()))
+        toReturn.append(String.format(" (%d XP)<br/>", tech.getXP()))
                 .append(String.format("%d minutes left", tech.getMinutesLeft()));
         if (overtimeAllowed) {
             toReturn.append(String.format(" + (%d overtime)", tech.getOvertimeLeft()));

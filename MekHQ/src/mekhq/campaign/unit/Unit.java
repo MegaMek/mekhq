@@ -3152,52 +3152,55 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 jj--;
             }
         }
-        if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
-            if(null == motiveType && entity.getMovementMode() != EntityMovementMode.INF_LEG) {
+        if (entity.isConventionalInfantry()) {
+            if ((null == motiveType) && (entity.getMovementMode() != EntityMovementMode.INF_LEG)) {
                 int number = entity.getOInternal(Infantry.LOC_INFANTRY);
-                if(((Infantry)entity).isMechanized()) {
-                    number = ((Infantry)entity).getSquadN();
+                if (((Infantry) entity).isMechanized()) {
+                    number = ((Infantry) entity).getSquadN();
                 }
-                while(number > 0) {
+                while (number > 0) {
                     motiveType = new InfantryMotiveType(0, getCampaign(), entity.getMovementMode());
                     addPart(motiveType);
                     partsToAdd.add(motiveType);
                     number--;
                 }
             }
-            if(null == infantryArmor) {
-                EquipmentType eq = ((Infantry)entity).getArmorKit();
+            if (null == infantryArmor) {
+                EquipmentType eq = ((Infantry) entity).getArmorKit();
                 if (null != eq) {
                     infantryArmor = new EquipmentPart(0, eq, 0, 1.0, false, getCampaign());
                 } else {
-                    infantryArmor = new InfantryArmorPart(0, getCampaign(), ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
+                    infantryArmor = new InfantryArmorPart(0, getCampaign(),
+                            ((Infantry) entity).getArmorDamageDivisor(), ((Infantry) entity).isArmorEncumbering(), ((Infantry) entity).hasDEST(), ((Infantry) entity).hasSneakCamo(), ((Infantry) entity).hasSneakECM(), ((Infantry) entity).hasSneakIR(), ((Infantry) entity).hasSpaceSuit());
                 }
-                if(infantryArmor.getStickerPrice().isPositive()) {
+                if (infantryArmor.getStickerPrice().isPositive()) {
                     int number = entity.getOInternal(Infantry.LOC_INFANTRY);
-                    while(number > 0) {
-                        infantryArmor = new InfantryArmorPart(0, getCampaign(), ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
+                    while (number > 0) {
+                        infantryArmor = new InfantryArmorPart(0, getCampaign(),
+                                ((Infantry) entity).getArmorDamageDivisor(), ((Infantry) entity).isArmorEncumbering(), ((Infantry) entity).hasDEST(), ((Infantry) entity).hasSneakCamo(), ((Infantry) entity).hasSneakECM(),
+                                ((Infantry) entity).hasSneakIR(), ((Infantry) entity).hasSpaceSuit());
                         addPart(infantryArmor);
                         partsToAdd.add(infantryArmor);
                         number--;
                     }
                 }
             }
-            InfantryWeapon primaryType = ((Infantry)entity).getPrimaryWeapon();
-            InfantryWeapon secondaryType = ((Infantry)entity).getSecondaryWeapon();
-            if(null == primaryW && null != primaryType) {
-                int number = (((Infantry)entity).getSquadSize() - ((Infantry)entity).getSecondaryN()) * ((Infantry)entity).getSquadN();
+            InfantryWeapon primaryType = ((Infantry) entity).getPrimaryWeapon();
+            InfantryWeapon secondaryType = ((Infantry) entity).getSecondaryWeapon();
+            if ((null == primaryW) && (null != primaryType)) {
+                int number = (((Infantry) entity).getSquadSize() - ((Infantry) entity).getSecondaryN()) * ((Infantry)entity).getSquadN();
                 while(number > 0) {
-                    primaryW = new InfantryWeaponPart((int)entity.getWeight(), primaryType, -1, getCampaign(), true);
+                    primaryW = new InfantryWeaponPart((int) entity.getWeight(), primaryType, -1, getCampaign(), true);
                     addPart(primaryW);
                     partsToAdd.add(primaryW);
                     number--;
                 }
 
             }
-            if(null == secondaryW && null != secondaryType) {
-                int number = ((Infantry)entity).getSecondaryN() * ((Infantry)entity).getSquadN();
+            if (null == secondaryW && null != secondaryType) {
+                int number = ((Infantry) entity).getSecondaryN() * ((Infantry) entity).getSquadN();
                 while(number > 0) {
-                    secondaryW = new InfantryWeaponPart((int)entity.getWeight(), secondaryType, -1, getCampaign(), false);
+                    secondaryW = new InfantryWeaponPart((int) entity.getWeight(), secondaryType, -1, getCampaign(), false);
                     addPart(secondaryW);
                     partsToAdd.add(secondaryW);
                     number--;
@@ -3956,35 +3959,32 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void resetEngineer() {
-        if(!isSelfCrewed()) {
+        if (!isSelfCrewed()) {
             return;
         }
         int minutesLeft = TECH_WORK_DAY;
         int overtimeLeft = TECH_WORK_DAY / 2;
-        int edgeLeft = 0;
         boolean breakpartreroll = true;
         boolean failrefitreroll = true;
-        if(null != engineer) {
+        if (null != engineer) {
             minutesLeft = engineer.getMinutesLeft();
             overtimeLeft = engineer.getOvertimeLeft();
-            edgeLeft = engineer.getEdge();
         } else {
             //then get the number based on the least amount available to crew members
             //in the case of Edge, everyone must have the same triggers set for Edge to work
-            for(Person p : getActiveCrew()) {
-                if(p.getMinutesLeft() < minutesLeft) {
+            for (Person p : getActiveCrew()) {
+                if (p.getMinutesLeft() < minutesLeft) {
                     minutesLeft = p.getMinutesLeft();
                 }
-                if(p.getOvertimeLeft() < overtimeLeft) {
+
+                if (p.getOvertimeLeft() < overtimeLeft) {
                     overtimeLeft = p.getOvertimeLeft();
-                }
-                if(p.getEdge() < edgeLeft) {
-                    edgeLeft = p.getEdge();
                 }
             }
         }
-        if(getEntity() instanceof Infantry) {
-            if(!isUnmanned()) {
+
+        if (getEntity() instanceof Infantry) {
+            if (!isUnmanned()) {
                 engineer = new Person(getCommander().getGivenName(), getCommander().getSurname(), getCampaign());
                 engineer.setEngineer(true);
                 engineer.setMinutesLeft(minutesLeft);
@@ -4007,9 +4007,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 String engineerGivenName = "Nobody";
                 String engineerSurname = "Nobody";
                 int bestRank = Integer.MIN_VALUE;
-                for(UUID pid : vesselCrew) {
+                for (UUID pid : vesselCrew) {
                     Person p = getCampaign().getPerson(pid);
-                    if(null == p) {
+                    if (null == p) {
                         continue;
                     }
                     if (engineer != null) {
@@ -4022,12 +4022,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                             }
                         }
                         //If the engineer gained XP, add it for each crewman
-                        p.setXp(p.getXp() + engineer.getEngineerXp());
+                        p.awardXP(engineer.getXP());
 
                         //Update each crewman's successful task count too
                         p.setNTasks(p.getNTasks() + engineer.getNTasks());
                         if (p.getNTasks() >= getCampaign().getCampaignOptions().getNTasksXP()) {
-                            p.setXp(p.getXp() + getCampaign().getCampaignOptions().getTaskXP());
+                            p.awardXP(getCampaign().getCampaignOptions().getTaskXP());
                             p.setNTasks(0);
                         }
                         sumEdgeUsed = engineer.getEdgeUsed();
@@ -4054,19 +4054,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if (nCrew > 0) {
                     engineer = new Person(engineerGivenName, engineerSurname, getCampaign());
                     engineer.setEngineer(true);
-                    engineer.setEngineerXp(0);
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakpartreroll);
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, failrefitreroll);
                     engineer.setMinutesLeft(minutesLeft);
                     engineer.setOvertimeLeft(overtimeLeft);
                     engineer.setId(getCommander().getId());
                     engineer.setPrimaryRole(Person.T_SPACE_CREW);
-                    if(bestRank > -1) {
+                    if (bestRank > -1) {
                         engineer.setRankNumeric(bestRank);
                     }
-                    engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
+                    engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
                     engineer.setEdgeUsed(sumEdgeUsed);
-                    engineer.setCurrentEdge((sumEdge - sumEdgeUsed)/nCrew);
+                    engineer.setCurrentEdge((sumEdge - sumEdgeUsed) / nCrew);
                     engineer.setUnitId(this.getId());
                 } else {
                     engineer = null;
@@ -4075,21 +4074,21 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 engineer = null;
             }
         }
-        if(null != engineer) {
+        if (null != engineer) {
             //change reference for any scheduled tasks
-            for(Part p : getParts()) {
-                if(p.isBeingWorkedOn()) {
+            for (Part p : getParts()) {
+                if (p.isBeingWorkedOn()) {
                     p.setTeamId(engineer.getId());
                 }
             }
         } else {
             //cancel any mothballing if this happens
-            if(isMothballing()) {
+            if (isMothballing()) {
                 mothballTime = 0;
             }
             //cancel any scheduled tasks
-            for(Part p : getParts()) {
-                if(p.isBeingWorkedOn()) {
+            for (Part p : getParts()) {
+                if (p.isBeingWorkedOn()) {
                     p.cancelAssignment();
                 }
             }
@@ -4114,8 +4113,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      */
     public int getTotalCrewNeeds() {
         int nav = 0;
-        if(entity instanceof SmallCraft || entity instanceof Jumpship) {
-            if(entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
+            if (entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
                 nav = 1;
             }
             return getAeroCrewNeeds() - getTotalDriverNeeds() - nav;
@@ -4134,7 +4133,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         int nCrew = vesselCrew.size();
         int nav = 0;
         if (entity instanceof SmallCraft || entity instanceof Jumpship) {
-            if(entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
+            if (entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
                 nav = 1;
             }
             return nCrew < (getAeroCrewNeeds() - getTotalDriverNeeds() - nav);

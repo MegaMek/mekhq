@@ -2,7 +2,7 @@
  * Person.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
@@ -37,8 +37,10 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -103,14 +105,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // This value should always be +1 of the last defined role
     public static final int T_NUM = 28;
 
-    // Phenotypes
-    public static final int PHENOTYPE_NONE = 0;
-    public static final int PHENOTYPE_MW = 1;
-    public static final int PHENOTYPE_BA = 2;
-    public static final int PHENOTYPE_AERO = 3;
-    public static final int PHENOTYPE_VEE = 4;
-    public static final int PHENOTYPE_NUM = 5;
-
     private static final Map<Integer, Money> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
@@ -118,15 +112,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region Family Variables
     // Lineage
-    protected UUID ancestorsId;
-    protected UUID spouse;
-    protected List<FormerSpouse> formerSpouses;
+    private Genealogy genealogy;
 
     //region Procreation
     // this is a flag used in random procreation to determine whether or not to attempt to procreate
     private boolean tryingToConceive;
-    protected LocalDate dueDate;
-    protected LocalDate expectedDueDate;
+    private LocalDate dueDate;
+    private LocalDate expectedDueDate;
 
     private static final int PREGNANCY_STANDARD_DURATION = 268; //standard duration of a pregnancy in days
 
@@ -164,8 +156,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Marriage
     //endregion Family Variables
 
-    protected UUID id;
-    protected int oldId;
+    private UUID id;
 
     private String fullName;
     private String givenName;
@@ -181,29 +172,29 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private ROMDesignation primaryDesignator;
     private ROMDesignation secondaryDesignator;
 
-    protected String biography;
-    protected LocalDate birthday;
-    protected LocalDate dateOfDeath;
-    protected LocalDate recruitment;
-    protected LocalDate lastRankChangeDate;
-    protected List<LogEntry> personnelLog;
-    protected List<LogEntry> missionLog;
+    private String biography;
+    private LocalDate birthday;
+    private LocalDate dateOfDeath;
+    private LocalDate recruitment;
+    private LocalDate lastRankChangeDate;
+    private LocalDate retirement;
+    private List<LogEntry> personnelLog;
+    private List<LogEntry> missionLog;
 
     private Skills skills;
     private PersonnelOptions options;
     private int toughness;
 
     private PersonnelStatus status;
-    protected int xp;
-    protected int engXp;
-    protected int acquisitions;
-    protected Money salary;
+    private int xp;
+    private int acquisitions;
+    private Money salary;
     private Money totalEarnings;
     private int hits;
     private PrisonerStatus prisonerStatus;
 
-    boolean dependent;
-    boolean commander;
+    private boolean dependent;
+    private boolean commander;
 
     // Supports edge usage by a ship's engineer composite crewman
     int edgeUsedThisRound;
@@ -211,7 +202,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     int currentEdge;
 
     //phenotype and background
-    private int phenotype;
+    private Phenotype phenotype;
     private boolean clan;
     private String bloodname;
     private Faction originFaction;
@@ -219,19 +210,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //assignments
     private UUID unitId;
-    protected UUID doctorId;
+    private UUID doctorId;
     private List<UUID> techUnitIds;
 
     //days of rest
-    protected int idleMonths;
-    protected int daysToWaitForHealing;
+    private int idleMonths;
+    private int daysToWaitForHealing;
 
     //region portrait
-    protected String portraitCategory;
-    protected String portraitFile;
+    private String portraitCategory;
+    private String portraitFile;
     // runtime override (not saved)
-    protected transient String portraitCategoryOverride = null;
-    protected transient String portraitFileOverride = null;
+    private transient String portraitCategoryOverride = null;
+    private transient String portraitFileOverride = null;
     //endregion portrait
 
     // Our rank
@@ -245,10 +236,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int maneiDominiRank;
 
     //stuff to track for support teams
-    protected int minutesLeft;
-    protected int overtimeLeft;
-    protected int nTasks;
-    protected boolean engineer;
+    private int minutesLeft;
+    private int overtimeLeft;
+    private int nTasks;
+    private boolean engineer;
     public static final int PRIMARY_ROLE_SUPPORT_TIME = 480;
     public static final int PRIMARY_ROLE_OVERTIME_SUPPORT_TIME = 240;
     public static final int SECONDARY_ROLE_SUPPORT_TIME = 240;
@@ -305,10 +296,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     //region Reverse Compatibility
+    // Unknown version
+    private int oldId;
     private int oldUnitId = -1;
     private int oldDoctorId = -1;
-    //v0.1.8 and earlier
-    protected int teamId = -1;
     //endregion Reverse Compatibility
     //endregion Variable Declarations
 
@@ -345,7 +336,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.campaign = campaign;
 
         // Then, we assign the variables in XML file order
-        id = null;
+        id = UUID.randomUUID();
         this.givenName = givenName;
         this.surname = surname;
         this.honorific = honorific;
@@ -360,13 +351,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         originFaction = Faction.getFaction(factionCode);
         originPlanet = null;
         clan = originFaction.isClan();
-        phenotype = PHENOTYPE_NONE;
+        phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
         idleMonths = -1;
-        ancestorsId = null;
-        spouse = null;
-        formerSpouses = new ArrayList<>();
+        genealogy = new Genealogy(getId());
         tryingToMarry = true;
         tryingToConceive = true;
         dueDate = null;
@@ -395,6 +384,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         dateOfDeath = null;
         recruitment = null;
         lastRankChangeDate = null;
+        retirement = null;
         skills = new Skills();
         options = new PersonnelOptions();
         currentEdge = 0;
@@ -420,12 +410,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return campaign;
     }
 
-    public int getPhenotype() {
+    public Phenotype getPhenotype() {
         return phenotype;
     }
 
-    public void setPhenotype(int i) {
-        phenotype = i;
+    public void setPhenotype(Phenotype phenotype) {
+        this.phenotype = phenotype;
     }
 
     public boolean isClanner() {
@@ -566,45 +556,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public String pregnancyStatus() {
         return isPregnant() ? " (Pregnant)" : "";
     }
-
-    public String getPhenotypeName() {
-        return getPhenotypeName(phenotype);
-    }
-
-    public static String getPhenotypeName(int pheno) {
-        switch (pheno) {
-            case PHENOTYPE_NONE:
-                return "Freeborn";
-            case PHENOTYPE_MW:
-                return "Trueborn Mechwarrior";
-            case PHENOTYPE_AERO:
-                return "Trueborn Pilot";
-            case PHENOTYPE_VEE:
-                return "Trueborn Vehicle Crew";
-            case PHENOTYPE_BA:
-                return "Trueborn Elemental";
-            default:
-                return "?";
-        }
-    }
-
-    public String getPhenotypeShortName() {
-        return getPhenotypeShortName(phenotype);
-    }
-
-    public static String getPhenotypeShortName(int pheno) {
-        switch (pheno) {
-            case PHENOTYPE_NONE:
-                return "Freeborn";
-            case PHENOTYPE_MW:
-            case PHENOTYPE_AERO:
-            case PHENOTYPE_VEE:
-            case PHENOTYPE_BA:
-                return "Trueborn";
-            default:
-                return "?";
-        }
-    }
     //endregion Text Getters
 
     //region Names
@@ -643,27 +594,36 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.maidenName = n;
     }
 
+    /**
+     * return a full last name which may be a bloodname or a surname with or without honorifics.
+     * A bloodname will overrule a surname but we do not disallow surnames for clanners, if the
+     * player wants to input them
+     * @return a String of the person's last name
+     */
+    public String getLastName() {
+        String lastName = "";
+        if (!StringUtil.isNullOrEmpty(bloodname)) {
+            lastName = bloodname;
+        } else if (!StringUtil.isNullOrEmpty(surname)) {
+            lastName = surname;
+        }
+
+        if (!StringUtil.isNullOrEmpty(honorific)) {
+            lastName += " " + honorific;
+        }
+        return lastName;
+    }
+
     public String getFullName() {
         return fullName;
     }
 
     public void setFullName() {
-        if (isClanner()) {
-            if (!StringUtil.isNullOrEmpty(bloodname)) {
-                fullName = givenName + " " + bloodname;
-            } else {
-                fullName = givenName;
-            }
+        String lastName = getLastName();
+        if (!StringUtil.isNullOrEmpty(lastName)) {
+            fullName = givenName + " " + lastName;
         } else {
-            if (!StringUtil.isNullOrEmpty(surname)) {
-                fullName = givenName + " " + surname;
-            } else {
-                fullName = givenName;
-            }
-        }
-
-        if (!StringUtil.isNullOrEmpty(honorific)) {
-            fullName += " " + honorific;
+            fullName = givenName;
         }
     }
 
@@ -992,7 +952,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getRoleDesc() {
         String role = getPrimaryRoleDesc();
-        if (secondaryRole != T_NONE && secondaryRole != -1) {
+        if ((getSecondaryRole() != T_NONE) && (getSecondaryRole() != -1)) {
             role += "/" + getSecondaryRoleDesc();
         }
         return role;
@@ -1001,13 +961,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public String getPrimaryRoleDesc() {
         String bgPrefix = "";
         if (isClanner()) {
-            bgPrefix = getPhenotypeShortName() + " ";
+            bgPrefix = getPhenotype().getShortName() + " ";
         }
-        return bgPrefix + getRoleDesc(primaryRole, campaign.getFaction().isClan());
+        return bgPrefix + getRoleDesc(getPrimaryRole(), isClanner());
     }
 
     public String getSecondaryRoleDesc() {
-        return getRoleDesc(secondaryRole, campaign.getFaction().isClan());
+        return getRoleDesc(getSecondaryRole(), isClanner());
     }
 
     public static int getRoleMnemonic(int type) {
@@ -1145,8 +1105,26 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return dateOfDeath;
     }
 
+    public String getDeathDateAsString(Campaign campaign) {
+        if (getDateOfDeath() == null) {
+            return "";
+        } else {
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getDateOfDeath());
+        }
+    }
+
     public void setDateOfDeath(LocalDate date) {
         this.dateOfDeath = date;
+    }
+
+    public int getAge(LocalDate today) {
+        // Get age based on year
+        if (getDateOfDeath() != null) {
+            //use date of death instead of birthday
+            today = getDateOfDeath();
+        }
+
+        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
     }
 
     public void setRecruitment(LocalDate date) {
@@ -1163,32 +1141,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         } else {
             return campaign.getCampaignOptions().getDisplayFormattedDate(getRecruitment());
         }
-    }
-
-    public void setLastRankChangeDate(LocalDate date) {
-        this.lastRankChangeDate = date;
-    }
-
-    public LocalDate getLastRankChangeDate() {
-        return lastRankChangeDate;
-    }
-
-    public String getLastRankChangeDateAsString(Campaign campaign) {
-        if (getLastRankChangeDate() == null) {
-            return "";
-        } else {
-            return campaign.getCampaignOptions().getDisplayFormattedDate(getLastRankChangeDate());
-        }
-    }
-
-    public int getAge(LocalDate today) {
-        // Get age based on year
-        if (getDateOfDeath() != null) {
-            //use date of death instead of birthday
-            today = getDateOfDeath();
-        }
-
-        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
     }
 
     public String getTimeInService(Campaign campaign) {
@@ -1210,6 +1162,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 .getDisplayFormattedOutput(getRecruitment(), today);
     }
 
+    public void setLastRankChangeDate(LocalDate date) {
+        this.lastRankChangeDate = date;
+    }
+
+    public LocalDate getLastRankChangeDate() {
+        return lastRankChangeDate;
+    }
+
+    public String getLastRankChangeDateAsString(Campaign campaign) {
+        if (getLastRankChangeDate() == null) {
+            return "";
+        } else {
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getLastRankChangeDate());
+        }
+    }
+
     public String getTimeInRank(Campaign campaign) {
         if (getLastRankChangeDate() == null) {
             return "";
@@ -1227,6 +1195,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 .getDisplayFormattedOutput(getLastRankChangeDate(), today);
     }
 
+    public void setRetirement(LocalDate date) {
+        this.retirement = date;
+    }
+
+    public LocalDate getRetirement() {
+        return retirement;
+    }
+
+    public String getRetirementAsString(Campaign campaign) {
+        if (getRetirement() == null) {
+            return "";
+        } else {
+            return campaign.getCampaignOptions().getDisplayFormattedDate(getRetirement());
+        }
+    }
+
     public void setId(UUID id) {
         this.id = id;
     }
@@ -1237,6 +1221,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public boolean isChild() {
         return (getAge(getCampaign().getLocalDate()) <= 13);
+    }
+
+    public Genealogy getGenealogy() {
+        return genealogy;
     }
 
     //region Pregnancy
@@ -1270,19 +1258,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     /**
      * This is used to determine if a person can procreate
+     * @param campaign the campaign the person was in
      * @return true if they can, otherwise false
      */
-    public boolean canProcreate() {
+    public boolean canProcreate(Campaign campaign) {
         return getGender().isFemale() && isTryingToConceive() && !isPregnant() && !isDeployed()
-                && !isChild() && (getAge(getCampaign().getLocalDate()) < 51);
+                && !isChild() && (getAge(campaign.getLocalDate()) < 51);
     }
 
-    public void procreate() {
-        if (canProcreate()) {
+    public void procreate(Campaign campaign) {
+        if (canProcreate(campaign)) {
             boolean conceived = false;
-            if (hasSpouse()) {
-                if (!getSpouse().isDeployed() && !getSpouse().isDeadOrMIA() && !getSpouse().isChild()
-                        && !(getSpouse().getGender() == getGender())) {
+            if (getGenealogy().hasSpouse()) {
+                Person spouse = getGenealogy().getSpouse(campaign);
+                if (!spouse.isDeployed() && !spouse.isDeadOrMIA() && !spouse.isChild()
+                        && !(spouse.getGender() == getGender())) {
                     // setting is the decimal chance that this procreation attempt will create a child, base is 0.05%
                     conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()));
                 }
@@ -1292,13 +1282,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
 
             if (conceived) {
-                addPregnancy();
+                addPregnancy(campaign);
             }
         }
     }
 
-    public void addPregnancy() {
-        LocalDate dueDate = getCampaign().getLocalDate();
+    public void addPregnancy(Campaign campaign) {
+        LocalDate dueDate = campaign.getLocalDate();
         dueDate = dueDate.plus(PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS);
         setExpectedDueDate(dueDate);
         dueDate = dueDate.plus(PREGNANCY_MODIFY_DURATION.getAsInt(), ChronoUnit.DAYS);
@@ -1306,15 +1296,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         int size = PREGNANCY_SIZE.getAsInt();
         extraData.set(PREGNANCY_CHILDREN_DATA, size);
-        extraData.set(PREGNANCY_FATHER_DATA, (hasSpouse()) ? getSpouseId().toString() : null);
+        extraData.set(PREGNANCY_FATHER_DATA, (getGenealogy().hasSpouse())
+                ? getGenealogy().getSpouseId().toString() : null);
 
         String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
 
         campaign.addReport(getHyperlinkedName() + " has conceived" + (sizeString == null ? "" : (" " + sizeString)));
         if (campaign.getCampaignOptions().logConception()) {
             MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
-            if (hasSpouse()) {
-                PersonalLogger.spouseConceived(getSpouse(), getFullName(), campaign.getDate(), sizeString);
+            if (getGenealogy().hasSpouse()) {
+                PersonalLogger.spouseConceived(getGenealogy().getSpouse(campaign),
+                        getFullName(), getCampaign().getDate(), sizeString);
             }
         }
     }
@@ -1334,20 +1326,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @param campaign the campaign to add the baby in question to
      */
     public void birth(Campaign campaign) {
+        // Determine the number of children
         int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
 
         // Determine father information
-        String fatherIdString = extraData.get(PREGNANCY_FATHER_DATA);
+        String fatherIdString = getExtraData().get(PREGNANCY_FATHER_DATA);
         UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
         fatherId = campaign.getCampaignOptions().determineFatherAtBirth()
-                ? Utilities.nonNull(getSpouseId(), fatherId) : fatherId;
-
-        // Determine Ancestry
-        Ancestors anc = campaign.getAncestors(fatherId, id);
-        if (anc == null) {
-            anc = campaign.createAncestors(fatherId, id);
-        }
-        final UUID ancId = anc.getId();
+                ? Utilities.nonNull(getGenealogy().getSpouseId(), fatherId) : fatherId;
 
         // Determine Prisoner Status
         PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
@@ -1363,15 +1349,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
         for (int i = 0; i < size; i++) {
             // Create the specific baby
             Person baby = campaign.newDependent(T_NONE, true);
-            baby.setId(UUID.randomUUID());
             String surname = campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
             baby.setSurname(surname);
             baby.setBirthday(campaign.getLocalDate());
-            baby.setAncestorsId(ancId);
 
             // Recruit the baby
             campaign.recruitPerson(baby, prisonerStatus, baby.isDependent(), true, true);
+
+            // Create genealogy information
+            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, getId());
+            getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby.getId());
+            if (fatherId != null) {
+                baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, fatherId);
+                campaign.getPerson(fatherId).getGenealogy()
+                        .addFamilyMember(FamilialRelationshipType.CHILD, baby.getId());
+            }
 
             // Create reports and log the birth
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
@@ -1379,7 +1372,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (campaign.getCampaignOptions().logConception()) {
                 MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
                 if (fatherId != null) {
-                    PersonalLogger.ourChildBorn(campaign.getPerson(fatherId), baby, getFullName(), campaign.getDate());
+                    PersonalLogger.ourChildBorn(campaign.getPerson(fatherId), baby, getFullName(),
+                            campaign.getDate());
                 }
             }
         }
@@ -1400,10 +1394,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     /**
      * Determines if another person is a safe spouse for the current person
-     * @param p the person to determine if they are a safe spouse
+     * @param person the person to determine if they are a safe spouse
      * @param campaign the campaign to use to determine if they are a safe spouse
      */
-    public boolean safeSpouse(Person p, Campaign campaign) {
+    public boolean safeSpouse(Person person, Campaign campaign) {
         // Huge convoluted return statement, with the following restrictions
         // can't marry yourself
         // can't marry someone who is already married
@@ -1414,16 +1408,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // TODO : can't marry anyone who is not located at the same planet as the person - GitHub #1672: Implement current planet tracking for personnel
         // can't marry a close relative
         return (
-                !this.equals(p)
-                && !p.hasSpouse()
-                && p.isTryingToMarry()
-                && p.oldEnoughToMarry(campaign)
-                && (!p.getPrisonerStatus().isPrisoner() || getPrisonerStatus().isPrisoner())
-                && !p.isDeadOrMIA()
-                && p.isActive()
-                && ((getAncestorsId() == null)
-                    || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(
-                            campaign.getAncestors(p.getAncestorsId())))
+                !this.equals(person)
+                && !person.getGenealogy().hasSpouse()
+                && person.isTryingToMarry()
+                && person.oldEnoughToMarry(campaign)
+                && (!person.getPrisonerStatus().isPrisoner() || getPrisonerStatus().isPrisoner())
+                && !person.isDeadOrMIA()
+                && person.isActive()
+                && !getGenealogy().checkMutualAncestors(person, getCampaign())
         );
     }
 
@@ -1434,7 +1426,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void randomMarriage(Campaign campaign) {
         // Don't attempt to generate is someone isn't trying to marry, has a spouse,
         // isn't old enough to marry, or is actively deployed
-        if (!isTryingToMarry() || hasSpouse() || !oldEnoughToMarry(campaign) || isDeployed()) {
+        if (!isTryingToMarry() || getGenealogy().hasSpouse() || !oldEnoughToMarry(campaign) || isDeployed()) {
             return;
         }
 
@@ -1466,7 +1458,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean isPotentialRandomSpouse(Person p, Gender gender, Campaign campaign) {
         if ((p.getGender() != gender) || !safeSpouse(p, campaign)
                 || !(getPrisonerStatus().isFree()
-                    || (getPrisonerStatus().isPrisoner() && p.getPrisonerStatus().isPrisoner()))) {
+                || (getPrisonerStatus().isPrisoner() && p.getPrisonerStatus().isPrisoner()))) {
             return false;
         }
 
@@ -1476,25 +1468,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
     //endregion Marriage
 
-    public int getXp() {
+    //region Experience
+    public int getXP() {
         return xp;
     }
 
-    public void setXp(int xp) {
+    public void setXP(int xp) {
         this.xp = xp;
     }
 
     public void awardXP(int xp) {
         this.xp += xp;
     }
-
-    public int getEngineerXp() {
-        return engXp;
-    }
-
-    public void setEngineerXp(int xp) {
-        engXp = xp;
-    }
+    //endregion Experience
 
     public int getAcquisitions() {
         return acquisitions;
@@ -1602,8 +1588,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             // Always save whether or not someone is a clanner
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clan", clan);
-            if (phenotype != PHENOTYPE_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype);
+            if (phenotype != Phenotype.NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype.name());
             }
             if (!StringUtil.isNullOrEmpty(bloodname)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bloodname", bloodname);
@@ -1614,18 +1600,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (idleMonths > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleMonths", idleMonths);
             }
-            if (ancestorsId != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "ancestors", ancestorsId.toString());
+            if (!genealogy.isEmpty()) {
+                genealogy.writeToXml(pw1, indent + 1);
             }
-            if (spouse != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "spouse", spouse.toString());
+            if (!isTryingToMarry()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToMarry", false);
             }
-            if (!formerSpouses.isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "formerSpouses");
-                for (FormerSpouse ex : formerSpouses) {
-                    ex.writeToXml(pw1, indent + 2);
-                }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "formerSpouses");
+            if (!isTryingToConceive()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToConceive", false);
             }
             if (dueDate != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dueDate",
@@ -1709,6 +1691,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (lastRankChangeDate != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastRankChangeDate",
                         MekHqXmlUtil.saveFormattedDate(lastRankChangeDate));
+            }
+            if (getRetirement() != null) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirement",
+                        MekHqXmlUtil.saveFormattedDate(getRetirement()));
             }
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXml(pw1, indent + 1);
@@ -1814,7 +1800,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("name")) { //included for backwards compatibility
+                if (wn2.getNodeName().equalsIgnoreCase("name")) { // legacy - 0.47.5 removal
                     retVal.migrateName(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
                     retVal.givenName = wn2.getTextContent();
@@ -1839,7 +1825,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
                     retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
-                    retVal.phenotype = Integer.parseInt(wn2.getTextContent());
+                    retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
                     retVal.bloodname = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
@@ -1864,29 +1850,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     } else {
                         retVal.id = UUID.fromString(wn2.getTextContent());
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) {
-                    retVal.ancestorsId = UUID.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) {
-                    retVal.spouse = UUID.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("formerSpouse")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in formerSpouses nodes: "
-                                            + wn3.getNodeName());
-                            continue;
-                        }
-                        retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn3));
-                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) { // legacy - 0.47.6 removal
+                    CampaignXmlParser.addToAncestryMigrationMap(UUID.fromString(wn2.getTextContent().trim()), retVal);
+                } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) { // legacy - 0.47.6 removal
+                    retVal.genealogy.setSpouse(UUID.fromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) { // legacy - 0.47.6 removal
+                    Genealogy.loadFormerSpouses(retVal.genealogy, wn2.getChildNodes());
+                } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
+                    retVal.genealogy = Genealogy.generateInstanceFromXML(wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) {
                     retVal.tryingToMarry = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {
@@ -1895,8 +1866,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.dueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
                     retVal.expectedDueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
-                    retVal.teamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
                     retVal.setPortraitCategory(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
@@ -1969,6 +1938,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.recruitment = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
                     retVal.lastRankChangeDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
+                    retVal.setRetirement(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
@@ -2126,6 +2097,36 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 retVal.setExpectedDueDate(retVal.getDueDate());
             }
 
+            //versions before 0.3.4 did not have proper clan phenotypes
+            if (version.isLowerThan("0.3.4") && c.getFaction().isClan()) {
+                //assume personnel are clan and trueborn if the right role
+                retVal.setClanner(true);
+                switch (retVal.getPrimaryRole()) {
+                    case Person.T_MECHWARRIOR:
+                        retVal.setPhenotype(Phenotype.MECHWARRIOR);
+                        break;
+                    case Person.T_AERO_PILOT:
+                    case Person.T_CONV_PILOT:
+                        retVal.setPhenotype(Phenotype.AEROSPACE);
+                        break;
+                    case Person.T_BA:
+                        retVal.setPhenotype(Phenotype.ELEMENTAL);
+                        break;
+                    case Person.T_VEE_GUNNER:
+                    case Person.T_GVEE_DRIVER:
+                    case Person.T_NVEE_DRIVER:
+                    case Person.T_VTOL_PILOT:
+                        retVal.setPhenotype(Phenotype.VEHICLE);
+                        break;
+                    case Person.T_PROTO_PILOT:
+                        retVal.setPhenotype(Phenotype.PROTOMECH);
+                        break;
+                    default:
+                        retVal.setPhenotype(Phenotype.NONE);
+                        break;
+                }
+            }
+
             if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {
                 if (retVal.primaryRole > T_INFANTRY) {
                     retVal.primaryRole += 4;
@@ -2241,11 +2242,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 retVal.setCallsign(pilotNickname);
             }
 
-            if (retVal.id == null) {
-                MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                        "ID not pre-defined; generating person's ID."); //$NON-NLS-1$
-                retVal.id = UUID.randomUUID();
-            }
+            // Ensure the Genealogy Origin Id is set to the proper id
+            retVal.getGenealogy().setOrigin(retVal.getId());
 
             // Prisoner and Bondsman updating
             if ((retVal.prisonerStatus != PrisonerStatus.FREE) && (retVal.rank == 0)) {
@@ -3850,500 +3848,4 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return OTHER_RANSOM_VALUES.get(getExperienceLevel(false));
         }
     }
-
-    //region Family
-    //region setFamily
-    /**
-     *
-     * @param id is the new ancestor id for the current person
-     */
-    public void setAncestorsId(UUID id) {
-        ancestorsId = id;
-    }
-
-    /**
-     *
-     * @param spouse the new spouse id for the current person
-     */
-    public void setSpouseId(UUID spouse) {
-        this.spouse = spouse;
-    }
-
-    /**
-     *
-     * @param formerSpouse a former spouse to add the the current person's list
-     */
-    public void addFormerSpouse(FormerSpouse formerSpouse) {
-        formerSpouses.add(formerSpouse);
-    }
-    //endregion setFamily
-
-    //region hasFamily
-    /**
-     *
-     * @return true if the person has either a spouse, any children, or specified parents.
-     *          These are required for any extended family to exist.
-     */
-    public boolean hasAnyFamily() {
-        return hasChildren() || hasSpouse() || hasParents();
-    }
-
-    /**
-     *
-     * @return true if the person has a spouse, false otherwise
-     */
-    public boolean hasSpouse() {
-        return (getSpouseId() != null);
-    }
-
-    /**
-     *
-     * @return true if the person has a former spouse, false otherwise
-     */
-    public boolean hasFormerSpouse() {
-        return !formerSpouses.isEmpty();
-    }
-
-    /**
-     *
-     * @return true if the person has at least one kid, false otherwise
-     */
-    public boolean hasChildren() {
-        if (getId() != null) {
-            for (Ancestors a : campaign.getAncestors()) {
-                if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     *
-     * @return true if the person has at least one grandchild, false otherwise
-     */
-    public boolean hasGrandchildren() {
-        for (Ancestors a : campaign.getAncestors()) {
-            if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
-                for (Person p : campaign.getPersonnel()) {
-                    if (a.getId().equals(p.getAncestorsId())) {
-                        if (p.hasChildren()) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     *
-     * @return true if the Person has either a mother or father, otherwise false
-     */
-    public boolean hasParents() {
-        return hasFather() || hasMother();
-    }
-
-    /**
-     *
-     * @return true if the person has a listed father, false otherwise
-     */
-    public boolean hasFather() {
-        return getFather() != null;
-    }
-
-    /**
-     *
-     * @return true if the Person has a listed mother, false otherwise
-     */
-    public boolean hasMother() {
-        return getMother() != null;
-    }
-
-    /**
-     *
-     * @return true if the person has siblings, false otherwise
-     */
-    public boolean hasSiblings() {
-        return !getSiblings().isEmpty();
-    }
-
-    /**
-     *
-     * @return true if the Person has a grandparent, false otherwise
-     */
-    public boolean hasGrandparent() {
-        if (hasFather()) {
-            if (hasFathersParents()) {
-                return true;
-            }
-        }
-
-        if (hasMother()) {
-            return hasMothersParents();
-        }
-        return false;
-    }
-
-    /**
-     *
-     * @return true if the person's father has any parents, false otherwise
-     */
-    public boolean hasFathersParents() {
-        return getFather().hasParents();
-    }
-
-    /**
-     *
-     * @return true if the person's mother has any parents, false otherwise
-     */
-    public boolean hasMothersParents() {
-        return getMother().hasParents();
-    }
-
-    /**
-     *
-     * @return true if the Person has an Aunt or Uncle, false otherwise
-     */
-    public boolean hasAuntOrUncle() {
-        if (hasFather()) {
-            if (hasFathersSiblings()) {
-                return true;
-            }
-        }
-
-        if (hasMother()) {
-            return hasMothersSiblings();
-        }
-        return false;
-    }
-
-    /**
-     *
-     * @return true if the person's father has siblings, false otherwise
-     */
-    public boolean hasFathersSiblings() {
-        return getFather().hasSiblings();
-    }
-
-    /**
-     *
-     * @return true if the person's mother has siblings, false otherwise
-     */
-    public boolean hasMothersSiblings() {
-        return getMother().hasSiblings();
-    }
-
-    /**
-     *
-     * @return true if the person has cousins, false otherwise
-     */
-    public boolean hasCousins() {
-        if (hasFather() && getFather().hasSiblings()) {
-            for (Person sibling : getFather().getSiblings()) {
-                if (sibling.hasChildren()) {
-                    return true;
-                }
-            }
-        }
-
-        if (hasMother() && getMother().hasSiblings()) {
-            for (Person sibling : getMother().getSiblings()) {
-                if (sibling.hasChildren()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-    //endregion hasFamily
-
-    //region getFamily
-    /**
-     *
-     * @return the person's ancestor id
-     */
-    public UUID getAncestorsId() {
-        return ancestorsId;
-    }
-
-    /**
-     *
-     * @return the person's ancestors
-     */
-    public Ancestors getAncestors() {
-        return campaign.getAncestors(ancestorsId);
-    }
-
-    /**
-     *
-     * @return the current person's spouse
-     */
-    @Nullable
-    public Person getSpouse() {
-        return campaign.getPerson(spouse);
-    }
-
-    /**
-     *
-     * @return the current person's spouse's id
-     */
-    @Nullable
-    public UUID getSpouseId() {
-        return spouse;
-    }
-
-    /**
-     *
-     * @return a list of FormerSpouse objects for all the former spouses of the current person
-     */
-    public List<FormerSpouse> getFormerSpouses() {
-        return formerSpouses;
-    }
-
-    /**
-     * getChildren creates a list of all children from the current person
-     * @return a list of Person objects for all children of the current person
-     */
-    public List<Person> getChildren() {
-        List<UUID> ancestors = new ArrayList<>();
-        for (Ancestors a : campaign.getAncestors()) {
-            if ((a != null) && (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId()))) {
-                ancestors.add(a.getId());
-            }
-        }
-
-        List<Person> children = new ArrayList<>();
-        for (Person p : campaign.getPersonnel()) {
-            if (ancestors.contains(p.getAncestorsId())) {
-                children.add(p);
-            }
-        }
-
-        return children;
-    }
-
-    public List<Person> getGrandchildren() {
-        List<Person> grandchildren = new ArrayList<>();
-        List<Person> tempChildList;
-
-        for (Ancestors a : campaign.getAncestors()) {
-            if ((a != null) && (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId()))) {
-                for (Person p : campaign.getPersonnel()) {
-                    if ((a.getId().equals(p.getAncestorsId())) && p.hasChildren()) {
-                        tempChildList = p.getChildren();
-                        //prevents duplicates, if anyone uses a small number of depth for their ancestry
-                        tempChildList.removeAll(grandchildren);
-                        grandchildren.addAll(tempChildList);
-                    }
-                }
-            }
-        }
-
-        return grandchildren;
-    }
-
-    /**
-     *
-     * @return the current person's father
-     */
-    public Person getFather() {
-        Ancestors a = getAncestors();
-
-        if (a != null) {
-            return campaign.getPerson(a.getFatherId());
-        }
-        return null;
-    }
-
-    /**
-     *
-     * @return the current person's mother
-     */
-    public Person getMother() {
-        Ancestors a = getAncestors();
-
-        if (a != null) {
-            return campaign.getPerson(a.getMotherId());
-        }
-        return null;
-    }
-
-    /**
-     * getSiblings creates a list of all the siblings from the current person
-     * @return a list of Person objects for all the siblings of the current person
-     */
-    public List<Person> getSiblings() {
-        List<UUID> parents = new ArrayList<>();
-        List<Person> siblings = new ArrayList<>();
-        Person father = getFather();
-        Person mother = getMother();
-
-        for (Ancestors a : campaign.getAncestors()) {
-            if ((a != null)
-                    && (((father != null) && father.getId().equals(a.getFatherId()))
-                        || ((mother != null) && mother.getId().equals(a.getMotherId())))) {
-
-                parents.add(a.getId());
-            }
-        }
-
-        for (Person p : campaign.getPersonnel()) {
-            if (parents.contains(p.getAncestorsId()) && !(p.getId().equals(getId()))) {
-                siblings.add(p);
-            }
-        }
-
-        return siblings;
-    }
-
-    /**
-     *
-     * @return a list of the person's siblings with spouses (if any
-     */
-    public List<Person> getSiblingsAndSpouses(){
-        List<UUID> parents = new ArrayList<>();
-        List<Person> siblingsAndSpouses = new ArrayList<>();
-
-        Person father = getFather();
-        Person mother = getMother();
-
-        for (Ancestors a : campaign.getAncestors()) {
-            if ((a != null)
-                    && (((father != null) && father.getId().equals(a.getFatherId()))
-                        || ((mother != null) && mother.getId().equals(a.getMotherId())))) {
-
-                parents.add(a.getId());
-            }
-        }
-
-        for (Person p : campaign.getPersonnel()) {
-            if (parents.contains(p.getAncestorsId()) && !(p.getId().equals(getId()))) {
-                siblingsAndSpouses.add(p);
-                if (p.hasSpouse()) {
-                    siblingsAndSpouses.add(campaign.getPerson(p.getSpouseId()));
-                }
-            }
-        }
-
-        return siblingsAndSpouses;
-    }
-
-    /**
-     *
-     * @return a list of the person's grandparents
-     */
-    public List<Person> getGrandparents() {
-        List<Person> grandparents = new ArrayList<>();
-        if (hasFather()) {
-            grandparents.addAll(getFathersParents());
-        }
-
-        if (hasMother()) {
-            List<Person> mothersParents = getMothersParents();
-            //prevents duplicates, if anyone uses a small number of depth for their ancestry
-            mothersParents.removeAll(grandparents);
-            grandparents.addAll(mothersParents);
-        }
-        return grandparents;
-    }
-
-    /**
-     *
-     * @return a list of the person's father's parents
-     */
-    public List<Person> getFathersParents() {
-        List<Person> fathersParents = new ArrayList<>();
-        if (getFather().hasFather()) {
-            fathersParents.add(getFather().getFather());
-        }
-        if (getFather().hasMother()) {
-            fathersParents.add(getFather().getMother());
-        }
-
-        return fathersParents;
-    }
-
-    /**
-     *
-     * @return a list of the person's mother's parents
-     */
-    public List<Person> getMothersParents() {
-        List<Person> mothersParents = new ArrayList<>();
-        if (getMother().hasFather()) {
-            mothersParents.add(getMother().getFather());
-        }
-        if (getMother().hasMother()) {
-            mothersParents.add(getMother().getMother());
-        }
-
-        return mothersParents;
-    }
-
-    /**
-     *
-     * @return a list of the person's Aunts and Uncles
-     */
-    public List<Person> getsAuntsAndUncles() {
-        List<Person> auntsAndUncles = new ArrayList<>();
-        if (hasFather()) {
-            auntsAndUncles.addAll(getFathersSiblings());
-        }
-
-        if (hasMother()) {
-            List<Person> mothersSiblings = getMothersSiblings();
-            //prevents duplicates, if anyone uses a small number of depth for their ancestry
-            mothersSiblings.removeAll(auntsAndUncles);
-            auntsAndUncles.addAll(mothersSiblings);
-        }
-
-        return auntsAndUncles;
-    }
-
-    /**
-     *
-     * @return a list of the person's father's siblings and their current spouses
-     */
-    public List<Person> getFathersSiblings() {
-        return getFather().getSiblingsAndSpouses();
-    }
-
-    /**
-     *
-     * @return a list of the person's mothers's siblings and their current spouses
-     */
-    public List<Person> getMothersSiblings() {
-        return getMother().getSiblingsAndSpouses();
-    }
-
-    /**
-     *
-     * @return a list of the person'c cousins
-     */
-    public List<Person> getCousins() {
-        List<Person> cousins = new ArrayList<>();
-        List<Person> tempCousins;
-        if (hasFather() && getFather().hasSiblings()) {
-            for (Person sibling : getFather().getSiblings()) {
-                tempCousins = sibling.getChildren();
-                tempCousins.removeAll(cousins);
-                cousins.addAll(tempCousins);
-            }
-        }
-
-        if (hasMother() && getMother().hasSiblings()) {
-            for (Person sibling : getMother().getSiblings()) {
-                tempCousins = sibling.getChildren();
-                tempCousins.removeAll(cousins);
-                cousins.addAll(tempCousins);
-            }
-        }
-
-        return cousins;
-    }
-    //endregion getFamily
-    //endregion Family
 }

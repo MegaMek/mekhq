@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.control;
 
 import megamek.common.util.EncodeControl;
@@ -32,7 +31,7 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 public class EditMissionLogControl extends JPanel {
-    private Frame parent;
+    private JFrame parent;
     private Campaign campaign;
     private Person person;
     private LogTableModel logModel;
@@ -43,7 +42,7 @@ public class EditMissionLogControl extends JPanel {
     private JTable logsTable;
     private JScrollPane scrollLogsTable;
 
-    public EditMissionLogControl(Frame parent, Campaign campaign, Person person) {
+    public EditMissionLogControl(JFrame parent, Campaign campaign, Person person) {
         this.parent = parent;
         this.campaign = campaign;
         this.person = person;
@@ -54,7 +53,7 @@ public class EditMissionLogControl extends JPanel {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMissionLogControl", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMissionLogControl", new EncodeControl());
 
         setName(resourceMap.getString("control.name")); // NOI18N
         this.setLayout(new java.awt.BorderLayout());

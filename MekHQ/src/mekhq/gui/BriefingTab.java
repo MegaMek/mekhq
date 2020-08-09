@@ -78,7 +78,6 @@ import mekhq.gui.dialog.NewAtBContractDialog;
 import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.sorter.ScenarioStatusComparator;
@@ -405,9 +404,8 @@ public final class BriefingTab extends CampaignGuiTab {
                                         for (int role : admins) {
                                             Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
                                             if (admin != null) {
-                                                admin.setXp(admin.getXp() + 1);
-                                                getCampaign()
-                                                        .addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
+                                                admin.awardXP(1);
+                                                getCampaign().addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
                                             }
                                         }
                                     }
@@ -419,11 +417,10 @@ public final class BriefingTab extends CampaignGuiTab {
                         }
                     }
 
-                    if(mission.getStatus() != Mission.S_ACTIVE) {
+                    if (mission.getStatus() != Mission.S_ACTIVE) {
                         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
                     }
                 }
-
 
                 if (!mission.isActive()) {
                     if (getCampaign().getCampaignOptions().getUseAtB() && mission instanceof AtBContract) {
@@ -854,7 +851,7 @@ public final class BriefingTab extends CampaignGuiTab {
         boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits().size() > 0;
         boolean canStartGame = scenario.isCurrent() && unitsAssigned;
         if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
-            canStartGame = canStartGame && getCampaign().getDate().equals(scenario.getDate());
+            canStartGame = canStartGame && getCampaign().getLocalDate().equals(scenario.getDate());
         }
         btnStartGame.setEnabled(canStartGame);
         btnJoinGame.setEnabled(canStartGame);

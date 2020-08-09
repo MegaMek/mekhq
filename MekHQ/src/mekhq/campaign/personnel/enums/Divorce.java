@@ -48,7 +48,7 @@ public enum Divorce {
 
     //region Divorce
     public void divorce(Person origin, Campaign campaign) {
-        Person spouse = origin.getSpouse();
+        Person spouse = origin.getGenealogy().getSpouse(campaign);
         int reason = FormerSpouse.REASON_WIDOWED;
 
         switch (this) {
@@ -75,7 +75,7 @@ public enum Divorce {
                 break;
         }
 
-        if (!(spouse.isDeadOrMIA() && origin.isDeadOrMIA())) {
+        if ((spouse.isDeadOrMIA() && origin.isDeadOrMIA()) || (!spouse.isDeadOrMIA() && !origin.isDeadOrMIA())) {
             reason = FormerSpouse.REASON_DIVORCE;
 
             PersonalLogger.divorcedFrom(origin, spouse, campaign.getDate());
@@ -87,27 +87,26 @@ public enum Divorce {
             spouse.setMaidenName(null);
             origin.setMaidenName(null);
 
-            spouse.setSpouseId(null);
-            origin.setSpouseId(null);
+            spouse.getGenealogy().setSpouse(null);
+            origin.getGenealogy().setSpouse(null);
         } else if (spouse.isDeadOrMIA()) {
-            origin.setMaidenName(null);
-            origin.setSpouseId(null);
-        } else if (origin.isDeadOrMIA()) {
-            spouse.setMaidenName(null);
-            spouse.setSpouseId(null);
-        }
+            PersonalLogger.spouseKia(origin, spouse, campaign.getDate());
 
-        // Output a message for Spouses who are KIA
-        if (reason == FormerSpouse.REASON_WIDOWED) {
+            origin.setMaidenName(null);
+            origin.getGenealogy().setSpouse(null);
+        } else if (origin.isDeadOrMIA()) {
             PersonalLogger.spouseKia(spouse, origin, campaign.getDate());
+
+            spouse.setMaidenName(null);
+            spouse.getGenealogy().setSpouse(null);
         }
 
         // Add to former spouse list
-        spouse.addFormerSpouse(new FormerSpouse(origin.getId(), campaign.getLocalDate(), reason));
-        origin.addFormerSpouse(new FormerSpouse(spouse.getId(), campaign.getLocalDate(), reason));
+        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin.getId(), campaign.getLocalDate(), reason));
+        origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse.getId(), campaign.getLocalDate(), reason));
 
-        MekHQ.triggerEvent(new PersonChangedEvent(origin));
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
+        MekHQ.triggerEvent(new PersonChangedEvent(origin));
     }
 
     @Override

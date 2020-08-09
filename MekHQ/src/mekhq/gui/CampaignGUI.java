@@ -37,6 +37,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.client.ui.swing.UnitLoadingDialog;
+import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.common.*;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.dialog.*;
@@ -50,11 +53,6 @@ import org.w3c.dom.NodeList;
 import chat.ChatClient;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.GameOptionsDialog;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
@@ -227,11 +225,7 @@ public class CampaignGUI extends JPanel {
 
     public void randomizeAllBloodnames() {
         for (Person p : getCampaign().getPersonnel()) {
-            if (!p.isClanner()) {
-                continue;
-            }
-            getCampaign().checkBloodnameAdd(p, p.getPrimaryRole());
-            getCampaign().personUpdated(p);
+            getCampaign().checkBloodnameAdd(p, false);
         }
     }
 
@@ -241,10 +235,10 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showBloodnameDialog() {
-        BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame());
-        bloodnameDialog.setFaction(getCampaign().getFactionCode());
-        bloodnameDialog.setYear(getCampaign().getCalendar().get(
-                java.util.Calendar.YEAR));
+        final int year = getCampaign().getGameYear();
+        BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame(),
+                getCampaign().getFaction().getFullName(year), year);
+
         bloodnameDialog.setVisible(true);
     }
 
@@ -275,12 +269,10 @@ public class CampaignGUI extends JPanel {
 
         //check to see if we just selected the command center tab
         //and if so change its color to standard
-        tabMain.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (tabMain.getSelectedIndex() == 0) {
-                    tabMain.setBackgroundAt(0, null);
-                    logNagActive = false;
-                }
+        tabMain.addChangeListener(e -> {
+            if (tabMain.getSelectedIndex() == 0) {
+                tabMain.setBackgroundAt(0, null);
+                logNagActive = false;
             }
         });
 
@@ -1252,7 +1244,7 @@ public class CampaignGUI extends JPanel {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
                     continue;
                 }
-                if (getCampaign().getDate().equals(s.getDate())) {
+                if (getCampaign().getLocalDate().equals(s.getDate())) {
                     return 0 != JOptionPane
                             .showConfirmDialog(
                                     null,
@@ -1455,6 +1447,7 @@ public class CampaignGUI extends JPanel {
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
         boolean timeIn = getCampaign().getCampaignOptions().getUseTimeInService();
         boolean rankIn = getCampaign().getCampaignOptions().getUseTimeInRank();
+        boolean retirementDateTracking = getCampaign().getCampaignOptions().useRetirementDateTracking();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
@@ -1463,13 +1456,33 @@ public class CampaignGUI extends JPanel {
         if (timeIn != getCampaign().getCampaignOptions().getUseTimeInService()) {
             if (getCampaign().getCampaignOptions().getUseTimeInService()) {
                 getCampaign().initTimeInService();
+            } else {
+                for (Person person : getCampaign().getPersonnel()) {
+                    person.setRecruitment(null);
+                }
             }
         }
+
         if (rankIn != getCampaign().getCampaignOptions().getUseTimeInRank()) {
             if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
                 getCampaign().initTimeInRank();
+            } else {
+                for (Person person : getCampaign().getPersonnel()) {
+                    person.setLastRankChangeDate(null);
+                }
             }
         }
+
+        if (retirementDateTracking != getCampaign().getCampaignOptions().useRetirementDateTracking()) {
+            if (getCampaign().getCampaignOptions().useRetirementDateTracking()) {
+                getCampaign().initRetirementDateTracking();
+            } else {
+                for (Person person : getCampaign().getPersonnel()) {
+                    person.setRetirement(null);
+                }
+            }
+        }
+
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 getCampaign().initAtB(false);
@@ -1589,9 +1602,12 @@ public class CampaignGUI extends JPanel {
     }
 
     private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {
-        UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), getCampaign(), true);
-
-        usd.setVisible(true);
+        UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
+        if (!MechSummaryCache.getInstance().isInitialized()) {
+            unitLoadingDialog.setVisible(true);
+        }
+        AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(), unitLoadingDialog,
+                getCampaign(), true);
     }
 
     private void buyParts() {
@@ -1902,7 +1918,8 @@ public class CampaignGUI extends JPanel {
                         String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            report = getCampaign().getFinances().exportFinancesToCSV(file.getPath(), format.getRecommendedExtension());
+                            report = getCampaign().getFinances().exportFinancesToCSV(getCampaign(),
+                                    file.getPath(), format.getRecommendedExtension());
                         } else {
                             report = "Unsupported FileType in Export Finances";
                         }
@@ -2057,13 +2074,14 @@ public class CampaignGUI extends JPanel {
             // both members of the couple
             // TODO : make it so that exports will automatically include both spouses
             for (Person p : getCampaign().getActivePersonnel()) {
-                if (p.hasSpouse() && !getCampaign().getPersonnel().contains(p.getSpouse())) {
+                if (p.getGenealogy().hasSpouse()
+                        && !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse(getCampaign()))) {
                     // If this happens, we need to clear the spouse
                     if (p.getMaidenName() != null) {
                         p.setSurname(p.getMaidenName());
                     }
 
-                    p.setSpouseId(null);
+                    p.getGenealogy().setSpouse(null);
                 }
 
                 if (p.isPregnant()) {

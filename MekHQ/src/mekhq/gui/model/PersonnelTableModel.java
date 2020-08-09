@@ -70,49 +70,52 @@ public class PersonnelTableModel extends DataTableModel {
 
     public static final int COL_RANK            = 0;
     public static final int COL_GIVEN_NAME      = 1;
-    public static final int COL_SURNAME         = 2;
-    public static final int COL_HONORIFIC       = 3;
-    public static final int COL_CALL            = 4;
-    public static final int COL_BLOODNAME       = 5;
-    public static final int COL_AGE             = 6;
-    public static final int COL_GENDER          = 7;
-    public static final int COL_SKILL           = 8;
-    public static final int COL_TYPE            = 9;
-    public static final int COL_ASSIGN          = 10;
-    public static final int COL_FORCE           = 11;
-    public static final int COL_DEPLOY          = 12;
-    public static final int COL_MECH            = 13;
-    public static final int COL_AERO            = 14;
-    public static final int COL_JET             = 15;
-    public static final int COL_VEE             = 16;
-    public static final int COL_VTOL            = 17;
-    public static final int COL_NVEE            = 18;
-    public static final int COL_SPACE           = 19;
-    public static final int COL_ARTY            = 20;
-    public static final int COL_GUN_BA          = 21;
-    public static final int COL_SMALL_ARMS      = 22;
-    public static final int COL_ANTI_MECH       = 23;
-    public static final int COL_TACTICS         = 24;
-    public static final int COL_STRATEGY        = 25;
-    public static final int COL_TECH_MECH       = 26;
-    public static final int COL_TECH_AERO       = 27;
-    public static final int COL_TECH_VEE        = 28;
-    public static final int COL_TECH_BA         = 29;
-    public static final int COL_MEDICAL         = 30;
-    public static final int COL_ADMIN           = 31;
-    public static final int COL_NEG             = 32;
-    public static final int COL_SCROUNGE        = 33;
-    public static final int COL_TOUGH           = 34;
-    public static final int COL_EDGE            = 35;
-    public static final int COL_NABIL           = 36;
-    public static final int COL_NIMP            = 37;
-    public static final int COL_HITS            = 38;
-    public static final int COL_KILLS           = 39;
-    public static final int COL_SALARY          = 40;
-    public static final int COL_XP              = 41;
-    public static final int COL_ORIGIN_FACTION  = 42;
-    public static final int COL_ORIGIN_PLANET   = 43;
-    public static final int N_COL               = 44;
+    public static final int COL_LAST_NAME       = 2;
+    public static final int COL_SURNAME         = 3;
+    public static final int COL_BLOODNAME       = 4;
+    public static final int COL_HONORIFIC       = 5;
+    public static final int COL_CALL            = 6;
+    public static final int COL_AGE             = 7;
+    public static final int COL_GENDER          = 8;
+    public static final int COL_SKILL           = 9;
+    public static final int COL_TYPE            = 10;
+    public static final int COL_ASSIGN          = 11;
+    public static final int COL_FORCE           = 12;
+    public static final int COL_DEPLOY          = 13;
+    public static final int COL_MECH            = 14;
+    public static final int COL_AERO            = 15;
+    public static final int COL_JET             = 16;
+    public static final int COL_VEE             = 17;
+    public static final int COL_VTOL            = 18;
+    public static final int COL_NVEE            = 19;
+    public static final int COL_SPACE           = 20;
+    public static final int COL_ARTY            = 21;
+    public static final int COL_GUN_BA          = 22;
+    public static final int COL_SMALL_ARMS      = 23;
+    public static final int COL_ANTI_MECH       = 24;
+    public static final int COL_TACTICS         = 25;
+    public static final int COL_STRATEGY        = 26;
+    public static final int COL_TECH_MECH       = 27;
+    public static final int COL_TECH_AERO       = 28;
+    public static final int COL_TECH_VEE        = 29;
+    public static final int COL_TECH_BA         = 30;
+    public static final int COL_MEDICAL         = 31;
+    public static final int COL_ADMIN           = 32;
+    public static final int COL_NEG             = 33;
+    public static final int COL_SCROUNGE        = 34;
+    public static final int COL_TOUGH           = 35;
+    public static final int COL_EDGE            = 36;
+    public static final int COL_NABIL           = 37;
+    public static final int COL_NIMP            = 38;
+    public static final int COL_HITS            = 39;
+    public static final int COL_KILLS           = 40;
+    public static final int COL_SALARY          = 41;
+    public static final int COL_XP              = 42;
+    public static final int COL_ORIGIN_FACTION  = 43;
+    public static final int COL_ORIGIN_PLANET   = 44;
+    public static final int COL_RECRUIT_DATE    = 45;
+    public static final int COL_DEATH_DATE      = 46;
+    public static final int N_COL               = 47;
 
     private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.PersonnelTableModel", new EncodeControl());
     //endregion Variable Declarations
@@ -150,11 +153,13 @@ public class PersonnelTableModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch(column) {
+        switch (column) {
             case COL_RANK:
                 return resources.getString("col_rank.text");
             case COL_GIVEN_NAME:
                 return resources.getString("col_given_name.text");
+            case COL_LAST_NAME:
+                return resources.getString("col_last_name.text");
             case COL_SURNAME:
                 return resources.getString("col_surname.text");
             case COL_HONORIFIC:
@@ -239,19 +244,24 @@ public class PersonnelTableModel extends DataTableModel {
                 return resources.getString("col_origin_faction.text");
             case COL_ORIGIN_PLANET:
                 return resources.getString("col_origin_planet.text");
+            case COL_RECRUIT_DATE:
+                return resources.getString("col_recruit_date.text");
+            case COL_DEATH_DATE:
+                return resources.getString("col_death_date.text");
             default:
                 return resources.getString("col_unknown.text");
         }
     }
 
     public int getColumnWidth(int c) {
-        switch(c) {
+        switch (c) {
             case COL_GIVEN_NAME:
             case COL_RANK:
             case COL_DEPLOY:
                 return 70;
             case COL_CALL:
             case COL_SURNAME:
+            case COL_LAST_NAME:
             case COL_BLOODNAME:
             case COL_SALARY:
             case COL_SKILL:
@@ -267,11 +277,12 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public int getAlignment(int col) {
-        switch(col) {
+        switch (col) {
             case COL_SALARY:
                 return SwingConstants.RIGHT;
             case COL_RANK:
             case COL_GIVEN_NAME:
+            case COL_LAST_NAME:
             case COL_SURNAME:
             case COL_HONORIFIC:
             case COL_BLOODNAME:
@@ -289,27 +300,27 @@ public class PersonnelTableModel extends DataTableModel {
 
     public String getTooltip(int row, int col) {
         Person p = getPerson(row);
-        switch(col) {
-        case COL_NABIL:
-            return p.getAbilityList(PilotOptions.LVL3_ADVANTAGES);
-        case COL_NIMP:
-            return p.getAbilityList(PilotOptions.MD_ADVANTAGES);
-        case COL_ASSIGN:
-            if ((p.getTechUnitIDs().size() > 1) && !loadAssignmentFromMarket) {
-                StringBuilder toReturn = new StringBuilder("<html>");
-                for (UUID id : p.getTechUnitIDs()) {
-                    Unit u = getCampaign().getUnit(id);
-                    if (null != u) {
-                        toReturn.append(u.getName()).append("<br>");
+        switch (col) {
+            case COL_NABIL:
+                return p.getAbilityList(PilotOptions.LVL3_ADVANTAGES);
+            case COL_NIMP:
+                return p.getAbilityList(PilotOptions.MD_ADVANTAGES);
+            case COL_ASSIGN:
+                if ((p.getTechUnitIDs().size() > 1) && !loadAssignmentFromMarket) {
+                    StringBuilder toReturn = new StringBuilder("<html>");
+                    for (UUID id : p.getTechUnitIDs()) {
+                        Unit u = getCampaign().getUnit(id);
+                        if (null != u) {
+                            toReturn.append(u.getName()).append("<br>");
+                        }
                     }
+                    toReturn.append("</html>");
+                    return toReturn.toString();
+                } else {
+                    return null;
                 }
-                toReturn.append("</html>");
-                return toReturn.toString();
-            } else {
+            default:
                 return null;
-            }
-        default:
-            return null;
         }
     }
 
@@ -324,10 +335,11 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public Person getPerson(int i) {
-        if( i >= data.size()) {
+        if (i >= data.size()) {
             return null;
+        } else {
+            return (Person) data.get(i);
         }
-        return (Person)data.get(i);
     }
 
     public boolean isDeployed(int row) {
@@ -350,6 +362,8 @@ public class PersonnelTableModel extends DataTableModel {
                 return p.makeHTMLRank();
             case COL_GIVEN_NAME:
                 return p.getGivenName();
+            case COL_LAST_NAME:
+                return p.getLastName();
             case COL_SURNAME:
                 toReturn = p.getSurname();
                 if (StringUtil.isNullOrEmpty(toReturn)) {
@@ -622,7 +636,7 @@ public class PersonnelTableModel extends DataTableModel {
                 }
                 break;
             case COL_XP:
-                return Integer.toString(p.getXp());
+                return Integer.toString(p.getXP());
             case COL_DEPLOY:
                 Unit u = getCampaign().getUnit(p.getUnitId());
                 if ((null != u) && u.isDeployed()) {
@@ -649,6 +663,10 @@ public class PersonnelTableModel extends DataTableModel {
                     return originPlanet.getName(getCampaign().getLocalDate());
                 }
                 break;
+            case COL_RECRUIT_DATE:
+                return p.getRecruitmentAsString(getCampaign());
+            case COL_DEATH_DATE:
+                return p.getDeathDateAsString(getCampaign());
             case COL_TOUGH:
             default:
                return resources.getString("col_unknown.text");
