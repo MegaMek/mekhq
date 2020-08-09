@@ -57,7 +57,7 @@ import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Dropship;
 import megamek.common.Jumpship;
-import megamek.common.util.DirectoryItems;
+import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.ImageUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
