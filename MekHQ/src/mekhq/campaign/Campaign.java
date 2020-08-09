@@ -5666,12 +5666,17 @@ public class Campaign implements Serializable, ITechManager {
                 et = ((MissingEquipmentPart) acquisition).getType();
             }
 
+            StringBuilder partAvailabilityLog = new StringBuilder();
+            partAvailabilityLog.append("Part Rating Level: " + partAvailability);
+            partAvailabilityLog.append("(" + EquipmentType.ratingNames[partAvailability] + ")");
+            
             /*
              * Even if we can acquire Clan parts, they have a minimum availability of F for
              * non-Clan units
              */
             if (acquisition.getTechBase() == Part.T_CLAN && !getFaction().isClan()) {
                 partAvailability = Math.max(partAvailability, EquipmentType.RATING_F);
+                partAvailabilityLog.append(";[clan part for non clan faction]");
             } else if (et != null) {
                 /*
                  * AtB rules do not simply affect difficulty of obtaining parts, but whether
@@ -5685,27 +5690,33 @@ public class Campaign implements Serializable, ITechManager {
                         && !(et instanceof megamek.common.weapons.flamers.FlamerWeapon)
                         && partAvailability < EquipmentType.RATING_C) {
                     partAvailability = EquipmentType.RATING_C;
+                    partAvailabilityLog.append(";(non-flamer lasers)");
                 }
                 if (et instanceof megamek.common.weapons.autocannons.ACWeapon) {
                     partAvailability -= 2;
+                    partAvailabilityLog.append(";(autocannon): -2");
                 }
                 if (et instanceof megamek.common.weapons.gaussrifles.GaussWeapon
                         || et instanceof megamek.common.weapons.flamers.FlamerWeapon) {
                     partAvailability--;
+                    partAvailabilityLog.append(";(gauss rifle or flamer): -1");
                 }
                 if (et instanceof megamek.common.AmmoType) {
                     switch (((megamek.common.AmmoType) et).getAmmoType()) {
                         case megamek.common.AmmoType.T_AC:
                             partAvailability -= 2;
+                            partAvailabilityLog.append(";(autocannon ammo): -2");
                             break;
                         case megamek.common.AmmoType.T_GAUSS:
                             partAvailability -= 1;
+                            partAvailabilityLog.append(";(gauss ammo): -1");
+                            break;
                     }
-                    if (((megamek.common.AmmoType) et).getMunitionType() == megamek.common.AmmoType.M_STANDARD) {
+                    if (((megamek.common.AmmoType) et).getMunitionType() == megamek.common.AmmoType.M_STANDARD) {                        
                         partAvailability--;
+                        partAvailabilityLog.append(";(standard ammo): -1");
                     }
                 }
-
             }
 
             if (((getGameYear() < 2950) || (getGameYear() > 3040))
@@ -5715,11 +5726,13 @@ public class Campaign implements Serializable, ITechManager {
                             || acquisition instanceof mekhq.campaign.parts.MissingMekLocation
                             || acquisition instanceof mekhq.campaign.parts.MissingMekSensor)) {
                 partAvailability--;
+                partAvailabilityLog.append("(Mek part prior to 2950 or after 3040): - 1");
             }
 
-            if (partAvailability > findAtBPartsAvailabilityLevel(acquisition)) {
-                return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                        "This part is not currently available to your unit.");
+            int AtBPartsAvailability = findAtBPartsAvailabilityLevel(acquisition, null);
+            partAvailabilityLog.append("; Total part availability: " + partAvailability + "; Current campaign availability: " + AtBPartsAvailability);
+            if (partAvailability > AtBPartsAvailability) {
+                return new TargetRoll(TargetRoll.IMPOSSIBLE, partAvailabilityLog.toString());
             }
         }
         TargetRoll target = new TargetRoll(skill.getFinalSkillValue(),
@@ -5749,28 +5762,44 @@ public class Campaign implements Serializable, ITechManager {
         return retVal;
     }
 
-    private int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition) {
-        AtBContract contract = getAttachedAtBContract(acquisition.getUnit());
+    public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {
+        AtBContract contract = acquisition != null ? getAttachedAtBContract(acquisition.getUnit()) : null;
         /*
          * If the unit is not assigned to a contract, use the least restrictive active
-         * contract
+         * contract. Don't restrict parts availability by contract if it has not started.
          */
         for (Mission m : getMissions()) {
-            if (m.isActive() && m instanceof AtBContract) {
+            if (m.isActive() && m instanceof AtBContract && ((AtBContract) m).getStartDate().isBefore(currentDay)) {
                 if (null == contract
                         || ((AtBContract) m).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()) {
                     contract = (AtBContract) m;
                 }
             }
         }
-        if (null != contract) {
+        
+        // if we have a contract and it has started
+        if (null != contract && contract.getStartDate().isBefore(currentDay)) {
+            if (reportBuilder != null) {
+                reportBuilder.append(contract.getPartsAvailabilityLevel() + " (" + contract.getType() +")");
+            }
             return contract.getPartsAvailabilityLevel();
         }
         /* If contract is still null, the unit is not in a contract. */
         Person adminLog = findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
         int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN
                 : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-        return getUnitRatingMod() + adminLogExp - SkillType.EXP_REGULAR;
+        int adminMod = adminLogExp - SkillType.EXP_REGULAR;
+        
+        if (reportBuilder != null) {
+            reportBuilder.append(getUnitRatingMod() + "(unit rating)");
+            if(adminLog != null) {
+                reportBuilder.append(adminMod + "(" + adminLog.getFullName() +", logistics admin)");
+            } else {
+                reportBuilder.append(adminMod + "(no logistics admin)");
+            }
+        }
+        
+        return getUnitRatingMod() + adminMod;
     }
 
     public void resetAstechMinutes() {
