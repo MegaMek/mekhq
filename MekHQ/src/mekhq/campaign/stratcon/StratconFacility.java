@@ -141,6 +141,8 @@ public class StratconFacility implements Cloneable {
         this.localModifiers = localModifiers;
     }
     
+    //public void applyM
+    
     /**
      * Attempt to deserialize an instance of a StratconFacilityManifest from the passed-in file 
      * @param inputFile The path to the manifest
