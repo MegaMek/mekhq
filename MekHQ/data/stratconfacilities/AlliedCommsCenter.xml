@@ -1,0 +1,6 @@
+<StratconFacility>
+	<displayableName>Comms Center</displayableName>
+        <facilityType>CommandCenter</facilityType>
+        <owner>Allied</owner>
+        <visible>true</visible>
+</StratconFacility>

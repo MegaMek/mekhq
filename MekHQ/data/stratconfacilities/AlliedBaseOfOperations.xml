@@ -1,0 +1,6 @@
+<StratconFacility>
+	<displayableName>Base of Operations</displayableName>
+        <facilityType>BaseOfOperations</facilityType>
+        <owner>Allied</owner>
+        <visible>true</visible>
+</StratconFacility>

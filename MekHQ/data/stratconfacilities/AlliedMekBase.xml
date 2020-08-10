@@ -3,6 +3,6 @@
         <facilityType>MekBase</facilityType>
         <localModifiers>AlliedMechGarrison.xml</localModifiers>
         <owner>Allied</owner>
-        <sharedModifiers>AlliedMechGarrison.xml</sharedModifiers>
-        <visible>false</visible>
+        <sharedModifiers>AlliedMechReinforcements.xml</sharedModifiers>
+        <visible>true</visible>
 </StratconFacility>

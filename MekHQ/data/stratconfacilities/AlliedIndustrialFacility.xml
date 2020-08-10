@@ -1,0 +1,6 @@
+<StratconFacility>
+	<displayableName>Industrial Center</displayableName>
+        <facilityType>IndustrialCenter</facilityType>
+        <owner>Allied</owner>
+        <visible>true</visible>
+</StratconFacility>

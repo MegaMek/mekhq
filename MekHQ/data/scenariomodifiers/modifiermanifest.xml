@@ -10,6 +10,12 @@
 			EnemyReinforcements.xml
 		</modifier>
 		<modifier>
+			EnemyTankReinforcements.xml
+		</modifier>
+		<modifier>
+			EnemyMechReinforcements.xml
+		</modifier>
+		<modifier>
 			EnemyArty.xml
 		</modifier>
 		<modifier>
@@ -49,6 +55,12 @@
 		<modifier>
 			BadIntelAir.xml
 		</modifier>
+		<modifier>
+			PiratesIncoming.xml
+		</modifier>
+		<modifier>
+			PiratesPresent.xml
+		</modifier>
 		<!--modifier>
 			Need "special duel flag".
 			Duel.xml
@@ -77,6 +89,12 @@
 		</modifier>
 		<modifier>
 			AlliedReinforcements.xml
+		</modifier>
+		<modifier>
+			AlliedTankReinforcements.xml
+		</modifier>
+		<modifier>
+			AlliedMechReinforcements.xml
 		</modifier>
 		<!--modifier>
 			Need campaign state
