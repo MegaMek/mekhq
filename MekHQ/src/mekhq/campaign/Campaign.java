@@ -5775,7 +5775,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         
         // if we have a contract and it has started
-        if (null != contract && contract.getStartDate().isBefore(currentDay)) {
+        if ((null != contract) && contract.getStartDate().isBefore(currentDay)) {
             if (reportBuilder != null) {
                 reportBuilder.append(contract.getPartsAvailabilityLevel() + " (" + contract.getType() +")");
             }
