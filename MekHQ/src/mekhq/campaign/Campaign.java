@@ -5767,11 +5767,11 @@ public class Campaign implements Serializable, ITechManager {
          * If the unit is not assigned to a contract, use the least restrictive active
          * contract. Don't restrict parts availability by contract if it has not started.
          */
-        if (hasActiveContract() && (contract == null)) {
+        if (hasActiveContract()) {
             for (Contract c : getActiveContracts()) {
-                if (c instanceof AtBContract && 
+                if ((c instanceof AtBContract) && 
                         (c.getStartDate().isBefore(currentDay) || c.getStartDate().equals(currentDay)) && 
-                        (contract == null || 
+                        ((contract == null) || 
                         (((AtBContract) c).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()))) {
                     contract = (AtBContract) c;
                 }
