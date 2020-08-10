@@ -2691,7 +2691,6 @@ public class CampaignGUI extends JPanel {
         refreshPartsAvailability();
     }
     
-    
     public void refreshLocation() {
         lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
     }
