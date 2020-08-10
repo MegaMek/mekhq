@@ -5760,7 +5760,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {
-        AtBContract contract = acquisition != null ? getAttachedAtBContract(acquisition.getUnit()) : null;
+        AtBContract contract = (acquisition != null) ? getAttachedAtBContract(acquisition.getUnit()) : null;
         /*
          * If the unit is not assigned to a contract, use the least restrictive active
          * contract. Don't restrict parts availability by contract if it has not started.
