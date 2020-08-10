@@ -5789,7 +5789,7 @@ public class Campaign implements Serializable, ITechManager {
         
         if (reportBuilder != null) {
             reportBuilder.append(getUnitRatingMod() + "(unit rating)");
-            if(adminLog != null) {
+            if (adminLog != null) {
                 reportBuilder.append(adminMod + "(" + adminLog.getFullName() +", logistics admin)");
             } else {
                 reportBuilder.append(adminMod + "(no logistics admin)");
