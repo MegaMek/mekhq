@@ -5771,7 +5771,8 @@ public class Campaign implements Serializable, ITechManager {
             for (Contract c : getActiveContracts()) {
                 if (c instanceof AtBContract && 
                         c.getStartDate().isBefore(currentDay) && 
-                        (((AtBContract) c).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel())) {
+                        (contract == null || 
+                        (((AtBContract) c).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()))) {
                     contract = (AtBContract) c;
                 }
             }
