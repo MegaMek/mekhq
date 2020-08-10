@@ -662,7 +662,7 @@ public class CampaignExportWizard extends JDialog {
         // otherwise, chain-add forces
 
         // hack: the root forces are irrelevant, so we replace the source root force name with the destination root force name
-        String sourceForceFullName = getDestinationFullName (sourceForce, sourceCampaign, destinationCampaign);
+        String sourceForceFullName = getDestinationFullName(sourceForce, sourceCampaign, destinationCampaign);
         
         Force destForce = findForce(sourceForceFullName, destinationCampaign.getForces());
         if (destForce != null) {
