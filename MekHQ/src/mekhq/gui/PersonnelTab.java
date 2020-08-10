@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017, 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui;
 
@@ -56,7 +56,6 @@ import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
@@ -95,7 +94,8 @@ public final class PersonnelTab extends CampaignGuiTab {
     public static final int PG_RETIRE = 17;
     public static final int PG_MIA = 18;
     public static final int PG_KIA = 19;
-    public static final int PG_NUM = 20;
+    public static final int PG_DEAD = 20;
+    public static final int PG_NUM = 21;
 
     // personnel views
     private static final int PV_GRAPHIC = 0;
@@ -327,73 +327,75 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     public static String getPersonnelGroupName(int group) {
         switch (group) {
-        case PG_ACTIVE:
-            return "Active Personnel";
-        case PG_COMBAT:
-            return "Combat Personnel";
-        case PG_MW:
-            return "Mechwarriors";
-        case PG_CREW:
-            return "Vehicle Crews";
-        case PG_PILOT:
-            return "Aerospace Pilots";
-        case PG_CPILOT:
-            return "Conventional Pilots";
-        case PG_PROTO:
-            return "Protomech Pilots";
-        case PG_BA:
-            return "Battle Armor Infantry";
-        case PG_SOLDIER:
-            return "Conventional Infantry";
-        case PG_SUPPORT:
-            return "Support Personnel";
-        case PG_VESSEL:
-            return "Large Vessel Crews";
-        case PG_TECH:
-            return "Techs";
-        case PG_DOC:
-            return "Medical Staff";
-        case PG_ADMIN:
-            return "Administrators";
-        case PG_DEPENDENT:
-            return "Dependents";
-        case PG_FOUNDER:
-            return "Founders";
-        case PG_RETIRE:
-            return "Retired Personnel";
-        case PG_MIA:
-            return "Personnel MIA";
-        case PG_KIA:
-            return "Rolls of Honor (KIA)";
-        case PG_PRISONER:
-            return "Prisoners";
-        default:
-            return "?";
+            case PG_ACTIVE:
+                return "Active Personnel";
+            case PG_COMBAT:
+                return "Combat Personnel";
+            case PG_MW:
+                return "MechWarriors";
+            case PG_CREW:
+                return "Vehicle Crews";
+            case PG_PILOT:
+                return "Aerospace Pilots";
+            case PG_CPILOT:
+                return "Conventional Pilots";
+            case PG_PROTO:
+                return "ProtoMech Pilots";
+            case PG_BA:
+                return "Battle Armor Infantry";
+            case PG_SOLDIER:
+                return "Conventional Infantry";
+            case PG_SUPPORT:
+                return "Support Personnel";
+            case PG_VESSEL:
+                return "Large Vessel Crews";
+            case PG_TECH:
+                return "Techs";
+            case PG_DOC:
+                return "Medical Staff";
+            case PG_ADMIN:
+                return "Administrators";
+            case PG_DEPENDENT:
+                return "Dependents";
+            case PG_FOUNDER:
+                return "Founders";
+            case PG_RETIRE:
+                return "Retired Personnel";
+            case PG_MIA:
+                return "Personnel MIA";
+            case PG_KIA:
+                return "Rolls of Honor (KIA)";
+            case PG_DEAD:
+                return "Cemetery";
+            case PG_PRISONER:
+                return "Prisoners";
+            default:
+                return "?";
         }
     }
 
     public static String getPersonnelViewName(int group) {
         switch (group) {
-        case PV_GRAPHIC:
-            return "Graphic";
-        case PV_GENERAL:
-            return "General";
-        case PV_PILOT:
-            return "Piloting/Gunnery Skills";
-        case PV_INF:
-            return "Infantry Skills";
-        case PV_TACTIC:
-            return "Tactical Skills";
-        case PV_TECH:
-            return "Tech Skills";
-        case PV_ADMIN:
-            return "Admin Skills";
-        case PV_BIO:
-            return "Biographical Information";
-        case PV_FLUFF:
-            return "Fluff Information";
-        default:
-            return "?";
+            case PV_GRAPHIC:
+                return "Graphic";
+            case PV_GENERAL:
+                return "General";
+            case PV_PILOT:
+                return "Piloting/Gunnery Skills";
+            case PV_INF:
+                return "Infantry Skills";
+            case PV_TACTIC:
+                return "Tactical Skills";
+            case PV_TECH:
+                return "Tech Skills";
+            case PV_ADMIN:
+                return "Admin Skills";
+            case PV_BIO:
+                return "Biographical Information";
+            case PV_FLUFF:
+                return "Fluff Information";
+            default:
+                return "?";
         }
     }
 
@@ -422,17 +424,19 @@ public final class PersonnelTab extends CampaignGuiTab {
                         || ((nGroup == PG_DOC) && person.hasRoleWithin(Person.T_DOCTOR, Person.T_MEDIC))
                         || ((nGroup == PG_ADMIN) && person.hasRoleWithin(Person.T_ADMIN_COM, Person.T_ADMIN_HR)))
                         && !person.getPrisonerStatus().isPrisoner()) {
-                    return person.isActive();
+                    return person.getStatus().isActive();
                 } else if (nGroup == PG_DEPENDENT) {
                     return person.isDependent();
                 } else if (nGroup == PG_FOUNDER) {
                     return person.isFounder();
                 } else if (nGroup == PG_RETIRE) {
-                    return person.getStatus() == PersonnelStatus.RETIRED;
+                    return person.getStatus().isRetired();
                 } else if (nGroup == PG_MIA) {
-                    return person.getStatus() == PersonnelStatus.MIA;
+                    return person.getStatus().isMIA();
                 } else if (nGroup == PG_KIA) {
-                    return person.getStatus() == PersonnelStatus.KIA;
+                    return person.getStatus().isKIA();
+                } else if (nGroup == PG_DEAD) {
+                    return person.getStatus().isDead();
                 } else if (nGroup == PG_PRISONER) {
                     return person.getPrisonerStatus().isPrisoner();
                 } else {

@@ -182,4 +182,19 @@ public class MedicalLogger {
                 GenderDescriptors.HIS_HER.getDescriptor(patient.getGender())));
         patient.addLogEntry(medicalLogEntry);
     }
+
+    public static void diedOfNaturalCauses(Person patient, LocalDate date) {
+        String message = logEntriesResourceMap.getString("diedOfNaturalCauses.text");
+        patient.addLogEntry(new MedicalLogEntry(date, message));
+    }
+
+    public static void diedFromDisease(Person patient, LocalDate date) {
+        String message = logEntriesResourceMap.getString("diedFromDisease.text");
+        patient.addLogEntry(new MedicalLogEntry(date, message));
+    }
+
+    public static void diedOfOldAge(Person patient, LocalDate date) {
+        String message = logEntriesResourceMap.getString("diedOfOldAge.text");
+        patient.addLogEntry(new MedicalLogEntry(date, message));
+    }
 }

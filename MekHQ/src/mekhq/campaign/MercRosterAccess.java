@@ -40,7 +40,6 @@ import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 
 public class MercRosterAccess extends SwingWorker<Void, Void> {
@@ -99,7 +98,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             statement = connect.createStatement();
         } catch (SQLException e) {
             MekHQ.getLogger().error(getClass(), "writeCampaignData", e);
-        };
+        }
 
         writeBasicData();
         writeForceData();
@@ -471,7 +470,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 preparedStatement.setString(2, truncateString(p.getSurname(),30));
                 preparedStatement.setString(3, truncateString(p.getGivenName(), 30));
                 preparedStatement.setString(4, truncateString(p.getCallsign(), 30));
-                preparedStatement.setString(5, getMercRosterStatusName(p.getStatus()));
+                preparedStatement.setString(5, p.getStatus().toString());
                 preparedStatement.setInt(6, forceId);
                 preparedStatement.setInt(7, 1);
                 //TODO: get joining date right
@@ -487,7 +486,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setString(2, truncateString(p.getSurname(), 30));
                     preparedStatement.setString(3, truncateString(p.getGivenName(), 30));
                     preparedStatement.setString(4, truncateString(p.getCallsign(), 30));
-                    preparedStatement.setString(5, getMercRosterStatusName(p.getStatus()));
+                    preparedStatement.setString(5, p.getStatus().toString());
                     preparedStatement.setInt(6, forceId);
                     preparedStatement.setInt(7, 1);
                     preparedStatement.setDate(8, Date.valueOf(p.getBirthday()));
@@ -629,21 +628,6 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         name = name.replaceAll("\\s","");
         name = name.replaceAll("Hyperspace", "");
         return name;
-    }
-
-    private static String getMercRosterStatusName(PersonnelStatus status) {
-        switch (status) {
-            case ACTIVE:
-                return "Active";
-            case KIA:
-                return "Deceased";
-            case RETIRED:
-                return "Retired";
-            case MIA:
-                return "Missing in Action";
-            default:
-                return "?";
-        }
     }
 
     private static String truncateString(String s, int len) {

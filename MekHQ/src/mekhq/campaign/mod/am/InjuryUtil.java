@@ -39,7 +39,6 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -79,10 +78,7 @@ public final class InjuryUtil {
     public static void resolveAfterCombat(Campaign c, Person p, int hits) {
         // Gather all the injury actions resulting from the combat situation
         final List<GameEffect> effects = new ArrayList<>();
-        p.getInjuries().forEach(i ->
-        {
-            effects.addAll(i.getType().genStressEffect(c, p, i, hits));
-        });
+        p.getInjuries().forEach(i -> effects.addAll(i.getType().genStressEffect(c, p, i, hits)));
 
         // We could do some fancy display-to-the-user thing here, but for now just resolve all actions
         effects.stream().forEach(GameEffect::apply);
@@ -435,14 +431,14 @@ public final class InjuryUtil {
             result.add(new GameEffect("Infirmary health check-up",
                 rnd -> {
                     boolean dismissed = false;
-                    if (p.getStatus() == PersonnelStatus.KIA) {
+                    if (p.getStatus().isDead()) {
                         dismissed = true;
                         MedicalLogger.diedInInfirmary(p, c.getLocalDate());
-                    } else if (p.getStatus() == PersonnelStatus.MIA) {
+                    } else if (p.getStatus().isMIA()) {
                         // What? How?
                         dismissed = true;
                         MedicalLogger.abductedFromInfirmary(p, c.getLocalDate());
-                    } else if (p.getStatus() == PersonnelStatus.RETIRED) {
+                    } else if (p.getStatus().isRetired()) {
                         dismissed = true;
                         MedicalLogger.retiredAndTransferredFromInfirmary(p, c.getLocalDate());
                     } else if (!p.needsFixing()) {
