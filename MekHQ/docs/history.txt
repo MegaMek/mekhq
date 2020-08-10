@@ -3,6 +3,9 @@ VERSION HISTORY:
 0.47.10-SNAPSHOT
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
 + Issue #1888: Founder Filter in Personnel Tab
++ Data: Numerous fixes to RATS, Mechfiles, Sprites, and update Unit Roles.
++ PR #1893: Personnel Status: Fixing ChangeStatus, Standardizing Boolean Comparisons, and Implementing Death Options
++ Issue #1808: Adding an Option for the Player to Control All Attached Units
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format

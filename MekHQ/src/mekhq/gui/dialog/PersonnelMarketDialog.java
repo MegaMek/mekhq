@@ -50,7 +50,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
@@ -443,19 +442,22 @@ public class PersonnelMarketDialog extends JDialog {
                             (nGroup == PersonnelTab.PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
                             (nGroup == PersonnelTab.PG_ADMIN && type > Person.T_MEDIC)
                             ) {
-                        return person.isActive();
+                        return person.getStatus().isActive();
                     } else if (nGroup == PersonnelTab.PG_DEPENDENT) {
                         return person.isDependent();
                     } else if (nGroup == PersonnelTab.PG_FOUNDER) {
                         return person.isFounder();
                     } else if(nGroup == PersonnelTab.PG_RETIRE) {
-                        return person.getStatus() == PersonnelStatus.RETIRED;
-                    } else if(nGroup == PersonnelTab.PG_MIA) {
-                        return person.getStatus() == PersonnelStatus.MIA;
-                    } else if(nGroup == PersonnelTab.PG_KIA) {
-                        return person.getStatus() == PersonnelStatus.KIA;
+                        return person.getStatus().isRetired();
+                    } else if (nGroup == PersonnelTab.PG_MIA) {
+                        return person.getStatus().isMIA();
+                    } else if (nGroup == PersonnelTab.PG_KIA) {
+                        return person.getStatus().isKIA();
+                    } else if (nGroup == PersonnelTab.PG_DEAD) {
+                        return person.getStatus().isDead();
+                    } else {
+                        return false;
                     }
-                    return false;
                 }
             };
         } catch (java.util.regex.PatternSyntaxException e) {
@@ -466,7 +468,7 @@ public class PersonnelMarketDialog extends JDialog {
 
     private void personChanged(javax.swing.event.ListSelectionEvent evt) {
         int view = tablePersonnel.getSelectedRow();
-        if(view < 0) {
+        if (view < 0) {
             //selection got filtered away
             selectedPerson = null;
             refreshPersonView();
@@ -494,7 +496,7 @@ public class PersonnelMarketDialog extends JDialog {
 
     	 int row = tablePersonnel.getSelectedRow();
 
-    	 if(row < 0) {
+    	 if (row < 0) {
              scrollPersonnelView.setViewportView(null);
              return;
          }
@@ -555,47 +557,49 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
 	public static String getPersonnelGroupName(int group) {
-        switch(group) {
-        case PersonnelTab.PG_ACTIVE:
-            return "All Personnel";
-        case PersonnelTab.PG_COMBAT:
-            return "Combat Personnel";
-        case PersonnelTab.PG_MW:
-            return "Mechwarriors";
-        case PersonnelTab.PG_CREW:
-            return "Vehicle Crews";
-        case PersonnelTab.PG_PILOT:
-            return "Aerospace Pilots";
-        case PersonnelTab.PG_CPILOT:
-            return "Conventional Pilots";
-        case PersonnelTab.PG_PROTO:
-            return "Protomech Pilots";
-        case PersonnelTab.PG_BA:
-            return "Battle Armor Infantry";
-        case PersonnelTab.PG_SOLDIER:
-            return "Conventional Infantry";
-        case PersonnelTab.PG_SUPPORT:
-            return "Support Personnel";
-        case PersonnelTab.PG_VESSEL:
-            return "Large Vessel Crews";
-        case PersonnelTab.PG_TECH:
-            return "Techs";
-        case PersonnelTab.PG_DOC:
-            return "Medical Staff";
-        case PersonnelTab.PG_ADMIN:
-            return "Administrators";
-        case PersonnelTab.PG_DEPENDENT:
-            return "Dependents";
-        case PersonnelTab.PG_FOUNDER:
-            return "Founders";
-        case PersonnelTab.PG_RETIRE:
-            return "Retired Personnel";
-        case PersonnelTab.PG_MIA:
-            return "Personnel MIA";
-        case PersonnelTab.PG_KIA:
-            return "Rolls of Honor (KIA)";
-        default:
-            return "?";
+        switch (group) {
+            case PersonnelTab.PG_ACTIVE:
+                return "All Personnel";
+            case PersonnelTab.PG_COMBAT:
+                return "Combat Personnel";
+            case PersonnelTab.PG_MW:
+                return "MechWarriors";
+            case PersonnelTab.PG_CREW:
+                return "Vehicle Crews";
+            case PersonnelTab.PG_PILOT:
+                return "Aerospace Pilots";
+            case PersonnelTab.PG_CPILOT:
+                return "Conventional Pilots";
+            case PersonnelTab.PG_PROTO:
+                return "ProtoMech Pilots";
+            case PersonnelTab.PG_BA:
+                return "Battle Armor Infantry";
+            case PersonnelTab.PG_SOLDIER:
+                return "Conventional Infantry";
+            case PersonnelTab.PG_SUPPORT:
+                return "Support Personnel";
+            case PersonnelTab.PG_VESSEL:
+                return "Large Vessel Crews";
+            case PersonnelTab.PG_TECH:
+                return "Techs";
+            case PersonnelTab.PG_DOC:
+                return "Medical Staff";
+            case PersonnelTab.PG_ADMIN:
+                return "Administrators";
+            case PersonnelTab.PG_DEPENDENT:
+                return "Dependents";
+            case PersonnelTab.PG_FOUNDER:
+                return "Founders";
+            case PersonnelTab.PG_RETIRE:
+                return "Retired Personnel";
+            case PersonnelTab.PG_MIA:
+                return "Personnel MIA";
+            case PersonnelTab.PG_KIA:
+                return "Rolls of Honor (KIA)";
+            case PersonnelTab.PG_DEAD:
+                return "Cemetery";
+            default:
+                return "?";
         }
     }
 

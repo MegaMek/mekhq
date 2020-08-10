@@ -489,8 +489,8 @@ public class PersonViewPanel extends ScrollablePanel {
 
         int firsty = 0, secondy = 0;
 
-        lblType.setName("lblType"); // NOI18N
-        lblType.setText(String.format(resourceMap.getString("format.italic"), person.getRoleDesc())); //$NON-NLS-1$
+        lblType.setName("lblType");
+        lblType.setText(String.format(resourceMap.getString("format.italic"), person.getRoleDesc()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = firsty;
@@ -504,7 +504,7 @@ public class PersonViewPanel extends ScrollablePanel {
         firsty++;
 
         lblStatus1.setName("lblStatus1"); // NOI18N
-        lblStatus1.setText(resourceMap.getString("lblStatus1.text")); //$NON-NLS-1$
+        lblStatus1.setText(resourceMap.getString("lblStatus1.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = firsty;
@@ -512,8 +512,8 @@ public class PersonViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblStatus1, gridBagConstraints);
 
-        lblStatus2.setName("lblStatus2"); // NOI18N
-        lblStatus2.setText(person.getStatus().getStatusName() + person.pregnancyStatus());
+        lblStatus2.setName("lblStatus2");
+        lblStatus2.setText(person.getStatus().toString() + person.pregnancyStatus());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = firsty;
@@ -527,7 +527,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         if (campaign.getCampaignOptions().showOriginFaction()) {
             lblOrigin1.setName("lblOrigin1"); // NOI18N
-            lblOrigin1.setText(resourceMap.getString("lblOrigin1.text")); //$NON-NLS-1$
+            lblOrigin1.setText(resourceMap.getString("lblOrigin1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = firsty;
@@ -535,7 +535,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblOrigin1, gridBagConstraints);
 
-            lblOrigin2.setName("lblOrigin2"); // NOI18N
+            lblOrigin2.setName("lblOrigin2");
             String factionName = person.getOriginFaction().getFullName(campaign.getGameYear());
             if (person.getOriginPlanet() != null) {
                 String planetName = person.getOriginPlanet().getName(campaign.getLocalDate());

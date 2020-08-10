@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import java.awt.Graphics;
@@ -52,7 +51,6 @@ import mekhq.gui.model.PatientTableModel;
 /**
  * Shows injured and medical personnel
  */
-
 public final class InfirmaryTab extends CampaignGuiTab {
 
     private static final long serialVersionUID = 7558886712192449186L;
@@ -81,8 +79,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$ ;
-                new EncodeControl());
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
@@ -133,7 +130,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         add(btnUnassignDoc, gridBagConstraints);
 
         assignedPatientModel = new PatientTableModel(getCampaign());
-        listAssignedPatient = new JList<Person>(assignedPatientModel);
+        listAssignedPatient = new JList<>(assignedPatientModel);
         listAssignedPatient.setCellRenderer(assignedPatientModel.getRenderer(getIconPackage()));
         listAssignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         listAssignedPatient.setVisibleRowCount(-1);
@@ -145,7 +142,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         scrollAssignedPatient.setOpaque(false);
         scrollAssignedPatient.getViewport().setOpaque(false);
         unassignedPatientModel = new PatientTableModel(getCampaign());
-        listUnassignedPatient = new JList<Person>(unassignedPatientModel);
+        listUnassignedPatient = new JList<>(unassignedPatientModel);
         listUnassignedPatient.setCellRenderer(unassignedPatientModel.getRenderer(getIconPackage()));
         listUnassignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         listUnassignedPatient.setVisibleRowCount(-1);
@@ -244,7 +241,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
     }
 
     protected ArrayList<Person> getSelectedUnassignedPatients() {
-        ArrayList<Person> patients = new ArrayList<Person>();
+        ArrayList<Person> patients = new ArrayList<>();
         int[] indices = listUnassignedPatient.getSelectedIndices();
         if (unassignedPatientModel.getSize() == 0) {
             return patients;
@@ -329,13 +326,13 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
     public void refreshPatientList() {
         Person doctor = getSelectedDoctor();
-        ArrayList<Person> assigned = new ArrayList<Person>();
-        ArrayList<Person> unassigned = new ArrayList<Person>();
+        ArrayList<Person> assigned = new ArrayList<>();
+        ArrayList<Person> unassigned = new ArrayList<>();
         for (Person patient : getCampaign().getPatients()) {
             // Knock out inactive doctors
             if ((patient.getDoctorId() != null)
                     && (getCampaign().getPerson(patient.getDoctorId()) != null)
-                    && getCampaign().getPerson(patient.getDoctorId()).isInActive()) {
+                    && !getCampaign().getPerson(patient.getDoctorId()).getStatus().isActive()) {
                 patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
             }
             if (patient.getDoctorId() == null) {

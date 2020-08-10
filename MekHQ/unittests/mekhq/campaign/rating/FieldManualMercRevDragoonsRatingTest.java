@@ -37,6 +37,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,7 +92,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockDoctorSkillGreen.getExperienceLevel()).thenReturn(SkillType.EXP_GREEN);
         when(mockDoctor.getPrimaryRole()).thenReturn(Person.T_DOCTOR);
         when(mockDoctor.isDoctor()).thenReturn(true);
-        when(mockDoctor.isActive()).thenReturn(true);
+        doReturn(PersonnelStatus.ACTIVE).when(mockDoctor).getStatus();
         when(mockDoctor.isDeployed()).thenReturn(false);
         when(mockDoctor.getSkill(eq(SkillType.S_DOCTOR))).thenReturn(mockDoctorSkillRegular);
         when(mockDoctor.hasSkill(eq(SkillType.S_DOCTOR))).thenReturn(true);
@@ -102,7 +103,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockMechTechSkillRegular.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
         when(mockTech.getPrimaryRole()).thenReturn(Person.T_MECH_TECH);
         when(mockTech.isTech()).thenReturn(true);
-        when(mockTech.isActive()).thenReturn(true);
+        doReturn(PersonnelStatus.ACTIVE).when(mockTech).getStatus();
         when(mockTech.isDeployed()).thenReturn(false);
         when(mockTech.getSkill(eq(SkillType.S_TECH_MECH))).thenReturn(mockMechTechSkillVeteran);
         when(mockTech.hasSkill(eq(SkillType.S_TECH_MECH))).thenReturn(true);
@@ -332,7 +333,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockMechwarrior.getPrimaryRole()).thenReturn(Person.T_MECHWARRIOR);
         when(mockMechwarrior.getSecondaryRole()).thenReturn(Person.T_DOCTOR);
         when(mockMechwarrior.isDoctor()).thenReturn(true);
-        when(mockMechwarrior.isActive()).thenReturn(true);
+        doReturn(PersonnelStatus.ACTIVE).when(mockMechwarrior).getStatus();
         when(mockMechwarrior.isDeployed()).thenReturn(false);
         when(mockMechwarrior.getSkill(eq(SkillType.S_DOCTOR))).thenReturn(mockDoctorSkillGreen);
         when(mockMechwarrior.hasSkill(eq(SkillType.S_DOCTOR))).thenReturn(true);
@@ -348,7 +349,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockMedic.getPrimaryRole()).thenReturn(Person.T_MEDIC);
         when(mockMedic.isDoctor()).thenReturn(false);
         when(mockMedic.isMedic()).thenReturn(true);
-        when(mockMedic.isActive()).thenReturn(true);
+        doReturn(PersonnelStatus.ACTIVE).when(mockMedic).getStatus();
         when(mockMedic.isDeployed()).thenReturn(false);
         when(mockMedic.getSkill(eq(SkillType.S_MEDTECH))).thenReturn(mockMedicSkill);
         when(mockMedic.hasSkill(eq(SkillType.S_MEDTECH))).thenReturn(true);
@@ -381,7 +382,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockMechwarrior.getSecondaryRole()).thenReturn(Person.T_MECH_TECH);
         when(mockMechwarrior.isTech()).thenReturn(true);
         when(mockMechwarrior.isTechSecondary()).thenReturn(true);
-        when(mockMechwarrior.isActive()).thenReturn(true);
+        doReturn(PersonnelStatus.ACTIVE).when(mockMechwarrior).getStatus();
         when(mockMechwarrior.isDeployed()).thenReturn(false);
         when(mockMechwarrior.getSkill(eq(SkillType.S_TECH_MECH))).thenReturn(mockMechTechSkillRegular);
         when(mockMechwarrior.hasSkill(eq(SkillType.S_TECH_MECH))).thenReturn(true);
@@ -397,7 +398,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockAstech.getPrimaryRole()).thenReturn(Person.T_ASTECH);
         when(mockAstech.isDoctor()).thenReturn(false);
         when(mockAstech.isTech()).thenReturn(false);
-        when(mockAstech.isActive()).thenReturn(true);
+        doReturn(PersonnelStatus.ACTIVE).when(mockAstech).getStatus();
         when(mockAstech.isDeployed()).thenReturn(false);
         when(mockAstech.getSkill(eq(SkillType.S_ASTECH))).thenReturn(mockAstechSkill);
         when(mockAstech.hasSkill(eq(SkillType.S_ASTECH))).thenReturn(true);
@@ -419,10 +420,13 @@ public class FieldManualMercRevDragoonsRatingTest {
 
         // Test a campaign where the commander is not flagged, but there is a clear highest ranking officer.
         testRating = spy(new FieldManualMercRevDragoonsRating(mockCampaign));
+        doReturn(PersonnelStatus.ACTIVE).when(expectedCommander).getStatus();
         when(expectedCommander.getRankNumeric()).thenReturn(10);
         Person leftennant = mock(Person.class);
+        doReturn(PersonnelStatus.ACTIVE).when(leftennant).getStatus();
         when(leftennant.getRankNumeric()).thenReturn(5);
         Person leftennant2 = mock(Person.class);
+        doReturn(PersonnelStatus.ACTIVE).when(leftennant2).getStatus();
         when(leftennant2.getRankNumeric()).thenReturn(5);
         List<Person> commandList = new ArrayList<>(3);
         commandList.add(leftennant);
@@ -436,12 +440,10 @@ public class FieldManualMercRevDragoonsRatingTest {
         testRating = spy(new FieldManualMercRevDragoonsRating(mockCampaign));
         when(mockCampaign.getFlaggedCommander()).thenReturn(null);
         doReturn(commandList).when(testRating).getCommanderList();
-        when(expectedCommander.isActive()).thenReturn(false);
+        doReturn(PersonnelStatus.RETIRED).when(expectedCommander).getStatus();
         mockActivePersonnelList.remove(expectedCommander);
         when(leftennant.getExperienceLevel(anyBoolean())).thenReturn(SkillType.EXP_VETERAN);
-        when(leftennant.isActive()).thenReturn(true);
         when(leftennant2.getExperienceLevel(anyBoolean())).thenReturn(SkillType.EXP_REGULAR);
-        when(leftennant2.isActive()).thenReturn(true);
         assertEquals(leftennant, testRating.getCommander());
 
         // Test a campaign with no flagged commander and where no ranks have been assigned.

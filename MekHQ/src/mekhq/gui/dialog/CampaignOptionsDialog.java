@@ -481,6 +481,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkAdjustPlayerVehicles;
     private JCheckBox chkRegionalMechVariations;
     private JCheckBox chkAttachedPlayerCamouflage;
+    private JCheckBox chkPlayerControlsAttachedUnits;
     private JCheckBox chkUseDropShips;
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
@@ -4405,6 +4406,11 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = yTablePosition++;
         panSubAtBScenario.add(chkAttachedPlayerCamouflage, gridBagConstraints);
 
+        chkPlayerControlsAttachedUnits = new JCheckBox(resourceMap.getString("chkPlayerControlsAttachedUnits.text"));
+        chkPlayerControlsAttachedUnits.setSelected(options.getPlayerControlsAttachedUnits());
+        gridBagConstraints.gridy = yTablePosition++;
+        panSubAtBScenario.add(chkPlayerControlsAttachedUnits, gridBagConstraints);
+
         chkUseDropShips = new JCheckBox(resourceMap.getString("chkUseDropShips.text"));
         chkUseDropShips.setToolTipText(resourceMap.getString("chkUseDropShips.toolTipText"));
         chkUseDropShips.setSelected(options.getUseDropShips());
@@ -5040,6 +5046,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
         options.setRegionalMechVariations(chkRegionalMechVariations.isSelected());
         options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
+        options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
         options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());

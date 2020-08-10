@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.rating;
 
@@ -24,7 +24,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -70,6 +69,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         super(campaign);
     }
 
+    @Override
     public UnitRatingMethod getUnitRatingMethod() {
         return UnitRatingMethod.CAMPAIGN_OPS;
     }
@@ -431,6 +431,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
     }
 
+    @Override
     public int getExperienceValue() {
         if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
             return 0;
