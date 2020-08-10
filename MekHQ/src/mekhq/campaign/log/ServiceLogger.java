@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 MegaMek team
+ * Copyright (C) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.log;
 
@@ -84,12 +84,25 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("mia.text")));
     }
 
+    public static void passedAway(Person person, Date date, String cause) {
+        String message = logEntriesResourceMap.getString("passedAway.text");
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, cause)));
+    }
+
     public static void retired(Person person, Date date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("retired.text")));
     }
 
     public static void recoveredMia(Person person, Date date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("recoveredMia.text")));
+    }
+
+    public static void resurrected(Person person, Date date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("resurrected.text")));
+    }
+
+    public static void rehired(Person person, Date date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("rehired.text")));
     }
 
     public static void promotedTo(Person person, Date date) {

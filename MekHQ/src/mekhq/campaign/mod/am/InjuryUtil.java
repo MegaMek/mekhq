@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 MegaMek team
+ * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.mod.am;
 
@@ -39,7 +39,6 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -53,7 +52,7 @@ public final class InjuryUtil {
     private static AMEventHandler eventHandler = null;
 
     public synchronized static void registerEventHandler(Campaign c) {
-        if(null != eventHandler) {
+        if (null != eventHandler) {
             MekHQ.EVENT_BUS.unregister(eventHandler);
         }
         MekHQ.EVENT_BUS.register(eventHandler = new AMEventHandler(c));
@@ -64,8 +63,8 @@ public final class InjuryUtil {
     public static void resolveDailyHealing(Campaign c, Person p) {
         Person doc = c.getPerson(p.getDoctorId());
         // TODO: Reporting
-        if((null != doc) && doc.isDoctor()) {
-            if(p.getDaysToWaitForHealing() <= 0) {
+        if ((null != doc) && doc.isDoctor()) {
+            if (p.getDaysToWaitForHealing() <= 0) {
                 genMedicalTreatment(c, p, doc).stream().forEach(GameEffect::apply);
             }
         } else {
@@ -79,10 +78,7 @@ public final class InjuryUtil {
     public static void resolveAfterCombat(Campaign c, Person p, int hits) {
         // Gather all the injury actions resulting from the combat situation
         final List<GameEffect> effects = new ArrayList<>();
-        p.getInjuries().forEach(i ->
-        {
-            effects.addAll(i.getType().genStressEffect(c, p, i, hits));
-        });
+        p.getInjuries().forEach(i -> effects.addAll(i.getType().genStressEffect(c, p, i, hits)));
 
         // We could do some fancy display-to-the-user thing here, but for now just resolve all actions
         effects.stream().forEach(GameEffect::apply);
@@ -98,7 +94,7 @@ public final class InjuryUtil {
     }
 
     private static void addHitToAccumulator(Map<BodyLocation, Integer> acc, BodyLocation loc) {
-        if(!acc.containsKey(loc)) {
+        if (!acc.containsKey(loc)) {
             acc.put(loc, 1);
         } else {
             acc.put(loc, acc.get(loc) + 1);
@@ -125,12 +121,12 @@ public final class InjuryUtil {
             addHitToAccumulator(hitAccumulator, location);
             // critical hits add to the amount
             int roll = Compute.d6(2);
-            if(roll + hits + critMod > 12) {
+            if (roll + hits + critMod > 12) {
                 addHitToAccumulator(hitAccumulator, location);
             }
         }
         List<Injury> newInjuries = new ArrayList<>();
-        for(Entry<BodyLocation, Integer> accEntry : hitAccumulator.entrySet()) {
+        for (Entry<BodyLocation, Integer> accEntry : hitAccumulator.entrySet()) {
             newInjuries.addAll(genInjuries(c, p, accEntry.getKey(), accEntry.getValue()));
         }
         return newInjuries;
@@ -193,7 +189,7 @@ public final class InjuryUtil {
                         break;
                     default:
                         newInjuries.add(gen.apply(InjuryTypes.BROKEN_BACK, 1));
-                        if(Compute.randomInt(100) < 15) {
+                        if (Compute.randomInt(100) < 15) {
                             newInjuries.add(gen.apply(InjuryTypes.SEVERED_SPINE, 1));
                         }
                         break;
@@ -232,12 +228,12 @@ public final class InjuryUtil {
     public static int genHealingTime(Campaign c, Person p, InjuryType itype, int severity) {
         int mod = 100;
         int rand = Compute.randomInt(100);
-        if(rand < 5) {
+        if (rand < 5) {
             mod += (Compute.d6() < 4) ? rand : -rand;
         }
 
         int time = itype.getRecoveryTime(severity);
-        if(itype == InjuryTypes.LACERATION) {
+        if (itype == InjuryTypes.LACERATION) {
             time += Compute.d6();
         }
 
@@ -261,8 +257,8 @@ public final class InjuryUtil {
 
         List<GameEffect> result = new ArrayList<>();
 
-        for(Injury i : p.getInjuries()) {
-            if(!i.isWorkedOn()) {
+        for (Injury i : p.getInjuries()) {
+            if (!i.isWorkedOn()) {
                 int roll = Compute.randomInt(100);
                 // Determine XP, if any
                 if (roll < Math.max(1, fumbleLimit / 10)) {
@@ -282,7 +278,7 @@ public final class InjuryUtil {
                     doc.setCurrentEdge(doc.getCurrentEdge() - 1);
                     roll = Compute.randomInt(100);
                 }
-                if(roll < fumbleLimit) {
+                if (roll < fumbleLimit) {
                     result.add(new GameEffect(
                         String.format("%s made a mistake in the treatment of %s and caused %s %s to worsen.",
                             doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
@@ -299,7 +295,7 @@ public final class InjuryUtil {
                                 // bleeding (death chance)
                             //}
                         }));
-                } else if((roll > critLimit) && (critTimeReduction > 0)) {
+                } else if ((roll > critLimit) && (critTimeReduction > 0)) {
                     result.add(new GameEffect(
                         String.format("%s performed some amazing work in treating %s of %s (%d fewer day(s) to heal).",
                                 doc.getHyperlinkedFullTitle(), i.getName(), p.getHyperlinkedName(), critTimeReduction),
@@ -429,14 +425,14 @@ public final class InjuryUtil {
             result.add(new GameEffect("Infirmary health check-up",
                 rnd -> {
                     boolean dismissed = false;
-                    if (p.getStatus() == PersonnelStatus.KIA) {
+                    if (p.getStatus().isKIA()) {
                         dismissed = true;
                         MedicalLogger.diedInInfirmary(p, c.getDate());
-                    } else if (p.getStatus() == PersonnelStatus.MIA) {
+                    } else if (p.getStatus().isMIA()) {
                         // What? How?
                         dismissed = true;
                         MedicalLogger.abductedFromInfirmary(p, c.getDate());
-                    } else if (p.getStatus() == PersonnelStatus.RETIRED) {
+                    } else if (p.getStatus().isRetired()) {
                         dismissed = true;
                         MedicalLogger.retiredAndTransferredFromInfirmary(p, c.getDate());
                     } else if (!p.needsFixing()) {

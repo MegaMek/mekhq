@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 MegaMek team
+ * Copyright (C) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.log;
 
@@ -181,5 +181,20 @@ public class MedicalLogger {
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
                 GenderDescriptors.HIS_HER.getDescriptor(patient.getGender())));
         patient.addLogEntry(medicalLogEntry);
+    }
+
+    public static void diedOfNaturalCauses(Person patient, Date date) {
+        String message = logEntriesResourceMap.getString("diedOfNaturalCauses.text");
+        patient.addLogEntry(new MedicalLogEntry(date, message));
+    }
+
+    public static void diedFromDisease(Person patient, Date date) {
+        String message = logEntriesResourceMap.getString("diedFromDisease.text");
+        patient.addLogEntry(new MedicalLogEntry(date, message));
+    }
+
+    public static void diedOfOldAge(Person patient, Date date) {
+        String message = logEntriesResourceMap.getString("diedOfOldAge.text");
+        patient.addLogEntry(new MedicalLogEntry(date, message));
     }
 }
