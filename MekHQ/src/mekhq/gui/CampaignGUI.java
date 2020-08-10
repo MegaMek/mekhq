@@ -77,7 +77,7 @@ import mekhq.campaign.event.MissionEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.TransactionEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -2687,8 +2687,12 @@ public class CampaignGUI extends JPanel {
     }
     
     @Subscribe
-    public void handleMissionChanged(PersonChangedEvent ev) {
-        refreshPartsAvailability();
+    public void handlePersonUpdate(PersonEvent ev) {
+        // only bother recalculating AtB parts availability if a logistics admin has been changed
+        // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
+        if(ev.getPerson().hasRole(Person.T_ADMIN_LOG)) {
+            refreshPartsAvailability();
+        }
     }
     
     public void refreshLocation() {

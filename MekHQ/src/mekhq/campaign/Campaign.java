@@ -5664,8 +5664,8 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             StringBuilder partAvailabilityLog = new StringBuilder();
-            partAvailabilityLog.append("Part Rating Level: " + partAvailability);
-            partAvailabilityLog.append("(" + EquipmentType.ratingNames[partAvailability] + ")");
+            partAvailabilityLog.append("Part Rating Level: " + partAvailability)
+                                .append("(" + EquipmentType.ratingNames[partAvailability] + ")");
             
             /*
              * Even if we can acquire Clan parts, they have a minimum availability of F for
@@ -5727,7 +5727,8 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             int AtBPartsAvailability = findAtBPartsAvailabilityLevel(acquisition, null);
-            partAvailabilityLog.append("; Total part availability: " + partAvailability + "; Current campaign availability: " + AtBPartsAvailability);
+            partAvailabilityLog.append("; Total part availability: " + partAvailability)
+                            .append("; Current campaign availability: " + AtBPartsAvailability);
             if (partAvailability > AtBPartsAvailability) {
                 return new TargetRoll(TargetRoll.IMPOSSIBLE, partAvailabilityLog.toString());
             }
@@ -5761,15 +5762,17 @@ public class Campaign implements Serializable, ITechManager {
 
     public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {
         AtBContract contract = (acquisition != null) ? getAttachedAtBContract(acquisition.getUnit()) : null;
+        
         /*
          * If the unit is not assigned to a contract, use the least restrictive active
          * contract. Don't restrict parts availability by contract if it has not started.
          */
-        for (Mission m : getMissions()) {
-            if (m.isActive() && m instanceof AtBContract && ((AtBContract) m).getStartDate().isBefore(currentDay)) {
-                if (null == contract
-                        || ((AtBContract) m).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()) {
-                    contract = (AtBContract) m;
+        if (hasActiveContract() && (contract == null)) {
+            for (Contract c : getActiveContracts()) {
+                if (c instanceof AtBContract && 
+                        c.getStartDate().isBefore(currentDay) && 
+                        (((AtBContract) c).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel())) {
+                    contract = (AtBContract) c;
                 }
             }
         }
@@ -5781,6 +5784,7 @@ public class Campaign implements Serializable, ITechManager {
             }
             return contract.getPartsAvailabilityLevel();
         }
+        
         /* If contract is still null, the unit is not in a contract. */
         Person adminLog = findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
         int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN
