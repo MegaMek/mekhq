@@ -5709,7 +5709,7 @@ public class Campaign implements Serializable, ITechManager {
                             partAvailabilityLog.append(";(gauss ammo): -1");
                             break;
                     }
-                    if (((megamek.common.AmmoType) et).getMunitionType() == megamek.common.AmmoType.M_STANDARD) {                        
+                    if (((megamek.common.AmmoType) et).getMunitionType() == megamek.common.AmmoType.M_STANDARD) {
                         partAvailability--;
                         partAvailabilityLog.append(";(standard ammo): -1");
                     }
