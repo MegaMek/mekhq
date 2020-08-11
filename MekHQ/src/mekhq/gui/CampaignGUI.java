@@ -33,8 +33,6 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.xml.parsers.DocumentBuilder;
 
 import megamek.client.ui.swing.UnitLoadingDialog;
@@ -75,9 +73,11 @@ import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.LoanEvent;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.MedicPoolChangedEvent;
+import mekhq.campaign.event.MissionEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.TransactionEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -138,6 +138,7 @@ public class CampaignGUI extends JPanel {
     private JLabel lblFunds;
     private JLabel lblTempAstechs;
     private JLabel lblTempMedics;
+    private JLabel lblPartsAvailabilityRating;
     @SuppressWarnings("unused")
     private JLabel lblCargo; // FIXME: Re-add this in an optionized form
 
@@ -290,6 +291,7 @@ public class CampaignGUI extends JPanel {
         refreshLocation();
         refreshTempAstechs();
         refreshTempMedics();
+        refreshPartsAvailability();
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -1001,10 +1003,12 @@ public class CampaignGUI extends JPanel {
         lblFunds = new JLabel();
         lblTempAstechs = new JLabel();
         lblTempMedics = new JLabel();
+        lblPartsAvailabilityRating = new JLabel();
 
         statusPanel.add(lblFunds);
         statusPanel.add(lblTempAstechs);
         statusPanel.add(lblTempMedics);
+        statusPanel.add(lblPartsAvailabilityRating);
     }
 
     private void initTopButtons() {
@@ -2586,6 +2590,16 @@ public class CampaignGUI extends JPanel {
         String text = "<html><b>Temp Medics:</b> " + getCampaign().getMedicPool() + "</html>";
         lblTempMedics.setText(text);
     }
+    
+    private void refreshPartsAvailability() {
+        if (!getCampaign().getCampaignOptions().getUseAtB()) {
+            lblPartsAvailabilityRating.setText("");
+        } else {
+            StringBuilder report = new StringBuilder();
+            int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel(null, report);
+            lblPartsAvailabilityRating.setText("<html><b>Campaign Parts Availability</b>:" + partsAvailability + "</html>");
+        }
+    }
 
     private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
 
@@ -2624,6 +2638,7 @@ public class CampaignGUI extends JPanel {
         refreshCalendar();
         refreshLocation();
         refreshFunds();
+        refreshPartsAvailability();
 
         refreshAllTabs();
     }
@@ -2631,16 +2646,19 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
         fundsScheduler.schedule();
+        refreshPartsAvailability();
     }
 
     @Subscribe
     public void handle(TransactionEvent ev) {
         fundsScheduler.schedule();
+        refreshPartsAvailability();
     }
 
     @Subscribe
     public void handle(LoanEvent ev) {
         fundsScheduler.schedule();
+        refreshPartsAvailability();
     }
 
     @Subscribe
@@ -2662,7 +2680,21 @@ public class CampaignGUI extends JPanel {
     public void handleLocationChanged(LocationChangedEvent ev) {
         refreshLocation();
     }
-
+    
+    @Subscribe
+    public void handleMissionChanged(MissionEvent ev) {
+        refreshPartsAvailability();
+    }
+    
+    @Subscribe
+    public void handlePersonUpdate(PersonEvent ev) {
+        // only bother recalculating AtB parts availability if a logistics admin has been changed
+        // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
+        if (ev.getPerson().hasRole(Person.T_ADMIN_LOG)) {
+            refreshPartsAvailability();
+        }
+    }
+    
     public void refreshLocation() {
         lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
     }
