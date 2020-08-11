@@ -5737,7 +5737,7 @@ public class Campaign implements Serializable, ITechManager {
         if (hasActiveContract()) {
             for (Contract c : getActiveContracts()) {
                 if ((c instanceof AtBContract) && 
-                        (c.getStartDate().isBefore(currentDay) || c.getStartDate().equals(currentDay)) && 
+                        (c.getStartDate().isBefore(getLocalDate()) || c.getStartDate().equals(getLocalDate())) && 
                         ((contract == null) || 
                         (((AtBContract) c).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()))) {
                     contract = (AtBContract) c;
@@ -5746,7 +5746,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         
         // if we have a contract and it has started
-        if ((null != contract) && (contract.getStartDate().isBefore(currentDay) || contract.getStartDate().equals(currentDay))) {
+        if ((null != contract) && (contract.getStartDate().isBefore(getLocalDate()) || contract.getStartDate().equals(getLocalDate()))) {
             if (reportBuilder != null) {
                 reportBuilder.append(contract.getPartsAvailabilityLevel() + " (" + contract.getType() +")");
             }
