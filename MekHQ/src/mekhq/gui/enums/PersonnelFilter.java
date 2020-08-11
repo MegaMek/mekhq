@@ -87,34 +87,46 @@ public enum PersonnelFilter {
             case ACTIVE:
                 return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner();
             case COMBAT:
-                return !person.getPrisonerStatus().isPrisoner() && person.hasCombatRole();
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
+                        && person.hasCombatRole();
             case SUPPORT:
-                return !person.getPrisonerStatus().isPrisoner() && person.hasSupportRole(true);
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
+                        && person.hasSupportRole(true);
             case MECHWARRIOR:
-                return !person.getPrisonerStatus().isPrisoner() && person.hasRole(Person.T_MECHWARRIOR);
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
+                        && person.hasRole(Person.T_MECHWARRIOR);
             case VEHICLE_CREW:
-                return !person.getPrisonerStatus().isPrisoner()
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
                         && (person.hasRoleWithin(Person.T_GVEE_DRIVER, Person.T_VEE_GUNNER) || person.hasRole(Person.T_VEHICLE_CREW));
             case AEROSPACE_PILOT:
-                return !person.getPrisonerStatus().isPrisoner() && person.hasRole(Person.T_AERO_PILOT);
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
+                        && person.hasRole(Person.T_AERO_PILOT);
             case CONVENTIONAL_AIRCRAFT_PILOT:
-                return !person.getPrisonerStatus().isPrisoner() && person.hasRole(Person.T_CONV_PILOT);
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
+                        && person.hasRole(Person.T_CONV_PILOT);
             case PROTOMECH_PILOT:
-                return !person.getPrisonerStatus().isPrisoner() && person.hasRole(Person.T_PROTO_PILOT);
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
+                        && person.hasRole(Person.T_PROTO_PILOT);
             case BATTLE_ARMOUR:
-                return !person.getPrisonerStatus().isPrisoner() && person.hasRole(Person.T_BA);
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
+                        && person.hasRole(Person.T_BA);
             case SOLDIER:
-                return !person.getPrisonerStatus().isPrisoner() && person.hasRole(Person.T_INFANTRY);
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
+                        && person.hasRole(Person.T_INFANTRY);
             case VESSEL_CREW:
-                return !person.getPrisonerStatus().isPrisoner() && person.hasRoleWithin(Person.T_SPACE_PILOT, Person.T_NAVIGATOR);
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
+                        && person.hasRoleWithin(Person.T_SPACE_PILOT, Person.T_NAVIGATOR);
             case TECH:
-                return !person.getPrisonerStatus().isPrisoner() && person.isTech();
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
+                        && person.isTech();
             case DOCTOR:
-                return !person.getPrisonerStatus().isPrisoner() && person.hasRoleWithin(Person.T_DOCTOR, Person.T_MEDIC);
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
+                        && person.hasRoleWithin(Person.T_DOCTOR, Person.T_MEDIC);
             case ADMINISTRATOR:
-                return !person.getPrisonerStatus().isPrisoner() && person.hasRoleWithin(Person.T_ADMIN_COM, Person.T_ADMIN_HR);
+                return person.getStatus().isActive() && !person.getPrisonerStatus().isPrisoner()
+                        && person.hasRoleWithin(Person.T_ADMIN_COM, Person.T_ADMIN_HR);
             case DEPENDENT:
-                return person.isDependent();
+                return person.getStatus().isActive() && person.isDependent();
             case FOUNDER:
                 return person.isFounder();
             case PRISONER:
