@@ -618,8 +618,6 @@ public class RetirementDefectionDialog extends JDialog {
                 if (resultsView && (rdTracker.getRetirees(contract) != null)
                         && !rdTracker.getRetirees(contract).contains(person.getId())) {
                     return false;
-                } else if (nGroup.isStandard()) {
-                    return nGroup.getFilteredInformation(person) || resultsView;
                 } else {
                     return nGroup.getFilteredInformation(person);
                 }
@@ -637,7 +635,7 @@ public class RetirementDefectionDialog extends JDialog {
                 Unit unit = unitModel.getUnit(entry.getIdentifier());
                 if (!chkShowAllUnits.isSelected() &&
                         retireeTable.getSelectedRow() >= 0) {
-                    Person selectedPerson = ((RetirementTableModel)retireeTable.getModel()).
+                    Person selectedPerson = ((RetirementTableModel) retireeTable.getModel()).
                             getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
                     if (null != rdTracker.getPayout(selectedPerson.getId()) &&
                             rdTracker.getPayout(selectedPerson.getId()).getWeightClass() > 0 &&
