@@ -306,7 +306,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                     PersonnelTabView.GRAPHIC == choicePersonView.getSelectedItem(),
                     getIconPackage()));
             if (i == PersonnelTableModel.COL_RANK) {
-                if (PersonnelTabView.GRAPHIC == view) {
+                if (view == PersonnelTabView.GRAPHIC) {
                     column.setPreferredWidth(125);
                     column.setHeaderValue("Person");
                 } else {
@@ -366,6 +366,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
+                break;
             case GENERAL:
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GIVEN_NAME), true);
@@ -414,6 +415,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
+                break;
             case PILOT_GUNNERY_SKILLS:
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GIVEN_NAME), true);
@@ -462,6 +464,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
+                break;
             case INFANTRY_SKILLS:
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GIVEN_NAME), true);
@@ -510,6 +513,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
+                break;
             case TACTICAL_SKILLS:
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GIVEN_NAME), true);
@@ -558,6 +562,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
+                break;
             case TECHNICAL_SKILLS:
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GIVEN_NAME), true);
@@ -606,6 +611,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
+                break;
             case ADMINISTRATIVE_SKILLS:
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GIVEN_NAME), true);
@@ -654,6 +660,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
+                break;
             case BIOGRAPHICAL:
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GIVEN_NAME), true);
@@ -702,6 +709,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), getCampaignOptions().showOriginFaction());
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), true);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), true);
+                break;
             case FLUFF:
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GIVEN_NAME), true);
@@ -750,6 +758,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
+                break;
         }
     }
 
