@@ -1906,14 +1906,18 @@ public class CampaignXmlParser {
                 Person person = people.next();
                 people.remove();
 
-                if (fatherId != null) {
+                if (retVal.getPerson(fatherId) != null) {
                     person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, fatherId);
                     retVal.getPerson(fatherId).getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person.getId());
+                } else {
+                    MekHQ.getLogger().warning(CampaignXmlParser.class, "migrateAncestorNodes", "Person with id " + fatherId + " does not exist, skipping adding Genealogy for them.");
                 }
 
-                if (motherId != null) {
+                if (retVal.getPerson(motherId) != null) {
                     person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, motherId);
                     retVal.getPerson(motherId).getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person.getId());
+                } else {
+                    MekHQ.getLogger().warning(CampaignXmlParser.class, "migrateAncestorNodes", "Person with id " + motherId + " does not exist, skipping adding Geneology for them.");
                 }
             }
         }
