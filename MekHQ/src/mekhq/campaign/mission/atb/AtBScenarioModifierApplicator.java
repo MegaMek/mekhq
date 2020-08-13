@@ -221,7 +221,7 @@ public class AtBScenarioModifierApplicator {
      */
     public static void adjustQuality(AtBDynamicScenario scenario, Campaign c, ForceAlignment eventRecipient, int qualityAdjustment) {
         if(eventRecipient != ForceAlignment.Opposing) {
-            MekHQ.getLogger().warning(AtBScenarioModifierApplicator.class, "adjustQuality", "Cannot only adjust opfor unit quality");
+            MekHQ.getLogger().warning(AtBScenarioModifierApplicator.class, "adjustQuality", "Can only adjust opfor unit quality");
             return;
         }
 
@@ -343,5 +343,12 @@ public class AtBScenarioModifierApplicator {
             ScenarioObjective actualObjective = AtBDynamicScenarioFactory.translateTemplateObjective(scenario, campaign, objective);
             scenario.getScenarioObjectives().add(actualObjective);
         }
+    }
+    
+    /**
+     * Applies an additional event, selected from only modifiers that benefit the player or do not benefit the player
+     */
+    public static void applyExtraEvent(AtBDynamicScenario scenario, Campaign campaign, boolean goodEvent) {
+        scenario.addScenarioModifier(AtBScenarioModifier.getRandomScenarioModifier(goodEvent));
     }
 }

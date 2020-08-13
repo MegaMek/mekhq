@@ -24,10 +24,8 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -40,9 +38,6 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 
 import megamek.common.Compute;
-import megamek.common.MovePath;
-import megamek.common.MoveStep;
-import megamek.server.commands.ListSavesCommand;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -69,11 +64,6 @@ public class AtBScenarioModifier implements Cloneable {
     public static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
     
-    public static final String SCENARIO_MODIFIER_TANK_LANCE = "TankGarrison.xml";
-    public static final String SCENARIO_MODIFIER_MECH_LANCE = "MechGarrison.xml";
-    public static final String SCENARIO_MODIFIER_AIR_FLIGHT = "AirGarrison.xml";
-    public static final String SCENARIO_MODIFIER_ARTY_LANCE = "ArtilleryGarrison.xml";
-    
     /**
      * Possible values for when a scenario modifier may occur: before or after primary force generation.
      * @author NickAragua
@@ -99,6 +89,7 @@ public class AtBScenarioModifier implements Cloneable {
     private List<MapLocation> allowedMapLocations = null;
     private Boolean useAmbushLogic = null; 
     private Boolean switchSides = null;
+    private Integer numExtraEvents = null;
     private List<ScenarioObjective> objectives = new ArrayList<>();
     
     public static AtBScenarioModifier generateTestModifier() {
@@ -158,6 +149,10 @@ public class AtBScenarioModifier implements Cloneable {
                     AtBScenarioModifierApplicator.applyObjective(scenario, campaign, objective, eventTiming);
                 }
             }
+            
+            if(getNumExtraEvents() != null && getNumExtraEvents() > 0) {
+                AtBScenarioModifierApplicator.applyExtraEvent(scenario, campaign, getEventRecipient() == ForceAlignment.Allied);
+            }
         }
     }
     
@@ -171,6 +166,8 @@ public class AtBScenarioModifier implements Cloneable {
     }
     
     private static Map<String, AtBScenarioModifier> scenarioModifiers;
+    private static List<String> beneficialScenarioKeys;
+    private static List<String> nonBeneficialScenarioKeys;
     private static List<String> scenarioModifierKeys;
     
     public static Map<String, AtBScenarioModifier> getScenarioModifiers() {
@@ -181,6 +178,19 @@ public class AtBScenarioModifier implements Cloneable {
         return scenarioModifierKeys;
     }
     
+    /**
+     * Returns a scenario modifier copy from the subset of modifiers that's either beneficial to the player or not
+     */
+    public static AtBScenarioModifier getRandomScenarioModifier(boolean beneficial) {
+        List<String> keyList = beneficial ? beneficialScenarioKeys : nonBeneficialScenarioKeys;
+        int modIndex = Compute.randomInt(keyList.size());
+        
+        return (AtBScenarioModifier) scenarioModifiers.get(keyList.get(modIndex)).clone();
+    }
+    
+    /**
+     * Returns a random scenario modifier copy
+     */
     public static AtBScenarioModifier getRandomScenarioModifier() {
         int modIndex = Compute.randomInt(scenarioModifierKeys.size());
         
@@ -455,6 +465,14 @@ public class AtBScenarioModifier implements Cloneable {
     @XmlElement(name="objective")
     public List<ScenarioObjective> getObjectives() {
         return objectives;
+    }
+    
+    public Integer getNumExtraEvents() {
+        return numExtraEvents;
+    }
+
+    public void setNumExtraEvents(Integer numExtraEvents) {
+        this.numExtraEvents = numExtraEvents;
     }
 }
 

@@ -25,6 +25,9 @@
 			LocalGarrisonTurrets.xml
 		</modifier>
 		<modifier>
+			EnemyTurrets.xml
+		</modifier>
+		<modifier>
 			Rookies.xml
 		</modifier>
 		<modifier>
@@ -35,6 +38,9 @@
 		</modifier>
 		<modifier>
 			GoodEquipment.xml
+		</modifier>
+		<modifier>
+			BadEvent.xml
 		</modifier>
 		<!--modifier> 
 			Need ability to allow player to specifically deploy dropships
@@ -94,6 +100,9 @@
 			AlliedTankReinforcements.xml
 		</modifier>
 		<modifier>
+			AlliedTurrets.xml
+		</modifier>
+		<modifier>
 			AlliedMechReinforcements.xml
 		</modifier>
 		<!--modifier>
@@ -113,6 +122,9 @@
 		</modifier-->
 		<modifier>
 			SearchAndRescue.xml
+		</modifier>
+		<modifier>
+			GoodEvent.xml
 		</modifier>
 
 		<!-- Fixed scenario modifiers suitable for specific scenario types go here -->

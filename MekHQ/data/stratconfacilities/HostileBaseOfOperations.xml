@@ -1,9 +1,9 @@
 <StratconFacility>
 	<displayableName>Base of Operations</displayableName>
         <facilityType>BaseOfOperations</facilityType>
-        <owner>Allied</owner>
+        <owner>Opposing</owner>
 	<localModifiers>Veterans.xml</localModifiers>
 	<localModifiers>GoodEquipment.xml</localModifiers>
 	<localModifiers>EnemyTurrets.xml</localModifiers>
-        <visible>true</visible>
+        <visible>false</visible>
 </StratconFacility>

@@ -170,4 +170,8 @@ public class StratconFacility implements Cloneable {
 
         return resultingManifest;
     }
+    
+    public void ApplyCampaignEffects(StratconCampaignState campaignState, StratconTrackState trackState) {
+        
+    }
 }

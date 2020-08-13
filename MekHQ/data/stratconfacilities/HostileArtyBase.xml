@@ -1,0 +1,8 @@
+<StratconFacility>
+	<displayableName>Artillery Base</displayableName>
+        <facilityType>ArtilleryBase</facilityType>
+        <localModifiers>EnemyArty.xml</localModifiers>
+        <owner>Opposing</owner>
+        <sharedModifiers>EnemyArtySupport.xml</sharedModifiers>
+        <visible>false</visible>
+</StratconFacility>

@@ -1,0 +1,6 @@
+<StratconFacility>
+	<displayableName>Orbital Defense</displayableName>
+        <facilityType>OrbitalDefense</facilityType>
+        <owner>Opposing</owner>
+        <visible>false</visible>
+</StratconFacility>
