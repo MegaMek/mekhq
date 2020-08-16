@@ -23,10 +23,8 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.AwardLogger;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**

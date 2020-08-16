@@ -23,8 +23,6 @@ package mekhq.campaign;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -35,6 +33,7 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
 import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
@@ -204,15 +203,11 @@ public class Campaign implements Serializable, ITechManager {
     private GameOptions gameOptions;
 
     private String name;
+    private LocalDate currentDay;
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
     private Hashtable<Integer, Lance> lances; //AtB
-
-    // calendar stuff
-    private GregorianCalendar calendar;
-    private LocalDate currentDay;
-    private String dateFormat;
 
     private String factionCode;
     private int techFactionCode;
@@ -282,7 +277,6 @@ public class Campaign implements Serializable, ITechManager {
         game = new Game();
         player = new Player(0, "self");
         game.addPlayer(0, player);
-        calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         currentDay = LocalDate.ofYearDay(3067, 1);
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Outreach"), 0);
@@ -290,7 +284,6 @@ public class Campaign implements Serializable, ITechManager {
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
-        dateFormat = "EEEE, MMMM d yyyy"; // TODO : LocalDate Remove Inline Date Format
         name = "My Campaign";
         overtime = false;
         gmMode = false;
@@ -410,17 +403,8 @@ public class Campaign implements Serializable, ITechManager {
 
     public String getTitle() {
         return getName() + " (" + getFactionName() + ")" + " - "
-                + getDateAsString() + " (" + getEraName() + ")";
-    }
-
-    @Deprecated
-    public GregorianCalendar getCalendar() {
-        return calendar;
-    }
-
-    @Deprecated
-    public void setCalendar(GregorianCalendar c) {
-        calendar = c;
+                + getCampaignOptions().getDisplayFormattedDate(getLocalDate())
+                + " (" + getEraName() + ")";
     }
 
     public LocalDate getLocalDate() {
@@ -429,25 +413,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setLocalDate(LocalDate currentDay) {
         this.currentDay = currentDay;
-    }
-
-    @Deprecated
-    public DateFormat getDateFormatter() {
-        return new SimpleDateFormat(dateFormat);
-    }
-
-    @Deprecated
-    public Date getDate() {
-        return calendar.getTime();
-    }
-
-    @Deprecated
-    public String getDateAsString() {
-        return getDateFormatter().format(calendar.getTime());
-    }
-
-    public String getCurrentSystemName() {
-        return location.getCurrentSystem().getPrintableName(getLocalDate());
     }
 
     public PlanetarySystem getCurrentSystem() {
@@ -3608,8 +3573,7 @@ public class Campaign implements Serializable, ITechManager {
         // Autosave based on the previous day's information
         this.autosaveService.requestDayAdvanceAutosave(this);
 
-        // Advance the day by one - TODO : LocalDate : Remove the Calendar addition
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        // Advance the day by one
         currentDay = currentDay.plus(1, ChronoUnit.DAYS);
 
         // Determine if we have an active contract or not, as this can get used elsewhere before
@@ -3622,7 +3586,7 @@ public class Campaign implements Serializable, ITechManager {
         getCurrentReport().clear();
         setCurrentReportHTML("");
         newReports.clear();
-        beginReport("<b>" + getDateAsString() + "</b>");
+        beginReport("<b>" + getCampaignOptions().getDisplayFormattedDate(getLocalDate()) + "</b>");
 
         // New Year Changes
         if (getLocalDate().getDayOfYear() == 1) {
@@ -4593,9 +4557,8 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastForceId", lastForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastMissionId", lastMissionId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastScenarioId", lastScenarioId);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "calendar",
-                df.format(calendar.getTime()));
+                MegaMekXmlUtil.saveFormattedDate(getLocalDate()));
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "fatigueLevel", fatigueLevel);
 
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "nameGen");
@@ -5629,7 +5592,7 @@ public class Campaign implements Serializable, ITechManager {
             StringBuilder partAvailabilityLog = new StringBuilder();
             partAvailabilityLog.append("Part Rating Level: " + partAvailability)
                                 .append("(" + EquipmentType.ratingNames[partAvailability] + ")");
-            
+
             /*
              * Even if we can acquire Clan parts, they have a minimum availability of F for
              * non-Clan units
@@ -5725,21 +5688,21 @@ public class Campaign implements Serializable, ITechManager {
 
     public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {
         AtBContract contract = (acquisition != null) ? getAttachedAtBContract(acquisition.getUnit()) : null;
-        
+
         /*
          * If the unit is not assigned to a contract, use the least restrictive active
          * contract. Don't restrict parts availability by contract if it has not started.
          */
         if (hasActiveContract()) {
             for (Contract c : getActiveContracts()) {
-                if ((c instanceof AtBContract) && 
-                        ((contract == null) || 
+                if ((c instanceof AtBContract) &&
+                        ((contract == null) ||
                         (((AtBContract) c).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()))) {
                     contract = (AtBContract) c;
                 }
             }
         }
-        
+
         // if we have a contract and it has started
         if ((null != contract) && getLocalDate().isBefore(contract.getStartDate())) {
             if (reportBuilder != null) {
@@ -5747,13 +5710,13 @@ public class Campaign implements Serializable, ITechManager {
             }
             return contract.getPartsAvailabilityLevel();
         }
-        
+
         /* If contract is still null, the unit is not in a contract. */
         Person adminLog = findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
         int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN
                 : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         int adminMod = adminLogExp - SkillType.EXP_REGULAR;
-        
+
         if (reportBuilder != null) {
             reportBuilder.append(getUnitRatingMod() + "(unit rating)");
             if (adminLog != null) {
@@ -5762,7 +5725,7 @@ public class Campaign implements Serializable, ITechManager {
                 reportBuilder.append(adminMod + "(no logistics admin)");
             }
         }
-        
+
         return getUnitRatingMod() + adminMod;
     }
 

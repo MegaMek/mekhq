@@ -22,7 +22,6 @@ package mekhq.campaign.market;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -206,7 +205,7 @@ public class ContractMarket implements Serializable {
 			}
 
 			if (campaign.getFactionCode().equals("MERC") || campaign.getFactionCode().equals("PIR")) {
-				if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentSystem().getId(), campaign.getDate())) {
+				if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentSystem().getId(), campaign.getLocalDate())) {
 					numContracts++;
 					/* Though the rules do not state these modifiers are mutually exclusive, the fact that the
 					 * distance of Galatea from a border means that it has no advantage for Mercs over border
@@ -286,56 +285,51 @@ public class ContractMarket implements Serializable {
 				int retries = 3;
 				AtBContract retVal = null;
 				while (retries > 0 && retVal == null) {
-					retVal = generateAtBContract(campaign,
-							RandomFactionGenerator.getInstance().getEmployer(),
+					retVal = generateAtBContract(campaign, RandomFactionGenerator.getInstance().getEmployer(),
 							unitRatingMod, 0);
 					retries--;
 				}
 				return retVal;
 			} else {
-				return generateAtBContract(campaign,
-						campaign.getRetainerEmployerCode(), unitRatingMod, 3);
+				return generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod, 3);
 			}
 		} else {
-			return generateAtBContract(campaign,
-					campaign.getFactionCode(), unitRatingMod, 3);
+			return generateAtBContract(campaign, campaign.getFactionCode(), unitRatingMod, 3);
 		}
 	}
 
-	private AtBContract generateAtBContract(Campaign campaign,
-			String employer, int unitRatingMod) {
+	private AtBContract generateAtBContract(Campaign campaign, String employer, int unitRatingMod) {
 		return generateAtBContract(campaign, employer, unitRatingMod, 3);
 	}
 
-	private AtBContract generateAtBContract(Campaign campaign,
-			String employer, int unitRatingMod, int retries) {
-	    final String METHOD_NAME = "generateAtBContract(Campaign,String,int,int)"; //$NON-NLS-1$
+	private AtBContract generateAtBContract(Campaign campaign, String employer, int unitRatingMod, int retries) {
+        final String METHOD_NAME = "generateAtBContract(Campaign,String,int,int)";
 
-		AtBContract contract = new AtBContract(employer
-				+"-"
-				+Contract.generateRandomContractName()
-				+"-"
-				+(new SimpleDateFormat("yyyyMM")).format(campaign.getCalendar().getTime()));
+        AtBContract contract = new AtBContract(employer
+                + "-"
+                + Contract.generateRandomContractName()
+                + "-"
+                + campaign.getCampaignOptions().getDisplayFormattedDate(campaign.getLocalDate()));
         lastId++;
         contract.setId(lastId);
         contractIds.put(lastId, contract);
 
         if (employer.equals("MERC")) {
-        	contract.setMercSubcontract(true);
-        	while (employer.equals("MERC")) {
-        		employer = RandomFactionGenerator.getInstance().getEmployer();
-        	}
+            contract.setMercSubcontract(true);
+            while (employer.equals("MERC")) {
+                employer = RandomFactionGenerator.getInstance().getEmployer();
+            }
         }
-		contract.setEmployerCode(employer, campaign.getGameYear());
-		contract.setMissionType(findAtBMissionType(unitRatingMod,
-		        RandomFactionGenerator.getInstance().getFactionHints()
-		            .isISMajorPower(Faction.getFaction(contract.getEmployerCode()))));
+        contract.setEmployerCode(employer, campaign.getGameYear());
+        contract.setMissionType(findAtBMissionType(unitRatingMod,
+                RandomFactionGenerator.getInstance().getFactionHints()
+                        .isISMajorPower(Faction.getFaction(contract.getEmployerCode()))));
 
-		if (contract.getMissionType() == AtBContract.MT_PIRATEHUNTING)
-			contract.setEnemyCode("PIR");
-		else if (contract.getMissionType() == AtBContract.MT_RIOTDUTY)
-			contract.setEnemyCode("REB");
-		else {
+        if (contract.getMissionType() == AtBContract.MT_PIRATEHUNTING) {
+            contract.setEnemyCode("PIR");
+        } else if (contract.getMissionType() == AtBContract.MT_RIOTDUTY) {
+            contract.setEnemyCode("REB");
+        } else {
 			boolean rebsAllowed = contract.getMissionType() <= AtBContract.MT_RIOTDUTY;
 			contract.setEnemyCode(RandomFactionGenerator.getInstance().getEnemy(contract.getEmployerCode(), rebsAllowed));
 		}

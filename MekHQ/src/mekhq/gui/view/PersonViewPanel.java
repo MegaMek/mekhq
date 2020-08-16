@@ -570,7 +570,7 @@ public class PersonViewPanel extends ScrollablePanel {
             firsty++;
         }
 
-        if(!person.getCallsign().equals("-") && person.getCallsign().length() > 0) { //$NON-NLS-1$
+        if (!person.getCallsign().equals("-") && (person.getCallsign().length() > 0)) {
             lblCall1.setName("lblCall1"); // NOI18N
             lblCall1.setText(resourceMap.getString("lblCall1.text")); //$NON-NLS-1$
             gridBagConstraints = new GridBagConstraints();
@@ -1172,16 +1172,15 @@ public class PersonViewPanel extends ScrollablePanel {
         double weight = 0.5;
 
         int j = 0;
-        for(int i = 0; i < SkillType.getSkillList().length; i++) {
-            if(person.hasSkill(SkillType.getSkillList()[i])) {
+        for (int i = 0; i < SkillType.getSkillList().length; i++) {
+            if (person.hasSkill(SkillType.getSkillList()[i])) {
                 j++;
-                if(j == colBreak) {
+                if (j == colBreak) {
                     addition = 2;
                     firsty = 0;
                     weight = 1.0;
                 }
-                lblName = new JLabel(
-                    String.format(resourceMap.getString("format.itemHeader"), SkillType.getSkillList()[i])); //$NON-NLS-1$
+                lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), SkillType.getSkillList()[i]));
                 lblValue = new JLabel(person.getSkill(SkillType.getSkillList()[i]).toString());
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = addition;
@@ -1204,7 +1203,7 @@ public class PersonViewPanel extends ScrollablePanel {
         //reset firsty
         firsty = colBreak;
 
-        if(campaign.getCampaignOptions().useAbilities() && person.countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
+        if (campaign.getCampaignOptions().useAbilities() && (person.countOptions(PilotOptions.LVL3_ADVANTAGES) > 0)) {
             lblAbility1.setName("lblAbility1"); // NOI18N //$NON-NLS-1$
             lblAbility1.setText(resourceMap.getString("lblAbility1.text")); //$NON-NLS-1$
             gridBagConstraints = new GridBagConstraints();
@@ -1228,7 +1227,7 @@ public class PersonViewPanel extends ScrollablePanel {
             firsty++;
         }
 
-        if(campaign.getCampaignOptions().useImplants() && person.countOptions(PilotOptions.MD_ADVANTAGES) > 0) {
+        if (campaign.getCampaignOptions().useImplants() && (person.countOptions(PilotOptions.MD_ADVANTAGES) > 0)) {
             lblImplants1.setName("lblImplants1"); // NOI18N
             lblImplants1.setText(resourceMap.getString("lblImplants1.text")); //$NON-NLS-1$
             gridBagConstraints = new GridBagConstraints();
@@ -1252,7 +1251,7 @@ public class PersonViewPanel extends ScrollablePanel {
             firsty++;
         }
 
-        if(campaign.getCampaignOptions().useEdge() && person.getEdge()>0) {
+        if (campaign.getCampaignOptions().useEdge() && (person.getEdge() > 0)) {
             lblEdge1.setName("lblEdge1"); // NOI18N //$NON-NLS-1$
             lblEdge1.setText(resourceMap.getString("lblEdge1.text")); //$NON-NLS-1$
             gridBagConstraints = new GridBagConstraints();
@@ -1301,7 +1300,7 @@ public class PersonViewPanel extends ScrollablePanel {
             firsty++;
         }
 
-        if(campaign.getCampaignOptions().useToughness()) {
+        if (campaign.getCampaignOptions().useToughness()) {
             lblTough1.setName("lblTough1"); // NOI18N
             lblTough1.setText(resourceMap.getString("lblTough1.text")); //$NON-NLS-1$
             gridBagConstraints = new GridBagConstraints();
@@ -1338,11 +1337,11 @@ public class PersonViewPanel extends ScrollablePanel {
         eventTable.setRowSelectionAllowed(false);
         eventTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column;
-        for(int i = 0; i < eventModel.getColumnCount(); ++ i) {
+        for (int i = 0; i < eventModel.getColumnCount(); ++ i) {
             column = eventTable.getColumnModel().getColumn(i);
             column.setCellRenderer(eventModel.getRenderer());
             column.setPreferredWidth(eventModel.getPreferredWidth(i));
-            if(eventModel.hasConstantWidth(i)) {
+            if (eventModel.hasConstantWidth(i)) {
                 column.setMinWidth(eventModel.getPreferredWidth(i));
                 column.setMaxWidth(eventModel.getPreferredWidth(i));
             }
@@ -1410,7 +1409,6 @@ public class PersonViewPanel extends ScrollablePanel {
     }
 
     private JPanel fillInjuries() {
-
         JPanel pnlInjuries = new JPanel(new BorderLayout());
         pnlInjuries.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlInjuries.title"))); //$NON-NLS-1$
 
@@ -1451,7 +1449,7 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlInjuryDetails.add(lblAdvancedMedical1, gridBagConstraints);
 
         double vweight = 1.0;
-        if(person.hasInjuries(false)) {
+        if (person.hasInjuries(false)) {
         	vweight = 0.0;
         }
 
@@ -1471,7 +1469,7 @@ public class PersonViewPanel extends ScrollablePanel {
         JLabel txtInjury;
         int row = 1;
         List<Injury> injuries = person.getInjuries();
-        for(Injury injury : injuries) {
+        for (Injury injury : injuries) {
             lblInjury = new JLabel(injury.getFluff());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -1490,7 +1488,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = row;
             gridBagConstraints.weightx = 1.0;
-            if(row == (injuries.size() - 1)) {
+            if (row == (injuries.size() - 1)) {
                 gridBagConstraints.weighty = 1.0;
             }
             gridBagConstraints.insets = new Insets(0, 20, 0, 0);
@@ -1513,17 +1511,17 @@ public class PersonViewPanel extends ScrollablePanel {
         StringBuilder sb = new StringBuilder("<html>");
         final int pilotingMod = p.getPilotingInjuryMod();
         final int gunneryMod = p.getGunneryInjuryMod();
-        if((pilotingMod != 0) && (pilotingMod < Integer.MAX_VALUE)) {
+        if ((pilotingMod != 0) && (pilotingMod < Integer.MAX_VALUE)) {
             sb.append(String.format("  Piloting %+d <br>", pilotingMod));
-        } else if(pilotingMod == Integer.MAX_VALUE) {
+        } else if (pilotingMod == Integer.MAX_VALUE) {
             sb.append("  Piloting: <i>Impossible</i>  <br>");
         }
-        if((gunneryMod != 0) && (gunneryMod < Integer.MAX_VALUE)) {
+        if ((gunneryMod != 0) && (gunneryMod < Integer.MAX_VALUE)) {
             sb.append(String.format("  Gunnery: %+d <br>", gunneryMod));
-        } else if(gunneryMod == Integer.MAX_VALUE) {
+        } else if (gunneryMod == Integer.MAX_VALUE) {
             sb.append("  Gunnery: <i>Impossible</i>  <br>");
         }
-        if(gunneryMod == 0 && pilotingMod == 0) {
+        if (gunneryMod == 0 && pilotingMod == 0) {
             sb.append("None");
         }
         return sb.append("</html>").toString();
@@ -1534,7 +1532,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         JPanel pnlKills = new JPanel(new GridBagLayout());
 
-        JLabel lblRecord = new JLabel(String.format(resourceMap.getString("format.kills"), kills.size())); //$NON-NLS-1$
+        JLabel lblRecord = new JLabel(String.format(resourceMap.getString("format.kills"), kills.size()));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -1544,17 +1542,17 @@ public class PersonViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlKills.add(lblRecord, gridBagConstraints);
 
-        PersonnelKillLogModel killModel = new PersonnelKillLogModel();
+        PersonnelKillLogModel killModel = new PersonnelKillLogModel(gui.getCampaign());
         killModel.setData(kills);
         JTable killTable = new JTable(killModel);
         killTable.setRowSelectionAllowed(false);
         killTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column;
-        for(int i = 0; i < killModel.getColumnCount(); ++ i) {
+        for (int i = 0; i < killModel.getColumnCount(); ++ i) {
             column = killTable.getColumnModel().getColumn(i);
             column.setCellRenderer(killModel.getRenderer());
             column.setPreferredWidth(killModel.getPreferredWidth(i));
-            if(killModel.hasConstantWidth(i)) {
+            if (killModel.hasConstantWidth(i)) {
                 column.setMinWidth(killModel.getPreferredWidth(i));
                 column.setMaxWidth(killModel.getPreferredWidth(i));
             }

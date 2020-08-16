@@ -22,7 +22,6 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;

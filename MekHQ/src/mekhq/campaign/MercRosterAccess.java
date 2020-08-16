@@ -528,7 +528,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".kills (parent, type, killdate, equipment) VALUES (?, ?, ?, ?)");
                     preparedStatement.setInt(1, id);
                     preparedStatement.setString(2, truncateString(k.getWhatKilled(), 45));
-                    preparedStatement.setDate(3, new Date(k.getDate().getTime()));
+                    preparedStatement.setDate(3, Date.valueOf(k.getDate().toString()));
                     preparedStatement.setString(4, truncateString(k.getKilledByWhat(), 45));
                     preparedStatement.executeUpdate();
                 }
