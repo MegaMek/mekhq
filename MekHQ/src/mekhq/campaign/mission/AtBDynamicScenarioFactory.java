@@ -629,7 +629,7 @@ public class AtBDynamicScenarioFactory {
 
         for (int forceID : scenario.getPlayerForceTemplates().keySet()) {
             if (scenario.getPlayerForceTemplates().get(forceID).getContributesToUnitCount()) {
-                primaryUnitCount += campaign.getForce(forceID).getAllUnits().size();
+                primaryUnitCount += campaign.getForce(forceID).getAllUnits(true).size();
             }
         }
 
@@ -1885,7 +1885,7 @@ public class AtBDynamicScenarioFactory {
         for (int forceID : scenario.getForceIDs()) {
             Force playerForce = campaign.getForce(forceID);
 
-            for (UUID unitID : playerForce.getAllUnits()) {
+            for (UUID unitID : playerForce.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
                 if (currentUnit != null && (currentUnit.getEntity().getDeployRound() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED)) {
                     staggeredEntities.add(currentUnit.getEntity());
@@ -1954,7 +1954,7 @@ public class AtBDynamicScenarioFactory {
             List<Entity> forceEntities = new ArrayList<>();
             Force playerForce = campaign.getForce(forceID);
 
-            for (UUID unitID : playerForce.getAllUnits()) {
+            for (UUID unitID : playerForce.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
                 if (currentUnit != null) {
                     forceEntities.add(currentUnit.getEntity());
@@ -2015,7 +2015,7 @@ public class AtBDynamicScenarioFactory {
             List<Entity> forceEntities = new ArrayList<>();
             Force playerForce = campaign.getForce(forceID);
 
-            for (UUID unitID : playerForce.getAllUnits()) {
+            for (UUID unitID : playerForce.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
                 if (currentUnit != null) {
                     forceEntities.add(currentUnit.getEntity());

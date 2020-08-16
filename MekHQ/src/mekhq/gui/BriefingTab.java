@@ -534,7 +534,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario == null) {
             return;
         }
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
         if (uids.size() == 0) {
             return;
         }
@@ -589,7 +589,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario == null) {
             return;
         }
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
         if (uids.size() == 0) {
             return;
         }
@@ -679,7 +679,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario == null) {
             return;
         }
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
         if (uids.size() == 0) {
             return;
         }
@@ -729,7 +729,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario == null) {
             return;
         }
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
         if (uids.size() == 0) {
             return;
         }
@@ -848,7 +848,7 @@ public final class BriefingTab extends CampaignGuiTab {
         // I can't just call it here, because it ends up getting reset somewhere
         // later
         javax.swing.SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
-        boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits().size() > 0;
+        boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits(true).size() > 0;
         boolean canStartGame = scenario.isCurrent() && unitsAssigned;
         if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
             canStartGame = canStartGame && getCampaign().getLocalDate().equals(scenario.getDate());
