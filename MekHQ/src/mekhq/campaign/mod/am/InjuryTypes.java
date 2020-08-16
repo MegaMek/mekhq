@@ -143,7 +143,7 @@ public final class InjuryTypes {
                             Injury severedSpine = SEVERED_SPINE.newInjury(c, p, BodyLocation.CHEST, 1);
                             p.addInjury(severedSpine);
 
-                            MedicalLogEntry entry = MedicalLogger.severedSpine(p, c.getDate());
+                            MedicalLogEntry entry = MedicalLogger.severedSpine(p, c.getLocalDate());
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                         }
                     }));
@@ -178,7 +178,7 @@ public final class InjuryTypes {
                                 "certain death",
                                 rnd -> {
                                     p.changeStatus(c, PersonnelStatus.WOUNDS);
-                                    MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getDate());
+                                    MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getLocalDate());
                                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                                 }));
             } else {
@@ -189,7 +189,7 @@ public final class InjuryTypes {
                         rnd -> {
                             if (rnd.applyAsInt(6) + hits >= 5) {
                                 p.changeStatus(c, PersonnelStatus.WOUNDS);
-                                MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getDate());
+                                MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getLocalDate());
                                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                         }
                     }));
@@ -244,7 +244,7 @@ public final class InjuryTypes {
                             Injury cte = CTE.newInjury(c, p, BodyLocation.HEAD, 1);
                             p.addInjury(cte);
                             p.removeInjury(i);
-                            MedicalLogEntry entry = MedicalLogger.developedEncephalopathy(p, c.getDate());
+                            MedicalLogEntry entry = MedicalLogger.developedEncephalopathy(p, c.getLocalDate());
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                         }
                     })
@@ -364,7 +364,7 @@ public final class InjuryTypes {
                                 "certain death",
                                 rnd -> {
                                     p.changeStatus(c, PersonnelStatus.WOUNDS);
-                                    MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getDate());
+                                    MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getLocalDate());
                                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                                 })
                 );
@@ -378,11 +378,11 @@ public final class InjuryTypes {
                             if (rnd.applyAsInt(6) + hits >= 5) {
                                 if (i.getHits() < 3) {
                                     i.setHits(i.getHits() + 1);
-                                    MedicalLogEntry entry = MedicalLogger.internalBleedingWorsened(p, c.getDate());
+                                    MedicalLogEntry entry = MedicalLogger.internalBleedingWorsened(p, c.getLocalDate());
                                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                                 } else {
                                     p.changeStatus(c, PersonnelStatus.WOUNDS);
-                                    MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getDate());
+                                    MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getLocalDate());
                                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                                 }
                             }
@@ -469,7 +469,7 @@ public final class InjuryTypes {
                         if (rnd.applyAsInt(100) < 10) {
                             Injury bleeding = INTERNAL_BLEEDING.newInjury(c, p, BodyLocation.ABDOMEN, 1);
                             p.addInjury(bleeding);
-                            MedicalLogEntry entry = MedicalLogger.brokenRibPuncture(p, c.getDate());
+                            MedicalLogEntry entry = MedicalLogger.brokenRibPuncture(p, c.getLocalDate());
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                         }
                     }));
@@ -495,12 +495,12 @@ public final class InjuryTypes {
                         int rib = rnd.applyAsInt(100);
                         if (rib < 1) {
                             p.changeStatus(c, PersonnelStatus.WOUNDS);
-                            MedicalLogEntry entry = MedicalLogger.brokenRibPunctureDead(p, c.getDate());
+                            MedicalLogEntry entry = MedicalLogger.brokenRibPunctureDead(p, c.getLocalDate());
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                         } else if (rib < 10) {
                             Injury puncturedLung = PUNCTURED_LUNG.newInjury(c, p, BodyLocation.CHEST, 1);
                             p.addInjury(puncturedLung);
-                            MedicalLogEntry entry = MedicalLogger.brokenRibPuncture(p, c.getDate());
+                            MedicalLogEntry entry = MedicalLogger.brokenRibPuncture(p, c.getLocalDate());
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                         }
                     }));
@@ -547,13 +547,13 @@ public final class InjuryTypes {
                         if (rnd.applyAsInt(6) + hits >= 5) {
                             if (i.getHits() == 1) {
                                 i.setHits(2);
-                                MedicalLogEntry entry = MedicalLogger.concussionWorsened(p, c.getDate());
+                                MedicalLogEntry entry = MedicalLogger.concussionWorsened(p, c.getLocalDate());
                                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                             } else {
                                 Injury cerebralContusion = CEREBRAL_CONTUSION.newInjury(c, p, BodyLocation.HEAD, 1);
                                 p.addInjury(cerebralContusion);
                                 p.removeInjury(i);
-                                MedicalLogEntry entry = MedicalLogger.developedCerebralContusion(p, c.getDate());
+                                MedicalLogEntry entry = MedicalLogger.developedCerebralContusion(p, c.getLocalDate());
                                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                             }
                         }

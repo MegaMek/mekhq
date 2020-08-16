@@ -968,7 +968,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_ADD_LOG_ENTRY: {
-                AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(gui.getFrame(), true, gui.getCampaign().getDate()); //$NON-NLS-1$
+                AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(gui.getFrame(), true, gui.getCampaign(), gui.getCampaign().getLocalDate());
                 addPersonnelLogDialog.setVisible(true);
                 Optional<LogEntry> personnelEntry = addPersonnelLogDialog.getEntry();
                 if (personnelEntry.isPresent()) {
@@ -986,7 +986,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_ADD_MISSION_ENTRY: {
-                AddOrEditMissionEntryDialog addMissionDialog = new AddOrEditMissionEntryDialog(gui.getFrame(), true, gui.getCampaign().getDate()); //$NON-NLS-1$
+                AddOrEditMissionEntryDialog addMissionDialog = new AddOrEditMissionEntryDialog(gui.getFrame(), true, gui.getCampaign(), gui.getCampaign().getLocalDate());
                 addMissionDialog.setVisible(true);
                 Optional<LogEntry> missionEntry = addMissionDialog.getEntry();
                 if (missionEntry.isPresent()) {

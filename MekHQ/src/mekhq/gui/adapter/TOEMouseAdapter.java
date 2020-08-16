@@ -232,11 +232,11 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     if (singleForce.getTechID() != null) {
                         Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                         oldTech.clearTechUnitIDs();
-                        ServiceLogger.removedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
+                        ServiceLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
                     }
                     singleForce.setTechID(tech.getId());
 
-                    ServiceLogger.assignedTo(tech, gui.getCampaign().getDate(), singleForce.getName());
+                    ServiceLogger.assignedTo(tech, gui.getCampaign().getLocalDate(), singleForce.getName());
 
                     if (singleForce.getAllUnits() != null) {
                         String cantTech = "";
@@ -414,7 +414,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                 oldTech.clearTechUnitIDs();
 
-                ServiceLogger.removedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
+                ServiceLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
 
                 if (singleForce.getAllUnits() !=null) {
                     for (UUID uuid : singleForce.getAllUnits()) {

@@ -1,7 +1,7 @@
 /*
  * Person.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -512,10 +512,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 setLastRankChangeDate(null);
                 if (log) {
                     if (isPrisoner) {
-                        ServiceLogger.madePrisoner(this, getCampaign().getDate(),
+                        ServiceLogger.madePrisoner(this, getCampaign().getLocalDate(),
                                 getCampaign().getName(), "");
                     } else {
-                        ServiceLogger.madeBondsman(this, getCampaign().getDate(),
+                        ServiceLogger.madeBondsman(this, getCampaign().getLocalDate(),
                                 getCampaign().getName(), "");
                     }
                 }
@@ -534,10 +534,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
                 if (log) {
                     if (freed) {
-                        ServiceLogger.freed(this, getCampaign().getDate(),
+                        ServiceLogger.freed(this, getCampaign().getLocalDate(),
                                 getCampaign().getName(), "");
                     } else {
-                        ServiceLogger.joined(this, getCampaign().getDate(),
+                        ServiceLogger.joined(this, getCampaign().getLocalDate(),
                                 getCampaign().getName(), "");
                     }
                 }
@@ -883,41 +883,41 @@ public class Person implements Serializable, MekHqXmlSerializable {
         switch (status) {
             case ACTIVE:
                 if (getStatus().isMIA()) {
-                    ServiceLogger.recoveredMia(this, campaign.getDate());
+                    ServiceLogger.recoveredMia(this, campaign.getLocalDate());
                 } else if (getStatus().isDead()) {
-                    ServiceLogger.resurrected(this, campaign.getDate());
+                    ServiceLogger.resurrected(this, campaign.getLocalDate());
                 } else {
-                    ServiceLogger.rehired(this, campaign.getDate());
+                    ServiceLogger.rehired(this, campaign.getLocalDate());
                 }
                 setRetirement(null);
                 break;
             case RETIRED:
-                ServiceLogger.retired(this, campaign.getDate());
+                ServiceLogger.retired(this, campaign.getLocalDate());
                 if (campaign.getCampaignOptions().useRetirementDateTracking()) {
                     setRetirement(campaign.getLocalDate());
                 }
                 break;
             case MIA:
-                ServiceLogger.mia(this, campaign.getDate());
+                ServiceLogger.mia(this, campaign.getLocalDate());
                 break;
             case KIA:
-                ServiceLogger.kia(this, campaign.getDate());
+                ServiceLogger.kia(this, campaign.getLocalDate());
                 break;
             case NATURAL_CAUSES:
-                MedicalLogger.diedOfNaturalCauses(this, campaign.getDate());
-                ServiceLogger.passedAway(this, campaign.getDate(), status.toString());
+                MedicalLogger.diedOfNaturalCauses(this, campaign.getLocalDate());
+                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
                 break;
             case WOUNDS:
-                MedicalLogger.diedFromWounds(this, campaign.getDate());
-                ServiceLogger.passedAway(this, campaign.getDate(), status.toString());
+                MedicalLogger.diedFromWounds(this, campaign.getLocalDate());
+                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
                 break;
             case DISEASE:
-                MedicalLogger.diedFromDisease(this, campaign.getDate());
-                ServiceLogger.passedAway(this, campaign.getDate(), status.toString());
+                MedicalLogger.diedFromDisease(this, campaign.getLocalDate());
+                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
                 break;
             case OLD_AGE:
-                MedicalLogger.diedOfOldAge(this, campaign.getDate());
-                ServiceLogger.passedAway(this, campaign.getDate(), status.toString());
+                MedicalLogger.diedOfOldAge(this, campaign.getLocalDate());
+                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
                 break;
         }
 
@@ -1404,10 +1404,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         campaign.addReport(getHyperlinkedName() + " has conceived" + (sizeString == null ? "" : (" " + sizeString)));
         if (campaign.getCampaignOptions().logConception()) {
-            MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
+            MedicalLogger.hasConceived(this, campaign.getLocalDate(), sizeString);
             if (getGenealogy().hasSpouse()) {
                 PersonalLogger.spouseConceived(getGenealogy().getSpouse(campaign),
-                        getFullName(), getCampaign().getDate(), sizeString);
+                        getFullName(), getCampaign().getLocalDate(), sizeString);
             }
         }
     }
@@ -1471,10 +1471,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             if (campaign.getCampaignOptions().logConception()) {
-                MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
+                MedicalLogger.deliveredBaby(this, baby, campaign.getLocalDate());
                 if (fatherId != null) {
                     PersonalLogger.ourChildBorn(campaign.getPerson(fatherId), baby, getFullName(),
-                            campaign.getDate());
+                            campaign.getLocalDate());
                 }
             }
         }

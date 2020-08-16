@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 MegaMek team
+ * Copyright (C) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.log;
 
 import mekhq.MekHQ;
@@ -24,30 +23,24 @@ import mekhq.MekHqXmlUtil;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * This class is responsible for instantiating the desired log entries from xml nodes.
  * @author Miguel Azevedo
  */
 public class LogEntryFactory {
-
     private static LogEntryFactory logEntryFactory = null;
 
     public LogEntryFactory() {
+
     }
 
     public static LogEntryFactory getInstance() {
-        if (null == logEntryFactory){
+        if (logEntryFactory == null) {
             logEntryFactory = new LogEntryFactory();
         }
         return logEntryFactory;
-    }
-
-    private SimpleDateFormat dateFormat() {
-        // LATER centralise date formatting so that every class doesn't have its own format and - possibly - switch to java.time
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
     }
 
     /**
@@ -57,9 +50,8 @@ public class LogEntryFactory {
      * @param type type of the log
      * @return the new log entry
      */
-    public LogEntry generateNew(Date date, String desc, LogEntryType type){
-
-        switch (type){
+    public LogEntry generateNew(LocalDate date, String desc, LogEntryType type){
+        switch (type) {
             case MEDICAL:
                 return new MedicalLogEntry(date, desc);
             case AWARD:
@@ -82,9 +74,9 @@ public class LogEntryFactory {
      * @return log entry
      */
     public LogEntry generateInstanceFromXML(Node wn) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
+        final String METHOD_NAME = "generateInstanceFromXML(Node)";
 
-        Date   date = null;
+        LocalDate date = null;
         String desc = null;
         LogEntryType type = null;
 
@@ -93,13 +85,17 @@ public class LogEntryFactory {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node   node = nl.item(x);
                 String nname = node.getNodeName();
-                if (nname.equals("desc")) { //$NON-NLS-1$
-                    desc = MekHqXmlUtil.unEscape(node.getTextContent());
-                } else if (nname.equals("type")) { //$NON-NLS-1$
-                    String typeString = MekHqXmlUtil.unEscape(node.getTextContent());
-                    type = LogEntryType.valueOf(ensureBackwardCompatibility(typeString));
-                } else if (nname.equals("date")) { //$NON-NLS-1$
-                    date = dateFormat().parse(node.getTextContent().trim());
+                switch (nname) {
+                    case "desc":
+                        desc = MekHqXmlUtil.unEscape(node.getTextContent());
+                        break;
+                    case "type":
+                        String typeString = MekHqXmlUtil.unEscape(node.getTextContent());
+                        type = LogEntryType.valueOf(ensureBackwardCompatibility(typeString));
+                        break;
+                    case "date":
+                        date = MekHqXmlUtil.parseDate(node.getTextContent().trim());
+                        break;
                 }
             }
         } catch (Exception ex) {
@@ -108,10 +104,13 @@ public class LogEntryFactory {
         }
 
         String newDescription = LogEntryController.updateOldDescription(desc);
-        if(!newDescription.isEmpty())
+        if (!newDescription.isEmpty()) {
             desc = newDescription;
+        }
 
-        if(type == null) type = LogEntryController.determineTypeFromLogDescription(desc);
+        if (type == null) {
+            type = LogEntryController.determineTypeFromLogDescription(desc);
+        }
 
         return generateNew(date, desc, type);
     }
@@ -121,10 +120,11 @@ public class LogEntryFactory {
      * @param logType the old log entry type
      * @return the new log entry type
      */
-    private static String ensureBackwardCompatibility(String logType){
-        if(logType.equalsIgnoreCase("med")) return LogEntryType.MEDICAL.toString();
-
-        return logType;
+    private static String ensureBackwardCompatibility(String logType) {
+        if (logType.equalsIgnoreCase("med")) {
+            return LogEntryType.MEDICAL.toString();
+        } else {
+            return logType;
+        }
     }
-
 }

@@ -1395,7 +1395,7 @@ public class ResolveScenarioTracker {
             }
             if (status.wasDeployed()) {
                 person.awardXP(status.getXP());
-                ServiceLogger.participatedInMission(person, campaign.getDate(), scenario.getName(), m.getName());
+                ServiceLogger.participatedInMission(person, campaign.getLocalDate(), scenario.getName(), m.getName());
             }
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);
@@ -1458,7 +1458,7 @@ public class ResolveScenarioTracker {
                 person.setHits(status.getHits());
             }
 
-            ServiceLogger.participatedInMission(person, campaign.getDate(), scenario.getName(), m.getName());
+            ServiceLogger.participatedInMission(person, campaign.getLocalDate(), scenario.getName(), m.getName());
 
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);
