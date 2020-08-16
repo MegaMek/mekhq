@@ -18,8 +18,7 @@
  */
 package mekhq.gui.view;
 
-import java.awt.Component;
-import java.awt.Image;
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -247,15 +246,15 @@ public class ForceViewPanel extends ScrollablePanel {
     	int nexty = 0;
 
     	if (null != type) {
-    		lblType.setName("lblCommander2"); // NOI18N
-			lblType.setText("<html><i>" + type + " " + resourceMap.getString("unit")+ "</i></html>");
-			gridBagConstraints = new java.awt.GridBagConstraints();
+    		lblType.setName("lblCommander2");
+			lblType.setText("<html><i>" + (force.isCombatForce() ? "" : "Non-Combat ") + type + " " + resourceMap.getString("unit")+ "</i></html>");
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = nexty;
 			gridBagConstraints.weightx = 1.0;
 			gridBagConstraints.gridwidth = 2;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblType, gridBagConstraints);
 			nexty++;
     	}
