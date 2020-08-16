@@ -548,9 +548,14 @@ public class StaticChecks {
     }
 
     public static boolean areAllEligible(Person[] people) {
+        return areAllEligible(people, false);
+    }
+
+    public static boolean areAllEligible(Person[] people, boolean ignorePrisonerStatus) {
         int profession = people[0].getProfession();
         for (Person person : people) {
-            if (!person.getPrisonerStatus().isFree() || person.getProfession() != profession) {
+            if (!(person.getPrisonerStatus().isFree() || ignorePrisonerStatus)
+                    || (person.getProfession() != profession)) {
                 return false;
             }
         }

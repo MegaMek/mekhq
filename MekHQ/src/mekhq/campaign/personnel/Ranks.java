@@ -1,7 +1,8 @@
 /*
  * Ranks.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
@@ -26,6 +27,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.StringJoiner;
 import java.util.Vector;
 
@@ -51,9 +53,7 @@ import mekhq.gui.model.RankTableModel;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Ranks {
-
 	// Rank Faction Codes
-	// TODO: Major periphery realms?
 	public static final int RS_SL		= 0;
 	public static final int RS_FS		= 1;
 	public static final int RS_FC		= 2;
@@ -105,12 +105,10 @@ public class Ranks {
 	private static Hashtable<Integer, Ranks> rankSystems;
 	@SuppressWarnings("unused") // FIXME
 	private static final int[] officerCut = {/*SLDF*/7,/*AFFS*/6,/*AFFC*/8,/*LCAF*/14,/*LAAF*/11,/*FWLM*/9,/*CCAF*/5,/*CCWH*/2,/*DCMD*/9,/*Clan*/3,/*COM*/2,/*WOB*/2};
-	public static final int RANK_BONDSMAN = -1;
-	public static final int RANK_PRISONER = -2;
 
 	private int rankSystem;
 	private int oldRankSystem = -1;
-	private ArrayList<Rank> ranks;
+	private List<Rank> ranks;
 
 	public Ranks() {
 		this(RS_SL);
@@ -153,8 +151,9 @@ public class Ranks {
             Node wn = nl.item(x);
             Ranks value;
 
-            if (wn.getParentNode() != ranksEle)
+            if (wn.getParentNode() != ranksEle) {
                 continue;
+            }
 
             int xc = wn.getNodeType();
 
@@ -192,47 +191,47 @@ public class Ranks {
 	}
 
 	public static String getRankSystemName(int system) {
-		switch(system) {
-		case RS_CUSTOM:
-			return "Custom";
-		case RS_SL:
-			return "Star League";
-		case RS_FS:
-			return "Federated Suns";
-		case RS_FC:
-			return "Federated Commonwealth";
-		case RS_LC:
-			return "Lyran Commonwealth";
-		case RS_LA:
-			return "Lyran Alliance";
-		case RS_FWL:
-			return "Free Worlds League";
-		case RS_CC:
-			return "Capellan Confederation";
-		case RS_CCWH:
-			return "Capellan Confederation Warrior House";
-		case RS_DC:
-			return "Draconis Combine";
-		case RS_CL:
-			return "Clan";
-		case RS_COM:
-			return "Comstar";
-		case RS_WOB:
-			return "Word of Blake";
-		case RS_MOC:
-			return "Magistry of Canopus";
-		case RS_MH:
-			return "Marian Hegemony";
-		case RS_TC:
-			return "Taurian Concordat";
-		case RS_OA:
-			return "Outworld's Alliance";
-		case RS_FRR:
-			return "Free Rasalhague Republic";
-        case RS_ARC:
-            return "Aurigan Coalition";
-		default:
-			return "?";
+		switch (system) {
+            case RS_CUSTOM:
+                return "Custom";
+            case RS_SL:
+                return "Star League";
+            case RS_FS:
+                return "Federated Suns";
+            case RS_FC:
+                return "Federated Commonwealth";
+            case RS_LC:
+                return "Lyran Commonwealth";
+            case RS_LA:
+                return "Lyran Alliance";
+            case RS_FWL:
+                return "Free Worlds League";
+            case RS_CC:
+                return "Capellan Confederation";
+            case RS_CCWH:
+                return "Capellan Confederation Warrior House";
+            case RS_DC:
+                return "Draconis Combine";
+            case RS_CL:
+                return "Clan";
+            case RS_COM:
+                return "Comstar";
+            case RS_WOB:
+                return "Word of Blake";
+            case RS_MOC:
+                return "Magistry of Canopus";
+            case RS_MH:
+                return "Marian Hegemony";
+            case RS_TC:
+                return "Taurian Concordat";
+            case RS_OA:
+                return "Outworld's Alliance";
+            case RS_FRR:
+                return "Free Rasalhague Republic";
+            case RS_ARC:
+                return "Aurigan Coalition";
+            default:
+                return "?";
 		}
 	}
 
@@ -241,7 +240,7 @@ public class Ranks {
 			profession = getAlternateProfession(profession);
 		}
 
-		for(int i = 0; i < RC_NUM; i++) {
+		for (int i = 0; i < RC_NUM; i++) {
 			Rank rank = getAllRanks().get(i);
         	int p = profession;
 
@@ -310,13 +309,13 @@ public class Ranks {
     	}
     }
 
-	public ArrayList<Rank> getAllRanks() {
+	public List<Rank> getAllRanks() {
 		return ranks;
 	}
 
 	private void useRankSystem(int system) {
 		// If we've got an invalid rank system, default to Star League
-		if(system >= rankSystems.size()) {
+		if (system >= rankSystems.size()) {
 			if (rankSystems.isEmpty()) {
 				ranks = new ArrayList<>();
 			} else {
@@ -338,24 +337,16 @@ public class Ranks {
 	}
 
 	public Rank getRank(int r) {
-		if(r >= ranks.size()) {
+		if (r >= ranks.size()) {
 		    //assign the highest rank
 		    r = ranks.size() - 1;
-		}
-		if (r == RANK_BONDSMAN) { // Bondsman
-			String[] bondsmen = { "Bondsman", "Bondsman", "Bondsman", "Bondsman", "Bondsman", "Bondsman" };
-			return new Rank(bondsmen, false, 0.0);
-		}
-		if (r == RANK_PRISONER) { // Prisoners
-			String [] prisoner = { "Prisoner", "Prisoner", "Prisoner", "Prisoner", "Prisoner", "Prisoner" };
-            return new Rank(prisoner, false, 0.0);
 		}
 		return ranks.get(r);
 	}
 
 	public int getOfficerCut() {
-	    for(int i = 0; i < ranks.size(); i++) {
-            if(ranks.get(i).isOfficer()) {
+	    for (int i = 0; i < ranks.size(); i++) {
+            if (ranks.get(i).isOfficer()) {
                 return i;
             }
         }
@@ -363,14 +354,8 @@ public class Ranks {
 	}
 
 	public int getRankOrder(String rank, int profession) {
-		if (rank.equals("Prisoner")) {
-			return RANK_PRISONER;
-		}
-		if (rank.equals("Bondsman")) {
-			return RANK_BONDSMAN;
-		}
-		for(int i = 0; i < ranks.size(); i++) {
-		    if(ranks.get(i).getName(profession).equals(rank)) {
+		for (int i = 0; i < ranks.size(); i++) {
+		    if (ranks.get(i).getName(profession).equals(rank)) {
 		        return i;
 		    }
 		}
@@ -378,7 +363,7 @@ public class Ranks {
 	}
 
 	public void setRankSystem(int system) {
-		if(system < RS_NUM) {
+		if (system < RS_NUM) {
 			rankSystem = system;
 			useRankSystem(rankSystem);
 		}
@@ -396,7 +381,7 @@ public class Ranks {
 	public void setRanksFromList(String names, int officerCut) {
 		ArrayList<ArrayList<String>> rankNames = new ArrayList<>();
 		String[] rnames = names.split(",");
-		for(String rname : rnames) {
+		for (String rname : rnames) {
 			ArrayList<String> temp = new ArrayList<>(RPROF_NUM);
 			for (int i = 0; i < RPROF_NUM; i++) {
 				temp.add(rname);
@@ -407,14 +392,18 @@ public class Ranks {
 	}
 
 	private String getRankPostTag(int rankNum) {
-		if (rankNum == 0)
-			return " <!-- E0 \"None\" -->";
-		if (rankNum < RE_NUM)
-			return " <!-- E"+rankNum+" -->";
-		if (rankNum < RWO_NUM)
-			return " <!-- WO"+(rankNum-RE_MAX)+" -->";
-		if (rankNum < RO_NUM)
-			return " <!-- O"+(rankNum-RWO_MAX)+" -->";
+		if (rankNum == 0) {
+            return " <!-- E0 \"None\" -->";
+        }
+		if (rankNum < RE_NUM) {
+            return " <!-- E" + rankNum + " -->";
+        }
+		if (rankNum < RWO_NUM) {
+            return " <!-- WO" + (rankNum - RE_MAX) + " -->";
+        }
+		if (rankNum < RO_NUM) {
+            return " <!-- O" + (rankNum - RWO_MAX) + " -->";
+        }
 
 		// Yuck, we've got nada!
 		return "";
@@ -433,7 +422,7 @@ public class Ranks {
                 +"</system>");
         // Only write out the ranks if we're using a custom system
         if (rankSystem == RS_CUSTOM || saveAll) {
-	        for(int i = 0; i < ranks.size(); i++) {
+	        for (int i = 0; i < ranks.size(); i++) {
 	        	Rank r = ranks.get(i);
 	            r.writeToXml(pw1, indent+1);
 	            pw1.println(getRankPostTag(i));
@@ -454,7 +443,7 @@ public class Ranks {
         try {
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("system") || wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
@@ -518,7 +507,7 @@ public class Ranks {
 	public Object[][] getRanksForModel() {
         Object[][] array = new Object[ranks.size()][RankTableModel.COL_NUM];
         int i = 0;
-        for(Rank rank : ranks) {
+        for (Rank rank : ranks) {
         	String rating = "E"+i;
         	if (i > RWO_MAX) {
         		rating = "O"+(i-RWO_MAX);
@@ -543,7 +532,7 @@ public class Ranks {
         ranks = new ArrayList<>();
 	    @SuppressWarnings("rawtypes") // Broken java doesn't have typed vectors in the DefaultTableModel
 		Vector<Vector> vectors = model.getDataVector();
-	    for(@SuppressWarnings("rawtypes") Vector row : vectors) {
+	    for (@SuppressWarnings("rawtypes") Vector row : vectors) {
 	        String[] names = { (String)row.get(RankTableModel.COL_NAME_MW), (String)row.get(RankTableModel.COL_NAME_ASF),
 	        		(String)row.get(RankTableModel.COL_NAME_VEE), (String)row.get(RankTableModel.COL_NAME_NAVAL),
 	        		(String)row.get(RankTableModel.COL_NAME_INF), (String)row.get(RankTableModel.COL_NAME_TECH) };

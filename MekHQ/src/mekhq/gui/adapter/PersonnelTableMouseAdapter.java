@@ -185,7 +185,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
         String[] data = action.getActionCommand().split(SEPARATOR, -1);
         String command = data[0];
 
-        switch(command) {
+        switch (command) {
             case CMD_RANKSYSTEM: {
                 int system = Integer.parseInt(data[1]);
                 for (Person person : people) {
@@ -1188,8 +1188,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             JCheckBoxMenuItem cbMenuItem;
             Person[] selected = getSelectedPeople();
             // **lets fill the pop up menu**//
-            if (StaticChecks.areAllEligible(selected)) {
-                menu = new JMenu(resourceMap.getString("changeRank.text")); //$NON-NLS-1$
+            if (StaticChecks.areAllEligible(selected, true)) {
+                menu = new JMenu(resourceMap.getString("changeRank.text"));
                 Ranks ranks = person.getRanks();
                 for (int rankOrder = 0; rankOrder < Ranks.RC_NUM; rankOrder++) {
                     Rank rank = ranks.getAllRanks().get(rankOrder);
@@ -1197,10 +1197,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
 
                     // Empty professions need swapped before the
                     // continuation
-                    while (ranks.isEmptyProfession(profession)
-                            && profession != Ranks.RPROF_MW) {
-                        profession = ranks
-                                .getAlternateProfession(profession);
+                    while (ranks.isEmptyProfession(profession) && (profession != Ranks.RPROF_MW)) {
+                        profession = ranks.getAlternateProfession(profession);
                     }
 
                     if (rank.getName(profession).equals(HYPHEN)) {
@@ -1209,41 +1207,30 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
 
                     // re-route through any profession redirections,
                     // starting with the empty profession check
-                    while (rank.getName(profession).startsWith("--") //$NON-NLS-1$
-                            && profession != Ranks.RPROF_MW) {
-                        if (rank.getName(profession).equals("--")) { //$NON-NLS-1$
-                            profession = ranks
-                                    .getAlternateProfession(profession);
-                        } else if (rank.getName(profession)
-                                .startsWith("--")) { //$NON-NLS-1$
-                            profession = ranks.getAlternateProfession(rank
-                                    .getName(profession));
+                    while (rank.getName(profession).startsWith("--") && (profession != Ranks.RPROF_MW)) {
+                        if (rank.getName(profession).equals("--")) {
+                            profession = ranks.getAlternateProfession(profession);
+                        } else if (rank.getName(profession).startsWith("--")) {
+                            profession = ranks.getAlternateProfession(rank.getName(profession));
                         }
                     }
 
                     if (rank.getRankLevels(profession) > 0) {
                         submenu = new JMenu(rank.getName(profession));
-                        for (int level = 0; level <= rank
-                                .getRankLevels(profession); level++) {
-                            cbMenuItem = new JCheckBoxMenuItem(
-                                    rank.getName(profession)
-                                            + Utilities.getRomanNumeralsFromArabicNumber(level, true));
+                        for (int level = 0; level <= rank.getRankLevels(profession); level++) {
+                            cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession)
+                                    + Utilities.getRomanNumeralsFromArabicNumber(level, true));
                             cbMenuItem.setActionCommand(makeCommand(CMD_RANK, String.valueOf(rankOrder), String.valueOf(level)));
-                            if (person.getRankNumeric() == rankOrder
-                                    && person.getRankLevel() == level) {
+                            if ((person.getRankNumeric() == rankOrder) && (person.getRankLevel() == level)) {
                                 cbMenuItem.setSelected(true);
                             }
                             cbMenuItem.addActionListener(this);
                             cbMenuItem.setEnabled(true);
                             submenu.add(cbMenuItem);
                         }
-                        if (submenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(submenu, MAX_POPUP_ITEMS);
-                        }
-                        menu.add(submenu);
+                        JMenuHelpers.addMenuIfNonEmpty(menu, submenu, MAX_POPUP_ITEMS);
                     } else {
-                        cbMenuItem = new JCheckBoxMenuItem(
-                                rank.getName(profession));
+                        cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession));
                         cbMenuItem.setActionCommand(makeCommand(CMD_RANK, String.valueOf(rankOrder)));
                         if (person.getRankNumeric() == rankOrder) {
                             cbMenuItem.setSelected(true);
@@ -1253,15 +1240,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         menu.add(cbMenuItem);
                     }
                 }
-                if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-                    MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
-                }
-                popup.add(menu);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
             }
-            menu = new JMenu(resourceMap.getString("changeRankSystem.text")); //$NON-NLS-1$
+            menu = new JMenu(resourceMap.getString("changeRankSystem.text"));
             // First allow them to revert to the campaign system
-            cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("useCampaignRankSystem.text")); //$NON-NLS-1$
-            cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, "-1")); //$NON-NLS-1$
+            cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("useCampaignRankSystem.text"));
+            cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, "-1"));
             cbMenuItem.addActionListener(this);
             cbMenuItem.setEnabled(true);
             menu.add(cbMenuItem);
@@ -1279,13 +1263,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 }
                 menu.add(cbMenuItem);
             }
-            if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-                MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
-            }
-            popup.add(menu);
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+
             if (StaticChecks.areAllWoB(selected)) {
                 // MD Ranks
-                menu = new JMenu(resourceMap.getString("changeMDRank.text")); //$NON-NLS-1$
+                menu = new JMenu(resourceMap.getString("changeMDRank.text"));
                 for (int i = Rank.MD_RANK_NONE; i < Rank.MD_RANK_NUM; i++) {
                     cbMenuItem = new JCheckBoxMenuItem(
                             Rank.getManeiDominiRankName(i));
@@ -1371,7 +1353,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT));
             }
 
-            menu = new JMenu(resourceMap.getString("changePrimaryRole.text")); //$NON-NLS-1$
+            menu = new JMenu(resourceMap.getString("changePrimaryRole.text"));
             for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
                 if (person.canPerformRole(i) && (person.getSecondaryRole() != i)) {
                     cbMenuItem = new JCheckBoxMenuItem(Person.getRoleDesc(
@@ -1417,7 +1399,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             popup.add(menu);
             // Bloodnames
             if (StaticChecks.areAllClanEligible(selected)) {
-                menuItem = new JMenuItem(resourceMap.getString("giveRandomBloodname.text")); //$NON-NLS-1$
+                menuItem = new JMenuItem(resourceMap.getString("giveRandomBloodname.text"));
                 menuItem.setActionCommand(CMD_BLOODNAME);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(StaticChecks.areAllActive(selected));
@@ -2605,14 +2587,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
             }
-            menuItem = new JMenuItem(resourceMap.getString("exportPersonnel.text")); //$NON-NLS-1$
+            menuItem = new JMenuItem(resourceMap.getString("exportPersonnel.text"));
             menuItem.addActionListener(ev -> gui.miExportPersonActionPerformed(ev));
             menuItem.setEnabled(true);
             popup.add(menuItem);
 
-            if (gui.getCampaign().getCampaignOptions().getUseAtB()
-                    && StaticChecks.areAllActive(selected)) {
-                menuItem = new JMenuItem(resourceMap.getString("sack.text")); //$NON-NLS-1$
+            if (gui.getCampaign().getCampaignOptions().getUseAtB() && StaticChecks.areAllActive(selected)) {
+                menuItem = new JMenuItem(resourceMap.getString("sack.text"));
                 menuItem.setActionCommand(CMD_SACK);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
@@ -2622,9 +2603,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             if (gui.getCampaign().isGM()) {
                 popup.addSeparator();
 
-                menu = new JMenu(resourceMap.getString("gmMode.text")); //$NON-NLS-1$
+                menu = new JMenu(resourceMap.getString("gmMode.text"));
 
-                menuItem = new JMenu(resourceMap.getString("changePrisonerStatus.text")); //$NON-NLS-1$
+                menuItem = new JMenu(resourceMap.getString("changePrisonerStatus.text"));
                 menuItem.add(newCheckboxMenu(
                         PrisonerStatus.FREE.toString(),
                         makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.FREE.name()),
@@ -2643,68 +2624,68 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         (person.getPrisonerStatus() == PrisonerStatus.BONDSMAN)));
                 menu.add(menuItem);
 
-                menuItem = new JMenuItem(resourceMap.getString("removePerson.text")); //$NON-NLS-1$
+                menuItem = new JMenuItem(resourceMap.getString("removePerson.text"));
                 menuItem.setActionCommand(CMD_REMOVE);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
 
                 if (!gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
-                    menuItem = new JMenuItem(resourceMap.getString("editHits.text")); //$NON-NLS-1$
+                    menuItem = new JMenuItem(resourceMap.getString("editHits.text"));
                     menuItem.setActionCommand(CMD_EDIT_HITS);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
                 }
 
-                menuItem = new JMenuItem(resourceMap.getString("add1XP.text")); //$NON-NLS-1$
+                menuItem = new JMenuItem(resourceMap.getString("add1XP.text"));
                 menuItem.setActionCommand(CMD_ADD_1_XP);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
 
-                menuItem = new JMenuItem(resourceMap.getString("addXP.text")); //$NON-NLS-1$
+                menuItem = new JMenuItem(resourceMap.getString("addXP.text"));
                 menuItem.setActionCommand(CMD_ADD_XP);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
 
-                menuItem = new JMenuItem(resourceMap.getString("setXP.text")); //$NON-NLS-1$
+                menuItem = new JMenuItem(resourceMap.getString("setXP.text"));
                 menuItem.setActionCommand(CMD_SET_XP);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
 
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
-                    menuItem = new JMenuItem(resourceMap.getString("setEdge.text")); //$NON-NLS-1$
+                    menuItem = new JMenuItem(resourceMap.getString("setEdge.text"));
                     menuItem.setActionCommand(CMD_SET_EDGE);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
                 }
 
                 if (oneSelected) {
-                    menuItem = new JMenuItem(resourceMap.getString("edit.text")); //$NON-NLS-1$
+                    menuItem = new JMenuItem(resourceMap.getString("edit.text"));
                     menuItem.setActionCommand(CMD_EDIT);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
 
                     if (person.getUnitId() == null) {
-                        menuItem = new JMenuItem(resourceMap.getString("rollForUnit.text")); //$NON-NLS-1$
+                        menuItem = new JMenuItem(resourceMap.getString("rollForUnit.text"));
                         menuItem.setActionCommand(CMD_ROLL_MECH);
                         menuItem.addActionListener(this);
                         menu.add(menuItem);
                     }
                 }
                 if (gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
-                    menuItem = new JMenuItem(resourceMap.getString("removeAllInjuries.text")); //$NON-NLS-1$
+                    menuItem = new JMenuItem(resourceMap.getString("removeAllInjuries.text"));
                     menuItem.setActionCommand(CMD_CLEAR_INJURIES);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
 
                     if (oneSelected) {
                         for (Injury i : person.getInjuries()) {
-                            menuItem = new JMenuItem(String.format(resourceMap.getString("removeInjury.format"), i.getName())); //$NON-NLS-1$
+                            menuItem = new JMenuItem(String.format(resourceMap.getString("removeInjury.format"), i.getName()));
                             menuItem.setActionCommand(makeCommand(CMD_REMOVE_INJURY, i.getUUID().toString()));
                             menuItem.addActionListener(this);
                             menu.add(menuItem);
                         }
 
-                        menuItem = new JMenuItem(resourceMap.getString("editInjuries.text")); //$NON-NLS-1$
+                        menuItem = new JMenuItem(resourceMap.getString("editInjuries.text"));
                         menuItem.setActionCommand(CMD_EDIT_INJURIES);
                         menuItem.addActionListener(this);
                         menu.add(menuItem);

@@ -771,7 +771,7 @@ public class PersonnelTableModel extends DataTableModel {
             switch(actualCol) {
                 case COL_RANK:
                     setPortrait(p);
-                    setText(p.getFullDesc(false));
+                    setText(p.getFullDesc());
                     break;
                 case COL_ASSIGN:
                     if (loadAssignmentFromMarket) {
