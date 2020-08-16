@@ -2838,7 +2838,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (rank.equalsIgnoreCase("None")) {
             rank = "";
         } else {
-            rank += " ";
+            rank = rank.trim() + " ";
         }
 
         return rank + getFullName();
@@ -2849,7 +2849,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public String makeHTMLRankDiv() {
-        return String.format("<div id=\"%s\">%s</div>", getId().toString(), getRankName());
+        return String.format("<div id=\"%s\">%s</div>", getId().toString(), getRankName().trim());
     }
 
     public String getHyperlinkedFullTitle() {
