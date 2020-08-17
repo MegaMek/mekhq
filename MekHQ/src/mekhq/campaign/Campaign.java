@@ -3285,7 +3285,7 @@ public class Campaign implements Serializable, ITechManager {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
-                        for (UUID uid : forceIds.get(forceId).getAllUnits()) {
+                        for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
                             Unit u = getUnit(uid);
                             if ((u != null) && u.isUnderRepair()) {
                                 forceUnderRepair = true;
@@ -3296,7 +3296,7 @@ public class Campaign implements Serializable, ITechManager {
                         if (!forceUnderRepair) {
                             forceIds.get(forceId).setScenarioId(s.getId());
                             s.addForces(forceId);
-                            for (UUID uid : forceIds.get(forceId).getAllUnits()) {
+                            for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
                                 Unit u = getUnit(uid);
                                 if (null != u) {
                                     u.setScenarioId(s.getId());
@@ -3852,7 +3852,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param l The {@link Lance} to calculate XP to award for training.
      */
     private void awardTrainingXPByMaximumRole(Lance l) {
-        for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits()) {
+        for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits(true)) {
             Unit trainerUnit = getUnit(trainerId);
 
             // not sure how this occurs, but it probably shouldn't halt processing of a new day.
@@ -3871,7 +3871,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (commanderExperience > SkillType.EXP_REGULAR) {
                     // ...and if the commander is better than a veteran, find all of
                     // the personnel under their command...
-                    for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits()) {
+                    for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits(true)) {
                         Unit traineeUnit = getUnit(traineeId);
 
                         if (traineeUnit == null) {
@@ -5629,7 +5629,7 @@ public class Campaign implements Serializable, ITechManager {
             StringBuilder partAvailabilityLog = new StringBuilder();
             partAvailabilityLog.append("Part Rating Level: " + partAvailability)
                                 .append("(" + EquipmentType.ratingNames[partAvailability] + ")");
-            
+
             /*
              * Even if we can acquire Clan parts, they have a minimum availability of F for
              * non-Clan units
@@ -5725,21 +5725,21 @@ public class Campaign implements Serializable, ITechManager {
 
     public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {
         AtBContract contract = (acquisition != null) ? getAttachedAtBContract(acquisition.getUnit()) : null;
-        
+
         /*
          * If the unit is not assigned to a contract, use the least restrictive active
          * contract. Don't restrict parts availability by contract if it has not started.
          */
         if (hasActiveContract()) {
             for (Contract c : getActiveContracts()) {
-                if ((c instanceof AtBContract) && 
-                        ((contract == null) || 
+                if ((c instanceof AtBContract) &&
+                        ((contract == null) ||
                         (((AtBContract) c).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()))) {
                     contract = (AtBContract) c;
                 }
             }
         }
-        
+
         // if we have a contract and it has started
         if ((null != contract) && getLocalDate().isBefore(contract.getStartDate())) {
             if (reportBuilder != null) {
@@ -5747,13 +5747,13 @@ public class Campaign implements Serializable, ITechManager {
             }
             return contract.getPartsAvailabilityLevel();
         }
-        
+
         /* If contract is still null, the unit is not in a contract. */
         Person adminLog = findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
         int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN
                 : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         int adminMod = adminLogExp - SkillType.EXP_REGULAR;
-        
+
         if (reportBuilder != null) {
             reportBuilder.append(getUnitRatingMod() + "(unit rating)");
             if (adminLog != null) {
@@ -5762,7 +5762,7 @@ public class Campaign implements Serializable, ITechManager {
                 reportBuilder.append(adminMod + "(no logistics admin)");
             }
         }
-        
+
         return getUnitRatingMod() + adminMod;
     }
 
@@ -7003,7 +7003,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public Money getForceValue(boolean noInfantry) {
         Money value = Money.zero();
-        for (UUID uuid : forces.getAllUnits()) {
+        for (UUID uuid : forces.getAllUnits(false)) {
             Unit u = getUnit(uuid);
             if (null == u) {
                 continue;

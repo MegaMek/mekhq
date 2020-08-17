@@ -2590,7 +2590,7 @@ public class CampaignGUI extends JPanel {
         String text = "<html><b>Temp Medics:</b> " + getCampaign().getMedicPool() + "</html>";
         lblTempMedics.setText(text);
     }
-    
+
     private void refreshPartsAvailability() {
         if (!getCampaign().getCampaignOptions().getUseAtB()) {
             lblPartsAvailabilityRating.setText("");
@@ -2680,12 +2680,12 @@ public class CampaignGUI extends JPanel {
     public void handleLocationChanged(LocationChangedEvent ev) {
         refreshLocation();
     }
-    
+
     @Subscribe
     public void handleMissionChanged(MissionEvent ev) {
         refreshPartsAvailability();
     }
-    
+
     @Subscribe
     public void handlePersonUpdate(PersonEvent ev) {
         // only bother recalculating AtB parts availability if a logistics admin has been changed
@@ -2694,7 +2694,7 @@ public class CampaignGUI extends JPanel {
             refreshPartsAvailability();
         }
     }
-    
+
     public void refreshLocation() {
         lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
     }
@@ -2749,6 +2749,13 @@ public class CampaignGUI extends JPanel {
         MekHQ.triggerEvent(new DeploymentChangedEvent(u, s));
     }
 
+    public void undeployForces(Vector<Force> forces) {
+        for (Force force : forces) {
+            undeployForce(force);
+            undeployForces(force.getSubForces());
+        }
+    }
+
     public void undeployForce(Force f) {
         undeployForce(f, true);
     }
@@ -2760,7 +2767,7 @@ public class CampaignGUI extends JPanel {
             f.clearScenarioIds(getCampaign(), killSubs);
             scenario.removeForce(f.getId());
             if (killSubs) {
-                for (UUID uid : f.getAllUnits()) {
+                for (UUID uid : f.getAllUnits(false)) {
                     Unit u = getCampaign().getUnit(uid);
                     if (null != u) {
                         scenario.removeUnit(u.getId());

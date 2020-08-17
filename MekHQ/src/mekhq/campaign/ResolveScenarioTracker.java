@@ -120,7 +120,7 @@ public class ResolveScenarioTracker {
         entities = new HashMap<>();
         bayLoadedEntities = new HashMap<>();
         idMap = new HashMap<>();
-        for (UUID uid : scenario.getForces(campaign).getAllUnits()) {
+        for (UUID uid : scenario.getForces(campaign).getAllUnits(true)) {
             Unit u = campaign.getUnit(uid);
             if (null != u && null == u.checkDeployment()) {
                 units.add(u);

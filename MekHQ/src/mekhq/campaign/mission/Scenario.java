@@ -296,7 +296,7 @@ public class Scenario implements Serializable {
     }
 
     public boolean isAssigned(Unit unit, Campaign campaign) {
-        for (UUID uid : getForces(campaign).getAllUnits()) {
+        for (UUID uid : getForces(campaign).getAllUnits(true)) {
             if (uid.equals(unit.getId())) {
                 return true;
             }
