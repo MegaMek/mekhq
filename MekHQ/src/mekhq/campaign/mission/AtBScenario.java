@@ -907,11 +907,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param weightMod        Modifier to the weight class of enemy lances.
      * @param campaign
      */
-    protected void addEnemyForce(List<Entity> list, int weightClass,
-            int maxWeight, int rollMod, int weightMod, Campaign campaign) {
+    protected void addEnemyForce(List<Entity> list, int weightClass, int maxWeight, int rollMod,
+                                 int weightMod, Campaign campaign) {
         String org = AtBConfiguration.getParentFactionType(getContract(campaign).getEnemyCode());
 
-        String lances = campaign.getAtBConfig().selectBotLances(org, weightClass, rollMod/20f);
+        String lances = campaign.getAtBConfig().selectBotLances(org, weightClass, rollMod / 20f);
         int maxLances = Math.min(lances.length(), campaign.getCampaignOptions().getSkillLevel() + 1);
 
         for (int i = 0; i < maxLances; i++) {
@@ -921,10 +921,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (campaign.getCampaignOptions().getAllowOpforLocalUnits()) {
             list.addAll(AtBDynamicScenarioFactory.fillTransports(this, list,
-                    getContract(campaign).getEnemyCode(),
-                    getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
-                    campaign));
-
+                    getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
+                    getContract(campaign).getEnemyQuality(), campaign));
         }
     }
 
