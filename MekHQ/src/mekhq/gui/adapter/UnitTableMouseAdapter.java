@@ -1039,13 +1039,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
                     if (oneActive) {
-                        menuItem = new JMenuItem(oneSelected ? "Mothball Units" : "Mass Mothball Unit");
+                        menuItem = new JMenuItem(oneSelected ? "Mothball Unit" : "Mass Mothball Units");
                         menuItem.setActionCommand(COMMAND_GM_MOTHBALL);
                         menuItem.addActionListener(this);
                         menu.add(menuItem);
                     }
                     if (oneMothballed) {
-                        menuItem = new JMenuItem(oneSelected ? "Activate Units" : "Mass Activate Unit");
+                        menuItem = new JMenuItem(oneSelected ? "Activate Unit" : "Mass Activate Units");
                         menuItem.setActionCommand(COMMAND_GM_ACTIVATE);
                         menuItem.addActionListener(this);
                         menu.add(menuItem);
