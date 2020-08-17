@@ -1834,8 +1834,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     +"]]></lastMaintenanceReport>");
         }
 
-        if (null != mothballInfo) {
-            mothballInfo.writeToXml(pw1, indentLvl);
+        if (mothballInfo != null) {
+            mothballInfo.writeToXml(pw1, indentLvl + 1);
         }
 
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
@@ -4529,7 +4529,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         tech = id;
 
-        //dont remove personnel yet, because self crewed units need their crews to mothball
+        //don't remove personnel yet, because self crewed units need their crews to mothball
         getCampaign().removeUnitFromForce(this);
 
         //clear any assigned tasks
