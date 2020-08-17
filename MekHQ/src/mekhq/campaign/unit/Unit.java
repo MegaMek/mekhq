@@ -4506,8 +4506,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * Begins mothballing a unit.
      * @param id The ID of the tech performing the mothball.
      */
-    public void startMothballing(UUID id) {
-        startMothballing(id, false);
+    public void startMothballing(Campaign campaign, UUID id) {
+        startMothballing(campaign, id, false);
     }
 
     /**
@@ -4516,8 +4516,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param isGM A value indicating if the mothball action should
      *             be performed immediately by the GM.
      */
-    public void startMothballing(UUID id, boolean isGM) {
-        if (!isMothballed()) {
+    public void startMothballing(Campaign campaign, UUID id, boolean isGM) {
+        if (!isMothballed() && campaign.getCampaignOptions().saveMothballState()) {
             mothballInfo = new MothballInfo(this);
         }
 
@@ -4530,7 +4530,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         tech = id;
 
         //don't remove personnel yet, because self crewed units need their crews to mothball
-        getCampaign().removeUnitFromForce(this);
+        campaign.removeUnitFromForce(this);
 
         //clear any assigned tasks
         for (Part p : getParts()) {
@@ -4539,10 +4539,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         if (!isGM) {
             setMothballTime(getMothballOrActivationTime());
-            getCampaign().mothball(this);
+            campaign.mothball(this);
         } else {
-            getCampaign().completeMothball(this);
-            getCampaign().addReport(getHyperlinkedName() + " has been mothballed (GM)");
+            campaign.completeMothball(this);
+            campaign.addReport(getHyperlinkedName() + " has been mothballed (GM)");
         }
     }
 

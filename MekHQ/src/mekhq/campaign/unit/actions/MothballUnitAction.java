@@ -50,14 +50,14 @@ public class MothballUnitAction implements IUnitAction {
     @Override
     public void Execute(Campaign campaign, Unit unit) {
         if (isGM) {
-            unit.startMothballing(null, true);
+            unit.startMothballing(campaign, null, true);
         }
         else {
             if (!unit.isSelfCrewed() && null == techId) {
                 return;
             }
 
-            unit.startMothballing(techId);
+            unit.startMothballing(campaign, techId);
         }
     }
 }

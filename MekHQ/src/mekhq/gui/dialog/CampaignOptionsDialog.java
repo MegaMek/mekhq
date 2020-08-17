@@ -177,6 +177,8 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox reverseQualityNames;
     private JCheckBox useUnofficialMaintenance;
     private JCheckBox logMaintenance;
+    //mothballing
+    private JCheckBox chkSaveMothballState;
     //endregion Repair and Maintenance Tab
 
     //region Supplies and Acquisitions Tab
@@ -833,38 +835,36 @@ public class CampaignOptionsDialog extends JDialog {
 
         tabOptions.addTab(resourceMap.getString("panGeneral.TabConstraints.tabTitle"), panGeneral); // NOI18N
 
-        panRepair.setName("panRules"); // NOI18N
+        //region Repair and Maintenance
+        panRepair.setName("panRepair");
         panRepair.setLayout(new java.awt.GridBagLayout());
 
         JPanel panSubRepair = new JPanel(new GridBagLayout());
         JPanel panSubMaintenance = new JPanel(new GridBagLayout());
+        JPanel panSubMothballing = new JPanel(new GridBagLayout());
 
         panSubRepair.setBorder(BorderFactory.createTitledBorder("Repair"));
         panSubMaintenance.setBorder(BorderFactory.createTitledBorder("Maintenance"));
+        panSubMothballing.setBorder(BorderFactory.createTitledBorder("Mothballing"));
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = .5;
+        gridBagConstraints.weightx = 0.5;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         panRepair.add(panSubRepair, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         panRepair.add(panSubMaintenance, gridBagConstraints);
 
-        //We want the new mass repair panel to span two cells
-        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.weighty = 1;
-        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-
+        gridBagConstraints.gridy = 1;
+        panRepair.add(panSubMothballing, gridBagConstraints);
 
         useEraModsCheckBox.setText(resourceMap.getString("useEraModsCheckBox.text")); // NOI18N
         useEraModsCheckBox.setToolTipText(resourceMap.getString("useEraModsCheckBox.toolTipText")); // NOI18N
@@ -937,13 +937,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(useDamageMargin, gridBagConstraints);
 
-        useDamageMargin.addActionListener(evt -> {
-            if (useDamageMargin.isSelected()) {
-                spnDamageMargin.setEnabled(true);
-            } else {
-                spnDamageMargin.setEnabled(false);
-            }
-        });
+        useDamageMargin.addActionListener(evt -> spnDamageMargin.setEnabled(useDamageMargin.isSelected()));
 
         spnDamageMargin = new JSpinner(new SpinnerNumberModel(options.getDestroyMargin(), 1, 20, 1));
         ((JSpinner.DefaultEditor) spnDamageMargin.getEditor()).getTextField().setEditable(false);
@@ -979,7 +973,6 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(pnlDestroyPartTarget, gridBagConstraints);
-
 
         checkMaintenance.setText(resourceMap.getString("checkMaintenance.text")); // NOI18N
         checkMaintenance.setToolTipText(resourceMap.getString("checkMaintenance.toolTipText")); // NOI18N
@@ -1089,7 +1082,19 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
         panSubMaintenance.add(logMaintenance, gridBagConstraints);
 
+        //region Mothballing
+        chkSaveMothballState = new JCheckBox(resourceMap.getString("chkSaveMothballState.text"));
+        chkSaveMothballState.setToolTipText(resourceMap.getString("chkSaveMothballState.toolTipText")); // NOI18N
+        chkSaveMothballState.setName("chkSaveMothballState");
+        chkSaveMothballState.setSelected(options.saveMothballState());
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        panSubMothballing.add(chkSaveMothballState, gridBagConstraints);
+        //endregion Mothballing
+
         tabOptions.addTab(resourceMap.getString("panRepair.TabConstraints.tabTitle"), panRepair); // NOI18N
+        //endregion Repair and Maintenance
 
         panSupplies.setName("panSupplies"); // NOI18N
         panSupplies.setLayout(new java.awt.GridBagLayout());
@@ -4787,6 +4792,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setReverseQualityNames(reverseQualityNames.isSelected());
         options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
         options.setLogMaintenance(logMaintenance.isSelected());
+        options.setSaveMothballState(chkSaveMothballState.isSelected());
         options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getModel().getValue());
         options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getModel().getValue());
         options.setPayForParts(payForPartsBox.isSelected());
