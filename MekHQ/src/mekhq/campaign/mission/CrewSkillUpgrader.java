@@ -115,7 +115,9 @@ public class CrewSkillUpgrader {
         // every time we generate an SPA, we reduce the max available XP
         // this logic also prevents attempting to assign an SPA when there are no SPAs
         // that cost less XP than the remaining cap
-        for (int x = 0; (x < spaCap) && (xpCap > minAbilityCost); x++) {
+        // We also want to ensure this only happens a maximum of a thousand times, to prevent an
+        // infinite loop
+        for (int x = 0, y = 0; (x < spaCap) && (xpCap > minAbilityCost) && (y < 1000); x++, y++) {
             int spaCost = addSingleSPA(entity, xpCap);
             // if we didn't assign an SPA, let's reroll it.
             if (spaCost == 0) {
