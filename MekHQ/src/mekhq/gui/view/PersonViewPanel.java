@@ -489,8 +489,8 @@ public class PersonViewPanel extends ScrollablePanel {
 
         int firsty = 0, secondy = 0;
 
-        lblType.setName("lblType"); // NOI18N
-        lblType.setText(String.format(resourceMap.getString("format.italic"), person.getRoleDesc())); //$NON-NLS-1$
+        lblType.setName("lblType");
+        lblType.setText(String.format(resourceMap.getString("format.italic"), person.getRoleDesc()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = firsty;
@@ -504,7 +504,7 @@ public class PersonViewPanel extends ScrollablePanel {
         firsty++;
 
         lblStatus1.setName("lblStatus1"); // NOI18N
-        lblStatus1.setText(resourceMap.getString("lblStatus1.text")); //$NON-NLS-1$
+        lblStatus1.setText(resourceMap.getString("lblStatus1.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = firsty;
@@ -512,8 +512,8 @@ public class PersonViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblStatus1, gridBagConstraints);
 
-        lblStatus2.setName("lblStatus2"); // NOI18N
-        lblStatus2.setText(person.getStatus().getStatusName() + person.pregnancyStatus());
+        lblStatus2.setName("lblStatus2");
+        lblStatus2.setText(person.getStatus().toString() + person.pregnancyStatus());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = firsty;
@@ -527,7 +527,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         if (campaign.getCampaignOptions().showOriginFaction()) {
             lblOrigin1.setName("lblOrigin1"); // NOI18N
-            lblOrigin1.setText(resourceMap.getString("lblOrigin1.text")); //$NON-NLS-1$
+            lblOrigin1.setText(resourceMap.getString("lblOrigin1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = firsty;
@@ -535,7 +535,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblOrigin1, gridBagConstraints);
 
-            lblOrigin2.setName("lblOrigin2"); // NOI18N
+            lblOrigin2.setName("lblOrigin2");
             String factionName = person.getOriginFaction().getFullName(campaign.getGameYear());
             if (person.getOriginPlanet() != null) {
                 String planetName = person.getOriginPlanet().getName(campaign.getLocalDate());
@@ -1332,7 +1332,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         JPanel pnlLog = new JPanel(new GridBagLayout());
 
-        PersonnelEventLogModel eventModel = new PersonnelEventLogModel();
+        PersonnelEventLogModel eventModel = new PersonnelEventLogModel(campaign);
         eventModel.setData(logs);
         JTable eventTable = new JTable(eventModel);
         eventTable.setRowSelectionAllowed(false);
@@ -1369,7 +1369,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         JPanel pnlMissionsLog = new JPanel(new GridBagLayout());
 
-        JLabel lblMissions = new JLabel(String.format(resourceMap.getString("format.missions"), missionLog.size())); //$NON-NLS-1$
+        JLabel lblMissions = new JLabel(String.format(resourceMap.getString("format.missions"), missionLog.size()));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -1379,17 +1379,17 @@ public class PersonViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlMissionsLog.add(lblMissions, gridBagConstraints);
 
-        PersonnelEventLogModel eventModel = new PersonnelEventLogModel();
+        PersonnelEventLogModel eventModel = new PersonnelEventLogModel(campaign);
         eventModel.setData(missionLog);
         JTable missionsTable = new JTable(eventModel);
         missionsTable.setRowSelectionAllowed(false);
         missionsTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column;
-        for(int i = 0; i < eventModel.getColumnCount(); ++ i) {
+        for (int i = 0; i < eventModel.getColumnCount(); ++i) {
             column = missionsTable.getColumnModel().getColumn(i);
             column.setCellRenderer(eventModel.getRenderer());
             column.setPreferredWidth(eventModel.getPreferredWidth(i));
-            if(eventModel.hasConstantWidth(i)) {
+            if (eventModel.hasConstantWidth(i)) {
                 column.setMinWidth(eventModel.getPreferredWidth(i));
                 column.setMaxWidth(eventModel.getPreferredWidth(i));
             }

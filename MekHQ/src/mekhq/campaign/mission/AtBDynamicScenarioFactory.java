@@ -499,7 +499,7 @@ public class AtBDynamicScenarioFactory {
             BotForce botForce = scenario.getBotForce(botIndex);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
 
-            if (forceTemplate != null && forceTemplate.isAlliedPlayerForce()) {
+            if ((forceTemplate != null) && forceTemplate.isAlliedPlayerForce()) {
 
                 for (Entity en : botForce.getEntityList()) {
                     scenario.getAlliesPlayer().add(en);

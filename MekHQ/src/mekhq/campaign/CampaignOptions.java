@@ -384,6 +384,7 @@ public class CampaignOptions implements Serializable {
     private boolean adjustPlayerVehicles;
     private boolean regionalMechVariations;
     private boolean attachedPlayerCamouflage;
+    private boolean playerControlsAttachedUnits;
     private boolean useDropShips;
     private boolean useWeatherConditions;
     private boolean useLightConditions;
@@ -772,6 +773,7 @@ public class CampaignOptions implements Serializable {
         adjustPlayerVehicles = false;
         regionalMechVariations = false;
         attachedPlayerCamouflage = true;
+        playerControlsAttachedUnits = false;
         useDropShips = false;
         useWeatherConditions = true;
         useLightConditions = true;
@@ -2708,11 +2710,19 @@ public class CampaignOptions implements Serializable {
         this.attachedPlayerCamouflage = attachedPlayerCamouflage;
     }
 
+    public boolean getPlayerControlsAttachedUnits() {
+        return playerControlsAttachedUnits;
+    }
+
+    public void setPlayerControlsAttachedUnits(boolean playerControlsAttachedUnits) {
+        this.playerControlsAttachedUnits = playerControlsAttachedUnits;
+    }
+
     public String[] getRATs() {
         return rats;
     }
 
-    public void setRATs (String[] rats) {
+    public void setRATs(String[] rats) {
         this.rats = rats;
     }
 
@@ -3227,6 +3237,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackOriginalUnit", trackOriginalUnit);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "regionalMechVariations", regionalMechVariations);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "attachedPlayerCamouflage", attachedPlayerCamouflage);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "playerControlsAttachedUnits", playerControlsAttachedUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "searchRadius", searchRadius);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "intensity", intensity);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "generateChases", generateChases);
@@ -3818,6 +3829,8 @@ public class CampaignOptions implements Serializable {
                 retVal.regionalMechVariations = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("attachedPlayerCamouflage")) {
                 retVal.attachedPlayerCamouflage = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("playerControlsAttachedUnits")) {
+                retVal.setPlayerControlsAttachedUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("searchRadius")) {
                 retVal.searchRadius = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) {

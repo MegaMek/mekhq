@@ -82,7 +82,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     private boolean ready;
 
     // Stores the user-input date.
-    private JFormattedTextField dateField = null;
+    private JFormattedTextField dateField;
 
     /**
      * Constructor for DateChooser
@@ -210,9 +210,9 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         ready = false;
         setVisible(true);
         if (ready) {
-            return (OK_OPTION);
+            return OK_OPTION;
         } else {
-            return (CANCEL_OPTION);
+            return CANCEL_OPTION;
         }
     }
 
@@ -316,7 +316,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         }
 
         // decide what day of the week is the first day of this month
-        int offset = LocalDate.of(y, m, 1).getDayOfWeek().ordinal() - 1;
+        int offset = LocalDate.of(y, m, 1).getDayOfWeek().ordinal();
 
 
         // display 7 days of the week across the top

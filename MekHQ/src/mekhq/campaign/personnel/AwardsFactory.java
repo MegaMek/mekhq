@@ -29,7 +29,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import mekhq.campaign.log.LogEntry;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -123,7 +122,7 @@ public class AwardsFactory {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().error(LogEntry.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(AwardsFactory.class, METHOD_NAME, ex);
         }
 
         Award award = generateNew(set, name);

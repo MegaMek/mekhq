@@ -1,7 +1,7 @@
 /*
  * Person.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -38,6 +38,7 @@ import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.log.*;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.w3c.dom.Node;
@@ -268,6 +269,9 @@ public class Person extends AbstractPerson {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
 
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            new EncodeControl());
+
     //region Reverse Compatibility
     // Unknown version
     private int oldId;
@@ -475,10 +479,10 @@ public class Person extends AbstractPerson {
                 setLastRankChangeDate(null);
                 if (log) {
                     if (isPrisoner) {
-                        ServiceLogger.madePrisoner(this, getCampaign().getDate(),
+                        ServiceLogger.madePrisoner(this, getCampaign().getLocalDate(),
                                 getCampaign().getName(), "");
                     } else {
-                        ServiceLogger.madeBondsman(this, getCampaign().getDate(),
+                        ServiceLogger.madeBondsman(this, getCampaign().getLocalDate(),
                                 getCampaign().getName(), "");
                     }
                 }
@@ -497,10 +501,10 @@ public class Person extends AbstractPerson {
                 }
                 if (log) {
                     if (freed) {
-                        ServiceLogger.freed(this, getCampaign().getDate(),
+                        ServiceLogger.freed(this, getCampaign().getLocalDate(),
                                 getCampaign().getName(), "");
                     } else {
-                        ServiceLogger.joined(this, getCampaign().getDate(),
+                        ServiceLogger.joined(this, getCampaign().getLocalDate(),
                                 getCampaign().getName(), "");
                     }
                 }
@@ -746,6 +750,99 @@ public class Person extends AbstractPerson {
         return (role >= T_MECH_TECH) && (role < T_LAM_PILOT);
     }
     //endregion Personnel Roles
+
+    /**
+     * This is used to change the person's PersonnelStatus
+     * @param campaign the campaign the person is part of
+     * @param status the person's new PersonnelStatus
+     */
+    public void changeStatus(Campaign campaign, PersonnelStatus status) {
+        if (status == getStatus()) { // no change means we don't need to process anything
+            return;
+        } else if (getStatus().isKIA()) {
+            // remove date of death for resurrection
+            setDateOfDeath(null);
+        }
+
+        switch (status) {
+            case ACTIVE:
+                if (getStatus().isMIA()) {
+                    ServiceLogger.recoveredMia(this, campaign.getLocalDate());
+                } else if (getStatus().isDead()) {
+                    ServiceLogger.resurrected(this, campaign.getLocalDate());
+                } else {
+                    ServiceLogger.rehired(this, campaign.getLocalDate());
+                }
+                setRetirement(null);
+                break;
+            case RETIRED:
+                ServiceLogger.retired(this, campaign.getLocalDate());
+                if (campaign.getCampaignOptions().useRetirementDateTracking()) {
+                    setRetirement(campaign.getLocalDate());
+                }
+                break;
+            case MIA:
+                ServiceLogger.mia(this, campaign.getLocalDate());
+                break;
+            case KIA:
+                ServiceLogger.kia(this, campaign.getLocalDate());
+                break;
+            case NATURAL_CAUSES:
+                MedicalLogger.diedOfNaturalCauses(this, campaign.getLocalDate());
+                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
+                break;
+            case WOUNDS:
+                MedicalLogger.diedFromWounds(this, campaign.getLocalDate());
+                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
+                break;
+            case DISEASE:
+                MedicalLogger.diedFromDisease(this, campaign.getLocalDate());
+                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
+                break;
+            case OLD_AGE:
+                MedicalLogger.diedOfOldAge(this, campaign.getLocalDate());
+                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
+                break;
+        }
+
+        setStatus(status);
+
+        if (status.isDead()) {
+            setDateOfDeath(campaign.getLocalDate());
+            // Don't forget to tell the spouse
+            if (getGenealogy().hasSpouse() && !getGenealogy().getSpouse(campaign).getStatus().isDeadOrMIA()) {
+                Divorce divorceType = campaign.getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
+                        ? Divorce.ORIGIN_CHANGE_SURNAME : Divorce.SPOUSE_CHANGE_SURNAME;
+                divorceType.divorce(this, campaign);
+            }
+        }
+
+        if (!status.isActive()) {
+            setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+            // If we're assigned to a unit, remove us from it
+            Unit unit = campaign.getUnit(getUnitId());
+            if (unit != null) {
+                unit.remove(this, true);
+            }
+
+            // If we're assigned as a tech for any unit, remove us from it/them
+            List<UUID> techIds = getTechUnitIDs();
+            if (!techIds.isEmpty()) {
+                for (UUID tUUID : techIds) {
+                    unit = campaign.getUnit(tUUID);
+                    unit.remove(this, true);
+                }
+            }
+            // If we're assigned to any repairs or refits, remove that assignment
+            for (Part part : campaign.getParts()) {
+                if (getId().equals(part.getTeamId())) {
+                    part.cancelAssignment();
+                }
+            }
+        }
+
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
 
     public int getIdleMonths() {
         return idleMonths;
@@ -1134,10 +1231,10 @@ public class Person extends AbstractPerson {
 
         campaign.addReport(getHyperlinkedName() + " has conceived" + (sizeString == null ? "" : (" " + sizeString)));
         if (campaign.getCampaignOptions().logConception()) {
-            MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
+            MedicalLogger.hasConceived(this, campaign.getLocalDate(), sizeString);
             if (getGenealogy().hasSpouse()) {
                 PersonalLogger.spouseConceived(getGenealogy().getSpouse(campaign),
-                        getFullName(), getCampaign().getDate(), sizeString);
+                        getFullName(), getCampaign().getLocalDate(), sizeString);
             }
         }
     }
@@ -1201,10 +1298,10 @@ public class Person extends AbstractPerson {
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             if (campaign.getCampaignOptions().logConception()) {
-                MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
+                MedicalLogger.deliveredBaby(this, baby, campaign.getLocalDate());
                 if (fatherId != null) {
                     PersonalLogger.ourChildBorn(campaign.getPerson(fatherId), baby, getFullName(),
-                            campaign.getDate());
+                            campaign.getLocalDate());
                 }
             }
         }
@@ -1245,7 +1342,7 @@ public class Person extends AbstractPerson {
                 && person.oldEnoughToMarry(campaign)
                 && (!person.getPrisonerStatus().isPrisoner() || getPrisonerStatus().isPrisoner())
                 && !person.getStatus().isDeadOrMIA()
-                && person.isActive()
+                && person.getStatus().isActive()
                 && !getGenealogy().checkMutualAncestors(person, getCampaign())
         );
     }
@@ -1351,14 +1448,6 @@ public class Person extends AbstractPerson {
             return (u.getScenarioId() != -1);
         }
         return false;
-    }
-
-    public boolean isActive() {
-        return getStatus() == PersonnelStatus.ACTIVE;
-    }
-
-    public boolean isInActive() {
-        return getStatus() != PersonnelStatus.ACTIVE;
     }
 
     public ExtraData getExtraData() {
@@ -2094,7 +2183,7 @@ public class Person extends AbstractPerson {
      * This is used to pay a person their salary
      */
     public void payPersonSalary() {
-        if (isActive()) {
+        if (getStatus().isActive()) {
             payPerson(getSalary());
         }
     }
@@ -3347,36 +3436,6 @@ public class Person extends AbstractPerson {
         setHits(0);
     }
 
-    public void changeStatus(PersonnelStatus status) {
-        if (status == getStatus()) {
-            return;
-        }
-        Unit u = campaign.getUnit(getUnitId());
-        if (status == PersonnelStatus.KIA) {
-            MedicalLogger.diedFromWounds(this, campaign.getDate());
-            //set the date of death
-            setDateOfDeath(getCampaign().getLocalDate());
-        }
-        if (status == PersonnelStatus.RETIRED) {
-            ServiceLogger.retireDueToWounds(this, campaign.getDate());
-        }
-        setStatus(status);
-        if (status != PersonnelStatus.ACTIVE) {
-            setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
-            // If we're assigned to a unit, remove us from it
-            if (null != u) {
-                u.remove(this, true);
-            }
-            // If we're assigned as a tech for any unit, remove us from it/them
-            if (!techUnitIds.isEmpty()) {
-                for (UUID tuuid : techUnitIds) {
-                    Unit t = campaign.getUnit(tuuid);
-                    t.remove(this, true);
-                }
-            }
-        }
-    }
-
     public int getAbilityTimeModifier() {
         int modifier = 100;
         if (campaign.getCampaignOptions().useToughness()) {
@@ -3564,7 +3623,8 @@ public class Person extends AbstractPerson {
      * @return the number of shares the person has
      */
     public int getNumShares(boolean sharesForAll) {
-        if (!isActive() || !getPrisonerStatus().isFree() || (!sharesForAll && !hasRole(T_MECHWARRIOR))) {
+        if (!getStatus().isActive() || !getPrisonerStatus().isFree()
+                || (!sharesForAll && !hasRole(T_MECHWARRIOR))) {
             return 0;
         }
         int shares = 1;

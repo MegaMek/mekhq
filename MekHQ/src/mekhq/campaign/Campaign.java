@@ -27,7 +27,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Predicate;
@@ -42,7 +41,6 @@ import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.*;
-import mekhq.campaign.personnel.enums.Divorce;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
@@ -742,12 +740,11 @@ public class Campaign implements Serializable, ITechManager {
      * @return False if there were payments AND they were unable to be processed, true otherwise.
      */
     public boolean applyRetirement(Money totalPayout, HashMap<UUID, UUID> unitAssignments) {
-        if ((totalPayout.isPositive())
-                || (null != getRetirementDefectionTracker().getRetirees())) {
+        if ((totalPayout.isPositive()) || (null != getRetirementDefectionTracker().getRetirees())) {
             if (getFinances().debit(totalPayout, Transaction.C_SALARY, "Final Payout", getLocalDate())) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
-                    if (getPerson(pid).isActive()) {
-                        changeStatus(getPerson(pid), PersonnelStatus.RETIRED);
+                    if (getPerson(pid).getStatus().isActive()) {
+                        getPerson(pid).changeStatus(this, PersonnelStatus.RETIRED);
                         addReport(getPerson(pid).getFullName() + " has retired.");
                     }
                     if (Person.T_NONE != getRetirementDefectionTracker().getPayout(pid).getRecruitType()) {
@@ -1602,7 +1599,7 @@ public class Campaign implements Serializable, ITechManager {
     public List<Person> getActivePersonnel() {
         List<Person> activePersonnel = new ArrayList<>();
         for (Person p : getPersonnel()) {
-            if (p.isActive()) {
+            if (p.getStatus().isActive()) {
                 activePersonnel.add(p);
             }
         }
@@ -1660,7 +1657,7 @@ public class Campaign implements Serializable, ITechManager {
         List<Person> patients = new ArrayList<>();
         for (Person p : getPersonnel()) {
             if (p.needsFixing()
-                    || (getCampaignOptions().useAdvancedMedical() && p.hasInjuries(true) && p.isActive())) {
+                    || (getCampaignOptions().useAdvancedMedical() && p.hasInjuries(true) && p.getStatus().isActive())) {
                 patients.add(p);
             }
         }
@@ -2024,9 +2021,8 @@ public class Campaign implements Serializable, ITechManager {
     public Person findBestInRole(int role, String primary, String secondary) {
         int highest = 0;
         Person retVal = null;
-        for (Person p : getPersonnel()) {
-            if (p.isActive() && (p.getPrimaryRole() == role || p.getSecondaryRole() == role)
-                    && p.getSkill(primary) != null) {
+        for (Person p : getActivePersonnel()) {
+            if ((p.getPrimaryRole() == role || p.getSecondaryRole() == role) && p.getSkill(primary) != null) {
                 if (p.getSkill(primary).getLevel() > highest) {
                     retVal = p;
                     highest = p.getSkill(primary).getLevel();
@@ -2085,13 +2081,13 @@ public class Campaign implements Serializable, ITechManager {
 
         // Get the first tech.
         Person firstTech = getPerson(firstTechId);
-        if ((firstTech != null) && firstTech.isTech() && firstTech.isActive()
+        if ((firstTech != null) && firstTech.isTech() && firstTech.getStatus().isActive()
                 && (!noZeroMinute || firstTech.getMinutesLeft() > 0)) {
             techs.add(firstTech);
         }
 
-        for (Person p : getPersonnel()) {
-            if (p.isTech() && p.isActive() && (!p.equals(firstTech)) && (!noZeroMinute || (p.getMinutesLeft() > 0))) {
+        for (Person p : getActivePersonnel()) {
+            if (p.isTech() && (!p.equals(firstTech)) && (!noZeroMinute || (p.getMinutesLeft() > 0))) {
                 techs.add(p);
             }
         }
@@ -2165,8 +2161,8 @@ public class Campaign implements Serializable, ITechManager {
 
     public List<Person> getAdmins() {
         List<Person> admins = new ArrayList<>();
-        for (Person p : getPersonnel()) {
-            if (p.isAdmin() && p.isActive()) {
+        for (Person p : getActivePersonnel()) {
+            if (p.isAdmin()) {
                 admins.add(p);
             }
         }
@@ -2186,10 +2182,10 @@ public class Campaign implements Serializable, ITechManager {
         return false;
     }
 
-    public ArrayList<Person> getDoctors() {
-        ArrayList<Person> docs = new ArrayList<>();
-        for (Person p : getPersonnel()) {
-            if (p.isDoctor() && p.isActive()) {
+    public List<Person> getDoctors() {
+        List<Person> docs = new ArrayList<>();
+        for (Person p : getActivePersonnel()) {
+            if (p.isDoctor()) {
                 docs.add(p);
             }
         }
@@ -2198,36 +2194,13 @@ public class Campaign implements Serializable, ITechManager {
 
     public int getPatientsFor(Person doctor) {
         int patients = 0;
-        for (Person person : getPersonnel()) {
-            if (null != person.getDoctorId()
-                    && person.getDoctorId().equals(doctor.getId())
-                    && person.isActive()) {
+        for (Person person : getActivePersonnel()) {
+            if ((null != person.getDoctorId()) && person.getDoctorId().equals(doctor.getId())) {
                 patients++;
             }
         }
         return patients;
     }
-
-    /**
-     * return an html report on this unit. This will go in MekInfo
-     *
-     */
-    /*
-     * public String getUnitDesc(UUID unitId) { Unit unit = getUnit(unitId); String
-     * toReturn = "<html><font size='2'"; if (unit.isDeployed()) { toReturn +=
-     * " color='white'"; } toReturn += ">"; toReturn += unit.getDescHTML(); int
-     * totalMin = 0; int total = 0; // int cost = unit.getRepairCost();
-     *
-     * if (total > 0) { toReturn += "Total tasks: " + total + " (" + totalMin +
-     * " minutes)<br/>"; } /* if (cost > 0) { NumberFormat numberFormat =
-     * DecimalFormat.getIntegerInstance(); String text = numberFormat.format(cost) +
-     * " " + (cost != 0 ? "CBills" : "CBill"); toReturn += "Repair cost : " + text +
-     * "<br/>"; }
-     */
-    /*
-     * toReturn += "</font>"; toReturn += "</html>"; return toReturn; }
-     */
-
 
     public String healPerson(Person medWork, Person doctor) {
         if (getCampaignOptions().useAdvancedMedical()) {
@@ -2324,29 +2297,27 @@ public class Campaign implements Serializable, ITechManager {
         if (skill.equals(CampaignOptions.S_AUTO)) {
             return admin;
         } else if (skill.equals(CampaignOptions.S_TECH)) {
-            for (Person p : getPersonnel()) {
+            for (Person p : getActivePersonnel()) {
                 if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(false)) {
                     continue;
                 }
-                if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
+                if (maxAcquisitions > 0 && (p.getAcquisitions() >= maxAcquisitions)) {
                     continue;
                 }
-                if (p.isActive() && null != p.getBestTechSkill()
-                        && p.getBestTechSkill().getLevel() > bestSkill) {
+                if ((p.getBestTechSkill() != null) && p.getBestTechSkill().getLevel() > bestSkill) {
                     admin = p;
                     bestSkill = p.getBestTechSkill().getLevel();
                 }
             }
         } else {
-            for (Person p : getPersonnel()) {
+            for (Person p : getActivePersonnel()) {
                 if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(false)) {
                     continue;
                 }
-                if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
+                if (maxAcquisitions > 0 && (p.getAcquisitions() >= maxAcquisitions)) {
                     continue;
                 }
-                if (p.isActive() && p.hasSkill(skill)
-                        && p.getSkill(skill).getLevel() > bestSkill) {
+                if (p.hasSkill(skill) && (p.getSkill(skill).getLevel() > bestSkill)) {
                     admin = p;
                     bestSkill = p.getSkill(skill).getLevel();
                 }
@@ -2367,14 +2338,11 @@ public class Campaign implements Serializable, ITechManager {
         } else {
             List<Person> logisticsPersonnel = new ArrayList<>();
             int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
-            for (Person p : getPersonnel()) {
-                if (!p.isActive()) {
-                    continue;
-                }
+            for (Person p : getActivePersonnel()) {
                 if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(false)) {
                     continue;
                 }
-                if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
+                if ((maxAcquisitions > 0) && (p.getAcquisitions() >= maxAcquisitions)) {
                     continue;
                 }
                 if (skill.equals(CampaignOptions.S_TECH)) {
@@ -3400,12 +3368,10 @@ public class Campaign implements Serializable, ITechManager {
                 && (!getCampaignOptions().getDependentsNeverLeave() || getCampaignOptions().canAtBAddDependents())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
-            for (Person p : getPersonnel()) {
-                if (p.isActive()) {
-                    numPersonnel++;
-                    if (p.isDependent()) {
-                        dependents.add(p);
-                    }
+            for (Person p : getActivePersonnel()) {
+                numPersonnel++;
+                if (p.isDependent()) {
+                    dependents.add(p);
                 }
             }
             int roll = Compute.d6(2) + getUnitRatingMod() - 2;
@@ -3506,7 +3472,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
-                    && p.isActive() && !p.getPrisonerStatus().isPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
+                    && !p.getPrisonerStatus().isPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
                 p.setIdleMonths(p.getIdleMonths() + 1);
                 if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
@@ -4271,12 +4237,9 @@ public class Campaign implements Serializable, ITechManager {
 
     private void addInMemoryLogHistory(LogEntry le) {
         if (inMemoryLogHistory.size() != 0) {
-            long diff = le.getDate().getTime() - inMemoryLogHistory.get(0).getDate().getTime();
-            while ((diff / (1000 * 60 * 60 * 24)) > HistoricalDailyReportDialog.MAX_DAYS_HISTORY) {
-                //we've hit the max size for the in-memory based on the UI display limit
-                //prune the oldest entry
+            while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) > HistoricalDailyReportDialog.MAX_DAYS_HISTORY) {
+                //we've hit the max size for the in-memory based on the UI display limit prune the oldest entry
                 inMemoryLogHistory.remove(0);
-                diff = le.getDate().getTime() - inMemoryLogHistory.get(0).getDate().getTime();
             }
         }
         inMemoryLogHistory.add(le);
@@ -4289,7 +4252,7 @@ public class Campaign implements Serializable, ITechManager {
     public void beginReport(String r) {
         if (this.getCampaignOptions().historicalDailyLog()) {
             //add the new items to our in-memory cache
-            addInMemoryLogHistory(new HistoricalLogEntry(getDate(), ""));
+            addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), ""));
         }
         addReportInternal(r);
     }
@@ -4300,7 +4263,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void addReport(String r) {
         if (this.getCampaignOptions().historicalDailyLog()) {
-            addInMemoryLogHistory(new HistoricalLogEntry(getDate(), r));
+            addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), r));
         }
         addReportInternal(r);
     }
@@ -5663,12 +5626,17 @@ public class Campaign implements Serializable, ITechManager {
                 et = ((MissingEquipmentPart) acquisition).getType();
             }
 
+            StringBuilder partAvailabilityLog = new StringBuilder();
+            partAvailabilityLog.append("Part Rating Level: " + partAvailability)
+                                .append("(" + EquipmentType.ratingNames[partAvailability] + ")");
+
             /*
              * Even if we can acquire Clan parts, they have a minimum availability of F for
              * non-Clan units
              */
             if (acquisition.getTechBase() == Part.T_CLAN && !getFaction().isClan()) {
                 partAvailability = Math.max(partAvailability, EquipmentType.RATING_F);
+                partAvailabilityLog.append(";[clan part for non clan faction]");
             } else if (et != null) {
                 /*
                  * AtB rules do not simply affect difficulty of obtaining parts, but whether
@@ -5682,27 +5650,33 @@ public class Campaign implements Serializable, ITechManager {
                         && !(et instanceof megamek.common.weapons.flamers.FlamerWeapon)
                         && partAvailability < EquipmentType.RATING_C) {
                     partAvailability = EquipmentType.RATING_C;
+                    partAvailabilityLog.append(";(non-flamer lasers)");
                 }
                 if (et instanceof megamek.common.weapons.autocannons.ACWeapon) {
                     partAvailability -= 2;
+                    partAvailabilityLog.append(";(autocannon): -2");
                 }
                 if (et instanceof megamek.common.weapons.gaussrifles.GaussWeapon
                         || et instanceof megamek.common.weapons.flamers.FlamerWeapon) {
                     partAvailability--;
+                    partAvailabilityLog.append(";(gauss rifle or flamer): -1");
                 }
                 if (et instanceof megamek.common.AmmoType) {
                     switch (((megamek.common.AmmoType) et).getAmmoType()) {
                         case megamek.common.AmmoType.T_AC:
                             partAvailability -= 2;
+                            partAvailabilityLog.append(";(autocannon ammo): -2");
                             break;
                         case megamek.common.AmmoType.T_GAUSS:
                             partAvailability -= 1;
+                            partAvailabilityLog.append(";(gauss ammo): -1");
+                            break;
                     }
                     if (((megamek.common.AmmoType) et).getMunitionType() == megamek.common.AmmoType.M_STANDARD) {
                         partAvailability--;
+                        partAvailabilityLog.append(";(standard ammo): -1");
                     }
                 }
-
             }
 
             if (((getGameYear() < 2950) || (getGameYear() > 3040))
@@ -5712,11 +5686,14 @@ public class Campaign implements Serializable, ITechManager {
                             || acquisition instanceof mekhq.campaign.parts.MissingMekLocation
                             || acquisition instanceof mekhq.campaign.parts.MissingMekSensor)) {
                 partAvailability--;
+                partAvailabilityLog.append("(Mek part prior to 2950 or after 3040): - 1");
             }
 
-            if (partAvailability > findAtBPartsAvailabilityLevel(acquisition)) {
-                return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                        "This part is not currently available to your unit.");
+            int AtBPartsAvailability = findAtBPartsAvailabilityLevel(acquisition, null);
+            partAvailabilityLog.append("; Total part availability: " + partAvailability)
+                            .append("; Current campaign availability: " + AtBPartsAvailability);
+            if (partAvailability > AtBPartsAvailability) {
+                return new TargetRoll(TargetRoll.IMPOSSIBLE, partAvailabilityLog.toString());
             }
         }
         TargetRoll target = new TargetRoll(skill.getFinalSkillValue(),
@@ -5746,28 +5723,47 @@ public class Campaign implements Serializable, ITechManager {
         return retVal;
     }
 
-    private int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition) {
-        AtBContract contract = getAttachedAtBContract(acquisition.getUnit());
+    public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {
+        AtBContract contract = (acquisition != null) ? getAttachedAtBContract(acquisition.getUnit()) : null;
+
         /*
          * If the unit is not assigned to a contract, use the least restrictive active
-         * contract
+         * contract. Don't restrict parts availability by contract if it has not started.
          */
-        for (Mission m : getMissions()) {
-            if (m.isActive() && m instanceof AtBContract) {
-                if (null == contract
-                        || ((AtBContract) m).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()) {
-                    contract = (AtBContract) m;
+        if (hasActiveContract()) {
+            for (Contract c : getActiveContracts()) {
+                if ((c instanceof AtBContract) &&
+                        ((contract == null) ||
+                        (((AtBContract) c).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()))) {
+                    contract = (AtBContract) c;
                 }
             }
         }
-        if (null != contract) {
+
+        // if we have a contract and it has started
+        if ((null != contract) && getLocalDate().isBefore(contract.getStartDate())) {
+            if (reportBuilder != null) {
+                reportBuilder.append(contract.getPartsAvailabilityLevel() + " (" + contract.getType() +")");
+            }
             return contract.getPartsAvailabilityLevel();
         }
+
         /* If contract is still null, the unit is not in a contract. */
         Person adminLog = findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
         int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN
                 : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-        return getUnitRatingMod() + adminLogExp - SkillType.EXP_REGULAR;
+        int adminMod = adminLogExp - SkillType.EXP_REGULAR;
+
+        if (reportBuilder != null) {
+            reportBuilder.append(getUnitRatingMod() + "(unit rating)");
+            if (adminLog != null) {
+                reportBuilder.append(adminMod + "(" + adminLog.getFullName() +", logistics admin)");
+            } else {
+                reportBuilder.append(adminMod + "(no logistics admin)");
+            }
+        }
+
+        return getUnitRatingMod() + adminMod;
     }
 
     public void resetAstechMinutes() {
@@ -5838,9 +5834,8 @@ public class Campaign implements Serializable, ITechManager {
 
     public int getNumberPrimaryAstechs() {
         int astechs = getAstechPool();
-        for (Person p : getPersonnel()) {
-            if ((p.getPrimaryRole() == Person.T_ASTECH) && p.isActive()
-                    && !p.isDeployed()) {
+        for (Person p : getActivePersonnel()) {
+            if ((p.getPrimaryRole() == Person.T_ASTECH) && !p.isDeployed()) {
                 astechs++;
             }
         }
@@ -5849,9 +5844,8 @@ public class Campaign implements Serializable, ITechManager {
 
     public int getNumberSecondaryAstechs() {
         int astechs = 0;
-        for (Person p : getPersonnel()) {
-            if ((p.getSecondaryRole() == Person.T_ASTECH) && p.isActive()
-                    && !p.isDeployed()) {
+        for (Person p : getActivePersonnel()) {
+            if ((p.getSecondaryRole() == Person.T_ASTECH) && !p.isDeployed()) {
                 astechs++;
             }
         }
@@ -5930,8 +5924,8 @@ public class Campaign implements Serializable, ITechManager {
      */
     public int getNumberMedics() {
         int medics = getMedicPool(); // this uses a getter for unit testing
-        for (Person p : getPersonnel()) {
-            if (p.isMedic() && p.isActive() && !p.isDeployed()) {
+        for (Person p : getActivePersonnel()) {
+            if (p.isMedic() && !p.isDeployed()) {
                 medics++;
             }
         }
@@ -5946,60 +5940,6 @@ public class Campaign implements Serializable, ITechManager {
     public void decreaseMedicPool(int i) {
         medicPool = Math.max(0, medicPool - i);
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
-    }
-
-    public void changeStatus(Person person, PersonnelStatus status) {
-        Unit u = getUnit(person.getUnitId());
-        if (status == PersonnelStatus.KIA) {
-            ServiceLogger.kia(person, getDate());
-            // set the date of death
-            person.setDateOfDeath(getLocalDate());
-            // Don't forget to tell the spouse
-            if (person.getGenealogy().hasSpouse()
-                    && !person.getGenealogy().getSpouse(this).getStatus().isDeadOrMIA()) {
-                Divorce divorceType = getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
-                        ? Divorce.ORIGIN_CHANGE_SURNAME : Divorce.SPOUSE_CHANGE_SURNAME;
-                divorceType.divorce(person, this);
-            }
-        } else if (person.getStatus() == PersonnelStatus.KIA) {
-            // remove date of death for resurrection
-            person.setDateOfDeath(null);
-        }
-        if (status == PersonnelStatus.MIA) {
-            ServiceLogger.mia(person, getDate());
-        }
-        if (status == PersonnelStatus.RETIRED) {
-            ServiceLogger.retired(person, getDate());
-            if (getCampaignOptions().useRetirementDateTracking()) {
-                person.setRetirement(getLocalDate());
-            }
-        }
-        if ((status == PersonnelStatus.ACTIVE) && (person.getStatus() == PersonnelStatus.MIA)) {
-            ServiceLogger.recoveredMia(person, getDate());
-        }
-        person.setStatus(status);
-        if (status != PersonnelStatus.ACTIVE) {
-            person.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
-            // If we're assigned to a unit, remove us from it
-            if (null != u) {
-                u.remove(person, true);
-            }
-            // If we're assigned as a tech for any unit, remove us from it/them
-            if (!person.getTechUnitIDs().isEmpty()) {
-                List<UUID> techIds = person.getTechUnitIDs();
-                for (UUID tUUID : techIds) {
-                    Unit t = getUnit(tUUID);
-                    t.remove(person, true);
-                }
-            }
-            // If we're assigned to any repairs or refits, remove that assignment
-            for (Part part : getParts()) {
-                if (person.getId().equals(part.getTeamId())) {
-                    part.cancelAssignment();
-                }
-            }
-        }
-        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
     public void changeRank(Person person, int rank, boolean report) {
@@ -6024,9 +5964,9 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonChangedEvent(person));
         if (report) {
             if (rank > oldRank || ((rank == oldRank) && (rankLevel > oldRankLevel))) {
-                ServiceLogger.promotedTo(person, getDate());
+                ServiceLogger.promotedTo(person, getLocalDate());
             } else if ((rank < oldRank) || (rankLevel < oldRankLevel)) {
-                ServiceLogger.demotedTo(person, getDate());
+                ServiceLogger.demotedTo(person, getLocalDate());
             }
         }
     }
@@ -7778,12 +7718,17 @@ public class Campaign implements Serializable, ITechManager {
         int countInjured = 0;
         int countMIA = 0;
         int countKIA = 0;
+        int countDead = 0;
         int countRetired = 0;
         Money salary = Money.zero();
 
         for (Person p : getPersonnel()) {
+            if (!p.hasPrimaryCombatRole() || !p.getPrisonerStatus().isFree()) {
+                continue;
+            }
+
             // Add them to the total count
-            if (p.hasPrimaryCombatRole() && p.getPrisonerStatus().isFree() && p.isActive()) {
+            if (p.getStatus().isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
                 if (getCampaignOptions().useAdvancedMedical() && p.getInjuries().size() > 0) {
@@ -7792,45 +7737,38 @@ public class Campaign implements Serializable, ITechManager {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary());
-            } else if (p.hasPrimaryCombatRole() && (p.getStatus() == PersonnelStatus.RETIRED)) {
+            } else if (p.getStatus().isRetired()) {
                 countRetired++;
-            } else if (p.hasPrimaryCombatRole() && (p.getStatus() == PersonnelStatus.MIA)) {
+            } else if (p.getStatus().isMIA()) {
                 countMIA++;
-            } else if (p.hasPrimaryCombatRole() && (p.getStatus() == PersonnelStatus.KIA)) {
+            } else if (p.getStatus().isKIA()) {
                 countKIA++;
+                countDead++;
+            } else if (p.getStatus().isDead()) {
+                countDead++;
             }
         }
 
-        StringBuffer sb = new StringBuffer("Combat Personnel\n\n");
+        StringBuilder sb = new StringBuilder("Combat Personnel\n\n");
 
-        String buffer = String.format("%-30s        %4s\n", "Total Combat Personnel",
-                countTotal);
-        sb.append(buffer);
+        sb.append(String.format("%-30s        %4s\n", "Total Combat Personnel", countTotal));
 
         for (int i = 0; i < Person.T_NUM; i++) {
             if (Person.isCombatRole(i)) {
-                buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i, getFaction().isClan()),
-                        countPersonByType[i]);
-                sb.append(buffer);
+                sb.append(String.format("    %-30s    %4s\n",
+                        Person.getRoleDesc(i, getFaction().isClan()), countPersonByType[i]));
             }
         }
 
-        buffer = String.format("%-30s        %4s\n",
-                "Injured Combat Personnel", countInjured);
-        sb.append("\n").append(buffer);
-        buffer = String.format("%-30s        %4s\n", "MIA Combat Personnel",
-                countMIA);
-        sb.append(buffer);
-        buffer = String.format("%-30s        %4s\n", "KIA Combat Personnel",
-                countKIA);
-        sb.append(buffer);
-        buffer = String.format("%-30s        %4s\n",
-                "Retired Combat Personnel", countRetired);
-        sb.append(buffer);
+        sb.append("\n")
+                .append(String.format("%-30s        %4s\n", "Injured Combat Personnel", countInjured))
+                .append(String.format("%-30s        %4s\n", "MIA Combat Personnel", countMIA))
+                .append(String.format("%-30s        %4s\n", "KIA Combat Personnel", countKIA))
+                .append(String.format("%-30s        %4s\n", "Retired Combat Personnel", countRetired))
+                .append(String.format("%-30s        %4s\n", "Dead Combat Personnel", countDead))
+                .append("\nMonthly Salary For Combat Personnel: ").append(salary.toAmountAndSymbolString());
 
-        sb.append("\nMonthly Salary For Combat Personnel: ").append(salary.toAmountAndSymbolString());
-
-        return new String(sb);
+        return sb.toString();
     }
 
     public String getSupportPersonnelDetails() {
@@ -7839,74 +7777,73 @@ public class Campaign implements Serializable, ITechManager {
         int countInjured = 0;
         int countMIA = 0;
         int countKIA = 0;
+        int countDead = 0;
         int countRetired = 0;
         Money salary = Money.zero();
         int prisoners = 0;
         int bondsmen = 0;
+        int dependents = 0;
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (p.hasPrimarySupportRole(false) && p.getPrisonerStatus().isFree() && p.isActive()) {
+            boolean primarySupport = p.hasPrimarySupportRole(false);
+
+            if (primarySupport && p.getPrisonerStatus().isFree() && p.getStatus().isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary());
-            } else if (p.getPrisonerStatus().isPrisoner() && p.isActive()) {
+            } else if (p.getPrisonerStatus().isPrisoner() && p.getStatus().isActive()) {
                 prisoners++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
-            } else if (p.getPrisonerStatus().isBondsman() && p.isActive()) {
+            } else if (p.getPrisonerStatus().isBondsman() && p.getStatus().isActive()) {
                 bondsmen++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
-            } else if (p.hasPrimarySupportRole(false) && (p.getStatus() == PersonnelStatus.RETIRED)) {
+            } else if (primarySupport && p.getStatus().isRetired()) {
                 countRetired++;
-            } else if (p.hasPrimarySupportRole(false) && (p.getStatus() == PersonnelStatus.MIA)) {
+            } else if (primarySupport && p.getStatus().isMIA()) {
                 countMIA++;
-            } else if (p.hasPrimarySupportRole(false) && (p.getStatus() == PersonnelStatus.KIA)) {
+            } else if (primarySupport && p.getStatus().isKIA()) {
                 countKIA++;
+                countDead++;
+            } else if (primarySupport && p.getStatus().isDead()) {
+                countDead++;
+            }
+
+            if (p.isDependent() && p.getStatus().isActive() && p.getPrisonerStatus().isFree()) {
+                dependents++;
             }
         }
 
-        StringBuffer sb = new StringBuffer("Support Personnel\n\n");
+        StringBuilder sb = new StringBuilder("Support Personnel\n\n");
 
-        String buffer = String.format("%-30s        %4s\n", "Total Support Personnel",
-                countTotal);
-        sb.append(buffer);
+        sb.append(String.format("%-30s        %4s\n", "Total Support Personnel", countTotal));
 
         for (int i = 0; i < Person.T_NUM; i++) {
             if (Person.isSupportRole(i)) {
-                buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i, getFaction().isClan()),
-                        countPersonByType[i]);
-                sb.append(buffer);
+                sb.append(String.format("    %-30s    %4s\n",
+                        Person.getRoleDesc(i, getFaction().isClan()), countPersonByType[i]));
             }
         }
 
-        buffer = String.format("%-30s        %4s\n",
-                "Injured Support Personnel", countInjured);
-        sb.append("\n").append(buffer);
-        buffer = String.format("%-30s        %4s\n", "MIA Support Personnel",
-                countMIA);
-        sb.append(buffer);
-        buffer = String.format("%-30s        %4s\n", "KIA Support Personnel",
-                countKIA);
-        sb.append(buffer);
-        buffer = String.format("%-30s        %4s\n",
-                "Retired Support Personnel", countRetired);
-        sb.append(buffer);
+        sb.append("\n")
+                .append(String.format("%-30s        %4s\n", "Injured Support Personnel", countInjured))
+                .append(String.format("%-30s        %4s\n", "MIA Support Personnel", countMIA))
+                .append(String.format("%-30s        %4s\n", "KIA Support Personnel", countKIA))
+                .append(String.format("%-30s        %4s\n", "Retired Support Personnel", countRetired))
+                .append(String.format("%-30s        %4s\n", "Dead Support Personnel", countDead))
+                .append("\nMonthly Salary For Support Personnel: ").append(salary.toAmountAndSymbolString())
+                .append(String.format("\nYou have " + dependents + " %s", (dependents == 1) ? "dependent" : "dependents"))
+                .append(String.format("\nYou have " + prisoners + " prisoner%s", (prisoners == 1) ? "" : "s"))
+                .append(String.format("\nYou have " + bondsmen + " %s", (bondsmen == 1) ? "bondsman" : "bondsmen"));
 
-        sb.append("\nMonthly Salary For Support Personnel: ").append(salary.toAmountAndSymbolString());
-
-        sb.append(String.format("\nYou have " + prisoners + " prisoner%s",
-                prisoners == 1 ? "" : "s"));
-        sb.append(String.format("\nYou have " + bondsmen + " %s",
-                bondsmen == 1 ? "bondsman" : "bondsmen"));
-
-        return new String(sb);
+        return sb.toString();
     }
 
     public void doMaintenance(Unit u) {
@@ -8139,7 +8076,7 @@ public class Campaign implements Serializable, ITechManager {
     public void initTimeInService() {
         for (Person p : getPersonnel()) {
             if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
-                Date join = null;
+                LocalDate join = null;
                 for (LogEntry e : p.getPersonnelLog()) {
                     if (join == null) {
                         // If by some nightmare there is no Joined date just use the first entry.
@@ -8151,14 +8088,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
 
-                LocalDate date;
-                // For that one in a billion chance the log is empty. Clone today's date and subtract a year
-                if (join == null) {
-                    date = getLocalDate().minusYears(1);
-                } else {
-                    date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                }
-                p.setRecruitment(date);
+                p.setRecruitment((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
     }
@@ -8167,7 +8097,7 @@ public class Campaign implements Serializable, ITechManager {
         for (Person p : getPersonnel()) {
             if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
 
-                Date join = null;
+                LocalDate join = null;
                 for (LogEntry e : p.getPersonnelLog()) {
                     if (join == null) {
                         // If by some nightmare there is no date from the below, just use the first entry.
@@ -8180,23 +8110,17 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
 
-                LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
-                if (join == null) {
-                    date = getLocalDate().minusYears(1);
-                } else {
-                    date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                }
-                p.setLastRankChangeDate(date);
+                p.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
     }
 
     public void initRetirementDateTracking() {
         for (Person person : getPersonnel()) {
-            if (person.getStatus() == PersonnelStatus.RETIRED) {
-                Date retired = null;
-                Date lastLoggedDate = null;
+            if (person.getStatus().isRetired()) {
+                LocalDate retired = null;
+                LocalDate lastLoggedDate = null;
                 for (LogEntry entry : person.getPersonnelLog()) {
                     lastLoggedDate = entry.getDate();
                     if (entry.getDesc().startsWith("Retired")) {
@@ -8208,12 +8132,8 @@ public class Campaign implements Serializable, ITechManager {
                     retired = lastLoggedDate;
                 }
 
-                if (retired == null) {
-                    // For that one in a billion chance the log is empty. Clone today's date and subtract a year
-                    person.setRetirement(getLocalDate().minusYears(1));
-                } else {
-                    person.setRetirement(retired.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                }
+                // For that one in a billion chance the log is empty. Clone today's date and subtract a year
+                person.setRetirement((retired != null) ? retired : getLocalDate().minusYears(1));
             }
         }
     }
@@ -8236,10 +8156,10 @@ public class Campaign implements Serializable, ITechManager {
             * Go through all the personnel records and assume the earliest date is the date
             * the unit was founded.
             */
-            Date founding = null;
+            LocalDate founding = null;
             for (Person p : getPersonnel()) {
                 for (LogEntry e : p.getPersonnelLog()) {
-                    if (null == founding || e.getDate().before(founding)) {
+                    if ((founding == null) || e.getDate().isBefore(founding)) {
                         founding = e.getDate();
                     }
                 }
@@ -8251,14 +8171,14 @@ public class Campaign implements Serializable, ITechManager {
             * that 'Mech (which is a less certain assumption)
             */
             for (Person p : getPersonnel()) {
-                Date join = null;
+                LocalDate join = null;
                 for (LogEntry e : p.getPersonnelLog()) {
                     if (e.getDesc().startsWith("Joined ")) {
                         join = e.getDate();
                         break;
                     }
                 }
-                if (null != join && join.equals(founding)) {
+                if ((join != null) && join.equals(founding)) {
                     p.setFounder(true);
                 }
                 if (p.getPrimaryRole() == Person.T_MECHWARRIOR
