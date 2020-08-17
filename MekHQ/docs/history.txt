@@ -11,6 +11,7 @@ VERSION HISTORY:
 + PR #1917: Fixing the Award Tracker post-Ancestors Removal
 + Issue #1920: Fixing xml load for bad Ancestry data
 + PR #1916: Personnel Filter Enum
++ Issue #790: Implementing Non-Combat TO&E Forces
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
