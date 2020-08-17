@@ -688,7 +688,7 @@ public class PersonViewPanel extends ScrollablePanel {
             firsty++;
         }
 
-        if (campaign.getCampaignOptions().trackTotalEarnings()) {
+        if (campaign.getCampaignOptions().trackTotalEarnings() && person.getPrisonerStatus().isFree()) {
             JLabel lblTotalEarnings1 = new JLabel(resourceMap.getString("lblTotalEarnings1.text"));
             lblTotalEarnings1.setName("lblTotalEarnings1");
             gridBagConstraints = new GridBagConstraints();
