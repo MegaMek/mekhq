@@ -49,6 +49,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonChangedEvent;
@@ -58,6 +59,7 @@ import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.model.RankTableModel;
 import mekhq.gui.preferences.JComboBoxPreference;
 import mekhq.gui.preferences.JIntNumberSpinnerPreference;
 import mekhq.gui.preferences.JToggleButtonPreference;
@@ -79,6 +81,9 @@ public final class BatchXPDialog extends JDialog {
     private JTable personnelTable;
     private JComboBox<PersonTypeItem> choiceType;
     private JComboBox<PersonTypeItem> choiceExp;
+    private JComboBox<PersonTypeItem> choiceRank;
+    private JCheckBox onlyOfficers;
+    private JCheckBox noOfficers;
     private JComboBox<String> choiceSkill;
     private JSpinner skillLevel;
     private JCheckBox allowPrisoners;
@@ -153,6 +158,15 @@ public final class BatchXPDialog extends JDialog {
 
         choiceExp.setName("experienceLevel");
         preferences.manage(new JComboBoxPreference(choiceExp));
+
+        choiceRank.setName("rank");
+        preferences.manage(new JComboBoxPreference(choiceRank));
+
+        onlyOfficers.setName("onlyOfficers");
+        preferences.manage(new JToggleButtonPreference(onlyOfficers));
+
+        noOfficers.setName("noOfficers");
+        preferences.manage(new JToggleButtonPreference(noOfficers));
 
         choiceSkill.setName("skill");
         preferences.manage(new JComboBoxPreference(choiceSkill));
@@ -235,6 +249,57 @@ public final class BatchXPDialog extends JDialog {
         });
         panel.add(choiceExp);
 
+        choiceRank = new JComboBox<>();
+        choiceRank.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
+        DefaultComboBoxModel<PersonTypeItem> personRankModel = new DefaultComboBoxModel<>();
+        personRankModel.addElement(new PersonTypeItem(resourceMap.getString("rank.choice.text"), null));
+
+        Object[][] ranks = campaign.getRanks().getRanksForModel();
+        for (int i = 0; i < ranks.length; i++) {
+            StringBuilder rankName = new StringBuilder(((String) ranks[i][0]).trim());
+            for (int j = 1; j <= RankTableModel.COL_NAME_TECH; j++) {
+                rankName.append(", ").append(((String) ranks[i][j]).trim());
+            }
+            personRankModel.addElement(new PersonTypeItem(rankName.toString(), i));
+        }
+        choiceRank.setModel(personRankModel);
+        choiceRank.setSelectedIndex(0);
+        choiceRank.addActionListener(e -> {
+            personnelFilter.setRank(((PersonTypeItem) choiceRank.getSelectedItem()).getId());
+            updatePersonnelTable();
+        });
+        panel.add(choiceRank);
+
+        onlyOfficers = new JCheckBox(resourceMap.getString("onlyOfficers.text"));
+        onlyOfficers.setHorizontalAlignment(SwingConstants.LEFT);
+        onlyOfficers.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) onlyOfficers.getPreferredSize().getHeight()));
+        onlyOfficers.addChangeListener(e -> {
+            personnelFilter.setOnlyOfficers(onlyOfficers.isSelected());
+            updatePersonnelTable();
+
+            noOfficers.setEnabled(!onlyOfficers.isSelected());
+        });
+        JPanel onlyOfficersPanel = new JPanel(new GridLayout(1, 1));
+        onlyOfficersPanel.setAlignmentY(JComponent.LEFT_ALIGNMENT);
+        onlyOfficersPanel.add(onlyOfficers);
+        onlyOfficersPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) onlyOfficersPanel.getPreferredSize().getHeight()));
+        panel.add(onlyOfficersPanel);
+
+        noOfficers = new JCheckBox(resourceMap.getString("noOfficers.text"));
+        noOfficers.setHorizontalAlignment(SwingConstants.LEFT);
+        noOfficers.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) noOfficers.getPreferredSize().getHeight()));
+        noOfficers.addChangeListener(e -> {
+            personnelFilter.setNoOfficers(noOfficers.isSelected());
+            updatePersonnelTable();
+
+            onlyOfficers.setEnabled(!noOfficers.isSelected());
+        });
+        JPanel noOfficersPanel = new JPanel(new GridLayout(1, 1));
+        noOfficersPanel.setAlignmentY(JComponent.LEFT_ALIGNMENT);
+        noOfficersPanel.add(noOfficers);
+        noOfficersPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) noOfficersPanel.getPreferredSize().getHeight()));
+        panel.add(noOfficersPanel);
+
         choiceSkill = new JComboBox<>();
         choiceSkill.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceSkill.getPreferredSize().getHeight()));
         DefaultComboBoxModel<String> personSkillModel = new DefaultComboBoxModel<>();
@@ -269,9 +334,8 @@ public final class BatchXPDialog extends JDialog {
 
         skillLevel = new JSpinner(new SpinnerNumberModel(10, 0, 10, 1));
         skillLevel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) skillLevel.getPreferredSize().getHeight()));
-        skillLevel.addChangeListener(e ->
-        {
-            personnelFilter.setMaxSkillLevel((Integer)skillLevel.getModel().getValue());
+        skillLevel.addChangeListener(e -> {
+            personnelFilter.setMaxSkillLevel((Integer) skillLevel.getModel().getValue());
             updatePersonnelTable();
         });
         panel.add(skillLevel);
@@ -279,8 +343,7 @@ public final class BatchXPDialog extends JDialog {
         allowPrisoners = new JCheckBox(resourceMap.getString("allowPrisoners.text"));
         allowPrisoners.setHorizontalAlignment(SwingConstants.LEFT);
         allowPrisoners.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) allowPrisoners.getPreferredSize().getHeight()));
-        allowPrisoners.addChangeListener(e ->
-        {
+        allowPrisoners.addChangeListener(e -> {
             personnelFilter.setAllowPrisoners(allowPrisoners.isSelected());
             updatePersonnelTable();
         });
@@ -387,6 +450,9 @@ public final class BatchXPDialog extends JDialog {
     public static class PersonnelFilter extends RowFilter<PersonnelTableModel, Integer> {
         private Integer primaryRole = null;
         private Integer expLevel = null;
+        private Integer rank = null;
+        private boolean onlyOfficers = false;
+        private boolean noOfficers = false;
         private String skill = null;
         private int maxSkillLevel = 10;
         private boolean prisoners = false;
@@ -396,17 +462,19 @@ public final class BatchXPDialog extends JDialog {
             Person p = entry.getModel().getPerson(entry.getIdentifier().intValue());
             if (!p.getStatus().isActive()) {
                 return false;
-            }
-            if (!prisoners && !p.getPrisonerStatus().isFree()) {
+            } else if (!prisoners && !p.getPrisonerStatus().isFree()) {
                 return false;
-            }
-            if ((null != primaryRole) && (p.getPrimaryRole() != primaryRole)) {
+            } else if ((null != primaryRole) && (p.getPrimaryRole() != primaryRole)) {
                 return false;
-            }
-            if ((null != expLevel) && (p.getExperienceLevel(false) != expLevel)) {
+            } else if ((null != expLevel) && (p.getExperienceLevel(false) != expLevel)) {
                 return false;
-            }
-            if (null != skill) {
+            } else if (onlyOfficers && !p.getRank().isOfficer()) {
+                return false;
+            } else if (noOfficers && p.getRank().isOfficer()) {
+                return false;
+            } else if ((rank != null) && (p.getRankNumeric() != rank)) {
+                return false;
+            } else if (null != skill) {
                 Skill s = p.getSkill(skill);
                 if (null == s) {
                     int cost = SkillType.getType(skill).getCost(0);
@@ -425,6 +493,18 @@ public final class BatchXPDialog extends JDialog {
 
         public void setExpLevel(Integer level) {
             expLevel = level;
+        }
+
+        public void setRank(Integer rank) {
+            this.rank = rank;
+        }
+
+        public void setOnlyOfficers(boolean onlyOfficers) {
+            this.onlyOfficers = onlyOfficers;
+        }
+
+        public void setNoOfficers(boolean noOfficers) {
+            this.noOfficers = noOfficers;
         }
 
         public void setSkill(String skillName) {
