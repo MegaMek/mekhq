@@ -3037,6 +3037,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return " <font color='green'><b>Successfully healed one hit.</b></font>";
     }
 
+    //region Personnel Options
     public PersonnelOptions getOptions() {
         return options;
     }
@@ -3103,6 +3104,25 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         return adv.toString();
     }
+
+    /**
+     *
+     * @return an html-coded list that says what abilities are enabled for this pilot
+     */
+    public String getAbilityList(String type) {
+        StringBuilder abilityString = new StringBuilder();
+        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
+            IOption ability = i.nextElement();
+            if (ability.booleanValue()) {
+                abilityString.append(Utilities.getOptionDisplayName(ability)).append("<br>");
+            }
+        }
+        if (abilityString.length() == 0) {
+            return null;
+        }
+        return "<html>" + abilityString + "</html>";
+    }
+    //endregion Personnel Options
 
     //region edge
     public int getEdge() {
@@ -3197,24 +3217,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return "<html>" + edgett + "</html>";
     }
     //endregion edge
-
-    /**
-     *
-     * @return an html-coded list that says what abilities are enabled for this pilot
-     */
-    public String getAbilityList(String type) {
-        StringBuilder abilityString = new StringBuilder();
-        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
-            if (ability.booleanValue()) {
-                abilityString.append(Utilities.getOptionDisplayName(ability)).append("<br>");
-            }
-        }
-        if (abilityString.length() == 0) {
-            return null;
-        }
-        return "<html>" + abilityString + "</html>";
-    }
 
     public boolean canDrive(Entity ent) {
         if (ent instanceof LandAirMech) {
