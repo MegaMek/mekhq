@@ -39,6 +39,8 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
+import megamek.common.options.IOption;
+import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.FormerSpouse;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
@@ -1150,10 +1152,6 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlSkills.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.title")));
 
         //abilities and implants
-        JLabel lblAbility1 = new JLabel();
-        JLabel lblAbility2 = new JLabel();
-        JLabel lblImplants1 = new JLabel();
-        JLabel lblImplants2 = new JLabel();
         JLabel lblTough1 = new JLabel();
         JLabel lblTough2 = new JLabel();
         JLabel lblEdge1 = new JLabel();
@@ -1204,8 +1202,8 @@ public class PersonViewPanel extends ScrollablePanel {
         firsty = colBreak;
 
         if (campaign.getCampaignOptions().useAbilities() && (person.countOptions(PilotOptions.LVL3_ADVANTAGES) > 0)) {
+            JLabel lblAbility1 = new JLabel(resourceMap.getString("lblAbility1.text"));
             lblAbility1.setName("lblAbility1");
-            lblAbility1.setText(resourceMap.getString("lblAbility1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = firsty;
@@ -1213,23 +1211,26 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblAbility1, gridBagConstraints);
 
-            lblAbility2.setName("lblAbility2");
-            lblAbility2.setText(person.getAbilityList(PilotOptions.LVL3_ADVANTAGES));
-            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
             gridBagConstraints.gridwidth = 3;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblAbility2, gridBagConstraints);
-            firsty++;
+
+            for (Enumeration<IOption> i = person.getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
+                IOption option = i.nextElement();
+                if (option.booleanValue()) {
+                    JLabel lblAbility2 = new JLabel(Utilities.getOptionDisplayName(option));
+                    lblAbility2.setToolTipText(option.getDescription());
+                    lblAbility2.setName("lblAbility2");
+                    gridBagConstraints.gridy = firsty++;
+                    pnlSkills.add(lblAbility2, gridBagConstraints);
+                }
+            }
         }
 
         if (campaign.getCampaignOptions().useImplants() && (person.countOptions(PilotOptions.MD_ADVANTAGES) > 0)) {
+            JLabel lblImplants1 = new JLabel(resourceMap.getString("lblImplants1.text"));
             lblImplants1.setName("lblImplants1");
-            lblImplants1.setText(resourceMap.getString("lblImplants1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = firsty;
@@ -1237,18 +1238,22 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblImplants1, gridBagConstraints);
 
-            lblImplants2.setName("lblImplants2");
-            lblImplants2.setText(person.getAbilityList(PilotOptions.MD_ADVANTAGES));
-            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
             gridBagConstraints.gridwidth = 3;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblImplants2, gridBagConstraints);
-            firsty++;
+
+            for (Enumeration<IOption> i = person.getOptions(PilotOptions.MD_ADVANTAGES); i.hasMoreElements();) {
+                IOption option = i.nextElement();
+
+                if (option.booleanValue()) {
+                    JLabel lblImplants2 = new JLabel(Utilities.getOptionDisplayName(option));
+                    lblImplants2.setToolTipText(option.getDescription());
+                    lblImplants2.setName("lblImplants2");
+                    gridBagConstraints.gridy = firsty++;
+                    pnlSkills.add(lblImplants2, gridBagConstraints);
+                }
+            }
         }
 
         if (campaign.getCampaignOptions().useEdge() && (person.getEdge() > 0)) {
