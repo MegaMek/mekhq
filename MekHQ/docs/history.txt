@@ -16,6 +16,7 @@ VERSION HISTORY:
 + Issue #1829: Fixing Duplicated Nags in AdvanceDaysDialog
 + Issue #470: Mass Training: Rank, No Officer, and Only Officer Filters
 + Issue #1929: Scenario Resolution: Fixing Display Anchor Issues
++ PR #1932: Fixing Total Earnings Display Issues
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
