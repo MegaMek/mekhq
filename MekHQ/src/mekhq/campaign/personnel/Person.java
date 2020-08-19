@@ -3106,10 +3106,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     *
      * @return an html-coded list that says what abilities are enabled for this pilot
      */
-    public String getAbilityList(String type) {
+    public String getAbilityListAsString(String type) {
         StringBuilder abilityString = new StringBuilder();
         for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
