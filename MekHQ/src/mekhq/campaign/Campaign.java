@@ -4556,8 +4556,7 @@ public class Campaign implements Serializable, ITechManager {
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
         // Start the XML root.
-        pw1.println("<campaign version=\""
-                + resourceMap.getString("Application.version") + "\">");
+        pw1.println("<campaign version=\"" + resourceMap.getString("Application.version") + "\">");
 
         //region Basic Campaign Info
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "info");
@@ -4734,7 +4733,10 @@ public class Campaign implements Serializable, ITechManager {
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "customPlanetaryEvents");
 
-        writeCustoms(pw1);
+        if (getCampaignOptions().writeCustomsToXML()) {
+            writeCustoms(pw1);
+        }
+
         // Okay, we're done.
         // Close everything out and be done with it.
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent - 1, "campaign");
