@@ -40,6 +40,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.FormerSpouse;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 
@@ -688,7 +689,11 @@ public class PersonViewPanel extends ScrollablePanel {
             firsty++;
         }
 
-        if (campaign.getCampaignOptions().trackTotalEarnings() && person.getPrisonerStatus().isFree()) {
+        // We show the following if track total earnings is on for a free non-dependent, or if the
+        // person has tracked total earnings
+        if (campaign.getCampaignOptions().trackTotalEarnings()
+                && ((person.getPrisonerStatus().isFree() && !person.isDependent())
+                || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
             JLabel lblTotalEarnings1 = new JLabel(resourceMap.getString("lblTotalEarnings1.text"));
             lblTotalEarnings1.setName("lblTotalEarnings1");
             gridBagConstraints = new GridBagConstraints();
