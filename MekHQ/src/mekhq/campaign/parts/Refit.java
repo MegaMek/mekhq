@@ -1179,7 +1179,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 AmmoBin bin = (AmmoBin) part;
                 Part foundAmmo = getCampaign().findSparePart(campaignPart -> AmmoStorage.IsRightAmmo(campaignPart, (AmmoType) bin.getType()));
 
-                if (foundAmmo == null || (((AmmoStorage) foundAmmo).getShots() < bin.getShotsNeeded())) {
+                if ((foundAmmo == null) || (((AmmoStorage) foundAmmo).getShots() < bin.getShotsNeeded())) {
                     missingAmmo = true;
                     // if we've found even one ammo bin that we can't load, we're not ready to refit, so bug out early
                     break;
