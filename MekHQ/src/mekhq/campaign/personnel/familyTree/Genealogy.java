@@ -123,10 +123,10 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
     /**
      * This is implemented for future use, as it will be required for the family tree implementation
-     * @param formerSpouse the former spouse to remove from the current person's list
+     * @param formerSpouseId the former spouse's id to remove from the current person's list
      */
-    public void removeFormerSpouse(FormerSpouse formerSpouse) {
-        getFormerSpouses().remove(formerSpouse);
+    public void removeFormerSpouse(UUID formerSpouseId) {
+        getFormerSpouses().removeIf(formerSpouse -> formerSpouse.getFormerSpouseId().equals(formerSpouseId));
     }
 
     /**
@@ -599,7 +599,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
             for (FormerSpouse formerSpouse : getFormerSpouses()) {
                 Person person = campaign.getPerson(formerSpouse.getFormerSpouseId());
                 if (person != null) {
-                    person.getGenealogy().removeFormerSpouse(formerSpouse);
+                    person.getGenealogy().removeFormerSpouse(getOrigin());
                 }
             }
         }

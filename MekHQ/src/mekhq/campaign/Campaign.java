@@ -3817,7 +3817,6 @@ public class Campaign implements Serializable, ITechManager {
 
         person.getGenealogy().clearGenealogy(this);
 
-
         Unit u = getUnit(person.getUnitId());
         if (null != u) {
             u.remove(person, true);
