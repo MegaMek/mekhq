@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2020 - The MegaMek Team. All rights reserved
+ * Copyright (C) 2009, 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -217,7 +217,6 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox allowISPurchasesBox;
     private JCheckBox allowCanonOnlyBox;
     private JCheckBox allowCanonRefitOnlyBox;
-    private JCheckBox chkWriteCustomsToXML;
     private JComboBox<String> choiceTechLevel;
     private JCheckBox variableTechLevelBox;
     private JCheckBox factionIntroDateBox;
@@ -1538,14 +1537,8 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(allowCanonRefitOnlyBox, gridBagConstraints);
 
-        chkWriteCustomsToXML = new JCheckBox(resourceMap.getString("chkWriteCustomsToXML.text"));
-        chkWriteCustomsToXML.setName("chkWriteCustomsToXML");
-        chkWriteCustomsToXML.setSelected(options.writeCustomsToXML());
-        gridBagConstraints.gridy = gridy++;
-        panTech.add(chkWriteCustomsToXML, gridBagConstraints);
-
-        JLabel lblTechLevel = new JLabel(resourceMap.getString("lblTechLevel.text")); // NOI18N
-        lblTechLevel.setName("lblTechLevel"); // NOI18N
+        JLabel lblTechLevel = new JLabel(resourceMap.getString("lblTechLevel.text"));
+        lblTechLevel.setName("lblTechLevel");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy++;
@@ -4883,7 +4876,6 @@ public class CampaignOptionsDialog extends JDialog {
         options.setFactionIntroDate(factionIntroDateBox.isSelected());
         campaign.updateTechFactionCode();
         options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
-        options.setWriteCustomsToXML(chkWriteCustomsToXML.isSelected());
         options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
         options.setTechLevel(choiceTechLevel.getSelectedIndex());
         campaign.getGameOptions().getOption("techlevel").setValue((String)choiceTechLevel.getSelectedItem());

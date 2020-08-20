@@ -172,7 +172,6 @@ public class CampaignOptions implements Serializable {
     private boolean allowISPurchases;
     private boolean allowCanonOnly;
     private boolean allowCanonRefitOnly;
-    private boolean writeCustomsToXML;
     private int techLevel;
     private boolean variableTechLevel;
     private boolean factionIntroDate;
@@ -503,7 +502,6 @@ public class CampaignOptions implements Serializable {
         allowISPurchases = true;
         allowCanonOnly = false;
         allowCanonRefitOnly = false;
-        writeCustomsToXML = true;
         techLevel = TECH_EXPERIMENTAL;
         variableTechLevel = false;
         factionIntroDate = false;
@@ -2084,14 +2082,6 @@ public class CampaignOptions implements Serializable {
         allowCanonRefitOnly = b;
     }
 
-    public boolean writeCustomsToXML() {
-        return writeCustomsToXML;
-    }
-
-    public void setWriteCustomsToXML(boolean writeCustomsToXML) {
-        this.writeCustomsToXML = writeCustomsToXML;
-    }
-
     public boolean useVariableTechLevel() {
         return variableTechLevel;
     }
@@ -3085,7 +3075,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowISPurchases", allowISPurchases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonOnly", allowCanonOnly);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonRefitOnly", allowCanonRefitOnly);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "writeCustomsToXML", writeCustomsToXML);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableTechLevel", variableTechLevel);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "factionIntroDate", factionIntroDate);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAmmoByType", useAmmoByType);
@@ -3554,8 +3543,6 @@ public class CampaignOptions implements Serializable {
                 retVal.allowCanonOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("allowCanonRefitOnly")) {
                 retVal.allowCanonRefitOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("writeCustomsToXML")) {
-                retVal.setWriteCustomsToXML(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useAmmoByType")) {
                 retVal.useAmmoByType = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("variableTechLevel")) {
