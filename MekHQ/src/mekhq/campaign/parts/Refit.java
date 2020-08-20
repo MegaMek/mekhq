@@ -1140,20 +1140,20 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     }
 
     public boolean acquireParts() {
-        if(!customJob) {
+        if (!customJob) {
             checkForArmorSupplies();
             return kitFound && !partsInTransit() && (null == newArmorSupplies || (armorNeeded - newArmorSupplies.getAmount()) <= 0);
         }
         ArrayList<Part> newShoppingList = new ArrayList<>();
-        for(Part part : shoppingList) {            
-            if(part instanceof IAcquisitionWork) {
+        for (Part part : shoppingList) {
+            if (part instanceof IAcquisitionWork) {
                 //check to see if we found a replacement
                 Part replacement = part;
                 if (part instanceof MissingPart) {
                     replacement = ((MissingPart)part).findReplacement(true);
                 }
                 
-                if(null != replacement) {
+                if (null != replacement) {
                     if(replacement.getQuantity() > 1) {
                         Part actualReplacement = replacement.clone();
                         actualReplacement.setRefitId(oldUnit.getId());
@@ -1172,14 +1172,16 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         
         // Cycle through newUnitParts, find any ammo bins and see if we have the ammo to load them
         boolean missingAmmo = false;
-        for(int pid : newUnitParts) {
+        for (int pid : newUnitParts) {
             Part part = getCampaign().getPart(pid);
             
-            if(part instanceof AmmoBin) {
+            if (part instanceof AmmoBin) {
                 AmmoBin bin = (AmmoBin) part;
                 Part foundAmmo = getCampaign().findSparePart(campaignPart -> AmmoStorage.IsRightAmmo(campaignPart, (AmmoType) bin.getType()));
-                if(foundAmmo == null || (((AmmoStorage) foundAmmo).getShots() < bin.getShotsNeeded())) {
+
+                if (foundAmmo == null || (((AmmoStorage) foundAmmo).getShots() < bin.getShotsNeeded())) {
                     missingAmmo = true;
+                    // if we've found even one ammo bin that we can't load, we're not ready to refit, so bug out early
                     break;
                 }
             }
@@ -2526,19 +2528,5 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     @Override
     public boolean isExtinctIn(int year, boolean clan, int techFaction) {
         return isExtinct(year, clan, techFaction);
-    }
-    
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(super.toString());
-        
-        for(int partID : getNewUnitPartIds()) {
-            Part part = getCampaign().getPart(partID);
-            if(part != null && !part.isPresent()) {
-                sb.append("<br/>").append(part.getName()).append("-").append(part.getDaysToWait()).append(" days to arrival");
-            }
-        }
-        
-        return sb.toString();
     }
 }
