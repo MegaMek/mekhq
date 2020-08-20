@@ -18,6 +18,7 @@ VERSION HISTORY:
 + Issue #1929: Scenario Resolution: Fixing Display Anchor Issues
 + PR #1932: Fixing Total Earnings Display Issues
 + Issue #1941: Person View Panel Ability and Injury Description ToolTip
++ Issue #1296, 1855: Fixed issue preventing customization of units in the meklab when ammunition is added to the unit.
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
