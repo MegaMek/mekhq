@@ -1,7 +1,7 @@
 /*
  * MekHqOptionsDialog.java
  *
- * Copyright (c) 2019 MekHQ Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,26 +12,23 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
-import megamek.common.logging.MMLogger;
-import mekhq.MekHqConstants;
+import mekhq.MekHQ;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
-import java.util.prefs.Preferences;
 
 public class MekHqOptionsDialog extends BaseDialog {
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog");
-    private final Preferences userPreferences = Preferences.userRoot().node(MekHqConstants.AUTOSAVE_NODE);
 
     private JRadioButton optionNoSave;
     private JRadioButton optionSaveDaily;
@@ -123,22 +120,22 @@ public class MekHqOptionsDialog extends BaseDialog {
 
     @Override
     protected void okAction() {
-        this.userPreferences.putBoolean(MekHqConstants.NO_SAVE_KEY, this.optionNoSave.isSelected());
-        this.userPreferences.putBoolean(MekHqConstants.SAVE_DAILY_KEY, this.optionSaveDaily.isSelected());
-        this.userPreferences.putBoolean(MekHqConstants.SAVE_WEEKLY_KEY, this.optionSaveWeekly.isSelected());
-        this.userPreferences.putBoolean(MekHqConstants.SAVE_MONTHLY_KEY, this.optionSaveMonthly.isSelected());
-        this.userPreferences.putBoolean(MekHqConstants.SAVE_YEARLY_KEY, this.optionSaveYearly.isSelected());
-        this.userPreferences.putBoolean(MekHqConstants.SAVE_BEFORE_MISSIONS_KEY, this.checkSaveBeforeMissions.isSelected());
-        this.userPreferences.putInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY, (Integer)this.spinnerSavedGamesCount.getValue());
+        MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
+        MekHQ.getMekHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
+        MekHQ.getMekHQOptions().setAutosaveWeeklyValue(optionSaveWeekly.isSelected());
+        MekHQ.getMekHQOptions().setAutosaveMonthlyValue(optionSaveMonthly.isSelected());
+        MekHQ.getMekHQOptions().setAutosaveYearlyValue(optionSaveYearly.isSelected());
+        MekHQ.getMekHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
+        MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
     }
 
     private void setInitialState() {
-        this.optionNoSave.setSelected(this.userPreferences.getBoolean(MekHqConstants.NO_SAVE_KEY, false));
-        this.optionSaveDaily.setSelected(this.userPreferences.getBoolean(MekHqConstants.SAVE_DAILY_KEY, false));
-        this.optionSaveWeekly.setSelected(this.userPreferences.getBoolean(MekHqConstants.SAVE_WEEKLY_KEY, true));
-        this.optionSaveMonthly.setSelected(this.userPreferences.getBoolean(MekHqConstants.SAVE_MONTHLY_KEY, false));
-        this.optionSaveYearly.setSelected(this.userPreferences.getBoolean(MekHqConstants.SAVE_YEARLY_KEY, false));
-        this.checkSaveBeforeMissions.setSelected(this.userPreferences.getBoolean(MekHqConstants.SAVE_BEFORE_MISSIONS_KEY, false));
-        this.spinnerSavedGamesCount.setValue(this.userPreferences.getInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY, MekHqConstants.DEFAULT_NUMBER_SAVES));
+        optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
+        optionSaveDaily.setSelected(MekHQ.getMekHQOptions().getAutosaveDailyValue());
+        optionSaveWeekly.setSelected(MekHQ.getMekHQOptions().getAutosaveWeeklyValue());
+        optionSaveMonthly.setSelected(MekHQ.getMekHQOptions().getAutosaveMonthlyValue());
+        optionSaveYearly.setSelected(MekHQ.getMekHQOptions().getAutosaveYearlyValue());
+        checkSaveBeforeMissions.setSelected(MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue());
+        spinnerSavedGamesCount.setValue(MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue());
     }
 }

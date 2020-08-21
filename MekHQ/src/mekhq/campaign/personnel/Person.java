@@ -234,7 +234,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private Ranks ranks;
 
     private ManeiDominiClass maneiDominiClass;
-    private int maneiDominiRank;
+    private ManeiDominiRank maneiDominiRank;
 
     //stuff to track for support teams
     private int minutesLeft;
@@ -372,7 +372,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         rank = 0;
         rankLevel = 0;
         rankSystem = -1;
-        maneiDominiRank = Rank.MD_RANK_NONE;
+        maneiDominiRank = ManeiDominiRank.NONE;
         maneiDominiClass = ManeiDominiClass.NONE;
         nTasks = 0;
         doctorId = null;
@@ -1724,8 +1724,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (rankSystem != -1) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rankSystem", rankSystem);
             }
-            if (maneiDominiRank != Rank.MD_RANK_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiRank", maneiDominiRank);
+            if (maneiDominiRank != ManeiDominiRank.NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiRank", maneiDominiRank.name());
             }
             if (maneiDominiClass != ManeiDominiClass.NONE) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiClass", maneiDominiClass.name());
@@ -1981,7 +1981,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
                     retVal.setRankSystem(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiRank")) {
-                    retVal.maneiDominiRank = Integer.parseInt(wn2.getTextContent());
+                    retVal.maneiDominiRank = ManeiDominiRank.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
                     retVal.maneiDominiClass = ManeiDominiClass.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
@@ -2529,12 +2529,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (maneiDominiClass != ManeiDominiClass.NONE) {
                 rankName = maneiDominiClass.toString() + " " + rankName;
             }
-            if (maneiDominiRank != Rank.MD_RANK_NONE) {
-                rankName += " " + Rank.getManeiDominiRankName(maneiDominiRank);
+            if (maneiDominiRank != ManeiDominiRank.NONE) {
+                rankName += " " + maneiDominiRank.toString();
             }
         } else {
             maneiDominiClass = ManeiDominiClass.NONE;
-            maneiDominiRank = Rank.MD_RANK_NONE;
+            maneiDominiRank = ManeiDominiRank.NONE;
         }
 
         if ((getRankSystem() == Ranks.RS_COM) || (getRankSystem() == Ranks.RS_WOB)) {
@@ -2570,11 +2570,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    public int getManeiDominiRank() {
+    public ManeiDominiRank getManeiDominiRank() {
         return maneiDominiRank;
     }
 
-    public void setManeiDominiRank(int maneiDominiRank) {
+    public void setManeiDominiRank(ManeiDominiRank maneiDominiRank) {
         this.maneiDominiRank = maneiDominiRank;
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
@@ -3014,6 +3014,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return " <font color='green'><b>Successfully healed one hit.</b></font>";
     }
 
+    //region Personnel Options
     public PersonnelOptions getOptions() {
         return options;
     }
@@ -3080,6 +3081,24 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         return adv.toString();
     }
+
+    /**
+     * @return an html-coded list that says what abilities are enabled for this pilot
+     */
+    public String getAbilityListAsString(String type) {
+        StringBuilder abilityString = new StringBuilder();
+        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
+            IOption ability = i.nextElement();
+            if (ability.booleanValue()) {
+                abilityString.append(Utilities.getOptionDisplayName(ability)).append("<br>");
+            }
+        }
+        if (abilityString.length() == 0) {
+            return null;
+        }
+        return "<html>" + abilityString + "</html>";
+    }
+    //endregion Personnel Options
 
     //region edge
     public int getEdge() {
@@ -3174,24 +3193,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return "<html>" + edgett + "</html>";
     }
     //endregion edge
-
-    /**
-     *
-     * @return an html-coded list that says what abilities are enabled for this pilot
-     */
-    public String getAbilityList(String type) {
-        StringBuilder abilityString = new StringBuilder();
-        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
-            if (ability.booleanValue()) {
-                abilityString.append(Utilities.getOptionDisplayName(ability)).append("<br>");
-            }
-        }
-        if (abilityString.length() == 0) {
-            return null;
-        }
-        return "<html>" + abilityString + "</html>";
-    }
 
     public boolean canDrive(Entity ent) {
         if (ent instanceof LandAirMech) {

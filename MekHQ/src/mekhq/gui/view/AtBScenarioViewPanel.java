@@ -416,15 +416,15 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                 objectiveBuilder.append("\n");
             }
 
-            for(String associatedUnitID : objective.getAssociatedUnitIDs()) {
+            for (String associatedUnitID : objective.getAssociatedUnitIDs()) {
                 String associatedUnitName = "";
                 UUID uid = UUID.fromString(associatedUnitID);
 
                 // "logic": try to get a hold of the unit with the given UUID,
                 // either from the list of bot units or from the list of player units
-                if(scenario.getExternalIDLookup().containsKey(associatedUnitID)) {
+                if (scenario.getExternalIDLookup().containsKey(associatedUnitID)) {
                     associatedUnitName = scenario.getExternalIDLookup().get(associatedUnitID).getShortName();
-                } else if(scenario.getForces(campaign).getAllUnits().contains(uid)) {
+                } else if (scenario.getForces(campaign).getAllUnits(true).contains(uid)) {
                     associatedUnitName = campaign.getUnit(uid).getEntity().getShortName();
                 }
 
