@@ -115,13 +115,10 @@ public class CrewSkillUpgrader {
         // every time we generate an SPA, we reduce the max available XP
         // this logic also prevents attempting to assign an SPA when there are no SPAs
         // that cost less XP than the remaining cap
-        // We also want to ensure this only happens a maximum of a thousand times, to prevent an
-        // infinite loop
-        for (int x = 0, y = 0; (x < spaCap) && (xpCap > minAbilityCost) && (y < 1000); x++, y++) {
+        for (int x = 0; (x < spaCap) && (xpCap > minAbilityCost); x++) {
             int spaCost = addSingleSPA(entity, xpCap);
-            // if we didn't assign an SPA, let's reroll it.
             if (spaCost == 0) {
-                x--;
+                break;
             }
             xpCap -= spaCost;
         }
@@ -140,60 +137,49 @@ public class CrewSkillUpgrader {
         	return 0;
         }
 
-        int spaIndex;
-        SpecialAbility spa = null;
-
-        // if the ability is disqualified by some weird circumstances,
-        // because the entity already has it
-        // or because it exceeds the weight limit
-        // then try to generate another one
         while (choices.size() > 0) {
-        	spaIndex = Compute.randomInt(choices.size());
-        	spa = choices.get(spaIndex);
+            int spaIndex = Compute.randomInt(choices.size());
+            SpecialAbility spa = choices.get(spaIndex);
 
-        	if (entity.hasAbility(spa.getName()) ||
-        			!extraEligibilityCheck(spa, entity)) {
+            // if the ability is disqualified by some weird circumstances,
+            // because the entity already has it
+            // or because it exceeds the weight limit
+            // then try to generate another one
+        	if (entity.hasAbility(spa.getName()) || !extraEligibilityCheck(spa, entity)) {
         		choices.remove(spaIndex);
-        		spa = null;
         	} else {
-        		break;
+                String spaValue;
+
+                switch (spa.getName()) {
+                    case OptionsConstants.MISC_HUMAN_TRO:
+                        spaValue = pickRandomHumanTRO();
+                        break;
+                    case OptionsConstants.GUNNERY_RANGE_MASTER:
+                        spaValue = pickRandomRangeMaster();
+                        break;
+                    case OptionsConstants.GUNNERY_SPECIALIST:
+                        spaValue = pickRandomGunnerySpecialization(entity);
+                        break;
+                    case OptionsConstants.GUNNERY_WEAPON_SPECIALIST:
+                        spaValue = pickRandomWeapon(entity, false);
+                        break;
+                    case OptionsConstants.GUNNERY_SANDBLASTER:
+                        spaValue = pickRandomWeapon(entity, true);
+                        break;
+                    default:
+                        entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
+                        return spa.getCost();
+                }
+
+                // Assign the SPA, unless it was unable to pick a random weapon/specialization for whatever reason
+                if (!spaValue.equals(Crew.SPECIAL_NONE)) {
+                    entity.getCrew().getOptions().getOption(spa.getName()).setValue(spaValue);
+                    return spa.getCost();
+                }
         	}
         }
 
-        if (spa == null) {
-        	return 0;
-        }
-
-        String spaValue;
-
-        switch (spa.getName()) {
-            case OptionsConstants.MISC_HUMAN_TRO:
-                spaValue = pickRandomHumanTRO();
-                break;
-            case OptionsConstants.GUNNERY_RANGE_MASTER:
-                spaValue = pickRandomRangeMaster();
-                break;
-            case OptionsConstants.GUNNERY_SPECIALIST:
-                spaValue = pickRandomGunnerySpecialization(entity);
-                break;
-            case OptionsConstants.GUNNERY_WEAPON_SPECIALIST:
-                spaValue = pickRandomWeapon(entity, false);
-                break;
-            case OptionsConstants.GUNNERY_SANDBLASTER:
-                spaValue = pickRandomWeapon(entity, true);
-                break;
-            default:
-                entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
-                return spa.getCost();
-        }
-
-        // if we fail to pick a random weapon/specialization for whatever reason, don't assign the SPA
-        if (spaValue.equals(Crew.SPECIAL_NONE)) {
-            return 0;
-        }
-
-        entity.getCrew().getOptions().getOption(spa.getName()).setValue(spaValue);
-        return spa.getCost();
+        return 0;
     }
 
     /**
