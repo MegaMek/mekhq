@@ -21,6 +21,7 @@ VERSION HISTORY:
 + Issue #1296, 1855: Fixed issue preventing customization of units in the meklab when ammunition is added to the unit.
 + Issue #1951: Autosave Does Not Always Initiate On First Load
 + Issue #1922: CrewSkillUpgrader Infinite Loop Fix
++ Issue #1661: Implementing Basic Russian Patronymics
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
