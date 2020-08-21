@@ -41,7 +41,6 @@ import megamek.common.QuirksHandler;
 import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHQOptions;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
