@@ -345,26 +345,26 @@ public class MedicalViewDialog extends JDialog {
                 : resourceMap.getString("baselinePhenotype.text");
 
         Force f = c.getForceFor(p);
-        String force = (null != f) ? f.getFullName() : "-"; //$NON-NLS-1$
+        String force = (null != f) ? f.getFullName() : "-";
 
         Person doc = c.getPerson(p.getDoctorId());
-        String doctor = resourceMap.getString("none.text"); //$NON-NLS-1$
-        if ((null != doc) && doc.isActive()) {
+        String doctor = resourceMap.getString("none.text");
+        if ((null != doc) && doc.getStatus().isActive()) {
             doctor = doc.getFullTitle();
         }
-        panel.add(genLabel(resourceMap.getString("familyName.text"))); //$NON-NLS-1$
-        panel.add(genLabel(resourceMap.getString("givenNames.text"))); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("familyName.text")));
+        panel.add(genLabel(resourceMap.getString("givenNames.text")));
         panel.add(genWrittenPanel(surname));
         panel.add(genWrittenPanel(givenName));
-        panel.add(genLabel(resourceMap.getString("birthDate.text"))); //$NON-NLS-1$
-        panel.add(genLabel(resourceMap.getString("age.text"))); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("birthDate.text")));
+        panel.add(genLabel(resourceMap.getString("age.text")));
         panel.add(genWrittenPanel(birthdayString));
-        panel.add(genWrittenPanel(String.format(resourceMap.getString("age.format"), age.getYears(), age.getMonths()))); //$NON-NLS-1$
-        panel.add(genLabel(resourceMap.getString("gender.text"))); //$NON-NLS-1$
-        panel.add(genLabel(resourceMap.getString("phenotype.text"))); //$NON-NLS-1$
-        panel.add(genWrittenPanel(p.getGender().isMale() ? resourceMap.getString("genderMale.text") : resourceMap.getString("genderFemale.text"))); //$NON-NLS-1$ //$NON-NLS-2$
+        panel.add(genWrittenPanel(String.format(resourceMap.getString("age.format"), age.getYears(), age.getMonths())));
+        panel.add(genLabel(resourceMap.getString("gender.text")));
+        panel.add(genLabel(resourceMap.getString("phenotype.text")));
+        panel.add(genWrittenPanel(p.getGender().isMale() ? resourceMap.getString("genderMale.text") : resourceMap.getString("genderFemale.text")));
         panel.add(genWrittenPanel(phenotype));
-        panel.add(genLabel(resourceMap.getString("assignedTo.text"))); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("assignedTo.text")));
         panel.add(genLabel("")); //$NON-NLS-1$
         panel.add(genWrittenPanel(force));
         panel.add(genWrittenPanel("")); //$NON-NLS-1$

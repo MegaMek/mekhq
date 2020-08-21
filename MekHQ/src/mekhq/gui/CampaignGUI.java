@@ -33,10 +33,11 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.client.ui.swing.UnitLoadingDialog;
+import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.common.*;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.dialog.*;
@@ -50,11 +51,6 @@ import org.w3c.dom.NodeList;
 import chat.ChatClient;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.GameOptionsDialog;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
@@ -77,9 +73,11 @@ import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.LoanEvent;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.MedicPoolChangedEvent;
+import mekhq.campaign.event.MissionEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.TransactionEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -140,6 +138,7 @@ public class CampaignGUI extends JPanel {
     private JLabel lblFunds;
     private JLabel lblTempAstechs;
     private JLabel lblTempMedics;
+    private JLabel lblPartsAvailabilityRating;
     @SuppressWarnings("unused")
     private JLabel lblCargo; // FIXME: Re-add this in an optionized form
 
@@ -292,6 +291,7 @@ public class CampaignGUI extends JPanel {
         refreshLocation();
         refreshTempAstechs();
         refreshTempMedics();
+        refreshPartsAvailability();
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -1003,10 +1003,12 @@ public class CampaignGUI extends JPanel {
         lblFunds = new JLabel();
         lblTempAstechs = new JLabel();
         lblTempMedics = new JLabel();
+        lblPartsAvailabilityRating = new JLabel();
 
         statusPanel.add(lblFunds);
         statusPanel.add(lblTempAstechs);
         statusPanel.add(lblTempMedics);
+        statusPanel.add(lblPartsAvailabilityRating);
     }
 
     private void initTopButtons() {
@@ -1578,9 +1580,12 @@ public class CampaignGUI extends JPanel {
     }
 
     private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {
-        UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), getCampaign(), true);
-
-        usd.setVisible(true);
+        UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
+        if (!MechSummaryCache.getInstance().isInitialized()) {
+            unitLoadingDialog.setVisible(true);
+        }
+        AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(), unitLoadingDialog,
+                getCampaign(), true);
     }
 
     private void buyParts() {
@@ -1891,7 +1896,8 @@ public class CampaignGUI extends JPanel {
                         String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            report = getCampaign().getFinances().exportFinancesToCSV(file.getPath(), format.getRecommendedExtension());
+                            report = getCampaign().getFinances().exportFinancesToCSV(getCampaign(),
+                                    file.getPath(), format.getRecommendedExtension());
                         } else {
                             report = "Unsupported FileType in Export Finances";
                         }
@@ -2046,13 +2052,14 @@ public class CampaignGUI extends JPanel {
             // both members of the couple
             // TODO : make it so that exports will automatically include both spouses
             for (Person p : getCampaign().getActivePersonnel()) {
-                if (p.hasSpouse() && !getCampaign().getPersonnel().contains(p.getSpouse())) {
+                if (p.getGenealogy().hasSpouse()
+                        && !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse(getCampaign()))) {
                     // If this happens, we need to clear the spouse
                     if (p.getMaidenName() != null) {
                         p.setSurname(p.getMaidenName());
                     }
 
-                    p.setSpouseId(null);
+                    p.getGenealogy().setSpouse(null);
                 }
 
                 if (p.isPregnant()) {
@@ -2584,6 +2591,16 @@ public class CampaignGUI extends JPanel {
         lblTempMedics.setText(text);
     }
 
+    private void refreshPartsAvailability() {
+        if (!getCampaign().getCampaignOptions().getUseAtB()) {
+            lblPartsAvailabilityRating.setText("");
+        } else {
+            StringBuilder report = new StringBuilder();
+            int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel(null, report);
+            lblPartsAvailabilityRating.setText("<html><b>Campaign Parts Availability</b>:" + partsAvailability + "</html>");
+        }
+    }
+
     private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
 
     @Subscribe
@@ -2621,6 +2638,7 @@ public class CampaignGUI extends JPanel {
         refreshCalendar();
         refreshLocation();
         refreshFunds();
+        refreshPartsAvailability();
 
         refreshAllTabs();
     }
@@ -2628,16 +2646,19 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
         fundsScheduler.schedule();
+        refreshPartsAvailability();
     }
 
     @Subscribe
     public void handle(TransactionEvent ev) {
         fundsScheduler.schedule();
+        refreshPartsAvailability();
     }
 
     @Subscribe
     public void handle(LoanEvent ev) {
         fundsScheduler.schedule();
+        refreshPartsAvailability();
     }
 
     @Subscribe
@@ -2658,6 +2679,20 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handleLocationChanged(LocationChangedEvent ev) {
         refreshLocation();
+    }
+
+    @Subscribe
+    public void handleMissionChanged(MissionEvent ev) {
+        refreshPartsAvailability();
+    }
+
+    @Subscribe
+    public void handlePersonUpdate(PersonEvent ev) {
+        // only bother recalculating AtB parts availability if a logistics admin has been changed
+        // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
+        if (ev.getPerson().hasRole(Person.T_ADMIN_LOG)) {
+            refreshPartsAvailability();
+        }
     }
 
     public void refreshLocation() {
@@ -2714,6 +2749,13 @@ public class CampaignGUI extends JPanel {
         MekHQ.triggerEvent(new DeploymentChangedEvent(u, s));
     }
 
+    public void undeployForces(Vector<Force> forces) {
+        for (Force force : forces) {
+            undeployForce(force);
+            undeployForces(force.getSubForces());
+        }
+    }
+
     public void undeployForce(Force f) {
         undeployForce(f, true);
     }
@@ -2725,7 +2767,7 @@ public class CampaignGUI extends JPanel {
             f.clearScenarioIds(getCampaign(), killSubs);
             scenario.removeForce(f.getId());
             if (killSubs) {
-                for (UUID uid : f.getAllUnits()) {
+                for (UUID uid : f.getAllUnits(false)) {
                     Unit u = getCampaign().getUnit(uid);
                     if (null != u) {
                         scenario.removeUnit(u.getId());

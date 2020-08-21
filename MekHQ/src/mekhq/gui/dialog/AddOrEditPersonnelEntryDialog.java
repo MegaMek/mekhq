@@ -1,7 +1,7 @@
 /*
  * AddOrEditPersonnelEntryDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,37 +12,33 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import javax.swing.BorderFactory;
+import javax.swing.*;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PersonalLogEntry;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
 /**
- *
  * @author  Taharqa
  */
 public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
@@ -50,12 +46,13 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
-    private Frame frame;
+    private JFrame frame;
     private int operationType;
     private LogEntry entry;
-    private Date date;
-    private Date originalDate;
+    private LocalDate date;
+    private LocalDate originalDate;
     private String originalDescription;
+    private Campaign campaign;
 
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOK;
@@ -64,15 +61,15 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     private javax.swing.JPanel panBtn;
     private javax.swing.JPanel panMain;
 
-    public AddOrEditPersonnelEntryDialog(Frame parent, boolean modal, Date entryDate) {
-        this(parent, modal, ADD_OPERATION, new PersonalLogEntry(entryDate, ""));
+    public AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, Campaign campaign, LocalDate entryDate) {
+        this(parent, modal, campaign, ADD_OPERATION, new PersonalLogEntry(entryDate, ""));
     }
 
-    public AddOrEditPersonnelEntryDialog(Frame parent, boolean modal, LogEntry entry) {
-        this(parent, modal, EDIT_OPERATION, entry);
+    public AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, Campaign campaign, LogEntry entry) {
+        this(parent, modal, campaign, EDIT_OPERATION, entry);
     }
 
-    private AddOrEditPersonnelEntryDialog(Frame parent, boolean modal, int operationType, LogEntry entry) {
+    private AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, Campaign campaign, int operationType, LogEntry entry) {
         super(parent, modal);
 
         assert entry != null;
@@ -80,6 +77,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
         this.frame = parent;
         this.operationType = operationType;
         this.entry = entry;
+        this.campaign = campaign;
 
         this.date = this.entry.getDate();
         this.originalDate = this.entry.getDate();
@@ -95,7 +93,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditPersonnelEntryDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditPersonnelEntryDialog", new EncodeControl());
     	java.awt.GridBagConstraints gridBagConstraints;
 
         panMain = new javax.swing.JPanel();
@@ -116,9 +114,9 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
         getContentPane().setLayout(new BorderLayout());
         panBtn.setLayout(new GridLayout(0,2));
         panMain.setLayout(new GridBagLayout());
-        
+
         btnDate = new javax.swing.JButton();
-        btnDate.setText(getDateAsString());
+        btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(evt -> changeDate());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -129,7 +127,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(btnDate, gridBagConstraints);
-        
+
         txtDesc.setText(entry.getDesc());
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(true);
@@ -149,7 +147,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(txtDesc, gridBagConstraints);
-        
+
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(this::btnOKActionPerformed);
@@ -185,17 +183,10 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     }
 
     private void changeDate() {
-    	GregorianCalendar cal = new GregorianCalendar();
-    	cal.setTime(date);
-        DateChooser dc = new DateChooser(frame, cal);
+        DateChooser dc = new DateChooser(frame, date);
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = dc.getDate().getTime();
-            btnDate.setText(getDateAsString());
+            date = dc.getDate();
+            btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(date));
         }
-    }
-    
-    private String getDateAsString() {
-    	SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
-        return dateFormat.format(date);
     }
 }

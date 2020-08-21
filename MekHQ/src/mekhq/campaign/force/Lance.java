@@ -226,6 +226,11 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isEligible(Campaign c) {
+        // ensure the lance is marked as a combat force
+        if (!c.getForce(forceId).isCombatForce()) {
+            return false;
+        }
+
         /* Check that the number of units and weight are within the limits
          * and that the force contains at least one ground unit. */
         if (c.getCampaignOptions().getLimitLanceNumUnits()) {
@@ -264,18 +269,18 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public static UUID findCommander(int forceId, Campaign c) {
         ArrayList<Person> people = new ArrayList<>();
-        for(UUID uid : c.getForce(forceId).getAllUnits()) {
+        for (UUID uid : c.getForce(forceId).getAllUnits(false)) {
             Unit u = c.getUnit(uid);
-            if(null != u) {
+            if (null != u) {
                 Person p = u.getCommander();
-                if(null != p) {
+                if (null != p) {
                     people.add(p);
                 }
             }
         }
         //sort person vector by rank
         people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-        if(people.size() > 0) {
+        if (people.size() > 0) {
             return people.get(0).getId();
         }
         return null;

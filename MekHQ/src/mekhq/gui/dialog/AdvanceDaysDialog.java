@@ -158,16 +158,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
 
             List<String> reports = new ArrayList<>();
             for (; days > 0; days--) {
-                if (gui.getCampaign().checkOverDueLoans()
-                        || gui.nagShortMaintenance()
-                        || (gui.getCampaign().getCampaignOptions().getUseAtB())
-                        && (gui.nagShortDeployments() || gui.nagOutstandingScenarios())) {
-                    break;
-                } else if (gui.getCampaign().checkRetirementDefections()
-                        || gui.getCampaign().checkYearlyRetirements()) {
-                    gui.showRetirementDefectionDialog();
-                    break;
-                } else if (!gui.getCampaign().newDay()) {
+                if (!gui.getCampaign().newDay()) {
                     break;
                 }
                 String report = gui.getCampaign().getCurrentReportHTML();

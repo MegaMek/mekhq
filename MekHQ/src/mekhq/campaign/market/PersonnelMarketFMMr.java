@@ -92,11 +92,7 @@ public class PersonnelMarketFMMr implements PersonnelMarketMethod {
                 q = 6;
             }
             for (int j = 0; j < q; j++) {
-                Person p = c.newPerson(i);
-                UUID id = UUID.randomUUID();
-                p.setId(id);
-
-                retVal.add(p);
+                retVal.add(c.newPerson(i));
             }
         }
         return retVal;

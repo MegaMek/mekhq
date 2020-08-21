@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018  - The MegaMek Team
+ * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.market;
 
@@ -22,7 +22,6 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import org.w3c.dom.Node;
 
@@ -86,8 +85,6 @@ public class PersonnelMarketStratOps implements PersonnelMarketMethod {
             } else {
                 p = c.newPerson(Person.T_NONE);
             }
-            UUID id = UUID.randomUUID();
-            p.setId(id);
             daysSinceRolled = 0;
             return Collections.singletonList(p);
         } else {

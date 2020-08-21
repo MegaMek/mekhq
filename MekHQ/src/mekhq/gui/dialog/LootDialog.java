@@ -24,17 +24,12 @@ package mekhq.gui.dialog;
 import java.awt.Frame;
 import java.util.ArrayList;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 
+import megamek.client.ui.swing.UnitLoadingDialog;
+import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.Entity;
+import megamek.common.MechSummaryCache;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -49,7 +44,7 @@ import mekhq.preferences.PreferencesNode;
  */
 public class LootDialog extends javax.swing.JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
-    private Frame frame;
+    private JFrame frame;
     private Loot loot;
     private boolean cancelled;
     private ArrayList<Entity> units;
@@ -69,8 +64,8 @@ public class LootDialog extends javax.swing.JDialog {
     private JScrollPane scrUnits;
     private JScrollPane scrParts;
 
-    /** Creates new form NewTeamDialog */
-    public LootDialog(java.awt.Frame parent, boolean modal, Loot l, Campaign c) {
+    /** Creates new LootDialog form */
+    public LootDialog(JFrame parent, boolean modal, Loot l, Campaign c) {
         super(parent, modal);
         this.frame = parent;
         this.loot = l;
@@ -78,10 +73,10 @@ public class LootDialog extends javax.swing.JDialog {
         cancelled = true;
         units = new ArrayList<>();
         parts = new ArrayList<>();
-        for(Entity e : l.getUnits()) {
+        for (Entity e : l.getUnits()) {
             units.add(e);
         }
-        for(Part p : l.getParts()) {
+        for (Part p : l.getParts()) {
             parts.add(p);
         }
         initComponents();
@@ -273,10 +268,15 @@ public class LootDialog extends javax.swing.JDialog {
     }
 
     private void addUnit() {
-        UnitSelectorDialog usd = new UnitSelectorDialog(frame, campaign, false);
-        usd.setVisible(true);
-        Entity e = usd.getEntity();
-        if(null != e) {
+        UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
+        if (!MechSummaryCache.getInstance().isInitialized()) {
+            unitLoadingDialog.setVisible(true);
+        }
+        AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(frame, unitLoadingDialog,
+                campaign, false);
+
+        Entity e = usd.getSelectedEntity();
+        if (null != e) {
             units.add(e);
         }
         refreshUnitList();

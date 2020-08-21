@@ -14,12 +14,15 @@ allprojects {
             url 'https://github.com/MegaMek/mavenrepo/raw/master'
         }
         jcenter()
+        maven {
+            url 'https://jitpack.io'
+        }
     }
 }
 
 subprojects {
     group = 'org.megamek'
-    version = '0.47.8-SNAPSHOT'
+    version = '0.47.10-SNAPSHOT'
 }
 
 ext {

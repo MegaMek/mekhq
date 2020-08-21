@@ -2,6 +2,7 @@
  * AtBContract.java
  *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -251,32 +252,32 @@ public class AtBContract extends Contract implements Serializable {
     /* Variable contract lengths taken from AtB v. 2.25 */
     private void calculateVariableLength() {
         switch (missionType) {
-        case MT_CADREDUTY:
-        case MT_SECURITYDUTY:
-            setLength(4);
-            break;
-        case MT_GARRISONDUTY:
-            setLength(9 + Compute.d6(3));
-            break;
-        case MT_DIVERSIONARYRAID:
-        case MT_RECONRAID:
-            setLength(1);
-            break;
-        case MT_EXTRACTIONRAID:
-            setLength(3 + enemySkill);
-            break;
-        case MT_GUERRILLAWARFARE:
-        case MT_RIOTDUTY:
-            setLength(6);
-            break;
-        case MT_OBJECTIVERAID:
-        case MT_PIRATEHUNTING:
-            setLength(3 + Compute.randomInt(3));
-            break;
-        case MT_PLANETARYASSAULT:
-        case MT_RELIEFDUTY:
-            setLength(4 + Compute.randomInt(3));
-            break;
+            case MT_CADREDUTY:
+            case MT_SECURITYDUTY:
+                setLength(4);
+                break;
+            case MT_GARRISONDUTY:
+                setLength(9 + Compute.d6(3));
+                break;
+            case MT_DIVERSIONARYRAID:
+            case MT_RECONRAID:
+                setLength(1);
+                break;
+            case MT_EXTRACTIONRAID:
+                setLength(3 + enemySkill);
+                break;
+            case MT_GUERRILLAWARFARE:
+            case MT_RIOTDUTY:
+                setLength(6);
+                break;
+            case MT_OBJECTIVERAID:
+            case MT_PIRATEHUNTING:
+                setLength(3 + Compute.randomInt(3));
+                break;
+            case MT_PLANETARYASSAULT:
+            case MT_RELIEFDUTY:
+                setLength(4 + Compute.randomInt(3));
+                break;
         }
     }
 
@@ -285,30 +286,30 @@ public class AtBContract extends Contract implements Serializable {
          * for era variations already
          */
         switch (missionType) {
-        case MT_GUERRILLAWARFARE:
-            partsAvailabilityLevel = 0;
-            break;
-        case MT_DIVERSIONARYRAID:
-        case MT_OBJECTIVERAID:
-        case MT_RECONRAID:
-        case MT_EXTRACTIONRAID:
-            partsAvailabilityLevel = 1;
-            break;
-        case MT_PLANETARYASSAULT:
-        case MT_RELIEFDUTY:
-            partsAvailabilityLevel = 2;
-            break;
-        case MT_PIRATEHUNTING:
-            partsAvailabilityLevel = 3;
-            break;
-        default:
-            partsAvailabilityLevel = 4;
+            case MT_GUERRILLAWARFARE:
+                partsAvailabilityLevel = 0;
+                break;
+            case MT_DIVERSIONARYRAID:
+            case MT_OBJECTIVERAID:
+            case MT_RECONRAID:
+            case MT_EXTRACTIONRAID:
+                partsAvailabilityLevel = 1;
+                break;
+            case MT_PLANETARYASSAULT:
+            case MT_RELIEFDUTY:
+                partsAvailabilityLevel = 2;
+                break;
+            case MT_PIRATEHUNTING:
+                partsAvailabilityLevel = 3;
+                break;
+            default:
+                partsAvailabilityLevel = 4;
         }
     }
 
     public static int getEffectiveNumUnits(Campaign campaign) {
         double numUnits = 0;
-        for (UUID uuid : campaign.getForces().getAllUnits()) {
+        for (UUID uuid : campaign.getForces().getAllUnits(true)) {
             if (null == campaign.getUnit(uuid)) {
                 continue;
             }
@@ -319,12 +320,12 @@ public class AtBContract extends Contract implements Serializable {
                 case UnitType.TANK:
                 case UnitType.VTOL:
                 case UnitType.NAVAL:
-                    numUnits += campaign.getFaction().isClan()?0.5:1;
+                    numUnits += campaign.getFaction().isClan() ? 0.5 : 1;
                     break;
                 case UnitType.CONV_FIGHTER:
                 case UnitType.AERO:
                     if (campaign.getCampaignOptions().getUseAero()) {
-                        numUnits += campaign.getFaction().isClan()?0.5:1;
+                        numUnits += campaign.getFaction().isClan() ? 0.5 : 1;
                     }
                     break;
                 case UnitType.PROTOMEK:
@@ -336,7 +337,7 @@ public class AtBContract extends Contract implements Serializable {
                     /* don't count */
             }
         }
-        return (int)numUnits;
+        return (int) numUnits;
     }
 
     public static boolean isMinorPower(String fName) {
@@ -355,7 +356,7 @@ public class AtBContract extends Contract implements Serializable {
         // IntOps reputation factor then Dragoons rating
         if (campaign.getCampaignOptions().useDragoonRating()
             && campaign.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
-            multiplier *= (unitRatingMod * .2) + .5;
+            multiplier *= (unitRatingMod * 0.2) + 0.5;
         } else {
             if (unitRatingMod >= IUnitRating.DRAGOON_A){
                 multiplier *= 2.0;

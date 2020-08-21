@@ -1,6 +1,35 @@
 VERSION HISTORY:
 ----------------
-0.47.8-SNAPSHOT
+0.47.10-SNAPSHOT
++ PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
++ Issue #1888: Founder Filter in Personnel Tab
++ Data: Numerous fixes to RATS, Mechfiles, Sprites, and update Unit Roles.
++ PR #1893: Personnel Status: Fixing ChangeStatus, Standardizing Boolean Comparisons, and Implementing Death Options
++ Issue #1808: Adding an Option for the Player to Control All Attached Units
++ Issue #399: AtB campaigns display current parts availability at the bottom; more detailed "this part is not available to your unit" explanations
++ Issue #1915: Fixing Date Lineup
++ PR #1917: Fixing the Award Tracker post-Ancestors Removal
++ Issue #1920: Fixing xml load for bad Ancestry data
++ PR #1916: Personnel Filter Enum
++ Issue #790: Implementing Non-Combat TO&E Forces
++ PR #1930: Fixing Fill Transports NPE
++ Issue #1829: Fixing Duplicated Nags in AdvanceDaysDialog
++ Issue #470: Mass Training: Rank, No Officer, and Only Officer Filters
++ Issue #1929: Scenario Resolution: Fixing Display Anchor Issues
++ PR #1932: Fixing Total Earnings Display Issues
++ Issue #1941: Person View Panel Ability and Injury Description ToolTip
++ Issue #1296, 1855: Fixed issue preventing customization of units in the meklab when ammunition is added to the unit.
++ Issue #1951: Autosave Does Not Always Initiate On First Load
++ Issue #1922: CrewSkillUpgrader Infinite Loop Fix
+
+0.47.9 (2020-08-07 1830 UTC)
++ Issue #1894: Adding additional legacy date format
++ PR #1897: Genealogy: Adding a contains map check
++ PR #1900: Adding Battle Damage to MekHQ Sprites
++ Issue #1902: Fixing DateChooser NPEs
++ Issue #1904: Updating Portrait documentation for role name changes
+
+0.47.8 (2020-08-02 2300 UTC)
 + PR #1825: Adding Advance to Next Monday to the AdvanceDaysDialog
 + Issue #1828: Rolling over to the next month when using AtB and your current faction goes extinct will no longer cause an error
 + Issue #1827: Adding documentation comment for required Excel version for Awards Tracker
@@ -17,6 +46,11 @@ VERSION HISTORY:
 + PR #1864: Random Callsign Generator
 + Issue #1871: Implementing sorting fixes for the personnel tab
 + PR #1850: Phenotype Rework Implementing Vehicle, ProtoMech, and Naval Phenotypes
++ PR #1669: Implementing the MegaMek Unit Selector in MekHQ
++ Issue #198: Adding Ransom Mech and Ransom Prisoner Options for Scenario Resolution
++ Issue #1881: Outer planets in Weldry system can now be clicked
++ Issues #1569 and #1570 Phase 1: Genealogy
++ PR #1857: Personnel biographical view and last name simplification
 
 0.47.7 (2020-06-22 2330 UTC)
 + PR #1811: Fix advance multiple days reports not showing

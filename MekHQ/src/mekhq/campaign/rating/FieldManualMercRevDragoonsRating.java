@@ -655,8 +655,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private int getYearsInDebt() {
-        int yearsInDebt = getCampaign().getFinances().getFullYearsInDebt(getCampaign().getCalendar());
-        yearsInDebt += getCampaign().getFinances().getPartialYearsInDebt(getCampaign().getCalendar());
+        int yearsInDebt = getCampaign().getFinances().getFullYearsInDebt(getCampaign().getLocalDate());
+        yearsInDebt += getCampaign().getFinances().getPartialYearsInDebt(getCampaign().getLocalDate());
         return yearsInDebt;
     }
 
@@ -877,6 +877,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                "tech support.";
     }
 
+    @Override
     public BigDecimal getTransportPercent() {
         // battle armor bays can hold 5 suits of battle armor per bay, while units can be 6 in some lore examples
         // so this is calculated first, and all calculations are based on this number

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -26,8 +26,12 @@ public enum PersonnelStatus {
     //region Enum Declarations
     ACTIVE("PersonnelStatus.ACTIVE.text"),
     RETIRED("PersonnelStatus.RETIRED.text"),
+    MIA("PersonnelStatus.MIA.text"),
     KIA("PersonnelStatus.KIA.text"),
-    MIA("PersonnelStatus.MIA.text");
+    NATURAL_CAUSES("PersonnelStatus.NATURAL_CAUSES.text"),
+    WOUNDS("PersonnelStatus.WOUNDS.text"),
+    DISEASE("PersonnelStatus.DISEASE.text"),
+    OLD_AGE("PersonnelStatus.OLD_AGE.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -42,12 +46,81 @@ public enum PersonnelStatus {
     }
     //endregion Constructors
 
-    /**
-     * @return the name of the status
-     */
-    public String getStatusName() {
+    @Override
+    public String toString() {
         return statusName;
     }
+
+    //region Boolean Information Methods
+    /**
+     * @return true if a person is active, otherwise false
+     */
+    public boolean isActive() {
+        return this == ACTIVE;
+    }
+    /**
+     * @return true if a person is retired, otherwise false
+     */
+    public boolean isRetired() {
+        return this == RETIRED;
+    }
+
+    /**
+     * @return true if a person is MIA, otherwise false
+     */
+    public boolean isMIA() {
+        return this == MIA;
+    }
+
+    /**
+     * @return true if a person is KIA, otherwise false
+     */
+    public boolean isKIA() {
+        return this == KIA;
+    }
+
+    /**
+     * @return true if a person has died of NATURAL_CAUSES, otherwise false
+     */
+    public boolean hasDiedOfNaturalCauses() {
+        return this == NATURAL_CAUSES;
+    }
+
+    /**
+     * @return true if a person has died from WOUNDS, otherwise false
+     */
+    public boolean hasDiedOfWounds() {
+        return this == WOUNDS;
+    }
+
+    /**
+     * @return true if a person has died from DISEASE, otherwise false
+     */
+    public boolean hasDiedOfDisease() {
+        return this == DISEASE;
+    }
+
+    /**
+     * @return true if a person has died from OLD_AGE, otherwise false
+     */
+    public boolean hasDiedOfOldAge() {
+        return this == OLD_AGE;
+    }
+    /**
+     * @return true if a person is dead, otherwise false
+     */
+    public boolean isDead() {
+        return isKIA() || hasDiedOfNaturalCauses() || hasDiedOfWounds() || hasDiedOfDisease()
+                || hasDiedOfOldAge();
+    }
+
+    /**
+     * @return true if a person is dead or MIA, otherwise false
+     */
+    public boolean isDeadOrMIA() {
+        return isDead() || isMIA();
+    }
+    //endregion Boolean Information Methods
 
     /**
      * @param text containing the PersonnelStatus

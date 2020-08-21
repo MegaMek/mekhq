@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,6 +38,7 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import org.w3c.dom.DOMException;
@@ -102,7 +103,6 @@ import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingMASC;
-import mekhq.campaign.personnel.Ancestors;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RankTranslator;
 import mekhq.campaign.personnel.Ranks;
@@ -274,8 +274,8 @@ public class CampaignXmlParser {
                     // TODO: hoist registerAll out of this
                     InjuryTypes.registerAll();
                     processPersonnelNodes(retVal, wn, version);
-                } else if (xn.equalsIgnoreCase("ancestors")) {
-                    processAncestorNodes(retVal, wn, version);
+                } else if (xn.equalsIgnoreCase("ancestors")) { // Legacy
+                    migrateAncestorNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("units")) {
                     processUnitNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("missions")) {
@@ -425,13 +425,13 @@ public class CampaignXmlParser {
                     }
                 }
                 //if the type is a BayWeapon, remove
-                if(prt instanceof EquipmentPart
+                if (prt instanceof EquipmentPart
                         && ((EquipmentPart) prt).getType() instanceof BayWeapon) {
                     removeParts.add(prt);
                     continue;
                 }
 
-                if(prt instanceof MissingEquipmentPart
+                if (prt instanceof MissingEquipmentPart
                         && ((MissingEquipmentPart) prt).getType() instanceof BayWeapon) {
                     removeParts.add(prt);
                     continue;
@@ -544,7 +544,7 @@ public class CampaignXmlParser {
         timestamp = System.currentTimeMillis();
 
         // Okay, Units, need their pilot references fixed.
-        for(Unit unit : retVal.getUnits()) {
+        for (Unit unit : retVal.getUnits()) {
             // Also, the unit should have its campaign set.
             unit.setCampaign(retVal);
 
@@ -601,15 +601,15 @@ public class CampaignXmlParser {
             }
 
             //get rid of BA parts before 0.3.4
-            if(unit.getEntity() instanceof BattleArmor
+            if (unit.getEntity() instanceof BattleArmor
                     && version.getMajorVersion() == 0
                     && (version.getMinorVersion() <= 2 ||
                             (version.getMinorVersion() <= 3 && version.getSnapshot() < 16))) {
-                for(Part p : unit.getParts()) {
+                for (Part p : unit.getParts()) {
                     retVal.removePart(p);
                 }
                 unit.resetParts();
-                if(version.getSnapshot() < 4) {
+                if (version.getSnapshot() < 4) {
                     for (int loc = 0; loc < unit.getEntity().locations(); loc++) {
                         unit.getEntity().setInternal(0, loc);
                     }
@@ -622,7 +622,7 @@ public class CampaignXmlParser {
                         System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
-        for(Unit unit : retVal.getUnits()) {
+        for (Unit unit : retVal.getUnits()) {
             // Some units have been incorrectly assigned a null C3UUID as a string. This should correct that by setting a new C3UUID
             if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i() || unit.getEntity().hasNavalC3())
                     && (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
@@ -696,12 +696,12 @@ public class CampaignXmlParser {
 
         //unload any ammo bins in the warehouse
         ArrayList<AmmoBin> binsToUnload = new ArrayList<AmmoBin>();
-        for(Part prt : retVal.getSpareParts()) {
+        for (Part prt : retVal.getSpareParts()) {
             if (prt instanceof AmmoBin && !prt.isReservedForRefit() && ((AmmoBin) prt).getShotsNeeded() == 0) {
                 binsToUnload.add((AmmoBin) prt);
             }
         }
-        for(AmmoBin bin : binsToUnload) {
+        for (AmmoBin bin : binsToUnload) {
             bin.unload();
         }
 
@@ -713,7 +713,7 @@ public class CampaignXmlParser {
 
         //Check all parts that are reserved for refit and if the refit id unit
         //is not refitting or is gone then unreserve
-        for(Part part : retVal.getParts()) {
+        for (Part part : retVal.getParts()) {
             if (part.isReservedForRefit()) {
                 Unit u = retVal.getUnit(part.getRefitId());
                 if (null == u || !u.isRefitting()) {
@@ -731,7 +731,7 @@ public class CampaignXmlParser {
         //for a variety of reasons
         List<Part> partsToRemove = new ArrayList<>();
         List<Part> partsToKeep = new ArrayList<>();
-        for(Part part : retVal.getParts()) {
+        for (Part part : retVal.getParts()) {
             if (part.isSpare() && part.isPresent()) {
                 for (Part oPart : partsToKeep) {
                     if (part.isSamePartTypeAndStatus(oPart)) {
@@ -761,7 +761,7 @@ public class CampaignXmlParser {
                 partsToKeep.add(part);
             }
         }
-        for(Part toRemove : partsToRemove) {
+        for (Part toRemove : partsToRemove) {
             retVal.removePart(toRemove);
         }
 
@@ -1005,7 +1005,7 @@ public class CampaignXmlParser {
         // Everything's new
         List<String> newReports = new ArrayList<String>(retVal.getCurrentReport().size() * 2);
         boolean firstReport = true;
-        for(String report : retVal.getCurrentReport()) {
+        for (String report : retVal.getCurrentReport()) {
             if (firstReport) {
                 firstReport = false;
             } else {
@@ -1190,45 +1190,6 @@ public class CampaignXmlParser {
 
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
                 "Load Personnel Nodes Complete!"); //$NON-NLS-1$
-    }
-
-    private static void processAncestorNodes(Campaign retVal, Node wn,
-            Version version) {
-        final String METHOD_NAME = "processAncestorNodes(Campaign,Node,Version)"; //$NON-NLS-1$
-
-        MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
-                "Loading Ancestor Nodes from XML..."); //$NON-NLS-1$
-
-        NodeList wList = wn.getChildNodes();
-
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (!wn2.getNodeName().equalsIgnoreCase("ancestor")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
-                MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.ERROR,
-                        "Unknown node type not loaded in Ancestor nodes: " //$NON-NLS-1$
-                                + wn2.getNodeName());
-
-                continue;
-            }
-
-            Ancestors a = Ancestors.generateInstanceFromXML(wn2, retVal, version);
-
-            if (a != null) {
-                retVal.importAncestors(a);
-            }
-        }
-
-        MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
-                "Load Ancestor Nodes Complete!"); //$NON-NLS-1$
     }
 
     private static void processSkillTypeNodes(Campaign retVal, Node wn,
@@ -1714,7 +1675,7 @@ public class CampaignXmlParser {
             }
 
             //if for some reason we couldn't find a type for equipment part, then remove it
-            if((p instanceof EquipmentPart && null == ((EquipmentPart)p).getType())
+            if ((p instanceof EquipmentPart && null == ((EquipmentPart)p).getType())
                     || (p instanceof MissingEquipmentPart && null == ((MissingEquipmentPart) p).getType())) {
                 p = null;
             }
@@ -1806,53 +1767,53 @@ public class CampaignXmlParser {
                 String systemId = null;
                 List<PlanetarySystem.PlanetarySystemEvent> sysEvents = new ArrayList<>();
                 eventsMap.clear();
-                for(int n = 0; n < systemNodes.getLength(); ++n) {
+                for (int n = 0; n < systemNodes.getLength(); ++n) {
                     Node systemNode = systemNodes.item(n);
-                    if(systemNode.getNodeType() != Node.ELEMENT_NODE) {
+                    if (systemNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
                     }
-                    if(systemNode.getNodeName().equalsIgnoreCase("id")) {
+                    if (systemNode.getNodeName().equalsIgnoreCase("id")) {
                         systemId = systemNode.getTextContent();
-                    } else if(systemNode.getNodeName().equalsIgnoreCase("event")) {
+                    } else if (systemNode.getNodeName().equalsIgnoreCase("event")) {
                         PlanetarySystem.PlanetarySystemEvent event = Systems.getInstance().readPlanetarySystemEvent(systemNode);
-                        if(null != event) {
-                        	event.custom = true;
-                        	sysEvents.add(event);
+                        if (null != event) {
+                            event.custom = true;
+                            sysEvents.add(event);
                         }
-                    } else if(systemNode.getNodeName().equalsIgnoreCase("planet")) {
-                    	NodeList planetNodes = systemNode.getChildNodes();
+                    } else if (systemNode.getNodeName().equalsIgnoreCase("planet")) {
+                        NodeList planetNodes = systemNode.getChildNodes();
                         int sysPos = 0;
                         events = new ArrayList<>();
-                        for(int j = 0; j < planetNodes.getLength(); ++j) {
-                        	Node planetNode = planetNodes.item(j);
-                            if(planetNode.getNodeType() != Node.ELEMENT_NODE) {
+                        for (int j = 0; j < planetNodes.getLength(); ++j) {
+                            Node planetNode = planetNodes.item(j);
+                            if (planetNode.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             }
-                            if(planetNode.getNodeName().equalsIgnoreCase("sysPos")) {
+                            if (planetNode.getNodeName().equalsIgnoreCase("sysPos")) {
                                 sysPos = Integer.parseInt(planetNode.getTextContent());
-                            } else if(planetNode.getNodeName().equalsIgnoreCase("event")) {
+                            } else if (planetNode.getNodeName().equalsIgnoreCase("event")) {
                                 Planet.PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
-                                if(null != event) {
+                                if (null != event) {
                                     event.custom = true;
                                     events.add(event);
                                 }
                             }
                         }
-                        if(sysPos > 0 && !events.isEmpty()) {
-                        	eventsMap.put(sysPos, events);
+                        if (sysPos > 0 && !events.isEmpty()) {
+                            eventsMap.put(sysPos, events);
                         }
                     }
                 }
-                if(null != systemId) {
-                	//iterate through events hash and assign events to planets
-                	Iterator<Map.Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();
+                if (null != systemId) {
+                    //iterate through events hash and assign events to planets
+                    Iterator<Map.Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();
                     while (it.hasNext()) {
                         Map.Entry<Integer, List<PlanetaryEvent>> pair = it.next();
                         Systems.getInstance().updatePlanetaryEvents(systemId, pair.getValue(), true, pair.getKey());
                     }
                     //check for system-wide events
-                    if(!sysEvents.isEmpty()) {
-                    	Systems.getInstance().updatePlanetarySystemEvents(systemId, sysEvents, true);
+                    if (!sysEvents.isEmpty()) {
+                        Systems.getInstance().updatePlanetarySystemEvents(systemId, sysEvents, true);
                     }
                 }
             }
@@ -1862,25 +1823,105 @@ public class CampaignXmlParser {
                 NodeList planetNodes = wn2.getChildNodes();
                 String planetId = null;
                 events = new ArrayList<>();
-                for(int n = 0; n < planetNodes.getLength(); ++n) {
+                for (int n = 0; n < planetNodes.getLength(); ++n) {
                     Node planetNode = planetNodes.item(n);
-                    if(planetNode.getNodeType() != Node.ELEMENT_NODE) {
+                    if (planetNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
                     }
-                    if(planetNode.getNodeName().equalsIgnoreCase("id")) {
+
+                    if (planetNode.getNodeName().equalsIgnoreCase("id")) {
                         planetId = planetNode.getTextContent();
-                    } else if(planetNode.getNodeName().equalsIgnoreCase("event")) {
+                    } else if (planetNode.getNodeName().equalsIgnoreCase("event")) {
                         Planet.PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
-                        if(null != event) {
+                        if (null != event) {
                             event.custom = true;
                             events.add(event);
                         }
                     }
                 }
-                if(null != planetId) {
+                if (null != planetId) {
                     Systems.getInstance().updatePlanetaryEvents(planetId, events, true);
                 }
             }
         }
     }
+
+
+    //region Migration Methods
+    //region Ancestry Migration
+    private static Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
+
+    /**
+     * This method is used to add people to the ancestry migration map that is used to migrate
+     * from the old Ancestors setup to {@link mekhq.campaign.personnel.familyTree.Genealogy} starting
+     * from 0.47.8
+     * @param ancestorsId the Person's Ancestor Id
+     * @param person the person to add the the above HashMap
+     */
+    public static void addToAncestryMigrationMap(UUID ancestorsId, Person person) {
+        ancestryMigrationMap.putIfAbsent(ancestorsId, new ArrayList<>());
+        ancestryMigrationMap.get(ancestorsId).add(person);
+    }
+
+    /**
+     * This method is used to migrate from Ancestry nodes to
+     * {@link mekhq.campaign.personnel.familyTree.Genealogy} since the swap-over in 0.47.8
+     * @param retVal the campaign to load the ancestor nodes for
+     * @param wn the node containing the saved ancestry
+     */
+    private static void migrateAncestorNodes(Campaign retVal, Node wn) {
+        NodeList wList = wn.getChildNodes();
+
+        for (int x = 0; x < wList.getLength(); x++) {
+            // First, we determine the node values
+            UUID id = null;
+            UUID fatherId = null;
+            UUID motherId = null;
+            Node wn2 = wList.item(x);
+
+            if ((wn2.getNodeType() != Node.ELEMENT_NODE)
+                    || !wn2.getNodeName().equalsIgnoreCase("ancestor")) {
+                continue;
+            }
+
+            NodeList nl = wn2.getChildNodes();
+            for (int y = 0; y < nl.getLength(); y++) {
+                Node wn3 = nl.item(y);
+                if (wn3.getNodeName().equalsIgnoreCase("id")) {
+                    id = UUID.fromString(wn3.getTextContent());
+                } else if (wn3.getNodeName().equalsIgnoreCase("fatherId")) {
+                    fatherId = UUID.fromString(wn3.getTextContent());
+                } else if (wn3.getNodeName().equalsIgnoreCase("motherId")) {
+                    motherId = UUID.fromString(wn3.getTextContent());
+                }
+            }
+
+            if ((id == null) || !ancestryMigrationMap.containsKey(id)) {
+                continue;
+            }
+
+            // Then, we migrate the individual person data
+            Iterator<Person> people = ancestryMigrationMap.get(id).iterator();
+            while (people.hasNext()) {
+                Person person = people.next();
+                people.remove();
+
+                if (retVal.getPerson(fatherId) != null) {
+                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, fatherId);
+                    retVal.getPerson(fatherId).getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person.getId());
+                } else {
+                    MekHQ.getLogger().warning(CampaignXmlParser.class, "migrateAncestorNodes", "Person with id " + fatherId + " does not exist, skipping adding Genealogy for them.");
+                }
+
+                if (retVal.getPerson(motherId) != null) {
+                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, motherId);
+                    retVal.getPerson(motherId).getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person.getId());
+                } else {
+                    MekHQ.getLogger().warning(CampaignXmlParser.class, "migrateAncestorNodes", "Person with id " + motherId + " does not exist, skipping adding Geneology for them.");
+                }
+            }
+        }
+    }
+    //endregion Ancestry Migration
+    //endregion Migration Methods
 }

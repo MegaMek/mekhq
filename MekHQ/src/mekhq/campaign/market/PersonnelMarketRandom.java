@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018  - The MegaMek Team
+ * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,17 +10,16 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.market;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
@@ -31,9 +30,8 @@ import mekhq.module.api.PersonnelMarketMethod;
 /**
  * Generation method for personnel market that adds a random number of recruits of a random type
  * each day and removes them based on skill (with more experienced leaving more quickly).
- * 
- * @author Neoancient
  *
+ * @author Neoancient
  */
 public class PersonnelMarketRandom implements PersonnelMarketMethod {
 
@@ -53,8 +51,6 @@ public class PersonnelMarketRandom implements PersonnelMarketMethod {
                 roll = Compute.randomInt(Person.T_NUM - 1);
             }
             Person p = c.newPerson(roll);
-            UUID id = UUID.randomUUID();
-            p.setId(id);
             personnel.add(p);
         }
         return personnel;
@@ -103,5 +99,4 @@ public class PersonnelMarketRandom implements PersonnelMarketMethod {
         }
         return retval;
     }
-
 }

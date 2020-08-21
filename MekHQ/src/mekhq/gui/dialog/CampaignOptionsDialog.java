@@ -23,7 +23,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -44,6 +43,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -75,7 +75,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
-import megamek.common.util.DirectoryItems;
+import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -123,7 +123,7 @@ public class CampaignOptionsDialog extends JDialog {
     private RandomSkillPreferences rSkillPrefs;
     private GregorianCalendar date;
     private SimpleDateFormat dateFormat;
-    private Frame frame;
+    private JFrame frame;
     private String camoCategory;
     private String camoFileName;
     private int colorIndex;
@@ -479,6 +479,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkAdjustPlayerVehicles;
     private JCheckBox chkRegionalMechVariations;
     private JCheckBox chkAttachedPlayerCamouflage;
+    private JCheckBox chkPlayerControlsAttachedUnits;
     private JCheckBox chkUseDropShips;
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
@@ -500,7 +501,7 @@ public class CampaignOptionsDialog extends JDialog {
     /**
      * Creates new form CampaignOptionsDialog
      */
-    public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos,
+    public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c, DirectoryItems camos,
                                  DirectoryItems forceIcons) {
         super(parent, modal);
         this.campaign = c;
@@ -4407,6 +4408,11 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = yTablePosition++;
         panSubAtBScenario.add(chkAttachedPlayerCamouflage, gridBagConstraints);
 
+        chkPlayerControlsAttachedUnits = new JCheckBox(resourceMap.getString("chkPlayerControlsAttachedUnits.text"));
+        chkPlayerControlsAttachedUnits.setSelected(options.getPlayerControlsAttachedUnits());
+        gridBagConstraints.gridy = yTablePosition++;
+        panSubAtBScenario.add(chkPlayerControlsAttachedUnits, gridBagConstraints);
+
         chkUseDropShips = new JCheckBox(resourceMap.getString("chkUseDropShips.text"));
         chkUseDropShips.setToolTipText(resourceMap.getString("chkUseDropShips.toolTipText"));
         chkUseDropShips.setSelected(options.getUseDropShips());
@@ -5044,6 +5050,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
         options.setRegionalMechVariations(chkRegionalMechVariations.isSelected());
         options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
+        options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
         options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
@@ -5108,21 +5115,21 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
 
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+    private void btnCancelActionPerformed(ActionEvent evt) {
         cancelled = true;
         this.setVisible(false);
-    }//GEN-LAST:event_btnCancelActionPerformed
+    }
 
     public boolean wasCancelled() {
         return cancelled;
     }
 
-    private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
+    private void btnDateActionPerformed(ActionEvent evt) {
         // show the date chooser
-        DateChooser dc = new DateChooser(frame, date);
+        DateChooser dc = new DateChooser(frame, date.toZonedDateTime().toLocalDate());
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = dc.getDate();
+            date = GregorianCalendar.from(dc.getDate().atStartOfDay(ZoneId.systemDefault()));
             btnDate.setText(getDateAsString());
             factionModel = new SortedComboBoxModel<>();
             for (String sname : Faction.choosableFactionCodes) {
@@ -5134,9 +5141,9 @@ public class CampaignOptionsDialog extends JDialog {
             factionModel.setSelectedItem(campaign.getFaction().getFullName(date.get(Calendar.YEAR)));
             comboFaction.setModel(factionModel);
         }
-    }//GEN-LAST:event_btnDateActionPerformed
+    }
 
-    private void btnIconActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnIconActionPerformed(ActionEvent evt) {
         ImageChoiceDialog pcd = new ImageChoiceDialog(frame, true, iconCategory, iconFileName, forceIcons);
         pcd.setVisible(true);
         if (pcd.isChanged()) {

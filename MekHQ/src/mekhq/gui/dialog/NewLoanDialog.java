@@ -1,20 +1,20 @@
 /*
  * NewLoanDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,8 +29,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
@@ -113,7 +111,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         this.numberFormatter = new NumberFormatter(NumberFormat.getInstance());
         IUnitRating unitRating = c.getUnitRating();
         rating = unitRating.getModifier();
-        loan = Loan.getBaseLoanFor(rating, campaign.getCalendar());
+        loan = Loan.getBaseLoanFor(rating, campaign.getLocalDate());
         maxCollateralValue = campaign.getFinances().getMaxCollateral(campaign);
         initComponents();
         setLocationRelativeTo(parent);
@@ -372,13 +370,13 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(panInfo, gridBagConstraints);
 
-        btnAdd = new JButton(resourceMap.getString("btnOkay.text")); // NOI18N
-        btnAdd.setName("btnOK"); // NOI18N
+        btnAdd = new JButton(resourceMap.getString("btnOkay.text"));
+        btnAdd.setName("btnOK");
         btnAdd.addActionListener(evt -> addLoan());
         panBtn.add(btnAdd);
 
-        btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnClose"); // NOI18N
+        btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
+        btnCancel.setName("btnClose");
         btnCancel.addActionListener(evt -> cancel());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridwidth = 1;
@@ -402,7 +400,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private void setUpInfo() {
         panInfo.setLayout(new GridLayout());
         panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("detailsTitle.text")));
-        refreshValues();
+        refreshValues(campaign);
 
         JPanel panLeft = new JPanel(new GridBagLayout());
         JPanel panRight = new JPanel(new GridBagLayout());
@@ -534,17 +532,17 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     	loan.setSchedule(choiceSchedule.getSelectedIndex());
     	loan.setInstitution(txtName.getText());
     	loan.setRefNumber(txtNumber.getText());
-    	
+
     	// Recalculate information based on settings
-    	loan.setNextPayment((GregorianCalendar)campaign.getCalendar().clone());
+    	loan.setNextPayment(campaign.getLocalDate());
     	loan.setFirstPaymentDate();
     	loan.calculateAmortization();
-    	
+
     	// Refresh dialog values
-        refreshValues();
+        refreshValues(campaign);
     }
 
-    private void refreshValues() {
+    private void refreshValues(Campaign campaign) {
         final String METHOD_NAME = "refreshValues";
         try {
             txtPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
@@ -553,12 +551,12 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
             lblYears.setText(loan.getYears() + " years");
             lblSchedule.setText(Finances.getScheduleName(loan.getPaymentSchedule()));
             lblPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
-            lblFirstPayment.setText(SimpleDateFormat.getDateInstance().format(loan.getNextPayDate()));
+            lblFirstPayment.setText(campaign.getCampaignOptions().getDisplayFormattedDate(loan.getNextPayment()));
             lblPayAmount.setText(loan.getPaymentAmount().toAmountAndSymbolString());
             lblNPayment.setText(numberFormatter.valueToString(loan.getRemainingPayments()));
             lblTotalPayment.setText(loan.getRemainingValue().toAmountAndSymbolString());
             lblCollateralAmount.setText(loan.getCollateralAmount().toAmountAndSymbolString());
-        } catch (Exception ex ){
+        } catch (Exception ex) {
             MekHQ.getLogger().error(NewLoanDialog.class, METHOD_NAME, ex);
         }
     }

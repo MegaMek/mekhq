@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,26 +11,12 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.text.DateFormatter;
+import javax.swing.*;
 import javax.swing.text.DefaultFormatterFactory;
 
 import mekhq.MekHQ;
@@ -64,16 +49,15 @@ import mekhq.preferences.PreferencesNode;
  * // user can either choose a date or cancel by closing if (dc.showDateChooser()
  * == DateChooser.OK_OPTION) { date = dc.getDate(); }
  */
-
 public class DateChooser extends JDialog implements ActionListener, FocusListener, KeyListener {
     private static final long serialVersionUID = 4353945278962427075L;
     public static final int OK_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
 
-    private final DateFormat MMDDYYYY = new SimpleDateFormat("MM/dd/yyyy"); // TODO : LocalDate : remove inline date
-    private final DateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd"); // TODO : LocalDate : remove inline date
+    private final DateTimeFormatter MMDDYYYY = DateTimeFormatter.ofPattern("MM/dd/yyyy"); // TODO : LocalDate : remove inline date
+    private final DateTimeFormatter ISO8601 = DateTimeFormatter.ISO_LOCAL_DATE; // TODO : LocalDate : remove inline date
 
-    private static final ArrayList<String> monthNames;
+    private static final List<String> monthNames;
     static {
         monthNames = new ArrayList<>(12);
         monthNames.add("January");
@@ -88,17 +72,17 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         monthNames.add("October ");
         monthNames.add("November");
         monthNames.add("December");
-    };
+    }
 
-    private GregorianCalendar date;
-    private GregorianCalendar workingDate;
+    private LocalDate date;
+    private LocalDate workingDate;
     private JLabel monthLabel;
     private JLabel yearLabel;
     private JPanel dayGrid;
     private boolean ready;
 
     // Stores the user-input date.
-    private JFormattedTextField dateField = null;
+    private JFormattedTextField dateField;
 
     /**
      * Constructor for DateChooser
@@ -109,7 +93,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      *            GregorianCalendar instance that will be the initial date for
      *            this dialog
      */
-    public DateChooser(Frame owner, GregorianCalendar d) {
+    public DateChooser(JFrame owner, LocalDate d) {
         super(owner, "Date Chooser", true);
         date = d;
         workingDate = date;
@@ -129,8 +113,8 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
         // build the panel with month name and navigation buttons
         monthPane.add(navButton[0] = new JButton("<"));
-        monthPane.add(monthLabel = new JLabel(String.valueOf(monthNames
-                .get(date.get(GregorianCalendar.MONTH))), JLabel.CENTER));
+        monthPane.add(monthLabel = new JLabel(String.valueOf(
+                monthNames.get(date.getMonth().ordinal())), JLabel.CENTER));
         monthLabel.setMinimumSize(new Dimension(80, 17));
         monthLabel.setMaximumSize(new Dimension(80, 17));
         monthLabel.setPreferredSize(new Dimension(80, 17));
@@ -139,8 +123,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         // build the panel with year and navigation buttons
         yearPane.add(navButton[2] = new JButton("<<"));
         yearPane.add(
-                yearLabel = new JLabel(String.valueOf(date
-                        .get(GregorianCalendar.YEAR)), JLabel.CENTER),
+                yearLabel = new JLabel(String.valueOf(date.getYear()), JLabel.CENTER),
                 BorderLayout.CENTER);
         yearLabel.setMinimumSize(new Dimension(50, 17));
         yearLabel.setMaximumSize(new Dimension(50, 17));
@@ -174,20 +157,26 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         contentPane.add(dayGrid, BorderLayout.CENTER);
 
         //Set up the date input text field with the current campaign date.
-        try {
-            dateField = new JFormattedTextField();
-            dateField.addFocusListener(this);
-            dateField.addKeyListener(this);
-            dateField.setFormatterFactory(new DefaultFormatterFactory(new DateFormatter(MMDDYYYY)));
-            dateField.setText(dateField.getFormatter().valueToString(date.getTime()));
-            dateField.setToolTipText("Date of the transaction.");
-            dateField.setName("dateField");
-            dateField.setHorizontalAlignment(SwingConstants.CENTER);
-            contentPane.add(dateField, BorderLayout.SOUTH);
-            dateField.setColumns(10);
-        } catch (ParseException e) {
-            MekHQ.getLogger().error(getClass(), "<init>(Frame,GregorianCalendar)", e);
-        }
+        dateField = new JFormattedTextField(date);
+        dateField.setName("dateField");
+        dateField.addFocusListener(this);
+        dateField.addKeyListener(this);
+        dateField.setFormatterFactory(new DefaultFormatterFactory(new JFormattedTextField.AbstractFormatter() {
+            private static final long serialVersionUID = -5512863073174935806L;
+
+            @Override
+            public Object stringToValue(String text) {
+                return parseDate(text);
+            }
+
+            @Override
+            public String valueToString(Object value) {
+                return ((LocalDate) value).format(MMDDYYYY);
+            }
+        }));
+        dateField.setHorizontalAlignment(SwingConstants.CENTER);
+        contentPane.add(dateField, BorderLayout.SOUTH);
+        dateField.setColumns(10);
 
         setResizable(false);
         ready = false;
@@ -208,7 +197,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     /**
      * Return the last selected date for this instance of DateChooser
      */
-    public GregorianCalendar getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
@@ -221,84 +210,77 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         ready = false;
         setVisible(true);
         if (ready) {
-            return (OK_OPTION);
+            return OK_OPTION;
         } else {
-            return (CANCEL_OPTION);
+            return CANCEL_OPTION;
         }
     }
 
     /**
      * Action handler for this dialog, which handles all the button presses.
      *
-     * @param evt
-     *            ActionEvent
+     * @param evt ActionEvent
      */
     @Override
     public void actionPerformed(ActionEvent evt) {
         String label = ((JButton) evt.getSource()).getText();
 
-        if (label.equals("<")) {
-            int m = monthNames.indexOf(monthLabel.getText());
-            m = prevMonth(m);
-            monthLabel.setText((String) monthNames.get(m));
-            updateDayGrid(false);
-        } else if (label.equals(">")) {
-            int m = monthNames.indexOf(monthLabel.getText());
-            m = nextMonth(m);
-            monthLabel.setText((String) monthNames.get(m));
-            updateDayGrid(false);
-        } else if (label.equals("<<")) {
-            int y = 0;
-            try {
-                y = Integer.parseInt(yearLabel.getText());
-            } catch (NumberFormatException e) {
-                MekHQ.getLogger().error(getClass(), "actionPerformed", e);
+        switch (label) {
+            case "<": {
+                int m = monthNames.indexOf(monthLabel.getText());
+                m = prevMonth(m);
+                monthLabel.setText(monthNames.get(m));
+                updateDayGrid(false);
+                break;
             }
-            yearLabel.setText(String.valueOf(--y));
-            updateDayGrid(false);
-        } else if (label.equals(">>")) {
-            int y = 0;
-            try {
-                y = Integer.parseInt(yearLabel.getText());
-            } catch (NumberFormatException e) {
-                MekHQ.getLogger().error(getClass(), "actionPerformed", e);
+            case ">": {
+                int m = monthNames.indexOf(monthLabel.getText());
+                m = nextMonth(m);
+                monthLabel.setText(monthNames.get(m));
+                updateDayGrid(false);
+                break;
             }
-            yearLabel.setText(String.valueOf(++y));
-            updateDayGrid(false);
-        } else {
-            int m = monthNames.indexOf(monthLabel.getText());
-            int y = 0;
-            int d = 0;
-            try {
-                y = Integer.parseInt(yearLabel.getText());
-                d = Integer.parseInt(label);
-            } catch (NumberFormatException e) {
-                MekHQ.getLogger().error(getClass(), "actionPerformed", e);
+            case "<<": {
+                int y = 0;
+                try {
+                    y = Integer.parseInt(yearLabel.getText());
+                } catch (NumberFormatException e) {
+                    MekHQ.getLogger().error(getClass(), "actionPerformed", e);
+                }
+                yearLabel.setText(String.valueOf(--y));
+                updateDayGrid(false);
+                break;
             }
-            date = new GregorianCalendar(y, m, d);
-            date.setLenient(false);
-            ready = true;
+            case ">>": {
+                int y = 0;
+                try {
+                    y = Integer.parseInt(yearLabel.getText());
+                } catch (NumberFormatException e) {
+                    MekHQ.getLogger().error(getClass(), "actionPerformed", e);
+                }
+                yearLabel.setText(String.valueOf(++y));
+                updateDayGrid(false);
+                break;
+            }
+            default: {
+                int m = monthNames.indexOf(monthLabel.getText()) + 1;
+                int y = 0;
+                int d = 0;
+                try {
+                    y = Integer.parseInt(yearLabel.getText());
+                    d = Integer.parseInt(label);
+                } catch (NumberFormatException e) {
+                    MekHQ.getLogger().error(getClass(), "actionPerformed", e);
+                }
+                date = LocalDate.of(y, m, d);
+                ready = true;
 
-            //Set the date field to the new date.
-            dateField.setText(MMDDYYYY.format(date.getTime()));
-            setVisible(false);
+                //Set the date field to the new date.
+                dateField.setText(MMDDYYYY.format(date));
+                setVisible(false);
+                break;
+            }
         }
-    }
-
-    /**
-     * Updates the dialog's controls with the passed in date.
-     *
-     * @param cal The date to be displayed.
-     */
-    private void setDate(GregorianCalendar cal, boolean fromDateField) {
-        date = cal;
-        date.setLenient(false);
-        ready = true;
-        monthLabel.setText(monthNames.get(cal.get(Calendar.MONTH)));
-        yearLabel.setText("" + cal.get(Calendar.YEAR));
-        dateField.setText(MMDDYYYY.format(date.getTime()));
-        updateDayGrid(fromDateField);
-
     }
 
     /**
@@ -306,23 +288,26 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      *
      * @param date The date to be displayed.
      */
-    private void setDate(Date date, boolean fromDateField) {
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        setDate(cal, fromDateField);
+    private void setDate(LocalDate date) {
+        this.date = date;
+        ready = true;
+        monthLabel.setText(monthNames.get(date.getMonth().ordinal()));
+        yearLabel.setText(String.valueOf(date.getYear()));
+        dateField.setText(MMDDYYYY.format(date));
+        updateDayGrid(true);
     }
 
     /**
      * This method is used by DateChooser to calculate and display days of the
      * month in correct format for the month currently displayed. Days of the
      * months are displayed as JButtons that the user can select. DateChooser's
-     * current day is higlighted in red color.
+     * current day is highlighted in red color.
      */
     private void updateDayGrid(boolean fromDateField) {
         dayGrid.removeAll();
 
         // get the currently selected month and year
-        int m = monthNames.indexOf(monthLabel.getText());
+        int m = monthNames.indexOf(monthLabel.getText()) + 1;
         int y = 0;
         try {
             y = Integer.parseInt(yearLabel.getText());
@@ -330,35 +315,9 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             MekHQ.getLogger().error(getClass(), "updateDayGrid", e);
         }
 
-        // look at the first day of the month for this month
-        GregorianCalendar temp = new GregorianCalendar(y, m, 1);
-        temp.setLenient(false);
-        int offset = 0;
-
         // decide what day of the week is the first day of this month
-        switch (temp.get(GregorianCalendar.DAY_OF_WEEK)) {
-            case GregorianCalendar.MONDAY:
-                offset = 0;
-                break;
-            case GregorianCalendar.TUESDAY:
-                offset = 1;
-                break;
-            case GregorianCalendar.WEDNESDAY:
-                offset = 2;
-                break;
-            case GregorianCalendar.THURSDAY:
-                offset = 3;
-                break;
-            case GregorianCalendar.FRIDAY:
-                offset = 4;
-                break;
-            case GregorianCalendar.SATURDAY:
-                offset = 5;
-                break;
-            case GregorianCalendar.SUNDAY:
-                offset = 6;
-                break;
-        }
+        int offset = LocalDate.of(y, m, 1).getDayOfWeek().ordinal();
+
 
         // display 7 days of the week across the top
         dayGrid.add(new JLabel("Mon", JLabel.CENTER));
@@ -383,8 +342,8 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             day.addActionListener(this);
 
             // show the current day in bright red.
-            if (i == date.get(Calendar.DATE) && m == date.get(Calendar.MONTH)
-                    && y == date.get(Calendar.YEAR)) {
+            if ((i == date.getDayOfMonth()) && (m == date.getMonth().ordinal())
+                    && (y == date.getYear())) {
                 day.setForeground(Color.red);
                 workingDay = i; //Store the correct day of the month.
             }
@@ -396,10 +355,9 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         }
 
         //Update the date field with the newly selected date.
-        if (dateField != null && !fromDateField) {
-            workingDate = new GregorianCalendar(y, m, workingDay);
-            String textDate = MMDDYYYY.format(workingDate.getTime());
-            dateField.setText(textDate);
+        if ((dateField != null) && !fromDateField) {
+            workingDate = LocalDate.of(y, m, workingDay);
+            dateField.setText(MMDDYYYY.format(workingDate));
         }
 
         repaint();
@@ -446,36 +404,23 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             MekHQ.getLogger().error(getClass(), "getLastDay", e);
         }
 
-        if ((m == 4) || (m == 6) || (m == 9) || (m == 11)) {
-            return (30);
-        } else if (m == 2) {
-            if (date.isLeapYear(y)) {
-                return (29);
-            }
-            return (28);
-        }
-        return (31);
+        return LocalDate.of(y, m, 1).lengthOfMonth();
     }
 
     /**
      * Select all text in the date field when it gains the focus.
-     * @param e
+     * @param e FocusEvent
      */
     @Override
     public void focusGained(FocusEvent e) {
         if (dateField.equals(e.getSource())) {
-            SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                dateField.selectAll();
-                            }
-                        });
+            SwingUtilities.invokeLater(() -> dateField.selectAll());
         }
     }
 
     /**
      * Update the date picker controls when the date field looses focus.
-     * @param e
+     * @param e FocusEvent
      */
     @Override
     public void focusLost(FocusEvent e) {
@@ -494,24 +439,23 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      *   YYYY-MM-DD
      *
      * @param dateString The date to be parsed.
-     * @return
+     * @return the parsed datae
      */
-    private Date parseDate(String dateString) {
-        DateFormat[] dateFormats = new DateFormat[]
+    private LocalDate parseDate(String dateString) {
+        DateTimeFormatter[] dateFormats = new DateTimeFormatter[]
         {
-                DateFormat.getDateInstance(DateFormat.LONG),
-                DateFormat.getDateInstance(DateFormat.FULL),
-                DateFormat.getDateInstance(DateFormat.DEFAULT),
-                DateFormat.getDateInstance(DateFormat.MEDIUM),
+                DateTimeFormatter.ofPattern("MMMM d, yyyy"),
+                DateTimeFormatter.ofPattern("E, MMMM d, yyyy G"),
+                DateTimeFormatter.ofPattern("E, MMMM d, yyyy"),
+                DateTimeFormatter.ofPattern("MMM d, yyyy"),
                 MMDDYYYY,
                 ISO8601
         };
-        for (DateFormat format : dateFormats) {
+        for (DateTimeFormatter format : dateFormats) {
             try {
-                Date date = format.parse(dateString);
-                return date;
-            } catch (ParseException e1) {
-                //continue
+                return LocalDate.parse(dateString, format);
+            } catch (Exception ignored) {
+
             }
         }
         return null;
@@ -519,19 +463,19 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
     @Override
     public void keyTyped(KeyEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     /**
      * Update the date chooser controls when the Enter key is pressed while the date field has the focus.  Then close
      * the dialog.
      *
-     * @param e
+     * @param e KeyEvent
      */
     @Override
     public void keyReleased(KeyEvent e) {
@@ -547,11 +491,11 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      * Sets the dialog's date based on the value in the date field.
      */
     private void updateDateFromDateField() {
-        Date newDate = parseDate(dateField.getText());
+        LocalDate newDate = parseDate(dateField.getText());
         if (newDate == null) {
-            JOptionPane.showMessageDialog(this, "Invalid Date Format\nTry: MM/DD/YYYY or YYYY-MM-DD", "Date Format", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Invalid Date Format\nTry: DD/MM/YYYY or YYYY-MM-DD", "Date Format", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        setDate(newDate, true);
+        setDate(newDate);
     }
 }
