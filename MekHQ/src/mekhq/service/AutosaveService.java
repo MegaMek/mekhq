@@ -1,7 +1,7 @@
 /*
  * AutosaveService.java
  *
- * Copyright (c) 2019 - The MekHQ Team. All Rights Reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,14 +35,13 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
 public class AutosaveService implements IAutosaveService {
-    private final Preferences userPreferences = Preferences.userRoot().node(MekHqConstants.AUTOSAVE_NODE);
+    public AutosaveService() {
 
-    public AutosaveService() { }
+    }
 
     @Override
     public void requestDayAdvanceAutosave(Campaign campaign) {
@@ -50,13 +49,13 @@ public class AutosaveService implements IAutosaveService {
 
         LocalDate today = campaign.getLocalDate();
 
-        if (this.isDailyAutosaveEnabled()) {
+        if (MekHQ.getMekHQOptions().getAutosaveDailyValue()) {
             this.performAutosave(campaign);
-        } else if (this.isWeeklyAutosaveEnabled() && (today.getDayOfWeek() == DayOfWeek.SUNDAY)) {
+        } else if (MekHQ.getMekHQOptions().getAutosaveWeeklyValue() && (today.getDayOfWeek() == DayOfWeek.SUNDAY)) {
             this.performAutosave(campaign);
-        } else if (this.isMonthlyAutosaveEnabled() && (today.getDayOfMonth() == today.lengthOfMonth())) {
+        } else if (MekHQ.getMekHQOptions().getAutosaveMonthlyValue() && (today.getDayOfMonth() == today.lengthOfMonth())) {
             this.performAutosave(campaign);
-        } else if (this.isYearlyAutosaveEnabled() && (today.getDayOfYear() == today.lengthOfYear())) {
+        } else if (MekHQ.getMekHQOptions().getAutosaveYearlyValue() && (today.getDayOfYear() == today.lengthOfYear())) {
             this.performAutosave(campaign);
         }
     }
@@ -65,29 +64,9 @@ public class AutosaveService implements IAutosaveService {
     public void requestBeforeMissionAutosave(Campaign campaign) {
         assert campaign != null;
 
-        if (this.isMissionAutosaveEnabled()) {
+        if (MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue()) {
             this.performAutosave(campaign);
         }
-    }
-
-    private boolean isDailyAutosaveEnabled() {
-        return this.userPreferences.getBoolean(MekHqConstants.SAVE_DAILY_KEY, false);
-    }
-
-    private boolean isWeeklyAutosaveEnabled() {
-        return this.userPreferences.getBoolean(MekHqConstants.SAVE_WEEKLY_KEY, false);
-    }
-
-    private boolean isMonthlyAutosaveEnabled() {
-        return this.userPreferences.getBoolean(MekHqConstants.SAVE_MONTHLY_KEY, false);
-    }
-
-    private boolean isYearlyAutosaveEnabled() {
-        return this.userPreferences.getBoolean(MekHqConstants.SAVE_YEARLY_KEY, false);
-    }
-
-    private boolean isMissionAutosaveEnabled() {
-        return this.userPreferences.getBoolean(MekHqConstants.SAVE_BEFORE_MISSIONS_KEY, false);
     }
 
     private void performAutosave(Campaign campaign) {
@@ -102,7 +81,7 @@ public class AutosaveService implements IAutosaveService {
                     writer.close();
                 }
             } else {
-                MekHQ.getLogger().error(getClass(), "performAutosave",
+                MekHQ.getLogger().error(this,
                         "Unable to perform an autosave because of a null or empty file name");
             }
         } catch (Exception ex) {
@@ -122,15 +101,14 @@ public class AutosaveService implements IAutosaveService {
                     .collect(Collectors.toList());
 
             // Delete older autosave files if needed
-            int maxNumberAutosaves = this.userPreferences.getInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY,
-                    MekHqConstants.DEFAULT_NUMBER_SAVES);
+            int maxNumberAutosaves = MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue();
 
             int index = 0;
             while (autosaveFiles.size() >= maxNumberAutosaves && autosaveFiles.size() > index) {
                 if (autosaveFiles.get(index).delete()) {
                     autosaveFiles.remove(index);
                 } else {
-                    MekHQ.getLogger().error(getClass(), "getAutosaveFilename",
+                    MekHQ.getLogger().error(this,
                             "Unable to delete file " + autosaveFiles.get(index).getName());
                     index++;
                 }

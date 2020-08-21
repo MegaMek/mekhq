@@ -4734,7 +4734,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "customPlanetaryEvents");
 
-        if (Preferences.userRoot().node(MekHqConstants.XML_SAVES_NODE).getBoolean(MekHqConstants.WRITE_CUSTOMS_TO_XML, true)) {
+        if (MekHQ.getMekHQOptions().getWriteCustomsToXML()) {
             writeCustoms(pw1);
         }
 
