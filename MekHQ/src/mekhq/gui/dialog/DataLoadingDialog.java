@@ -41,6 +41,7 @@ import megamek.common.QuirksHandler;
 import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
@@ -173,6 +174,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                 }
             }
+            new MekHQOptions().initializeMekHQOptions();
             setProgress(2);
             //load in directory items and tilesets
             app.getIconPackage().loadDirectories();

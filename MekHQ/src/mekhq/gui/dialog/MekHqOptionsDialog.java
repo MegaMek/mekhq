@@ -20,7 +20,6 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.common.logging.MMLogger;
 import mekhq.MekHqConstants;
 
 import javax.swing.*;
@@ -29,6 +28,11 @@ import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
+/**
+ * This dialog is used for MekHQ Options.
+ * Note: If you add any options to this you will also need to add the preference initialization in
+ * MekHQ Options.
+ */
 public class MekHqOptionsDialog extends BaseDialog {
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog");
     private final Preferences userPreferences = Preferences.userRoot().node(MekHqConstants.AUTOSAVE_NODE);
