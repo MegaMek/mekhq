@@ -92,7 +92,7 @@ public class ScenarioTableModel extends DataTableModel {
                 return getCampaign().getCampaignOptions().getDisplayFormattedDate(scenario.getDate());
             }
         } else if (col == COL_ASSIGN) {
-            return scenario.getForces(getCampaign()).getAllUnits().size();
+            return scenario.getForces(getCampaign()).getAllUnits(true).size();
         } else {
             return "?";
         }

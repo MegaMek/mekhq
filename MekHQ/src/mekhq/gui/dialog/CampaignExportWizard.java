@@ -148,7 +148,7 @@ public class CampaignExportWizard extends JDialog {
         gbc.gridy++;
 
         JScrollPane scrollPane = new JScrollPane();
-        switch(state) {
+        switch (state) {
             case ForceSelection:
                 lblInstructions.setText(resourceMap.getString("lblInstructions.ForceSelection.text"));
                 scrollPane.setViewportView(forceList);
@@ -236,7 +236,7 @@ public class CampaignExportWizard extends JDialog {
                 JButton btnExistingCampaign = new JButton(resourceMap.getString("btnExistingCampaign.text"));
                 btnExistingCampaign.addActionListener(e -> {
                     destinationCampaignFile = FileDialogs.openCampaign(null);
-                    if(destinationCampaignFile.isPresent()) {
+                    if (destinationCampaignFile.isPresent()) {
                         if (!exportToCampaign(destinationCampaignFile.get())) {
                             MekHQ.getLogger().error(getClass(), "display",
                                     "Failed to export campaign to existing campaign file");
@@ -359,7 +359,7 @@ public class CampaignExportWizard extends JDialog {
                 .boxed().collect(Collectors.toList());
 
         for (Force force : forceList.getSelectedValuesList()) {
-            for (UUID unitID : force.getAllUnits()) {
+            for (UUID unitID : force.getAllUnits(false)) {
                 Unit unit = sourceCampaign.getUnit(unitID);
 
                 for (Person person : unit.getActiveCrew()) {
@@ -407,7 +407,7 @@ public class CampaignExportWizard extends JDialog {
                 .boxed().collect(Collectors.toList());
 
         for (Force force : forceList.getSelectedValuesList()) {
-            for (UUID unitID : force.getAllUnits()) {
+            for (UUID unitID : force.getAllUnits(false)) {
                 Unit unit = sourceCampaign.getUnit(unitID);
 
                 unitList.setSelectedValue(unit, false);
@@ -430,7 +430,7 @@ public class CampaignExportWizard extends JDialog {
     }
 
     private void nextButtonHandler(CampaignExportWizardState state) {
-        switch(state) {
+        switch (state) {
             case ForceSelection:
                 updatePersonList();
                 updateUnitList();
@@ -512,7 +512,7 @@ public class CampaignExportWizard extends JDialog {
 
         try {
             money = Integer.parseInt(txtExportMoney.getText());
-            if(money > 0) {
+            if (money > 0) {
                 destinationCampaign.addFunds(Money.of(money), String.format("Transfer from %s", sourceCampaign.getName()), Transaction.C_START);
             }
         } catch(Exception ignored) { }
@@ -631,7 +631,7 @@ public class CampaignExportWizard extends JDialog {
                 } else {
                     partCount.part.setQuantity(partCount.part.getQuantity() - partCount.count);
 
-                    if(partCount.part.getQuantity() <= 0) {
+                    if (partCount.part.getQuantity() <= 0) {
                         sourceCampaign.removePart(partCount.part);
                     }
                 }

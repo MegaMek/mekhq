@@ -11,6 +11,16 @@ VERSION HISTORY:
 + PR #1917: Fixing the Award Tracker post-Ancestors Removal
 + Issue #1920: Fixing xml load for bad Ancestry data
 + PR #1916: Personnel Filter Enum
++ Issue #790: Implementing Non-Combat TO&E Forces
++ PR #1930: Fixing Fill Transports NPE
++ Issue #1829: Fixing Duplicated Nags in AdvanceDaysDialog
++ Issue #470: Mass Training: Rank, No Officer, and Only Officer Filters
++ Issue #1929: Scenario Resolution: Fixing Display Anchor Issues
++ PR #1932: Fixing Total Earnings Display Issues
++ Issue #1941: Person View Panel Ability and Injury Description ToolTip
++ Issue #1296, 1855: Fixed issue preventing customization of units in the meklab when ammunition is added to the unit.
++ Issue #1951: Autosave Does Not Always Initiate On First Load
++ Issue #1922: CrewSkillUpgrader Infinite Loop Fix
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format

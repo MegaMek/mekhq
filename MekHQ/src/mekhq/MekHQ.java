@@ -108,6 +108,7 @@ public class MekHQ implements GameListener {
 
     private static MMLogger logger = null;
 	private static MekHqPreferences preferences = null;
+    private static MekHQOptions mekHQOptions = new MekHQOptions();
 
     // Directory options
     private static ObservableString personnelDirectory;
@@ -185,6 +186,10 @@ public class MekHQ implements GameListener {
         }
 
 	    return preferences;
+    }
+
+    public static MekHQOptions getMekHQOptions() {
+	    return mekHQOptions;
     }
 
     public static void setWindow(Frame window) {

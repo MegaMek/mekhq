@@ -286,13 +286,20 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         return "<font color='red'><b> part not found</b>.</font>";
     }
 
-    public void changeAmountAvailable(int amount, final AmmoType curType) {
-        final long curMunition = curType.getMunitionType();
-        AmmoStorage a = (AmmoStorage)campaign.findSparePart(part -> {
-            return part instanceof AmmoStorage
+    /**
+     * Boolean function that determines if the given part is of the correct ammo. 
+     * Useful as a predicate for campaign.findSparePart()
+     */
+    public static boolean IsRightAmmo(Part part, AmmoType curType) {
+        return part instanceof AmmoStorage
                 && part.isPresent()
                 && ((AmmoType)((AmmoStorage)part).getType()).equals(curType)
-                && curMunition == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType();
+                && curType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
+    }
+    
+    public void changeAmountAvailable(int amount, final AmmoType curType) {
+        AmmoStorage a = (AmmoStorage) campaign.findSparePart(part -> {
+            return IsRightAmmo(part, curType);
         });
 
         if (null != a) {
@@ -412,4 +419,3 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         return isExtinct(year, clan, techFaction);
     }
 }
-

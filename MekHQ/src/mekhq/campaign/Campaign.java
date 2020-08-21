@@ -3250,7 +3250,7 @@ public class Campaign implements Serializable, ITechManager {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
-                        for (UUID uid : forceIds.get(forceId).getAllUnits()) {
+                        for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
                             Unit u = getUnit(uid);
                             if ((u != null) && u.isUnderRepair()) {
                                 forceUnderRepair = true;
@@ -3261,7 +3261,7 @@ public class Campaign implements Serializable, ITechManager {
                         if (!forceUnderRepair) {
                             forceIds.get(forceId).setScenarioId(s.getId());
                             s.addForces(forceId);
-                            for (UUID uid : forceIds.get(forceId).getAllUnits()) {
+                            for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
                                 Unit u = getUnit(uid);
                                 if (null != u) {
                                     u.setScenarioId(s.getId());
@@ -3816,7 +3816,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param l The {@link Lance} to calculate XP to award for training.
      */
     private void awardTrainingXPByMaximumRole(Lance l) {
-        for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits()) {
+        for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits(true)) {
             Unit trainerUnit = getUnit(trainerId);
 
             // not sure how this occurs, but it probably shouldn't halt processing of a new day.
@@ -3835,7 +3835,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (commanderExperience > SkillType.EXP_REGULAR) {
                     // ...and if the commander is better than a veteran, find all of
                     // the personnel under their command...
-                    for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits()) {
+                    for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits(true)) {
                         Unit traineeUnit = getUnit(traineeId);
 
                         if (traineeUnit == null) {
@@ -6966,7 +6966,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public Money getForceValue(boolean noInfantry) {
         Money value = Money.zero();
-        for (UUID uuid : forces.getAllUnits()) {
+        for (UUID uuid : forces.getAllUnits(false)) {
             Unit u = getUnit(uuid);
             if (null == u) {
                 continue;
