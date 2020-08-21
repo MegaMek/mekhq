@@ -292,7 +292,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public AtBScenario checkForBattle(Campaign c) {
         // Make sure there is a battle first
-        if (Compute.randomInt(100) > c.getCampaignOptions().getAtBBattleChance(role)) {
+        if ((c.getCampaignOptions().getAtBBattleChance(role) == 0.0)
+                || (Compute.randomInt(100) > c.getCampaignOptions().getAtBBattleChance(role))) {
             // No battle
             return null;
         }
