@@ -53,7 +53,7 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 	        		    if (p0.getManeiDominiRank() == p1.getManeiDominiRank()) {
 	        		        return s0.compareTo(s1);
 	        		    }
-	        		    return Integer.compare(p0.getManeiDominiRank(), p1.getManeiDominiRank());
+	        		    return Integer.compare(p0.getManeiDominiRank().ordinal(), p1.getManeiDominiRank().ordinal());
 	        		}
 	        		return Integer.compare(p0.getRankLevel(), p1.getRankLevel());
 	        	}
