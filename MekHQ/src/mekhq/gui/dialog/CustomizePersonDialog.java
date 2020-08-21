@@ -338,12 +338,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                                                           final int index,
                                                           final boolean isSelected,
                                                           final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected,
-                                                   cellHasFocus);
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Faction) {
                     Faction faction = (Faction)value;
                     setText(String.format("%s [%s]",
-                        faction.getFullName(person.getCampaign().getGameYear()),
+                        faction.getFullName(campaign.getGameYear()),
                         faction.getShortName()));
                 }
 
@@ -780,7 +779,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         scrOptions.setPreferredSize(new java.awt.Dimension(500, 500));
 
         tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"), scrSkills); // NOI18N
-        if(campaign.getCampaignOptions().useAbilities() || campaign.getCampaignOptions().useEdge()
+        if (campaign.getCampaignOptions().useAbilities() || campaign.getCampaignOptions().useEdge()
                 || campaign.getCampaignOptions().useImplants()) {
             tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions); // NOI18N
         }
@@ -833,7 +832,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private DefaultComboBoxModel<Faction> getFactionsComboBoxModel() {
-        int year = person.getCampaign().getGameYear();
+        int year = campaign.getGameYear();
         List<Faction> orderedFactions = Faction.getFactions().stream()
             .sorted((a, b) -> a.getFullName(year).compareToIgnoreCase(b.getFullName(year)))
             .collect(Collectors.toList());
@@ -917,7 +916,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         if (planetarySystem != null) {
             planetsModel.addElement(planetarySystem.getPrimaryPlanet());
             for (Planet planet : planetarySystem.getPlanets()) {
-                if (planet != planetarySystem.getPrimaryPlanet()) {
+                if (!planet.equals(planetarySystem.getPrimaryPlanet())) {
                     planetsModel.addElement(planet);
                 }
             }
@@ -1340,7 +1339,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         skillBonus.get(SkillType.S_PILOT_VTOL).setValue(0);
     }
 
+    @Override
     public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
-        //IMplement me!!
+        //Implement me!!
     }
 }

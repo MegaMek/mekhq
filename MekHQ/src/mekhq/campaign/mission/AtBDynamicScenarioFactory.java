@@ -1133,7 +1133,12 @@ public class AtBDynamicScenarioFactory {
      * @param campaign
      * @return transportedUnits List of units being transported
      */
-    public static List<Entity> fillTransports(AtBScenario scenario, List<Entity> transports, String factionCode, int skill, int quality, Campaign campaign) {
+    public static List<Entity> fillTransports(AtBScenario scenario, List<Entity> transports,
+                                              String factionCode, int skill, int quality, Campaign campaign) {
+        if ((transports == null) || transports.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         List<Entity> transportedUnits = new ArrayList<>();
 
         UnitGeneratorParameters params = new UnitGeneratorParameters();
@@ -1151,7 +1156,8 @@ public class AtBDynamicScenarioFactory {
     /**
      * Worker function that generates a battle armor unit to attach to a unit of clan mechs
      */
-    public static List<Entity> generateBAForNova(AtBScenario scenario, List<Entity> starUnits, String factionCode, int skill, int quality, Campaign campaign) {
+    public static List<Entity> generateBAForNova(AtBScenario scenario, List<Entity> starUnits,
+                                                 String factionCode, int skill, int quality, Campaign campaign) {
         List<Entity> transportedUnits = new ArrayList<>();
 
         // determine if this should be a nova
