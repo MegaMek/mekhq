@@ -174,7 +174,6 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                 }
             }
-            new MekHQOptions().initializeMekHQOptions();
             setProgress(2);
             //load in directory items and tilesets
             app.getIconPackage().loadDirectories();

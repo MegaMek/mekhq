@@ -31,33 +31,52 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putBoolean(MekHqConstants.NO_SAVE_KEY, value);
     }
 
-    public void initializeMekHQOptions() {
-        //region Autosave
-        setNoAutosaveValue(getNoAutosaveValue());
-        userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putBoolean(
-                MekHqConstants.SAVE_DAILY_KEY,
-                userPreferences.node(MekHqConstants.AUTOSAVE_NODE)
-                        .getBoolean(MekHqConstants.SAVE_DAILY_KEY, false));
-        userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putBoolean(
-                MekHqConstants.SAVE_WEEKLY_KEY,
-                userPreferences.node(MekHqConstants.AUTOSAVE_NODE)
-                        .getBoolean(MekHqConstants.SAVE_WEEKLY_KEY, true));
-        userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putBoolean(
-                MekHqConstants.SAVE_MONTHLY_KEY,
-                userPreferences.node(MekHqConstants.AUTOSAVE_NODE)
-                        .getBoolean(MekHqConstants.SAVE_MONTHLY_KEY, false));
-        userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putBoolean(
-                MekHqConstants.SAVE_YEARLY_KEY,
-                userPreferences.node(MekHqConstants.AUTOSAVE_NODE)
-                        .getBoolean(MekHqConstants.SAVE_YEARLY_KEY, false));
-        userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putBoolean(
-                MekHqConstants.SAVE_BEFORE_MISSIONS_KEY,
-                userPreferences.node(MekHqConstants.AUTOSAVE_NODE)
-                        .getBoolean(MekHqConstants.SAVE_BEFORE_MISSIONS_KEY, false));
-        userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putInt(
-                MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY,
-                userPreferences.node(MekHqConstants.AUTOSAVE_NODE)
-                        .getInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY, MekHqConstants.DEFAULT_NUMBER_SAVES));
-        //endregion Autosave
+    public boolean getAutosaveDailyValue() {
+        return userPreferences.node(MekHqConstants.AUTOSAVE_NODE).getBoolean(MekHqConstants.SAVE_DAILY_KEY, false);
+    }
+
+    public void setAutosaveDailyValue(boolean value) {
+        userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putBoolean(MekHqConstants.SAVE_DAILY_KEY, value);
+    }
+
+    public boolean getAutosaveWeeklyValue() {
+        return userPreferences.node(MekHqConstants.AUTOSAVE_NODE).getBoolean(MekHqConstants.SAVE_WEEKLY_KEY, true);
+    }
+
+    public void setAutosaveWeeklyValue(boolean value) {
+        userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putBoolean(MekHqConstants.SAVE_WEEKLY_KEY, value);
+    }
+
+    public boolean getAutosaveMonthlyValue() {
+        return userPreferences.node(MekHqConstants.AUTOSAVE_NODE).getBoolean(MekHqConstants.SAVE_MONTHLY_KEY, false);
+    }
+
+    public void setAutosaveMonthlyValue(boolean value) {
+        userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putBoolean(MekHqConstants.SAVE_MONTHLY_KEY, value);
+    }
+
+    public boolean getAutosaveYearlyValue() {
+        return userPreferences.node(MekHqConstants.AUTOSAVE_NODE).getBoolean(MekHqConstants.SAVE_YEARLY_KEY, false);
+    }
+
+    public void setAutosaveYearlyValue(boolean value) {
+        userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putBoolean(MekHqConstants.SAVE_YEARLY_KEY, value);
+    }
+
+    public boolean getAutosaveBeforeMissionsValue() {
+        return userPreferences.node(MekHqConstants.AUTOSAVE_NODE).getBoolean(MekHqConstants.SAVE_BEFORE_MISSIONS_KEY, false);
+    }
+
+    public void setAutosaveBeforeMissionsValue(boolean value) {
+        userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putBoolean(MekHqConstants.SAVE_BEFORE_MISSIONS_KEY, value);
+    }
+
+    public int getMaximumNumberOfAutosavesValue() {
+        return userPreferences.node(MekHqConstants.AUTOSAVE_NODE).getInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY,
+                MekHqConstants.DEFAULT_NUMBER_SAVES);
+    }
+
+    public void setMaximumNumberOfAutosavesValue(int value) {
+        userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY, value);
     }
 }
