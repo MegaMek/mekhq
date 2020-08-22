@@ -100,7 +100,9 @@ public class Faction {
     }
 
     public static void setChoosableFactionCodes(String... choosableFactionCodes) {
-        Collections.addAll(Faction.choosableFactionCodes, choosableFactionCodes);
+        if (choosableFactionCodes.length > 0) {
+            Faction.choosableFactionCodes = Arrays.asList(choosableFactionCodes);
+        }
     }
 
     public String getShortName() {
