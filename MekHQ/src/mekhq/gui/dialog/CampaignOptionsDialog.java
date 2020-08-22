@@ -755,7 +755,7 @@ public class CampaignOptionsDialog extends JDialog {
         panGeneral.add(btnDate, gridBagConstraints);
 
         factionModel = new SortedComboBoxModel<>();
-        for (String sName : Faction.choosableFactionCodes) {
+        for (String sName : Faction.getChoosableFactionCodes()) {
             Faction f = Faction.getFaction(sName);
             if (f.validIn(date.get(Calendar.YEAR))) {
                 factionModel.addElement(f.getFullName(date.get(Calendar.YEAR)));
@@ -5132,7 +5132,7 @@ public class CampaignOptionsDialog extends JDialog {
             date = GregorianCalendar.from(dc.getDate().atStartOfDay(ZoneId.systemDefault()));
             btnDate.setText(getDateAsString());
             factionModel = new SortedComboBoxModel<>();
-            for (String sname : Faction.choosableFactionCodes) {
+            for (String sname : Faction.getChoosableFactionCodes()) {
                 Faction f = Faction.getFaction(sname);
                 if (f.validIn(date.get(Calendar.YEAR))) {
                     factionModel.addElement(f.getFullName(date.get(Calendar.YEAR)));
