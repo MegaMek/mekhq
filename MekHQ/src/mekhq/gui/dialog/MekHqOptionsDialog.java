@@ -30,6 +30,7 @@ import java.util.ResourceBundle;
 public class MekHqOptionsDialog extends BaseDialog {
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog");
 
+    //region Autosave
     private JRadioButton optionNoSave;
     private JRadioButton optionSaveDaily;
     private JRadioButton optionSaveWeekly;
@@ -37,6 +38,11 @@ public class MekHqOptionsDialog extends BaseDialog {
     private JRadioButton optionSaveYearly;
     private JCheckBox checkSaveBeforeMissions;
     private JSpinner spinnerSavedGamesCount;
+    //endregion Autosave
+
+    //region Campaign XML Save
+    private JCheckBox optionWriteCustomsToXML;
+    //endregion Campaign XML Save
 
     public MekHqOptionsDialog(JFrame parent) {
         super(parent);
@@ -45,9 +51,14 @@ public class MekHqOptionsDialog extends BaseDialog {
         this.setInitialState();
     }
 
+    /**
+     * This dialog uses the following Mnemonics:
+     * C, D, M, M, S, W, Y
+     */
     @Override
     protected Container createCustomUI() {
-        // Create UI components
+        //region Create UI components
+        //region Autosave
         JLabel labelSavedInfo = new JLabel(resources.getString("labelSavedInfo.text"));
 
         optionNoSave = new JRadioButton(resources.getString("optionNoSave.text"));
@@ -78,6 +89,15 @@ public class MekHqOptionsDialog extends BaseDialog {
         JLabel labelSavedGamesCount = new JLabel(resources.getString("labelSavedGamesCount.text"));
         spinnerSavedGamesCount = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
         labelSavedGamesCount.setLabelFor(spinnerSavedGamesCount);
+        //endregion Autosave
+
+        //region Campaign XML Save
+        JLabel labelXMLSave = new JLabel(resources.getString("labelXMLSave.text"));
+
+        optionWriteCustomsToXML = new JCheckBox(resources.getString("optionWriteCustomsToXML.text"));
+        optionWriteCustomsToXML.setMnemonic(KeyEvent.VK_C);
+        //endregion Campaign XML Save
+        //endregion Create UI components
 
         // Layout the UI
         JPanel body = new JPanel();
@@ -89,30 +109,34 @@ public class MekHqOptionsDialog extends BaseDialog {
 
         layout.setVerticalGroup(
             layout.createSequentialGroup()
-                .addComponent(labelSavedInfo)
-                .addComponent(optionNoSave)
-                .addComponent(optionSaveDaily)
-                .addComponent(optionSaveWeekly)
-                .addComponent(optionSaveMonthly)
-                .addComponent(optionSaveYearly)
-                .addComponent(checkSaveBeforeMissions)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelSavedGamesCount)
-                    .addComponent(spinnerSavedGamesCount, GroupLayout.Alignment.TRAILING))
+                    .addComponent(labelSavedInfo)
+                    .addComponent(optionNoSave)
+                    .addComponent(optionSaveDaily)
+                    .addComponent(optionSaveWeekly)
+                    .addComponent(optionSaveMonthly)
+                    .addComponent(optionSaveYearly)
+                    .addComponent(checkSaveBeforeMissions)
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelSavedGamesCount)
+                            .addComponent(spinnerSavedGamesCount, GroupLayout.Alignment.TRAILING))
+                    .addComponent(labelXMLSave)
+                    .addComponent(optionWriteCustomsToXML)
         );
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addComponent(labelSavedInfo)
-                .addComponent(optionNoSave)
-                .addComponent(optionSaveDaily)
-                .addComponent(optionSaveWeekly)
-                .addComponent(optionSaveMonthly)
-                .addComponent(optionSaveYearly)
-                .addComponent(checkSaveBeforeMissions)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(labelSavedGamesCount)
-                    .addComponent(spinnerSavedGamesCount))
+                    .addComponent(labelSavedInfo)
+                    .addComponent(optionNoSave)
+                    .addComponent(optionSaveDaily)
+                    .addComponent(optionSaveWeekly)
+                    .addComponent(optionSaveMonthly)
+                    .addComponent(optionSaveYearly)
+                    .addComponent(checkSaveBeforeMissions)
+                    .addGroup(layout.createSequentialGroup()
+                            .addComponent(labelSavedGamesCount)
+                            .addComponent(spinnerSavedGamesCount))
+                    .addComponent(labelXMLSave)
+                    .addComponent(optionWriteCustomsToXML)
         );
 
         return body;
@@ -127,6 +151,8 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setAutosaveYearlyValue(optionSaveYearly.isSelected());
         MekHQ.getMekHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
         MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
+        MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
+
     }
 
     private void setInitialState() {
@@ -137,5 +163,6 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionSaveYearly.setSelected(MekHQ.getMekHQOptions().getAutosaveYearlyValue());
         checkSaveBeforeMissions.setSelected(MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue());
         spinnerSavedGamesCount.setValue(MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue());
+        optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
     }
 }
