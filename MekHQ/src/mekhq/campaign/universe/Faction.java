@@ -61,7 +61,7 @@ import mekhq.campaign.parts.Part;
 public class Faction {
     private static Map<String,Faction> factions;
     private static Map<Integer,Faction> factionIdMap;
-    private static String[] choosableFactionCodes = {"MERC","CC","DC","FS","FWL","LA","FC","ROS","CS","WOB","FRR","SIC","MOC","MH","OA","TC","CDS","CGB","CHH","CJF","CNC","CSJ","CSV","CW","TH","RWR"};
+    private static List<String> choosableFactionCodes = Collections.singletonList("MERC");
 
     private String shortName;
     private String fullName;
@@ -95,12 +95,12 @@ public class Faction {
         end = 9999;
     }
 
-    public static String[] getChoosableFactionCodes() {
+    public static List<String> getChoosableFactionCodes() {
         return choosableFactionCodes;
     }
 
     public static void setChoosableFactionCodes(String... choosableFactionCodes) {
-        Faction.choosableFactionCodes = choosableFactionCodes;
+        Collections.addAll(Faction.choosableFactionCodes, choosableFactionCodes);
     }
 
     public String getShortName() {
