@@ -22,6 +22,8 @@ VERSION HISTORY:
 + Issue #1951: Autosave Does Not Always Initiate On First Load
 + Issue #1922: CrewSkillUpgrader Infinite Loop Fix
 + Issue #1661: Implementing Basic Russian Patronymics
++ Issue #1817: Implementing option to not save customs to XML
++ PR #1949: Fixing Genealogy Removal
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
