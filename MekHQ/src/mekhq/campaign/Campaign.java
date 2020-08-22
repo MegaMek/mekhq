@@ -30,7 +30,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -6248,7 +6247,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setStartingSystem() {
         Map<String, PlanetarySystem> systemList = Systems.getInstance().getSystems();
-        PlanetarySystem startingSystem = systemList.get(getFaction().getStartingPlanet(getGameYear()));
+        PlanetarySystem startingSystem = systemList.get(getFaction().getStartingPlanet(getLocalDate()));
 
         if (startingSystem == null) {
             startingSystem = systemList.get(JOptionPane.showInputDialog(

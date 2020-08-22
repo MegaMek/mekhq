@@ -70,7 +70,7 @@ public class Faction {
     private Color color;
     private String nameGenerator;
     private String startingPlanet;
-    private NavigableMap<Integer,String> planetChanges = new TreeMap<>();
+    private NavigableMap<LocalDate,String> planetChanges = new TreeMap<>();
     private int[] eraMods;
     private Integer id;
     private Set<Tag> tags;
@@ -136,8 +136,8 @@ public class Faction {
         return nameGenerator;
     }
 
-    public String getStartingPlanet(int year) {
-        Map.Entry<Integer,String> change = planetChanges.floorEntry(year);
+    public String getStartingPlanet(LocalDate year) {
+        Map.Entry<LocalDate, String> change = planetChanges.floorEntry(year);
         if (null == change) {
             return startingPlanet;
         } else {
@@ -358,8 +358,9 @@ public class Faction {
             } else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
                 retVal.startingPlanet = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("changePlanet")) {
-                int year = Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent());
-                retVal.planetChanges.put(year, wn2.getTextContent());
+                retVal.planetChanges.put(
+                        MekHqXmlUtil.parseDate(wn2.getAttributes().getNamedItem("year").getTextContent().trim()),
+                        wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByYear")) {
                 int year = Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent());
                 retVal.nameChanges.put(year, wn2.getTextContent());
