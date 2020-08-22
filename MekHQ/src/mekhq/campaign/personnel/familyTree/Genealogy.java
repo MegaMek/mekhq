@@ -123,10 +123,10 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
     /**
      * This is implemented for future use, as it will be required for the family tree implementation
-     * @param formerSpouse the former spouse to remove from the current person's list
+     * @param formerSpouseId the former spouse's id to remove from the current person's list
      */
-    public void removeFormerSpouse(FormerSpouse formerSpouse) {
-        getFormerSpouses().remove(formerSpouse);
+    public void removeFormerSpouse(UUID formerSpouseId) {
+        getFormerSpouses().removeIf(formerSpouse -> formerSpouse.getFormerSpouseId().equals(formerSpouseId));
     }
 
     /**
@@ -154,17 +154,27 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @param id the id of the person to remove
      */
     public void removeFamilyMember(FamilialRelationshipType relationshipType, UUID id) {
-        if (getFamily().get(relationshipType) == null) {
+        if (relationshipType == null) {
+            for (FamilialRelationshipType type : FamilialRelationshipType.values()) {
+                List<UUID> ids = getFamily().get(type);
+                if ((ids != null) && ids.contains(id)) {
+                    ids.remove(id);
+                    if (ids.isEmpty()) {
+                        getFamily().remove(type);
+                    }
+                    break;
+                }
+            }
+        } else if (getFamily().get(relationshipType) == null) {
             MekHQ.getLogger().error(getClass(), "removeFamilyMember",
                     "Could not remove unknown family member of relationship "
                             + relationshipType.name() + " and UUID " + id.toString() + ".");
-            return;
-        }
-
-        List<UUID> familyTypeMembers = getFamily().get(relationshipType);
-        familyTypeMembers.remove(id);
-        if (familyTypeMembers.isEmpty()) {
-            getFamily().remove(relationshipType);
+        } else {
+            List<UUID> familyTypeMembers = getFamily().get(relationshipType);
+            familyTypeMembers.remove(id);
+            if (familyTypeMembers.isEmpty()) {
+                getFamily().remove(relationshipType);
+            }
         }
     }
     //endregion Getters/Setters
@@ -569,4 +579,42 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
         return true;
     }
     //endregion Read/Write to XML
+
+    //region Clear Genealogy
+    /**
+     * This is used to remove Genealogy for a person
+     * @param campaign the campaign they are part of
+     */
+    public void clearGenealogy(Campaign campaign) {
+        // Clear Spouse Id
+        if (getSpouseId() != null) {
+            Person person = getSpouse(campaign);
+            if (person != null) {
+                person.getGenealogy().setSpouse(null);
+            }
+        }
+
+        // Clear Former Spouses
+        if (!getFormerSpouses().isEmpty()) {
+            for (FormerSpouse formerSpouse : getFormerSpouses()) {
+                Person person = campaign.getPerson(formerSpouse.getFormerSpouseId());
+                if (person != null) {
+                    person.getGenealogy().removeFormerSpouse(getOrigin());
+                }
+            }
+        }
+
+        // Clear Family
+        if (!familyIsEmpty()) {
+            for (List<UUID> list : getFamily().values()) {
+                for (UUID id : list) {
+                    Person person  = campaign.getPerson(id);
+                    if (person != null) {
+                        person.getGenealogy().removeFamilyMember(null, this.origin);
+                    }
+                }
+            }
+        }
+    }
+    //endregion Clear Genealogy
 }

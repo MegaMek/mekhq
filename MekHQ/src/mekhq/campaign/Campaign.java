@@ -3816,6 +3816,8 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
 
+        person.getGenealogy().clearGenealogy(this);
+
         Unit u = getUnit(person.getUnitId());
         if (null != u) {
             u.remove(person, true);
@@ -3826,16 +3828,16 @@ public class Campaign implements Serializable, ITechManager {
         getRetirementDefectionTracker().removePerson(person);
 
         if (log) {
-            addReport(person.getFullTitle()
-                    + " has been removed from the personnel roster.");
+            addReport(person.getFullTitle() + " has been removed from the personnel roster.");
         }
 
         personnel.remove(id);
+
+        // Deal with Astech Pool Minutes
         if (person.getPrimaryRole() == Person.T_ASTECH) {
             astechPoolMinutes = Math.max(0, astechPoolMinutes - 480);
             astechPoolOvertime = Math.max(0, astechPoolOvertime - 240);
-        }
-        if (person.getSecondaryRole() == Person.T_ASTECH) {
+        } else if (person.getSecondaryRole() == Person.T_ASTECH) {
             astechPoolMinutes = Math.max(0, astechPoolMinutes - 240);
             astechPoolOvertime = Math.max(0, astechPoolOvertime - 120);
         }

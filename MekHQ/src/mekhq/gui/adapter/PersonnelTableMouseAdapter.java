@@ -716,20 +716,16 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_REMOVE: {
-                String title = String.format(resourceMap.getString("numPersonnel.text"), people.length); //$NON-NLS-1$
+                String title = String.format(resourceMap.getString("numPersonnel.text"), people.length);
                 if (people.length == 1) {
                     title = people[0].getFullTitle();
                 }
-                if (0 == JOptionPane.showConfirmDialog(
-                        null,
-                        String.format(resourceMap.getString("confirmRemove.format"), title), //$NON-NLS-1$
-                        resourceMap.getString("removeQ.text"), //$NON-NLS-1$
+                if (0 == JOptionPane.showConfirmDialog(null,
+                        String.format(resourceMap.getString("confirmRemove.format"), title),
+                        resourceMap.getString("removeQ.text"),
                         JOptionPane.YES_NO_OPTION)) {
                     for (Person person : people) {
                         gui.getCampaign().removePerson(person.getId());
-                        if (person.getGenealogy().hasSpouse()) {
-                            person.getGenealogy().getSpouse(gui.getCampaign()).getGenealogy().setSpouse(null);
-                        }
                     }
                 }
                 break;
