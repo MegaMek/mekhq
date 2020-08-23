@@ -231,47 +231,6 @@ public class MekHQ implements GameListener {
 	    return financesDirectory;
     }
 
-	/**
-	 * Designed to centralize output and logging.
-	 * Purely a pass-through to the version with a log level.
-	 * Default to log level 3.
-	 *
-	 * @param msg The message you want to log.
-	 * @deprecated Use {@link #getLogger()} instead.
-	 */
-	@Deprecated
-	public static void logMessage(String msg) {
-		getLogger().log(MekHQ.class, "unknown", LogLevel.INFO, msg);
-	}
-
-	/**
-	 * Designed to centralize output and logging.
-	 *
-	 * @param msg The message you want to log.
-	 * @param logLevel The log level of the message.
-	 * @deprecated Use {@link #getLogger()} instead.
-	 */
-	@Deprecated
-	public static void logMessage(String msg, int logLevel) {
-		getLogger().log(MekHQ.class, "unknown", verbosityToLogLevel(logLevel), msg);
-	}
-
-	/**
-	 * @deprecated Use {@link #getLogger()} instead.
-	 */
-	@Deprecated
-	public static void logError(String err) {
-		getLogger().log(MekHQ.class, "unknown", LogLevel.ERROR, err);
-	}
-
-	/**
-	 * @deprecated Use {@link #getLogger()} instead.
-	 */
-	@Deprecated
-	public static void logError(Exception ex) {
-		getLogger().log(MekHQ.class, "unknown," + LogLevel.ERROR, ex);
-	}
-
 	protected static MekHQ getInstance() {
 		return new MekHQ();
 	}
@@ -464,9 +423,8 @@ public class MekHQ implements GameListener {
 
     	try {
     		client = new Client(lgd.playerName, lgd.serverAddr, lgd.port);
-        } catch (Exception ex) {
-        	MekHQ.logMessage("Failed to connect to server properly");
-			MekHQ.logError(ex);
+        } catch (Exception e) {
+    	    getLogger().error(this, "Failed to connect to server properly", e);
             return;
         }
 
@@ -631,9 +589,8 @@ public class MekHQ implements GameListener {
             }
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
 
-        }// end try
-        catch (Exception ex) {
-            logError(ex);
+        } catch (Exception e) {
+		    getLogger().error(this, e);
         }
 	}
 
