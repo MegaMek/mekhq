@@ -2,7 +2,7 @@
  * MekHQ.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 The MegaMek Team.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq;
 
@@ -96,14 +96,13 @@ public class MekHQ implements GameListener {
 	// TODO : So it should be backed down to 1 for releases...
 	// TODO : It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
 	public static int VERBOSITY_LEVEL = 5;
-	public static String CAMPAIGN_DIRECTORY = "./campaigns/";
-	public static String PREFERENCES_FILE = "mmconf/mekhq.preferences";
-	public static String PRESET_DIR = "./mmconf/mhqPresets/";
-	public static String DEFAULT_LOG_FILE_NAME = "mekhqlog.txt";
+	public static final String CAMPAIGN_DIRECTORY = "./campaigns/";
+	public static final String PREFERENCES_FILE = "mmconf/mekhq.preferences";
+	public static final String PRESET_DIR = "./mmconf/mhqPresets/";
+	public static final String DEFAULT_LOG_FILE_NAME = "mekhqlog.txt";
 
 	private static final EventBus EVENT_BUS = new EventBus();
 
-	private static Frame window;
     private static ObservableString selectedTheme;
 
     private static MMLogger logger = null;
@@ -192,10 +191,6 @@ public class MekHQ implements GameListener {
 	    return mekHQOptions;
     }
 
-    public static void setWindow(Frame window) {
-	    MekHQ.window = window;
-    }
-
     public static ObservableString getSelectedTheme() {
 	    return selectedTheme;
     }
@@ -258,10 +253,7 @@ public class MekHQ implements GameListener {
 	 */
 	@Deprecated
 	public static void logMessage(String msg, int logLevel) {
-		getLogger().log(MekHQ.class,
-						"unknown",
-						verbosityToLogLevel(logLevel),
-						msg);
+		getLogger().log(MekHQ.class, "unknown", verbosityToLogLevel(logLevel), msg);
 	}
 
 	/**
@@ -277,10 +269,7 @@ public class MekHQ implements GameListener {
 	 */
 	@Deprecated
 	public static void logError(Exception ex) {
-		getLogger().log(MekHQ.class,
-						"unknown," +
-						LogLevel.ERROR,
-						ex);
+		getLogger().log(MekHQ.class, "unknown," + LogLevel.ERROR, ex);
 	}
 
 	protected static MekHQ getInstance() {
@@ -348,13 +337,11 @@ public class MekHQ implements GameListener {
     }
 
     public void exit() {
-    	if(JOptionPane.showConfirmDialog(null,
+    	if (JOptionPane.showConfirmDialog(null,
                 "Do you really want to quit MekHQ?",
                 "Quit?",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE) ==
-                JOptionPane.YES_OPTION) {
-    		if(null != campaigngui) {
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+    		if (null != campaigngui) {
         		campaigngui.getFrame().dispose();
         	}
     		getPreferences().saveToFile(PREFERENCES_FILE);
@@ -389,32 +376,25 @@ public class MekHQ implements GameListener {
 
     private void showInfo() {
         final String METHOD_NAME = "showInfo";
-        final long TIMESTAMP = new File(PreferenceManager
-                .getClientPreferences().getLogDirectory()
-                + File.separator
-                + "timestamp").lastModified();
+        final long TIMESTAMP = new File(PreferenceManager.getClientPreferences().getLogDirectory()
+                + File.separator + "timestamp").lastModified();
         // echo some useful stuff
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl());
 
         StringBuilder msg = new StringBuilder();
-        msg.append("\t").append(resourceMap.getString("Application.name")) //$NON-NLS-1$ //$NON-NLS-2$
-                .append(" ").append(resourceMap.getString("Application.version")); //$NON-NLS-1$ //$NON-NLS-2$
+        msg.append("\t").append(resourceMap.getString("Application.name")).append(" ").append(resourceMap.getString("Application.version"));
         if (TIMESTAMP > 0) {
-            msg.append("\n\tCompiled on ").append(Instant.ofEpochMilli(TIMESTAMP)); //$NON-NLS-1$
+            msg.append("\n\tCompiled on ").append(Instant.ofEpochMilli(TIMESTAMP));
         }
-        msg.append("\n\tToday is ").append(LocalDate.now()); //$NON-NLS-1$
-        msg.append("\n\tJava vendor ").append(System.getProperty("java.vendor")); //$NON-NLS-1$ //$NON-NLS-2$
-        msg.append("\n\tJava version ").append(System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$
-        msg.append("\n\tPlatform ") //$NON-NLS-1$
-               .append(System.getProperty("os.name")) //$NON-NLS-1$
-               .append(" ") //$NON-NLS-1$
-               .append(System.getProperty("os.version")) //$NON-NLS-1$
-               .append(" (") //$NON-NLS-1$
-               .append(System.getProperty("os.arch")) //$NON-NLS-1$
-               .append(")"); //$NON-NLS-1$
-        long maxMemory = Runtime.getRuntime().maxMemory() / 1024;
+        msg.append("\n\tToday is ").append(LocalDate.now())
+                .append("\n\tJava vendor ").append(System.getProperty("java.vendor"))
+                .append("\n\tJava version ").append(System.getProperty("java.version"))
+                .append("\n\tPlatform ")
+                .append(System.getProperty("os.name")).append(" ").append(System.getProperty("os.version"))
+               .append(" (").append(System.getProperty("os.arch")).append(")");
         msg.append("\n\tTotal memory available to MegaMek: ")
-            .append(NumberFormat.getInstance().format(maxMemory)).append(" kB"); //$NON-NLS-1$ //$NON-NLS-2$
+                .append(NumberFormat.getInstance().format(Runtime.getRuntime().maxMemory() / 1024))
+                .append(" kB");
         getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, msg.toString());
     }
 
@@ -426,7 +406,7 @@ public class MekHQ implements GameListener {
     // output to the console for dev builds
     private static void redirectOutput(String logFilename) {
         try {
-            System.out.println("Redirecting output to mekhqlog.txt"); //$NON-NLS-1$
+            System.out.println("Redirecting output to mekhqlog.txt");
             File logDir = new File("logs");
             if (!logDir.exists()) {
                 logDir.mkdir();
@@ -478,7 +458,7 @@ public class MekHQ implements GameListener {
 		LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), false, getCampaign());
 		lgd.setVisible(true);
 
-		if(lgd.cancelled) {
+		if (lgd.cancelled) {
 		    return;
 		}
 
@@ -499,7 +479,6 @@ public class MekHQ implements GameListener {
     }
 
     public void startHost(Scenario scenario, boolean loadSavegame, ArrayList<Unit> meks) {
-
         int port;
         String playerName;
         {
@@ -523,10 +502,10 @@ public class MekHQ implements GameListener {
             myServer = new Server("", port);
             if (loadSavegame) {
                 FileDialog f = new FileDialog(campaigngui.getFrame(), "Load Savegame");
-                f.setDirectory(System.getProperty("user.dir") + "/savegames"); //$NON-NLS-1$ //$NON-NLS-2$
+                f.setDirectory(System.getProperty("user.dir") + "/savegames");
                 f.setVisible(true);
                 if (null != f.getFile()) {
-                    myServer.loadGame(new File(f.getDirectory(), f.getFile()));
+                    getMyServer().loadGame(new File(f.getDirectory(), f.getFile()));
                 } else {
                     stopHost();
                     return; // exceptions as flow control? no thanks.
@@ -538,18 +517,18 @@ public class MekHQ implements GameListener {
             stopHost();
             return;
         } catch (Exception ex) {
-            MekHQ.getLogger().error(getClass(), "startHost", "Failed to start up server", ex); //$NON-NLS-1$ //$NON-NLS-2$
+            MekHQ.getLogger().error(getClass(), "startHost", "Failed to start up server", ex);
             stopHost();
             return;
         }
 
-        client = new Client(playerName, "127.0.0.1", port); //$NON-NLS-1$
+        client = new Client(playerName, "127.0.0.1", port);
 
         client.getGame().addGameListener(this);
         currentScenario = scenario;
 
         // Start the game thread
-        if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
+        if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
             gameThread = new AtBGameThread(playerName, client, this, meks, (AtBScenario) scenario);
         } else {
             gameThread = new GameThread(playerName, client, this, meks);
@@ -559,9 +538,8 @@ public class MekHQ implements GameListener {
 
     // Stop & send the close game event to the Server
     public synchronized void stopHost() {
-       if(null != myServer) {
-    	   //myServer.getGame().removeGameListener(this);
-    	   myServer.die();
+       if (null != getMyServer()) {
+    	   getMyServer().die();
     	   myServer = null;
        }
        currentScenario = null;
@@ -569,13 +547,11 @@ public class MekHQ implements GameListener {
 
 	@Override
 	public void gameBoardChanged(GameBoardChangeEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gameBoardNew(GameBoardNewEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -586,42 +562,37 @@ public class MekHQ implements GameListener {
 
 	@Override
 	public void gameEntityChange(GameEntityChangeEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gameEntityNew(GameEntityNewEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gameEntityNewOffboard(GameEntityNewOffboardEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gameEntityRemove(GameEntityRemoveEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gameMapQuery(GameMapQueryEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gameNewAction(GameNewActionEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gamePhaseChange(GamePhaseChangeEvent e) {
+
 	}
 
 	@Override
@@ -630,31 +601,30 @@ public class MekHQ implements GameListener {
 		if (gameThread.stopRequested()) {
 			return;
 		}
+
 		try {
         	boolean control = JOptionPane.showConfirmDialog(campaigngui.getFrame(),
                     "Did your side control the battlefield at the end of the scenario?",
                     "Control of Battlefield?",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE) ==
-                    JOptionPane.YES_OPTION;
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
         	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
             tracker.setClient(gameThread.getClient());
             tracker.setEvent(gve);
         	tracker.processGame();
         	ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaigngui.getFrame(), true, tracker);
         	resolveDialog.setVisible(true);
-        	if (campaigngui.getCampaign().getCampaignOptions().getUseAtB() &&
-                    campaigngui.getCampaign().getMission(currentScenario.getMissionId()) instanceof AtBContract &&
-        			campaigngui.getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0) {
+        	if (campaigngui.getCampaign().getCampaignOptions().getUseAtB()
+                    && (campaigngui.getCampaign().getMission(currentScenario.getMissionId()) instanceof AtBContract)
+                    && (campaigngui.getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0)) {
         		RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaigngui,
-        				(AtBContract)campaigngui.getCampaign().getMission(currentScenario.getMissionId()), false);
+        				(AtBContract) campaigngui.getCampaign().getMission(currentScenario.getMissionId()), false);
         		rdd.setVisible(true);
         		if (!rdd.wasAborted()) {
         			getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
         		}
         	}
         	gameThread.requestStop();
-            /*Megamek dumps these in the deployment phase to free memory*/
+            /*MegaMek dumps these in the deployment phase to free memory*/
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 RandomUnitGenerator.getInstance();
                 RandomNameGenerator.getInstance();
@@ -669,49 +639,41 @@ public class MekHQ implements GameListener {
 
 	@Override
 	public void gamePlayerChange(GamePlayerChangeEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gamePlayerChat(GamePlayerChatEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gamePlayerConnected(GamePlayerConnectedEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gamePlayerDisconnected(GamePlayerDisconnectedEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gameReport(GameReportEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gameSettingsChange(GameSettingsChangeEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void gameTurnChange(GameTurnChangeEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
-	public void gameClientFeedbackRequest(GameCFREvent e) {
-		// TODO Auto-generated method stub
-
+	@Override
+    public void gameClientFeedbackRequest(GameCFREvent e) {
 	}
 
 	public IconPackage getIconPackage() {
@@ -779,18 +741,16 @@ public class MekHQ implements GameListener {
                     InstantiationException |
                     IllegalAccessException |
                     UnsupportedLookAndFeelException e) {
-                MekHQ.getLogger().error(
-                        MekHQ.class,
-                        METHOD_NAME,
-                        e);
+                MekHQ.getLogger().error(MekHQ.class, METHOD_NAME, e);
             }
         };
         SwingUtilities.invokeLater(runnable);
     }
 
     private static class MekHqPropertyChangedListener implements PropertyChangeListener {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            if (evt.getSource() == selectedTheme) {
+            if (evt.getSource().equals(selectedTheme)) {
                 setLookAndFeel((String)evt.getNewValue());
             }
         }

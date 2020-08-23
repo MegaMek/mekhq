@@ -246,7 +246,6 @@ public class CampaignGUI extends JPanel {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()); //$NON-NLS-1$
 
         frame = new JFrame("MekHQ"); //$NON-NLS-1$
-        MekHQ.setWindow(frame);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
