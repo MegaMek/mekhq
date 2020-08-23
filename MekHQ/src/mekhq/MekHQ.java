@@ -354,7 +354,7 @@ public class MekHQ implements GameListener {
         msg.append("\n\tTotal memory available to MegaMek: ")
                 .append(NumberFormat.getInstance().format(Runtime.getRuntime().maxMemory() / 1024))
                 .append(" kB");
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, msg.toString());
+        getLogger().info(this, msg.toString());
     }
 
     /**
