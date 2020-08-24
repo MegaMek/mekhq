@@ -5151,7 +5151,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             int currentYear = getCampaign().getGameYear();
             int rating = getTechRating();
             if (((currentYear > 2859) && (currentYear < 3040))
-                    && (!getCampaign().getFaction().isClan() && !getCampaign().getFaction().isComstar())) {
+                    && (!getCampaign().getFaction().isClan() && !getCampaign().getFaction().isComStar())) {
                 if (rating > EquipmentType.RATING_D) {
                     partsCost = partsCost.multipliedBy(5.0);
                 }

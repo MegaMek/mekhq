@@ -232,7 +232,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
      * @return A weight to apply to the given {@link Faction}.
      */
     private double getFactionWeight(Faction faction) {
-        if (faction.isComstar() || faction.getShortName().equals("WOB")) {
+        if (faction.isComStar() || faction.getShortName().equals("WOB")) {
             return 0.05;
         } else if (faction.is(Tag.MERC) || faction.is(Tag.SUPER) || faction.is(Tag.MAJOR)) {
             return 1.0;

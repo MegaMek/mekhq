@@ -76,7 +76,7 @@ public class AtBConfiguration implements Serializable {
     public static final String ORG_IS = "IS";
     public static final String ORG_CLAN = "CLAN";
     public static final String ORG_CS = "CS";
-    
+
     public static final char WEIGHT_ULTRA_LIGHT = 'U';
     public static final char WEIGHT_LIGHT = 'L';
     public static final char WEIGHT_MEDIUM = 'M';
@@ -306,7 +306,7 @@ public class AtBConfiguration implements Serializable {
         String org = AtBConfiguration.ORG_IS;
         Faction faction = Faction.getFaction(factionCode);
 
-        if (faction.isComstar()) {
+        if (faction.isComStar()) {
             org = AtBConfiguration.ORG_CS;
         } else if(faction.isClan()) {
             org = AtBConfiguration.ORG_CLAN;
