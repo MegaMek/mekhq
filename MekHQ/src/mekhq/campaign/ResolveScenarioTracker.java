@@ -120,7 +120,7 @@ public class ResolveScenarioTracker {
         entities = new HashMap<>();
         bayLoadedEntities = new HashMap<>();
         idMap = new HashMap<>();
-        for (UUID uid : scenario.getForces(campaign).getAllUnits()) {
+        for (UUID uid : scenario.getForces(campaign).getAllUnits(true)) {
             Unit u = campaign.getUnit(uid);
             if (null != u && null == u.checkDeployment()) {
                 units.add(u);
@@ -221,7 +221,7 @@ public class ResolveScenarioTracker {
                     // Kill credit automatically assigned only if they can't escape
                     if (!e.canEscape()) {
                         Entity killer = victoryEvent.getEntity(e.getKillerId());
-                        if (null != killer && killer.getOwnerId() == pid) {
+                        if (null != killer) {
                             //the killer is one of your units, congrats!
                             killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
                         } else {
@@ -288,7 +288,7 @@ public class ResolveScenarioTracker {
                 }
             } else {
                 Entity killer = victoryEvent.getEntity(e.getKillerId());
-                if (null != killer && killer.getOwnerId() == pid) {
+                if (null != killer) {
                     //the killer is one of your units, congrats!
                     killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
                 } else {
@@ -373,7 +373,7 @@ public class ResolveScenarioTracker {
                 }
             } else if (e.getOwner().isEnemyOf(client.getLocalPlayer())) {
                 Entity killer = victoryEvent.getEntity(e.getKillerId());
-                if (null != killer && killer.getOwnerId() == pid) {
+                if (null != killer) {
                     //the killer is one of your units, congrats!
                     killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
                 } else {
@@ -1395,15 +1395,15 @@ public class ResolveScenarioTracker {
             }
             if (status.wasDeployed()) {
                 person.awardXP(status.getXP());
-                ServiceLogger.participatedInMission(person, campaign.getDate(), scenario.getName(), m.getName());
+                ServiceLogger.participatedInMission(person, campaign.getLocalDate(), scenario.getName(), m.getName());
             }
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);
             }
             if (status.isMissing()) {
-                campaign.changeStatus(person, PersonnelStatus.MIA);
+                person.changeStatus(getCampaign(), PersonnelStatus.MIA);
             } else if (status.isDead()) {
-                campaign.changeStatus(person, PersonnelStatus.KIA);
+                person.changeStatus(getCampaign(), PersonnelStatus.KIA);
                 if (campaign.getCampaignOptions().getUseAtB() && m instanceof AtBContract) {
                     campaign.getRetirementDefectionTracker().removeFromCampaign(person,
                             true, campaign.getCampaignOptions().getUseShareSystem()
@@ -1458,7 +1458,7 @@ public class ResolveScenarioTracker {
                 person.setHits(status.getHits());
             }
 
-            ServiceLogger.participatedInMission(person, campaign.getDate(), scenario.getName(), m.getName());
+            ServiceLogger.participatedInMission(person, campaign.getLocalDate(), scenario.getName(), m.getName());
 
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);

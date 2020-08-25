@@ -25,6 +25,7 @@ import java.awt.Insets;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -71,6 +72,11 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
 
+/**
+ * This class manages the GUI and logic for the campaign subset export wizard.
+ * May Knuth forgive me.
+ * @author NickAragua
+ */
 public class CampaignExportWizard extends JDialog {
     private static final long serialVersionUID = -7171621116865584010L;
 
@@ -142,7 +148,7 @@ public class CampaignExportWizard extends JDialog {
         gbc.gridy++;
 
         JScrollPane scrollPane = new JScrollPane();
-        switch(state) {
+        switch (state) {
             case ForceSelection:
                 lblInstructions.setText(resourceMap.getString("lblInstructions.ForceSelection.text"));
                 scrollPane.setViewportView(forceList);
@@ -230,7 +236,7 @@ public class CampaignExportWizard extends JDialog {
                 JButton btnExistingCampaign = new JButton(resourceMap.getString("btnExistingCampaign.text"));
                 btnExistingCampaign.addActionListener(e -> {
                     destinationCampaignFile = FileDialogs.openCampaign(null);
-                    if(destinationCampaignFile.isPresent()) {
+                    if (destinationCampaignFile.isPresent()) {
                         if (!exportToCampaign(destinationCampaignFile.get())) {
                             MekHQ.getLogger().error(getClass(), "display",
                                     "Failed to export campaign to existing campaign file");
@@ -353,7 +359,7 @@ public class CampaignExportWizard extends JDialog {
                 .boxed().collect(Collectors.toList());
 
         for (Force force : forceList.getSelectedValuesList()) {
-            for (UUID unitID : force.getAllUnits()) {
+            for (UUID unitID : force.getAllUnits(false)) {
                 Unit unit = sourceCampaign.getUnit(unitID);
 
                 for (Person person : unit.getActiveCrew()) {
@@ -401,7 +407,7 @@ public class CampaignExportWizard extends JDialog {
                 .boxed().collect(Collectors.toList());
 
         for (Force force : forceList.getSelectedValuesList()) {
-            for (UUID unitID : force.getAllUnits()) {
+            for (UUID unitID : force.getAllUnits(false)) {
                 Unit unit = sourceCampaign.getUnit(unitID);
 
                 unitList.setSelectedValue(unit, false);
@@ -424,7 +430,7 @@ public class CampaignExportWizard extends JDialog {
     }
 
     private void nextButtonHandler(CampaignExportWizardState state) {
-        switch(state) {
+        switch (state) {
             case ForceSelection:
                 updatePersonList();
                 updateUnitList();
@@ -506,7 +512,7 @@ public class CampaignExportWizard extends JDialog {
 
         try {
             money = Integer.parseInt(txtExportMoney.getText());
-            if(money > 0) {
+            if (money > 0) {
                 destinationCampaign.addFunds(Money.of(money), String.format("Transfer from %s", sourceCampaign.getName()), Transaction.C_START);
             }
         } catch(Exception ignored) { }
@@ -515,12 +521,14 @@ public class CampaignExportWizard extends JDialog {
         // to be exported
 
         for (Unit unit : unitList.getSelectedValuesList()) {
+            int sourceForceID = unit.getForceId();
+
             if (destinationCampaign.getUnit(unit.getId()) != null) {
                 destinationCampaign.removeUnit(unit.getId());
             }
 
             destinationCampaign.importUnit(unit);
-            destinationCampaign.getUnit(unit.getId()).setForceId(Force.FORCE_NONE);
+
             // Reset any transport assignments, as the export may not contain all transports and cargo units
             if (unit.hasTransportShipId()) {
                 unit.getTransportShipId().clear();
@@ -528,6 +536,10 @@ public class CampaignExportWizard extends JDialog {
             if (!unit.getTransportedUnits().isEmpty()) {
                 unit.unloadTransportShip();
             }
+
+            // make an attempt to re-construct the force structure in the destination campaign
+            // or assign the unit to the same force
+            attemptToAssignToForce(unit, sourceForceID, sourceCampaign, destinationCampaign);
         }
 
         // overwrite any people with the same ID.
@@ -619,7 +631,7 @@ public class CampaignExportWizard extends JDialog {
                 } else {
                     partCount.part.setQuantity(partCount.part.getQuantity() - partCount.count);
 
-                    if(partCount.part.getQuantity() <= 0) {
+                    if (partCount.part.getQuantity() <= 0) {
                         sourceCampaign.removePart(partCount.part);
                     }
                 }
@@ -632,6 +644,101 @@ public class CampaignExportWizard extends JDialog {
         SpecialAbility.replaceSpecialAbilities(spaPush);
 
         return saved;
+    }
+
+    private void attemptToAssignToForce(Unit unit, int sourceForceID, Campaign sourceCampaign, Campaign destinationCampaign) {
+        Force sourceForce = sourceCampaign.getForce(sourceForceID);
+        if (sourceForce == null) {
+            return;
+        }
+
+        // this indicates a unit assigned to the root-level force
+        if (sourceForce.getParentForce() == null) {
+            destinationCampaign.getForces().addUnit(unit.getId());
+        }
+
+        // first thing we will try is to identify a force with the same name and tree structure in the destination campaign
+        // if we find one, add the unit to it
+        // otherwise, chain-add forces
+
+        // hack: the root forces are irrelevant, so we replace the source root force name with the destination root force name
+        String sourceForceFullName = getDestinationFullName(sourceForce, sourceCampaign, destinationCampaign);
+
+        Force destForce = findForce(sourceForceFullName, destinationCampaign.getForces());
+        if (destForce != null) {
+            destForce.addUnit(unit.getId());
+        } else {
+            List<Force> parentForces = getForceAndParents(sourceForce);
+            Force currentDestinationForce = destinationCampaign.getForces();
+
+            for (int x = parentForces.size() - 1; x >= 0; x--) {
+                Force nextSourceForce = parentForces.get(x);
+                String nextSourceForceFullName = getDestinationFullName(nextSourceForce, sourceCampaign, destinationCampaign);
+                Force nextDestinationForce = findForce(nextSourceForceFullName, currentDestinationForce);
+
+                // if this level doesn't exist yet, add it to where we currently are
+                if (nextDestinationForce == null) {
+                    Force forceCopy = new Force(nextSourceForce.getName());
+                    destinationCampaign.addForce(forceCopy, currentDestinationForce);
+                    currentDestinationForce = forceCopy;
+                // otherwise, update current location and move to next level
+                } else {
+                    currentDestinationForce = nextDestinationForce;
+                }
+            }
+
+            currentDestinationForce.addUnit(unit.getId());
+        }
+    }
+
+    /**
+     * Helper function that returns a full force name with the
+     * source campaign root force name swapped out for the destination campaign root force name
+     */
+    private String getDestinationFullName(Force sourceForce, Campaign sourceCampaign, Campaign destinationCampaign) {
+        return sourceForce.getFullName().replace(sourceCampaign.getForces().getName(), destinationCampaign.getForces().getName());
+    }
+
+    /**
+     * Recurses through a Force structure to look for a force with the given "full force name"
+     */
+    private Force findForce(String forceName, Force force) {
+        if (force.getFullName().equals(forceName)) {
+            return force;
+        } else {
+            for (Force subForce : force.getSubForces()) {
+                Force foundForce = findForce(forceName, subForce);
+
+                if (foundForce != null) {
+                    return foundForce;
+                }
+            }
+
+            return null;
+        }
+    }
+
+    /**
+     * Moves through a force's ancestors and returns a flattened list of force names in order
+     * from me to furtherst ancestor.
+     */
+    private List<Force> getForceAndParents(Force force) {
+        List<Force> retval = new ArrayList<>();
+        retval.add(force);
+
+        Force ancestorForce;
+        while (force.getParentForce() != null) {
+            ancestorForce = force.getParentForce();
+
+            // we don't want the top-level force
+            if (ancestorForce.getParentForce() != null) {
+                retval.add(ancestorForce);
+            }
+
+            force = ancestorForce;
+        }
+
+        return retval;
     }
 
     private String getPersonSelectionStatus() {
@@ -704,7 +811,15 @@ public class CampaignExportWizard extends JDialog {
                                                       boolean isSelected, boolean cellHasFocus) {
             Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             Person person = (Person) value;
-            String cellValue = String.format("%s (%s)", person.getFullName(), person.getPrimaryRoleDesc());
+            String callsign = "";
+            if ((person.getCallsign() != null) && (person.getCallsign().trim().length() > 0)) {
+                callsign = String.format("\"%s\" ", person.getCallsign());
+            }
+
+            String cellValue = String.format("%s %s(%s)",
+                    person.getFullName(),
+                    callsign,
+                    person.getPrimaryRoleDesc());
             ((JLabel) cmp).setText(cellValue);
             return cmp;
         }

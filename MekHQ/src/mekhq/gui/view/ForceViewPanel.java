@@ -18,12 +18,9 @@
  */
 package mekhq.gui.view;
 
-import java.awt.Component;
-import java.awt.Image;
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -133,7 +130,7 @@ public class ForceViewPanel extends ScrollablePanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(pnlSubUnits, gridBagConstraints);
 
-        if(null != force.getDescription() && !force.getDescription().isEmpty()) {
+        if (null != force.getDescription() && !force.getDescription().isEmpty()) {
             txtDesc.setName("txtDesc");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
@@ -158,7 +155,7 @@ public class ForceViewPanel extends ScrollablePanel {
         String filename = force.getIconFileName();
         LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
 
-        if(Crew.ROOT_PORTRAIT.equals(category)) {
+        if (Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
@@ -168,10 +165,10 @@ public class ForceViewPanel extends ScrollablePanel {
         }
 
         // Try to get the player's portrait file.
-        Image portrait = null;
+        Image portrait;
         try {
             portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
-            if(null != portrait) {
+            if (null != portrait) {
         		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);
             } else {
             	portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
@@ -212,32 +209,28 @@ public class ForceViewPanel extends ScrollablePanel {
     	String LanceTech = "";
     	String assigned = "";
     	String type = null;
-    	ArrayList<Person> people = new ArrayList<Person>();
-    	for(UUID uid : force.getAllUnits()) {
+    	ArrayList<Person> people = new ArrayList<>();
+    	for (UUID uid : force.getAllUnits(false)) {
     		Unit u = campaign.getUnit(uid);
-    		if(null != u) {
+    		if (null != u) {
     			Person p = u.getCommander();
     			bv += u.getEntity().calculateBattleValue(true, !u.hasPilot());
     			cost = cost.plus(u.getEntity().getCost(true));
     			ton += u.getEntity().getWeight();
     			String utype = UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
-    			if(null == type) {
+    			if (null == type) {
     				type = utype;
-    			} else if(!utype.equals(type)) {
+    			} else if (!utype.equals(type)) {
     				type = resourceMap.getString("mixed");
     			}
-    			if(null != p) {
+    			if (null != p) {
     				people.add(p);
     			}
     		}
     	}
  		//sort person vector by rank
- 		Collections.sort(people, new Comparator<Person>(){
-            public int compare(final Person p1, final Person p2) {
-               return ((Comparable<Integer>)p2.getRankNumeric()).compareTo(p1.getRankNumeric());
-            }
-        });
-    	if(people.size() > 0) {
+ 		people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
+    	if (people.size() > 0) {
     		commander = people.get(0).getFullTitle();
     	}
 
@@ -246,27 +239,27 @@ public class ForceViewPanel extends ScrollablePanel {
     		LanceTech = p.getFullName();
     	}
 
-    	if(null != force.getParentForce()) {
+    	if (null != force.getParentForce()) {
     		assigned = force.getParentForce().getName();
     	}
 
     	int nexty = 0;
 
-    	if(null != type) {
-    		lblType.setName("lblCommander2"); // NOI18N
-			lblType.setText("<html><i>" + type + " " + resourceMap.getString("unit")+ "</i></html>");
-			gridBagConstraints = new java.awt.GridBagConstraints();
+    	if (null != type) {
+    		lblType.setName("lblCommander2");
+			lblType.setText("<html><i>" + (force.isCombatForce() ? "" : "Non-Combat ") + type + " " + resourceMap.getString("unit")+ "</i></html>");
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = nexty;
 			gridBagConstraints.weightx = 1.0;
 			gridBagConstraints.gridwidth = 2;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblType, gridBagConstraints);
 			nexty++;
     	}
 
-    	if(!commander.equals("")) {
+    	if (!commander.equals("")) {
 	    	lblCommander1.setName("lblCommander1"); // NOI18N
 	    	lblCommander1.setText(resourceMap.getString("lblCommander1.text"));
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -313,7 +306,7 @@ public class ForceViewPanel extends ScrollablePanel {
     			}
     	}
 
-    	if(!assigned.equals("")) {
+    	if (!assigned.equals("")) {
 	    	lblAssign1.setName("lblAssign1"); // NOI18N
 	    	lblAssign1.setText(resourceMap.getString("lblAssign1.text"));
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -422,7 +415,7 @@ public class ForceViewPanel extends ScrollablePanel {
 		JLabel lblForce;
 
 		int nexty = 0;
-		for(Force subForce : force.getSubForces()) {
+		for (Force subForce : force.getSubForces()) {
 			lblForce = new JLabel();
 			lblForce.setText(getSummaryFor(subForce));
 			setIcon(subForce, lblForce, 72);
@@ -440,33 +433,27 @@ public class ForceViewPanel extends ScrollablePanel {
 		}
 		JLabel lblPerson;
 		JLabel lblUnit;
-		ArrayList<Unit> units = new ArrayList<Unit>();
-		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
- 		for(UUID uid : force.getUnits()) {
+		ArrayList<Unit> units = new ArrayList<>();
+		ArrayList<Unit> unmannedUnits = new ArrayList<>();
+ 		for (UUID uid : force.getUnits()) {
 			Unit u = campaign.getUnit(uid);
-			if(null == u) {
+			if (null == u) {
 				continue;
 			}
-			if(null == u.getCommander()) {
+			if (null == u.getCommander()) {
 				unmannedUnits.add(u);
 			} else {
 				units.add(u);
 			}
  		}
  		//sort person vector by rank
- 		Collections.sort(units, new Comparator<Unit>(){
-            public int compare(final Unit u1, final Unit u2) {
-               return ((Comparable<Integer>)u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric());
-            }
-        });
- 		for(Unit unit : unmannedUnits) {
- 			units.add(unit);
- 		}
- 		for(Unit unit : units) {
+ 		units.sort((u1, u2) -> ((Comparable<Integer>) u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric()));
+        units.addAll(unmannedUnits);
+ 		for (Unit unit : units) {
  			Person p = unit.getCommander();
  			lblPerson = new JLabel();
 			lblUnit = new JLabel();
-			if(null != p) {
+			if (null != p) {
 				lblPerson.setText(getSummaryFor(p, unit));
 				setPortrait(p, lblPerson);
 			}
@@ -495,17 +482,13 @@ public class ForceViewPanel extends ScrollablePanel {
 
 	/**
      * set the portrait for the given person.
-     *
-     * @return The <code>Image</code> of the pilot's portrait. This value
-     *         will be <code>null</code> if no portrait was selected
-     *          or if there was an error loading it.
      */
     public void setPortrait(Person p, JLabel lbl) {
 
         String category = p.getPortraitCategory();
         String filename = p.getPortraitFileName();
 
-        if(Crew.ROOT_PORTRAIT.equals(category)) {
+        if (Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
@@ -515,14 +498,14 @@ public class ForceViewPanel extends ScrollablePanel {
         }
 
         // Try to get the player's portrait file.
-        Image portrait = null;
+        Image portrait;
         try {
             portrait = (Image) icons.getPortraits().getItem(category, filename);
-            if(null != portrait) {
+            if (null != portrait) {
                 portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);
             } else {
             	portrait = (Image) icons.getPortraits().getItem("", "default.gif");
-            	if(null != portrait) {
+            	if (null != portrait) {
                     portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);
             	}
             }
@@ -556,7 +539,7 @@ public class ForceViewPanel extends ScrollablePanel {
     public String getSummaryFor(Person person, Unit unit) {
         String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
         toReturn += person.getSkillSummary() + " " + person.getRoleDesc();
-        if(null != unit && null != unit.getEntity()
+        if (null != unit && null != unit.getEntity()
         		&& null != unit.getEntity().getCrew() && unit.getEntity().getCrew().getHits() > 0) {
         	toReturn += "<br><font color='red' size='2'>" + unit.getEntity().getCrew().getHits() + " hit(s)";
         }
@@ -574,12 +557,9 @@ public class ForceViewPanel extends ScrollablePanel {
             if (entity.calculateFreeC3Nodes() >= 5) {
                 toReturn += Messages.getString("ChatLounge.NC3None");
             } else {
-                toReturn += Messages
-                        .getString("ChatLounge.NC3Network")
-                        + entity.getC3NetId();
+                toReturn += Messages.getString("ChatLounge.NC3Network") + entity.getC3NetId();
                 if (entity.calculateFreeC3Nodes() > 0) {
-                    toReturn += Messages.getString("ChatLounge.NC3Nodes",
-                            new Object[] { entity.calculateFreeC3Nodes() });
+                    toReturn += Messages.getString("ChatLounge.NC3Nodes", entity.calculateFreeC3Nodes());
                 }
             }
             toReturn += "</i>";
@@ -592,8 +572,7 @@ public class ForceViewPanel extends ScrollablePanel {
                         .getString("ChatLounge.C3iNetwork")
                         + entity.getC3NetId();
                 if (entity.calculateFreeC3Nodes() > 0) {
-                	toReturn += Messages.getString("ChatLounge.C3Nodes",
-                            new Object[] { entity.calculateFreeC3Nodes() });
+                	toReturn += Messages.getString("ChatLounge.C3Nodes", entity.calculateFreeC3Nodes());
                 }
             }
     		toReturn += "</i>";
@@ -643,10 +622,10 @@ public class ForceViewPanel extends ScrollablePanel {
     	double ton = 0;
     	int number = 0;
     	String commander = "No personnel found";
-    	ArrayList<Person> people = new ArrayList<Person>();
-    	for(UUID uid : f.getAllUnits()) {
+    	ArrayList<Person> people = new ArrayList<>();
+    	for (UUID uid : f.getAllUnits(false)) {
     		Unit u = campaign.getUnit(uid);
-    		if(null != u) {
+    		if (null != u) {
     			Person p = u.getCommander();
     			number++;
                 if (p != null) {
@@ -656,18 +635,14 @@ public class ForceViewPanel extends ScrollablePanel {
                 }
     			cost = cost.plus(u.getEntity().getCost(true));
     			ton += u.getEntity().getWeight();
-    			if(null != p) {
+    			if (p != null) {
     				people.add(p);
     			}
     		}
     	}
  		//sort person vector by rank
- 		Collections.sort(people, new Comparator<Person>(){
-            public int compare(final Person p1, final Person p2) {
-               return ((Comparable<Integer>)p2.getRankNumeric()).compareTo(p1.getRankNumeric());
-            }
-        });
-    	if(people.size() > 0) {
+ 		people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
+    	if (people.size() > 0) {
     		commander = people.get(0).getFullTitle();
     	}
         String toReturn = "<html><font size='2'><b>" + f.getName() + "</b> (" + commander + ")<br/>";
@@ -678,5 +653,4 @@ public class ForceViewPanel extends ScrollablePanel {
         toReturn += "</font></html>";
         return toReturn;
     }
-
 }

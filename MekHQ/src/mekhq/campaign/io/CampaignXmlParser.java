@@ -1777,15 +1777,15 @@ public class CampaignXmlParser {
                     } else if (systemNode.getNodeName().equalsIgnoreCase("event")) {
                         PlanetarySystem.PlanetarySystemEvent event = Systems.getInstance().readPlanetarySystemEvent(systemNode);
                         if (null != event) {
-                        	event.custom = true;
-                        	sysEvents.add(event);
+                            event.custom = true;
+                            sysEvents.add(event);
                         }
                     } else if (systemNode.getNodeName().equalsIgnoreCase("planet")) {
-                    	NodeList planetNodes = systemNode.getChildNodes();
+                        NodeList planetNodes = systemNode.getChildNodes();
                         int sysPos = 0;
                         events = new ArrayList<>();
                         for (int j = 0; j < planetNodes.getLength(); ++j) {
-                        	Node planetNode = planetNodes.item(j);
+                            Node planetNode = planetNodes.item(j);
                             if (planetNode.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             }
@@ -1800,20 +1800,20 @@ public class CampaignXmlParser {
                             }
                         }
                         if (sysPos > 0 && !events.isEmpty()) {
-                        	eventsMap.put(sysPos, events);
+                            eventsMap.put(sysPos, events);
                         }
                     }
                 }
                 if (null != systemId) {
-                	//iterate through events hash and assign events to planets
-                	Iterator<Map.Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();
+                    //iterate through events hash and assign events to planets
+                    Iterator<Map.Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();
                     while (it.hasNext()) {
                         Map.Entry<Integer, List<PlanetaryEvent>> pair = it.next();
                         Systems.getInstance().updatePlanetaryEvents(systemId, pair.getValue(), true, pair.getKey());
                     }
                     //check for system-wide events
                     if (!sysEvents.isEmpty()) {
-                    	Systems.getInstance().updatePlanetarySystemEvents(systemId, sysEvents, true);
+                        Systems.getInstance().updatePlanetarySystemEvents(systemId, sysEvents, true);
                     }
                 }
             }
@@ -1906,14 +1906,18 @@ public class CampaignXmlParser {
                 Person person = people.next();
                 people.remove();
 
-                if (fatherId != null) {
+                if (retVal.getPerson(fatherId) != null) {
                     person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, fatherId);
                     retVal.getPerson(fatherId).getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person.getId());
+                } else {
+                    MekHQ.getLogger().warning(CampaignXmlParser.class, "migrateAncestorNodes", "Person with id " + fatherId + " does not exist, skipping adding Genealogy for them.");
                 }
 
-                if (motherId != null) {
+                if (retVal.getPerson(motherId) != null) {
                     person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, motherId);
                     retVal.getPerson(motherId).getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person.getId());
+                } else {
+                    MekHQ.getLogger().warning(CampaignXmlParser.class, "migrateAncestorNodes", "Person with id " + motherId + " does not exist, skipping adding Geneology for them.");
                 }
             }
         }

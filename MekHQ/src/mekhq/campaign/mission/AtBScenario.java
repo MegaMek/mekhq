@@ -1,7 +1,7 @@
 /*
  * AtBScenario.java
  *
- * Copyright (C) 2014-2016 MegaMek team
+ * Copyright (C) 2014-2016 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2014 Carl Spain. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.mission;
 
@@ -266,7 +266,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             lanceRole = lance.getRole();
             setMissionId(lance.getMissionId());
 
-            for (UUID id : c.getForce(lance.getForceId()).getAllUnits()) {
+            for (UUID id : c.getForce(lance.getForceId()).getAllUnits(true)) {
                 entityIds.put(id, c.getUnit(id).getEntity());
             }
         }
@@ -509,10 +509,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @return true if the unit is eligible, otherwise false
      */
     public boolean canDeploy(Unit unit, Campaign campaign) {
-        if (isBigBattle() && (getForces(campaign).getAllUnits().size() > 7)) {
+        if (isBigBattle() && (getForces(campaign).getAllUnits(true).size() > 7)) {
             return false;
         } else {
-            return !isSpecialMission() || (getForces(campaign).getAllUnits().size() <= 0);
+            return !isSpecialMission() || (getForces(campaign).getAllUnits(true).size() <= 0);
         }
     }
 
@@ -525,12 +525,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @return true if the force is eligible to deploy, otherwise false
      */
     public boolean canDeploy(Force force, Campaign campaign) {
-        Vector<UUID> units = force.getAllUnits();
+        Vector<UUID> units = force.getAllUnits(true);
         if (isBigBattle() &&
-                getForces(campaign).getAllUnits().size() + units.size() > 8) {
+                getForces(campaign).getAllUnits(true).size() + units.size() > 8) {
             return false;
         } else if (isSpecialMission() &&
-                getForces(campaign).getAllUnits().size() + units.size() > 0) {
+                getForces(campaign).getAllUnits(true).size() + units.size() > 0) {
             return false;
         }
         for (UUID id : units) {
@@ -550,9 +550,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     public boolean canDeployUnits(Vector<Unit> units, Campaign campaign) {
         if (isBigBattle()) {
-            return getForces(campaign).getAllUnits().size() + units.size() <= 8;
+            return getForces(campaign).getAllUnits(true).size() + units.size() <= 8;
         } else if (isSpecialMission()) {
-            return getForces(campaign).getAllUnits().size() + units.size() <= 1;
+            return getForces(campaign).getAllUnits(true).size() + units.size() <= 1;
         }
         for (Unit unit : units) {
             if (!canDeploy(unit, campaign)) {
@@ -572,12 +572,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public boolean canDeployForces(Vector<Force> forces, Campaign c) {
         int total = 0;
         for (Force force : forces) {
-            Vector<UUID> units = force.getAllUnits();
+            Vector<UUID> units = force.getAllUnits(true);
             total += units.size();
             if (isBigBattle()) {
-                return getForces(c).getAllUnits().size() + units.size() <= 8;
+                return getForces(c).getAllUnits(true).size() + units.size() <= 8;
             } else if (isSpecialMission()) {
-                return getForces(c).getAllUnits().size() + units.size() <= 0;
+                return getForces(c).getAllUnits(true).size() + units.size() <= 0;
             }
             for (UUID id : units) {
                 if (!canDeploy(c.getUnit(id), c)) {
@@ -586,9 +586,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             }
         }
         if (isBigBattle()) {
-            return getForces(c).getAllUnits().size() + total <= 8;
+            return getForces(c).getAllUnits(true).size() + total <= 8;
         } else if (isSpecialMission()) {
-            return getForces(c).getAllUnits().size() + total <= 0;
+            return getForces(c).getAllUnits(true).size() + total <= 0;
         }
         return true;
     }
@@ -605,7 +605,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             setObjectives(campaign, getContract(campaign));
             return;
         }
-        Vector<UUID> deployed = getForces(campaign).getAllUnits();
+        Vector<UUID> deployed = getForces(campaign).getAllUnits(true);
         if (isBigBattle()) {
             int numAllies = Math.min(4, 8 - deployed.size());
             alliesPlayer.clear();
@@ -680,12 +680,18 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             numAttachedPlayer = 3;
         } else if (campaign.getFactionCode().equals("MERC")) {
             if (getContract(campaign).getCommandRights() == Contract.COM_INTEGRATED) {
-                numAttachedBot = 2;
-            }
-            if (getContract(campaign).getCommandRights() == Contract.COM_HOUSE) {
-                numAttachedBot = 1;
-            }
-            if (getContract(campaign).getCommandRights() == Contract.COM_LIAISON) {
+                if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
+                    numAttachedPlayer = 2;
+                } else {
+                    numAttachedBot = 2;
+                }
+            } else if (getContract(campaign).getCommandRights() == Contract.COM_HOUSE) {
+                if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
+                    numAttachedPlayer = 1;
+                } else {
+                    numAttachedBot = 1;
+                }
+            } else if (getContract(campaign).getCommandRights() == Contract.COM_LIAISON) {
                 numAttachedPlayer = 1;
             }
         }
@@ -767,7 +773,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (campaign.getCampaignOptions().getUseDropShips()) {
             if (canAddDropShips()) {
                 boolean dropshipFound = false;
-                for (UUID id : campaign.getForces().getAllUnits()) {
+                for (UUID id : campaign.getForces().getAllUnits(true)) {
                     if ((campaign.getUnit(id).getEntity().getEntityType() & Entity.ETYPE_DROPSHIP) != 0 &&
                             campaign.getUnit(id).isAvailable()) {
                         addUnit(id);
@@ -901,11 +907,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param weightMod        Modifier to the weight class of enemy lances.
      * @param campaign
      */
-    protected void addEnemyForce(List<Entity> list, int weightClass,
-            int maxWeight, int rollMod, int weightMod, Campaign campaign) {
+    protected void addEnemyForce(List<Entity> list, int weightClass, int maxWeight, int rollMod,
+                                 int weightMod, Campaign campaign) {
         String org = AtBConfiguration.getParentFactionType(getContract(campaign).getEnemyCode());
 
-        String lances = campaign.getAtBConfig().selectBotLances(org, weightClass, rollMod/20f);
+        String lances = campaign.getAtBConfig().selectBotLances(org, weightClass, rollMod / 20f);
         int maxLances = Math.min(lances.length(), campaign.getCampaignOptions().getSkillLevel() + 1);
 
         for (int i = 0; i < maxLances; i++) {
@@ -915,10 +921,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (campaign.getCampaignOptions().getAllowOpforLocalUnits()) {
             list.addAll(AtBDynamicScenarioFactory.fillTransports(this, list,
-                    getContract(campaign).getEnemyCode(),
-                    getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
-                    campaign));
-
+                    getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
+                    getContract(campaign).getEnemyQuality(), campaign));
         }
     }
 

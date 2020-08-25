@@ -27,14 +27,14 @@ import java.util.ResourceBundle;
 
 public enum LayeredForceIcon {
     //region Enum Declarations
-    TYPE("Force.types", "Pieces/Type/", "tableTypes", ListSelectionModel.SINGLE_SELECTION),
-    FORMATION("Force.formations", "Pieces/Formations/", "tableFormations", ListSelectionModel.SINGLE_SELECTION),
-    ADJUSTMENT("Force.adjustments", "Pieces/Adjustments/", "tableAdjustments", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    ALPHANUMERIC("Force.alphanumerics", "Pieces/Alphanumerics/", "tableAlphanumerics", ListSelectionModel.SINGLE_SELECTION),
-    SPECIAL_MODIFIER("Force.special", "Pieces/Special Modifiers/", "tableSpecialModifiers", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    BACKGROUND("Force.backgrounds", "Pieces/Backgrounds/", "tableBackgrounds", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    FRAME("Force.frame", "Pieces/Frames/", "tableFrames", ListSelectionModel.SINGLE_SELECTION),
-    LOGO("Force.logos", "Pieces/Logos/", "tableLogos", ListSelectionModel.SINGLE_SELECTION);
+    TYPE("LayeredForceIcon.types", "Pieces/Type/", "tableTypes", ListSelectionModel.SINGLE_SELECTION),
+    FORMATION("LayeredForceIcon.formations", "Pieces/Formations/", "tableFormations", ListSelectionModel.SINGLE_SELECTION),
+    ADJUSTMENT("LayeredForceIcon.adjustments", "Pieces/Adjustments/", "tableAdjustments", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
+    ALPHANUMERIC("LayeredForceIcon.alphanumerics", "Pieces/Alphanumerics/", "tableAlphanumerics", ListSelectionModel.SINGLE_SELECTION),
+    SPECIAL_MODIFIER("LayeredForceIcon.special", "Pieces/Special Modifiers/", "tableSpecialModifiers", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
+    BACKGROUND("LayeredForceIcon.backgrounds", "Pieces/Backgrounds/", "tableBackgrounds", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
+    FRAME("LayeredForceIcon.frame", "Pieces/Frames/", "tableFrames", ListSelectionModel.SINGLE_SELECTION),
+    LOGO("LayeredForceIcon.logos", "Pieces/Logos/", "tableLogos", ListSelectionModel.SINGLE_SELECTION);
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -45,8 +45,8 @@ public enum LayeredForceIcon {
     //endregion Variable Declarations
 
     LayeredForceIcon(String name, String layerPath, String tableName, int listSelectionModel) {
-        this.name = ResourceBundle.getBundle("mekhq.resources.ImageChoiceDialog",
-                new EncodeControl()).getString(name);
+        this.name = ResourceBundle.getBundle("mekhq.resources.GUIEnums", new EncodeControl())
+                .getString(name);
         this.layerPath = layerPath;
         this.tableName = tableName;
         this.listSelectionModel = listSelectionModel;

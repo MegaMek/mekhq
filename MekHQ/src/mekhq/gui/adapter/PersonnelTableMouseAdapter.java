@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.adapter;
 
@@ -207,9 +207,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_MANEI_DOMINI_RANK: {
-                int md_rank = Integer.parseInt(data[1]);
+                ManeiDominiRank maneiDominiRank = ManeiDominiRank.parseFromString(data[1]);
                 for (Person person : people) {
-                    person.setManeiDominiRank(md_rank);
+                    person.setManeiDominiRank(maneiDominiRank);
                 }
                 break;
             }
@@ -632,10 +632,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             case CMD_CHANGE_STATUS: {
                 PersonnelStatus status = PersonnelStatus.valueOf(data[1]);
                 for (Person person : people) {
-                    if ((status == PersonnelStatus.ACTIVE) || (0 == JOptionPane.showConfirmDialog(null,
+                    if (status.isActive() || (JOptionPane.showConfirmDialog(null,
                             String.format(resourceMap.getString("confirmRetireQ.format"), person.getFullTitle()),
-                            resourceMap.getString("kiaQ.text"), JOptionPane.YES_NO_OPTION))) {
-                        gui.getCampaign().changeStatus(person, status);
+                            status.toString(), JOptionPane.YES_NO_OPTION) == 0)) {
+                        person.changeStatus(gui.getCampaign(), status);
                     }
                 }
                 break;
@@ -716,20 +716,16 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_REMOVE: {
-                String title = String.format(resourceMap.getString("numPersonnel.text"), people.length); //$NON-NLS-1$
+                String title = String.format(resourceMap.getString("numPersonnel.text"), people.length);
                 if (people.length == 1) {
                     title = people[0].getFullTitle();
                 }
-                if (0 == JOptionPane.showConfirmDialog(
-                        null,
-                        String.format(resourceMap.getString("confirmRemove.format"), title), //$NON-NLS-1$
-                        resourceMap.getString("removeQ.text"), //$NON-NLS-1$
+                if (0 == JOptionPane.showConfirmDialog(null,
+                        String.format(resourceMap.getString("confirmRemove.format"), title),
+                        resourceMap.getString("removeQ.text"),
                         JOptionPane.YES_NO_OPTION)) {
                     for (Person person : people) {
                         gui.getCampaign().removePerson(person.getId());
-                        if (person.getGenealogy().hasSpouse()) {
-                            person.getGenealogy().getSpouse(gui.getCampaign()).getGenealogy().setSpouse(null);
-                        }
                     }
                 }
                 break;
@@ -968,7 +964,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_ADD_LOG_ENTRY: {
-                AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(gui.getFrame(), true, gui.getCampaign().getDate()); //$NON-NLS-1$
+                AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(gui.getFrame(), true, gui.getCampaign(), gui.getCampaign().getLocalDate());
                 addPersonnelLogDialog.setVisible(true);
                 Optional<LogEntry> personnelEntry = addPersonnelLogDialog.getEntry();
                 if (personnelEntry.isPresent()) {
@@ -986,7 +982,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_ADD_MISSION_ENTRY: {
-                AddOrEditMissionEntryDialog addMissionDialog = new AddOrEditMissionEntryDialog(gui.getFrame(), true, gui.getCampaign().getDate()); //$NON-NLS-1$
+                AddOrEditMissionEntryDialog addMissionDialog = new AddOrEditMissionEntryDialog(gui.getFrame(), true, gui.getCampaign(), gui.getCampaign().getLocalDate());
                 addMissionDialog.setVisible(true);
                 Optional<LogEntry> missionEntry = addMissionDialog.getEntry();
                 if (missionEntry.isPresent()) {
@@ -1285,13 +1281,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             popup.add(menu);
             if (StaticChecks.areAllWoB(selected)) {
                 // MD Ranks
-                menu = new JMenu(resourceMap.getString("changeMDRank.text")); //$NON-NLS-1$
-                for (int i = Rank.MD_RANK_NONE; i < Rank.MD_RANK_NUM; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(
-                            Rank.getManeiDominiRankName(i));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_RANK, String.valueOf(i)));
+                menu = new JMenu(resourceMap.getString("changeMDRank.text"));
+                for (ManeiDominiRank maneiDominiRank : ManeiDominiRank.values()) {
+                    cbMenuItem = new JCheckBoxMenuItem(maneiDominiRank.toString());
+                    cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_RANK, maneiDominiRank.name()));
                     cbMenuItem.addActionListener(this);
-                    if (i == person.getManeiDominiRank()) {
+                    if (person.getManeiDominiRank() == maneiDominiRank) {
                         cbMenuItem.setSelected(true);
                     }
                     menu.add(cbMenuItem);
@@ -1339,7 +1334,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
             menu = new JMenu(resourceMap.getString("changeStatus.text"));
             for (PersonnelStatus status : PersonnelStatus.values()) {
-                cbMenuItem = new JCheckBoxMenuItem(status.getStatusName());
+                cbMenuItem = new JCheckBoxMenuItem(status.toString());
                 if (person.getStatus() == status) {
                     cbMenuItem.setSelected(true);
                 }
@@ -1467,7 +1462,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 int unitType = -1;
                 int weightClass = -1;
 
-                if (oneSelected && person.isActive() && person.getPrisonerStatus().isFree()) {
+                if (oneSelected && person.getStatus().isActive() && person.getPrisonerStatus().isFree()) {
                     for (Unit unit : gui.getCampaign().getUnits(true, true, true)) {
                         if (!unit.isAvailable()) {
                             continue;
@@ -1805,7 +1800,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 popup.add(menu);
             }
 
-            if (oneSelected && person.isActive()) {
+            if (oneSelected && person.getStatus().isActive()) {
                 if (person.oldEnoughToMarry(gui.getCampaign()) && (!person.getGenealogy().hasSpouse())) {
                     menu = new JMenu(resourceMap.getString("chooseSpouse.text")); //$NON-NLS-1$
                     JMenu maleMenu = new JMenu(resourceMap.getString("spouseMenuMale.text"));
@@ -1960,7 +1955,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             popup.add(awardMenu);
             //endregion Awards Menu
 
-            if (oneSelected && person.isActive()) {
+            if (oneSelected && person.getStatus().isActive()) {
                 menu = new JMenu(resourceMap.getString("spendXP.text")); //$NON-NLS-1$
                 if (gui.getCampaign().getCampaignOptions().useAbilities()) {
                     JMenu abMenu = new JMenu(resourceMap.getString("spendOnSpecialAbilities.text")); //$NON-NLS-1$

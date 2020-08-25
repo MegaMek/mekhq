@@ -56,7 +56,7 @@ public class AtBScenarioModifierApplicator {
     public static void addForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate forceToApply, EventTiming eventTiming) {
         preAddForce(campaign, scenario, forceToApply);
 
-        if(eventTiming == EventTiming.PostForceGeneration) {
+        if (eventTiming == EventTiming.PostForceGeneration) {
             postAddForce(campaign, scenario, forceToApply);
         }
     }
@@ -90,7 +90,7 @@ public class AtBScenarioModifierApplicator {
      * @param forceToApply
      */
     private static void preAddForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate forceToApply) {
-        if(scenario.getTemplate() != null) {
+        if (scenario.getTemplate() != null) {
             scenario.getTemplate().scenarioForces.put(forceToApply.getForceName(), forceToApply);
         }
     }
@@ -103,10 +103,10 @@ public class AtBScenarioModifierApplicator {
     public static void removeUnits(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient, int unitRemovalCount) {
         int actualUnitsToRemove = unitRemovalCount;
 
-        if(unitRemovalCount == ScenarioForceTemplate.FIXED_UNIT_SIZE_LANCE) {
+        if (unitRemovalCount == ScenarioForceTemplate.FIXED_UNIT_SIZE_LANCE) {
             String factionCode;
 
-            if(eventRecipient == ForceAlignment.Allied) {
+            if (eventRecipient == ForceAlignment.Allied) {
                 factionCode = scenario.getContract(campaign).getEmployerCode();
             } else {
                 factionCode = scenario.getContract(campaign).getEnemyCode();
@@ -115,10 +115,10 @@ public class AtBScenarioModifierApplicator {
             actualUnitsToRemove = AtBDynamicScenarioFactory.getLanceSize(factionCode);
         }
 
-        for(int x = 0; x < actualUnitsToRemove; x++) {
+        for (int x = 0; x < actualUnitsToRemove; x++) {
             int botForceIndex = Compute.randomInt(scenario.getNumBots());
             BotForce bf = scenario.getBotForce(botForceIndex);
-            if(bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
+            if (bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
                 int unitIndexToRemove = Compute.randomInt(bf.getEntityList().size());
                 bf.getEntityList().remove(unitIndexToRemove);
             }
@@ -132,16 +132,16 @@ public class AtBScenarioModifierApplicator {
      * @param campaign
      */
     public static void inflictBattleDamage(AtBDynamicScenario scenario, Campaign campaign,
-            ForceAlignment eventRecipient, int battleDamageIntensity) {
+                                           ForceAlignment eventRecipient, int battleDamageIntensity) {
         // now go through all the entities belonging to the recipient currently in the scenario
         // and apply random battle damage
-        for(int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
+        for (int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
             BotForce bf = scenario.getBotForce(botIndex);
-            if(bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
-                for(Entity en : bf.getEntityList()) {
+            if (bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
+                for (Entity en : bf.getEntityList()) {
                     int numClusters = Compute.randomInt(battleDamageIntensity);
 
-                    for(int clusterCount = 0; clusterCount < numClusters; clusterCount++) {
+                    for (int clusterCount = 0; clusterCount < numClusters; clusterCount++) {
                         HitData hitData = en.rollHitLocation(ToHitData.HIT_NORMAL, Compute.randomInt(4));
                         int resultingArmor = Math.max(1, en.getArmor(hitData) - 5);
 
@@ -161,11 +161,11 @@ public class AtBScenarioModifierApplicator {
             ForceAlignment eventRecipient, int ammoExpenditureIntensity) {
         // now go through all the entities belonging to the recipient currently in the scenario
         // and remove a random amount of ammo from each bin
-        for(int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
+        for (int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
             BotForce bf = scenario.getBotForce(botIndex);
-            if(bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
-                for(Entity en : bf.getEntityList()) {
-                    for(Mounted ammoBin : en.getAmmo()) {
+            if (bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
+                for (Entity en : bf.getEntityList()) {
+                    for (Mounted ammoBin : en.getAmmo()) {
                         int remainingShots = Math.max(0, ammoBin.getUsableShotsLeft() - Compute.randomInt(ammoExpenditureIntensity));
                         ammoBin.setShotsLeft(remainingShots);
                     }
@@ -197,10 +197,10 @@ public class AtBScenarioModifierApplicator {
 
         // now go through all the opfor entities currently in the scenario
         // and re-generate their
-        for(int x = 0; x < scenario.getNumBots(); x++) {
+        for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce bf = scenario.getBotForce(x);
-            if(bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
-                for(Entity en : bf.getEntityList()) {
+            if (bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
+                for (Entity en : bf.getEntityList()) {
                     int[] skills = rsg.getRandomSkills(en);
 
                     en.getCrew().setGunnery(skills[0]);
@@ -244,27 +244,27 @@ public class AtBScenarioModifierApplicator {
      * @param eventRecipient
      */
     public static void setupAmbush(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient) {
-        if(eventRecipient == ForceAlignment.Player) {
-            for(int forceID : scenario.getForceIDs()) {
+        if (eventRecipient == ForceAlignment.Player) {
+            for (int forceID : scenario.getForceIDs()) {
                 ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
 
-                if(forceTemplate.getArrivalTurn() == 0) {
+                if (forceTemplate.getArrivalTurn() == 0) {
                     forceTemplate.setActualDeploymentZone(Board.START_ANY);
                     Force playerForce = campaign.getForce(forceID);
 
                     // we can hide the "commander tactics skill" number of units, but we must keep at least one visible
                     // as the bot is unable to handle an invisible opfor at the moment.
-                    int maxHiddenUnits = Math.min(playerForce.getAllUnits().size() - 1, scenario.getLanceCommanderSkill(SkillType.S_TACTICS, campaign));
+                    int maxHiddenUnits = Math.min(playerForce.getAllUnits(true).size() - 1, scenario.getLanceCommanderSkill(SkillType.S_TACTICS, campaign));
                     int numHiddenUnits = 0;
 
-                    for(UUID unitID : playerForce.getAllUnits()) {
-                        if(numHiddenUnits >= maxHiddenUnits) {
+                    for (UUID unitID : playerForce.getAllUnits(true)) {
+                        if (numHiddenUnits >= maxHiddenUnits) {
                             break;
                         }
 
                         Unit currentUnit = campaign.getUnit(unitID);
                         // to hide, a unit must exist and not be in mid-air
-                        if(currentUnit != null && !currentUnit.getEntity().isAero() && !currentUnit.getEntity().hasETypeFlag(Entity.ETYPE_VTOL)) {
+                        if (currentUnit != null && !currentUnit.getEntity().isAero() && !currentUnit.getEntity().hasETypeFlag(Entity.ETYPE_VTOL)) {
                             currentUnit.getEntity().setHidden(true);
                             numHiddenUnits++;
                         }
@@ -273,23 +273,23 @@ public class AtBScenarioModifierApplicator {
             }
         // logic for bot ambushes is a little different
         } else if (eventRecipient == ForceAlignment.Opposing) {
-            for(int x = 0; x < scenario.getNumBots(); x++) {
+            for (int x = 0; x < scenario.getNumBots(); x++) {
                 BotForce currentBotForce = scenario.getBotForce(x);
                 ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
 
-                if(forceTemplate.getArrivalTurn() == 0) {
+                if (forceTemplate.getArrivalTurn() == 0) {
                     forceTemplate.setActualDeploymentZone(Board.START_ANY);
 
                     int maxHiddenUnits = currentBotForce.getEntityList().size() / 2;
                     int numHiddenUnits = 0;
 
-                    for(Entity entity : currentBotForce.getEntityList()) {
-                        if(numHiddenUnits >= maxHiddenUnits) {
+                    for (Entity entity : currentBotForce.getEntityList()) {
+                        if (numHiddenUnits >= maxHiddenUnits) {
                             break;
                         }
 
-                     // to hide, a unit must not be in mid-air
-                        if(!entity.isAero() && !entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
+                        // to hide, a unit must not be in mid-air
+                        if (!entity.isAero() && !entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
                             entity.setHidden(true);
                             numHiddenUnits++;
                         }
@@ -307,16 +307,16 @@ public class AtBScenarioModifierApplicator {
      */
     public static void switchSides(AtBDynamicScenario scenario, ForceAlignment recipient) {
         // this operation is only meaningful for the allied forces currently
-        if(recipient != ForceAlignment.Allied) {
+        if (recipient != ForceAlignment.Allied) {
             return;
         }
 
         int team = ScenarioForceTemplate.TEAM_IDS.get(recipient.ordinal());
         int oppositeTeam = ScenarioForceTemplate.TEAM_IDS.get(ForceAlignment.Opposing.ordinal());
 
-        for(int x = 0; x < scenario.getNumBots(); x++) {
+        for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce bf = scenario.getBotForce(x);
-            if(bf.getTeam() == team) {
+            if (bf.getTeam() == team) {
                 bf.setTeam(oppositeTeam);
             }
         }
@@ -339,7 +339,7 @@ public class AtBScenarioModifierApplicator {
         scenario.getTemplate().scenarioObjectives.add(objective);
 
         // if we're doing it after, we have to translate it individually
-        if(timing == EventTiming.PostForceGeneration) {
+        if (timing == EventTiming.PostForceGeneration) {
             ScenarioObjective actualObjective = AtBDynamicScenarioFactory.translateTemplateObjective(scenario, campaign, objective);
             scenario.getScenarioObjectives().add(actualObjective);
         }

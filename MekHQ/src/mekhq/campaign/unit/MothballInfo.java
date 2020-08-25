@@ -1,7 +1,7 @@
 /*
  * MothballInfo.java
  *
- * Copyright (c) 2018 Megamek Team. All rights reserved.
+ * Copyright (c) 2018 - The Megamek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
@@ -41,7 +40,6 @@ import mekhq.campaign.personnel.Person;
  * lost when a unit is mothballed, so that it may be restored to as close to
  * its prior state as possible when the unit is reactivated.
  * @author NickAragua
- *
  */
 public class MothballInfo implements MekHqXmlSerializable {
     private UUID techID;
@@ -80,51 +78,50 @@ public class MothballInfo implements MekHqXmlSerializable {
      * @param unit The unit to restore
      * @param campaign The campaign in which this is happening
      */
-    public void restorePreMothballInfo(Unit unit, Campaign campaign)
-    {
+    public void restorePreMothballInfo(Unit unit, Campaign campaign) {
         Person tech = campaign.getPerson(techID);
-        if(tech != null) {
+        if (tech != null) {
             unit.setTech(tech);
         }
 
-        for(UUID driverID : driverIDs) {
+        for (UUID driverID : driverIDs) {
             Person driver = campaign.getPerson(driverID);
 
-            if(driver != null && driver.isActive() && driver.getUnitId() == null) {
+            if (driver != null && driver.getStatus().isActive() && driver.getUnitId() == null) {
                 unit.addDriver(driver);
             }
         }
 
-        for(UUID gunnerID : gunnerIDs) {
+        for (UUID gunnerID : gunnerIDs) {
             Person gunner = campaign.getPerson(gunnerID);
 
             // add the gunner if they exist, aren't dead/retired/etc and aren't already assigned to some
             // other unit. Caveat: single-person units have the same driver and gunner.
-            if(gunner != null && gunner.isActive() &&
+            if (gunner != null && gunner.getStatus().isActive() &&
                     ((gunner.getUnitId() == null) || (gunner.getUnitId() == unit.getId()))) {
                 unit.addGunner(gunner);
             }
         }
 
-        for(UUID vesselCrewID : vesselCrewIDs) {
+        for (UUID vesselCrewID : vesselCrewIDs) {
             Person vesselCrew = campaign.getPerson(vesselCrewID);
 
-            if(vesselCrew != null && vesselCrew.isActive() && vesselCrew.getUnitId() == null) {
+            if (vesselCrew != null && vesselCrew.getStatus().isActive() && vesselCrew.getUnitId() == null) {
                 unit.addVesselCrew(vesselCrew);
             }
         }
 
         Person techOfficer = campaign.getPerson(techOfficerID);
-        if(techOfficer != null && techOfficer.isActive() && techOfficer.getUnitId() == null) {
+        if (techOfficer != null && techOfficer.getStatus().isActive() && techOfficer.getUnitId() == null) {
             unit.setTechOfficer(techOfficer);
         }
 
         Person navigator = campaign.getPerson(navigatorID);
-        if(navigator != null && navigator.isActive() && navigator.getUnitId() == null) {
+        if (navigator != null && navigator.getStatus().isActive() && navigator.getUnitId() == null) {
             unit.setNavigator(navigator);
         }
 
-        if(campaign.getForce(forceID) != null) {
+        if (campaign.getForce(forceID) != null) {
             campaign.addUnitToForce(unit, forceID);
         }
 
@@ -138,37 +135,37 @@ public class MothballInfo implements MekHqXmlSerializable {
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<mothballInfo>");
 
-        if(techID != null) {
+        if (techID != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<techID>" + techID.toString() + "</techID>");
         }
 
-        if(forceID > 0) {
+        if (forceID > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<forceID>" + forceID + "</forceID>");
         }
 
-        if(driverIDs.size() > 0) {
-            for(UUID driverID : driverIDs) {
+        if (driverIDs.size() > 0) {
+            for (UUID driverID : driverIDs) {
                 pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<driverID>" + driverID.toString() + "</driverID>");
             }
         }
 
-        if(gunnerIDs.size() > 0) {
-            for(UUID gunnerID : gunnerIDs) {
+        if (gunnerIDs.size() > 0) {
+            for (UUID gunnerID : gunnerIDs) {
                 pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<gunnerID>" + gunnerID.toString() + "</gunnerID>");
             }
         }
 
-        if(vesselCrewIDs.size() > 0) {
-            for(UUID vesselCrewID : vesselCrewIDs) {
+        if (vesselCrewIDs.size() > 0) {
+            for (UUID vesselCrewID : vesselCrewIDs) {
                 pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<vesselCrewID>" + vesselCrewID.toString() + "</vesselCrewID>");
             }
         }
 
-        if(techOfficerID != null) {
+        if (techOfficerID != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<techOfficerID>" + techOfficerID.toString() + "</techOfficerID>");
         }
 
-        if(navigatorID != null) {
+        if (navigatorID != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<navigatorID>" + navigatorID.toString() + "</navigatorID>");
         }
 
@@ -187,7 +184,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         NodeList nl = wn.getChildNodes();
 
         try {
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("techID")) {

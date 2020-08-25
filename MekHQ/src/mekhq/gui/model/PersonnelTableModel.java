@@ -302,9 +302,9 @@ public class PersonnelTableModel extends DataTableModel {
         Person p = getPerson(row);
         switch (col) {
             case COL_NABIL:
-                return p.getAbilityList(PilotOptions.LVL3_ADVANTAGES);
+                return p.getAbilityListAsString(PilotOptions.LVL3_ADVANTAGES);
             case COL_NIMP:
-                return p.getAbilityList(PilotOptions.MD_ADVANTAGES);
+                return p.getAbilityListAsString(PilotOptions.MD_ADVANTAGES);
             case COL_ASSIGN:
                 if ((p.getTechUnitIDs().size() > 1) && !loadAssignmentFromMarket) {
                     StringBuilder toReturn = new StringBuilder("<html>");

@@ -194,13 +194,13 @@ public class NewsItem {
             dateString = dateString.trim().toUpperCase(Locale.ROOT);
             // Try to parse and set proper precision
             if (dateString.matches("^\\d\\d\\dX$")) {
-                date = MekHqXmlUtil.parseDate(dateString.substring(0, 3) + "0-01-01");
+                date = MekHqXmlUtil.parseDate(dateString.substring(0, 3));
                 datePrecision = Precision.DECADE;
             } else if (dateString.matches("^\\d\\d\\d\\d$")) {
-                date = MekHqXmlUtil.parseDate(dateString + "-01-01");
+                date = MekHqXmlUtil.parseDate(dateString);
                 datePrecision = Precision.YEAR;
             } else if (dateString.matches("^\\d\\d\\d\\d-\\d\\d$")) {
-                date = MekHqXmlUtil.parseDate(dateString + "-01");
+                date = MekHqXmlUtil.parseDate(dateString);
                 datePrecision = Precision.MONTH;
             } else {
                 date = MekHqXmlUtil.parseDate(dateString);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 - The MegaMek Team.
+ * Copyright (c) 2014 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.utilities;
 
@@ -27,7 +27,6 @@ import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
@@ -35,6 +34,15 @@ public class StaticChecks {
     public static boolean areAllForcesUndeployed(Vector<Force> forces) {
         for (Force force : forces) {
             if (force.isDeployed()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean areAllCombatForces(Vector<Force> forces) {
+        for (Force force : forces) {
+            if (!force.isCombatForce()) {
                 return false;
             }
         }
@@ -532,7 +540,7 @@ public class StaticChecks {
 
     public static boolean areAllActive(Person[] people) {
         for (Person person : people) {
-            if (!person.isActive()) {
+            if (!person.getStatus().isActive()) {
                 return false;
             }
         }
