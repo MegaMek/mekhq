@@ -21,6 +21,12 @@ VERSION HISTORY:
 + Issue #1296, 1855: Fixed issue preventing customization of units in the meklab when ammunition is added to the unit.
 + Issue #1951: Autosave Does Not Always Initiate On First Load
 + Issue #1922: CrewSkillUpgrader Infinite Loop Fix
++ Issue #1661: Implementing Basic Russian Patronymics
++ Issue #1817: Implementing option to not save customs to XML
++ PR #1949: Fixing Genealogy Removal
++ Issue #1962: Grant kill credit to units from the player's campaign given to other players for the duration of a megamek scenario
++ Issue #1264: Allow faction capitals to change on a specific date, not just year
++ PR #1966: Fixing Duplicated Siblings
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format

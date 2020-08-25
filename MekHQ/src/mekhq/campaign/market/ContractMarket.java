@@ -226,7 +226,7 @@ public class ContractMarket implements Serializable {
 			 */
 			for (Faction f : campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate())) {
 				try {
-					if (f.getStartingPlanet(campaign.getGameYear()).equals(campaign.getCurrentSystem().getId())
+					if (f.getStartingPlanet(campaign.getLocalDate()).equals(campaign.getCurrentSystem().getId())
 							&& RandomFactionGenerator.getInstance().getEmployerSet().contains(f.getShortName())) {
 						AtBContract c = generateAtBContract(campaign, f.getShortName(), unitRatingMod);
 						if (c != null) {
@@ -260,7 +260,7 @@ public class ContractMarket implements Serializable {
 			int numSubcontracts = 0;
 			for (Mission m : campaign.getMissions()) {
 				if (m instanceof AtBContract &&
-						((AtBContract)m).getParentContract() == contract) {
+                        ((AtBContract) m).getParentContract().equals(contract)) {
 					numSubcontracts++;
 				}
 			}
@@ -284,7 +284,7 @@ public class ContractMarket implements Serializable {
 			if (null == campaign.getRetainerEmployerCode()) {
 				int retries = 3;
 				AtBContract retVal = null;
-				while (retries > 0 && retVal == null) {
+				while ((retries > 0) && (retVal == null)) {
 					retVal = generateAtBContract(campaign, RandomFactionGenerator.getInstance().getEmployer(),
 							unitRatingMod, 0);
 					retries--;
@@ -361,9 +361,8 @@ public class ContractMarket implements Serializable {
 			contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
 		}
         if (contract.getSystem() == null) {
-		    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING,
-		            "Could not find contract location for " //$NON-NLS-1$
-		                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode()); //$NON-NLS-1$
+		    MekHQ.getLogger().warning(this, "Could not find contract location for "
+		                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode());
 			if (retries > 0) {
 				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
 			} else {

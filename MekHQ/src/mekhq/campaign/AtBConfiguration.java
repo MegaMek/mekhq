@@ -300,7 +300,7 @@ public class AtBConfiguration implements Serializable {
         String org = AtBConfiguration.ORG_IS;
         Faction faction = Faction.getFaction(factionCode);
 
-        if (faction.isComstar()) {
+        if (faction.isComStar()) {
             org = AtBConfiguration.ORG_CS;
         } else if (faction.isClan()) {
             org = AtBConfiguration.ORG_CLAN;

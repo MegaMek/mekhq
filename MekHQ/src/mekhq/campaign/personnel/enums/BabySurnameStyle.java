@@ -18,10 +18,8 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.Crew;
 import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 
 import java.util.ResourceBundle;
@@ -38,7 +36,8 @@ public enum BabySurnameStyle {
     WELSH_MATRONYMICS("BabySurnameStyle.WELSH_MATRONYMICS.text", "BabySurnameStyle.WELSH_MATRONYMICS.toolTipText"),
     ICELANDIC_PATRONYMICS("BabySurnameStyle.ICELANDIC_PATRONYMICS.text", "BabySurnameStyle.ICELANDIC_PATRONYMICS.toolTipText"),
     ICELANDIC_MATRONYMICS("BabySurnameStyle.ICELANDIC_MATRONYMICS.text", "BabySurnameStyle.ICELANDIC_MATRONYMICS.toolTipText"),
-    ICELANDIC_COMBINATION_NYMICS("BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.text", "BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.toolTipText");
+    ICELANDIC_COMBINATION_NYMICS("BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.text", "BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.toolTipText"),
+    RUSSIAN_PATRONYMICS("BabySurnameStyle.RUSSIAN_PATRONYMICS.text", "BabySurnameStyle.RUSSIAN_PATRONYMICS.toolTipText");
     //endregion Enum Declaration
 
     //region Variable Declarations
@@ -83,6 +82,10 @@ public enum BabySurnameStyle {
                 }
             case ICELANDIC_MATRONYMICS:
                 return getIcelandicNymic(mother.getGivenName(), babyGender);
+            case RUSSIAN_PATRONYMICS:
+                if (hasFather) {
+                    return getRussianNymic(father.getGivenName().trim(), babyGender);
+                }
             case MOTHERS_FATHERS:
                 if (hasFather) {
                     return mother.getSurname() + " " + father.getSurname();
@@ -121,7 +124,6 @@ public enum BabySurnameStyle {
                 return "ferch " + givenName;
             case MALE:
             default:
-                MekHQ.getLogger().error(getClass(), "getWelshNymic", String.valueOf(givenName.charAt(0)));
                 switch (givenName.charAt(0)) {
                     case 'a':
                     case 'A':
@@ -158,6 +160,25 @@ public enum BabySurnameStyle {
                 return givenName + "sd\u00F3ttir";
             default:
                 return givenName + "bur";
+        }
+    }
+
+    private String getRussianNymic(String givenName, Gender babyGender) {
+        switch (givenName.charAt(givenName.length() - 1)) {
+            case 'a':
+            case 'A':
+            case 'e':
+            case 'E':
+            case 'i':
+            case 'I':
+            case 'o':
+            case 'O':
+            case 'u':
+            case 'U':
+                return givenName.substring(0, givenName.length() - 1) + (babyGender.isMale() ? "evich" : "evna");
+            default:
+                return givenName + (babyGender.isMale() ? "ovich" : "ovna");
+
         }
     }
 

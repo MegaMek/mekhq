@@ -20,40 +20,39 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.Person;
 
 import java.util.ResourceBundle;
 
-public enum ManeiDominiClass {
+public enum ManeiDominiRank {
     //region Enum Declarations
-    NONE("ManeiDominiClass.NONE.text"),
-    GHOST("ManeiDominiClass.GHOST.text"),
-    WRAITH("ManeiDominiClass.WRAITH.text"),
-    BANSHEE("ManeiDominiClass.BANSHEE.text"),
-    ZOMBIE("ManeiDominiClass.ZOMBIE.text"),
-    PHANTOM("ManeiDominiClass.PHANTOM.text"),
-    SPECTER("ManeiDominiClass.SPECTER.text"),
-    POLTERGEIST("ManeiDominiClass.POLTERGEIST.text");
+    NONE("ManeiDominiRank.NONE.text"),
+    ALPHA("ManeiDominiRank.ALPHA.text"),
+    BETA("ManeiDominiRank.BETA.text"),
+    OMEGA("ManeiDominiRank.OMEGA.text"),
+    TAU("ManeiDominiRank.TAU.text"),
+    DELTA("ManeiDominiRank.DELTA.text"),
+    SIGMA("ManeiDominiRank.SIGMA.text"),
+    OMICRON("ManeiDominiRank.OMICRON.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
-    private final String className;
+    private final String rankName;
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    ManeiDominiClass(String className) {
-        this.className = resources.getString(className);
+    ManeiDominiRank(String rankName) {
+        this.rankName = resources.getString(rankName);
     }
     //endregion Constructors
 
     @Override
     public String toString() {
-        return className;
+        return rankName;
     }
 
-    public static ManeiDominiClass parseFromString(String information) {
+    public static ManeiDominiRank parseFromString(String information) {
         // Parse based on the enum name
         try {
             return valueOf(information);
@@ -62,19 +61,19 @@ public enum ManeiDominiClass {
         }
 
         // Parse from Ordinal Int - Legacy save method
-        ManeiDominiClass[] values = values();
+        ManeiDominiRank[] values = values();
         try {
-            int mdClass = Integer.parseInt(information);
-            if (values.length > mdClass) {
-                return values[mdClass];
+            int mdRank = Integer.parseInt(information) + 1;
+            if (values.length > mdRank) {
+                return values[mdRank];
             }
         } catch (Exception ignored) {
 
         }
 
-        MekHQ.getLogger().error(ManeiDominiClass.class, "parseFromString",
-                "Unable to parse " + information + "into a ManeiDominiClass. Returning NONE.");
+        MekHQ.getLogger().error(ManeiDominiRank.class, "parseFromString",
+                "Unable to parse " + information + "into a ManeiDominiRank. Returning NONE.");
 
-        return ManeiDominiClass.NONE;
+        return ManeiDominiRank.NONE;
     }
 }

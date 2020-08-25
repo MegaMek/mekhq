@@ -3779,6 +3779,8 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
 
+        person.getGenealogy().clearGenealogy(this);
+
         Unit u = getUnit(person.getUnitId());
         if (null != u) {
             u.remove(person, true);
@@ -3789,16 +3791,16 @@ public class Campaign implements Serializable, ITechManager {
         getRetirementDefectionTracker().removePerson(person);
 
         if (log) {
-            addReport(person.getFullTitle()
-                    + " has been removed from the personnel roster.");
+            addReport(person.getFullTitle() + " has been removed from the personnel roster.");
         }
 
         personnel.remove(id);
+
+        // Deal with Astech Pool Minutes
         if (person.getPrimaryRole() == Person.T_ASTECH) {
             astechPoolMinutes = Math.max(0, astechPoolMinutes - 480);
             astechPoolOvertime = Math.max(0, astechPoolOvertime - 240);
-        }
-        if (person.getSecondaryRole() == Person.T_ASTECH) {
+        } else if (person.getSecondaryRole() == Person.T_ASTECH) {
             astechPoolMinutes = Math.max(0, astechPoolMinutes - 240);
             astechPoolOvertime = Math.max(0, astechPoolOvertime - 120);
         }
@@ -4520,8 +4522,7 @@ public class Campaign implements Serializable, ITechManager {
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
         // Start the XML root.
-        pw1.println("<campaign version=\""
-                + resourceMap.getString("Application.version") + "\">");
+        pw1.println("<campaign version=\"" + resourceMap.getString("Application.version") + "\">");
 
         //region Basic Campaign Info
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "info");
@@ -4697,7 +4698,10 @@ public class Campaign implements Serializable, ITechManager {
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "customPlanetaryEvents");
 
-        writeCustoms(pw1);
+        if (MekHQ.getMekHQOptions().getWriteCustomsToXML()) {
+            writeCustoms(pw1);
+        }
+
         // Okay, we're done.
         // Close everything out and be done with it.
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent - 1, "campaign");
@@ -6206,7 +6210,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setStartingSystem() {
         Map<String, PlanetarySystem> systemList = Systems.getInstance().getSystems();
-        PlanetarySystem startingSystem = systemList.get(getFaction().getStartingPlanet(getGameYear()));
+        PlanetarySystem startingSystem = systemList.get(getFaction().getStartingPlanet(getLocalDate()));
 
         if (startingSystem == null) {
             startingSystem = systemList.get(JOptionPane.showInputDialog(

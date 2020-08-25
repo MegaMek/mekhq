@@ -221,7 +221,7 @@ public class ResolveScenarioTracker {
                     // Kill credit automatically assigned only if they can't escape
                     if (!e.canEscape()) {
                         Entity killer = victoryEvent.getEntity(e.getKillerId());
-                        if (null != killer && killer.getOwnerId() == pid) {
+                        if (null != killer) {
                             //the killer is one of your units, congrats!
                             killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
                         } else {
@@ -288,7 +288,7 @@ public class ResolveScenarioTracker {
                 }
             } else {
                 Entity killer = victoryEvent.getEntity(e.getKillerId());
-                if (null != killer && killer.getOwnerId() == pid) {
+                if (null != killer) {
                     //the killer is one of your units, congrats!
                     killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
                 } else {
@@ -373,7 +373,7 @@ public class ResolveScenarioTracker {
                 }
             } else if (e.getOwner().isEnemyOf(client.getLocalPlayer())) {
                 Entity killer = victoryEvent.getEntity(e.getKillerId());
-                if (null != killer && killer.getOwnerId() == pid) {
+                if (null != killer) {
                     //the killer is one of your units, congrats!
                     killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
                 } else {

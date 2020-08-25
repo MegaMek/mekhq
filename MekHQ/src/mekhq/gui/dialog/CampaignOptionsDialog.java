@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2020 - The MegaMek Team. All rights reserved
+ * Copyright (C) 2009, 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -749,7 +749,7 @@ public class CampaignOptionsDialog extends JDialog {
         panGeneral.add(btnDate, gridBagConstraints);
 
         factionModel = new SortedComboBoxModel<>();
-        for (String sName : Faction.choosableFactionCodes) {
+        for (String sName : Faction.getChoosableFactionCodes()) {
             Faction f = Faction.getFaction(sName);
             if (f.validIn(date.getYear())) {
                 factionModel.addElement(f.getFullName(date.getYear()));
@@ -1454,6 +1454,9 @@ public class CampaignOptionsDialog extends JDialog {
 
         tabOptions.addTab(resourceMap.getString("panSupplies.TabConstraints.tabTitle"), panSupplies); // NOI18N
 
+        //region Tech Limits Tab
+        gridy = 0;
+
         panTech.setName("panTech"); // NOI18N
         panTech.setLayout(new java.awt.GridBagLayout());
 
@@ -1462,7 +1465,7 @@ public class CampaignOptionsDialog extends JDialog {
         limitByYearBox.setName("limitByYearBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1474,7 +1477,7 @@ public class CampaignOptionsDialog extends JDialog {
         disallowExtinctStuffBox.setName("disallowExtinctStuffBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1485,7 +1488,7 @@ public class CampaignOptionsDialog extends JDialog {
         allowClanPurchasesBox.setName("allowClanPurchasesBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1496,7 +1499,7 @@ public class CampaignOptionsDialog extends JDialog {
         allowISPurchasesBox.setName("allowISPurchasesBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1507,7 +1510,7 @@ public class CampaignOptionsDialog extends JDialog {
         allowCanonOnlyBox.setName("allowCanonOnlyBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1518,17 +1521,17 @@ public class CampaignOptionsDialog extends JDialog {
         allowCanonRefitOnlyBox.setName("allowCanonRefitOnlyBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(allowCanonRefitOnlyBox, gridBagConstraints);
 
-        JLabel lblTechLevel = new JLabel(resourceMap.getString("lblTechLevel.text")); // NOI18N
-        lblTechLevel.setName("lblTechLevel"); // NOI18N
+        JLabel lblTechLevel = new JLabel(resourceMap.getString("lblTechLevel.text"));
+        lblTechLevel.setName("lblTechLevel");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panTech.add(lblTechLevel, gridBagConstraints);
@@ -1545,7 +1548,7 @@ public class CampaignOptionsDialog extends JDialog {
         choiceTechLevel.setSelectedIndex(options.getTechLevel());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(choiceTechLevel, gridBagConstraints);
@@ -1555,7 +1558,7 @@ public class CampaignOptionsDialog extends JDialog {
         variableTechLevelBox.setName("variableTechLevelBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1566,7 +1569,7 @@ public class CampaignOptionsDialog extends JDialog {
         factionIntroDateBox.setName("factionIntroDateBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1577,13 +1580,14 @@ public class CampaignOptionsDialog extends JDialog {
         useAmmoByTypeBox.setName("useAmmoByTypeBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(useAmmoByTypeBox, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panTech.TabConstraints.tabTitle"), panTech); // NOI18N
+        //endregion Tech Limits Tab
 
         //region Personnel Tab
         panPersonnel.setName("panPersonnel");
@@ -5115,7 +5119,7 @@ public class CampaignOptionsDialog extends JDialog {
             date = dc.getDate();
             btnDate.setText(options.getDisplayFormattedDate(date));
             factionModel = new SortedComboBoxModel<>();
-            for (String sname : Faction.choosableFactionCodes) {
+            for (String sname : Faction.getChoosableFactionCodes()) {
                 Faction f = Faction.getFaction(sname);
                 if (f.validIn(date.getYear())) {
                     factionModel.addElement(f.getFullName(date.getYear()));
