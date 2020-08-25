@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -920,19 +920,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 AddOrEditKillEntryDialog nkd;
                 Unit unit = gui.getCampaign().getUnit(selectedPerson.getUnitId());
                 if (people.length > 1) {
-                    nkd = new AddOrEditKillEntryDialog(
-                            gui.getFrame(),
-                            true,
-                            null,
-                            unit != null ? unit.getName() : resourceMap.getString("bareHands.text"),
-                            gui.getCampaign().getDate());
+                    nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true,
+                            gui.getCampaign(), null,
+                            (unit != null) ? unit.getName() : resourceMap.getString("bareHands.text"),
+                            gui.getCampaign().getLocalDate());
                 } else {
-                    nkd = new AddOrEditKillEntryDialog(
-                            gui.getFrame(),
-                            true,
-                            selectedPerson.getId(),
-                            unit != null ? unit.getName() : resourceMap.getString("bareHands.text"),
-                            gui.getCampaign().getDate());
+                    nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true,
+                            gui.getCampaign(), selectedPerson.getId(),
+                            (unit != null) ? unit.getName() : resourceMap.getString("bareHands.text"),
+                            gui.getCampaign().getLocalDate());
                 }
                 nkd.setVisible(true);
                 if (nkd.getKill().isPresent()) {

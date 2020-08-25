@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -711,13 +711,14 @@ public class InterstellarMapPanel extends JPanel {
                                 int i = 0;
                                 for (Faction faction : factions) {
                                     if (capitals.get(faction).equals(system.getId())) {
-                                        g2.setPaint(new Color(212,175,55));
-                                        arc.setArcByCenter(x, y, size+3, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
+                                        g2.setPaint(new Color(212, 175, 55));
+                                        arc.setArcByCenter(x, y, size + 3, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
                                         g2.fill(arc);
                                     }
-                                    if (campaign.getCampaignOptions().getUseAtB() && campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getDate())) {
-                                        g2.setPaint(new Color(192,192,192));
-                                        arc.setArcByCenter(x, y, size+2, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
+                                    if (campaign.getCampaignOptions().getUseAtB()
+                                            && campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getLocalDate())) {
+                                        g2.setPaint(new Color(192, 192, 192));
+                                        arc.setArcByCenter(x, y, size + 2, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
                                         g2.fill(arc);
                                     }
                                     g2.setPaint(faction.getColor());
@@ -744,9 +745,9 @@ public class InterstellarMapPanel extends JPanel {
                     if (isSystemVisible(system, !optEmptySystems.isSelected())) {
                         double x = map2scrX(system.getX());
                         double y = map2scrY(system.getY());
-                        if (conf.showPlanetNamesThreshold == 0 || conf.scale > conf.showPlanetNamesThreshold
+                        if ((conf.showPlanetNamesThreshold == 0) || (conf.scale > conf.showPlanetNamesThreshold)
                                 || jumpPath.contains(system)
-                                || (null != campaign.getLocation().getJumpPath() && campaign.getLocation().getJumpPath().contains(system))) {
+                                || ((campaign.getLocation().getJumpPath() != null) && campaign.getLocation().getJumpPath().contains(system))) {
                             final String planetName = system.getPrintableName(campaign.getLocalDate());
                             final float xPos = (float) (x + size * 1.8);
                             final float yPos = (float) y;
