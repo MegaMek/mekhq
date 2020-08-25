@@ -344,9 +344,14 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
     public List<UUID> getSiblings(Campaign campaign) {
         List<UUID> siblings = new ArrayList<>();
         for (UUID parentId : getParents()) {
-            siblings.addAll(campaign.getPerson(parentId).getGenealogy().getChildren());
+            for (UUID sibling : campaign.getPerson(parentId).getGenealogy().getChildren()) {
+                if (!getOrigin().equals(sibling)) {
+                    siblings.remove(sibling);
+                    siblings.add(sibling);
+                }
+            }
         }
-        siblings.remove(getOrigin());
+
         return siblings;
     }
 
