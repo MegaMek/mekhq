@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -54,7 +55,6 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.gui.view.LanceAssignmentView;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -573,30 +573,30 @@ public class AtBContract extends Contract implements Serializable {
         moraleMod += mod;
     }
 
-    public int getRequiredLanceType() {
+    public AtBLanceRole getRequiredLanceType() {
         return getRequiredLanceType(missionType);
     }
 
-    public static int getRequiredLanceType(int missionType) {
+    public static AtBLanceRole getRequiredLanceType(int missionType) {
         switch (missionType) {
             case MT_CADREDUTY:
-                return LanceAssignmentView.ROLE_TRAINING;
+                return AtBLanceRole.TRAINING;
             case MT_GARRISONDUTY:
             case MT_SECURITYDUTY:
             case MT_RIOTDUTY:
-                return LanceAssignmentView.ROLE_DEFEND;
+                return AtBLanceRole.DEFENCE;
             case MT_GUERRILLAWARFARE:
             case MT_PIRATEHUNTING:
             case MT_PLANETARYASSAULT:
             case MT_RELIEFDUTY:
-                return LanceAssignmentView.ROLE_FIGHT;
+                return AtBLanceRole.FIGHTING;
             case MT_DIVERSIONARYRAID:
             case MT_EXTRACTIONRAID:
             case MT_OBJECTIVERAID:
             case MT_RECONRAID:
-                return LanceAssignmentView.ROLE_SCOUT;
+                return AtBLanceRole.SCOUTING;
             default:
-                return LanceAssignmentView.ROLE_NONE;
+                return AtBLanceRole.UNASSIGNED;
         }
     }
 

@@ -18,8 +18,6 @@
  */
 package mekhq.gui.model;
 
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javax.swing.SwingConstants;
@@ -91,8 +89,7 @@ public class ScenarioTableModel extends DataTableModel {
             if (scenario.getDate() == null) {
                 return "-";
             } else {
-                return scenario.getDate().format(DateTimeFormatter.ofPattern(getCampaign()
-                        .getCampaignOptions().getDisplayDateFormat()));
+                return getCampaign().getCampaignOptions().getDisplayFormattedDate(scenario.getDate());
             }
         } else if (col == COL_ASSIGN) {
             return scenario.getForces(getCampaign()).getAllUnits(true).size();

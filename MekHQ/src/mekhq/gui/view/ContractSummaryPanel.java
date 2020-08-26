@@ -24,7 +24,6 @@ package mekhq.gui.view;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
@@ -266,8 +265,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblStartDate, gridBagConstraintsLabels);
 
-        JLabel txtStartDate = new JLabel(contract.getStartDate().format(DateTimeFormatter
-                .ofPattern(campaign.getCampaignOptions().getDisplayDateFormat())));
+        JLabel txtStartDate = new JLabel(campaign.getCampaignOptions().getDisplayFormattedDate(contract.getStartDate()));
         txtStartDate.setName("txtStartDate");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtStartDate, gridBagConstraintsText);

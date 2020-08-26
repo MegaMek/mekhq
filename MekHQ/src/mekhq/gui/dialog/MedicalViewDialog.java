@@ -37,7 +37,6 @@ import java.awt.event.MouseEvent;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -80,13 +79,12 @@ import mekhq.campaign.personnel.Person;
 
 public class MedicalViewDialog extends JDialog {
     private static final long serialVersionUID = 6178230374580087883L;
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd"); // TODO : LocalDate : Remove me with the logs rework
-    private static final String MENU_CMD_SEPARATOR = ","; //$NON-NLS-1$
+    private static final String MENU_CMD_SEPARATOR = ",";
 
-    private static final ExtraData.Key<String> DOCTOR_NOTES = new ExtraData.StringKey("doctor_notes"); //$NON-NLS-1$
+    private static final ExtraData.Key<String> DOCTOR_NOTES = new ExtraData.StringKey("doctor_notes");
     // TODO: Custom paper dolls
     @SuppressWarnings("unused")
-    private static final ExtraData.Key<String> PAPERDOLL = new ExtraData.StringKey("paperdoll_xml_file"); //$NON-NLS-1$
+    private static final ExtraData.Key<String> PAPERDOLL = new ExtraData.StringKey("paperdoll_xml_file");
 
     private final Campaign campaign;
     private final Person person;
@@ -287,7 +285,7 @@ public class MedicalViewDialog extends JDialog {
             .filter(p::hasInjury)
             .forEach(bl -> {
                 if (person.isLocationMissing(bl) && !person.isLocationMissing(bl.Parent())) {
-                    doll.setLocTag(bl, "lost"); //$NON-NLS-1$
+                    doll.setLocTag(bl, "lost");
                 } else if (!person.isLocationMissing(bl)) {
                     InjuryLevel level = getMaxInjuryLevel(person, bl);
                     Color col;
@@ -365,13 +363,13 @@ public class MedicalViewDialog extends JDialog {
         panel.add(genWrittenPanel(p.getGender().isMale() ? resourceMap.getString("genderMale.text") : resourceMap.getString("genderFemale.text")));
         panel.add(genWrittenPanel(phenotype));
         panel.add(genLabel(resourceMap.getString("assignedTo.text")));
-        panel.add(genLabel("")); //$NON-NLS-1$
+        panel.add(genLabel(""));
         panel.add(genWrittenPanel(force));
-        panel.add(genWrittenPanel("")); //$NON-NLS-1$
-        panel.add(genLabel(resourceMap.getString("assignedDoctor.text"))); //$NON-NLS-1$
-        panel.add(genLabel(resourceMap.getString("lastCheckup.text"))); //$NON-NLS-1$
+        panel.add(genWrittenPanel(""));
+        panel.add(genLabel(resourceMap.getString("assignedDoctor.text")));
+        panel.add(genLabel(resourceMap.getString("lastCheckup.text")));
         panel.add(genWrittenPanel(doctor));
-        panel.add(genWrittenPanel("")); //$NON-NLS-1$
+        panel.add(genWrittenPanel(""));
         return panel;
     }
 
@@ -379,11 +377,11 @@ public class MedicalViewDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.add(genLabel(resourceMap.getString("medicalHistory.text"))); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("medicalHistory.text")));
         Map<String, List<LogEntry>> groupedEntries = p.getPersonnelLog().stream()
             .filter(entry -> entry.getType() == LogEntryType.MEDICAL)
             .sorted(Comparator.comparing(LogEntry::getDate))
-            .collect(Collectors.groupingBy(entry -> DATE_FORMAT.format(entry.getDate())));
+            .collect(Collectors.groupingBy(entry -> c.getCampaignOptions().getDisplayFormattedDate(entry.getDate())));
         groupedEntries.entrySet().stream()
             .filter(e -> !e.getValue().isEmpty())
             .sorted(Map.Entry.comparingByKey())

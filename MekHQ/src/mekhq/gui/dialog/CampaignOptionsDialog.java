@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2020 - The MegaMek Team. All rights reserved
+ * Copyright (C) 2009, 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -41,14 +41,10 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.EventObject;
-import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
@@ -83,6 +79,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
@@ -120,8 +117,7 @@ public class CampaignOptionsDialog extends JDialog {
     private Campaign campaign;
     private CampaignOptions options;
     private RandomSkillPreferences rSkillPrefs;
-    private GregorianCalendar date;
-    private SimpleDateFormat dateFormat;
+    private LocalDate date;
     private JFrame frame;
     private String camoCategory;
     private String camoFileName;
@@ -450,11 +446,8 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner spnBaseStrategyDeployment;
     private JSpinner spnAdditionalStrategyDeployment;
     private JCheckBox chkAdjustPaymentForStrategy;
-    private JSpinner spnIntensity;
-    private JLabel lblFightPct;
-    private JLabel lblDefendPct;
-    private JLabel lblScoutPct;
-    private JLabel lblTrainingPct;
+    private JSpinner spnAtBBattleIntensity;
+    private JSpinner[] spnAtBBattleChance;
     private JCheckBox chkGenerateChases;
 
     //RATs
@@ -513,8 +506,7 @@ public class CampaignOptionsDialog extends JDialog {
         this.rSkillPrefs = c.getRandomSkillPreferences();
         //this is a hack but I have no idea what is going on here
         this.frame = parent;
-        this.date = campaign.getCalendar();
-        dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
+        this.date = campaign.getLocalDate();
         this.camoCategory = campaign.getCamoCategory();
         this.camoFileName = campaign.getCamoFileName();
         this.colorIndex = campaign.getColorIndex();
@@ -699,34 +691,34 @@ public class CampaignOptionsDialog extends JDialog {
         int gridy = 0;
         //endregion Variable Declaration and Initialisation
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setName("Form");
         setTitle(resourceMap.getString("title.text"));
-        getContentPane().setLayout(new java.awt.GridBagLayout());
+        getContentPane().setLayout(new GridBagLayout());
 
-        tabOptions.setName("tabOptions"); // NOI18N
+        tabOptions.setName("tabOptions");
 
-        panGeneral.setName("panGeneral"); // NOI18N
-        panGeneral.setLayout(new java.awt.GridBagLayout());
+        panGeneral.setName("panGeneral");
+        panGeneral.setLayout(new GridBagLayout());
 
         txtName.setText(campaign.getName());
-        txtName.setMinimumSize(new java.awt.Dimension(500, 30));
-        txtName.setName("txtName"); // NOI18N
+        txtName.setMinimumSize(new Dimension(500, 30));
+        txtName.setName("txtName");
         txtName.setPreferredSize(new java.awt.Dimension(500, 30));
         txtName.addActionListener(this::txtNameActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(txtName, gridBagConstraints);
 
-        JLabel lblName = new JLabel(resourceMap.getString("lblName.text")); // NOI18N
-        lblName.setName("lblName"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        JLabel lblName = new JLabel(resourceMap.getString("lblName.text"));
+        lblName.setName("lblName");
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(lblName, gridBagConstraints);
 
         JLabel lblFaction = new JLabel(resourceMap.getString("lblFaction.text")); // NOI18N
@@ -734,44 +726,44 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(lblFaction, gridBagConstraints);
 
-        JLabel lblDate = new JLabel(resourceMap.getString("lblDate.text")); // NOI18N
-        lblDate.setName("lblDate"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        JLabel lblDate = new JLabel(resourceMap.getString("lblDate.text"));
+        lblDate.setName("lblDate");
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(lblDate, gridBagConstraints);
 
-        btnDate.setText(getDateAsString());
-        btnDate.setMinimumSize(new java.awt.Dimension(400, 30));
-        btnDate.setName("btnDate"); // NOI18N
-        btnDate.setPreferredSize(new java.awt.Dimension(400, 30));
+        btnDate.setText(options.getDisplayFormattedDate(date));
+        btnDate.setMinimumSize(new Dimension(400, 30));
+        btnDate.setName("btnDate");
+        btnDate.setPreferredSize(new Dimension(400, 30));
         btnDate.addActionListener(this::btnDateActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(btnDate, gridBagConstraints);
 
         factionModel = new SortedComboBoxModel<>();
-        for (String sName : Faction.choosableFactionCodes) {
+        for (String sName : Faction.getChoosableFactionCodes()) {
             Faction f = Faction.getFaction(sName);
-            if (f.validIn(date.get(Calendar.YEAR))) {
-                factionModel.addElement(f.getFullName(date.get(Calendar.YEAR)));
+            if (f.validIn(date.getYear())) {
+                factionModel.addElement(f.getFullName(date.getYear()));
             }
         }
-        factionModel.setSelectedItem(campaign.getFaction().getFullName(date.get(Calendar.YEAR)));
+        factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
         comboFaction.setModel(factionModel);
-        comboFaction.setMinimumSize(new java.awt.Dimension(400, 30));
-        comboFaction.setName("comboFaction"); // NOI18N
-        comboFaction.setPreferredSize(new java.awt.Dimension(400, 30));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        comboFaction.setMinimumSize(new Dimension(400, 30));
+        comboFaction.setName("comboFaction");
+        comboFaction.setPreferredSize(new Dimension(400, 30));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(comboFaction, gridBagConstraints);
 
         JPanel unitRatingPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
@@ -808,8 +800,8 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panGeneral.add(btnCamo, gridBagConstraints);
 
-        JLabel lblCamo = new JLabel(resourceMap.getString("lblCamo.text")); // NOI18N
-        lblCamo.setName("lblCamo"); // NOI18N
+        JLabel lblCamo = new JLabel(resourceMap.getString("lblCamo.text"));
+        lblCamo.setName("lblCamo");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -926,8 +918,8 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(useAeroSystemHitsBox, gridBagConstraints);
 
-        useDamageMargin.setText(resourceMap.getString("useDamageMargin.text")); // NOI18N
-        useDamageMargin.setToolTipText(resourceMap.getString("useDamageMargin.toolTipText")); // NOI18N
+        useDamageMargin.setText(resourceMap.getString("useDamageMargin.text"));
+        useDamageMargin.setToolTipText(resourceMap.getString("useDamageMargin.toolTipText"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -1469,6 +1461,9 @@ public class CampaignOptionsDialog extends JDialog {
 
         tabOptions.addTab(resourceMap.getString("panSupplies.TabConstraints.tabTitle"), panSupplies); // NOI18N
 
+        //region Tech Limits Tab
+        gridy = 0;
+
         panTech.setName("panTech"); // NOI18N
         panTech.setLayout(new java.awt.GridBagLayout());
 
@@ -1477,7 +1472,7 @@ public class CampaignOptionsDialog extends JDialog {
         limitByYearBox.setName("limitByYearBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1489,7 +1484,7 @@ public class CampaignOptionsDialog extends JDialog {
         disallowExtinctStuffBox.setName("disallowExtinctStuffBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1500,7 +1495,7 @@ public class CampaignOptionsDialog extends JDialog {
         allowClanPurchasesBox.setName("allowClanPurchasesBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1511,7 +1506,7 @@ public class CampaignOptionsDialog extends JDialog {
         allowISPurchasesBox.setName("allowISPurchasesBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1522,7 +1517,7 @@ public class CampaignOptionsDialog extends JDialog {
         allowCanonOnlyBox.setName("allowCanonOnlyBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1533,17 +1528,17 @@ public class CampaignOptionsDialog extends JDialog {
         allowCanonRefitOnlyBox.setName("allowCanonRefitOnlyBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(allowCanonRefitOnlyBox, gridBagConstraints);
 
-        JLabel lblTechLevel = new JLabel(resourceMap.getString("lblTechLevel.text")); // NOI18N
-        lblTechLevel.setName("lblTechLevel"); // NOI18N
+        JLabel lblTechLevel = new JLabel(resourceMap.getString("lblTechLevel.text"));
+        lblTechLevel.setName("lblTechLevel");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panTech.add(lblTechLevel, gridBagConstraints);
@@ -1560,7 +1555,7 @@ public class CampaignOptionsDialog extends JDialog {
         choiceTechLevel.setSelectedIndex(options.getTechLevel());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(choiceTechLevel, gridBagConstraints);
@@ -1570,7 +1565,7 @@ public class CampaignOptionsDialog extends JDialog {
         variableTechLevelBox.setName("variableTechLevelBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1581,7 +1576,7 @@ public class CampaignOptionsDialog extends JDialog {
         factionIntroDateBox.setName("factionIntroDateBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1592,13 +1587,14 @@ public class CampaignOptionsDialog extends JDialog {
         useAmmoByTypeBox.setName("useAmmoByTypeBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(useAmmoByTypeBox, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panTech.TabConstraints.tabTitle"), panTech); // NOI18N
+        //endregion Tech Limits Tab
 
         //region Personnel Tab
         panPersonnel.setName("panPersonnel");
@@ -4227,15 +4223,8 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = 11;
         panSubAtBContract.add(lblIntensity, gridBagConstraints);
 
-        spnIntensity = new JSpinner(new SpinnerNumberModel(options.getIntensity(), 0.0, 5.0, 0.1));
-        spnIntensity.setToolTipText(resourceMap.getString("spnIntensity.toolTipText"));
-        spnIntensity.setValue(options.getIntensity());
-        spnIntensity.setMinimumSize(new Dimension(60, 25));
-        spnIntensity.setPreferredSize(new Dimension(60, 25));
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 11;
-        panSubAtBContract.add(spnIntensity, gridBagConstraints);
-        spnIntensity.addChangeListener(arg0 -> updateBattleChances());
+        // Note that spnAtBBattleIntensity is located here visibly, however must be initialized
+        // following the chance of battle by role
 
         JLabel lblBattleFrequency = new JLabel(resourceMap.getString("lblBattleFrequency.text"));
         gridBagConstraints.gridx = 0;
@@ -4243,58 +4232,78 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(lblBattleFrequency, gridBagConstraints);
 
-        JLabel lblFightChance = new JLabel(resourceMap.getString("lblFightChance.text"));
-        gridBagConstraints.gridx = 0;
+        spnAtBBattleChance = new JSpinner[AtBLanceRole.values().length - 1];
+
+        JLabel lblFightChance = new JLabel(AtBLanceRole.FIGHTING.toString() + ":");
         gridBagConstraints.gridy = 13;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblFightChance, gridBagConstraints);
 
-        lblFightPct = new JLabel();
+        JSpinner atbBattleChance = new JSpinner(new SpinnerNumberModel(options.getAtBBattleChance(AtBLanceRole.FIGHTING), 0.0, 100.0, 0.1));
+        spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 13;
-        panSubAtBContract.add(lblFightPct, gridBagConstraints);
+        panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblDefendChance = new JLabel(resourceMap.getString("lblDefendChance.text"));
+        JLabel lblDefendChance = new JLabel(AtBLanceRole.DEFENCE.toString() + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 14;
-        gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblDefendChance, gridBagConstraints);
 
-        lblDefendPct = new JLabel();
+        atbBattleChance = new JSpinner(new SpinnerNumberModel(options.getAtBBattleChance(AtBLanceRole.DEFENCE), 0.0, 100.0, 0.1));
+        spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 14;
-        panSubAtBContract.add(lblDefendPct, gridBagConstraints);
+        panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblScoutChance = new JLabel(resourceMap.getString("lblScoutChance.text"));
+        JLabel lblScoutChance = new JLabel(AtBLanceRole.SCOUTING.toString() + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 15;
-        gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblScoutChance, gridBagConstraints);
 
-        lblScoutPct = new JLabel();
+        atbBattleChance = new JSpinner(new SpinnerNumberModel(options.getAtBBattleChance(AtBLanceRole.SCOUTING), 0.0, 100.0, 0.1));
+        spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 15;
-        panSubAtBContract.add(lblScoutPct, gridBagConstraints);
+        panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblTrainingChance = new JLabel(resourceMap.getString("lblTrainingChance.text"));
+        JLabel lblTrainingChance = new JLabel(AtBLanceRole.TRAINING.toString() + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 16;
-        gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblTrainingChance, gridBagConstraints);
 
-        lblTrainingPct = new JLabel();
+        atbBattleChance = new JSpinner(new SpinnerNumberModel(options.getAtBBattleChance(AtBLanceRole.TRAINING), 0.0, 100.0, 0.1));
+        spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 16;
-        panSubAtBContract.add(lblTrainingPct, gridBagConstraints);
+        panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        updateBattleChances();
+        JButton btnIntensityUpdate = new JButton(resourceMap.getString("btnIntensityUpdate.text"));
+        AtBBattleIntensityChangeListener atBBattleIntensityChangeListener = new AtBBattleIntensityChangeListener();
+        btnIntensityUpdate.addChangeListener(evt -> {
+            spnAtBBattleIntensity.removeChangeListener(atBBattleIntensityChangeListener);
+            spnAtBBattleIntensity.setValue(determineAtBBattleIntensity());
+            spnAtBBattleIntensity.addChangeListener(atBBattleIntensityChangeListener);
+        });
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridwidth = 2;
+        panSubAtBContract.add(btnIntensityUpdate, gridBagConstraints);
+
+        // Note that this must be after the chance by role because it requires the chance by role
+        // for the initial value to be calculated
+        spnAtBBattleIntensity = new JSpinner(new SpinnerNumberModel(determineAtBBattleIntensity(), 0.0, 100.0, 0.1));
+        spnAtBBattleIntensity.setToolTipText(resourceMap.getString("spnIntensity.toolTipText"));
+        spnAtBBattleIntensity.addChangeListener(atBBattleIntensityChangeListener);
+        spnAtBBattleIntensity.setMinimumSize(new Dimension(60, 25));
+        spnAtBBattleIntensity.setPreferredSize(new Dimension(60, 25));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(spnAtBBattleIntensity, gridBagConstraints);
 
         chkGenerateChases = new JCheckBox(resourceMap.getString("chkGenerateChases.text"));
         chkGenerateChases.setName("chkGenerateChases");
         chkGenerateChases.setToolTipText(resourceMap.getString("chkGenerateChases.toolTipText"));
         chkGenerateChases.setSelected(options.generateChases());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridy = 18;
         panSubAtBContract.add(chkGenerateChases, gridBagConstraints);
 
         int yTablePosition = 0;
@@ -4733,8 +4742,7 @@ public class CampaignOptionsDialog extends JDialog {
 
     private void updateOptions() {
         campaign.setName(txtName.getText());
-        campaign.setCalendar(date);
-        campaign.setLocalDate(LocalDate.ofYearDay(date.get(Calendar.YEAR), date.get(Calendar.DAY_OF_YEAR)));
+        campaign.setLocalDate(date);
         // Ensure that the MegaMek year GameOption matches the campaign year
         GameOptions gameOpts = campaign.getGameOptions();
         int campaignYear = campaign.getGameYear();
@@ -4742,7 +4750,7 @@ public class CampaignOptionsDialog extends JDialog {
             gameOpts.getOption("year").setValue(campaignYear);
         }
         campaign.setFactionCode(Faction.getFactionFromFullNameAndYear
-                (String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR)).getShortName());
+                (String.valueOf(comboFaction.getSelectedItem()), date.getYear()).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
             RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
@@ -4845,9 +4853,9 @@ public class CampaignOptionsDialog extends JDialog {
         options.setPenaltyClanPartsFroIS((int)spnPenaltyClanPartsFromIS.getModel().getValue());
         options.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedIndex());
         for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
-            options.setPlanetTechAcquisitionBonus((int)spnPlanetAcquireTechBonus[i].getModel().getValue(), i);
-            options.setPlanetIndustryAcquisitionBonus((int)spnPlanetAcquireIndustryBonus[i].getModel().getValue(), i);
-            options.setPlanetOutputAcquisitionBonus((int)spnPlanetAcquireOutputBonus[i].getModel().getValue(), i);
+            options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getModel().getValue(), i);
+            options.setPlanetIndustryAcquisitionBonus((int) spnPlanetAcquireIndustryBonus[i].getModel().getValue(), i);
+            options.setPlanetOutputAcquisitionBonus((int) spnPlanetAcquireOutputBonus[i].getModel().getValue(), i);
 
         }
 
@@ -4994,8 +5002,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setPersonnelMarketRandomVeteranRemoval(Integer.parseInt(personnelMarketRandomVeteranRemoval.getText()));
         options.setPersonnelMarketRandomRegularRemoval(Integer.parseInt(personnelMarketRandomRegularRemoval.getText()));
         options.setPersonnelMarketRandomGreenRemoval(Integer.parseInt(personnelMarketRandomGreenRemoval.getText()));
-        options.setPersonnelMarketRandomUltraGreenRemoval(Integer.parseInt(personnelMarketRandomUltraGreenRemoval
-                                                                                   .getText()));
+        options.setPersonnelMarketRandomUltraGreenRemoval(Integer.parseInt(personnelMarketRandomUltraGreenRemoval.getText()));
         options.setPersonnelMarketReportRefresh(personnelMarketReportRefresh.isSelected());
         options.setPersonnelMarketType((String) personnelMarketType.getSelectedItem());
         // End Personnel Market
@@ -5045,7 +5052,9 @@ public class CampaignOptionsDialog extends JDialog {
         }
         options.setRATs(ratList);
         options.setSearchRadius((Integer) spnSearchRadius.getValue());
-        options.setIntensity((Double) spnIntensity.getValue());
+        for (int i = 0; i < spnAtBBattleChance.length; i++) {
+            options.setAtBBattleChance(i, (Double) spnAtBBattleChance[i].getValue());
+        }
         options.setGenerateChases(chkGenerateChases.isSelected());
         options.setVariableContractLength(chkVariableContractLength.isSelected());
         options.setMercSizeLimited(chkMercSizeLimited.isSelected());
@@ -5087,8 +5096,7 @@ public class CampaignOptionsDialog extends JDialog {
                     int cost = Integer.parseInt((String) tableXP.getValueAt(i, j));
                     SkillType.setCost(SkillType.skillList[i], cost, j);
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().log(getClass(), "updateXPCosts()", LogLevel.ERROR,
-                            "unreadable value in skill cost table for " + SkillType.skillList[i]); //$NON-NLS-1$
+                    MekHQ.getLogger().error(this, "unreadable value in skill cost table for " + SkillType.skillList[i]);
                 }
             }
         }
@@ -5128,19 +5136,19 @@ public class CampaignOptionsDialog extends JDialog {
 
     private void btnDateActionPerformed(ActionEvent evt) {
         // show the date chooser
-        DateChooser dc = new DateChooser(frame, date.toZonedDateTime().toLocalDate());
+        DateChooser dc = new DateChooser(frame, date);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = GregorianCalendar.from(dc.getDate().atStartOfDay(ZoneId.systemDefault()));
-            btnDate.setText(getDateAsString());
+            date = dc.getDate();
+            btnDate.setText(options.getDisplayFormattedDate(date));
             factionModel = new SortedComboBoxModel<>();
-            for (String sname : Faction.choosableFactionCodes) {
+            for (String sname : Faction.getChoosableFactionCodes()) {
                 Faction f = Faction.getFaction(sname);
-                if (f.validIn(date.get(Calendar.YEAR))) {
-                    factionModel.addElement(f.getFullName(date.get(Calendar.YEAR)));
+                if (f.validIn(date.getYear())) {
+                    factionModel.addElement(f.getFullName(date.getYear()));
                 }
             }
-            factionModel.setSelectedItem(campaign.getFaction().getFullName(date.get(Calendar.YEAR)));
+            factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
             comboFaction.setModel(factionModel);
         }
     }
@@ -5155,7 +5163,7 @@ public class CampaignOptionsDialog extends JDialog {
         setForceIcon();
     }
 
-    private void btnCamoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCamoActionPerformed
+    private void btnCamoActionPerformed(ActionEvent evt) {
         CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex, camos);
         ccd.setVisible(true);
         camoCategory = ccd.getCategory();
@@ -5178,14 +5186,14 @@ public class CampaignOptionsDialog extends JDialog {
 
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                 IOption option = j.nextElement();
-                if(null == tempSPA.get(option.getName())) {
+                if (null == tempSPA.get(option.getName())) {
                     unused.add(option.getName());
                 }
             }
         }
 
         for (String key : SpecialAbility.getAllDefaultSpecialAbilities().keySet()) {
-            if(null == tempSPA.get(key) && !unused.contains(key)) {
+            if ((null == tempSPA.get(key)) && !unused.contains(key)) {
                 unused.add(key);
             }
         }
@@ -5233,18 +5241,18 @@ public class CampaignOptionsDialog extends JDialog {
 
         //we also need to cycle through the existing SPAs and remove this one from
         //any prereqs
-        for(String key: tempSPA.keySet()) {
+        for (String key: tempSPA.keySet()) {
             SpecialAbility otherAbil = tempSPA.get(key);
             Vector<String> prereq = otherAbil.getPrereqAbilities();
             Vector<String> invalid = otherAbil.getInvalidAbilities();
             Vector<String> remove = otherAbil.getRemovedAbilities();
-            if(prereq.remove(name)) {
+            if (prereq.remove(name)) {
                 otherAbil.setPrereqAbilities(prereq);
             }
-            if(invalid.remove(name)) {
+            if (invalid.remove(name)) {
                 otherAbil.setInvalidAbilities(invalid);
             }
-            if(remove.remove(name)) {
+            if (remove.remove(name)) {
                 otherAbil.setRemovedAbilities(remove);
             }
         }
@@ -5268,16 +5276,12 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.weightx =1.0;
         gridBagConstraints.weighty =1.0;
 
-        for(String title : tempSPA.keySet()) {
+        for (String title : tempSPA.keySet()) {
             panSpecialAbilities.add(new SpecialAbilityPanel(tempSPA.get(title), this), gridBagConstraints);
             gridBagConstraints.gridy++;
         }
         panSpecialAbilities.revalidate();
         panSpecialAbilities.repaint();
-    }
-
-    public String getDateAsString() {
-        return dateFormat.format(date.getTime());
     }
 
     public void setCamoIcon() {
@@ -5290,8 +5294,7 @@ public class CampaignOptionsDialog extends JDialog {
             if (colorInd == -1) {
                 colorInd = 0;
             }
-            BufferedImage tempImage = new BufferedImage(84, 72,
-                                                        BufferedImage.TYPE_INT_RGB);
+            BufferedImage tempImage = new BufferedImage(84, 72, BufferedImage.TYPE_INT_RGB);
             Graphics2D graphics = tempImage.createGraphics();
             graphics.setColor(PlayerColors.getColor(colorInd));
             graphics.fillRect(0, 0, 84, 72);
@@ -5371,18 +5374,51 @@ public class CampaignOptionsDialog extends JDialog {
         }
     }
 
-    private void updateBattleChances() {
-        double intensity = (Double) spnIntensity.getValue();
-        if (intensity >= AtBContract.MINIMUM_INTENSITY) {
-            lblFightPct.setText((int)(40.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) + "%");
-            lblDefendPct.setText((int)(20.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) + "%");
-            lblScoutPct.setText((int)(60.0 * intensity / (60.0 * intensity + 40.0) * 100.0 + 0.5) + "%");
-            lblTrainingPct.setText((int)(10.0 * intensity / (10.0 * intensity + 90.0) * 100.0 + 0.5) + "%");
-        } else {
-            lblFightPct.setText("Disabled");
-            lblDefendPct.setText("Disabled");
-            lblScoutPct.setText("Disabled");
-            lblTrainingPct.setText("Disabled");
+    private double determineAtBBattleIntensity() {
+        double intensity = 0.0;
+        double x;
+
+        x = (Double) spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].getValue();
+        intensity += ((-3.0 / 2.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
+
+        x = (Double) spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].getValue();
+        intensity += ((-4.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
+
+        x = (Double) spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].getValue();
+        intensity += ((-2.0 / 3.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
+
+        x = (Double) spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].getValue();
+        intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
+
+        intensity = intensity / 4.0;
+
+        if (intensity > 100.0) {
+            intensity = 100.0;
+        }
+
+        return Math.round(intensity * 10.0) / 10.0;
+    }
+
+    private class AtBBattleIntensityChangeListener implements ChangeListener  {
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            double intensity = (Double) spnAtBBattleIntensity.getValue();
+
+            if (intensity >= AtBContract.MINIMUM_INTENSITY) {
+                spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()]
+                        .setValue(Math.round(400.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) / 10.0);
+                spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()]
+                        .setValue(Math.round(200.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) / 10.0);
+                spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()]
+                        .setValue(Math.round(600.0 * intensity / (60.0 * intensity + 40.0) * 100.0 + 0.5) / 10.0);
+                spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()]
+                        .setValue(Math.round(100.0 * intensity / (10.0 * intensity + 90.0) * 100.0 + 0.5) / 10.0);
+            } else {
+                spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].setValue(0.0);
+                spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].setValue(0.0);
+                spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].setValue(0.0);
+                spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].setValue(0.0);
+            }
         }
     }
 
@@ -5393,11 +5429,7 @@ public class CampaignOptionsDialog extends JDialog {
      *  This table must be added to the row header of the scrollpane that
      *  contains the main table.
      */
-    public static class RowNamesTable extends JTable
-            implements ChangeListener, PropertyChangeListener {
-        /**
-         *
-         */
+    public static class RowNamesTable extends JTable implements ChangeListener, PropertyChangeListener {
         private static final long serialVersionUID = 3151119498072423302L;
         private JTable main;
 
@@ -5491,9 +5523,6 @@ public class CampaignOptionsDialog extends JDialog {
          *  Borrow the renderer from JDK1.4.2 table header
          */
         private static class RowNumberRenderer extends DefaultTableCellRenderer {
-            /**
-             *
-             */
             private static final long serialVersionUID = -5430873664301394767L;
 
             public RowNumberRenderer() {

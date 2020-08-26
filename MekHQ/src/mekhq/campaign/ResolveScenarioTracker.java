@@ -221,7 +221,7 @@ public class ResolveScenarioTracker {
                     // Kill credit automatically assigned only if they can't escape
                     if (!e.canEscape()) {
                         Entity killer = victoryEvent.getEntity(e.getKillerId());
-                        if (null != killer && killer.getOwnerId() == pid) {
+                        if (null != killer) {
                             //the killer is one of your units, congrats!
                             killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
                         } else {
@@ -288,7 +288,7 @@ public class ResolveScenarioTracker {
                 }
             } else {
                 Entity killer = victoryEvent.getEntity(e.getKillerId());
-                if (null != killer && killer.getOwnerId() == pid) {
+                if (null != killer) {
                     //the killer is one of your units, congrats!
                     killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
                 } else {
@@ -373,7 +373,7 @@ public class ResolveScenarioTracker {
                 }
             } else if (e.getOwner().isEnemyOf(client.getLocalPlayer())) {
                 Entity killer = victoryEvent.getEntity(e.getKillerId());
-                if (null != killer && killer.getOwnerId() == pid) {
+                if (null != killer) {
                     //the killer is one of your units, congrats!
                     killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
                 } else {
@@ -474,8 +474,6 @@ public class ResolveScenarioTracker {
     }
 
     public void assignKills() {
-        final String METHOD_NAME = "assignKills()"; //$NON-NLS-1$
-
         for (Unit u : units) {
             for (String killed : killCredits.keySet()) {
                 if (killCredits.get(killed).equalsIgnoreCase("None")) {
@@ -486,12 +484,12 @@ public class ResolveScenarioTracker {
                         PersonStatus status = peopleStatus.get(p.getId());
                         if (null == status) {
                             //this shouldn't happen so report
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                                    "A null person status was found for person id " + p.getId().toString() //$NON-NLS-1$
-                                    + " when trying to assign kills"); //$NON-NLS-1$
+                            MekHQ.getLogger().error(this,
+                                    "A null person status was found for person id " + p.getId().toString()
+                                    + " when trying to assign kills");
                             continue;
                         }
-                        status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getCalendar().getTime()));
+                        status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getLocalDate()));
                     }
                 }
             }

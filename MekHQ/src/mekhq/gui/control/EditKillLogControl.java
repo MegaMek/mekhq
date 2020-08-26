@@ -47,7 +47,7 @@ public class EditKillLogControl extends JPanel {
         this.campaign = campaign;
         this.person = person;
 
-        this.killModel = new KillTableModel(this.campaign.getKillsFor(this.person.getId()));
+        this.killModel = new KillTableModel(campaign, campaign.getKillsFor(this.person.getId()));
 
         initComponents();
     }
@@ -107,7 +107,8 @@ public class EditKillLogControl extends JPanel {
     }
 
     private void addKill() {
-        AddOrEditKillEntryDialog dialog = new AddOrEditKillEntryDialog(parent, true, person.getId(), "", campaign.getDate());
+        AddOrEditKillEntryDialog dialog = new AddOrEditKillEntryDialog(parent, true, campaign,
+                person.getId(), "", campaign.getLocalDate());
         dialog.setVisible(true);
         if (dialog.getKill().isPresent()) {
             campaign.addKill(dialog.getKill().get());
@@ -118,7 +119,7 @@ public class EditKillLogControl extends JPanel {
     private void editKill() {
         Kill kill = killModel.getKillAt(killTable.getSelectedRow());
         if (null != kill) {
-            AddOrEditKillEntryDialog dialog = new AddOrEditKillEntryDialog(parent, true, kill);
+            AddOrEditKillEntryDialog dialog = new AddOrEditKillEntryDialog(parent, true, campaign, kill);
             dialog.setVisible(true);
             refreshTable();
         }

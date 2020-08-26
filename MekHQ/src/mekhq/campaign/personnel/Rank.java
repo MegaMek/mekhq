@@ -1,7 +1,6 @@
 /*
- * Rank.java
- *
- * Copyright (c) 2013 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2013 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +11,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
@@ -45,18 +43,6 @@ public class Rank implements MekHqXmlSerializable {
     private boolean officer;
     private double payMultiplier;
     private List<Integer> rankLevels;
-
-    // Manei Domini Ranks
-    // These should be safe as completely static items
-	public static final int MD_RANK_NONE	= -1;
-	public static final int MD_RANK_ALPHA	= 0;
-	public static final int MD_RANK_BETA	= 1;
-	public static final int MD_RANK_OMEGA	= 2;
-	public static final int MD_RANK_TAU		= 3;
-	public static final int MD_RANK_DELTA	= 4;
-	public static final int MD_RANK_SIGMA	= 5;
-	public static final int MD_RANK_OMICRON	= 6;
-	public static final int MD_RANK_NUM	= 7;
 
     public Rank() {
         this(new ArrayList<>(), false, 1.0);
@@ -88,19 +74,6 @@ public class Rank implements MekHqXmlSerializable {
         	}
         }
     }
-
-	public static String getManeiDominiRankName(int rank) {
-		switch (rank) {
-			case MD_RANK_ALPHA: return "Alpha";
-			case MD_RANK_BETA: return "Beta";
-			case MD_RANK_OMEGA: return "Omega";
-			case MD_RANK_TAU: return "Tau";
-			case MD_RANK_DELTA: return "Delta";
-			case MD_RANK_SIGMA: return "Sigma";
-			case MD_RANK_OMICRON: return "Omicron";
-			default: return "";
-		}
-	}
 
     public String getName(int profession) {
     	if (profession >= rankNames.size()) {
@@ -167,7 +140,7 @@ public class Rank implements MekHqXmlSerializable {
 
     public static Rank generateInstanceFromXML(Node wn) {
         final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
-        
+
         Rank retVal = null;
 
         try {
