@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign;
+package mekhq.campaign.againstTheBot;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -35,6 +35,7 @@ import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -394,11 +395,11 @@ public class AtBConfiguration implements Serializable {
     }
 
     public static AtBConfiguration loadFromXml() {
-        final String METHOD_NAME = "loadFromXml()"; //$NON-NLS-1$
+        final String METHOD_NAME = "loadFromXml()";
         AtBConfiguration retVal = new AtBConfiguration();
 
         MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, LogLevel.INFO,
-                "Starting load of AtB configuration data from XML..."); //$NON-NLS-1$
+                "Starting load of AtB configuration data from XML...");
 
         Document xmlDoc;
         try (InputStream is = new FileInputStream("data/universe/atbconfig.xml")) {
@@ -407,7 +408,7 @@ public class AtBConfiguration implements Serializable {
             xmlDoc = db.parse(is);
         } catch (FileNotFoundException ex) {
             MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, LogLevel.INFO,
-                    "File data/universe/atbconfig.xml not found. Loading defaults."); //$NON-NLS-1$
+                    "File data/universe/atbconfig.xml not found. Loading defaults.");
             retVal.setAllValuesToDefaults();
             return retVal;
         } catch (Exception ex) {
@@ -488,7 +489,7 @@ public class AtBConfiguration implements Serializable {
                     retVal.set(weightClass, loadWeightedTableFromXml(wn));
                 } catch (Exception ex) {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                            "Could not parse weight class attribute for enemy forces table"); //$NON-NLS-1$
+                            "Could not parse weight class attribute for enemy forces table");
                     MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
                 }
             }
@@ -564,7 +565,7 @@ public class AtBConfiguration implements Serializable {
     }
 
     private WeightedTable<String> loadWeightedTableFromXml(Node node) {
-        return loadWeightedTableFromXml(node, s -> s);
+        return loadWeightedTableFromXml(node, Function.identity());
     }
 
     private <T>WeightedTable<T> loadWeightedTableFromXml(Node node, Function<String,T> fromString) {

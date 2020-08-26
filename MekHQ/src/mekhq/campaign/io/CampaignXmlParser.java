@@ -64,7 +64,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
-import mekhq.campaign.AtBConfiguration;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CurrentLocation;

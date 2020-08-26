@@ -1,7 +1,8 @@
 /*
  * Lance.java
  *
- * Copyright (c) 2011 Carl Spain. All rights reserved.
+ * Copyright (c) 2011 - Carl Spain. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,6 +36,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
@@ -58,17 +60,6 @@ import org.w3c.dom.NodeList;
 public class Lance implements Serializable, MekHqXmlSerializable {
     private static final long serialVersionUID = -1197697940987478509L;
 
-    public static final int ROLE_UNASSIGNED = 0;
-    public static final int ROLE_FIGHT = 1;
-    public static final int ROLE_DEFEND = 2;
-    public static final int ROLE_SCOUT = 3;
-    public static final int ROLE_TRAINING = 4;
-    public static final int ROLE_NUM = 5;
-
-    public static final String[] roleNames = {
-        "Unassigned", "Fight", "Defend", "Scout", "Training"
-    };
-
     public static final int STR_IS = 4;
     public static final int STR_CLAN = 5;
     public static final int STR_CS = 6;
@@ -81,7 +72,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     private int forceId;
     private int missionId;
-    private int role;
+    private AtBLanceRole role;
     private UUID commanderId;
 
     public static int getStdLanceSize(Faction f) {
@@ -98,7 +89,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public Lance(int fid, Campaign c) {
         forceId = fid;
-        role = ROLE_UNASSIGNED;
+        role = AtBLanceRole.UNASSIGNED;
         missionId = -1;
         for (Mission m : c.getSortedMissions()) {
             if (!m.isActive()) {
@@ -135,11 +126,11 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public int getRole() {
+    public AtBLanceRole getRole() {
         return role;
     }
 
-    public void setRole(int role) {
+    public void setRole(AtBLanceRole role) {
         this.role = role;
     }
 
@@ -300,13 +291,13 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     }
 
     public AtBScenario checkForBattle(Campaign c) {
-        double intensity = c.getCampaignOptions().getIntensity();
-        if (intensity < AtBContract.MINIMUM_INTENSITY) {
-            // AtB Battle Generation disabled
+        // Make sure there is a battle first
+        if ((c.getCampaignOptions().getAtBBattleChance(role) == 0.0)
+                || (Compute.randomInt(100) > c.getCampaignOptions().getAtBBattleChance(role))) {
+            // No battle
             return null;
         }
 
-        int noBattle;
         int roll;
         //thresholds are coded from charts with 1-100 range, so we add 1 to mod to adjust 0-based random int
         int battleTypeMod = 1 + (AtBContract.MORALE_NORMAL - getContract(c).getMoraleLevel()) * 5;
@@ -322,9 +313,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         }*/
 
         switch (role) {
-            case ROLE_FIGHT: {
-                noBattle = (int) (60.0 / intensity + 0.5);
-                roll = Compute.randomInt(40 + noBattle) + battleTypeMod;
+            case FIGHTING: {
+                roll = Compute.randomInt(40) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BASEATTACK, false,
@@ -333,17 +323,15 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BREAKTHROUGH, true,
                             getBattleDate(c.getLocalDate()));
-                } else if (roll < 9 + noBattle) {
-                    return null;
-                } else if (roll < 17 + noBattle) {
+                } else if (roll < 17) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.STANDUP, true,
                             getBattleDate(c.getLocalDate()));
-                } else if (roll < 25 + noBattle) {
+                } else if (roll < 25) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.STANDUP, false,
                             getBattleDate(c.getLocalDate()));
-                } else if (roll < 33 + noBattle) {
+                } else if (roll < 33) {
                     if (c.getCampaignOptions().generateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, false,
@@ -353,7 +341,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                                 AtBScenario.HOLDTHELINE, false,
                                 getBattleDate(c.getLocalDate()));
                     }
-                } else if (roll < 41 + noBattle) {
+                } else if (roll < 41) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.HOLDTHELINE, true,
                             getBattleDate(c.getLocalDate()));
@@ -363,9 +351,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                             getBattleDate(c.getLocalDate()));
                 }
             }
-            case Lance.ROLE_SCOUT: {
-                noBattle = (int) (40.0 / intensity + 0.5);
-                roll = Compute.randomInt(60 + noBattle) + battleTypeMod;
+            case SCOUTING: {
+                roll = Compute.randomInt(60) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BASEATTACK, false,
@@ -392,9 +379,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.PROBE, false,
                             getBattleDate(c.getLocalDate()));
-                } else if (roll < 41 + noBattle) {
-                    return null;
-                } else if (roll < 51 + noBattle) {
+                } else if (roll < 51) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.EXTRACTION, true,
                             getBattleDate(c.getLocalDate()));
@@ -404,9 +389,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                             getBattleDate(c.getLocalDate()));
                 }
             }
-            case Lance.ROLE_DEFEND: {
-                noBattle = (int) (80.0 / intensity + 0.5);
-                roll = Compute.randomInt(20 + noBattle) + battleTypeMod;
+            case DEFENCE: {
+                roll = Compute.randomInt(20) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BASEATTACK, false,
@@ -423,9 +407,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.EXTRACTION, false,
                             getBattleDate(c.getLocalDate()));
-                } else if (roll < 13 + noBattle) {
-                    return null;
-                } else if (roll < 17 + noBattle) {
+                } else if (roll < 17) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.HIDEANDSEEK, true,
                             getBattleDate(c.getLocalDate()));
@@ -435,9 +417,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                             getBattleDate(c.getLocalDate()));
                 }
             }
-            case Lance.ROLE_TRAINING: {
-                noBattle = (int) (90.0 / intensity + 0.5);
-                roll = Compute.randomInt(10 + noBattle) + battleTypeMod;
+            case TRAINING: {
+                roll = Compute.randomInt(10) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.BASEATTACK, false,
@@ -464,8 +445,6 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                     return AtBScenarioFactory.createScenario(c, this,
                             AtBScenario.HIDEANDSEEK, false,
                             getBattleDate(c.getLocalDate()));
-                } else if (roll < 9 + noBattle) {
-                    return null;
                 } else {
                     if (c.getCampaignOptions().generateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
@@ -486,31 +465,16 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<lance type=\""
-                +this.getClass().getName()
-                +"\">");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<forceId>"
-                + forceId
-                +"</forceId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<missionId>"
-                + missionId
-                +"</missionId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<role>"
-                + role
-                +"</role>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<commanderId>"
-                + commanderId
-                +"</commanderId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</lance>");
-
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<lance type=\"" + getClass().getName() + "\">");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "forceId", forceId);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "missionId", missionId);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "role", role.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commanderId", commanderId.toString());
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "lance");
     }
 
     public static Lance generateInstanceFromXML(Node wn) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
+        final String METHOD_NAME = "generateInstanceFromXML(Node)";
 
         Lance retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
@@ -528,7 +492,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
                     retVal.missionId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("role")) {
-                    retVal.role = Integer.parseInt(wn2.getTextContent());
+                    retVal.setRole(AtBLanceRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("commanderId")) {
                     retVal.commanderId = UUID.fromString(wn2.getTextContent());
                 }

@@ -41,6 +41,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import megamek.common.*;
 import megamek.common.util.StringUtil;
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -49,7 +50,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.campaign.AtBConfiguration;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
@@ -168,7 +169,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private boolean attacker;
     private int lanceForceId; // -1 if scenario is not generated for a specific lance (special mission, big battle)
-    private int lanceRole; /* set when scenario is created in case it is changed for the next week before the scenario is resolved;
+    private AtBLanceRole lanceRole; /* set when scenario is created in case it is changed for the next week before the scenario is resolved;
                             specifically affects scenarios generated for scout lances, in which the deployment may be delayed
                             for slower units */
     private int terrainType;
@@ -225,7 +226,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public AtBScenario () {
         super();
         lanceForceId = -1;
-        lanceRole = Lance.ROLE_UNASSIGNED;
+        lanceRole = AtBLanceRole.UNASSIGNED;
         alliesPlayer = new ArrayList<>();
         botForces = new ArrayList<>();
         alliesPlayerStub = new ArrayList<>();
@@ -260,7 +261,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (null == lance) {
             lanceForceId = -1;
-            lanceRole = Lance.ROLE_UNASSIGNED;
+            lanceRole = AtBLanceRole.UNASSIGNED;
         } else {
             this.lanceForceId = lance.getForceId();
             lanceRole = lance.getRole();
@@ -276,7 +277,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         wind = PlanetaryConditions.WI_NONE;
         fog = PlanetaryConditions.FOG_NONE;
         atmosphere = PlanetaryConditions.ATMO_STANDARD;
-        gravity = (float)1.0;
+        gravity = (float) 1.0;
         deploymentDelay = 0;
         setDate(date);
         lanceCount = 0;
@@ -671,7 +672,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private void setStandardMissionForces(Campaign campaign) {
         /* Find the number of attached units required by the command rights clause */
         int attachedUnitWeight = EntityWeightClass.WEIGHT_MEDIUM;
-        if (lanceRole == Lance.ROLE_SCOUT || lanceRole == Lance.ROLE_TRAINING) {
+        if (lanceRole == AtBLanceRole.SCOUTING || lanceRole == AtBLanceRole.TRAINING) {
             attachedUnitWeight = EntityWeightClass.WEIGHT_LIGHT;
         }
         int numAttachedPlayer = 0;
@@ -792,7 +793,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 campaign.getCampaignOptions().getRegionalMechVariations()),
                             EntityWeightClass.WEIGHT_ASSAULT, campaign);
                 }
-            } else if (getLanceRole() == Lance.ROLE_SCOUT) {
+            } else if (getLanceRole() == AtBLanceRole.SCOUTING) {
                 /* Set allied forces to deploy in (6 - speed) turns just as player's units,
                  * but only if not deploying by dropship.
                  */
@@ -1541,7 +1542,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "attacker", isAttacker());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceForceId", lanceForceId);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceRole", lanceRole);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceRole", lanceRole.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "terrainType", terrainType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "light", light);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "weather", weather);
@@ -1698,7 +1699,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     @Override
     protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
-        final String METHOD_NAME = "loadFieldsFromXmlNode(Node)"; //$NON-NLS-1$
+        final String METHOD_NAME = "loadFieldsFromXmlNode(Node)";
         super.loadFieldsFromXmlNode(wn);
         NodeList nl = wn.getChildNodes();
 
@@ -1710,7 +1711,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             } else if (wn2.getNodeName().equalsIgnoreCase("lanceForceId")) {
                 lanceForceId = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("lanceRole")) {
-                lanceRole = Integer.parseInt(wn2.getTextContent());
+                lanceRole = AtBLanceRole.parseFromString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
                 terrainType = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("light")) {
@@ -1749,7 +1750,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                             en = MekHqXmlUtil.getEntityFromXmlString(wn3);
                         } catch (Exception e) {
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                                    "Error loading allied unit in scenario"); //$NON-NLS-1$
+                                    "Error loading allied unit in scenario");
                             MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                         }
                         if (en != null) {
@@ -1770,7 +1771,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                             en = MekHqXmlUtil.getEntityFromXmlString(wn3);
                         } catch (Exception e) {
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                                    "Error loading allied unit in scenario"); //$NON-NLS-1$
+                                    "Error loading allied unit in scenario");
                             MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                         }
                         if (en != null) {
@@ -1904,7 +1905,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return lanceForceId;
     }
 
-    public int getLanceRole() {
+    public AtBLanceRole getLanceRole() {
         return lanceRole;
     }
 

@@ -79,6 +79,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
@@ -443,11 +444,8 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner spnBaseStrategyDeployment;
     private JSpinner spnAdditionalStrategyDeployment;
     private JCheckBox chkAdjustPaymentForStrategy;
-    private JSpinner spnIntensity;
-    private JLabel lblFightPct;
-    private JLabel lblDefendPct;
-    private JLabel lblScoutPct;
-    private JLabel lblTrainingPct;
+    private JSpinner spnAtBBattleIntensity;
+    private JSpinner[] spnAtBBattleChance;
     private JCheckBox chkGenerateChases;
 
     //RATs
@@ -4216,15 +4214,8 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = 11;
         panSubAtBContract.add(lblIntensity, gridBagConstraints);
 
-        spnIntensity = new JSpinner(new SpinnerNumberModel(options.getIntensity(), 0.0, 5.0, 0.1));
-        spnIntensity.setToolTipText(resourceMap.getString("spnIntensity.toolTipText"));
-        spnIntensity.setValue(options.getIntensity());
-        spnIntensity.setMinimumSize(new Dimension(60, 25));
-        spnIntensity.setPreferredSize(new Dimension(60, 25));
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 11;
-        panSubAtBContract.add(spnIntensity, gridBagConstraints);
-        spnIntensity.addChangeListener(arg0 -> updateBattleChances());
+        // Note that spnAtBBattleIntensity is located here visibly, however must be initialized
+        // following the chance of battle by role
 
         JLabel lblBattleFrequency = new JLabel(resourceMap.getString("lblBattleFrequency.text"));
         gridBagConstraints.gridx = 0;
@@ -4232,58 +4223,78 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(lblBattleFrequency, gridBagConstraints);
 
-        JLabel lblFightChance = new JLabel(resourceMap.getString("lblFightChance.text"));
-        gridBagConstraints.gridx = 0;
+        spnAtBBattleChance = new JSpinner[AtBLanceRole.values().length - 1];
+
+        JLabel lblFightChance = new JLabel(AtBLanceRole.FIGHTING.toString() + ":");
         gridBagConstraints.gridy = 13;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblFightChance, gridBagConstraints);
 
-        lblFightPct = new JLabel();
+        JSpinner atbBattleChance = new JSpinner(new SpinnerNumberModel(options.getAtBBattleChance(AtBLanceRole.FIGHTING), 0.0, 100.0, 0.1));
+        spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 13;
-        panSubAtBContract.add(lblFightPct, gridBagConstraints);
+        panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblDefendChance = new JLabel(resourceMap.getString("lblDefendChance.text"));
+        JLabel lblDefendChance = new JLabel(AtBLanceRole.DEFENCE.toString() + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 14;
-        gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblDefendChance, gridBagConstraints);
 
-        lblDefendPct = new JLabel();
+        atbBattleChance = new JSpinner(new SpinnerNumberModel(options.getAtBBattleChance(AtBLanceRole.DEFENCE), 0.0, 100.0, 0.1));
+        spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 14;
-        panSubAtBContract.add(lblDefendPct, gridBagConstraints);
+        panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblScoutChance = new JLabel(resourceMap.getString("lblScoutChance.text"));
+        JLabel lblScoutChance = new JLabel(AtBLanceRole.SCOUTING.toString() + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 15;
-        gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblScoutChance, gridBagConstraints);
 
-        lblScoutPct = new JLabel();
+        atbBattleChance = new JSpinner(new SpinnerNumberModel(options.getAtBBattleChance(AtBLanceRole.SCOUTING), 0.0, 100.0, 0.1));
+        spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 15;
-        panSubAtBContract.add(lblScoutPct, gridBagConstraints);
+        panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblTrainingChance = new JLabel(resourceMap.getString("lblTrainingChance.text"));
+        JLabel lblTrainingChance = new JLabel(AtBLanceRole.TRAINING.toString() + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 16;
-        gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblTrainingChance, gridBagConstraints);
 
-        lblTrainingPct = new JLabel();
+        atbBattleChance = new JSpinner(new SpinnerNumberModel(options.getAtBBattleChance(AtBLanceRole.TRAINING), 0.0, 100.0, 0.1));
+        spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 16;
-        panSubAtBContract.add(lblTrainingPct, gridBagConstraints);
+        panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        updateBattleChances();
+        JButton btnIntensityUpdate = new JButton(resourceMap.getString("btnIntensityUpdate.text"));
+        AtBBattleIntensityChangeListener atBBattleIntensityChangeListener = new AtBBattleIntensityChangeListener();
+        btnIntensityUpdate.addChangeListener(evt -> {
+            spnAtBBattleIntensity.removeChangeListener(atBBattleIntensityChangeListener);
+            spnAtBBattleIntensity.setValue(determineAtBBattleIntensity());
+            spnAtBBattleIntensity.addChangeListener(atBBattleIntensityChangeListener);
+        });
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridwidth = 2;
+        panSubAtBContract.add(btnIntensityUpdate, gridBagConstraints);
+
+        // Note that this must be after the chance by role because it requires the chance by role
+        // for the initial value to be calculated
+        spnAtBBattleIntensity = new JSpinner(new SpinnerNumberModel(determineAtBBattleIntensity(), 0.0, 100.0, 0.1));
+        spnAtBBattleIntensity.setToolTipText(resourceMap.getString("spnIntensity.toolTipText"));
+        spnAtBBattleIntensity.addChangeListener(atBBattleIntensityChangeListener);
+        spnAtBBattleIntensity.setMinimumSize(new Dimension(60, 25));
+        spnAtBBattleIntensity.setPreferredSize(new Dimension(60, 25));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(spnAtBBattleIntensity, gridBagConstraints);
 
         chkGenerateChases = new JCheckBox(resourceMap.getString("chkGenerateChases.text"));
         chkGenerateChases.setName("chkGenerateChases");
         chkGenerateChases.setToolTipText(resourceMap.getString("chkGenerateChases.toolTipText"));
         chkGenerateChases.setSelected(options.generateChases());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridy = 18;
         panSubAtBContract.add(chkGenerateChases, gridBagConstraints);
 
         int yTablePosition = 0;
@@ -5031,7 +5042,9 @@ public class CampaignOptionsDialog extends JDialog {
         }
         options.setRATs(ratList);
         options.setSearchRadius((Integer) spnSearchRadius.getValue());
-        options.setIntensity((Double) spnIntensity.getValue());
+        for (int i = 0; i < spnAtBBattleChance.length; i++) {
+            options.setAtBBattleChance(i, (Double) spnAtBBattleChance[i].getValue());
+        }
         options.setGenerateChases(chkGenerateChases.isSelected());
         options.setVariableContractLength(chkVariableContractLength.isSelected());
         options.setMercSizeLimited(chkMercSizeLimited.isSelected());
@@ -5351,18 +5364,51 @@ public class CampaignOptionsDialog extends JDialog {
         }
     }
 
-    private void updateBattleChances() {
-        double intensity = (Double) spnIntensity.getValue();
-        if (intensity >= AtBContract.MINIMUM_INTENSITY) {
-            lblFightPct.setText((int) (40.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) + "%");
-            lblDefendPct.setText((int) (20.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) + "%");
-            lblScoutPct.setText((int) (60.0 * intensity / (60.0 * intensity + 40.0) * 100.0 + 0.5) + "%");
-            lblTrainingPct.setText((int) (10.0 * intensity / (10.0 * intensity + 90.0) * 100.0 + 0.5) + "%");
-        } else {
-            lblFightPct.setText("Disabled");
-            lblDefendPct.setText("Disabled");
-            lblScoutPct.setText("Disabled");
-            lblTrainingPct.setText("Disabled");
+    private double determineAtBBattleIntensity() {
+        double intensity = 0.0;
+        double x;
+
+        x = (Double) spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].getValue();
+        intensity += ((-3.0 / 2.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
+
+        x = (Double) spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].getValue();
+        intensity += ((-4.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
+
+        x = (Double) spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].getValue();
+        intensity += ((-2.0 / 3.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
+
+        x = (Double) spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].getValue();
+        intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
+
+        intensity = intensity / 4.0;
+
+        if (intensity > 100.0) {
+            intensity = 100.0;
+        }
+
+        return Math.round(intensity * 10.0) / 10.0;
+    }
+
+    private class AtBBattleIntensityChangeListener implements ChangeListener  {
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            double intensity = (Double) spnAtBBattleIntensity.getValue();
+
+            if (intensity >= AtBContract.MINIMUM_INTENSITY) {
+                spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()]
+                        .setValue(Math.round(400.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) / 10.0);
+                spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()]
+                        .setValue(Math.round(200.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) / 10.0);
+                spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()]
+                        .setValue(Math.round(600.0 * intensity / (60.0 * intensity + 40.0) * 100.0 + 0.5) / 10.0);
+                spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()]
+                        .setValue(Math.round(100.0 * intensity / (10.0 * intensity + 90.0) * 100.0 + 0.5) / 10.0);
+            } else {
+                spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].setValue(0.0);
+                spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].setValue(0.0);
+                spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].setValue(0.0);
+                spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].setValue(0.0);
+            }
         }
     }
 
