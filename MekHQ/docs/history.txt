@@ -28,6 +28,7 @@ VERSION HISTORY:
 + Issue #1264: Allow faction capitals to change on a specific date, not just year
 + PR #1966: Fixing Duplicated Siblings
 + PR #1925: Final PR to swap MekHQ to use LocalDate
++ Issue #254: Implementing AtB Battle Chance by Role
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
