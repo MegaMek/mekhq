@@ -28,7 +28,7 @@ import mekhq.preferences.PreferencesNode;
  * December 06, 2000
  *
  * DateChooser class is a general GUI based date chooser. It allows the user to
- * select an instance of GregorianCalendar defined in java.util package.
+ * select an instance of LocalDate defined in java.time package.
  *
  * Programming API is similar to JFC's JColorChooser or JFileChooser. This class
  * can be used in any application to enable the user to select a date from a
@@ -40,7 +40,7 @@ import mekhq.preferences.PreferencesNode;
  *
  * Typical usage is like:
  *
- * // initial date GregorianCalendar date = new GregorianCalendar()
+ * // initial date LocalDate date = LocalDate.now()
  *
  * // The owner is the JFrame of the application ("AppClass.this")
  *
@@ -90,7 +90,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      * @param owner
      *            JFrame instance, owner of DateChooser dialog
      * @param d
-     *            GregorianCalendar instance that will be the initial date for
+     *            LocalDate instance that will be the initial date for
      *            this dialog
      */
     public DateChooser(JFrame owner, LocalDate d) {

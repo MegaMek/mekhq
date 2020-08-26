@@ -247,7 +247,7 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private CategoryDataset setupMonthlyDataset() {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyy"); // TOOD : LocalDate : Remove Inline Date Format
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyy");
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         List<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
 

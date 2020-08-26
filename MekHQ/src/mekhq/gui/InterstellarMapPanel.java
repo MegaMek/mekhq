@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -655,7 +655,7 @@ public class InterstellarMapPanel extends JPanel {
                         arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
                         g2.fill(arc);
                         if (i > 0) {
-                            PlanetarySystem systemA = campaign.getLocation().getJumpPath().get(i-1);
+                            PlanetarySystem systemA = campaign.getLocation().getJumpPath().get(i - 1);
                             g2.setPaint(Color.YELLOW);
                             g2.draw(new Line2D.Double(map2scrX(systemA.getX()), map2scrY(systemA.getY()),
                                     map2scrX(systemB.getX()), map2scrY(systemB.getY())));
@@ -665,7 +665,7 @@ public class InterstellarMapPanel extends JPanel {
 
                 Map<Faction, String> capitals = new HashMap<>();
                 for (Faction faction : Faction.getFactions()) {
-                    capitals.put(faction,faction.getStartingPlanet(campaign.getGameYear()));
+                    capitals.put(faction, faction.getStartingPlanet(campaign.getLocalDate()));
                 }
 
                 for (PlanetarySystem system : systems) {
@@ -687,7 +687,7 @@ public class InterstellarMapPanel extends JPanel {
                             arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
                             g2.fill(arc);
                         }
-                        if (null != selectedSystem && selectedSystem.equals(system)) {
+                        if ((null != selectedSystem) && selectedSystem.equals(system)) {
                             //lest try rings
                             g2.setPaint(Color.WHITE);
                             arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
@@ -707,21 +707,22 @@ public class InterstellarMapPanel extends JPanel {
                         //of multiple factions per planet
                         if (isFactionsSelected()) {
                             Set<Faction> factions = system.getFactionSet(now);
-                            if (null != factions && !isSystemEmpty(system)) {
+                            if ((null != factions) && !isSystemEmpty(system)) {
                                 int i = 0;
                                 for (Faction faction : factions) {
                                     if (capitals.get(faction).equals(system.getId())) {
-                                        g2.setPaint(new Color(212,175,55));
-                                        arc.setArcByCenter(x, y, size+3, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
+                                        g2.setPaint(new Color(212, 175, 55));
+                                        arc.setArcByCenter(x, y, size + 3, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
                                         g2.fill(arc);
                                     }
-                                    if (campaign.getCampaignOptions().getUseAtB()  && campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getDate())) {
-                                        g2.setPaint(new Color(192,192,192));
-                                        arc.setArcByCenter(x, y, size+2, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
+                                    if (campaign.getCampaignOptions().getUseAtB()
+                                            && campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getLocalDate())) {
+                                        g2.setPaint(new Color(192, 192, 192));
+                                        arc.setArcByCenter(x, y, size + 2, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
                                         g2.fill(arc);
                                     }
                                     g2.setPaint(faction.getColor());
-                                    arc.setArcByCenter(x, y, size, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
+                                    arc.setArcByCenter(x, y, size, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
                                     g2.fill(arc);
                                     ++ i;
                                 }
@@ -744,9 +745,9 @@ public class InterstellarMapPanel extends JPanel {
                     if (isSystemVisible(system, !optEmptySystems.isSelected())) {
                         double x = map2scrX(system.getX());
                         double y = map2scrY(system.getY());
-                        if (conf.showPlanetNamesThreshold == 0 || conf.scale > conf.showPlanetNamesThreshold
+                        if ((conf.showPlanetNamesThreshold == 0) || (conf.scale > conf.showPlanetNamesThreshold)
                                 || jumpPath.contains(system)
-                                || (null != campaign.getLocation().getJumpPath() && campaign.getLocation().getJumpPath().contains(system))) {
+                                || ((campaign.getLocation().getJumpPath() != null) && campaign.getLocation().getJumpPath().contains(system))) {
                             final String planetName = system.getPrintableName(campaign.getLocalDate());
                             final float xPos = (float) (x + size * 1.8);
                             final float yPos = (float) y;

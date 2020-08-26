@@ -1,7 +1,8 @@
 /*
  * AtBPreferences.java
  *
- * Copyright (c) 2014 Carl Spain. All rights reserved.
+ * Copyright (c) 2014 - Carl Spain. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.againstTheBot;
 
@@ -24,10 +25,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -64,13 +63,8 @@ import mekhq.campaign.universe.Faction;
  * more extensive than what is handled by CampaignOptions. Most of the options
  * fall into one of two categories: they allow users to customize the various
  * tables in the rules, or they avoid hard-coding universe details.
- *
  */
 public class AtBConfiguration implements Serializable {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 515628415152924457L;
 
     /* Used to indicate size of lance or equivalent in opfor forces */
@@ -117,14 +111,14 @@ public class AtBConfiguration implements Serializable {
 
     private WeightedTable<String> getDefaultForceTable(String key, int index) {
         final String METHOD_NAME = "getDefaultForceTable(String,int)"; //$NON-NLS-1$
-        if(index < 0) {
+        if (index < 0) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME,
                     LogLevel.ERROR, "Default force tables don't support negative weights, limiting to 0"); //$NON-NLS-1$
             index = 0;
         }
         String property = defaultProperties.getString(key);
         String[] fields = property.split("\\|"); //$NON-NLS-1$
-        if(index >= fields.length) {
+        if (index >= fields.length) {
             // Deal with too short field lengths
             MekHQ.getLogger().log(getClass(), METHOD_NAME,
                     LogLevel.ERROR,  String.format("Default force tables have %d weight entries; limiting the original value of %d.", fields.length, index)); //$NON-NLS-1$
@@ -134,7 +128,7 @@ public class AtBConfiguration implements Serializable {
     }
 
     private WeightedTable<String> parseDefaultWeightedTable(String entry) {
-        return parseDefaultWeightedTable(entry, s -> s);
+        return parseDefaultWeightedTable(entry, Function.identity());
     }
 
     private <T>WeightedTable<T> parseDefaultWeightedTable(String entry, Function<String,T> fromString) {
@@ -151,66 +145,58 @@ public class AtBConfiguration implements Serializable {
      * Used if the config file is missing.
      */
     private void setAllValuesToDefaults() {
-        final String METHOD_NAME = "setAllValuesToDefaults()"; //$NON-NLS-1$
-
         for (Enumeration<String> e = defaultProperties.getKeys(); e.hasMoreElements(); ) {
             String key = e.nextElement();
             String property = defaultProperties.getString(key);
             switch (key) {
-            case "botForce.IS":
-            case "botForce.CLAN":
-            case "botForce.CS":
-                ArrayList<WeightedTable<String>> list = new ArrayList<>();
-                for (String entry : property.split("\\|")) {
-                    list.add(parseDefaultWeightedTable(entry));
-                }
-                botForceTables.put(key.replace("botForce.", ""), list);
-                break;
-            case "botLance.IS":
-            case "botLance.CLAN":
-            case "botLance.CS":
-                list = new ArrayList<>();
-                for (String entry : property.split("\\|")) {
-                    list.add(parseDefaultWeightedTable(entry));
-                }
-                botLanceTables.put(key.replace("botLance.", ""), list);
-                break;
-            case "hiringHalls":
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                for (String entry : property.split("\\|")) {
-                    String[] fields = entry.split(",");
-                    try {
-                        hiringHalls.add(new DatedRecord<>(fields[0].length() > 0? df.parse(fields[0]) : null,
-                                fields[1].length() > 0? df.parse(fields[1]) : null,
-                                        fields[2]));
-                    } catch (ParseException ex) {
-                        MekHQ.getLogger().log(getClass(), METHOD_NAME,
-                                LogLevel.ERROR, "Error parsing default date for hiring hall on " + fields[2]); //$NON-NLS-1$
-                        MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+                case "botForce.IS":
+                case "botForce.CLAN":
+                case "botForce.CS":
+                    ArrayList<WeightedTable<String>> list = new ArrayList<>();
+                    for (String entry : property.split("\\|")) {
+                        list.add(parseDefaultWeightedTable(entry));
                     }
-                }
-                break;
-            case "shipSearchCost":
-                shipSearchCost = Money.of(Double.parseDouble(property));
-                break;
-            case "shipSearchLengthWeeks":
-                shipSearchLengthWeeks = Integer.parseInt(property);
-                break;
-            case "shipSearchTarget.Dropship":
-                dropshipSearchTarget = property.matches("\\d+")? Integer.valueOf(property) : null;
-                break;
-            case "shipSearchTarget.Jumpship":
-                jumpshipSearchTarget = property.matches("\\d+")? Integer.valueOf(property) : null;
-                break;
-            case "shipSearchTarget.Warship":
-                warshipSearchTarget = property.matches("\\d+")? Integer.valueOf(property) : null;
-                break;
-            case "ships.Dropship":
-                dsTable = parseDefaultWeightedTable(property);
-                break;
-            case "ships.Jumpship":
-                jsTable = parseDefaultWeightedTable(property);
-                break;
+                    botForceTables.put(key.replace("botForce.", ""), list);
+                    break;
+                case "botLance.IS":
+                case "botLance.CLAN":
+                case "botLance.CS":
+                    list = new ArrayList<>();
+                    for (String entry : property.split("\\|")) {
+                        list.add(parseDefaultWeightedTable(entry));
+                    }
+                    botLanceTables.put(key.replace("botLance.", ""), list);
+                    break;
+                case "hiringHalls":
+                    for (String entry : property.split("\\|")) {
+                        String[] fields = entry.split(",");
+                        hiringHalls.add(new DatedRecord<>(
+                                (fields[0].length() > 0) ? MekHqXmlUtil.parseDate(fields[0]) : null,
+                                (fields[1].length() > 0) ? MekHqXmlUtil.parseDate(fields[1]) : null,
+                                fields[2]));
+                    }
+                    break;
+                case "shipSearchCost":
+                    shipSearchCost = Money.of(Double.parseDouble(property));
+                    break;
+                case "shipSearchLengthWeeks":
+                    shipSearchLengthWeeks = Integer.parseInt(property);
+                    break;
+                case "shipSearchTarget.Dropship":
+                    dropshipSearchTarget = property.matches("\\d+")? Integer.valueOf(property) : null;
+                    break;
+                case "shipSearchTarget.Jumpship":
+                    jumpshipSearchTarget = property.matches("\\d+")? Integer.valueOf(property) : null;
+                    break;
+                case "shipSearchTarget.Warship":
+                    warshipSearchTarget = property.matches("\\d+")? Integer.valueOf(property) : null;
+                    break;
+                case "ships.Dropship":
+                    dsTable = parseDefaultWeightedTable(property);
+                    break;
+                case "ships.Jumpship":
+                    jsTable = parseDefaultWeightedTable(property);
+                    break;
             }
         }
     }
@@ -221,19 +207,20 @@ public class AtBConfiguration implements Serializable {
 
     public int weightClassIndex(String wc) {
         switch (wc) {
-        case "L":
-        case "UL":
-            return 0;
-        case "M":
-            return 1;
-        case "H":
-            return 2;
-        case "A":
-        case "C":
-        case "SH":
-            return 3;
+            case "L":
+            case "UL":
+                return 0;
+            case "M":
+                return 1;
+            case "H":
+                return 2;
+            case "A":
+            case "C":
+            case "SH":
+                return 3;
+            default:
+                throw new IllegalArgumentException("Could not parse weight class " + wc);
         }
-        throw new IllegalArgumentException("Could not parse weight class " + wc);
     }
 
     public String selectBotLances(String org, int weightClass) {
@@ -246,7 +233,7 @@ public class AtBConfiguration implements Serializable {
             final List<WeightedTable<String>> botForceTable = botForceTables.get(org);
             int weightClassIndex = weightClassIndex(weightClass);
             WeightedTable<String> table;
-            if((weightClassIndex < 0) || (weightClassIndex >= botForceTable.size())) {
+            if ((weightClassIndex < 0) || (weightClassIndex >= botForceTable.size())) {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                         String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass)); //$NON-NLS-1$
                 weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
@@ -293,30 +280,37 @@ public class AtBConfiguration implements Serializable {
      */
     public static int decodeWeightStr(String s, int i) {
         switch (s.charAt(i)) {
-        case WEIGHT_ULTRA_LIGHT : return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
-        case WEIGHT_LIGHT : return EntityWeightClass.WEIGHT_LIGHT;
-        case WEIGHT_MEDIUM : return EntityWeightClass.WEIGHT_MEDIUM;
-        case WEIGHT_HEAVY : return EntityWeightClass.WEIGHT_HEAVY;
-        case WEIGHT_ASSAULT : return EntityWeightClass.WEIGHT_ASSAULT;
-        case WEIGHT_SUPER_HEAVY : return EntityWeightClass.WEIGHT_SUPER_HEAVY;
+            case WEIGHT_ULTRA_LIGHT:
+                return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+            case WEIGHT_LIGHT:
+                return EntityWeightClass.WEIGHT_LIGHT;
+            case WEIGHT_MEDIUM:
+                return EntityWeightClass.WEIGHT_MEDIUM;
+            case WEIGHT_HEAVY:
+                return EntityWeightClass.WEIGHT_HEAVY;
+            case WEIGHT_ASSAULT:
+                return EntityWeightClass.WEIGHT_ASSAULT;
+            case WEIGHT_SUPER_HEAVY:
+                return EntityWeightClass.WEIGHT_SUPER_HEAVY;
+            default:
+                return 0;
         }
-        return 0;
     }
 
     public static String getParentFactionType(String factionCode) {
         String org = AtBConfiguration.ORG_IS;
         Faction faction = Faction.getFaction(factionCode);
 
-        if (faction.isComstar()) {
+        if (faction.isComStar()) {
             org = AtBConfiguration.ORG_CS;
-        } else if(faction.isClan()) {
+        } else if (faction.isClan()) {
             org = AtBConfiguration.ORG_CLAN;
         }
 
         return org;
     }
 
-    public boolean isHiringHall(String planet, Date date) {
+    public boolean isHiringHall(String planet, LocalDate date) {
         return hiringHalls.stream().anyMatch( rec -> rec.getValue().equals(planet)
                 && rec.fitsDate(date));
     }
@@ -351,12 +345,12 @@ public class AtBConfiguration implements Serializable {
 
     public Integer shipSearchTargetBase(int unitType) {
         switch (unitType) {
-        case UnitType.DROPSHIP:
-            return dropshipSearchTarget;
-        case UnitType.JUMPSHIP:
-            return jumpshipSearchTarget;
-        case UnitType.WARSHIP:
-            return warshipSearchTarget;
+            case UnitType.DROPSHIP:
+                return dropshipSearchTarget;
+            case UnitType.JUMPSHIP:
+                return jumpshipSearchTarget;
+            case UnitType.WARSHIP:
+                return warshipSearchTarget;
         }
         return null;
     }
@@ -401,11 +395,11 @@ public class AtBConfiguration implements Serializable {
     }
 
     public static AtBConfiguration loadFromXml() {
-        final String METHOD_NAME = "loadFromXml()"; //$NON-NLS-1$
+        final String METHOD_NAME = "loadFromXml()";
         AtBConfiguration retVal = new AtBConfiguration();
 
         MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, LogLevel.INFO,
-                "Starting load of AtB configuration data from XML..."); //$NON-NLS-1$
+                "Starting load of AtB configuration data from XML...");
 
         Document xmlDoc;
         try (InputStream is = new FileInputStream("data/universe/atbconfig.xml")) {
@@ -414,7 +408,7 @@ public class AtBConfiguration implements Serializable {
             xmlDoc = db.parse(is);
         } catch (FileNotFoundException ex) {
             MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, LogLevel.INFO,
-                    "File data/universe/atbconfig.xml not found. Loading defaults."); //$NON-NLS-1$
+                    "File data/universe/atbconfig.xml not found. Loading defaults.");
             retVal.setAllValuesToDefaults();
             return retVal;
         } catch (Exception ex) {
@@ -429,15 +423,15 @@ public class AtBConfiguration implements Serializable {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn = nl.item(x);
             switch (wn.getNodeName()) {
-            case "scenarioGeneration":
-                retVal.loadScenarioGenerationNodeFromXml(wn);
-                break;
-            case "contractGeneration":
-                retVal.loadContractGenerationNodeFromXml(wn);
-                break;
-            case "shipSearch":
-                retVal.loadShipSearchNodeFromXml(wn);
-                break;
+                case "scenarioGeneration":
+                    retVal.loadScenarioGenerationNodeFromXml(wn);
+                    break;
+                case "contractGeneration":
+                    retVal.loadContractGenerationNodeFromXml(wn);
+                    break;
+                case "shipSearch":
+                    retVal.loadShipSearchNodeFromXml(wn);
+                    break;
             }
         }
 
@@ -451,30 +445,30 @@ public class AtBConfiguration implements Serializable {
             String[] orgs;
             ArrayList<WeightedTable<String>> list;
             switch (wn.getNodeName()) {
-            case "botForce":
-                if (wn.getAttributes().getNamedItem("org") == null) {
-                    orgs = new String[1];
-                    orgs[0] = ORG_IS;
-                } else {
-                    orgs = wn.getAttributes().getNamedItem("org").getTextContent().split(",");
-                }
-                list = loadForceTableFromXml(wn);
-                for (String org : orgs) {
-                    botForceTables.put(org, list);
-                }
-                break;
-            case "botLance":
-                if (wn.getAttributes().getNamedItem("org") == null) {
-                    orgs = new String[1];
-                    orgs[0] = ORG_IS;
-                } else {
-                    orgs = wn.getAttributes().getNamedItem("org").getTextContent().split(",");
-                }
-                list = loadForceTableFromXml(wn);
-                for (String org : orgs) {
-                    botLanceTables.put(org, list);
-                }
-                break;
+                case "botForce":
+                    if (wn.getAttributes().getNamedItem("org") == null) {
+                        orgs = new String[1];
+                        orgs[0] = ORG_IS;
+                    } else {
+                        orgs = wn.getAttributes().getNamedItem("org").getTextContent().split(",");
+                    }
+                    list = loadForceTableFromXml(wn);
+                    for (String org : orgs) {
+                        botForceTables.put(org, list);
+                    }
+                    break;
+                case "botLance":
+                    if (wn.getAttributes().getNamedItem("org") == null) {
+                        orgs = new String[1];
+                        orgs[0] = ORG_IS;
+                    } else {
+                        orgs = wn.getAttributes().getNamedItem("org").getTextContent().split(",");
+                    }
+                    list = loadForceTableFromXml(wn);
+                    for (String org : orgs) {
+                        botLanceTables.put(org, list);
+                    }
+                    break;
             }
         }
     }
@@ -495,7 +489,7 @@ public class AtBConfiguration implements Serializable {
                     retVal.set(weightClass, loadWeightedTableFromXml(wn));
                 } catch (Exception ex) {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                            "Could not parse weight class attribute for enemy forces table"); //$NON-NLS-1$
+                            "Could not parse weight class attribute for enemy forces table");
                     MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
                 }
             }
@@ -504,9 +498,6 @@ public class AtBConfiguration implements Serializable {
     }
 
     private void loadContractGenerationNodeFromXml(Node node) {
-        final String METHOD_NAME = "loadContractGenerationNodeFromXml(Node)"; //$NON-NLS-1$
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
         NodeList nl = node.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
@@ -515,18 +506,13 @@ public class AtBConfiguration implements Serializable {
                 for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
                     Node wn2 = wn.getChildNodes().item(j);
                     if (wn2.getNodeName().equals("hall")) {
-                        Date start = null;
-                        Date end = null;
-                        try {
-                            if (wn2.getAttributes().getNamedItem("start") != null) {
-                                start = new Date(df.parse(wn2.getAttributes().getNamedItem("start").getTextContent()).getTime());
-                            }
-                            if (wn2.getAttributes().getNamedItem("end") != null) {
-                                end = new Date(df.parse(wn2.getAttributes().getNamedItem("end").getTextContent()).getTime());
-                            }
-                        } catch (ParseException ex) {
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, "Error parsing date for hiring hall on " + wn2.getTextContent()); //$NON-NLS-1$
-                            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+                        LocalDate start = null;
+                        LocalDate end = null;
+                        if (wn2.getAttributes().getNamedItem("start") != null) {
+                            start = MekHqXmlUtil.parseDate(wn2.getAttributes().getNamedItem("start").getTextContent());
+                        }
+                        if (wn2.getAttributes().getNamedItem("end") != null) {
+                            end = MekHqXmlUtil.parseDate(wn2.getAttributes().getNamedItem("end").getTextContent());
                         }
                         hiringHalls.add(new DatedRecord<>(start, end, wn2.getTextContent()));
                     }
@@ -540,46 +526,46 @@ public class AtBConfiguration implements Serializable {
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
             switch (wn.getNodeName()) {
-            case "shipSearchCost":
-                shipSearchCost = Money.of(Double.parseDouble(wn.getTextContent()));
-                break;
-            case "shipSearchLengthWeeks":
-                shipSearchLengthWeeks = Integer.parseInt(wn.getTextContent());
-                break;
-            case "target":
-                if (wn.getAttributes().getNamedItem("unitType") != null) {
-                    int target = Integer.parseInt(wn.getTextContent());
-                    switch (wn.getAttributes().getNamedItem("unitType").getTextContent()) {
-                    case "Dropship":
-                        dropshipSearchTarget = target;
-                        break;
-                    case "Jumpship":
-                        jumpshipSearchTarget = target;
-                        break;
-                    case "Warship":
-                        warshipSearchTarget = target;
-                        break;
+                case "shipSearchCost":
+                    shipSearchCost = Money.of(Double.parseDouble(wn.getTextContent()));
+                    break;
+                case "shipSearchLengthWeeks":
+                    shipSearchLengthWeeks = Integer.parseInt(wn.getTextContent());
+                    break;
+                case "target":
+                    if (wn.getAttributes().getNamedItem("unitType") != null) {
+                        int target = Integer.parseInt(wn.getTextContent());
+                        switch (wn.getAttributes().getNamedItem("unitType").getTextContent()) {
+                            case "Dropship":
+                                dropshipSearchTarget = target;
+                                break;
+                            case "Jumpship":
+                                jumpshipSearchTarget = target;
+                                break;
+                            case "Warship":
+                                warshipSearchTarget = target;
+                                break;
+                        }
                     }
-                }
-                break;
-            case "weightedTable":
-                if (wn.getAttributes().getNamedItem("unitType") != null) {
-                    WeightedTable<String> map = loadWeightedTableFromXml(wn);
-                    switch (wn.getAttributes().getNamedItem("unitType").getTextContent()) {
-                    case "Dropship":
-                        dsTable = map;
-                        break;
-                    case "Jumpship":
-                        jsTable = map;
+                    break;
+                case "weightedTable":
+                    if (wn.getAttributes().getNamedItem("unitType") != null) {
+                        WeightedTable<String> map = loadWeightedTableFromXml(wn);
+                        switch (wn.getAttributes().getNamedItem("unitType").getTextContent()) {
+                            case "Dropship":
+                                dsTable = map;
+                                break;
+                            case "Jumpship":
+                                jsTable = map;
+                        }
                     }
-                }
-                break;
+                    break;
             }
         }
     }
 
     private WeightedTable<String> loadWeightedTableFromXml(Node node) {
-        return loadWeightedTableFromXml(node, s -> s);
+        return loadWeightedTableFromXml(node, Function.identity());
     }
 
     private <T>WeightedTable<T> loadWeightedTableFromXml(Node node, Function<String,T> fromString) {
@@ -605,8 +591,8 @@ public class AtBConfiguration implements Serializable {
      * or to the end of the epoch, respectively.
      */
     static class DatedRecord<E> {
-        private Date start;
-        private Date end;
+        private LocalDate start;
+        private LocalDate end;
         private E value;
 
         public DatedRecord() {
@@ -615,37 +601,25 @@ public class AtBConfiguration implements Serializable {
             value = null;
         }
 
-        public DatedRecord(Date s, Date e, E v) {
-            if (s != null) {
-                start = new Date(s.getTime());
-            }
-            if (e != null) {
-                end = new Date(e.getTime());
-            }
-            value = v;
+        public DatedRecord(LocalDate start, LocalDate end, E value) {
+            this.start = start;
+            this.end = end;
+            this.value = value;
         }
 
-        public void setStart(Date s) {
-            if (start == null) {
-                start = new Date(s.getTime());
-            } else {
-                start.setTime(s.getTime());
-            }
+        public void setStart(LocalDate start) {
+            this.start = start;
         }
 
-        public Date getStart() {
+        public LocalDate getStart() {
             return start;
         }
 
-        public void setEnd(Date e) {
-            if (end == null) {
-                end = new Date(e.getTime());
-            } else {
-                end.setTime(e.getTime());
-            }
+        public void setEnd(LocalDate end) {
+            this.end = end;
         }
 
-        public Date getEnd() {
+        public LocalDate getEnd() {
             return end;
         }
 
@@ -658,20 +632,16 @@ public class AtBConfiguration implements Serializable {
         }
 
         /**
-         *
          * @param d date to check
          * @return true if d is between the start and end date, inclusive
          */
-        public boolean fitsDate(Date d) {
-            return (start == null || !start.after(d))
-                    && (end == null || !end.before(d));
+        public boolean fitsDate(LocalDate d) {
+            return ((start == null) || !start.isAfter(d))
+                    && ((end == null) || !end.isBefore(d));
         }
     }
 
     static class WeightedTable<T> implements Serializable {
-        /**
-         *
-         */
         private static final long serialVersionUID = 1984759212668176620L;
 
         private ArrayList<Integer> weights = new ArrayList<>();

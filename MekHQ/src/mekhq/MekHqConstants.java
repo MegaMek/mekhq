@@ -21,6 +21,8 @@
 package mekhq;
 
 public final class MekHqConstants {
+    //region MekHQ Options
+    //region Autosave
     public static final String AUTOSAVE_NODE = "mekhq/prefs/autosave";
     public static final String NO_SAVE_KEY = "noSave";
     public static final String SAVE_DAILY_KEY = "saveDaily";
@@ -29,8 +31,14 @@ public final class MekHqConstants {
     public static final String SAVE_YEARLY_KEY = "saveYearly";
     public static final String SAVE_BEFORE_MISSIONS_KEY = "saveBeforeMissions";
     public static final String MAXIMUM_NUMBER_SAVES_KEY = "maximumNumberAutoSaves";
-
     public static final int DEFAULT_NUMBER_SAVES = 5;
+    //endregion Autosave
+
+    //region Campaign XML Save Options
+    public static final String XML_SAVES_NODE = "mekhq/prefs/xmlsaves";
+    public static final String WRITE_CUSTOMS_TO_XML = "writeCustomsToXML";
+    //endregion Campaign XML Save Options
+    //endregion MekHQ Options
 
     /** This is used in creating the name of save files, e.g. the MekHQ campaign file */
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";

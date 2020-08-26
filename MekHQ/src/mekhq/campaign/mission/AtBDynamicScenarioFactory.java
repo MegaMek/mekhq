@@ -1552,7 +1552,7 @@ public class AtBDynamicScenarioFactory {
         String factionWeightString = AtBConfiguration.ORG_IS;
         if (genFaction.isClan() || faction.equals("MH")) {
             factionWeightString = AtBConfiguration.ORG_CLAN;
-        } else if (genFaction.isComstar()) {
+        } else if (genFaction.isComStar()) {
             factionWeightString = AtBConfiguration.ORG_CS;
         }
 
@@ -2229,7 +2229,7 @@ public class AtBDynamicScenarioFactory {
             if (faction.isClan() || factionCode.equals("MH")) {
                 return CLAN_MH_LANCE_SIZE;
             // comstar and wobbies use a fundamental unit size of 6.
-            } else if (faction.isComstar()) {
+            } else if (faction.isComStar()) {
                 return COMSTAR_LANCE_SIZE;
             }
         }

@@ -23,6 +23,7 @@ import java.util.prefs.Preferences;
 public final class MekHQOptions {
     private static final Preferences userPreferences = Preferences.userRoot();
 
+    //region Autosave
     public boolean getNoAutosaveValue() {
         return userPreferences.node(MekHqConstants.AUTOSAVE_NODE).getBoolean(MekHqConstants.NO_SAVE_KEY, false);
     }
@@ -79,4 +80,15 @@ public final class MekHQOptions {
     public void setMaximumNumberOfAutosavesValue(int value) {
         userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY, value);
     }
+    //endregion Autosave
+
+    //region Campaign XML Save Options
+    public boolean getWriteCustomsToXML() {
+        return userPreferences.node(MekHqConstants.XML_SAVES_NODE).getBoolean(MekHqConstants.WRITE_CUSTOMS_TO_XML, true);
+    }
+
+    public void setWriteCustomsToXML(boolean value) {
+        userPreferences.node(MekHqConstants.XML_SAVES_NODE).putBoolean(MekHqConstants.WRITE_CUSTOMS_TO_XML, value);
+    }
+    //endregion Campaign XML Save Options
 }

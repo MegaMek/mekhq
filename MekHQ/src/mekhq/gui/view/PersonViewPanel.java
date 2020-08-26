@@ -1554,7 +1554,7 @@ public class PersonViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlKills.add(lblRecord, gridBagConstraints);
 
-        PersonnelKillLogModel killModel = new PersonnelKillLogModel();
+        PersonnelKillLogModel killModel = new PersonnelKillLogModel(gui.getCampaign());
         killModel.setData(kills);
         JTable killTable = new JTable(killModel);
         killTable.setRowSelectionAllowed(false);

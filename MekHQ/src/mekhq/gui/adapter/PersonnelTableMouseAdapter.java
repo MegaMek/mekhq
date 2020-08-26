@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -716,20 +716,16 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_REMOVE: {
-                String title = String.format(resourceMap.getString("numPersonnel.text"), people.length); //$NON-NLS-1$
+                String title = String.format(resourceMap.getString("numPersonnel.text"), people.length);
                 if (people.length == 1) {
                     title = people[0].getFullTitle();
                 }
-                if (0 == JOptionPane.showConfirmDialog(
-                        null,
-                        String.format(resourceMap.getString("confirmRemove.format"), title), //$NON-NLS-1$
-                        resourceMap.getString("removeQ.text"), //$NON-NLS-1$
+                if (0 == JOptionPane.showConfirmDialog(null,
+                        String.format(resourceMap.getString("confirmRemove.format"), title),
+                        resourceMap.getString("removeQ.text"),
                         JOptionPane.YES_NO_OPTION)) {
                     for (Person person : people) {
                         gui.getCampaign().removePerson(person.getId());
-                        if (person.getGenealogy().hasSpouse()) {
-                            person.getGenealogy().getSpouse(gui.getCampaign()).getGenealogy().setSpouse(null);
-                        }
                     }
                 }
                 break;
@@ -924,19 +920,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 AddOrEditKillEntryDialog nkd;
                 Unit unit = gui.getCampaign().getUnit(selectedPerson.getUnitId());
                 if (people.length > 1) {
-                    nkd = new AddOrEditKillEntryDialog(
-                            gui.getFrame(),
-                            true,
-                            null,
-                            unit != null ? unit.getName() : resourceMap.getString("bareHands.text"),
-                            gui.getCampaign().getDate());
+                    nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true,
+                            gui.getCampaign(), null,
+                            (unit != null) ? unit.getName() : resourceMap.getString("bareHands.text"),
+                            gui.getCampaign().getLocalDate());
                 } else {
-                    nkd = new AddOrEditKillEntryDialog(
-                            gui.getFrame(),
-                            true,
-                            selectedPerson.getId(),
-                            unit != null ? unit.getName() : resourceMap.getString("bareHands.text"),
-                            gui.getCampaign().getDate());
+                    nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true,
+                            gui.getCampaign(), selectedPerson.getId(),
+                            (unit != null) ? unit.getName() : resourceMap.getString("bareHands.text"),
+                            gui.getCampaign().getLocalDate());
                 }
                 nkd.setVisible(true);
                 if (nkd.getKill().isPresent()) {
