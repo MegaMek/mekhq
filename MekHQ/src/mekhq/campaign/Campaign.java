@@ -955,11 +955,6 @@ public class Campaign implements Serializable, ITechManager {
         addMissionWithoutId(m);
         
         if(m instanceof AtBContract) {
-            // temporary hack: initalize a campaign state if there isn't one.
-            if(((AtBContract) m).getStratconCampaignState() == null) {
-                ((AtBContract) m).setStratconCampaignState(StratconRulesManager.InitializeCampaignState((AtBContract) m, this));
-            }
-            
             // having loaded scenarios and such, we now need to go through any stratcon scenarios for this contract
             // and set their backing scenario pointers to the existing scenarios stored in the campaign for this contract
             AtBContract atbContract = (AtBContract) m;

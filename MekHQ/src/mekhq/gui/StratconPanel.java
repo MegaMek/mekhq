@@ -15,20 +15,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import megamek.common.Coords;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconFacility;
-import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.stratcon.StratconScenarioWizard;
@@ -79,7 +75,6 @@ public class StratconPanel extends JPanel implements ActionListener {
         campaign = gui.getCampaign();
         scenarioWizard = new StratconScenarioWizard(campaign);
         this.infoArea = infoArea;
-        infoArea.setText("WTF");
         
         buildRightClickMenu(null);
         
@@ -456,9 +451,13 @@ public class StratconPanel extends JPanel implements ActionListener {
 
     @Override
     public Dimension getPreferredSize() {
-        int xDimension = (int) (HEX_X_RADIUS * 1.75 * currentTrack.getWidth());
-        int yDimension = (int) (HEX_Y_RADIUS * 2.1 * currentTrack.getHeight());
-        
-        return new Dimension(xDimension, yDimension);
+        if(currentTrack != null) {
+            int xDimension = (int) (HEX_X_RADIUS * 1.75 * currentTrack.getWidth());
+            int yDimension = (int) (HEX_Y_RADIUS * 2.1 * currentTrack.getHeight());
+            
+            return new Dimension(xDimension, yDimension);
+        } else {
+            return super.getPreferredSize();
+        }
     }
 }

@@ -331,7 +331,7 @@ public class AtBScenarioModifier implements Cloneable {
         copy.blockFurtherEvents = blockFurtherEvents;
         copy.eventRecipient = eventRecipient;
         copy.eventTiming = eventTiming;
-        copy.forceDefinition = new ScenarioForceTemplate(forceDefinition);
+        copy.forceDefinition = forceDefinition != null ? new ScenarioForceTemplate(forceDefinition) : null;
         copy.modifierName = modifierName;
         copy.qualityAdjustment = qualityAdjustment;
         copy.skillAdjustment = skillAdjustment;

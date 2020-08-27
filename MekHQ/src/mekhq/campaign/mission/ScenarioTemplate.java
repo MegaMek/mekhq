@@ -61,11 +61,11 @@ public class ScenarioTemplate implements Cloneable {
         }
         
         for(String mod : scenarioModifiers) {
-            scenarioModifiers.add(mod);
+            st.scenarioModifiers.add(mod);
         }
         
         for(ScenarioObjective obj : scenarioObjectives) {
-            scenarioObjectives.add(new ScenarioObjective(obj));
+            st.scenarioObjectives.add(new ScenarioObjective(obj));
         }
         
         st.mapParameters = (ScenarioMapParameters) mapParameters.clone();

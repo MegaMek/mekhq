@@ -83,6 +83,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         gbc.gridy++;
         
         getContentPane().add(btnConfirm, gbc);
+        btnConfirm.setEnabled(true);
         
         pack();
         repaint();

@@ -35,6 +35,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
@@ -528,6 +529,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setSharesPct((Integer)spnShares.getValue());
 
         contract.calculatePartsAvailabilityLevel(campaign);
+        
+        StratconRulesManager.InitializeCampaignState((AtBContract) contract, campaign);
 
         campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                 "Advance monies for " + contract.getName(), campaign.getLocalDate());

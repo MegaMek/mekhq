@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
@@ -46,25 +45,25 @@ public class StratconRulesManager {
     
     public static final int NUM_LANCES_PER_TRACK = 3;
     
-    public static StratconCampaignState InitializeCampaignState(AtBContract contract, Campaign campaign) {
-        StratconCampaignState retVal = new StratconCampaignState(contract);
+    public static void InitializeCampaignState(AtBContract contract, Campaign campaign) {
+        StratconCampaignState campaignState = new StratconCampaignState(contract);
         
         // a campaign will have X tracks going at a time, where
         // X = # required lances / 3, rounded up. The last track will have fewer required lances.
         int oddLanceCount = contract.getRequiredLances() % NUM_LANCES_PER_TRACK;
         if(oddLanceCount > 0) {
-            StratconTrackState track = InitializeTrackState(retVal, oddLanceCount);
+            StratconTrackState track = InitializeTrackState(campaignState, oddLanceCount);
             track.setDisplayableName("Odd Track");
-            retVal.addTrack(track);
+            campaignState.addTrack(track);
         }
         
         for(int x = 0; x < contract.getRequiredLances() / NUM_LANCES_PER_TRACK; x++) {
-            StratconTrackState track = InitializeTrackState(retVal, NUM_LANCES_PER_TRACK);
+            StratconTrackState track = InitializeTrackState(campaignState, NUM_LANCES_PER_TRACK);
             track.setDisplayableName(String.format("Track %d", x));
-            retVal.addTrack(track);
+            campaignState.addTrack(track);
         }
         
-        return retVal;
+        contract.setStratconCampaignState(campaignState);
     }
     
     public static StratconTrackState InitializeTrackState(StratconCampaignState campaignState, int numLances) {
@@ -86,20 +85,27 @@ public class StratconRulesManager {
         retVal.setHeight(height);
         
         // generate the facilities
-        //for(int fCount = 0; fCount < numLances; fCount++) {
-            StratconFacilityFactory.reloadFacilities();
-            StratconFacility sf = StratconFacility.createTestFacility();//StratconFacilityFactory.getRandomFacility();
+        for(int fCount = 0; fCount < numLances; fCount++) {
+            //StratconFacilityFactory.reloadFacilities();
+            StratconFacility sf = StratconFacilityFactory.getRandomFacility();
             
             int fIndex = Compute.randomInt(StratconFacility.FacilityType.values().length);
             sf.setFacilityType(FacilityType.values()[fIndex]);
             
             int x = Compute.randomInt(width);
             int y = Compute.randomInt(height);
+            StratconCoords coords = new StratconCoords(x, y);
+            
+            while(retVal.getFacility(coords) != null) {
+                x = Compute.randomInt(width);
+                y = Compute.randomInt(height);
+                coords = new StratconCoords(x, y);
+            }
             
             sf.setDisplayableName(String.format("Facility %d,%d", x, y));
             
-            retVal.addFacility(new StratconCoords(4, 4), sf);
-        //}
+            retVal.addFacility(new StratconCoords(x, y), sf);
+        }
         
         return retVal;
     }
@@ -113,7 +119,7 @@ public class StratconRulesManager {
     public static void generateScenariosForTrack(Campaign campaign, AtBContract contract, StratconTrackState track) {
         // maps scenarios to force IDs
         List<StratconScenario> generatedScenarios = new ArrayList<>(); 
-        boolean autoAssignLances = false;//contract.getCommandRights() == AtBContract.COM_INTEGRATED;
+        boolean autoAssignLances = contract.getCommandRights() == AtBContract.COM_INTEGRATED;
         
         //StratconScenarioFactory.reloadScenarios();
         
@@ -415,7 +421,7 @@ public class StratconRulesManager {
                 
                 // if the modifier is some kind of force, we need to perform a few programmatic overrides
                 // of the template. Ideally this is kept to a minimum.
-                if(modifier.getForceDefinition() != null) {
+                /*if(modifier.getForceDefinition() != null) {
                     // figure out deployment zones here
                     // aero units will always deploy at the edge
                     // ground units will deploy in the center if scenario at facility, at edge otherwise
@@ -434,7 +440,7 @@ public class StratconRulesManager {
                     
                     // figure out actual force alignment here 
                     modifier.getForceDefinition().setForceAlignment(facility.getOwner().ordinal());
-                }
+                }*/
                 
                 scenario.getBackingScenario().addScenarioModifier(modifier);
             }
@@ -730,7 +736,7 @@ public class StratconRulesManager {
         if(ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             // run scenario generation routine for every track attached to an active contract
             for(Contract contract : ev.getCampaign().getActiveContracts()) {
-                if(contract instanceof AtBContract) {
+                if((contract instanceof AtBContract) && contract.isActive() && (((AtBContract) contract).getStratconCampaignState() != null)) {
                     for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
                         generateScenariosForTrack(ev.getCampaign(), (AtBContract) contract, track);
                     }

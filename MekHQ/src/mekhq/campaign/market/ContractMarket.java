@@ -44,6 +44,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -409,11 +410,7 @@ public class ContractMarket implements Serializable {
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
 
-        //Ralgith had a version of this then the PR got added. Commenting this Out.
-/*        contract.setName(Faction.getFaction(employer).getShortName() + "-" + String.format("%1$tY%1$tm", contract.getStartDate())
-        				 + "-" + AtBContract.missionTypeNames[contract.getMissionType()]
-        				 + "-" + Faction.getFaction(contract.getEnemyCode()).getShortName()
-        				 + "-" + contract.getLength());*/
+        StratconRulesManager.InitializeCampaignState(contract, campaign);
 
 		return contract;
 	}

@@ -4,12 +4,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.time.DayOfWeek;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import megamek.common.event.Subscribe;
+import mekhq.MekHQ;
+import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.stratcon.StratconScenario;
@@ -51,6 +55,8 @@ public class StratconTab extends CampaignGuiTab {
         gbc.gridx = 4;
         gbc.gridwidth = 1;
         this.add(infoPanel, gbc);
+        
+        MekHQ.registerHandler(this);
     }
 
     private void initializeInfoPanel() {
@@ -103,17 +109,41 @@ public class StratconTab extends CampaignGuiTab {
     }
     
     private void repopulateTrackList() {
+        TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
         cboCurrentTrack.removeAllItems();
         
         // track dropdown is populated with all tracks across all active contracts
         for(Contract contract : getCampaignGui().getCampaign().getActiveContracts()) {
-            if(contract instanceof AtBContract) {
+            if((contract instanceof AtBContract) && contract.isActive() && (((AtBContract) contract).getStratconCampaignState() != null)) {
                 for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
                     TrackDropdownItem tdi = new TrackDropdownItem((AtBContract) contract, track);
                     cboCurrentTrack.addItem(tdi);
+                    
+                    if((currentTDI != null) && currentTDI.equals(tdi)) {
+                        currentTDI = tdi;
+                        cboCurrentTrack.setSelectedItem(tdi);
+                    } else if (currentTDI == null) {
+                        currentTDI = tdi;
+                        cboCurrentTrack.setSelectedItem(tdi);
+                    }
                 }
             }
         }
+        
+        if((cboCurrentTrack.getItemCount() > 0) && (currentTDI != null) && (currentTDI.contract != null)) {
+            TrackDropdownItem selectedTrack = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
+            
+            stratconPanel.selectTrack(selectedTrack.contract.getStratconCampaignState(), currentTDI.track);
+            stratconPanel.setVisible(true);
+        } else {
+            infoPanelText.setText("No active campaign tracks");
+            stratconPanel.setVisible(false);
+        }
+    }
+    
+    @Subscribe
+    public void handleNewDay(NewDayEvent ev) {
+        repopulateTrackList();
     }
     
     /**
@@ -133,6 +163,16 @@ public class StratconTab extends CampaignGuiTab {
         @Override
         public String toString() {
             return String.format("%s - %s", contract.getName(), track.getDisplayableName());
+        }
+        
+        @Override
+        public boolean equals(Object other) {
+            if(!(other instanceof TrackDropdownItem) || (other == null)) {
+                return false;
+            } else {
+                TrackDropdownItem otherTDI = (TrackDropdownItem) other;
+                return otherTDI.contract.equals(this.contract) && otherTDI.track.equals(this.track);
+            }
         }
     }
 }
