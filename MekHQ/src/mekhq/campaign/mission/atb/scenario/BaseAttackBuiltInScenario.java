@@ -134,7 +134,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         addBotForce(civilianForce);
 
         ArrayList<Entity> turretForce = new ArrayList<>();
-        addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce));
+        
         if (isAttacker()) {
             addTurrets(turretForce, 6, getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
                     campaign);
@@ -142,6 +142,8 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
             addTurrets(turretForce, 6, getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
                     campaign);
         }
+        
+        addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce));
 
         /* Roll 2x on bot lances roll */
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
