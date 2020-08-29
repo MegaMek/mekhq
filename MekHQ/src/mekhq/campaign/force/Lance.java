@@ -307,7 +307,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         // when generating a lance-based scenario (Standup, Probe, etc), the second parameter in
         // createScenario is "this" (the lance). Otherwise, it should be null.
         /*if (true) {
-            AtBScenario scenario = AtBScenarioFactory.createScenario(c, null, AtBScenario.CIVILIANHELP, true, getBattleDate(c.getCalendar()));
+            AtBScenario scenario = AtBScenarioFactory.createScenario(c, this, AtBScenario.BASEATTACK, true, getBattleDate(c.getLocalDate()));
             scenario.setMissionId(this.getMissionId());
             return scenario;
         }*/

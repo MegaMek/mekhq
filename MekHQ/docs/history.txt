@@ -29,6 +29,8 @@ VERSION HISTORY:
 + PR #1966: Fixing Duplicated Siblings
 + PR #1925: Final PR to swap MekHQ to use LocalDate
 + Issue #254: Implementing AtB Battle Chance by Role
++ Issue #1166: Possible fix for missing turrets in AtB base attack/defense missions; still no turrets prior to 2750
++ Issue #1757: Enable Ranks For Captured Prisoners
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
