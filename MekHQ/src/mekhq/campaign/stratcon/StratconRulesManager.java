@@ -24,6 +24,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.stratcon.StratconFacility.FacilityType;
@@ -208,8 +209,8 @@ public class StratconRulesManager {
         processForceDeployment(coords, forceID, campaign, track);
         
         if(track.getFacilities().containsKey(coords)) {
-            // TODO: let's ensure that this is a facility scenario and the objective is set appropriately
-            StratconScenario scenario = generateScenario(campaign, contract, track, forceID, coords);
+            ScenarioTemplate template = StratconScenarioFactory.getFacilityScenario(track.getFacility(coords).getOwner() == ForceAlignment.Allied);
+            StratconScenario scenario = generateScenario(campaign, contract, track, forceID, coords, template);
             scenario.commitPrimaryForces(campaign, contract);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
         } else if(Compute.randomInt(100) > track.getScenarioOdds()) {
@@ -351,18 +352,22 @@ public class StratconRulesManager {
     /**
      * Worker function that generates stratcon scenario at the given coords, for the given force, on the given track.
      * Also registers it with the track and campaign.
-     * @param campaign
-     * @param contract
-     * @param track
-     * @param forceID
-     * @param coords
-     * @return
      */
     private static StratconScenario generateScenario(Campaign campaign, AtBContract contract, StratconTrackState track, 
             int forceID, StratconCoords coords) {
-        StratconScenario scenario = new StratconScenario();
         int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
         ScenarioTemplate template = StratconScenarioFactory.getRandomScenario(unitType);
+        
+        return generateScenario(campaign, contract, track, forceID, coords, template);
+    }
+    
+    /**
+     * Worker function that generates stratcon scenario at the given coords, for the given force, on the given track,
+     * using the given template. Also registers it with the track and campaign.
+     */
+    private static StratconScenario generateScenario(Campaign campaign, AtBContract contract, StratconTrackState track, 
+            int forceID, StratconCoords coords, ScenarioTemplate template) {
+        StratconScenario scenario = new StratconScenario();
         scenario.setBackingScenario(AtBDynamicScenarioFactory.initializeScenarioFromTemplate(template, contract, campaign));
         
         // do an appropriate allied force if the contract calls for it
@@ -398,16 +403,16 @@ public class StratconRulesManager {
     private static void applyFacilityModifiers(StratconScenario scenario, StratconTrackState track, StratconCoords coords) {
         // loop through all the facilities on the track
         // if a facility has been revealed, then it has a 100% chance to apply its effect
-        // if a facility has not been revealed, then it has a x% chance to apply its effect, and a cumulative y% chance to reveal itself
-        // if a facility is on the the scenario coordinates the it applies the local effects in
+        // if a facility has not been revealed, then it has a x% chance to apply its effect
+        // if a facility is on the the scenario coordinates the it applies the local effects
         for(StratconCoords facilityCoords : track.getFacilities().keySet()) {
             boolean scenarioAtFacility = facilityCoords.equals(coords);
             StratconFacility facility = track.getFacilities().get(facilityCoords);
-            List<String> modifierIDs;
+            List<String> modifierIDs = new ArrayList<>();
             
             if(scenarioAtFacility) {
                 modifierIDs = facility.getLocalModifiers();
-            } else {
+            } else if (facility.isVisible() || (Compute.randomInt(100) < facility.getAggroRating())) {
                 modifierIDs = facility.getSharedModifiers();
             }
             
@@ -418,29 +423,6 @@ public class StratconRulesManager {
                             String.format("Modifier %s not found for facility %s", modifierID, facility.getDisplayableName()));
                     continue;
                 }
-                
-                // if the modifier is some kind of force, we need to perform a few programmatic overrides
-                // of the template. Ideally this is kept to a minimum.
-                /*if(modifier.getForceDefinition() != null) {
-                    // figure out deployment zones here
-                    // aero units will always deploy at the edge
-                    // ground units will deploy in the center if scenario at facility, at edge otherwise
-                    // artillery will deploy off board additionally if scenario not at facility
-                    
-                    // HACK: the default deployment zone for these modifiers is expected to be a randomly selected edge
-                    // so we only need to override it when the scenario takes place at this facility
-                    if(scenarioAtFacility) {
-                        modifier.getForceDefinition().getDeploymentZones().clear();
-                        modifier.getForceDefinition().getDeploymentZones().add(Board.START_CENTER);
-                    }
-                    
-                    if(modifier.getForceDefinition().getUseArtillery()) {
-                        modifier.getForceDefinition().setDeployOffboard(!scenarioAtFacility);
-                    }
-                    
-                    // figure out actual force alignment here 
-                    modifier.getForceDefinition().setForceAlignment(facility.getOwner().ordinal());
-                }*/
                 
                 scenario.getBackingScenario().addScenarioModifier(modifier);
             }

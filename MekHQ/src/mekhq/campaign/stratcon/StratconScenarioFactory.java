@@ -36,11 +36,17 @@ public class StratconScenarioFactory {
     // loaded dynamic scenario templates, sorted by location (ground, low atmosphere, space)
     private static Map<MapLocation, List<ScenarioTemplate>> dynamicScenarioLocationMap = new HashMap<>();
     private static Map<Integer, List<ScenarioTemplate>> dynamicScenarioUnitTypeMap = new HashMap<>();
+    private static Map<String, ScenarioTemplate> dynamicScenarioNameMap = new HashMap<>();
+    private static String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
+    private static String ALLIED_FACILITY_SCENARIO = "Allied Facility.xml";
     
     static {
         reloadScenarios();
     }
     
+    /**
+     * Reload the dynamic scenarios. 
+     */
     public static void reloadScenarios() {
         dynamicScenarioLocationMap.clear();
         dynamicScenarioUnitTypeMap.clear();
@@ -70,6 +76,7 @@ public class StratconScenarioFactory {
         }
         
         for(int key : manifest.scenarioFileNames.keySet()) {
+            String fileName = manifest.scenarioFileNames.get(key).trim();
             String filePath = String.format("./data/ScenarioTemplates/%s", manifest.scenarioFileNames.get(key).trim());
             
             try {
@@ -92,6 +99,8 @@ public class StratconScenarioFactory {
                     }
                     
                     dynamicScenarioUnitTypeMap.get(playerForceUnitType).add(template);
+                    
+                    dynamicScenarioNameMap.put(fileName, template);
                 }
             } catch(Exception e) {
                 MekHQ.getLogger().error(StratconScenarioFactory.class, "loadScenariosFromManifest", 
@@ -132,6 +141,17 @@ public class StratconScenarioFactory {
         
         int scenarioIndex = Compute.randomInt(dynamicScenarioUnitTypeMap.get(actualUnitType).size());
         return (ScenarioTemplate) dynamicScenarioUnitTypeMap.get(actualUnitType).get(scenarioIndex).clone();
+    }
+    
+    /**
+     * Get an allied or hostile facilit scenario, depending on passed on parameter.
+     */
+    public static ScenarioTemplate getFacilityScenario(boolean allied) {
+        if(allied) {
+            return dynamicScenarioNameMap.get(ALLIED_FACILITY_SCENARIO);
+        } else {
+            return dynamicScenarioNameMap.get(HOSTILE_FACILITY_SCENARIO);
+        }
     }
     
     /**

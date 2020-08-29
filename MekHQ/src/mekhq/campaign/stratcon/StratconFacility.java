@@ -56,6 +56,7 @@ public class StratconFacility implements Cloneable {
     private String displayableName;
     private FacilityType facilityType;
     private boolean visible;
+    private int aggroRating;
     private List<String> sharedModifiers = new ArrayList<>();
     private List<String> localModifiers = new ArrayList<>();
     private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
@@ -141,7 +142,13 @@ public class StratconFacility implements Cloneable {
         this.localModifiers = localModifiers;
     }
     
-    //public void applyM
+    public int getAggroRating() {
+        return aggroRating;
+    }
+    
+    public void setAggroRating(int rating) {
+        aggroRating = rating;
+    }
     
     /**
      * Attempt to deserialize an instance of a StratconFacilityManifest from the passed-in file 
