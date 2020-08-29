@@ -504,10 +504,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case PRISONER:
             case PRISONER_DEFECTOR:
             case BONDSMAN:
-                // They don't get to have a rank. Their rank is Prisoner or Bondsman
-                // TODO : Remove this as part of permitting ranked prisoners
-                getCampaign().changeRank(this,
-                        isPrisoner ? Ranks.RANK_PRISONER : Ranks.RANK_BONDSMAN, true);
                 setRecruitment(null);
                 setLastRankChangeDate(null);
                 if (log) {
@@ -528,9 +524,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
                         setLastRankChangeDate(getCampaign().getLocalDate());
                     }
-                }
-                if (getRankNumeric() < 0) {
-                    getCampaign().changeRank(this, 0, false);
                 }
                 if (log) {
                     if (freed) {
@@ -2296,8 +2289,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                "Error restoring implants: " + adv); //$NON-NLS-1$
+                        MekHQ.getLogger().error(Person.class, METHOD_NAME, "Error restoring implants: " + adv);
                     }
                 }
             }
@@ -2339,12 +2331,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             retVal.getGenealogy().setOrigin(retVal.getId());
 
             // Prisoner and Bondsman updating
-            if ((retVal.prisonerStatus != PrisonerStatus.FREE) && (retVal.rank == 0)) {
-                if (retVal.prisonerStatus == PrisonerStatus.BONDSMAN) {
-                    retVal.setRankNumeric(Ranks.RANK_BONDSMAN);
-                } else {
-                    retVal.setRankNumeric(Ranks.RANK_PRISONER);
-                }
+            if (retVal.rank < 0) {
+                retVal.setRankNumeric(0);
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(Person.class, METHOD_NAME, "Failed to read person "
@@ -2444,7 +2432,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public int getRankLevel() {
         // If we're somehow above the max level for this rank, drop to that level
         int profession = getProfession();
-        while (profession != Ranks.RPROF_MW && getRanks().isEmptyProfession(profession)) {
+        while ((profession != Ranks.RPROF_MW) && getRanks().isEmptyProfession(profession)) {
             profession = getRanks().getAlternateProfession(profession);
         }
 
@@ -2508,7 +2496,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         int redirects = 0;
 
         // If we're using an "empty" profession, default to MechWarrior
-        while (getRanks().isEmptyProfession(profession) && redirects < Ranks.RPROF_NUM) {
+        while (getRanks().isEmptyProfession(profession) && (redirects < Ranks.RPROF_NUM)) {
             profession = campaign.getRanks().getAlternateProfession(profession);
             redirects++;
         }
@@ -2520,8 +2508,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         redirects = 0;
         // re-route through any profession redirections
-        while (getRank().getName(profession).startsWith("--") && profession != Ranks.RPROF_MW
-                && redirects < Ranks.RPROF_NUM) {
+        while (getRank().getName(profession).startsWith("--") && (profession != Ranks.RPROF_MW)
+                && (redirects < Ranks.RPROF_NUM)) {
             // We've hit a rank that defaults to the MechWarrior table, so grab the equivalent name from there
             if (getRank().getName(profession).equals("--")) {
                 profession = getRanks().getAlternateProfession(profession);
@@ -2549,7 +2537,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             maneiDominiRank = ManeiDominiRank.NONE;
         }
 
-        if (getRankSystem() == Ranks.RS_COM || getRankSystem() == Ranks.RS_WOB) {
+        if ((getRankSystem() == Ranks.RS_COM) || (getRankSystem() == Ranks.RS_WOB)) {
             rankName += ROMDesignation.getComStarBranchDesignation(this, campaign);
         }
 
@@ -2559,6 +2547,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 rankName += Utilities.getRomanNumeralsFromArabicNumber(rankLevel, true);
             else // Oops! Our rankLevel didn't get correctly cleared, they's remedy that.
                 rankLevel = 0;
+        }
+
+        if (rankName.equalsIgnoreCase("None")) {
+            if (!getPrisonerStatus().getTitleExtension().equals("")) {
+                rankName = getPrisonerStatus().getTitleExtension();
+            }
+        } else {
+            rankName = getPrisonerStatus().getTitleExtension() + rankName;
         }
 
         // We have our name, return it
@@ -2830,40 +2826,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
     /**
      * returns a full description in HTML format that will be used for the graphical display in the
      * personnel table among other places
-     * @param htmlRank if the rank will be wrapped in an HTML DIV and id
      * @return String
      */
-    public String getFullDesc(boolean htmlRank) {
-        return "<b>" + getFullTitle(htmlRank) + "</b><br/>" + getSkillSummary() + " " + getRoleDesc();
+    public String getFullDesc() {
+        return "<b>" + getFullTitle() + "</b><br/>" + getSkillSummary() + " " + getRoleDesc();
     }
 
     public String getFullTitle() {
-        return getFullTitle(false);
-    }
-
-    public String getFullTitle(boolean html) {
         String rank = getRankName();
 
-        // Do prisoner checks
         if (rank.equalsIgnoreCase("None")) {
-            if (getPrisonerStatus().isPrisoner()) {
-                return "Prisoner " + getFullName();
-            }
-            if (getPrisonerStatus().isBondsman()) {
-                return "Bondsman " + getFullName();
-            }
-            return getFullName();
+            rank = "";
+        } else {
+            rank = rank.trim() + " ";
         }
 
-        // This is used for the rank sorter. If you have a better way to accomplish it, by all means...
-        // Of course, nothing that uses Full Title actually uses the rank sorter yet I guess...
-        // Still, I've turned it back on and I don't see it messing anything up anywhere.
-        // - Dylan
-        // If we need it in html for any reason, make it so.
-        if (html)
-            rank = makeHTMLRankDiv();
-
-        return rank + " " + getFullName();
+        return rank + getFullName();
     }
 
     public String makeHTMLRank() {
@@ -2871,8 +2849,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public String makeHTMLRankDiv() {
-        return String.format("<div id=\"%s\">%s%s</div>", getId().toString(), getRankName(),
-                getPrisonerStatus().isWillingToDefect() ? "*" : "");
+        return String.format("<div id=\"%s\">%s</div>", getId().toString(), getRankName().trim());
     }
 
     public String getHyperlinkedFullTitle() {
