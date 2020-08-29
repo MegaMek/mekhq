@@ -90,5 +90,13 @@ public final class MekHQOptions {
     public void setWriteCustomsToXML(boolean value) {
         userPreferences.node(MekHqConstants.XML_SAVES_NODE).putBoolean(MekHqConstants.WRITE_CUSTOMS_TO_XML, value);
     }
+
+    public boolean getSaveMothballState() {
+        return userPreferences.node(MekHqConstants.XML_SAVES_NODE).getBoolean(MekHqConstants.SAVE_MOTHBALL_STATE, true);
+    }
+
+    public void setSaveMothballState(boolean value) {
+        userPreferences.node(MekHqConstants.XML_SAVES_NODE).putBoolean(MekHqConstants.SAVE_MOTHBALL_STATE, value);
+    }
     //endregion Campaign XML Save Options
 }

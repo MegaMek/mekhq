@@ -4517,7 +4517,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      *             be performed immediately by the GM.
      */
     public void startMothballing(Campaign campaign, UUID id, boolean isGM) {
-        if (!isMothballed() && campaign.getCampaignOptions().saveMothballState()) {
+        if (!isMothballed() && MekHQ.getMekHQOptions().getSaveMothballState()) {
             mothballInfo = new MothballInfo(this);
         }
 

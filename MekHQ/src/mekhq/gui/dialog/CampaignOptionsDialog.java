@@ -173,8 +173,6 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox reverseQualityNames;
     private JCheckBox useUnofficialMaintenance;
     private JCheckBox logMaintenance;
-    //mothballing
-    private JCheckBox chkSaveMothballState;
     //endregion Repair and Maintenance Tab
 
     //region Supplies and Acquisitions Tab
@@ -833,11 +831,9 @@ public class CampaignOptionsDialog extends JDialog {
 
         JPanel panSubRepair = new JPanel(new GridBagLayout());
         JPanel panSubMaintenance = new JPanel(new GridBagLayout());
-        JPanel panSubMothballing = new JPanel(new GridBagLayout());
 
         panSubRepair.setBorder(BorderFactory.createTitledBorder("Repair"));
         panSubMaintenance.setBorder(BorderFactory.createTitledBorder("Maintenance"));
-        panSubMothballing.setBorder(BorderFactory.createTitledBorder("Mothballing"));
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -853,10 +849,6 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         panRepair.add(panSubMaintenance, gridBagConstraints);
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        panRepair.add(panSubMothballing, gridBagConstraints);
 
         useEraModsCheckBox.setText(resourceMap.getString("useEraModsCheckBox.text")); // NOI18N
         useEraModsCheckBox.setToolTipText(resourceMap.getString("useEraModsCheckBox.toolTipText")); // NOI18N
@@ -1073,17 +1065,6 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panSubMaintenance.add(logMaintenance, gridBagConstraints);
-
-        //region Mothballing
-        chkSaveMothballState = new JCheckBox(resourceMap.getString("chkSaveMothballState.text"));
-        chkSaveMothballState.setToolTipText(resourceMap.getString("chkSaveMothballState.toolTipText")); // NOI18N
-        chkSaveMothballState.setName("chkSaveMothballState");
-        chkSaveMothballState.setSelected(options.saveMothballState());
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panSubMothballing.add(chkSaveMothballState, gridBagConstraints);
-        //endregion Mothballing
 
         tabOptions.addTab(resourceMap.getString("panRepair.TabConstraints.tabTitle"), panRepair); // NOI18N
         //endregion Repair and Maintenance
@@ -4800,7 +4781,6 @@ public class CampaignOptionsDialog extends JDialog {
         options.setReverseQualityNames(reverseQualityNames.isSelected());
         options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
         options.setLogMaintenance(logMaintenance.isSelected());
-        options.setSaveMothballState(chkSaveMothballState.isSelected());
         options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getModel().getValue());
         options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getModel().getValue());
         options.setPayForParts(payForPartsBox.isSelected());
@@ -4849,8 +4829,8 @@ public class CampaignOptionsDialog extends JDialog {
         options.setDisallowClanPartsFromIS(disallowClanPartsFromIS.isSelected());
         options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
         options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
-        options.setMaxJumpsPlanetaryAcquisition((int)spnMaxJumpPlanetaryAcquisitions.getModel().getValue());
-        options.setPenaltyClanPartsFroIS((int)spnPenaltyClanPartsFromIS.getModel().getValue());
+        options.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getModel().getValue());
+        options.setPenaltyClanPartsFroIS((int) spnPenaltyClanPartsFromIS.getModel().getValue());
         options.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedIndex());
         for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
             options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getModel().getValue(), i);

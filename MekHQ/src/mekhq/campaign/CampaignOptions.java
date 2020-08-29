@@ -133,9 +133,6 @@ public class CampaignOptions implements Serializable {
     private boolean reverseQualityNames;
     private boolean useUnofficialMaintenance;
     private boolean logMaintenance;
-
-    // Mothballing
-    private boolean saveMothballState;
     //endregion Repair and Maintenance Tab
 
     //region Supplies and Acquisition Tab
@@ -447,9 +444,6 @@ public class CampaignOptions implements Serializable {
         reverseQualityNames = false;
         useUnofficialMaintenance = false;
         logMaintenance = false;
-
-        //Mothballing
-        saveMothballState = true;
         //endregion Repair and Maintenance Tab
 
         //region Supplies and Acquisitions Tab
@@ -874,16 +868,6 @@ public class CampaignOptions implements Serializable {
         logMaintenance = b;
     }
     //endregion Maintenance
-
-    //region Mothballing
-    public boolean saveMothballState() {
-        return saveMothballState;
-    }
-
-    public void setSaveMothballState(boolean saveMothballState) {
-        this.saveMothballState = saveMothballState;
-    }
-    //endregion Mothballing
     //endregion Repair and Maintenance Tab
 
     //region Supplies and Acquisitions Tab
@@ -3066,10 +3050,6 @@ public class CampaignOptions implements Serializable {
         //region Maintenance
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMaintenance", logMaintenance);
         //endregion Maintenance
-
-        //region Mothballing
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "saveMothballState", saveMothballState);
-        //endregion Mothballing
         //endregion Repair and Maintenance Tab
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useOriginFactionForNames);
@@ -3428,8 +3408,6 @@ public class CampaignOptions implements Serializable {
                 retVal.useUnofficialMaintenance = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("logMaintenance")) {
                 retVal.logMaintenance = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("saveMothballState")) {
-                retVal.setSaveMothballState(Boolean.parseBoolean(wn2.getTextContent().trim()));
             //endregion Repair and Maintenance Tab
 
             } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {

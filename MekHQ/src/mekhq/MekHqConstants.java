@@ -37,6 +37,7 @@ public final class MekHqConstants {
     //region Campaign XML Save Options
     public static final String XML_SAVES_NODE = "mekhq/prefs/xmlsaves";
     public static final String WRITE_CUSTOMS_TO_XML = "writeCustomsToXML";
+    public static final String SAVE_MOTHBALL_STATE = "saveMothballState";
     //endregion Campaign XML Save Options
     //endregion MekHQ Options
 
