@@ -405,7 +405,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public String getTitle() {
         return getName() + " (" + getFactionName() + ")" + " - "
-                + MekHQ.getMekHQOptions().getDisplayFormattedDate(getLocalDate())
+                + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(getLocalDate())
                 + " (" + getEraName() + ")";
     }
 
