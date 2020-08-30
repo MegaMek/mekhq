@@ -3,7 +3,6 @@
 	<title>Campaign Operations</title>
 	<description>Options to run a unit using the Campaign Operations rules. This preset uses the basic rules and rating system. Optional rules are off by default as well as SPAs, Implants, and Quirks. For games using the older Field Manual Mercenaries system use the Total Warfare (TW) preset instead.</description>
 	<campaignOptions>
-		<displayDateFormat>yyyy-MM-dd</displayDateFormat>
 		<logMaintenance>false</logMaintenance>
 		<useFactionForNames>true</useFactionForNames>
 		<repairSystem>0</repairSystem>

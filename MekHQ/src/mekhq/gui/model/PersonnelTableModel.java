@@ -66,7 +66,7 @@ public class PersonnelTableModel extends DataTableModel {
     private boolean loadAssignmentFromMarket;
     private boolean groupByUnit;
 
-    private final MekHqColors colors = new MekHqColors();
+    private static final transient MekHqColors colors = new MekHqColors();
 
     public static final int COL_RANK            = 0;
     public static final int COL_GIVEN_NAME      = 1;
@@ -664,9 +664,9 @@ public class PersonnelTableModel extends DataTableModel {
                 }
                 break;
             case COL_RECRUIT_DATE:
-                return p.getRecruitmentAsString(getCampaign());
+                return p.getRecruitmentAsString();
             case COL_DEATH_DATE:
-                return p.getDeathDateAsString(getCampaign());
+                return p.getDeathDateAsString();
             case COL_TOUGH:
             default:
                return resources.getString("col_unknown.text");

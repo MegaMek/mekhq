@@ -18,6 +18,7 @@
  */
 package mekhq.gui.model;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.LogEntry;
 
@@ -34,16 +35,14 @@ public class LogTableModel extends AbstractTableModel {
     private static final long serialVersionUID = 534443424190075264L;
 
     protected List<LogEntry> data;
-    private Campaign campaign;
 
     public final static int COL_DATE = 0;
     public final static int COL_DESC = 1;
     public final static int N_COL = 2;
 
-    public LogTableModel(List<LogEntry> entries, Campaign campaign) {
+    public LogTableModel(List<LogEntry> entries) {
         assert entries != null;
         data = entries;
-        this.campaign = campaign;
     }
 
     @Override
@@ -78,7 +77,7 @@ public class LogTableModel extends AbstractTableModel {
         }
 
         if (col == COL_DATE) {
-            return campaign.getCampaignOptions().getDisplayFormattedDate(entry.getDate());
+            return MekHQ.getMekHQOptions().getDisplayFormattedDate(entry.getDate());
         } else if (col == COL_DESC) {
             return entry.getDesc();
         } else {

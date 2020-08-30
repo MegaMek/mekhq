@@ -735,7 +735,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(lblDate, gridBagConstraints);
 
-        btnDate.setText(options.getDisplayFormattedDate(date));
+        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         btnDate.setMinimumSize(new Dimension(400, 30));
         btnDate.setName("btnDate");
         btnDate.setPreferredSize(new Dimension(400, 30));
@@ -5130,7 +5130,7 @@ public class CampaignOptionsDialog extends JDialog {
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             date = dc.getDate();
-            btnDate.setText(options.getDisplayFormattedDate(date));
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
             factionModel = new SortedComboBoxModel<>();
             for (String sname : Faction.getChoosableFactionCodes()) {
                 Faction f = Faction.getFaction(sname);

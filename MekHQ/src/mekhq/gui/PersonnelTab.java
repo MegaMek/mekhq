@@ -184,8 +184,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         }
         personnelSorter.setComparator(PersonnelTableModel.COL_SALARY, new FormattedNumberSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_AGE, new FormattedNumberSorter());
-        personnelSorter.setComparator(PersonnelTableModel.COL_RECRUIT_DATE, new DateStringComparator(getCampaign()));
-        personnelSorter.setComparator(PersonnelTableModel.COL_DEATH_DATE, new DateStringComparator(getCampaign()));
+        personnelSorter.setComparator(PersonnelTableModel.COL_RECRUIT_DATE, new DateStringComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_DEATH_DATE, new DateStringComparator());
         personnelSorter.setComparator(PersonnelTableModel.COL_ORIGIN_FACTION, new NaturalOrderComparator());
         personnelSorter.setComparator(PersonnelTableModel.COL_ORIGIN_PLANET, new NaturalOrderComparator());
         personnelTable.setRowSorter(personnelSorter);

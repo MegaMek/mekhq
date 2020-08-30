@@ -22,6 +22,12 @@ package mekhq;
 
 public final class MekHqConstants {
     //region MekHQ Options
+    //region Display
+    public static final String DISPLAY_NODE = "mekhq/prefs/display";
+    public static final String DISPLAY_DATE_FORMAT = "displayDateFormat";
+    public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
+    //endregion Display
+
     //region Autosave
     public static final String AUTOSAVE_NODE = "mekhq/prefs/autosave";
     public static final String NO_SAVE_KEY = "noSave";

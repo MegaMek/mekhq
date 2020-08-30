@@ -26,7 +26,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import mekhq.campaign.Campaign;
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.gui.MekHqColors;
@@ -48,12 +48,10 @@ public class LoanTableModel extends DataTableModel {
     public final static int COL_NEXT_PAY   =   8;
     public final static int N_COL            = 9;
 
-    private final MekHqColors colors = new MekHqColors();
-    private Campaign campaign;
+    private static final transient MekHqColors colors = new MekHqColors();
 
-    public LoanTableModel(Campaign campaign) {
+    public LoanTableModel() {
         data = new ArrayList<Loan>();
-        this.campaign = campaign;
     }
 
     @Override
@@ -112,7 +110,7 @@ public class LoanTableModel extends DataTableModel {
         } else if (col == COL_NLEFT) {
             return loan.getRemainingPayments();
         } else if (col == COL_NEXT_PAY) {
-            return campaign.getCampaignOptions().getDisplayFormattedDate(loan.getNextPayment());
+            return MekHQ.getMekHQOptions().getDisplayFormattedDate(loan.getNextPayment());
         } else {
             return "?";
         }
