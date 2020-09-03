@@ -20,6 +20,7 @@ import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
@@ -87,7 +88,6 @@ public class StratconRulesManager {
         
         // generate the facilities
         for(int fCount = 0; fCount < numLances; fCount++) {
-            //StratconFacilityFactory.reloadFacilities();
             StratconFacility sf = StratconFacilityFactory.getRandomFacility();
             
             int fIndex = Compute.randomInt(StratconFacility.FacilityType.values().length);
@@ -218,6 +218,42 @@ public class StratconRulesManager {
             scenario.commitPrimaryForces(campaign, contract);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
         }
+    }
+    
+    private static void setupFacilityScenario(StratconScenario scenario) {
+        // carries out tasks relevant to facility scenarios
+        // this includes:
+        // for hostile facilities
+        // - add a destroy objective (always the option to level the facility)
+        // - add a capture objective (always the option to capture the facility)
+        // - if so indicated by parameter, roll a random hostile facility objective and add it if not capture/destroy
+        // for allied facilities
+        // - add a defend objective (always the option to defend the facility)
+        // - if so indicated by parameter, roll a random allied facility objective and add it if not defend
+        
+        // to facilitate this, modify AtBScenarioModifier to include a collection of:
+        // requiredHostileFacilityModifiers
+        // hostileFacilityModifiers
+        // alliedFacilityModifiers
+        // 
+        // while we're there:
+        // validAerospaceModifiers
+        // validGroundModifiers
+        // appropriatePrimaryPlayerForceModifiers (command level - environment (ground/space) - modifier)
+    }
+    
+    private static void processFacilityEffects(StratconTrackState track) {
+        // todo: these are "weekly"? effects that a stratcon facility has on the campaign/track state
+        // currrently, that's 
+        // supply depot - allied - +1 sp
+        // supply depot - hostile - +5% BV budget to all scenarios on track (shared modifier, so should be implemented there)
+        // data center - allied - +1% star league cache contract (don't implement yet, but...)
+        // data center - hostile - +5% scenario odds in track
+        // industrial center - allied - all scenarios here have THIS IS COMING OUT OF YOUR PAYCHECK modifier
+        // orbital defense - allied - sets 'no hostile aircraft' flag for track
+        // orbital defense - hostile - sets 'no allied aircraft' flag for track
+        // early warning system - allied - sets 'intercept allied base attacks' flag for track
+        // early warning system - hostile - sets 'intercept hostile base attacks' flag for track
     }
     
     /**
@@ -707,6 +743,41 @@ public class StratconRulesManager {
         }
         
         return ReinforcementEligibilityType.SupportPoint;
+    }
+    
+    /**
+     * Removes the facility associated with the given scenario from the relevant track/
+     */
+    public static void updateFacilityForScenario(AtBScenario scenario, AtBContract contract, boolean capture) {
+        if(contract.getStratconCampaignState() == null) {
+            return;
+        }
+        
+        // this is kind of kludgy, but there's currently no way to link a scenario back to its backing scenario
+        // TODO: introduce mapping in contract or at least trackstate
+        // basically, we're looping through all scenarios on all the contract's tracks
+        // if we find one with the same ID as the one being resolved, that's our facility: get rid of it.
+        for(StratconTrackState trackState : contract.getStratconCampaignState().getTracks()) {
+            for(StratconCoords coords : trackState.getScenarios().keySet()) {
+                StratconScenario potentialScenario = trackState.getScenario(coords);
+                if(potentialScenario.getBackingScenarioID() == scenario.getId()) {
+                    
+                    if(!capture) {
+                        trackState.removeFacility(coords);
+                    } else {
+                        StratconFacility facility = trackState.getFacility(coords);
+                        
+                        if(facility.getOwner() == ForceAlignment.Allied) {
+                            facility.setOwner(ForceAlignment.Opposing);
+                        } else {
+                            facility.setOwner(ForceAlignment.Allied);
+                        }
+                    }
+                    
+                    break;
+                }
+            }
+        }
     }
     
     public StratconRulesManager() {

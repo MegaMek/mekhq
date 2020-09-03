@@ -1,0 +1,11 @@
+<!-- This is all scenario modifiers that may be assigned to allied facilities -->
+<scenarioModifierManifest>
+	<modifiers>
+		<modifier>
+			FacilityAlliedDefend.xml 
+		</modifier>
+		<modifier>
+			FacilityAlliedEvac.xml
+		</modifier>
+	</modifiers>
+</scenarioModifierManifest>

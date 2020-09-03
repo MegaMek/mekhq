@@ -2,9 +2,7 @@ package mekhq.campaign.stratcon;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -19,10 +17,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Node;
 
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.ScenarioTemplate;
 
 /**
  * Contract-level state object for a stratcon campaign.

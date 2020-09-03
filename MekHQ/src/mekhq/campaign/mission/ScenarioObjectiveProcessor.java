@@ -32,6 +32,7 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.stratcon.StratconRulesManager;
 
 public class ScenarioObjectiveProcessor {
 
@@ -400,6 +401,26 @@ public class ScenarioObjectiveProcessor {
                         for (int x = 0; x < numBonuses; x++) {
                             contract.doBonusRoll(tracker.getCampaign());
                         }
+                    }
+                }
+            case FacilityRemains:
+                break;
+            case FacilityRemoved:
+                if ((tracker.getMission() instanceof AtBContract) &&
+                        (tracker.getScenario() instanceof AtBScenario)) {
+                    if (dryRun) {
+                        return "This facility will be destroyed.";
+                    } else {
+                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), false);
+                    }
+                }
+                break;
+            case FacilityCaptured:
+                if (tracker.getMission() instanceof AtBContract) {
+                    if (dryRun) {
+                        return "Allied forces will control this facility.";
+                    } else {
+                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), true);
                     }
                 }
         }

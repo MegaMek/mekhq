@@ -1,0 +1,11 @@
+<!-- This is scenario modifiers that are always assigned to hostile facilities -->
+<scenarioModifierManifest>
+	<modifiers>
+		<modifier>
+			FacilityHostileDestroy.xml
+		</modifier>
+		<modifier>
+			FacilityHostileCapture.xml
+		</modifier>
+	</modifiers>
+</scenarioModifierManifest>

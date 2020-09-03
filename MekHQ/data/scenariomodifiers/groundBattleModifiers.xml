@@ -78,10 +78,6 @@
 			Need "special duel flag".
 			Duel.xml
 		</modifier-->
-		<!--modifier>
-			Need objective system
-			TrainingExercise.xml
-		</modifier-->
 		<modifier>
 			EnemyAmbush.xml
 		</modifier>
@@ -133,95 +129,8 @@
 		<modifier>
 			GoodEvent.xml
 		</modifier>
-
-		<!-- Fixed scenario modifiers suitable for specific scenario types go here -->
-		<modifier>
-			AlliedMechGarrison.xml
-		</modifier>
-		<modifier>
-			AlliedTankGarrison.xml
-		</modifier>
-		<modifier>
-			AlliedAirGarrison.xml
-		</modifier>
-		<modifier>
-			AlliedArtyGarrison.xml
-		</modifier>
-		<modifier>
-			EnemyMechGarrison.xml
-		</modifier>
-		<modifier>
-			EnemyTankGarrison.xml
-		</modifier>
-		<modifier>
-			EnemyAirGarrison.xml
-		</modifier>
-		<modifier>
-			EnemyArtyGarrison.xml
-		</modifier>
-		<modifier>
-			ExtraGoodEvent.xml
-		</modifier>
-		<modifier>
-			ExtraBadEvent.xml
-		</modifier>
-
-		<!-- Facility objective modifiers -->
-		<modifier>
-			FacilityHostileDestroy.xml
-		</modifier>
-		<modifier>
-			FacilityHostileCapture.xml
-		</modifier>
-		<modifier>
-			FacilityHostileEngage.xml
-		</modifier>
-		<modifier>
-			FacilityHostileExtract.xml
-		</modifier>
-		<modifier>
-			FacilityHostileRecon.xml
-		</modifier>
-		<modifier>
-			FacilityHostilePreventEvac.xml
-		</modifier>
-
-		<modifier>
-			FacilityAlliedDefend.xml 
-		</modifier>
-		<modifier>
-			FacilityAlliedEvac.xml
-		</modifier>
-
-		<!-- Scenario modifiers that come from campaign state go here -->
-		<modifier>
-			IntegratedAlliesGround.xml
-		</modifier>
-		<modifier>
-			HouseOfficerGround.xml
-		</modifier>
-		<modifier>
-			LiaisonGround.xml
-		</modifier>
-		<modifier>
-			PrimaryAlliesGround.xml
-		</modifier>
 		<modifier>
 			AlliedTraineesGround.xml
-		</modifier>
-
-		<!-- and the air versions -->
-		<modifier>
-			IntegratedAlliesAir.xml
-		</modifier>
-		<modifier>
-			HouseOfficerAir.xml
-		</modifier>
-		<modifier>
-			LiaisonAir.xml
-		</modifier>
-		<modifier>
-			PrimaryAlliesAir.xml
 		</modifier>
 		<modifier>
 			AlliedTraineesAir.xml

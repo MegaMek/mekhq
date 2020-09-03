@@ -166,9 +166,17 @@ public class AtBScenarioModifier implements Cloneable {
     }
     
     private static Map<String, AtBScenarioModifier> scenarioModifiers;
-    private static List<String> beneficialScenarioKeys;
-    private static List<String> nonBeneficialScenarioKeys;
-    private static List<String> scenarioModifierKeys;
+    private static List<String> scenarioModifierKeys = new ArrayList<>();
+    private static List<String> requiredHostileFacilityModifierKeys = new ArrayList<>();
+    private static List<String> hostileFacilityModifierKeys = new ArrayList<>();
+    private static List<String> alliedFacilityModifierKeys = new ArrayList<>();
+    private static List<String> groundBattleModifierKeys = new ArrayList<>();
+    private static List<String> airBattleModifierKeys = new ArrayList<>();
+    private static List<String> positiveGroundBattleModifierKeys = new ArrayList<>();
+    private static List<String> positiveAirBattleModifierKeys = new ArrayList<>();
+    private static List<String> negativeGroundBattleModifierKeys = new ArrayList<>();
+    private static List<String> negativeAirBattleModifierKeys = new ArrayList<>();
+    private static List<String> primaryPlayerForceModifierKeys = new ArrayList<>();
     
     public static Map<String, AtBScenarioModifier> getScenarioModifiers() {
         return scenarioModifiers;
@@ -176,27 +184,6 @@ public class AtBScenarioModifier implements Cloneable {
     
     public static List<String> getOrderedModifierKeys() {
         return scenarioModifierKeys;
-    }
-    
-    /**
-     * Returns a scenario modifier copy from the subset of modifiers that's either beneficial to the player or not
-     */
-    public static AtBScenarioModifier getRandomScenarioModifier(boolean beneficial) {
-        List<String> keyList = beneficial ? beneficialScenarioKeys : nonBeneficialScenarioKeys;
-        int modIndex = Compute.randomInt(keyList.size());
-        
-        return (AtBScenarioModifier) scenarioModifiers.get(keyList.get(modIndex)).clone();
-    }
-    
-    /**
-     * Returns a random scenario modifier copy
-     */
-    public static AtBScenarioModifier getRandomScenarioModifier() {
-        int modIndex = Compute.randomInt(scenarioModifierKeys.size());
-        
-        // because we load a static set of modifiers, if a modifier gets changed we don't want to change the 
-        // underlying template, so we clone it.
-        return (AtBScenarioModifier) scenarioModifiers.get(scenarioModifierKeys.get(modIndex)).clone();
     }
     
     /**
@@ -209,9 +196,124 @@ public class AtBScenarioModifier implements Cloneable {
         return (AtBScenarioModifier) scenarioModifiers.get(key).clone();
     }
     
+    /**
+     * Convenience method to get all the 'required' hostile facility modifiers()
+     */
+    public static List<AtBScenarioModifier> getRequiredHostileFacilityModifiers() {
+        List<AtBScenarioModifier> retval = new ArrayList<>();
+        for(String key : requiredHostileFacilityModifierKeys) {
+            retval.add((AtBScenarioModifier) scenarioModifiers.get(key).clone());
+        }
+        
+        return retval;
+    }
+    
+    /**
+     * Convenience method to get a random hostile facility modifier
+     * @return The scenario modifier, if any.
+     */
+    public static AtBScenarioModifier getRandomHostileFacilityModifier() {
+        int modIndex = Compute.randomInt(hostileFacilityModifierKeys.size());
+        
+        return getScenarioModifier(hostileFacilityModifierKeys.get(modIndex));
+    }
+    
+    /**
+     * Convenience method to get a random allied  facility modifier
+     * @return The scenario modifier, if any.
+     */
+    public static AtBScenarioModifier getRandomAlliedFacilityModifier() {
+        int modIndex = Compute.randomInt(alliedFacilityModifierKeys.size());
+        
+        return getScenarioModifier(alliedFacilityModifierKeys.get(modIndex));
+    }
+    
+    public static AtBScenarioModifier getRandomBattleModifier(MapLocation mapLocation) {
+        return getRandomBattleModifier(mapLocation, null);
+    }
+    
+    /**
+     * Convenience method to get a random battle modifier
+     * @return The scenario modifier, if any.
+     */
+    public static AtBScenarioModifier getRandomBattleModifier(MapLocation mapLocation, Boolean beneficial) {
+        List<String> keyList = null;
+        
+        switch (mapLocation) {
+        case Space:
+        case LowAtmosphere:
+            if (beneficial == null) {
+                keyList = airBattleModifierKeys;
+            } else if (beneficial) {
+                keyList = positiveAirBattleModifierKeys;
+            } else if (!beneficial) {
+                keyList = negativeAirBattleModifierKeys;
+            }
+            break;
+        case AllGroundTerrain:
+        case SpecificGroundTerrain:
+        default:
+            if (beneficial == null) {
+                keyList = groundBattleModifierKeys;
+            } else if (beneficial) {
+                keyList = positiveGroundBattleModifierKeys;
+            } else if (!beneficial) {
+                keyList = negativeGroundBattleModifierKeys;
+            }
+            break;
+        
+        }
+        
+        if(keyList == null) {
+            return null;
+        }
+        
+        int modIndex = Compute.randomInt(keyList.size());
+        return getScenarioModifier(groundBattleModifierKeys.get(modIndex));
+    }
+    
     static {
         loadManifest();
         loadScenarioModifiers();
+
+        initializeSpecificManifest("./data/scenariomodifiers/requiredHostileFacilityModifiers.xml", requiredHostileFacilityModifierKeys);
+        initializeSpecificManifest("./data/scenariomodifiers/hostileFacilityModifiers.xml", hostileFacilityModifierKeys);
+        initializeSpecificManifest("./data/scenariomodifiers/alliedFacilityModifiers.xml", alliedFacilityModifierKeys);
+        initializeSpecificManifest("./data/scenariomodifiers/groundBattleModifiers.xml", groundBattleModifierKeys);
+        initializeSpecificManifest("./data/scenariomodifiers/airBattleModifiers.xml", airBattleModifierKeys);
+        initializeSpecificManifest("./data/scenariomodifiers/primaryPlayerForceModifiers.xml", primaryPlayerForceModifierKeys);
+        
+        initializePositiveNegativeManifests(groundBattleModifierKeys, positiveGroundBattleModifierKeys, negativeGroundBattleModifierKeys);
+        initializePositiveNegativeManifests(airBattleModifierKeys, positiveAirBattleModifierKeys, negativeAirBattleModifierKeys);
+    }
+    
+    /**
+     * Initializes a specific manifest file name list from a file with the given name
+     */
+    private static void initializeSpecificManifest(String manifestFileName, List<String> keyCollection) {
+        ScenarioModifierManifest manifest = ScenarioModifierManifest.Deserialize(manifestFileName);
+        
+        // add trimmed versions of each file name to the given collection
+        for(String modifierName : manifest.fileNameList) {
+            keyCollection.add(modifierName.trim());
+        }
+    }
+    
+    /**
+     * Divides the given modifiers into a positive and negative bucket.
+     */
+    private static void initializePositiveNegativeManifests(List<String> modifiers, List<String> positiveKeyCollection, List<String> negativeKeyCollection) {
+        for(String modifier : modifiers) {
+            if(!scenarioModifiers.containsKey(modifier)) {
+                continue;
+            }
+            
+            if(scenarioModifiers.get(modifier).benefitsPlayer) {
+                positiveKeyCollection.add(modifier);
+            } else {
+                negativeKeyCollection.add(modifier);
+            }
+        }
     }
     
     /**

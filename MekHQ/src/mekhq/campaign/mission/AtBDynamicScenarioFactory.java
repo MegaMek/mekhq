@@ -852,7 +852,7 @@ public class AtBDynamicScenarioFactory {
         int numMods = Compute.randomInt(2);
 
         for (int x = 0; x < numMods; x++) {
-            AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomScenarioModifier();
+            AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation());
 
             if ((scenarioMod.getAllowedMapLocations() == null) ||
                     scenarioMod.getAllowedMapLocations().contains(scenario.getTemplate().mapParameters.getMapLocation())) {

@@ -1,0 +1,24 @@
+<!-- This is all modifiers that may be assigned to a hostile facility -->
+<scenarioModifierManifest>
+	<modifiers>
+		<!-- Facility objective modifiers -->
+		<modifier>
+			FacilityHostileDestroy.xml
+		</modifier>
+		<modifier>
+			FacilityHostileCapture.xml
+		</modifier>
+		<modifier>
+			FacilityHostileEngage.xml
+		</modifier>
+		<modifier>
+			FacilityHostileExtract.xml
+		</modifier>
+		<modifier>
+			FacilityHostileRecon.xml
+		</modifier>
+		<modifier>
+			FacilityHostilePreventEvac.xml
+		</modifier>
+	</modifiers>
+</scenarioModifierManifest>
