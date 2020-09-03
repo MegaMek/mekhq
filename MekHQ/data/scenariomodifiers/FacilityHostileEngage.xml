@@ -1,6 +1,7 @@
 <AtBScenarioModifier>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
+	<modifierName>Engage</modifierName>
 	<objectives>
         <objective>
             <associatedForceNames>

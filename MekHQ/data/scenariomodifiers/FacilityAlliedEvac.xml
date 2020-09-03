@@ -29,6 +29,7 @@
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
 	</forceDefinition>
+	<modifierName>Evacuate</modifierName>
 	<objectives>
         <objective>
             <associatedForceNames>

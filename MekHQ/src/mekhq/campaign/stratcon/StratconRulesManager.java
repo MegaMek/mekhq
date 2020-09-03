@@ -209,9 +209,11 @@ public class StratconRulesManager {
         processForceDeployment(coords, forceID, campaign, track);
         
         if(track.getFacilities().containsKey(coords)) {
-            ScenarioTemplate template = StratconScenarioFactory.getFacilityScenario(track.getFacility(coords).getOwner() == ForceAlignment.Allied);
+            boolean alliedFacility = track.getFacility(coords).getOwner() == ForceAlignment.Allied;
+            ScenarioTemplate template = StratconScenarioFactory.getFacilityScenario(alliedFacility);
             StratconScenario scenario = generateScenario(campaign, contract, track, forceID, coords, template);
             scenario.commitPrimaryForces(campaign, contract);
+            setupFacilityScenario(scenario, track.getFacility(coords));
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
         } else if(Compute.randomInt(100) > track.getScenarioOdds()) {
             StratconScenario scenario = generateScenario(campaign, contract, track, forceID, coords);
@@ -220,8 +222,10 @@ public class StratconRulesManager {
         }
     }
     
-    private static void setupFacilityScenario(StratconScenario scenario) {
-        // carries out tasks relevant to facility scenarios
+    /**
+     * carries out tasks relevant to facility scenarios
+     */
+    private static void setupFacilityScenario(StratconScenario scenario, StratconFacility facility) {
         // this includes:
         // for hostile facilities
         // - add a destroy objective (always the option to level the facility)
@@ -230,16 +234,28 @@ public class StratconRulesManager {
         // for allied facilities
         // - add a defend objective (always the option to defend the facility)
         // - if so indicated by parameter, roll a random allied facility objective and add it if not defend
+        AtBScenarioModifier objectiveModifier = null;
+        boolean alliedFacility = facility.getOwner() == ForceAlignment.Allied;
         
-        // to facilitate this, modify AtBScenarioModifier to include a collection of:
-        // requiredHostileFacilityModifiers
-        // hostileFacilityModifiers
-        // alliedFacilityModifiers
-        // 
-        // while we're there:
-        // validAerospaceModifiers
-        // validGroundModifiers
-        // appropriatePrimaryPlayerForceModifiers (command level - environment (ground/space) - modifier)
+        if(alliedFacility) {
+            objectiveModifier = AtBScenarioModifier.getRandomAlliedFacilityModifier();
+        } else {            
+            objectiveModifier = AtBScenarioModifier.getRandomHostileFacilityModifier();
+            
+            for(AtBScenarioModifier modifier : AtBScenarioModifier.getRequiredHostileFacilityModifiers()) {
+                if(!scenario.getBackingScenario().getScenarioModifiers().contains(modifier)) {
+                    scenario.getBackingScenario().addScenarioModifier(modifier);
+                }
+            }
+        }
+        
+        if(objectiveModifier != null) {
+            scenario.getBackingScenario().addScenarioModifier(objectiveModifier);
+            scenario.getBackingScenario().setName(String.format("%s - %s - %s", 
+                    facility.getFacilityType(), alliedFacility ? "Allied" : "Hostile", objectiveModifier.getModifierName()));
+        }
+        
+        //
     }
     
     private static void processFacilityEffects(StratconTrackState track) {

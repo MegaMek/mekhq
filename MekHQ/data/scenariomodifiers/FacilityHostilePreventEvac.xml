@@ -2,6 +2,7 @@
 	<additionalBriefingText>Prevent at least 75% of the designated units from leaving the area.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
+	<modifierName>Prevent Evac</modifierName>
 	<forceDefinition>
 		<actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>

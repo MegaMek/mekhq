@@ -2,6 +2,7 @@
 	<additionalBriefingText>Destroy or cripple all of the designated turrets.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
+	<modifierName>Destroy</modifierName>
 	<objectives>
         <objective>
             <associatedForceNames>

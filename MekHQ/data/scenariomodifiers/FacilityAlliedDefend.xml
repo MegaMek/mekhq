@@ -2,6 +2,7 @@
 	<additionalBriefingText>Preserve 50% of the designated turrets.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
+	<modifierName>Defend</modifierName>
 	<objectives>
         <objective>
             <associatedForceNames>

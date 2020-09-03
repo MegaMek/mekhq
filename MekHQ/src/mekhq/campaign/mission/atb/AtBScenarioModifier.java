@@ -348,13 +348,12 @@ public class AtBScenarioModifier implements Cloneable {
                 AtBScenarioModifier modifier = Deserialize(filePath);
                 
                 if(modifier != null) {
+                    scenarioModifiers.put(fileName, modifier);
+                    scenarioModifierKeys.add(fileName);
+                    
                     if(modifier.getModifierName() == null) {
                         modifier.setModifierName(fileName);
                     }
-                    
-            
-                    scenarioModifiers.put(modifier.getModifierName(), modifier);
-                    scenarioModifierKeys.add(modifier.getModifierName());
 				}
             }
             catch(Exception e) {
@@ -442,7 +441,7 @@ public class AtBScenarioModifier implements Cloneable {
         copy.useAmbushLogic = useAmbushLogic;
         return copy;
     }
-
+    
     public String getModifierName() {
         return modifierName;
     }

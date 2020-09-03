@@ -2,6 +2,7 @@
 	<additionalBriefingText>This facility must be captured: 75% of the designated buildings must remain intact.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
+	<modifierName>Capture</modifierName>
 	<objectives>
 		<objective>
 	            <associatedForceNames>

@@ -1,6 +1,7 @@
 <AtBScenarioModifier>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
+	<modifierName>Recon</modifierName>
 	<objectives>
         <objective>
             <associatedForceNames>
