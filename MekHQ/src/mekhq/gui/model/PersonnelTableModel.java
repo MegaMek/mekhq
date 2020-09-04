@@ -66,7 +66,7 @@ public class PersonnelTableModel extends DataTableModel {
     private boolean loadAssignmentFromMarket;
     private boolean groupByUnit;
 
-    private static final transient MekHqColors colors = new MekHqColors();
+    private final MekHqColors colors = new MekHqColors();
 
     public static final int COL_RANK            = 0;
     public static final int COL_GIVEN_NAME      = 1;
