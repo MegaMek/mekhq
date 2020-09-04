@@ -27,11 +27,8 @@ import javax.swing.*;
 
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -234,25 +231,7 @@ public class AcquisitionsDialog extends JDialog {
     }
 
     private void calculateBonusParts() {
-        Campaign campaign = campaignGUI.getCampaign();
-
-        List<Unit> unitList = campaign.getServiceableUnits();
-        Unit unit = null;
-
-        if ((unitList != null) && !unitList.isEmpty()) {
-            unit = unitList.get(0);
-        }
-
-        if (campaign.getCampaignOptions().getUseAtB() && (unit != null)) {
-            numBonusParts = 0;
-            AtBContract contract = campaign.getAttachedAtBContract(unit);
-
-            if (contract == null) {
-                numBonusParts = campaign.totalBonusParts();
-            } else {
-                numBonusParts = contract.getNumBonusParts();
-            }
-        }
+        numBonusParts = campaignGUI.getCampaign().totalBonusParts();
 
         if (partPanelMap != null) {
             for (AcquisitionPanel pnl : partPanelMap.values()) {
@@ -303,26 +282,7 @@ public class AcquisitionsDialog extends JDialog {
                 targetWork = ((AmmoBin) targetWork).getAcquisitionWork();
             }
 
-            String report = targetWork.find(0);
-
-            if (report.endsWith("0 days.")) {
-                AtBContract contract = campaignGUI.getCampaign().getAttachedAtBContract(targetWork.getUnit());
-
-                if (null == contract) {
-                    for (Mission m : campaignGUI.getCampaign().getMissions()) {
-                        if (m.isActive() && (m instanceof AtBContract) && ((AtBContract) m).getNumBonusParts() > 0) {
-                            contract = (AtBContract) m;
-                            break;
-                        }
-                    }
-                }
-
-                if (contract == null) {
-                    MekHQ.getLogger().error(this, "AtB: used bonus part but no contract has bonus parts available.");
-                } else {
-                    contract.useBonusPart();
-                }
-            }
+            campaignGUI.getCampaign().spendBonusPart(targetWork);
 
             refresh();
 
@@ -352,12 +312,8 @@ public class AcquisitionsDialog extends JDialog {
 
                 btnDepod.setVisible(partCountInfo.getOmniPodCount() != 0);
 
-                if (numBonusParts == 0) {
-                    btnUseBonus.setVisible(false);
-                } else {
-                    btnUseBonus.setText(String.format("Use Bonus Part (%s)", numBonusParts));
-                    btnUseBonus.setVisible(true);
-                }
+                btnUseBonus.setText(String.format("Use Bonus Part (%s)", numBonusParts));
+                btnUseBonus.setVisible(numBonusParts > 0);
             }
         }
 
@@ -528,10 +484,8 @@ public class AcquisitionsDialog extends JDialog {
             btnUseBonus.setToolTipText("Use a bonus part to acquire this item");
             btnUseBonus.setName("btnUseBonus");
             btnUseBonus.addActionListener(ev -> useBonusPart());
+            btnUseBonus.setVisible(numBonusParts > 0);
 
-            if (numBonusParts <= 0) {
-                btnUseBonus.setVisible(false);
-            }
 
             actionButtons.add(btnUseBonus, gbcActions);
             gbcActions.gridy++;

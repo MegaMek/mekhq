@@ -5684,12 +5684,44 @@ public class Campaign implements Serializable, ITechManager {
      */
     public int totalBonusParts() {
         int retVal = 0;
-        for (Mission m : getMissions()) {
-            if (m.isActive() && m instanceof AtBContract) {
-                retVal += ((AtBContract) m).getNumBonusParts();
+        if (hasActiveContract()) {
+            for (Contract c : getActiveContracts()) {
+                if (c instanceof AtBContract) {
+                    retVal += ((AtBContract) c).getNumBonusParts();
+                }
             }
         }
         return retVal;
+    }
+
+    public void spendBonusPart(IAcquisitionWork targetWork) {
+        // Can only spend from active contracts, so if there are none we can't spend a bonus part
+        if (!hasActiveContract()) {
+            return;
+        }
+
+        String report = targetWork.find(0);
+
+        if (report.endsWith("0 days.")) {
+            // First, try to spend from the contact the Acquisition's unit is attached to
+            AtBContract contract = getAttachedAtBContract(targetWork.getUnit());
+
+            if (contract == null) {
+                // Then, just the first free one that is active
+                for (Contract c : getActiveContracts()) {
+                    if (((AtBContract) c).getNumBonusParts() > 0) {
+                        contract = (AtBContract) c;
+                        break;
+                    }
+                }
+            }
+
+            if (contract == null) {
+                MekHQ.getLogger().error(this, "AtB: used bonus part but no contract has bonus parts available.");
+            } else {
+                contract.useBonusPart();
+            }
+        }
     }
 
     public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {
