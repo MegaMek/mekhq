@@ -32,6 +32,7 @@ VERSION HISTORY:
 + Issue #1166: Possible fix for missing turrets in AtB base attack/defense missions; still no turrets prior to 2750
 + Issue #1757: Enable Ranks For Captured Prisoners
 + Data: Large dump of current data.
++ Issue #259: Implementing Customizable MekHQ Display Date Formats
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
