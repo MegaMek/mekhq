@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1779,8 +1779,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
 
             if (oneSelected && person.getStatus().isActive()) {
-                if (person.oldEnoughToMarry(gui.getCampaign()) && (!person.getGenealogy().hasSpouse())) {
-                    menu = new JMenu(resourceMap.getString("chooseSpouse.text")); //$NON-NLS-1$
+                if (gui.getCampaign().getCampaignOptions().useManualMarriages()
+                        && person.oldEnoughToMarry(gui.getCampaign()) && (!person.getGenealogy().hasSpouse())) {
+                    menu = new JMenu(resourceMap.getString("chooseSpouse.text"));
                     JMenu maleMenu = new JMenu(resourceMap.getString("spouseMenuMale.text"));
                     JMenu femaleMenu = new JMenu(resourceMap.getString("spouseMenuFemale.text"));
                     JMenu spouseMenu;
@@ -1832,6 +1833,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         popup.add(menu);
                     }
                 }
+
                 if (person.getGenealogy().hasSpouse()) {
                     menu = new JMenu(resourceMap.getString("removeSpouse.text"));
 

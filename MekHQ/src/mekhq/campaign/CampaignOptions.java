@@ -217,6 +217,7 @@ public class CampaignOptions implements Serializable {
     private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
     private boolean logMarriageNameChange;
+    private boolean useManualMarriages;
     private boolean useRandomMarriages;
     private double chanceRandomMarriages;
     private int marriageAgeRange;
@@ -547,6 +548,7 @@ public class CampaignOptions implements Serializable {
         minimumMarriageAge = 16;
         checkMutualAncestorsDepth = 4;
         logMarriageNameChange = false;
+        useManualMarriages = true;
         useRandomMarriages = false;
         chanceRandomMarriages = 0.00025;
         marriageAgeRange = 10;
@@ -1260,6 +1262,20 @@ public class CampaignOptions implements Serializable {
      */
     public void setLogMarriageNameChange(boolean b) {
         logMarriageNameChange = b;
+    }
+
+    /**
+     * @return whether or not to use manual marriages
+     */
+    public boolean useManualMarriages() {
+        return useManualMarriages;
+    }
+
+    /**
+     * @param useManualMarriages whether or not to use manual marriages
+     */
+    public void setUseManualMarriages(boolean useManualMarriages) {
+        this.useManualMarriages = useManualMarriages;
     }
 
     /**
