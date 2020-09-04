@@ -2769,7 +2769,7 @@ public class CampaignOptions implements Serializable {
      * @return the chance of having a battle for the specified role
      */
     public double getAtBBattleChance(AtBLanceRole role) {
-        return atbBattleChance[role.ordinal()];
+        return (role == AtBLanceRole.UNASSIGNED) ? 0.0 : atbBattleChance[role.ordinal()];
     }
 
     /**
