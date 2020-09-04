@@ -33,6 +33,8 @@ VERSION HISTORY:
 + Issue #1757: Enable Ranks For Captured Prisoners
 + Data: Large dump of current data.
 + Issue #259: Implementing Customizable MekHQ Display Date Formats
++ Issue #1982: Fixing AtBBattleChance for unassigned lances
++ Issue #1984: Implementing useManualMarriages Option
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
