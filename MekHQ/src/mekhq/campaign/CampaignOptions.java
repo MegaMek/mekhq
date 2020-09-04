@@ -214,6 +214,7 @@ public class CampaignOptions implements Serializable {
     private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
     private boolean logMarriageNameChange;
+    private boolean useManualMarriages;
     private boolean useRandomMarriages;
     private double chanceRandomMarriages;
     private int marriageAgeRange;
@@ -543,6 +544,7 @@ public class CampaignOptions implements Serializable {
         minimumMarriageAge = 16;
         checkMutualAncestorsDepth = 4;
         logMarriageNameChange = false;
+        useManualMarriages = true;
         useRandomMarriages = false;
         chanceRandomMarriages = 0.00025;
         marriageAgeRange = 10;
@@ -1245,6 +1247,20 @@ public class CampaignOptions implements Serializable {
      */
     public void setLogMarriageNameChange(boolean b) {
         logMarriageNameChange = b;
+    }
+
+    /**
+     * @return whether or not to use manual marriages
+     */
+    public boolean useManualMarriages() {
+        return useManualMarriages;
+    }
+
+    /**
+     * @param useManualMarriages whether or not to use manual marriages
+     */
+    public void setUseManualMarriages(boolean useManualMarriages) {
+        this.useManualMarriages = useManualMarriages;
     }
 
     /**
@@ -3129,6 +3145,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMarriageNameChange", logMarriageNameChange);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useManualMarriages", useManualMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomMarriages", useRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomMarriages", chanceRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageAgeRange", marriageAgeRange);
@@ -3592,6 +3609,8 @@ public class CampaignOptions implements Serializable {
                 retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) {
                 retVal.logMarriageNameChange = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {
+                retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
                 retVal.useRandomMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
@@ -3608,7 +3627,7 @@ public class CampaignOptions implements Serializable {
                     migrateMarriageSurnameWeights(retVal, values);
                 } else {
                     MekHQ.getLogger().error(CampaignOptions.class,
-                            "generateCampaignOptionsFromXml", "");
+                            "generateCampaignOptionsFromXml", "Unkown length of randomMarriageSurnameWeights");
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
