@@ -1780,7 +1780,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
 
             if (oneSelected && person.getStatus().isActive()) {
                 if (gui.getCampaign().getCampaignOptions().useManualMarriages()
-                        && person.oldEnoughToMarry(gui.getCampaign()) && (!person.getGenealogy().hasSpouse())) {
+                        && person.oldEnoughToMarry(gui.getCampaign()) && !person.getGenealogy().hasSpouse()) {
                     menu = new JMenu(resourceMap.getString("chooseSpouse.text"));
                     JMenu maleMenu = new JMenu(resourceMap.getString("spouseMenuMale.text"));
                     JMenu femaleMenu = new JMenu(resourceMap.getString("spouseMenuFemale.text"));

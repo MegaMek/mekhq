@@ -3161,6 +3161,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMarriageNameChange", logMarriageNameChange);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useManualMarriages", useManualMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomMarriages", useRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomMarriages", chanceRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageAgeRange", marriageAgeRange);
@@ -3628,6 +3629,8 @@ public class CampaignOptions implements Serializable {
                 retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) {
                 retVal.logMarriageNameChange = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {
+                retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
                 retVal.useRandomMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
@@ -3644,7 +3647,7 @@ public class CampaignOptions implements Serializable {
                     migrateMarriageSurnameWeights(retVal, values);
                 } else {
                     MekHQ.getLogger().error(CampaignOptions.class,
-                            "generateCampaignOptionsFromXml", "");
+                            "generateCampaignOptionsFromXml", "Unkown length of randomMarriageSurnameWeights");
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
