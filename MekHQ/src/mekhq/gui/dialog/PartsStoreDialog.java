@@ -271,7 +271,8 @@ public class PartsStoreDialog extends JDialog {
                         PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
                         int quantity = 1;
                         PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
-                                true, "How Many " + partProxy.getName() + "?", quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                                true, "How Many " + partProxy.getName() + "?", quantity,
+                                1, CampaignGUI.MAX_QUANTITY_SPINNER);
                         pcd.setVisible(true);
                         quantity = pcd.getValue();
 
@@ -291,8 +292,7 @@ public class PartsStoreDialog extends JDialog {
 
             //region Bonus Part
             if (campaign.getCampaignOptions().getUseAtB()) {
-                btnUseBonusPart = new JButton();
-                btnUseBonusPart.setText(resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
+                btnUseBonusPart = new JButton(resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
                 btnUseBonusPart.addActionListener(evt -> {
                     if (partsTable.getSelectedRowCount() > 0) {
                         int[] selectedRow = partsTable.getSelectedRows();
@@ -350,7 +350,8 @@ public class PartsStoreDialog extends JDialog {
 
                         int quantity = 1;
                         PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
-                                true, "How Many " + partProxy.getName() + "?", quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                                true, "How Many " + partProxy.getName() + "?", quantity,
+                                1, CampaignGUI.MAX_QUANTITY_SPINNER);
                         pcd.setVisible(true);
                         quantity = pcd.getValue();
 
