@@ -86,9 +86,12 @@ public class TOETransferHandler extends TransferHandler {
             return false;
         }
 
-        // Do not allow a drop on the drag source selections.
         JTree.DropLocation dl = (JTree.DropLocation) support.getDropLocation();
+        if (dl.getPath() == null) {
+            return false;
+        }
 
+        // Do not allow a drop on the drag source selections.
         JTree tree = (JTree) support.getComponent();
         int dropRow = tree.getRowForPath(dl.getPath());
         int[] selRows = tree.getSelectionRows();
