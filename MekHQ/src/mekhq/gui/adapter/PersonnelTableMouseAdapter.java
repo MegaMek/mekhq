@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -518,9 +517,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         if (person.getAwardController().hasAward(data[1], data[2])) {
                             person.getAwardController().removeAward(data[1], data[2],
                                     (data.length > 3)
-                                            ? LocalDate.parse(data[3], DateTimeFormatter.ofPattern(
-                                                    gui.getCampaign().getCampaignOptions()
-                                                            .getDisplayDateFormat()))
+                                            ? MekHQ.getMekHQOptions().parseDisplayFormattedDate(data[3])
                                             : null,
                                     gui.getCampaign().getLocalDate());
                         }
@@ -920,13 +917,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 AddOrEditKillEntryDialog nkd;
                 Unit unit = gui.getCampaign().getUnit(selectedPerson.getUnitId());
                 if (people.length > 1) {
-                    nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true,
-                            gui.getCampaign(), null,
+                    nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true, null,
                             (unit != null) ? unit.getName() : resourceMap.getString("bareHands.text"),
                             gui.getCampaign().getLocalDate());
                 } else {
-                    nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true,
-                            gui.getCampaign(), selectedPerson.getId(),
+                    nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true, selectedPerson.getId(),
                             (unit != null) ? unit.getName() : resourceMap.getString("bareHands.text"),
                             gui.getCampaign().getLocalDate());
                 }
@@ -960,7 +955,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_ADD_LOG_ENTRY: {
-                AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(gui.getFrame(), true, gui.getCampaign(), gui.getCampaign().getLocalDate());
+                AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(
+                        gui.getFrame(), true, gui.getCampaign().getLocalDate());
                 addPersonnelLogDialog.setVisible(true);
                 Optional<LogEntry> personnelEntry = addPersonnelLogDialog.getEntry();
                 if (personnelEntry.isPresent()) {
@@ -978,7 +974,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_ADD_MISSION_ENTRY: {
-                AddOrEditMissionEntryDialog addMissionDialog = new AddOrEditMissionEntryDialog(gui.getFrame(), true, gui.getCampaign(), gui.getCampaign().getLocalDate());
+                AddOrEditMissionEntryDialog addMissionDialog = new AddOrEditMissionEntryDialog(
+                        gui.getFrame(), true, gui.getCampaign().getLocalDate());
                 addMissionDialog.setVisible(true);
                 Optional<LogEntry> missionEntry = addMissionDialog.getEntry();
                 if (missionEntry.isPresent()) {
@@ -1901,7 +1898,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 if (oneSelected) {
                     for (Award award : person.getAwardController().getAwards()) {
                         JMenu singleAwardMenu = new JMenu(award.getName());
-                        for (String date : award.getFormattedDates(gui.getCampaign())) {
+                        for (String date : award.getFormattedDates()) {
                             JMenuItem specificAwardMenu = new JMenuItem(date);
                             specificAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), date));
                             specificAwardMenu.addActionListener(this);

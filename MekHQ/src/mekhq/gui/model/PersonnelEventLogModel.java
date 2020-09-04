@@ -33,7 +33,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.Campaign;
+import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
@@ -47,12 +47,10 @@ public class PersonnelEventLogModel extends DataTableModel {
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelEventLogModel", new EncodeControl());
     private final int dateTextWidth;
-    private Campaign campaign;
 
-    public PersonnelEventLogModel(Campaign campaign) {
+    public PersonnelEventLogModel() {
         data = new ArrayList<LogEntry>();
-        this.campaign = campaign;
-        dateTextWidth = getRenderer().metrics.stringWidth(campaign.getCampaignOptions()
+        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMekHQOptions()
                 .getDisplayFormattedDate(LocalDate.now())) + 10;
     }
 
@@ -83,7 +81,7 @@ public class PersonnelEventLogModel extends DataTableModel {
         LogEntry event = getEvent(row);
         switch (column) {
             case COL_DATE:
-                return campaign.getCampaignOptions().getDisplayFormattedDate(event.getDate());
+                return MekHQ.getMekHQOptions().getDisplayFormattedDate(event.getDate());
             case COL_TEXT:
                 return event.getDesc();
             default:

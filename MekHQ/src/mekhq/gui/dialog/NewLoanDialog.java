@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -400,7 +399,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private void setUpInfo() {
         panInfo.setLayout(new GridLayout());
         panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("detailsTitle.text")));
-        refreshValues(campaign);
+        refreshValues();
 
         JPanel panLeft = new JPanel(new GridBagLayout());
         JPanel panRight = new JPanel(new GridBagLayout());
@@ -539,10 +538,10 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     	loan.calculateAmortization();
 
     	// Refresh dialog values
-        refreshValues(campaign);
+        refreshValues();
     }
 
-    private void refreshValues(Campaign campaign) {
+    private void refreshValues() {
         final String METHOD_NAME = "refreshValues";
         try {
             txtPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
@@ -551,7 +550,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
             lblYears.setText(loan.getYears() + " years");
             lblSchedule.setText(Finances.getScheduleName(loan.getPaymentSchedule()));
             lblPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
-            lblFirstPayment.setText(campaign.getCampaignOptions().getDisplayFormattedDate(loan.getNextPayment()));
+            lblFirstPayment.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(loan.getNextPayment()));
             lblPayAmount.setText(loan.getPaymentAmount().toAmountAndSymbolString());
             lblNPayment.setText(numberFormatter.valueToString(loan.getRemainingPayments()));
             lblTotalPayment.setText(loan.getRemainingValue().toAmountAndSymbolString());

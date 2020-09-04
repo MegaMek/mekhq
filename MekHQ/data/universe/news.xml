@@ -14,7 +14,7 @@ This file defines defines a set of news item that will display in the daily repo
 Here is a description of what goes in each newsItem tag
 headline - This is the headline that will appear in the daily report and in the title of the full article.
            This item should always be defined.
-date - the date of the news item in YYYY-MM-DD format. This is required. If the "DD" part is missing, the day
+date - the date of the news item in yyyy-MM-dd format. This is required. If the "dd" part is missing, the day
        will be rolled randomly (each campaign will have its own random seed for that). Same if only the year
 	   is supplied.
 	   Finally, the year can be of the form "302X", which will generate a random day within that decade.
@@ -731,6 +731,7 @@ location - an optional tag for the location of the news report
 		<service>TBC</service>
 		<location>Tharkad</location>
 	</newsItem>
+
 <!-- added Operation Galahad note-->
 <newsItem>
   <headline>AFFS Announced Operation Galahad</headline>

@@ -523,8 +523,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblBday, gridBagConstraints);
 
-        btnDate = new JButton(campaign.getCampaignOptions().getDisplayFormattedDate(birthdate));
-        btnDate.setName("btnDate"); // NOI18N
+        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(birthdate));
+        btnDate.setName("btnDate");
         btnDate.addActionListener(this::btnDateActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -553,7 +553,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             panDemog.add(lblRecruitment, gridBagConstraints);
 
-            btnServiceDate = new JButton(campaign.getCampaignOptions().getDisplayFormattedDate(recruitment));
+            btnServiceDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(recruitment));
             btnServiceDate.setName("btnServiceDate");
             btnServiceDate.addActionListener(this::btnServiceDateActionPerformed);
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -575,7 +575,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             panDemog.add(lblLastRankChangeDate, gridBagConstraints);
 
-            btnRankDate = new JButton(campaign.getCampaignOptions().getDisplayFormattedDate(lastRankChangeDate));
+            btnRankDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(lastRankChangeDate));
             btnRankDate.setName("btnRankDate");
             btnRankDate.addActionListener(e -> btnRankDateActionPerformed());
             gridBagConstraints = new GridBagConstraints();
@@ -597,7 +597,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             panDemog.add(lblRetirement, gridBagConstraints);
 
-            btnRetirementDate = new JButton(campaign.getCampaignOptions().getDisplayFormattedDate(retirement));
+            btnRetirementDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(retirement));
             btnRetirementDate.setName("btnRetirementDate");
             btnRetirementDate.addActionListener(e -> btnRetirementDateActionPerformed());
             gridBagConstraints = new GridBagConstraints();
@@ -1244,7 +1244,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             birthdate = dc.getDate();
-            btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(birthdate));
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(birthdate));
             lblAge.setText(getAge() + " " + resourceMap.getString("age"));
         }
     }
@@ -1256,7 +1256,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             recruitment = dc.getDate();
-            btnServiceDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(recruitment));
+            btnServiceDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(recruitment));
         }
     }
 
@@ -1266,7 +1266,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             lastRankChangeDate = dc.getDate();
-            btnRankDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(lastRankChangeDate));
+            btnRankDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(lastRankChangeDate));
         }
     }
 
@@ -1276,7 +1276,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             retirement = dc.getDate();
-            btnRetirementDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(retirement));
+            btnRetirementDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(retirement));
         }
     }
 

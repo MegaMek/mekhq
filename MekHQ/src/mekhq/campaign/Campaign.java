@@ -405,7 +405,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public String getTitle() {
         return getName() + " (" + getFactionName() + ")" + " - "
-                + getCampaignOptions().getDisplayFormattedDate(getLocalDate())
+                + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(getLocalDate())
                 + " (" + getEraName() + ")";
     }
 
@@ -648,7 +648,7 @@ public class Campaign implements Serializable, ITechManager {
                     report.append(getShipSearchResult()).append(" is available for purchase for ")
                             .append(Money.of(ms.getCost()).toAmountAndSymbolString())
                             .append(" until ")
-                            .append(getCampaignOptions().getDisplayFormattedDate(getShipSearchExpiration()));
+                            .append(MekHQ.getMekHQOptions().getDisplayFormattedDate(getShipSearchExpiration()));
                 } else {
                     report.append(" <font color=\"red\">Could not determine ship type.</font>");
                 }
@@ -663,8 +663,7 @@ public class Campaign implements Serializable, ITechManager {
         final String METHOD_NAME = "purchaseShipSearchResult()";
         MechSummary ms = MechSummaryCache.getInstance().getMech(getShipSearchResult());
         if (ms == null) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                    "Cannot find entry for " + getShipSearchResult());
+            MekHQ.getLogger().error(this, "Cannot find entry for " + getShipSearchResult());
             return;
         }
 
@@ -3588,7 +3587,7 @@ public class Campaign implements Serializable, ITechManager {
         getCurrentReport().clear();
         setCurrentReportHTML("");
         newReports.clear();
-        beginReport("<b>" + getCampaignOptions().getDisplayFormattedDate(getLocalDate()) + "</b>");
+        beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
 
         // New Year Changes
         if (getLocalDate().getDayOfYear() == 1) {

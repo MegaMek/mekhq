@@ -47,13 +47,13 @@ public class EditPersonnelLogControl extends JPanel {
         this.campaign = campaign;
         this.person = person;
 
-        this.logModel = new LogTableModel(person.getPersonnelLog(), campaign);
+        this.logModel = new LogTableModel(person.getPersonnelLog());
 
         initComponents();
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogControl", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogControl", new EncodeControl());
 
         setName(resourceMap.getString("control.name")); // NOI18N
         this.setLayout(new java.awt.BorderLayout());
@@ -107,7 +107,7 @@ public class EditPersonnelLogControl extends JPanel {
     }
 
     private void addEntry() {
-        AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, true, campaign, campaign.getLocalDate());
+        AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, true, campaign.getLocalDate());
         dialog.setVisible(true);
         if (dialog.getEntry().isPresent()) {
             person.addLogEntry(dialog.getEntry().get());
@@ -118,7 +118,7 @@ public class EditPersonnelLogControl extends JPanel {
     private void editEntry() {
         LogEntry entry = logModel.getEntry(logsTable.getSelectedRow());
         if (null != entry) {
-            AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, true, campaign, entry);
+            AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, true, entry);
             dialog.setVisible(true);
             refreshTable();
         }

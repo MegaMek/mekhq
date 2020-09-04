@@ -664,9 +664,9 @@ public class PersonnelTableModel extends DataTableModel {
                 }
                 break;
             case COL_RECRUIT_DATE:
-                return p.getRecruitmentAsString(getCampaign());
+                return p.getRecruitmentAsString();
             case COL_DEATH_DATE:
-                return p.getDeathDateAsString(getCampaign());
+                return p.getDeathDateAsString();
             case COL_TOUGH:
             default:
                return resources.getString("col_unknown.text");

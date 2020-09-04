@@ -21,8 +21,6 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -111,7 +109,6 @@ public class CampaignOptions implements Serializable {
     //region General Tab
     private boolean useUnitRating;
     private UnitRatingMethod unitRatingMethod;
-    private String displayDateFormat; // This is currently unlisted, but will be added in the near future
     //endregion General Tab
 
     //region Repair and Maintenance Tab
@@ -422,7 +419,6 @@ public class CampaignOptions implements Serializable {
         //region General Tab
         useUnitRating = true;
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
-        displayDateFormat = "yyyy-MM-dd";
         //endregion General Tab
 
         //region Repair and Maintenance Tab
@@ -794,17 +790,6 @@ public class CampaignOptions implements Serializable {
     //endregion Constructors
 
     //region General Tab
-    public String getDisplayDateFormat() {
-        return displayDateFormat;
-    }
-
-    public String getDisplayFormattedDate(LocalDate date) {
-        return date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()));
-    }
-
-    public void setDisplayDateFormat(String s) {
-        displayDateFormat = s;
-    }
     //endregion General Tab
 
     //region Repair and Maintenance Tab
@@ -3043,7 +3028,6 @@ public class CampaignOptions implements Serializable {
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         //region General Tab
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayDateFormat", displayDateFormat);
         //endregion General Tab
 
         //region Repair and Maintenance Tab
@@ -3384,15 +3368,11 @@ public class CampaignOptions implements Serializable {
                 continue;
             }
 
-            MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
+            MekHQ.getLogger().info(CampaignOptions.class, METHOD_NAME,
                     String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
-            //region General Tab
-            if (wn2.getNodeName().equalsIgnoreCase("displayDateFormat")) {
-                retVal.displayDateFormat = wn2.getTextContent().trim();
-            //endregion General Tab
 
             //region Repair and Maintenance Tab
-            } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
+            if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
                 retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
                 retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
