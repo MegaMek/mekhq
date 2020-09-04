@@ -200,7 +200,8 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             factions.put(2.0, campaign.getFaction());
         } else {
             // There is a good chance they're a merc!
-            factions.put(total + total * getFactionWeight(mercenaries), mercenaries);
+            // The 1.0 prevents no weight calculations
+            factions.put((total == 0.0) ? 1.0 : total + total * getFactionWeight(mercenaries), mercenaries);
         }
 
         cachedDate = now;
