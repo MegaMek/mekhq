@@ -19,6 +19,7 @@ import java.util.List;
 
 import megamek.common.Compute;
 import mekhq.MekHQ;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 
 /**
  * This class handles functionality related to loading and stratcon facility definitions.
@@ -28,6 +29,8 @@ import mekhq.MekHQ;
 public class StratconFacilityFactory {
     // loaded facility definitions
     private static List<StratconFacility> stratconFacilityList = new ArrayList<>();
+    private static List<StratconFacility> hostileFacilities = new ArrayList<>();
+    private static List<StratconFacility> alliedFacilities = new ArrayList<>();
     
     static {
         reloadFacilities();
@@ -68,6 +71,12 @@ public class StratconFacilityFactory {
                 
                 if(facility != null) {
                     stratconFacilityList.add(facility);
+                    
+                    if(facility.getOwner() == ForceAlignment.Allied) {
+                        alliedFacilities.add(facility);
+                    } else {
+                        hostileFacilities.add(facility);
+                    }
                 }
             } catch(Exception e) {
                 MekHQ.getLogger().error(StratconFacilityFactory.class, "loadFacilitiesFromManifest", 
@@ -82,5 +91,15 @@ public class StratconFacilityFactory {
     public static StratconFacility getRandomFacility() {
         int facilityIndex = Compute.randomInt(stratconFacilityList.size());
         return (StratconFacility) stratconFacilityList.get(facilityIndex).clone();
+    }
+    
+    public static StratconFacility getRandomHostileFacility() {
+        int facilityIndex = Compute.randomInt(hostileFacilities.size());
+        return (StratconFacility) hostileFacilities.get(facilityIndex).clone();
+    }
+    
+    public static StratconFacility getRandomAlliedFacility() {
+        int facilityIndex = Compute.randomInt(alliedFacilities.size());
+        return (StratconFacility) alliedFacilities.get(facilityIndex).clone();
     }
 }

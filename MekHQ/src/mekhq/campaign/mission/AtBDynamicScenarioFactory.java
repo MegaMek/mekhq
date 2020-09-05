@@ -153,8 +153,6 @@ public class AtBDynamicScenarioFactory {
 
         setTerrain(scenario);
 
-        applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
-
         // apply a default "reinforcements" force template if a scenario-specific one does not already exist
         if (!template.scenarioForces.containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {
             ScenarioForceTemplate defaultReinforcements = ScenarioForceTemplate.getDefaultReinforcementsTemplate();
@@ -178,6 +176,8 @@ public class AtBDynamicScenarioFactory {
         for (int x = scenario.getNumBots() - 1; x >= 0; x--) {
             scenario.removeBotForce(x);
         }
+        
+        applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
 
         // Now we can clear the other related lists
         scenario.getAlliesPlayer().clear();
@@ -849,7 +849,7 @@ public class AtBDynamicScenarioFactory {
     public static void setScenarioModifiers(AtBDynamicScenario scenario) {
         // this is hardcoded for now, but the eventual plan is to let the user configure how many modifiers
         // they want applied
-        int numMods = Compute.randomInt(2);
+        int numMods = Compute.randomInt(3);
 
         for (int x = 0; x < numMods; x++) {
             AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation());

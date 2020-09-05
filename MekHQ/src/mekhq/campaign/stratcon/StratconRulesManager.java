@@ -27,8 +27,6 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
-import mekhq.campaign.stratcon.StratconFacility.FacilityType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
 
@@ -90,9 +88,6 @@ public class StratconRulesManager {
         for(int fCount = 0; fCount < numLances; fCount++) {
             StratconFacility sf = StratconFacilityFactory.getRandomFacility();
             
-            int fIndex = Compute.randomInt(StratconFacility.FacilityType.values().length);
-            sf.setFacilityType(FacilityType.values()[fIndex]);
-            
             int x = Compute.randomInt(width);
             int y = Compute.randomInt(height);
             StratconCoords coords = new StratconCoords(x, y);
@@ -102,8 +97,6 @@ public class StratconRulesManager {
                 y = Compute.randomInt(height);
                 coords = new StratconCoords(x, y);
             }
-            
-            sf.setDisplayableName(String.format("Facility %d,%d", x, y));
             
             retVal.addFacility(new StratconCoords(x, y), sf);
         }
@@ -136,7 +129,7 @@ public class StratconRulesManager {
         for(int scenarioIndex = 0; scenarioIndex < track.getRequiredLanceCount(); scenarioIndex++) {
             // if we haven't already used all the player forces and are required to randomly generate a scenario
             if((availableForceIDs.size() > 0) &&
-                    (Compute.randomInt(100) > track.getScenarioOdds())) {
+                    (Compute.randomInt(100) < track.getScenarioOdds())) {
                 // pick random coordinates and force to drive the scenario
                 int x = Compute.randomInt(track.getWidth());
                 int y = Compute.randomInt(track.getHeight());                
@@ -155,16 +148,28 @@ public class StratconRulesManager {
                 sortedAvailableForceIDs.get(MapLocation.Space).remove((Integer) randomForceID);
                 
                 // two scenarios on the same coordinates wind up increasing in size
-                // todo: scenario on top of a facility generates a facility scenario instead
                 if(track.getScenarios().containsKey(scenarioCoords)) {
                     track.getScenarios().get(scenarioCoords).incrementRequiredPlayerLances();
                     assignAppropriateExtraForceToScenario(track.getScenarios().get(scenarioCoords), sortedAvailableForceIDs, campaign);
                     continue;
                 }
                 
-                StratconScenario scenario = generateScenario(campaign, contract,track, randomForceID, scenarioCoords);
-                generatedScenarios.add(scenario);        
+                StratconScenario scenario = setupScenario(scenarioCoords, randomForceID, campaign, contract, track);
+                generatedScenarios.add(scenario);
+                
+                // if we're auto-assigning lances, deploy the force to the track as well
+                if(autoAssignLances) {
+                    processForceDeployment(scenarioCoords, randomForceID, campaign, track);
+                }
             }
+        }
+        
+        // if under liaison command, pick a random scenario from the ones generated
+        // to set as required and attach liaison
+        if(contract.getCommandRights() == AtBContract.COM_LIAISON) {
+            int scenarioIndex = Compute.randomInt(generatedScenarios.size() - 1);
+            generatedScenarios.get(scenarioIndex).setRequiredScenario(true);
+            setAttachedUnitsModifier(generatedScenarios.get(scenarioIndex), contract);
         }
         
         // now, we loop through all the scenarios we set up
@@ -180,25 +185,13 @@ public class StratconRulesManager {
                 
                 scenario.setCurrentState(ScenarioState.UNRESOLVED);
             } else {
-                scenario.setCurrentState(ScenarioState.PRIMARY_FORCES_COMMITTED);
+                scenario.commitPrimaryForces(campaign, contract);
             }
-        }
-        
-     // if under liaison command, pick a random scenario from the ones generated
-        // to set as required and attach liaison
-        if(contract.getCommandRights() == AtBContract.COM_LIAISON) {
-            int scenarioIndex = Compute.randomInt(generatedScenarios.size() - 1);
-            generatedScenarios.get(scenarioIndex).setRequiredScenario(true);
-            setAttachedUnitsModifier(generatedScenarios.get(scenarioIndex), contract);
         }
     }
 
     /**
-     * Deploys a force to the given coordinates on the given track.
-     * @param coords
-     * @param campaign
-     * @param contract
-     * @param track
+     * Deploys a force to the given coordinates on the given track as a result of explicit player action.
      */
     public static void deployForceToCoords(StratconCoords coords, int forceID, Campaign campaign, AtBContract contract, StratconTrackState track) {
         // the following things should happen:
@@ -208,24 +201,41 @@ public class StratconRulesManager {
         
         processForceDeployment(coords, forceID, campaign, track);
         
-        if(track.getFacilities().containsKey(coords)) {
-            boolean alliedFacility = track.getFacility(coords).getOwner() == ForceAlignment.Allied;
-            ScenarioTemplate template = StratconScenarioFactory.getFacilityScenario(alliedFacility);
-            StratconScenario scenario = generateScenario(campaign, contract, track, forceID, coords, template);
-            scenario.commitPrimaryForces(campaign, contract);
-            setupFacilityScenario(scenario, track.getFacility(coords));
+        // don't create a scenario on top of allied facilities
+        StratconFacility facility = track.getFacility(coords);
+        //TODO: should be <= track.scenarioodds
+        if(((facility == null) && (Compute.randomInt(100) > track.getScenarioOdds())) || (facility.getOwner() != ForceAlignment.Allied)) {
+            StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
-        } else if(Compute.randomInt(100) > track.getScenarioOdds()) {
-            StratconScenario scenario = generateScenario(campaign, contract, track, forceID, coords);
             scenario.commitPrimaryForces(campaign, contract);
-            AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
         }
+    }
+    
+    /**
+     * Logic to set up a scenario
+     */
+    private static StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign, AtBContract contract, StratconTrackState track) {
+        StratconScenario scenario = null;
+        
+        if(track.getFacilities().containsKey(coords)) {
+            StratconFacility facility = track.getFacility(coords);
+            boolean alliedFacility = facility.getOwner() == ForceAlignment.Allied;
+            ScenarioTemplate template = StratconScenarioFactory.getFacilityScenario(alliedFacility);
+            scenario = generateScenario(campaign, contract, track, forceID, coords, template);
+            setupFacilityScenario(scenario, track, coords, facility);
+        } else {
+            scenario = generateScenario(campaign, contract, track, forceID, coords);
+        }
+        
+        return scenario;
     }
     
     /**
      * carries out tasks relevant to facility scenarios
      */
-    private static void setupFacilityScenario(StratconScenario scenario, StratconFacility facility) {
+    private static void setupFacilityScenario(StratconScenario scenario, StratconTrackState track, StratconCoords coords, StratconFacility facility) {
+        applyFacilityModifiers(scenario, track, coords);
+        
         // this includes:
         // for hostile facilities
         // - add a destroy objective (always the option to level the facility)
@@ -254,8 +264,6 @@ public class StratconRulesManager {
             scenario.getBackingScenario().setName(String.format("%s - %s - %s", 
                     facility.getFacilityType(), alliedFacility ? "Allied" : "Hostile", objectiveModifier.getModifierName()));
         }
-        
-        //
     }
     
     private static void processFacilityEffects(StratconTrackState track) {
@@ -421,6 +429,7 @@ public class StratconRulesManager {
             int forceID, StratconCoords coords, ScenarioTemplate template) {
         StratconScenario scenario = new StratconScenario();
         scenario.setBackingScenario(AtBDynamicScenarioFactory.initializeScenarioFromTemplate(template, contract, campaign));
+        scenario.setCoords(coords);
         
         // do an appropriate allied force if the contract calls for it
         // do any attached or integrated units
@@ -434,15 +443,12 @@ public class StratconRulesManager {
         }
         
         AtBDynamicScenarioFactory.setScenarioModifiers(scenario.getBackingScenario());
-        AtBDynamicScenarioFactory.applyScenarioModifiers(scenario.getBackingScenario(), campaign, EventTiming.PreForceGeneration);
         scenario.setCurrentState(ScenarioState.UNRESOLVED);
-        setScenarioDates(track, campaign, scenario);                
+        setScenarioDates(track, campaign, scenario);
         
         // register the scenario with the campaign and the track it's generated on
         track.getScenarios().put(coords, scenario);
         scenario.addPrimaryForce(forceID);
-        campaign.addScenario(scenario.getBackingScenario(), contract);
-        scenario.setBackingScenarioID(scenario.getBackingScenario().getId());
         
         return scenario;
     }

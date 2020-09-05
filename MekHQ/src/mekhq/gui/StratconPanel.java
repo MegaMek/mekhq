@@ -22,6 +22,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconFacility;
@@ -390,6 +391,14 @@ public class StratconPanel extends JPanel implements ActionListener {
         
         if(currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords())) {
             infoBuilder.append("<span color='green'>Recon complete</span>");
+            
+            StratconFacility facility = currentTrack.getFacility(boardState.getSelectedCoords());
+            if(facility != null) {
+                infoBuilder.append((facility.getOwner() == ForceAlignment.Allied) ? "<span color='green'>" : "<span color='red'>");
+                infoBuilder.append(String.format("<br/>Active Facility : %s", facility.getFacilityType().toString()));
+                infoBuilder.append("<span>");
+            }
+            
         } else {
             infoBuilder.append("<span color='red'>Recon incomplete</span>");
         }

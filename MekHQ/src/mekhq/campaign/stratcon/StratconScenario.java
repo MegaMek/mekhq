@@ -52,6 +52,7 @@ public class StratconScenario implements IStratconDisplayable {
     private LocalDate deploymentDate;
     private LocalDate actionDate;
     private LocalDate returnDate;
+    private StratconCoords coords;
 
     /**
      * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the scenario template.
@@ -103,6 +104,9 @@ public class StratconScenario implements IStratconDisplayable {
      */
     public void commitPrimaryForces(Campaign campaign, AtBContract contract) {
         currentState = ScenarioState.PRIMARY_FORCES_COMMITTED;
+        
+        campaign.addScenario(getBackingScenario(), contract);
+        setBackingScenarioID(getBackingScenario().getId());
     }
 
     public ScenarioState getCurrentState() {
@@ -220,6 +224,14 @@ public class StratconScenario implements IStratconDisplayable {
 
     public void setReturnDate(LocalDate returnDate) {
         this.returnDate = returnDate;
+    }
+    
+    public StratconCoords getCoords() {
+        return coords;
+    }
+
+    public void setCoords(StratconCoords coords) {
+        this.coords = coords;
     }
     
     public ScenarioTemplate getScenarioTemplate() {

@@ -5,13 +5,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.DefaultListModel;
@@ -21,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -31,8 +27,6 @@ import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -68,6 +62,7 @@ public class StratconScenarioWizard extends JDialog {
     
     public StratconScenarioWizard(Campaign campaign) {
         this.campaign = campaign;
+        this.setModalityType(ModalityType.APPLICATION_MODAL);
     }
 
     public void setCurrentScenario(StratconScenario scenario, StratconTrackState trackState, StratconCampaignState campaignState) {
@@ -426,6 +421,11 @@ public class StratconScenarioWizard extends JDialog {
         for(Unit unit : availableInfantryUnits.getSelectedValuesList()) {
             currentScenario.addUnit(unit.getId(), ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
             unit.setScenarioId(currentScenario.getBackingScenarioID());
+        }
+        
+        // every force that's been deployed to this scenario gets assigned to the track
+        for(int forceID : currentScenario.getAssignedForces()) {
+            StratconRulesManager.processForceDeployment(currentScenario.getCoords(), forceID, campaign, currentTrackState);
         }
         
         // scenarios that haven't had primary forces committed yet get those committed now
