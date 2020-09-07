@@ -86,16 +86,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     public void fix() {
         Part replacement = findReplacement(false);
         if(null != replacement) {
-            Part actualReplacement;
-
-            //Check to see if munition types are different
-            if (getType() == ((AmmoBin)replacement).getType()) {
-                actualReplacement = replacement.clone();
-            } else {
-                actualReplacement = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(),
-                        getFullShots(), isOneShot(), isOmniPodded(), campaign);
-            }
-
+            Part actualReplacement = getActualReplacement((AmmoBin) replacement);
             unit.addPart(actualReplacement);
             campaign.addPart(actualReplacement, 0);
             replacement.decrementQuantity();
@@ -103,6 +94,16 @@ public class MissingAmmoBin extends MissingEquipmentPart {
             remove(false);
             //assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
+        }
+    }
+
+    protected Part getActualReplacement(AmmoBin found) {
+        //Check to see if munition types are different
+        if (getType() == found.getType()) {
+            return found.clone();
+        } else {
+            return new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(),
+                    getFullShots(), isOneShot(), isOmniPodded(), campaign);
         }
     }
 
@@ -121,8 +122,8 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         return oneShot;
     }
 
-    private int getFullShots() {
-        int fullShots = ((AmmoType)type).getShots();
+    protected int getFullShots() {
+        int fullShots = ((AmmoType) type).getShots();
         if(oneShot) {
             fullShots = 1;
         }
