@@ -52,7 +52,7 @@ import mekhq.campaign.personnel.SpecialAbility;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class GamePreset implements MekHqXmlSerializable {
-	private String title;
+    private String title;
     private String description;
     private CampaignOptions options;
     private RandomSkillPreferences randomSkillPreferences;
@@ -67,28 +67,28 @@ public class GamePreset implements MekHqXmlSerializable {
     public GamePreset(String title, String description, CampaignOptions options,
                       RandomSkillPreferences randomSkillPreferences, Hashtable<String, SkillType> skillHash,
                       Hashtable<String, SpecialAbility> specialAbilities) {
-    	this.title = title;
-    	this.description = description;
-    	this.setOptions(options);
-    	this.setRandomSkillPreferences(randomSkillPreferences);
-    	this.setSkillHash(skillHash);
-    	this.setSpecialAbilities(specialAbilities);
+        this.title = title;
+        this.description = description;
+        this.setOptions(options);
+        this.setRandomSkillPreferences(randomSkillPreferences);
+        this.setSkillHash(skillHash);
+        this.setSpecialAbilities(specialAbilities);
     }
 
     public String getTitle() {
-    	return title;
+        return title;
     }
 
     public void setTitle(String s) {
-    	title = s;
+        title = s;
     }
 
     public String getDescription() {
-    	return description;
+        return description;
     }
 
     public void setDescription(String s) {
-    	description = s;
+        description = s;
     }
 
     public CampaignOptions getOptions() {
@@ -123,75 +123,50 @@ public class GamePreset implements MekHqXmlSerializable {
         this.specialAbilities = specialAbilities;
     }
 
-    /**
-     * Collect and load all the Game Presets in files in a given directory and
-     * return a List of them
-     * @return a list of all of the game presets in the given directory
-     */
-    public static List<GamePreset> getGamePresetsIn() {
-        List<GamePreset> presets = new ArrayList<>();
-
-        File[] files = Utilities.getAllFiles(MekHQ.PRESET_DIR, (dir, name) -> name.toLowerCase().endsWith(".xml"));
-        for(File file : files) {
-            // And then load the campaign object from it.
-            GamePreset preset;
-
-            try (FileInputStream fis = new FileInputStream(file)) {
-                preset = GamePreset.createGamePresetFromXMLFileInputStream(fis);
-                if (preset.isValid()) {
-                    presets.add(preset);
-                }
-            } catch (Exception e) {
-                MekHQ.getLogger().error(GamePreset.class, "getGamePresetsIn", e);
-            }
-        }
-        return presets;
-    }
-
     public boolean isValid() {
-    	//could be used to disqualify bad presets
-    	return true;
+        //could be used to disqualify bad presets
+        return true;
     }
 
-	@Override
+    @Override
     public void writeToXml(PrintWriter pw, int indent) {
-		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "gamePreset");
+        pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "gamePreset");
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "title", title);
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "description", description);
         if (getOptions() != null) {
-        	getOptions().writeToXml(pw, indent);
+            getOptions().writeToXml(pw, indent);
         }
 
         if (getSkillHash() != null) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "skillTypes");
-	        for (String name : SkillType.skillList) {
-	            SkillType type = getSkillHash().get(name);
-	            if (type != null) {
-	                type.writeToXml(pw, indent);
-	            }
-	        }
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, --indent, "skillTypes");
+            for (String name : SkillType.skillList) {
+                SkillType type = getSkillHash().get(name);
+                if (type != null) {
+                    type.writeToXml(pw, indent);
+                }
+            }
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "skillTypes");
         }
 
         if (getSpecialAbilities() != null) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "specialAbilities");
-	        for (String key : getSpecialAbilities().keySet()) {
-	        	getSpecialAbilities().get(key).writeToXml(pw, indent);
-	        }
+            for (String key : getSpecialAbilities().keySet()) {
+                getSpecialAbilities().get(key).writeToXml(pw, indent);
+            }
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "specialAbilities");
         }
 
         if (getRandomSkillPreferences() != null) {
-        	getRandomSkillPreferences().writeToXml(pw, --indent);
+            getRandomSkillPreferences().writeToXml(pw, --indent);
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, indent, "gamePreset");
-	}
+    }
 
-	public static GamePreset createGamePresetFromXMLFileInputStream(FileInputStream fis) throws DOMException {
-	    final String METHOD_NAME = "createGamePresetFromXMLFileInputStream(FileInputStream)";
+    public static GamePreset createGamePresetFromXMLFileInputStream(FileInputStream fis) throws DOMException {
+        final String METHOD_NAME = "createGamePresetFromXMLFileInputStream(FileInputStream)";
 
-		GamePreset preset = new GamePreset();
+        GamePreset preset = new GamePreset();
 
         Document xmlDoc;
         try {
@@ -230,7 +205,7 @@ public class GamePreset implements MekHqXmlSerializable {
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     preset.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn));
                 } else if (xn.equalsIgnoreCase("skillTypes")) {
-                	NodeList wList = wn.getChildNodes();
+                    NodeList wList = wn.getChildNodes();
                     // Okay, lets iterate through the children, eh?
                     for (int z = 0; z < wList.getLength(); z++) {
                         Node wn2 = wList.item(z);
@@ -269,6 +244,31 @@ public class GamePreset implements MekHqXmlSerializable {
                 }
             }
         }
-		return preset;
-	}
+        return preset;
+    }
+
+    /**
+     * Collect and load all the Game Presets in files in a given directory and
+     * return a List of them
+     * @return a list of all of the game presets in the given directory
+     */
+    public static List<GamePreset> getGamePresetsIn() {
+        List<GamePreset> presets = new ArrayList<>();
+
+        File[] files = Utilities.getAllFiles(MekHQ.PRESET_DIR, (dir, name) -> name.toLowerCase().endsWith(".xml"));
+        for (File file : files) {
+            // And then load the campaign object from it.
+            GamePreset preset;
+
+            try (FileInputStream fis = new FileInputStream(file)) {
+                preset = GamePreset.createGamePresetFromXMLFileInputStream(fis);
+                if (preset.isValid()) {
+                    presets.add(preset);
+                }
+            } catch (Exception e) {
+                MekHQ.getLogger().error(GamePreset.class, "getGamePresetsIn", e);
+            }
+        }
+        return presets;
+    }
 }
