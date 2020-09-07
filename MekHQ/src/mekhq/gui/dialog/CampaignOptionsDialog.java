@@ -81,7 +81,8 @@ import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
-import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.PersonnelMarketDylan;
+import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -493,13 +494,9 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Miscellaneous Tab
     //endregion Variable Declarations
 
-    // TODO: Figure out why these are not used
-    private JCheckBox chkClanBonus;
-
     public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c, IconPackage icons) {
         super(parent, modal);
         this.campaign = c;
-        this.options = c.getCampaignOptions();
         this.rSkillPrefs = c.getRandomSkillPreferences();
         //this is a hack but I have no idea what is going on here
         this.frame = parent;
@@ -519,7 +516,7 @@ public class CampaignOptionsDialog extends JDialog {
         cancelled = false;
 
         initComponents();
-        setOptions();
+        setOptions(c.getCampaignOptions(), c.getRandomSkillPreferences());
         setCamoIcon();
         setForceIcon();
         setLocationRelativeTo(parent);
@@ -2218,7 +2215,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(clanPriceModifierLabel, gridBagConstraints);
 
-        spnClanPriceModifier = new JSpinner(new SpinnerNumberModel(options.getClanPriceModifier(), 1.0, null, 0.1));
+        spnClanPriceModifier = new JSpinner(new SpinnerNumberModel(1.0, 1.0, null, 0.1));
         spnClanPriceModifier.setEditor(new JSpinner.NumberEditor(spnClanPriceModifier, "0.00"));
         spnClanPriceModifier.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2875,8 +2872,6 @@ public class CampaignOptionsDialog extends JDialog {
         JLabel lblOverallRecruitBonus = new JLabel(resourceMap.getString("lblOverallRecruitBonus.text"));
         chkExtraRandom = new JCheckBox(resourceMap.getString("chkExtraRandom.text"));
         chkExtraRandom.setToolTipText(resourceMap.getString("chkExtraRandom.toolTipText"));
-        chkClanBonus = new JCheckBox(resourceMap.getString("chkClanBonus.text"));
-        chkClanBonus.setToolTipText(resourceMap.getString("chkClanBonus.toolTipText"));
         JLabel lblProbAntiMek = new JLabel(resourceMap.getString("lblProbAntiMek.text"));
         spnProbAntiMek = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getAntiMekProb(), 0, 100, 5));
         ((JSpinner.DefaultEditor) spnProbAntiMek.getEditor()).getTextField().setEditable(false);
@@ -3430,8 +3425,8 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnelMarket.add(personnelMarketTypeLabel, gridBagConstraints);
         personnelMarketType.addActionListener(evt -> {
-            final boolean enabled = (personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_RANDOM)
-                    || (personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_DYLANS);
+            final boolean enabled = new PersonnelMarketDylan().getModuleName().equals(personnelMarketType.getSelectedItem())
+                    || new PersonnelMarketRandom().getModuleName().equals(personnelMarketType.getSelectedItem());
             personnelMarketRandomEliteRemoval.setEnabled(enabled);
             personnelMarketRandomVeteranRemoval.setEnabled(enabled);
             personnelMarketRandomRegularRemoval.setEnabled(enabled);
@@ -4398,10 +4393,8 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     public void applyPreset(GamePreset gamePreset) {
-        if (gamePreset.getOptions() != null) {
-            options = gamePreset.getOptions();
-        }
-        setOptions();
+        setOptions(gamePreset.getOptions(), gamePreset.getRandomSkillPreferences());
+
         /// TODO : WINDCHILD FINISH ME
 
         /*
@@ -4430,12 +4423,72 @@ public class CampaignOptionsDialog extends JDialog {
     /**
      * This is used to set the status of the dialog based on the provided CampaignOptions
      */
-    public void setOptions() {
+    public void setOptions(CampaignOptions options, RandomSkillPreferences randomSkillPreferences) {
+        // Use the provided options and preferences when possible, but flip if they are null to be safe
+        if (options != null) {
+            this.options = options;
+        } else {
+            options = this.options;
+        }
+
+        if (randomSkillPreferences != null) {
+            this.rSkillPrefs = randomSkillPreferences;
+        } else {
+            randomSkillPreferences = this.rSkillPrefs;
+        }
+
+        //region General Tab
+        useUnitRatingCheckBox.setSelected(options.useDragoonRating());
+        unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod().getDescription());
+        //endregion General Tab
+
+        //region Repair and Maintenance Tab
         useEraModsCheckBox.setSelected(options.useEraMods());
         assignedTechFirstCheckBox.setSelected(options.useAssignedTechFirst());
         resetToFirstTechCheckBox.setSelected(options.useResetToFirstTech());
-        useUnitRatingCheckBox.setSelected(options.useDragoonRating());
-        unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod().getDescription());
+
+        useQuirksBox.setSelected(options.useQuirks());
+
+        if (options.isDestroyByMargin()) {
+            useDamageMargin.doClick();
+        }
+        useAeroSystemHitsBox.setSelected(options.useAeroSystemHits());
+
+        if (options.checkMaintenance()) {
+            checkMaintenance.doClick();
+        }
+
+        useQualityMaintenance.setSelected(options.useQualityMaintenance());
+        reverseQualityNames.setSelected(options.reverseQualityNames());
+        useUnofficialMaintenance.setSelected(options.useUnofficialMaintenance());
+        logMaintenance.setSelected(options.logMaintenance());
+        //endregion Repair and Maintenance Tab
+
+        //region Supplies and Acquisitions Tab
+        chkSupportStaffOnly.setSelected(options.isAcquisitionSupportStaffOnly());
+        usePlanetaryAcquisitions.setSelected(options.usesPlanetaryAcquisition());
+        disallowPlanetaryAcquisitionClanCrossover.setSelected(options.disallowPlanetAcquisitionClanCrossover());
+        disallowClanPartsFromIS.setSelected(options.disallowClanPartsFromIS());
+        usePlanetaryAcquisitionsVerbose.setSelected(options.usePlanetAcquisitionVerboseReporting());
+        comboPlanetaryAcquisitionsFactionLimits.setSelectedIndex(options.getPlanetAcquisitionFactionLimit());
+        //endregion Supplies and Acquisitions Tab
+
+        //region Tech Limits Tab
+        if (options.limitByYear()) {
+            limitByYearBox.doClick();
+        }
+        disallowExtinctStuffBox.setSelected(options.disallowExtinctStuff());
+        allowClanPurchasesBox.setSelected(options.allowClanPurchases());
+        allowISPurchasesBox.setSelected(options.allowISPurchases());
+        allowCanonOnlyBox.setSelected(options.allowCanonOnly());
+        allowCanonRefitOnlyBox.setSelected(options.allowCanonRefitOnly());
+        variableTechLevelBox.setSelected(options.useVariableTechLevel() && options.limitByYear());
+        factionIntroDateBox.setSelected(options.useFactionIntroDate());
+        useAmmoByTypeBox.setSelected(options.useAmmoByType());
+        choiceTechLevel.setSelectedIndex(options.getTechLevel());
+        //endregion Tech Limits Tab
+
+        //region Personnel Tab
         useTacticsBox.setSelected(options.useTactics());
         useInitBonusBox.setSelected(options.useInitBonus());
         useToughnessBox.setSelected(options.useToughness());
@@ -4447,79 +4500,6 @@ public class CampaignOptionsDialog extends JDialog {
         chkCapturePrisoners.setSelected(options.capturePrisoners());
         useAdvancedMedicalBox.setSelected(options.useAdvancedMedical());
         useDylansRandomXpBox.setSelected(options.useDylansRandomXp());
-        payForPartsBox.setSelected(options.payForParts());
-        payForRepairsBox.setSelected(options.payForRepairs());
-        payForUnitsBox.setSelected(options.payForUnits());
-        payForSalariesBox.setSelected(options.payForSalaries());
-        payForOverheadBox.setSelected(options.payForOverhead());
-        payForMaintainBox.setSelected(options.payForMaintain());
-        payForTransportBox.setSelected(options.payForTransport());
-        payForRecruitmentBox.setSelected(options.payForRecruitment());
-        useLoanLimitsBox.setSelected(options.useLoanLimits());
-        usePercentageMaintBox.setSelected(options.usePercentageMaint());
-        useInfantryDontCountBox.setSelected(options.useInfantryDontCount());
-        usePeacetimeCostBox.setSelected(options.usePeacetimeCost());
-        useExtendedPartsModifierBox.setSelected(options.useExtendedPartsModifier());
-        showPeacetimeCostBox.setSelected(options.showPeacetimeCost());
-
-        usePlanetaryAcquisitions.setSelected(options.usesPlanetaryAcquisition());
-        disallowPlanetaryAcquisitionClanCrossover.setSelected(options.disallowPlanetAcquisitionClanCrossover());
-        disallowClanPartsFromIS.setSelected(options.disallowClanPartsFromIS());
-        usePlanetaryAcquisitionsVerbose.setSelected(options.usePlanetAcquisitionVerboseReporting());
-
-        if (options.isDestroyByMargin()) {
-            useDamageMargin.doClick();
-        }
-        useAeroSystemHitsBox.setSelected(options.useAeroSystemHits());
-        useQualityMaintenance.setSelected(options.useQualityMaintenance());
-        useUnofficialMaintenance.setSelected(options.useUnofficialMaintenance());
-        checkMaintenance.setSelected(options.checkMaintenance());
-        reverseQualityNames.setSelected(options.reverseQualityNames());
-
-        sellUnitsBox.setSelected(options.canSellUnits());
-        sellPartsBox.setSelected(options.canSellParts());
-
-        limitByYearBox.setSelected(options.limitByYear());
-        disallowExtinctStuffBox.setSelected(options.disallowExtinctStuff());
-        allowClanPurchasesBox.setSelected(options.allowClanPurchases());
-        allowISPurchasesBox.setSelected(options.allowISPurchases());
-        allowCanonOnlyBox.setSelected(options.allowCanonOnly());
-        allowCanonRefitOnlyBox.setSelected(options.allowCanonRefitOnly());
-        variableTechLevelBox.setSelected(options.useVariableTechLevel() && options.limitByYear());
-        variableTechLevelBox.setEnabled(options.limitByYear());
-        factionIntroDateBox.setSelected(options.useFactionIntroDate());
-        useAmmoByTypeBox.setSelected(options.useAmmoByType());
-
-        useQuirksBox.setSelected(options.useQuirks());
-        chkSupportStaffOnly.setSelected(options.isAcquisitionSupportStaffOnly());
-
-        logMaintenance.setSelected(options.logMaintenance());
-        comboPlanetaryAcquisitionsFactionLimits.setSelectedIndex(options.getPlanetAcquisitionFactionLimit());
-        choiceTechLevel.setSelectedIndex(options.getTechLevel());
-
-        comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
-        newFinancialYearFinancesToCSVExportBox.setSelected(options.getNewFinancialYearFinancesToCSVExport());
-
-        if (options.useEquipmentContractBase()) {
-            btnContractEquipment.setSelected(true);
-        } else {
-            btnContractPersonnel.setSelected(true);
-        }
-        chkEquipContractSaleValue.setSelected(options.useEquipmentContractSaleValue());
-        chkBLCSaleValue.setSelected(options.useBLCSaleValue());
-
-        chkExtraRandom.setSelected(rSkillPrefs.randomizeSkill());
-        chkClanBonus.setSelected(rSkillPrefs.useClanBonuses());
-        //region General Tab
-        //endregion General Tab
-
-        //region Repair and Maintenance Tab
-        //endregion Repair and Maintenance Tab
-
-        //region Supplies and Acquisitions Tab
-        //endregion Supplies and Acquisitions Tab
-
-        //region Personnel Tab
         comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
         chkPrisonerBabyStatus.setSelected(options.getPrisonerBabyStatus());
         altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
@@ -4552,9 +4532,35 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Personnel Tab
 
         //region Finances Tab
+        payForPartsBox.setSelected(options.payForParts());
+        payForRepairsBox.setSelected(options.payForRepairs());
+        payForUnitsBox.setSelected(options.payForUnits());
+        payForSalariesBox.setSelected(options.payForSalaries());
+        payForOverheadBox.setSelected(options.payForOverhead());
+        payForMaintainBox.setSelected(options.payForMaintain());
+        payForTransportBox.setSelected(options.payForTransport());
+        payForRecruitmentBox.setSelected(options.payForRecruitment());
+        useLoanLimitsBox.setSelected(options.useLoanLimits());
+        usePercentageMaintBox.setSelected(options.usePercentageMaint());
+        useInfantryDontCountBox.setSelected(options.useInfantryDontCount());
+        usePeacetimeCostBox.setSelected(options.usePeacetimeCost());
+        useExtendedPartsModifierBox.setSelected(options.useExtendedPartsModifier());
+        showPeacetimeCostBox.setSelected(options.showPeacetimeCost());
+        spnClanPriceModifier.setValue(options.getClanPriceModifier());
+        sellUnitsBox.setSelected(options.canSellUnits());
+        sellPartsBox.setSelected(options.canSellParts());
+        comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
+        newFinancialYearFinancesToCSVExportBox.setSelected(options.getNewFinancialYearFinancesToCSVExport());
         //endregion Finances Tab
 
         //region Mercenary Tab
+        if (options.useEquipmentContractBase()) {
+            btnContractEquipment.setSelected(true);
+        } else {
+            btnContractPersonnel.setSelected(true);
+        }
+        chkEquipContractSaleValue.setSelected(options.useEquipmentContractSaleValue());
+        chkBLCSaleValue.setSelected(options.useBLCSaleValue());
         //endregion Mercenary Tab
 
         //region Experience Tab
@@ -4564,6 +4570,7 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Special Abilities Tab
 
         //region Skill Randomization Tab
+        chkExtraRandom.setSelected(randomSkillPreferences.randomizeSkill());
         //endregion Skill Randomization Tab
 
         //region Rank System Tab
@@ -5467,14 +5474,6 @@ public class CampaignOptionsDialog extends JDialog {
         }
     }
 
-    @Override
-    public void setVisible(boolean b) {
-        super.setVisible(b);
-
-        if (b) {
-            setOptions();
-        }
-    }
     /*
      * Taken from:
      *  http://tips4java.wordpress.com/2008/11/18/row-number-table/

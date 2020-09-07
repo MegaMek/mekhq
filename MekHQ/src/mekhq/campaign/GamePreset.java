@@ -55,7 +55,7 @@ public class GamePreset implements MekHqXmlSerializable {
 	private String title;
     private String description;
     private CampaignOptions options;
-    private RandomSkillPreferences rskillPrefs;
+    private RandomSkillPreferences randomSkillPreferences;
     private Hashtable<String, SkillType> skillHash;
     private Hashtable<String, SpecialAbility> specialAbilities;
 
@@ -65,12 +65,12 @@ public class GamePreset implements MekHqXmlSerializable {
     }
 
     public GamePreset(String title, String description, CampaignOptions options,
-                      RandomSkillPreferences rskillPrefs, Hashtable<String, SkillType> skillHash,
+                      RandomSkillPreferences randomSkillPreferences, Hashtable<String, SkillType> skillHash,
                       Hashtable<String, SpecialAbility> specialAbilities) {
     	this.title = title;
     	this.description = description;
     	this.setOptions(options);
-    	this.rskillPrefs = rskillPrefs;
+    	this.setRandomSkillPreferences(randomSkillPreferences);
     	this.skillHash = skillHash;
     	this.specialAbilities = specialAbilities;
     }
@@ -97,6 +97,14 @@ public class GamePreset implements MekHqXmlSerializable {
 
     public void setOptions(CampaignOptions options) {
         this.options = options;
+    }
+
+    public RandomSkillPreferences getRandomSkillPreferences() {
+        return randomSkillPreferences;
+    }
+
+    public void setRandomSkillPreferences(RandomSkillPreferences randomSkillPreferences) {
+        this.randomSkillPreferences = randomSkillPreferences;
     }
 
     /**
@@ -158,8 +166,8 @@ public class GamePreset implements MekHqXmlSerializable {
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "specialAbilities");
         }
 
-        if (rskillPrefs != null) {
-        	rskillPrefs.writeToXml(pw, --indent);
+        if (getRandomSkillPreferences() != null) {
+        	getRandomSkillPreferences().writeToXml(pw, --indent);
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, indent, "gamePreset");
 	}
@@ -204,7 +212,7 @@ public class GamePreset implements MekHqXmlSerializable {
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
                     preset.setOptions(CampaignOptions.generateCampaignOptionsFromXml(wn));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
-                    preset.rskillPrefs = RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn);
+                    preset.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn));
                 } else if (xn.equalsIgnoreCase("skillTypes")) {
                 	NodeList wList = wn.getChildNodes();
                     // Okay, lets iterate through the children, eh?
