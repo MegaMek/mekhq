@@ -362,7 +362,7 @@ public class CampaignOptions implements Serializable {
     private int baseStrategyDeployment;
     private int additionalStrategyDeployment;
     private boolean adjustPaymentForStrategy;
-    private double[] atbBattleChance;
+    private int[] atbBattleChance;
     private boolean generateChases;
 
     // RATs
@@ -751,7 +751,7 @@ public class CampaignOptions implements Serializable {
         baseStrategyDeployment = 3;
         additionalStrategyDeployment = 1;
         adjustPaymentForStrategy = false;
-        atbBattleChance = new double[AtBLanceRole.values().length - 1];
+        atbBattleChance = new int[AtBLanceRole.values().length - 1];
         atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = 40;
         atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = 20;
         atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = 60;
@@ -2768,19 +2768,19 @@ public class CampaignOptions implements Serializable {
      * @param role the {@link AtBLanceRole} to get the battle chance for
      * @return the chance of having a battle for the specified role
      */
-    public double getAtBBattleChance(AtBLanceRole role) {
-        return (role == AtBLanceRole.UNASSIGNED) ? 0.0 : atbBattleChance[role.ordinal()];
+    public int getAtBBattleChance(AtBLanceRole role) {
+        return (role == AtBLanceRole.UNASSIGNED) ? 0 : atbBattleChance[role.ordinal()];
     }
 
     /**
      * @param role      the {@link AtBLanceRole} ordinal value
-     * @param frequency the frequency to set the generation to (chance from 0 to 1)
+     * @param frequency the frequency to set the generation to (percent chance from 0 to 100)
      */
-    public void setAtBBattleChance(int role, Double frequency) {
-        if (frequency < 0.0) {
-            frequency = 0.0;
-        } else if (frequency > 1.0) {
-            frequency = 1.0;
+    public void setAtBBattleChance(int role, int frequency) {
+        if (frequency < 0) {
+            frequency = 0;
+        } else if (frequency > 100) {
+            frequency = 100;
         }
 
         this.atbBattleChance[role] = frequency;
@@ -3852,14 +3852,14 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
                 double intensity = Double.parseDouble(wn2.getTextContent().trim());
 
-                retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = ((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5;
-                retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = ((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5;
-                retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = ((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5;
-                retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = ((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5;
+                retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
+                retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
+                retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
+                retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
             } else if (wn2.getNodeName().equalsIgnoreCase("atbBattleChance")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
-                    retVal.atbBattleChance[i] = Double.parseDouble(values[i]);
+                    retVal.atbBattleChance[i] = Integer.parseInt(values[i]);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("generateChases")) {
                 retVal.setGenerateChases(Boolean.parseBoolean(wn2.getTextContent().trim()));
