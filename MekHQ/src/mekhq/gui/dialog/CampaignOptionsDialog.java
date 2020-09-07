@@ -4743,9 +4743,7 @@ public class CampaignOptionsDialog extends JDialog {
         // Ensure that the MegaMek year GameOption matches the campaign year
         GameOptions gameOpts = campaign.getGameOptions();
         int campaignYear = campaign.getGameYear();
-        if (gameOpts.intOption("year") != campaignYear) {
-            gameOpts.getOption("year").setValue(campaignYear);
-        }
+        gameOpts.getOption("year").setValue(campaignYear);
         campaign.setFactionCode(Faction.getFactionFromFullNameAndYear
                 (String.valueOf(comboFaction.getSelectedItem()), date.getYear()).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
