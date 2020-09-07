@@ -3859,7 +3859,14 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("atbBattleChance")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
-                    retVal.atbBattleChance[i] = Integer.parseInt(values[i]);
+                    try {
+                        retVal.atbBattleChance[i] = Integer.parseInt(values[i]);
+                    } catch (Exception ignored) {
+                        // Badly coded, but this is to migrate devs and their games as the swap was
+                        // done before a release and is thus better to handle this way than through
+                        // a more code complex method
+                        retVal.atbBattleChance[i] = (int) Math.round(Double.parseDouble(values[i]));
+                    }
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("generateChases")) {
                 retVal.setGenerateChases(Boolean.parseBoolean(wn2.getTextContent().trim()));
