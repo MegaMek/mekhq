@@ -55,6 +55,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
@@ -340,6 +341,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JTextArea txtInstructionsXP;
     private JScrollPane scrXP;
     private JTable tableXP;
+    private static final String[] TABLE_XP_COLUMN_NAMES = {"+0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"};
     //endregion Experience Tab
 
     //region Skills Tab
@@ -348,7 +350,7 @@ public class CampaignOptionsDialog extends JDialog {
 
     //region Special Abilities Tab
     private JPanel panSpecialAbilities;
-    Hashtable<String, SpecialAbility> tempSPA;
+    private Hashtable<String, SpecialAbility> tempSPA;
     private JButton btnAddSPA;
     //endregion Special Abilities Tab
 
@@ -486,7 +488,6 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUsePlanetaryConditions;
     private JCheckBox chkUseAtBCapture;
     private JSpinner spnStartGameDelay;
-
     //endregion Against the Bot Tab
 
     //region Miscellaneous Tab
@@ -2674,8 +2675,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(txtInstructionsXP, gridBagConstraints);
 
-        String[] colNames = {"+0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"};
-        tableXP = new JTable(SkillType.getSkillCostsArray(), colNames);
+        tableXP = new JTable(getSkillCostsArray(SkillType.getSkillHash()), TABLE_XP_COLUMN_NAMES);
         tableXP.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableXP.setRowSelectionAllowed(false);
         tableXP.setColumnSelectionAllowed(false);
@@ -2794,7 +2794,7 @@ public class CampaignOptionsDialog extends JDialog {
         //changing the underlying one in case the user cancels the changes
         tempSPA = new Hashtable<>();
         for (String name : spaNames) {
-            tempSPA.put(name, SpecialAbility.getAbility(name).clone());
+            getCurrentSPA().put(name, SpecialAbility.getAbility(name).clone());
         }
 
         btnAddSPA = new JButton("Add Another Special Ability");
@@ -2805,8 +2805,8 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx =1.0;
-        gridBagConstraints.weighty =0.0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
         panSpecialAbilities.add(btnAddSPA, gridBagConstraints);
         btnAddSPA.setEnabled(!getUnusedSPA().isEmpty());
 
@@ -2815,11 +2815,11 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx =1.0;
-        gridBagConstraints.weighty =1.0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
 
         for (String name : spaNames) {
-            panSpecialAbilities.add(new SpecialAbilityPanel(tempSPA.get(name), this), gridBagConstraints);
+            panSpecialAbilities.add(new SpecialAbilityPanel(getCurrentSPA().get(name), this), gridBagConstraints);
             gridBagConstraints.gridy++;
         }
 
@@ -4355,36 +4355,36 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     public void applyPreset(GamePreset gamePreset) {
+        // Handle CampaignOptions and RandomSkillPreferences
         setOptions(gamePreset.getOptions(), gamePreset.getRandomSkillPreferences());
 
-        /// TODO : WINDCHILD FINISH ME
+        // Handle SPAs
+        tempSPA = (gamePreset.getSpecialAbilities() != null) ? gamePreset.getSpecialAbilities() : new Hashtable<>();
+        recreateSPAPanel(!getUnusedSPA().isEmpty());
 
-        /*
-        Former GamePreset::Apply
+        if (gamePreset.getSkillHash() != null) {
+            // Overwriting XP Table
+            tableXP.setModel(new DefaultTableModel(getSkillCostsArray(gamePreset.getSkillHash()), TABLE_XP_COLUMN_NAMES));
+            ((DefaultTableModel) tableXP.getModel()).fireTableDataChanged();
 
-    public void apply(Campaign campaign) {
-    	if (options != null) {
-    		campaign.setCampaignOptions(options);
-    	}
-    	if (rskillPrefs != null) {
-    		campaign.setRandomSkillPreferences(rskillPrefs);
-    	}
+            // Overwriting Skill List
+            for (String skillName : SkillType.getSkillList()) {
+                SkillType skillType = gamePreset.getSkillHash().get(skillName);
 
-    	if (skillHash != null) {
-    		SkillType.setSkillTypes(skillHash);
-    	}
+                JSpinner spnTarget = hashSkillTargets.get(skillName);
+                if (spnTarget == null) {
+                    continue;
+                }
 
-    	if (specialAbilities != null) {
-    		SpecialAbility.setSpecialAbilities(specialAbilities);
-    	}
+                spnTarget.setValue(skillType.getTarget());
+                hashGreenSkill.get(skillName).setValue(skillType.getGreenLevel());
+                hashRegSkill.get(skillName).setValue(skillType.getRegularLevel());
+                hashVetSkill.get(skillName).setValue(skillType.getVeteranLevel());
+                hashEliteSkill.get(skillName).setValue(skillType.getEliteLevel());
+            }
+        }
     }
 
-         */
-    }
-
-    /**
-     * This is used to set the status of the dialog based on the provided CampaignOptions
-     */
     public void setOptions(CampaignOptions options, RandomSkillPreferences randomSkillPreferences) {
         // Use the provided options and preferences when possible, but flip if they are null to be safe
         if (options != null) {
@@ -4761,6 +4761,18 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Miscellaneous Tab
     }
 
+    public static String[][] getSkillCostsArray(Hashtable<String, SkillType> skillHash) {
+        String[][] array = new String[SkillType.getSkillList().length][11];
+        int i = 0;
+        for (String name : SkillType.getSkillList()) {
+            SkillType type = skillHash.get(name);
+            for (int j = 0; j < 11; j++) {
+                array[i][j] = Integer.toString(type.getCost(j));
+            }
+            i++;
+        }
+        return array;
+    }
     //endregion Initialization
 
     @SuppressWarnings(value = "unused") // FIXME:
@@ -5133,7 +5145,7 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Personnel Tab
 
         //start SPA
-        SpecialAbility.replaceSpecialAbilities(tempSPA);
+        SpecialAbility.replaceSpecialAbilities(getCurrentSPA());
         //end SPA
 
         // Start Personnel Market
@@ -5326,14 +5338,14 @@ public class CampaignOptionsDialog extends JDialog {
 
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                 IOption option = j.nextElement();
-                if (null == tempSPA.get(option.getName())) {
+                if (getCurrentSPA().get(option.getName()) == null) {
                     unused.add(option.getName());
                 }
             }
         }
 
         for (String key : SpecialAbility.getAllDefaultSpecialAbilities().keySet()) {
-            if ((null == tempSPA.get(key)) && !unused.contains(key)) {
+            if ((getCurrentSPA().get(key) == null) && !unused.contains(key)) {
                 unused.add(key);
             }
         }
@@ -5349,40 +5361,16 @@ public class CampaignOptionsDialog extends JDialog {
         SelectUnusedAbilityDialog suad = new SelectUnusedAbilityDialog(this.frame, getUnusedSPA(), getCurrentSPA());
         suad.setVisible(true);
 
-        panSpecialAbilities.removeAll();
-
-        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panSpecialAbilities.add(btnAddSPA, gridBagConstraints);
-        btnAddSPA.setEnabled(!getUnusedSPA().isEmpty());
-
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-
-        for(String title : tempSPA.keySet()) {
-            panSpecialAbilities.add(new SpecialAbilityPanel(tempSPA.get(title), this), gridBagConstraints);
-            gridBagConstraints.gridy++;
-        }
-        panSpecialAbilities.revalidate();
-        panSpecialAbilities.repaint();
+        recreateSPAPanel(!getUnusedSPA().isEmpty());
     }
 
     public void btnRemoveSPA(String name) {
-        tempSPA.remove(name);
+        getCurrentSPA().remove(name);
 
         //we also need to cycle through the existing SPAs and remove this one from
         //any prereqs
-        for (String key: tempSPA.keySet()) {
-            SpecialAbility otherAbil = tempSPA.get(key);
+        for (String key: getCurrentSPA().keySet()) {
+            SpecialAbility otherAbil = getCurrentSPA().get(key);
             Vector<String> prereq = otherAbil.getPrereqAbilities();
             Vector<String> invalid = otherAbil.getInvalidAbilities();
             Vector<String> remove = otherAbil.getRemovedAbilities();
@@ -5397,27 +5385,28 @@ public class CampaignOptionsDialog extends JDialog {
             }
         }
 
+        recreateSPAPanel(true);
+    }
+
+    public void recreateSPAPanel(boolean enableAddSPA) {
         panSpecialAbilities.removeAll();
 
-        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx =1.0;
-        gridBagConstraints.weighty =0.0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
         panSpecialAbilities.add(btnAddSPA, gridBagConstraints);
-        btnAddSPA.setEnabled(true);
+        btnAddSPA.setEnabled(enableAddSPA);
 
         gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx =1.0;
-        gridBagConstraints.weighty =1.0;
+        gridBagConstraints.weighty = 1.0;
 
-        for (String title : tempSPA.keySet()) {
-            panSpecialAbilities.add(new SpecialAbilityPanel(tempSPA.get(title), this), gridBagConstraints);
+        for (String title : getCurrentSPA().keySet()) {
+            panSpecialAbilities.add(new SpecialAbilityPanel(getCurrentSPA().get(title), this), gridBagConstraints);
             gridBagConstraints.gridy++;
         }
         panSpecialAbilities.revalidate();

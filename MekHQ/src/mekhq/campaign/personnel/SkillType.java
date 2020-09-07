@@ -386,19 +386,6 @@ public class SkillType implements Serializable {
         }
     }
 
-    public static String[][] getSkillCostsArray() {
-        String[][] array = new String[skillList.length][11];
-        int i = 0;
-        for (String name : skillList) {
-            SkillType type = lookupHash.get(name);
-            for (int j = 0; j< 11; j++) {
-                array[i][j] = Integer.toString(type.getCost(j));
-            }
-            i++;
-        }
-        return array;
-    }
-
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "skillType");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "name", name);

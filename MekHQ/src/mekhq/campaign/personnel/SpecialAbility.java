@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.personnel;
 
 import java.io.FileInputStream;
@@ -40,7 +39,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
@@ -584,35 +582,35 @@ public class SpecialAbility implements MekHqXmlSerializable {
         ArrayList<String> candidates = new ArrayList<>();
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
-            
+
             if(!isWeaponEligibleForSPA(et, type, clusterOnly)) {
                 continue;
             }
-            
+
             WeaponType wt = (WeaponType) et;
-            
+
             if(TechConstants.isClan(wt.getTechLevel(year)) != isClan) {
                 continue;
             }
-            
+
             int lvl = wt.getTechLevel(year);
             if(lvl < 0) {
                 continue;
             }
-            
+
             if(techLvl < Utilities.getSimpleTechLevel(lvl)) {
                 continue;
             }
-            
+
             if(techLvl == TechConstants.T_IS_UNOFFICIAL) {
                 continue;
             }
-            
+
             int ntimes = 10;
             if(techLvl >= TechConstants.T_IS_ADVANCED) {
                 ntimes = 1;
             }
-            
+
             while(ntimes > 0) {
                 candidates.add(et.getName());
                 ntimes--;
@@ -623,9 +621,9 @@ public class SpecialAbility implements MekHqXmlSerializable {
         }
         return Utilities.getRandomItem(candidates);
     }
-    
+
     /**
-     * Worker function that determines if a piece of equipment is eligible 
+     * Worker function that determines if a piece of equipment is eligible
      * for being selected for an SPA.
      * @param et Equipment type to check
      * @param type Person role, e.g. Person.T_MECHWARRIOR. This check is ignored if Person.T_NONE is passed in.
@@ -648,8 +646,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 || wt.hasFlag(WeaponType.F_PROTOTYPE)) {
             return false;
         }
-        
-        if(type > Person.T_NONE && 
+
+        if(type > Person.T_NONE &&
                 !((wt.hasFlag(WeaponType.F_MECH_WEAPON) && type == Person.T_MECHWARRIOR)
                 || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && type != Person.T_AERO_PILOT)
                 || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !(type == Person.T_VEE_GUNNER
@@ -660,13 +658,13 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && type != Person.T_PROTO_PILOT))) {
             return false;
         }
-        
+
         if(wt.getAtClass() == WeaponType.CLASS_NONE ||
                 wt.getAtClass() == WeaponType.CLASS_POINT_DEFENSE ||
                 wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER) {
             return false;
         }
-        
+
         if(clusterOnly && !(
                 (wt.getDamage() == WeaponType.DAMAGE_BY_CLUSTERTABLE) ||
                 (wt instanceof ACWeapon) ||
@@ -674,7 +672,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 (wt instanceof LBXACWeapon))) {
             return false;
         }
-        
+
         return true;
     }
 

@@ -71,8 +71,8 @@ public class GamePreset implements MekHqXmlSerializable {
     	this.description = description;
     	this.setOptions(options);
     	this.setRandomSkillPreferences(randomSkillPreferences);
-    	this.skillHash = skillHash;
-    	this.specialAbilities = specialAbilities;
+    	this.setSkillHash(skillHash);
+    	this.setSpecialAbilities(specialAbilities);
     }
 
     public String getTitle() {
@@ -105,6 +105,22 @@ public class GamePreset implements MekHqXmlSerializable {
 
     public void setRandomSkillPreferences(RandomSkillPreferences randomSkillPreferences) {
         this.randomSkillPreferences = randomSkillPreferences;
+    }
+
+    public Hashtable<String, SkillType> getSkillHash() {
+        return skillHash;
+    }
+
+    public void setSkillHash(Hashtable<String, SkillType> skillHash) {
+        this.skillHash = skillHash;
+    }
+
+    public Hashtable<String, SpecialAbility> getSpecialAbilities() {
+        return specialAbilities;
+    }
+
+    public void setSpecialAbilities(Hashtable<String, SpecialAbility> specialAbilities) {
+        this.specialAbilities = specialAbilities;
     }
 
     /**
@@ -147,10 +163,10 @@ public class GamePreset implements MekHqXmlSerializable {
         	getOptions().writeToXml(pw, indent);
         }
 
-        if (skillHash != null) {
+        if (getSkillHash() != null) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "skillTypes");
 	        for (String name : SkillType.skillList) {
-	            SkillType type = skillHash.get(name);
+	            SkillType type = getSkillHash().get(name);
 	            if (type != null) {
 	                type.writeToXml(pw, indent);
 	            }
@@ -158,10 +174,10 @@ public class GamePreset implements MekHqXmlSerializable {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, --indent, "skillTypes");
         }
 
-        if (specialAbilities != null) {
+        if (getSpecialAbilities() != null) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "specialAbilities");
-	        for (String key : specialAbilities.keySet()) {
-	        	specialAbilities.get(key).writeToXml(pw, indent);
+	        for (String key : getSpecialAbilities().keySet()) {
+	        	getSpecialAbilities().get(key).writeToXml(pw, indent);
 	        }
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "specialAbilities");
         }
@@ -230,7 +246,7 @@ public class GamePreset implements MekHqXmlSerializable {
 
                             continue;
                         }
-                        SkillType.generateSeparateInstanceFromXML(wn2, preset.skillHash);
+                        SkillType.generateSeparateInstanceFromXML(wn2, preset.getSkillHash());
                     }
                 } else if (xn.equalsIgnoreCase("specialAbilities")) {
                     PilotOptions options = new PilotOptions();
@@ -248,7 +264,7 @@ public class GamePreset implements MekHqXmlSerializable {
                             continue;
                         }
 
-                        SpecialAbility.generateSeparateInstanceFromXML(wn2, preset.specialAbilities, options);
+                        SpecialAbility.generateSeparateInstanceFromXML(wn2, preset.getSpecialAbilities(), options);
                     }
                 }
             }
