@@ -51,7 +51,7 @@ public class InfantryAmmoBin extends AmmoBin {
      * @param tonnage     The weight of the unit it's installed on
      * @param ammoType    The type of ammo
      * @param equipNum    The equipment index on the unit
-     * @param shots       The number of shots of ammo contained in the bin
+     * @param shots       The number of shots of ammo needed to refill the bin
      * @param weaponType  The weapon this ammo is for
      * @param omniPodded  Whether the weapon is pod-mounted on an omnivehicle
      * @param c           The campaign instance
@@ -76,7 +76,6 @@ public class InfantryAmmoBin extends AmmoBin {
         InfantryAmmoBin clone = new InfantryAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded,
                 weaponType, size, omniPodded, campaign);
         clone.copyBaseData(this);
-        clone.shotsNeeded = this.shotsNeeded;
         clone.munition = this.munition;
         return clone;
     }
@@ -105,7 +104,7 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public double getTonnage() {
-        return super.getTonnage() * weaponType.getAmmoWeight();
+        return weaponType.getAmmoWeight();
     }
 
     @Override
