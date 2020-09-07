@@ -3958,7 +3958,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         chkClanVehicles.setText(resourceMap.getString("chkClanVehicles.text"));
         chkClanVehicles.setToolTipText(resourceMap.getString("chkClanVehicles.toolTipText"));
-        chkClanVehicles.setSelected(options.getUseVehicles());
+        chkClanVehicles.setSelected(options.getClanVehicles());
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkClanVehicles, gridBagConstraints);
 
