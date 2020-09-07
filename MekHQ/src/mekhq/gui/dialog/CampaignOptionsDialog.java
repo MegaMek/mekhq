@@ -663,8 +663,6 @@ public class CampaignOptionsDialog extends JDialog {
         factionIntroDateBox = new JCheckBox();
         useAmmoByTypeBox = new JCheckBox();
         choiceTechLevel = new JComboBox<>();
-        btnOkay = new JButton();
-        btnSave = new JButton();
         btnLoad = new JButton();
         btnCancel = new JButton();
         scrRanks = new JScrollPane();
@@ -4541,23 +4539,23 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(tabOptions, gridBagConstraints);
 
-        btnOkay.setText(resourceMap.getString("btnOkay.text")); // NOI18N
-        btnOkay.setName("btnOkay"); // NOI18N
+        btnOkay = new JButton(resourceMap.getString("btnOkay.text"));
+        btnOkay.setName("btnOkay");
         btnOkay.addActionListener(evt -> btnOkayActionPerformed());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.weightx = 0.25;
         getContentPane().add(btnOkay, gridBagConstraints);
 
-        btnSave.setText(resourceMap.getString("btnSave.text")); // NOI18N
-        btnSave.setName("btnSave"); // NOI18N
+        btnSave = new JButton(resourceMap.getString("btnSave.text"));
+        btnSave.setName("btnSave");
         btnSave.addActionListener(evt -> btnSaveActionPerformed());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.weightx = 0.25;
         getContentPane().add(btnSave, gridBagConstraints);
 
@@ -4583,7 +4581,7 @@ public class CampaignOptionsDialog extends JDialog {
         getContentPane().add(btnCancel, gridBagConstraints);
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(CampaignOptionsDialog.class);
