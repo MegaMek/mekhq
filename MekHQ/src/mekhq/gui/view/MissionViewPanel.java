@@ -26,6 +26,7 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -363,7 +364,7 @@ public class MissionViewPanel extends ScrollablePanel {
         pnlStats.add(lblStartDate, gridBagConstraints);
 
         txtStartDate.setName("txtStartDate");
-        txtStartDate.setText(gui.getCampaign().getCampaignOptions().getDisplayFormattedDate(contract.getStartDate()));
+        txtStartDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -383,7 +384,7 @@ public class MissionViewPanel extends ScrollablePanel {
         pnlStats.add(lblEndDate, gridBagConstraints);
 
         txtEndDate.setName("txtEndDate");
-        txtEndDate.setText(gui.getCampaign().getCampaignOptions().getDisplayFormattedDate(contract.getEndingDate()));
+        txtEndDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getEndingDate()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -752,7 +753,7 @@ public class MissionViewPanel extends ScrollablePanel {
         pnlStats.add(lblStartDate, gridBagConstraints);
 
         txtStartDate.setName("txtStartDate");
-        txtStartDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(contract.getStartDate()));
+        txtStartDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -772,7 +773,7 @@ public class MissionViewPanel extends ScrollablePanel {
         pnlStats.add(lblEndDate, gridBagConstraints);
 
         txtEndDate.setName("txtEndDate");
-        txtEndDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(contract.getEndingDate()));
+        txtEndDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getEndingDate()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;

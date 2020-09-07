@@ -159,9 +159,8 @@ public class Finances implements Serializable {
         if (campaign.getCampaignOptions().getNewFinancialYearFinancesToCSVExport()) {
             String exportFileName = campaign.getName() + " Finances for " + campaign.getLocalDate().getYear()
                     + "." + FileType.CSV.getRecommendedExtension();
-            exportFinancesToCSV(campaign,
-                    new File(MekHQ.getCampaignsDirectory().getValue(), exportFileName).getPath(),
-                    FileType.CSV.getRecommendedExtension());
+            exportFinancesToCSV(new File(MekHQ.getCampaignsDirectory().getValue(),
+                            exportFileName).getPath(), FileType.CSV.getRecommendedExtension());
         }
 
         Money carryover = getBalance();
@@ -493,7 +492,7 @@ public class Finances implements Serializable {
                 .minus(getTotalLoanCollateral());
     }
 
-    public String exportFinancesToCSV(Campaign campaign, String path, String format) {
+    public String exportFinancesToCSV(String path, String format) {
         String report;
 
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
@@ -504,7 +503,7 @@ public class Finances implements Serializable {
             for (Transaction transaction : getAllTransactions()) {
                 runningTotal = runningTotal.plus(transaction.getAmount());
                 csvPrinter.printRecord(
-                        campaign.getCampaignOptions().getDisplayFormattedDate(transaction.getDate()),
+                        MekHQ.getMekHQOptions().getDisplayFormattedDate(transaction.getDate()),
                         transaction.getCategoryName(),
                         transaction.getDescription(),
                         transaction.getAmount(),

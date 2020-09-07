@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import megamek.common.Compute;
 
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.campaign.Campaign;
 
 /**
  * NewsItem
@@ -179,9 +179,9 @@ public class NewsItem {
         return s;
     }
 
-    public String getFullDescription(Campaign campaign) {
+    public String getFullDescription() {
         return "<html><h1>" + getHeadline() + "</h1>("
-                + campaign.getCampaignOptions().getDisplayFormattedDate(date)
+                + MekHQ.getMekHQOptions().getDisplayFormattedDate(date)
                 + ")<br><p>" + getPrefix() + description + "</p></html>";
     }
 

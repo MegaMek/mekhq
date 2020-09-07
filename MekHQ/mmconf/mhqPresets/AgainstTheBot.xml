@@ -3,7 +3,6 @@
 	<title>Official AtB Options</title>
 	<description>(Release 2) These are the default settings for the Against the Bot campaign system. As always change them to what you like for your style of play.</description>
 	<campaignOptions>
-		<displayDateFormat>yyyy-MM-dd</displayDateFormat>
 		<logMaintenance>false</logMaintenance>
 		<useFactionForNames>true</useFactionForNames>
 		<repairSystem>0</repairSystem>

@@ -32,6 +32,11 @@ VERSION HISTORY:
 + Issue #1166: Possible fix for missing turrets in AtB base attack/defense missions; still no turrets prior to 2750
 + Issue #1757: Enable Ranks For Captured Prisoners
 + Data: Large dump of current data.
++ Issue #259: Implementing Customizable MekHQ Display Date Formats
++ Issue #1982: Fixing AtBBattleChance for unassigned lances
++ Issue #1984: Implementing useManualMarriages Option
++ Issue #1983: Switching to new form of UUID save format
++ Issue #1952: Personnel Market Updates No Longer Fail in Rare Cases During Person Creation
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format

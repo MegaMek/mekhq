@@ -255,6 +255,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner spnMinimumMarriageAge;
     private JSpinner spnCheckMutualAncestorsDepth;
     private JCheckBox chkLogMarriageNameChange;
+    private JCheckBox chkUseManualMarriages;
     private JCheckBox chkUseRandomMarriages;
     private JSpinner spnChanceRandomMarriages;
     private JSpinner spnMarriageAgeRange;
@@ -735,7 +736,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(lblDate, gridBagConstraints);
 
-        btnDate.setText(options.getDisplayFormattedDate(date));
+        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         btnDate.setMinimumSize(new Dimension(400, 30));
         btnDate.setName("btnDate");
         btnDate.setPreferredSize(new Dimension(400, 30));
@@ -1818,6 +1819,12 @@ public class CampaignOptionsDialog extends JDialog {
         chkLogMarriageNameChange.setSelected(options.logMarriageNameChange());
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(chkLogMarriageNameChange, gridBagConstraints);
+
+        chkUseManualMarriages = new JCheckBox(resourceMap.getString("useManualMarriages.text"));
+        chkUseManualMarriages.setToolTipText(resourceMap.getString("useManualMarriages.toolTipText"));
+        chkUseManualMarriages.setSelected(options.useManualMarriages());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkUseManualMarriages, gridBagConstraints);
 
         chkUseRandomMarriages = new JCheckBox(resourceMap.getString("useRandomMarriages.text"));
         chkUseRandomMarriages.setToolTipText(resourceMap.getString("useRandomMarriages.toolTipText"));
@@ -3356,15 +3363,15 @@ public class CampaignOptionsDialog extends JDialog {
         //txtInstructionsRanks.setMinimumSize(new Dimension(400, 400));
         panRank.add(txtInstructionsRanks, gridBagConstraints);
 
-        tabOptions.addTab(resourceMap.getString("panRank.TabConstraints.tabTitle"), panRank); // NOI18N
+        tabOptions.addTab(resourceMap.getString("panRank.TabConstraints.tabTitle"), panRank);
 
         // Name and Portraits tab controls below
-        panNameGen.setName("panNameGen"); // NOI18N
+        panNameGen.setName("panNameGen");
         panNameGen.setLayout(new GridBagLayout());
 
         chkUseOriginFactionForNames = new JCheckBox(resourceMap.getString("chkUseOriginFactionForNames.text"));
         chkUseOriginFactionForNames.setToolTipText(resourceMap.getString("chkUseOriginFactionForNames.toolTipText"));
-        chkUseOriginFactionForNames.setName("chkUseOriginFactionForNames"); // NOI18N
+        chkUseOriginFactionForNames.setName("chkUseOriginFactionForNames");
         chkUseOriginFactionForNames.setSelected(options.useOriginFactionForNames());
         chkUseOriginFactionForNames.addActionListener(
                 evt -> comboFactionNames.setEnabled(!chkUseOriginFactionForNames.isSelected()));
@@ -3378,8 +3385,8 @@ public class CampaignOptionsDialog extends JDialog {
         panNameGen.add(chkUseOriginFactionForNames, gridBagConstraints);
 
 
-        JLabel lblFactionNames = new JLabel(resourceMap.getString("lblFactionNames.text")); // NOI18N
-        lblFactionNames.setName("lblFactionNames"); // NOI18N
+        JLabel lblFactionNames = new JLabel(resourceMap.getString("lblFactionNames.text"));
+        lblFactionNames.setName("lblFactionNames");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
@@ -3501,7 +3508,7 @@ public class CampaignOptionsDialog extends JDialog {
         panNameGen.add(chkAssignPortraitOnRoleChange, gridBagConstraints);
         // assignPortraitOnRoleChange
 
-        tabOptions.addTab(resourceMap.getString("panNameGen.TabConstraints.tabTitle"), panNameGen); // NOI18N
+        tabOptions.addTab(resourceMap.getString("panNameGen.TabConstraints.tabTitle"), panNameGen);
 
         // Start Personnel Market
         panPersonnelMarket = new JPanel();
@@ -3693,15 +3700,14 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnelMarket.add(personnelMarketRandomUltraGreenRemovalLabel, gridBagConstraints);
 
-        personnelMarketRandomUltraGreenRemoval.setText(Integer.toString(options
-                                                                                .getPersonnelMarketRandomUltraGreenRemoval()));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        personnelMarketRandomUltraGreenRemoval.setText(Integer.toString(options.getPersonnelMarketRandomUltraGreenRemoval()));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(10, 0, 0, 0);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panPersonnelMarket.add(personnelMarketRandomUltraGreenRemoval, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -4947,6 +4953,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getModel().getValue());
         options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
         options.setLogMarriageNameChange(chkLogMarriageNameChange.isSelected());
+        options.setUseManualMarriages(chkUseManualMarriages.isSelected());
         options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
         options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue() / 100.0);
         options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());
@@ -5130,7 +5137,7 @@ public class CampaignOptionsDialog extends JDialog {
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             date = dc.getDate();
-            btnDate.setText(options.getDisplayFormattedDate(date));
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
             factionModel = new SortedComboBoxModel<>();
             for (String sname : Faction.getChoosableFactionCodes()) {
                 Faction f = Faction.getFaction(sname);

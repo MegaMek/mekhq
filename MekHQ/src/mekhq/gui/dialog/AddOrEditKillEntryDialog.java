@@ -30,7 +30,6 @@ import java.util.UUID;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
@@ -49,7 +48,6 @@ public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
     private int operationType;
     private Kill kill;
     private LocalDate date;
-    private Campaign campaign;
 
     private JButton btnClose;
     private JButton btnOK;
@@ -59,21 +57,20 @@ public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
     private JTextField txtKiller;
     private JButton btnDate;
 
-    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, Campaign campaign, UUID killerPerson, String killerUnit, LocalDate entryDate) {
-        this(parent, modal, campaign, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate));
+    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, UUID killerPerson, String killerUnit, LocalDate entryDate) {
+        this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate));
     }
 
-    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, Campaign campaign, Kill kill) {
-        this(parent, modal, campaign, EDIT_OPERATION, kill);
+    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, Kill kill) {
+        this(parent, modal, EDIT_OPERATION, kill);
     }
 
-    private AddOrEditKillEntryDialog(JFrame parent, boolean modal, Campaign campaign, int operationType, Kill kill) {
+    private AddOrEditKillEntryDialog(JFrame parent, boolean modal, int operationType, Kill kill) {
         super(parent, modal);
 
         assert kill != null;
 
         this.frame = parent;
-        this.campaign = campaign;
         this.kill = kill;
         this.date = this.kill.getDate();
         this.operationType = operationType;
@@ -149,7 +146,7 @@ public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtKiller, gridBagConstraints);
 
-        btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(date));
+        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeDate());
         gridBagConstraints = new GridBagConstraints();
@@ -208,7 +205,7 @@ public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
         DateChooser dc = new DateChooser(frame, date);
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             date = dc.getDate();
-            btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(date));
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         }
     }
 }

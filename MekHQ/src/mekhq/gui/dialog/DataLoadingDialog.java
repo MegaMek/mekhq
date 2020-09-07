@@ -280,7 +280,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     campaign.generateNewPersonnelMarket();
                     campaign.reloadNews();
                     campaign.readNews();
-                    campaign.beginReport("<b>" + campaign.getCampaignOptions().getDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
+                    campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
                     if (campaign.getCampaignOptions().getUseAtB()) {
                         campaign.initAtB(true);
                     }

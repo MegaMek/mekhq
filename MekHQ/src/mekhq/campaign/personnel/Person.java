@@ -1199,11 +1199,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return dateOfDeath;
     }
 
-    public String getDeathDateAsString(Campaign campaign) {
+    public String getDeathDateAsString() {
         if (getDateOfDeath() == null) {
             return "";
         } else {
-            return campaign.getCampaignOptions().getDisplayFormattedDate(getDateOfDeath());
+            return MekHQ.getMekHQOptions().getDisplayFormattedDate(getDateOfDeath());
         }
     }
 
@@ -1229,11 +1229,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return recruitment;
     }
 
-    public String getRecruitmentAsString(Campaign campaign) {
+    public String getRecruitmentAsString() {
         if (getRecruitment() == null) {
             return "";
         } else {
-            return campaign.getCampaignOptions().getDisplayFormattedDate(getRecruitment());
+            return MekHQ.getMekHQOptions().getDisplayFormattedDate(getRecruitment());
         }
     }
 
@@ -1264,11 +1264,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return lastRankChangeDate;
     }
 
-    public String getLastRankChangeDateAsString(Campaign campaign) {
+    public String getLastRankChangeDateAsString() {
         if (getLastRankChangeDate() == null) {
             return "";
         } else {
-            return campaign.getCampaignOptions().getDisplayFormattedDate(getLastRankChangeDate());
+            return MekHQ.getMekHQOptions().getDisplayFormattedDate(getLastRankChangeDate());
         }
     }
 
@@ -1297,11 +1297,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return retirement;
     }
 
-    public String getRetirementAsString(Campaign campaign) {
+    public String getRetirementAsString() {
         if (getRetirement() == null) {
             return "";
         } else {
-            return campaign.getCampaignOptions().getDisplayFormattedDate(getRetirement());
+            return MekHQ.getMekHQOptions().getDisplayFormattedDate(getRetirement());
         }
     }
 

@@ -155,7 +155,7 @@ public class HistoricalDailyReportDialog extends JDialog {
                 if (!log.getDate().equals(trackDay)) {
                     logPanel.appendLog(Collections.singletonList("<hr>"));
                     logPanel.appendLog(Collections.singletonList("<b>"
-                            + gui.getCampaign().getCampaignOptions().getDisplayFormattedDate(log.getDate())
+                            + MekHQ.getMekHQOptions().getDisplayFormattedDate(log.getDate())
                             + "</b>"));
                     logPanel.appendLog(Collections.singletonList("<br><br>"));
                     trackDay = log.getDate();

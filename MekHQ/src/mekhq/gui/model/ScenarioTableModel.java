@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import javax.swing.SwingConstants;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 
@@ -89,7 +90,7 @@ public class ScenarioTableModel extends DataTableModel {
             if (scenario.getDate() == null) {
                 return "-";
             } else {
-                return getCampaign().getCampaignOptions().getDisplayFormattedDate(scenario.getDate());
+                return MekHQ.getMekHQOptions().getDisplayFormattedDate(scenario.getDate());
             }
         } else if (col == COL_ASSIGN) {
             return scenario.getForces(getCampaign()).getAllUnits(true).size();

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 
-import mekhq.campaign.Campaign;
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
@@ -43,11 +43,8 @@ public class FinanceTableModel extends DataTableModel {
     public final static int COL_BALANCE = 5;
     public final static int N_COL = 6;
 
-    private Campaign campaign;
-
-    public FinanceTableModel(Campaign campaign) {
+    public FinanceTableModel() {
         data = new ArrayList<Transaction>();
-        this.campaign = campaign;
     }
 
     @Override
@@ -107,7 +104,7 @@ public class FinanceTableModel extends DataTableModel {
         } else if (col == COL_BALANCE) {
             return balance.toAmountAndSymbolString();
         } else if (col == COL_DATE) {
-            return campaign.getCampaignOptions().getDisplayFormattedDate(transaction.getDate());
+            return MekHQ.getMekHQOptions().getDisplayFormattedDate(transaction.getDate());
         } else {
             return "?";
         }
