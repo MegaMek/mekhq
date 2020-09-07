@@ -264,16 +264,18 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 setVisible(false);
 
                 // Game Presets
-                List<GamePreset> presets = GamePreset.getGamePresetsIn(MekHQ.PRESET_DIR);
+                GamePreset gamePreset = null;
+                List<GamePreset> presets = GamePreset.getGamePresetsIn();
                 if (!presets.isEmpty()) {
                     ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(frame, true, presets);
                     cgpd.setVisible(true);
-                    if (cgpd.getSelectedPreset() != null) {
-                        cgpd.getSelectedPreset().apply(campaign);
-                    }
+                    gamePreset = cgpd.getSelectedPreset();
                 }
                 CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true,
-                        campaign, app.getIconPackage().getCamos(), app.getIconPackage().getForceIcons());
+                        campaign, app.getIconPackage());
+                if (gamePreset != null) {
+                    optionsDialog.applyPreset(gamePreset);
+                }
                 optionsDialog.setVisible(true);
                 if (optionsDialog.wasCancelled()) {
                     cancelled = true;
