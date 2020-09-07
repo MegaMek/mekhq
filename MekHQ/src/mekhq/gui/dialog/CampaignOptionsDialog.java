@@ -4040,7 +4040,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblFightChance, gridBagConstraints);
 
-        JSpinner atbBattleChance = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
+        JSpinner atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
         spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
@@ -4050,7 +4050,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = 14;
         panSubAtBContract.add(lblDefendChance, gridBagConstraints);
 
-        atbBattleChance = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
+        atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
         spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
@@ -4060,7 +4060,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = 15;
         panSubAtBContract.add(lblScoutChance, gridBagConstraints);
 
-        atbBattleChance = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
+        atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
         spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
@@ -4070,7 +4070,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = 16;
         panSubAtBContract.add(lblTrainingChance, gridBagConstraints);
 
-        atbBattleChance = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
+        atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
         spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
@@ -5104,7 +5104,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setRATs(ratList);
         options.setSearchRadius((Integer) spnSearchRadius.getValue());
         for (int i = 0; i < spnAtBBattleChance.length; i++) {
-            options.setAtBBattleChance(i, (Double) spnAtBBattleChance[i].getValue());
+            options.setAtBBattleChance(i, (Integer) spnAtBBattleChance[i].getValue());
         }
         options.setGenerateChases(chkGenerateChases.isSelected());
         options.setVariableContractLength(chkVariableContractLength.isSelected());
@@ -5428,18 +5428,18 @@ public class CampaignOptionsDialog extends JDialog {
 
     private double determineAtBBattleIntensity() {
         double intensity = 0.0;
-        double x;
+        int x;
 
-        x = (Double) spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].getValue();
+        x = (Integer) spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].getValue();
         intensity += ((-3.0 / 2.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Double) spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].getValue();
+        x = (Integer) spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].getValue();
         intensity += ((-4.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Double) spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].getValue();
+        x = (Integer) spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].getValue();
         intensity += ((-2.0 / 3.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Double) spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].getValue();
+        x = (Integer) spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].getValue();
         intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
         intensity = intensity / 4.0;
@@ -5457,19 +5457,19 @@ public class CampaignOptionsDialog extends JDialog {
             double intensity = (Double) spnAtBBattleIntensity.getValue();
 
             if (intensity >= AtBContract.MINIMUM_INTENSITY) {
-                spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()]
-                        .setValue(Math.round(400.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) / 10.0);
-                spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()]
-                        .setValue(Math.round(200.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) / 10.0);
-                spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()]
-                        .setValue(Math.round(600.0 * intensity / (60.0 * intensity + 40.0) * 100.0 + 0.5) / 10.0);
-                spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()]
-                        .setValue(Math.round(100.0 * intensity / (10.0 * intensity + 90.0) * 100.0 + 0.5) / 10.0);
+                int value = (int) Math.min(Math.round(400.0 * intensity / (4.0 * intensity + 6.0) + 0.05), 100);
+                spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].setValue(value);
+                value = (int) Math.min(Math.round(200.0 * intensity / (2.0 * intensity + 8.0) + 0.05), 100);
+                spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].setValue(value);
+                value = (int) Math.min(Math.round(600.0 * intensity / (6.0 * intensity + 4.0) + 0.05), 100);
+                spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].setValue(value);
+                value = (int) Math.min(Math.round(100.0 * intensity / (intensity + 9.0) + 0.05), 100);
+                spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].setValue(value);
             } else {
-                spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].setValue(0.0);
-                spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].setValue(0.0);
-                spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].setValue(0.0);
-                spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].setValue(0.0);
+                spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].setValue(0);
+                spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].setValue(0);
+                spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].setValue(0);
+                spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].setValue(0);
             }
         }
     }
