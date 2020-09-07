@@ -37,6 +37,7 @@ VERSION HISTORY:
 + Issue #1984: Implementing useManualMarriages Option
 + Issue #1983: Switching to new form of UUID save format
 + Issue #1952: Personnel Market Updates No Longer Fail in Rare Cases During Person Creation
++ Issue #1981: Fixing NPE when dragging TOE Units and Forces Around
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
