@@ -262,16 +262,11 @@ public class SkillType implements Serializable {
             return EXP_VETERAN;
         } else if (lvl >= regLvl) {
             return EXP_REGULAR;
-        }
-        else if (lvl >= greenLvl) {
+        } else if (lvl >= greenLvl) {
             return EXP_GREEN;
+        } else {
+            return EXP_ULTRA_GREEN;
         }
-        return EXP_ULTRA_GREEN;
-    }
-
-    public int getExperienceLevelFromTarget(int tgt) {
-        int level = target - tgt;
-        return getExperienceLevel(level);
     }
 
     public static void initializeTypes() {
@@ -421,7 +416,7 @@ public class SkillType implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("eliteLvl")) {
                     retVal.eliteLvl = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("countUp")) {
-                    retVal.countUp = wn2.getTextContent().equalsIgnoreCase(("true"));
+                    retVal.countUp = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("costs")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
@@ -469,7 +464,7 @@ public class SkillType implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("eliteLvl")) {
                     retVal.eliteLvl = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("countUp")) {
-                    retVal.countUp = wn2.getTextContent().equalsIgnoreCase(("true"));
+                    retVal.countUp = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("costs")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
