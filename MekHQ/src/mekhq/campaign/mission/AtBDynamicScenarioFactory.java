@@ -60,7 +60,7 @@ import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.AtBConfiguration;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;

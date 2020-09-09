@@ -57,17 +57,16 @@ public class FinanceTableMouseAdapter extends MouseInputAdapter implements Actio
             return;
         }
         if (command.equalsIgnoreCase("DELETE")) {
-            gui.getCampaign().addReport(transaction.voidTransaction(gui.getCampaign()));
+            gui.getCampaign().addReport(transaction.voidTransaction());
             financeModel.deleteTransaction(row);
             MekHQ.triggerEvent(new TransactionVoidedEvent(transaction));
         } else if (command.contains("EDIT")) {
-            EditTransactionDialog dialog = new EditTransactionDialog(gui.getFrame(),gui.getCampaign(), transaction, true);
+            EditTransactionDialog dialog = new EditTransactionDialog(gui.getFrame(), transaction, true);
             dialog.setVisible(true);
             if (!transaction.equals(dialog.getOldTransaction())) {
 	            financeModel.setTransaction(row, transaction);
 	            MekHQ.triggerEvent(new TransactionChangedEvent(dialog.getOldTransaction(), transaction));
-	            gui.getCampaign().addReport(
-	                    transaction.updateTransaction(gui.getCampaign(), dialog.getOldTransaction()));
+	            gui.getCampaign().addReport(transaction.updateTransaction(dialog.getOldTransaction()));
             }
         }
     }

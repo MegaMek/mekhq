@@ -15,6 +15,7 @@ import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -306,7 +307,7 @@ public class StratconRulesManager {
             facility.setVisible(true);
         }
         
-        if(campaign.getLances().get(forceID).getRole() == Lance.ROLE_SCOUT) {
+        if(campaign.getLances().get(forceID).getRole() == AtBLanceRole.SCOUTING) {
             for(int direction = 0; direction < 6; direction++) {
                 StratconCoords checkCoords = coords.translate(direction);
                 
@@ -773,7 +774,7 @@ public class StratconRulesManager {
         // if the force is a "fight" lance that has been deployed to the track
         // then the result is FightLance
         if(campaign.getLances().contains(force.getId()) &&
-            campaign.getLances().get(force.getId()).getRole() == Lance.ROLE_FIGHT &&
+            campaign.getLances().get(force.getId()).getRole() == AtBLanceRole.FIGHTING &&
             trackState.getAssignedForceCoords().containsKey(force.getId())) {
             return ReinforcementEligibilityType.FightLance;
         }

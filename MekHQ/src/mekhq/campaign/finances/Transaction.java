@@ -28,8 +28,8 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Vector;
 
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -242,18 +242,19 @@ public class Transaction implements Serializable {
         return retVal;
     }
 
-    public String updateTransaction(Campaign campaign, Transaction previousTransaction) {
+    public String updateTransaction(Transaction previousTransaction) {
         return "Edited Transaction: {" +
-               "Previous = " + previousTransaction.toText(campaign) +
-               "} -> {New = " + toText(campaign) + "}";
+               "Previous = " + previousTransaction.toString() +
+               "} -> {New = " + toString() + "}";
     }
 
-    public String voidTransaction(Campaign campaign) {
-        return "Deleted Transaction: " + toText(campaign);
+    public String voidTransaction() {
+        return "Deleted Transaction: " + toString();
     }
 
-    public String toText(Campaign campaign) {
-        return campaign.getCampaignOptions().getDisplayFormattedDate(getDate()) + ", "
+    @Override
+    public String toString() {
+        return MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate()) + ", "
                 + getCategoryName() + ", " + getDescription() + ", " + getAmount();
     }
 }

@@ -116,7 +116,7 @@ public final class FinancesTab extends CampaignGuiTab {
         ChartPanel financeAmountPanel = (ChartPanel) createGraphPanel(GraphType.BALANCE_AMOUNT);
         ChartPanel financeMonthlyPanel = (ChartPanel) createGraphPanel(GraphType.MONTHLY_FINANCES);
 
-        financeModel = new FinanceTableModel(getCampaign());
+        financeModel = new FinanceTableModel();
         financeTable = new JTable(financeModel);
         financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         financeTable.addMouseListener(new FinanceTableMouseAdapter(getCampaignGui(),
@@ -131,13 +131,12 @@ public final class FinancesTab extends CampaignGuiTab {
         financeTable.setIntercellSpacing(new Dimension(0, 0));
         financeTable.setShowGrid(false);
 
-        loanModel = new LoanTableModel(getCampaign());
+        loanModel = new LoanTableModel();
         loanTable = new JTable(loanModel);
         loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         loanTable.addMouseListener(new LoanTableMouseAdapter(getCampaignGui(),
                 loanTable, loanModel));
         loanTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        column = null;
         for (int i = 0; i < LoanTableModel.N_COL; i++) {
             column = loanTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(loanModel.getColumnWidth(i));
@@ -247,7 +246,7 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private CategoryDataset setupMonthlyDataset() {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyy"); // TOOD : LocalDate : Remove Inline Date Format
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyy");
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         List<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
 

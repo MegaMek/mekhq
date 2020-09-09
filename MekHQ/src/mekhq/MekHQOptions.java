@@ -18,10 +18,42 @@
  */
 package mekhq;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.prefs.Preferences;
 
 public final class MekHQOptions {
     private static final Preferences userPreferences = Preferences.userRoot();
+
+    //region Display
+    public String getDisplayDateFormat() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).get(MekHqConstants.DISPLAY_DATE_FORMAT, "yyyy-MM-dd");
+    }
+
+    public String getDisplayFormattedDate(LocalDate date) {
+        return date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()));
+    }
+
+    public void setDisplayDateFormat(String value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).put(MekHqConstants.DISPLAY_DATE_FORMAT, value);
+    }
+
+    public LocalDate parseDisplayFormattedDate(String text) {
+        return LocalDate.parse(text, DateTimeFormatter.ofPattern(getDisplayDateFormat()));
+    }
+
+    public String getLongDisplayDateFormat() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).get(MekHqConstants.LONG_DISPLAY_DATE_FORMAT, "EEEE, MMMM d, yyyy");
+    }
+
+    public String getLongDisplayFormattedDate(LocalDate date) {
+        return date.format(DateTimeFormatter.ofPattern(getLongDisplayDateFormat()));
+    }
+
+    public void setLongDisplayDateFormat(String value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).put(MekHqConstants.LONG_DISPLAY_DATE_FORMAT, value);
+    }
+    //endregion Display
 
     //region Autosave
     public boolean getNoAutosaveValue() {

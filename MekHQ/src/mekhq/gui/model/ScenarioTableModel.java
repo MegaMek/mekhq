@@ -18,12 +18,11 @@
  */
 package mekhq.gui.model;
 
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javax.swing.SwingConstants;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 
@@ -91,8 +90,7 @@ public class ScenarioTableModel extends DataTableModel {
             if (scenario.getDate() == null) {
                 return "-";
             } else {
-                return scenario.getDate().format(DateTimeFormatter.ofPattern(getCampaign()
-                        .getCampaignOptions().getDisplayDateFormat()));
+                return MekHQ.getMekHQOptions().getDisplayFormattedDate(scenario.getDate());
             }
         } else if (col == COL_ASSIGN) {
             return scenario.getForces(getCampaign()).getAllUnits(true).size();

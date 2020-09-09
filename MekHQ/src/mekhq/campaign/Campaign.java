@@ -23,8 +23,6 @@ package mekhq.campaign;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -35,7 +33,10 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
@@ -208,15 +209,11 @@ public class Campaign implements Serializable, ITechManager {
     private GameOptions gameOptions;
 
     private String name;
+    private LocalDate currentDay;
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
     private Hashtable<Integer, Lance> lances; //AtB
-
-    // calendar stuff
-    private GregorianCalendar calendar;
-    private LocalDate currentDay;
-    private String dateFormat;
 
     private String factionCode;
     private int techFactionCode;
@@ -287,7 +284,6 @@ public class Campaign implements Serializable, ITechManager {
         game = new Game();
         player = new Player(0, "self");
         game.addPlayer(0, player);
-        calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         currentDay = LocalDate.ofYearDay(3067, 1);
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Outreach"), 0);
@@ -295,7 +291,6 @@ public class Campaign implements Serializable, ITechManager {
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
-        dateFormat = "EEEE, MMMM d yyyy"; // TODO : LocalDate Remove Inline Date Format
         name = "My Campaign";
         overtime = false;
         gmMode = false;
@@ -415,17 +410,8 @@ public class Campaign implements Serializable, ITechManager {
 
     public String getTitle() {
         return getName() + " (" + getFactionName() + ")" + " - "
-                + getDateAsString() + " (" + getEraName() + ")";
-    }
-
-    @Deprecated
-    public GregorianCalendar getCalendar() {
-        return calendar;
-    }
-
-    @Deprecated
-    public void setCalendar(GregorianCalendar c) {
-        calendar = c;
+                + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(getLocalDate())
+                + " (" + getEraName() + ")";
     }
 
     public LocalDate getLocalDate() {
@@ -434,25 +420,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setLocalDate(LocalDate currentDay) {
         this.currentDay = currentDay;
-    }
-
-    @Deprecated
-    public DateFormat getDateFormatter() {
-        return new SimpleDateFormat(dateFormat);
-    }
-
-    @Deprecated
-    public Date getDate() {
-        return calendar.getTime();
-    }
-
-    @Deprecated
-    public String getDateAsString() {
-        return getDateFormatter().format(calendar.getTime());
-    }
-
-    public String getCurrentSystemName() {
-        return location.getCurrentSystem().getPrintableName(getLocalDate());
     }
 
     public PlanetarySystem getCurrentSystem() {
@@ -698,7 +665,7 @@ public class Campaign implements Serializable, ITechManager {
                     report.append(getShipSearchResult()).append(" is available for purchase for ")
                             .append(Money.of(ms.getCost()).toAmountAndSymbolString())
                             .append(" until ")
-                            .append(getCampaignOptions().getDisplayFormattedDate(getShipSearchExpiration()));
+                            .append(MekHQ.getMekHQOptions().getDisplayFormattedDate(getShipSearchExpiration()));
                 } else {
                     report.append(" <font color=\"red\">Could not determine ship type.</font>");
                 }
@@ -713,8 +680,7 @@ public class Campaign implements Serializable, ITechManager {
         final String METHOD_NAME = "purchaseShipSearchResult()";
         MechSummary ms = MechSummaryCache.getInstance().getMech(getShipSearchResult());
         if (ms == null) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                    "Cannot find entry for " + getShipSearchResult());
+            MekHQ.getLogger().error(this, "Cannot find entry for " + getShipSearchResult());
             return;
         }
 
@@ -3244,7 +3210,7 @@ public class Campaign implements Serializable, ITechManager {
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
         for (Lance l : lances.values()) {
-            if ((l.getMissionId() == contract.getId()) && (l.getRole() != Lance.ROLE_UNASSIGNED)) {
+            if ((l.getMissionId() == contract.getId()) && (l.getRole() != AtBLanceRole.UNASSIGNED)) {
                 total++;
                 if (l.getRole() == contract.getRequiredLanceType()) {
                     role++;
@@ -3646,8 +3612,7 @@ public class Campaign implements Serializable, ITechManager {
         // Autosave based on the previous day's information
         this.autosaveService.requestDayAdvanceAutosave(this);
 
-        // Advance the day by one - TODO : LocalDate : Remove the Calendar addition
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        // Advance the day by one
         currentDay = currentDay.plus(1, ChronoUnit.DAYS);
 
         // Determine if we have an active contract or not, as this can get used elsewhere before
@@ -3660,7 +3625,7 @@ public class Campaign implements Serializable, ITechManager {
         getCurrentReport().clear();
         setCurrentReportHTML("");
         newReports.clear();
-        beginReport("<b>" + getDateAsString() + "</b>");
+        beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
 
         // New Year Changes
         if (getLocalDate().getDayOfYear() == 1) {
@@ -4632,9 +4597,8 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastForceId", lastForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastMissionId", lastMissionId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastScenarioId", lastScenarioId);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "calendar",
-                df.format(calendar.getTime()));
+                MegaMekXmlUtil.saveFormattedDate(getLocalDate()));
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "fatigueLevel", fatigueLevel);
 
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "nameGen");

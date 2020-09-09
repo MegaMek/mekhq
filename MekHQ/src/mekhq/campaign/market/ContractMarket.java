@@ -22,7 +22,6 @@ package mekhq.campaign.market;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -32,7 +31,6 @@ import org.w3c.dom.NodeList;
 
 import megamek.client.generator.RandomSkillsGenerator;
 import megamek.common.Compute;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
@@ -121,18 +119,18 @@ public class ContractMarket implements Serializable {
 	public void rerollClause(AtBContract c, int clause, Campaign campaign) {
 		if (null != clauseMods.get(c.getId())) {
 			switch (clause) {
-			case CLAUSE_COMMAND:
-				rollCommandClause(c, clauseMods.get(c.getId()).mods[clause]);
-				break;
-			case CLAUSE_SALVAGE:
-				rollSalvageClause(c, clauseMods.get(c.getId()).mods[clause]);
-				break;
-			case CLAUSE_TRANSPORT:
-				rollTransportClause(c, clauseMods.get(c.getId()).mods[clause]);
-				break;
-			case CLAUSE_SUPPORT:
-				rollSupportClause(c, clauseMods.get(c.getId()).mods[clause]);
-				break;
+                case CLAUSE_COMMAND:
+                    rollCommandClause(c, clauseMods.get(c.getId()).mods[clause]);
+                    break;
+                case CLAUSE_SALVAGE:
+                    rollSalvageClause(c, clauseMods.get(c.getId()).mods[clause]);
+                    break;
+                case CLAUSE_TRANSPORT:
+                    rollTransportClause(c, clauseMods.get(c.getId()).mods[clause]);
+                    break;
+                case CLAUSE_SUPPORT:
+                    rollSupportClause(c, clauseMods.get(c.getId()).mods[clause]);
+                    break;
 			}
 			clauseMods.get(c.getId()).rerollsUsed[clause]++;
 			c.calculateContract(campaign);
@@ -207,7 +205,7 @@ public class ContractMarket implements Serializable {
 			}
 
 			if (campaign.getFactionCode().equals("MERC") || campaign.getFactionCode().equals("PIR")) {
-				if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentSystem().getId(), campaign.getDate())) {
+				if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentSystem().getId(), campaign.getLocalDate())) {
 					numContracts++;
 					/* Though the rules do not state these modifiers are mutually exclusive, the fact that the
 					 * distance of Galatea from a border means that it has no advantage for Mercs over border
@@ -287,56 +285,49 @@ public class ContractMarket implements Serializable {
 				int retries = 3;
 				AtBContract retVal = null;
 				while ((retries > 0) && (retVal == null)) {
-					retVal = generateAtBContract(campaign,
-							RandomFactionGenerator.getInstance().getEmployer(),
+					retVal = generateAtBContract(campaign, RandomFactionGenerator.getInstance().getEmployer(),
 							unitRatingMod, 0);
 					retries--;
 				}
 				return retVal;
 			} else {
-				return generateAtBContract(campaign,
-						campaign.getRetainerEmployerCode(), unitRatingMod, 3);
+				return generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod, 3);
 			}
 		} else {
-			return generateAtBContract(campaign,
-					campaign.getFactionCode(), unitRatingMod, 3);
+			return generateAtBContract(campaign, campaign.getFactionCode(), unitRatingMod, 3);
 		}
 	}
 
-	private AtBContract generateAtBContract(Campaign campaign,
-			String employer, int unitRatingMod) {
+	private AtBContract generateAtBContract(Campaign campaign, String employer, int unitRatingMod) {
 		return generateAtBContract(campaign, employer, unitRatingMod, 3);
 	}
 
-	private AtBContract generateAtBContract(Campaign campaign,
-			String employer, int unitRatingMod, int retries) {
-	    final String METHOD_NAME = "generateAtBContract(Campaign,String,int,int)"; //$NON-NLS-1$
-
-		AtBContract contract = new AtBContract(employer
-				+"-"
-				+Contract.generateRandomContractName()
-				+"-"
-				+(new SimpleDateFormat("yyyyMM")).format(campaign.getCalendar().getTime()));
+	private AtBContract generateAtBContract(Campaign campaign, String employer, int unitRatingMod, int retries) {
+        AtBContract contract = new AtBContract(employer
+                + "-"
+                + Contract.generateRandomContractName()
+                + "-"
+                + MekHQ.getMekHQOptions().getDisplayFormattedDate(campaign.getLocalDate()));
         lastId++;
         contract.setId(lastId);
         contractIds.put(lastId, contract);
 
         if (employer.equals("MERC")) {
-        	contract.setMercSubcontract(true);
-        	while (employer.equals("MERC")) {
-        		employer = RandomFactionGenerator.getInstance().getEmployer();
-        	}
+            contract.setMercSubcontract(true);
+            while (employer.equals("MERC")) {
+                employer = RandomFactionGenerator.getInstance().getEmployer();
+            }
         }
-		contract.setEmployerCode(employer, campaign.getGameYear());
-		contract.setMissionType(findAtBMissionType(unitRatingMod,
-		        RandomFactionGenerator.getInstance().getFactionHints()
-		            .isISMajorPower(Faction.getFaction(contract.getEmployerCode()))));
+        contract.setEmployerCode(employer, campaign.getGameYear());
+        contract.setMissionType(findAtBMissionType(unitRatingMod,
+                RandomFactionGenerator.getInstance().getFactionHints()
+                        .isISMajorPower(Faction.getFaction(contract.getEmployerCode()))));
 
-		if (contract.getMissionType() == AtBContract.MT_PIRATEHUNTING)
-			contract.setEnemyCode("PIR");
-		else if (contract.getMissionType() == AtBContract.MT_RIOTDUTY)
-			contract.setEnemyCode("REB");
-		else {
+        if (contract.getMissionType() == AtBContract.MT_PIRATEHUNTING) {
+            contract.setEnemyCode("PIR");
+        } else if (contract.getMissionType() == AtBContract.MT_RIOTDUTY) {
+            contract.setEnemyCode("REB");
+        } else {
 			boolean rebsAllowed = contract.getMissionType() <= AtBContract.MT_RIOTDUTY;
 			contract.setEnemyCode(RandomFactionGenerator.getInstance().getEnemy(contract.getEmployerCode(), rebsAllowed));
 		}
@@ -368,9 +359,8 @@ public class ContractMarket implements Serializable {
 			contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
 		}
         if (contract.getSystem() == null) {
-		    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING,
-		            "Could not find contract location for " //$NON-NLS-1$
-		                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode()); //$NON-NLS-1$
+		    MekHQ.getLogger().warning(this, "Could not find contract location for "
+		                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode());
 			if (retries > 0) {
 				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
 			} else {
@@ -503,7 +493,7 @@ public class ContractMarket implements Serializable {
 
 	public void addFollowup(Campaign campaign,
 			AtBContract contract) {
-		if (followupContracts.values().contains(contract.getId())) {
+		if (followupContracts.containsValue(contract.getId())) {
 			return;
 		}
 		AtBContract followup = new AtBContract("Followup Contract");
@@ -511,15 +501,15 @@ public class ContractMarket implements Serializable {
 		followup.setEnemyCode(contract.getEnemyCode());
 		followup.setSystemId(contract.getSystemId());
 		switch (contract.getMissionType()) {
-		case AtBContract.MT_DIVERSIONARYRAID:
-			followup.setMissionType(AtBContract.MT_OBJECTIVERAID);
-			break;
-		case AtBContract.MT_RECONRAID:
-			followup.setMissionType(AtBContract.MT_PLANETARYASSAULT);
-			break;
-		case AtBContract.MT_RIOTDUTY:
-			followup.setMissionType(AtBContract.MT_GARRISONDUTY);
-			break;
+            case AtBContract.MT_DIVERSIONARYRAID:
+                followup.setMissionType(AtBContract.MT_OBJECTIVERAID);
+                break;
+            case AtBContract.MT_RECONRAID:
+                followup.setMissionType(AtBContract.MT_PLANETARYASSAULT);
+                break;
+            case AtBContract.MT_RIOTDUTY:
+                followup.setMissionType(AtBContract.MT_GARRISONDUTY);
+                break;
 		}
 		followup.setAllySkill(contract.getAllySkill());
 		followup.setAllyQuality(contract.getAllyQuality());

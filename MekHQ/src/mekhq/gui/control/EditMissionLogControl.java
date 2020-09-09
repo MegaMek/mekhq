@@ -47,7 +47,7 @@ public class EditMissionLogControl extends JPanel {
         this.campaign = campaign;
         this.person = person;
 
-        this.logModel = new LogTableModel(person.getMissionLog(), campaign);
+        this.logModel = new LogTableModel(person.getMissionLog());
 
         initComponents();
     }
@@ -107,7 +107,7 @@ public class EditMissionLogControl extends JPanel {
     }
 
     private void addEntry() {
-        AddOrEditMissionEntryDialog dialog = new AddOrEditMissionEntryDialog(parent, true, campaign, campaign.getLocalDate());
+        AddOrEditMissionEntryDialog dialog = new AddOrEditMissionEntryDialog(parent, true, campaign.getLocalDate());
         dialog.setVisible(true);
         if (dialog.getEntry().isPresent()) {
             person.addMissionLogEntry(dialog.getEntry().get());
@@ -118,7 +118,7 @@ public class EditMissionLogControl extends JPanel {
     private void editEntry() {
         LogEntry entry = logModel.getEntry(logsTable.getSelectedRow());
         if (null != entry) {
-            AddOrEditMissionEntryDialog dialog = new AddOrEditMissionEntryDialog(parent, true, campaign, entry);
+            AddOrEditMissionEntryDialog dialog = new AddOrEditMissionEntryDialog(parent, true, entry);
             dialog.setVisible(true);
             refreshTable();
         }

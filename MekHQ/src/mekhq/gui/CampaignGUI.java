@@ -1172,7 +1172,7 @@ public class CampaignGUI extends JPanel {
     public void showNews(int id) {
         NewsItem news = getCampaign().getNews().getNewsItem(id);
         if (null != news) {
-            NewsReportDialog nrd = new NewsReportDialog(frame, news, getCampaign());
+            NewsReportDialog nrd = new NewsReportDialog(frame, news);
             nrd.setVisible(true);
         }
     }
@@ -1922,8 +1922,8 @@ public class CampaignGUI extends JPanel {
                         String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            report = getCampaign().getFinances().exportFinancesToCSV(getCampaign(),
-                                    file.getPath(), format.getRecommendedExtension());
+                            report = getCampaign().getFinances().exportFinancesToCSV(file.getPath(),
+                                    format.getRecommendedExtension());
                         } else {
                             report = "Unsupported FileType in Export Finances";
                         }

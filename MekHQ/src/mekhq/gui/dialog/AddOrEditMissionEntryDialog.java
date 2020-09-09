@@ -20,7 +20,6 @@ package mekhq.gui.dialog;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogEntry;
 import mekhq.gui.preferences.JWindowPreference;
@@ -47,8 +46,6 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     private String originalDescription;
     private LocalDate newDate;
 
-    private Campaign campaign;
-
     private JPanel panMain;
     private JButton btnDate;
     private JTextField txtDesc;
@@ -56,15 +53,15 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     private JButton btnOK;
     private JButton btnClose;
 
-    public AddOrEditMissionEntryDialog(JFrame parent, boolean modal, Campaign campaign, LocalDate entryDate) {
-        this(parent, modal, campaign, ADD_OPERATION, new ServiceLogEntry(entryDate, ""));
+    public AddOrEditMissionEntryDialog(JFrame parent, boolean modal, LocalDate entryDate) {
+        this(parent, modal, ADD_OPERATION, new ServiceLogEntry(entryDate, ""));
     }
 
-    public AddOrEditMissionEntryDialog(JFrame parent, boolean modal, Campaign campaign, LogEntry entry) {
-        this(parent, modal, campaign, EDIT_OPERATION, entry);
+    public AddOrEditMissionEntryDialog(JFrame parent, boolean modal, LogEntry entry) {
+        this(parent, modal, EDIT_OPERATION, entry);
     }
 
-    private AddOrEditMissionEntryDialog(JFrame parent, boolean modal, Campaign campaign, int operationType, LogEntry entry) {
+    private AddOrEditMissionEntryDialog(JFrame parent, boolean modal, int operationType, LogEntry entry) {
         super(parent, modal);
 
         assert entry != null;
@@ -72,7 +69,6 @@ public class AddOrEditMissionEntryDialog extends JDialog {
         this.frame = parent;
         this.operationType = operationType;
         this.entry = entry;
-        this.campaign = campaign;
 
         newDate = this.entry.getDate();
         originalDate = this.entry.getDate();
@@ -111,7 +107,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
         panBtn.setLayout(new GridLayout(0,2));
 
         btnDate = new JButton();
-        btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(newDate));
+        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(newDate));
         btnDate.addActionListener(evt -> changeDate());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -165,7 +161,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
         DateChooser dc = new DateChooser(frame, newDate);
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             newDate = dc.getDate();
-            btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(newDate));
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(newDate));
         }
     }
 

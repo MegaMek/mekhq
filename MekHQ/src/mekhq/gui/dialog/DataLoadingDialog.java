@@ -21,9 +21,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
@@ -242,9 +240,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 DateChooser dc = new DateChooser(frame, campaign.getLocalDate());
                 // user can either choose a date or cancel by closing
                 if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-                    LocalDate date = dc.getDate();
-                    campaign.setCalendar(new GregorianCalendar(date.getYear(), date.getMonth().ordinal(), date.getDayOfYear()));
-                    campaign.setLocalDate(date);
+                    campaign.setLocalDate(dc.getDate());
                     // Ensure that the MegaMek year GameOption matches the campaign year
                     GameOptions gameOpts = campaign.getGameOptions();
                     int campaignYear = campaign.getGameYear();
@@ -286,7 +282,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     campaign.generateNewPersonnelMarket();
                     campaign.reloadNews();
                     campaign.readNews();
-                    campaign.beginReport("<b>" + campaign.getDateAsString() + "</b>");
+                    campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
                     if (campaign.getCampaignOptions().getUseAtB()) {
                         campaign.initAtB(true);
                     }

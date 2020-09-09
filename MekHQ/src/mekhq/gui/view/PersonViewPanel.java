@@ -325,7 +325,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     continue;
                 ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
-                ribbonLabel.setToolTipText(award.getTooltip(campaign));
+                ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
             } catch (Exception e) {
                 MekHQ.getLogger().error(getClass(), "drawRibbons", e);
@@ -369,7 +369,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     continue;
                 medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
                 medalLabel.setIcon(new ImageIcon(medal));
-                medalLabel.setToolTipText(award.getTooltip(campaign));
+                medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
             } catch (Exception e) {
                 MekHQ.getLogger().error(getClass(), "drawMedals", e);
@@ -400,7 +400,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
                         Image.SCALE_DEFAULT);
                 miscLabel.setIcon(new ImageIcon(miscAward));
-                miscLabel.setToolTipText(award.getTooltip(campaign));
+                miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
             } catch (Exception e) {
                 MekHQ.getLogger().error(getClass(), "drawMiscAwards", e);
@@ -650,7 +650,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblDueDate1, gridBagConstraints);
 
-            String dueDate = campaign.getCampaignOptions().getDisplayFormattedDate(
+            String dueDate = MekHQ.getMekHQOptions().getDisplayFormattedDate(
                     campaign.getCampaignOptions().getDisplayTrueDueDate()
                             ? person.getDueDate()
                             : person.getExpectedDueDate());
@@ -678,7 +678,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblRetirement1, gridBagConstraints);
 
-            JLabel lblRetirement2 = new JLabel(person.getRetirementAsString(campaign));
+            JLabel lblRetirement2 = new JLabel(person.getRetirementAsString());
             lblRetirement2.setName("lblRetirement2");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
@@ -729,7 +729,7 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlInfo.add(lblRecruited1, gridBagConstraints);
 
             lblRecruited2.setName("lblRecruited2");
-            lblRecruited2.setText(person.getRecruitmentAsString(campaign));
+            lblRecruited2.setText(person.getRecruitmentAsString());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 3;
             gridBagConstraints.gridy = secondy;
@@ -772,7 +772,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblLastRankChangeDate1, gridBagConstraints);
 
-            JLabel lblLastRankChangeDate2 = new JLabel(person.getLastRankChangeDateAsString(campaign));
+            JLabel lblLastRankChangeDate2 = new JLabel(person.getLastRankChangeDateAsString());
             lblLastRankChangeDate2.setName("lblLastRankChangeDate2");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 3;
@@ -884,7 +884,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
                         ex.getFullName(), formerSpouse.getReasonString(),
-                        campaign.getCampaignOptions().getDisplayFormattedDate(formerSpouse.getDate())));
+                        MekHQ.getMekHQOptions().getDisplayFormattedDate(formerSpouse.getDate())));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -1341,7 +1341,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         JPanel pnlLog = new JPanel(new GridBagLayout());
 
-        PersonnelEventLogModel eventModel = new PersonnelEventLogModel(campaign);
+        PersonnelEventLogModel eventModel = new PersonnelEventLogModel();
         eventModel.setData(logs);
         JTable eventTable = new JTable(eventModel);
         eventTable.setRowSelectionAllowed(false);
@@ -1388,7 +1388,7 @@ public class PersonViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlMissionsLog.add(lblMissions, gridBagConstraints);
 
-        PersonnelEventLogModel eventModel = new PersonnelEventLogModel(campaign);
+        PersonnelEventLogModel eventModel = new PersonnelEventLogModel();
         eventModel.setData(missionLog);
         JTable missionsTable = new JTable(eventModel);
         missionsTable.setRowSelectionAllowed(false);

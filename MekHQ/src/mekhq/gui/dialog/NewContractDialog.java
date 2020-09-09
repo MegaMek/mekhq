@@ -26,7 +26,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemListener;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
@@ -339,12 +338,8 @@ public class NewContractDialog extends javax.swing.JDialog {
         JLabel lblAdvance = new JLabel(resourceMap.getString("lblAdvance.text"));
 
 
-        btnDate = new javax.swing.JButton();
-        btnDate.setText(contract.getStartDate().format(DateTimeFormatter.ofPattern(campaign
-                .getCampaignOptions().getDisplayDateFormat())));
-        //btnDate.setMinimumSize(new java.awt.Dimension(400, 30));
-        btnDate.setName("btnDate"); // NOI18N
-        //btnDate.setPreferredSize(new java.awt.Dimension(400, 30));
+        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
+        btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeStartDate());
 
         checkMRBC = new JCheckBox(resourceMap.getString("checkMRBC.text"));
@@ -683,7 +678,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         	}
             contract.setStartDate(dc.getDate());
             contract.calculateContract(campaign);
-            btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(contract.getStartDate()));
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         }
     }
 
@@ -788,7 +783,6 @@ public class NewContractDialog extends javax.swing.JDialog {
 
         contract.calculateContract(campaign);
         contractPaymentBreakdown.refresh();
-        btnDate.setText(contract.getStartDate().format(DateTimeFormatter.ofPattern(campaign
-                .getCampaignOptions().getDisplayDateFormat())));
+        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
     }
 }
