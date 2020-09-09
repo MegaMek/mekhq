@@ -14,6 +14,7 @@ import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -22,6 +23,7 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -184,8 +186,9 @@ public class StratconRulesManager {
                 }
                 
                 scenario.setCurrentState(ScenarioState.UNRESOLVED);
+                track.addScenario(scenario);
             } else {
-                scenario.commitPrimaryForces(campaign, contract);
+                commitPrimaryForces(campaign, contract, scenario, track);
             }
         }
     }
@@ -207,7 +210,7 @@ public class StratconRulesManager {
         if(((facility == null) && (Compute.randomInt(100) > track.getScenarioOdds())) || (facility.getOwner() != ForceAlignment.Allied)) {
             StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
-            scenario.commitPrimaryForces(campaign, contract);
+            commitPrimaryForces(campaign, contract, scenario, track);
         }
     }
     
@@ -225,6 +228,15 @@ public class StratconRulesManager {
             setupFacilityScenario(scenario, track, coords, facility);
         } else {
             scenario = generateScenario(campaign, contract, track, forceID, coords);
+            
+            // we may generate a facility scenario randomly - if so, do the facility-related stuff
+            // and add a new facility to the track
+            if(scenario.getBackingScenario().getTemplate().isHostileFacility()) {
+                StratconFacility facility = scenario.getBackingScenario().getTemplate().isHostileFacility ?
+                        StratconFacilityFactory.getRandomHostileFacility() : StratconFacilityFactory.getRandomAlliedFacility();
+                track.addFacility(coords, facility);
+                setupFacilityScenario(scenario, track, coords, facility);
+            }
         }
         
         return scenario;
@@ -344,6 +356,20 @@ public class StratconRulesManager {
     }
     
     /**
+     * Worker function that "locks in" a scenario - 
+     * Adds it to the campaign so it's visible in the briefing room,
+     * adds it to the track
+     * 
+     */
+    private static void commitPrimaryForces(Campaign campaign, AtBContract contract, StratconScenario scenario, StratconTrackState trackState) {
+        // order of operations is important here, we need a valid scenario ID prior to adding the scenario to the track.
+        campaign.addScenario(scenario.getBackingScenario(), contract);
+        scenario.setBackingScenarioID(scenario.getBackingScenario().getId());
+        trackState.addScenario(scenario);
+        scenario.commitPrimaryForces(campaign, contract);
+    }
+    
+    /**
      * A hackish worker function that takes the given list of force IDs and
      * separates it into three sets;
      * one of forces that can be "primary" on a ground map
@@ -447,7 +473,6 @@ public class StratconRulesManager {
         setScenarioDates(track, campaign, scenario);
         
         // register the scenario with the campaign and the track it's generated on
-        track.getScenarios().put(coords, scenario);
         scenario.addPrimaryForce(forceID);
         
         return scenario;
@@ -798,6 +823,58 @@ public class StratconRulesManager {
                     
                     break;
                 }
+            }
+        }
+    }
+    
+    /**
+     * Processes completion of a Stratcon scenario, if the given tracker is associated
+     * with a stratcon-enabled mission. Intended to be called after ResolveScenarioTracker.finish() has been invoked.
+     */
+    public static void processScenarioCompletion(ResolveScenarioTracker rst) {
+        if(rst.getMission() instanceof AtBContract) {
+            StratconCampaignState campaignState = ((AtBContract) rst.getMission()).getStratconCampaignState();
+            if(campaignState == null) {
+                return;
+            }
+            
+            for(StratconTrackState track : campaignState.getTracks()) {
+                if(track.getBackingScenariosMap().containsKey(rst.getScenario().getId())) {
+                    // things that may potentially happen:
+                    // scenario is removed from track - implemented
+                    // track gets remaining forces added to reinforcement pool
+                    // facility gets remaining forces stored in reinforcement pool
+                    // process VP and SO
+                    
+                    StratconScenario scenario = track.getBackingScenariosMap().get(rst.getScenario().getId());
+                    
+                    if(scenario.isRequiredScenario()) {
+                        boolean victory = rst.getScenario().getStatus() == Scenario.S_VICTORY ||
+                                rst.getScenario().getStatus() == Scenario.S_MVICTORY;
+                        campaignState.updateVictoryPoints(victory ? 1 : -1);
+                    }
+                    
+                    track.removeScenario(scenario);                    
+                    break;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Processes an ignored Stratcon scenario
+     */
+    public static void processIgnoredScenario(StratconScenario scenario, StratconCampaignState campaignState) {
+        for(StratconTrackState track : campaignState.getTracks()) {
+            if(track.getScenarios().containsKey(scenario.getCoords())) {
+                
+                // subtract VP if scenario is 'required'
+                if(scenario.isRequiredScenario()) {
+                    campaignState.updateVictoryPoints(-1);
+                }
+                
+                // move scenario towards nearest allied facility
+                // or add its forces to track reinforcement pool 
             }
         }
     }

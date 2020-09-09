@@ -3,6 +3,7 @@
     <name>Hostile Facility</name>
     <shortBriefing>Hostile facility</shortBriefing>
     <detailedBriefing>A hostile-controlled facility has been located.</detailedBriefing>
+	<isHostileFacility>true</isHostileFacility>
     <mapParameters>
         <allowedTerrainTypes>
             <allowedTerrainType>3</allowedTerrainType>

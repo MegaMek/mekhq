@@ -2,6 +2,7 @@ package mekhq.campaign.stratcon;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,6 +54,9 @@ public class StratconTrackState {
     private Map<StratconCoords, StratconScenario> scenarios;    
     private Map<Integer, StratconCoords> assignedForceCoords;
     private Set<StratconCoords> revealedCoords;
+
+    // don't serialize this
+    private transient Map<Integer, StratconScenario> backingScenarioMap;
     
     private int scenarioOdds;
     private int deploymentTime;
@@ -103,6 +107,11 @@ public class StratconTrackState {
         return facilities.get(coords);
     }
     
+    /**
+     * Used for serialization/deserialization.
+     * Do not manipulate directly, or things get unpleasant.
+     * @return
+     */
     @XmlElementWrapper(name="trackScenarios")
     @XmlElement(name="scenario")
     public Map<StratconCoords, StratconScenario> getScenarios() {
@@ -111,6 +120,33 @@ public class StratconTrackState {
 
     public void setScenarios(Map<StratconCoords, StratconScenario> scenarios) {
         this.scenarios = scenarios;
+    }
+    
+    /**
+     * Adds a StratconScenario to this track. Assumes it already has some coordinates assigned,
+     * and a valid campaign scenario ID for its backing AtB scenario
+     */
+    public void addScenario(StratconScenario scenario) {
+        scenarios.put(scenario.getCoords(), scenario);
+        
+        updateScenario(scenario);
+    }
+    
+    /**
+     * Updates an existing scenario on this track.
+     */
+    public void updateScenario(StratconScenario scenario) {
+        if(scenarios.containsKey(scenario.getCoords()) && (scenario.getBackingScenarioID() > 0)) {
+            getBackingScenariosMap().put(scenario.getBackingScenarioID(), scenario);
+        }
+    }
+    
+    /**
+     * Removes a StratconScenario from this track.
+     */
+    public void removeScenario(StratconScenario scenario) {
+        scenarios.remove(scenario.getCoords());
+        getBackingScenariosMap().remove(scenario.getBackingScenarioID());
     }
     
     public StratconScenario getScenario(StratconCoords coords) {
@@ -175,6 +211,21 @@ public class StratconTrackState {
     
     public void removeFacility(StratconCoords coords) {
         facilities.remove(coords);
+    }
+    
+    /**
+     * Returns (and possibly initializes, if necessary) a map between
+     * scenario IDs and stratcon scenario pointers
+     */
+    public Map<Integer, StratconScenario> getBackingScenariosMap() {
+        if (backingScenarioMap == null) {
+            backingScenarioMap = new HashMap<>();
+            for (StratconScenario scenario : getScenarios().values()) {
+                backingScenarioMap.put(scenario.getBackingScenarioID(), scenario);
+            }
+        }
+        
+        return backingScenarioMap;
     }
     
     @Override

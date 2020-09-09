@@ -3,6 +3,7 @@
     <name>Allied Facility</name>
     <shortBriefing>Allied facility</shortBriefing>
     <detailedBriefing>An allied facility has come under attack.</detailedBriefing>
+	<isAlliedFacility>true</isAlliedFacility>
     <mapParameters>
         <allowedTerrainTypes>
             <allowedTerrainType>3</allowedTerrainType>

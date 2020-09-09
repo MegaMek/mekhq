@@ -40,6 +40,9 @@ public class ScenarioTemplate implements Cloneable {
     public String shortBriefing;
     public String detailedBriefing;
     
+    public boolean isHostileFacility;
+    public boolean isAlliedFacility;
+    
     public ScenarioMapParameters mapParameters = new ScenarioMapParameters();
     public List<String> scenarioModifiers = new ArrayList<>(); 
     
@@ -84,6 +87,18 @@ public class ScenarioTemplate implements Cloneable {
     
     public List<ScenarioForceTemplate> getAllScenarioForces() {
         return scenarioForces.values().stream().collect(Collectors.toList());
+    }
+    
+    public boolean isHostileFacility() {
+        return isHostileFacility;
+    }
+    
+    public boolean isAlliedFacility() {
+        return isAlliedFacility;
+    }
+    
+    public boolean isFacilityScenario() {
+        return isHostileFacility || isAlliedFacility;
     }
     
     public List<ScenarioForceTemplate> getAllBotControlledAllies() {

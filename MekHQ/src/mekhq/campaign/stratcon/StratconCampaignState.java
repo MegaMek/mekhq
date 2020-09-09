@@ -94,6 +94,10 @@ public class StratconCampaignState {
     public void setVictoryPoints(int victoryPoints) {
         this.victoryPoints = victoryPoints;
     }
+    
+    public void updateVictoryPoints(int increment) {
+        victoryPoints += increment;
+    }
 
     public int getStrategicObjectivePoints() {
         return strategicObjectivePoints;

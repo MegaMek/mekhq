@@ -49,6 +49,7 @@ public class StratconScenario implements IStratconDisplayable {
     private ScenarioState currentState = ScenarioState.UNRESOLVED;
     private int requiredPlayerLances;
     private boolean requiredScenario;
+    private boolean isStrategicObjective;
     private LocalDate deploymentDate;
     private LocalDate actionDate;
     private LocalDate returnDate;
@@ -97,16 +98,11 @@ public class StratconScenario implements IStratconDisplayable {
     }
     
     /**
-     * This method triggers the performance of all operations that should occur
-     * after the player has committed the primary forces to this scenario.
-     * @param campaign
-     * @param contract
+     * This method triggers the performance of all operations specific to this scenario 
+     * that should occur after the player has committed the primary forces to this scenario.
      */
     public void commitPrimaryForces(Campaign campaign, AtBContract contract) {
         currentState = ScenarioState.PRIMARY_FORCES_COMMITTED;
-        
-        campaign.addScenario(getBackingScenario(), contract);
-        setBackingScenarioID(getBackingScenario().getId());
     }
 
     public ScenarioState getCurrentState() {
@@ -232,6 +228,14 @@ public class StratconScenario implements IStratconDisplayable {
 
     public void setCoords(StratconCoords coords) {
         this.coords = coords;
+    }
+    
+    public boolean isStrategicObjective() {
+        return isStrategicObjective;
+    }
+    
+    public void setStrategicObjective(boolean value) {
+        isStrategicObjective = value;
     }
     
     public ScenarioTemplate getScenarioTemplate() {
