@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>This facility must be captured: 75% of the designated buildings must remain intact.</additionalBriefingText>
+	<additionalBriefingText>This facility can be captured if 75% of the designated buildings remain intact with 75% of the hostile forces destroyed, crippled or forced to withdraw.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<modifierName>Capture</modifierName>
@@ -10,11 +10,6 @@
 	            </associatedForceNames>
 	            <associatedUnitIDs/>
 	            <successEffects>
-	                <successEffect>
-	                    <effectType>ScenarioVictory</effectType>
-	                    <effectScaling>Fixed</effectScaling>
-	                    <howMuch>2</howMuch>
-	                </successEffect>
 			<successEffect>
 	                    <effectType>FacilityCaptured</effectType>
 	                    <effectScaling>Fixed</effectScaling>
@@ -22,11 +17,6 @@
 	                </successEffect>
 	            </successEffects>
 	            <failureEffects>
-	                <failureEffect>
-	                    <effectType>ScenarioDefeat</effectType>
-	                    <effectScaling>Fixed</effectScaling>
-	                    <howMuch>1</howMuch>
-	                </failureEffect>
 			<failureEffect>
 				<effectType>FacilityRemains</effectType>
 				<effectScaling>Fixed</effectScaling>
@@ -51,11 +41,6 @@
             </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
-                </successEffect>
 		<successEffect>
 			<effectType>FacilityCaptured</effectType>
 			<effectScaling>Fixed</effectScaling>
@@ -63,11 +48,6 @@
 		</successEffect>
             </successEffects>
             <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
 		<failureEffect>
                     <effectType>FacilityRemains</effectType>
                     <effectScaling>Fixed</effectScaling>

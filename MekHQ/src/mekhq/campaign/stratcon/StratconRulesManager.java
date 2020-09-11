@@ -18,7 +18,6 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -247,8 +246,6 @@ public class StratconRulesManager {
      * carries out tasks relevant to facility scenarios
      */
     private static void setupFacilityScenario(StratconScenario scenario, StratconTrackState track, StratconCoords coords, StratconFacility facility) {
-        applyFacilityModifiers(scenario, track, coords);
-        
         // this includes:
         // for hostile facilities
         // - add a destroy objective (always the option to level the facility)
@@ -264,18 +261,21 @@ public class StratconRulesManager {
             objectiveModifier = AtBScenarioModifier.getRandomAlliedFacilityModifier();
         } else {            
             objectiveModifier = AtBScenarioModifier.getRandomHostileFacilityModifier();
-            
-            for(AtBScenarioModifier modifier : AtBScenarioModifier.getRequiredHostileFacilityModifiers()) {
-                if(!scenario.getBackingScenario().getScenarioModifiers().contains(modifier)) {
-                    scenario.getBackingScenario().addScenarioModifier(modifier);
-                }
-            }
         }
         
         if(objectiveModifier != null) {
             scenario.getBackingScenario().addScenarioModifier(objectiveModifier);
             scenario.getBackingScenario().setName(String.format("%s - %s - %s", 
                     facility.getFacilityType(), alliedFacility ? "Allied" : "Hostile", objectiveModifier.getModifierName()));
+        }
+        
+        // add the "fixed" hostile facility modifiers after the primary ones
+        if(!alliedFacility) {
+            for(AtBScenarioModifier modifier : AtBScenarioModifier.getRequiredHostileFacilityModifiers()) {
+                if(!scenario.getBackingScenario().alreadyHasModifier(modifier)) {
+                    scenario.getBackingScenario().addScenarioModifier(modifier);
+                }
+            }
         }
     }
     
@@ -295,10 +295,6 @@ public class StratconRulesManager {
     
     /**
      * Process the deployment of a force to the given coordinates on the given track.
-     * @param coords
-     * @param forceID
-     * @param campaign
-     * @param track
      */
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign, StratconTrackState track) {
         track.getRevealedCoords().add(coords);
@@ -320,7 +316,7 @@ public class StratconRulesManager {
             }
         }
         
-        track.assignForce(forceID, coords);
+        track.assignForce(forceID, coords, campaign.getLocalDate());
     }
     
     /**
@@ -855,10 +851,31 @@ public class StratconRulesManager {
                         campaignState.updateVictoryPoints(victory ? 1 : -1);
                     }
                     
+                    processTrackForceReturnDates(track, rst.getCampaign().getLocalDate());
+                    
                     track.removeScenario(scenario);                    
                     break;
                 }
             }
+        }
+    }
+    
+    /**
+     * Worker function that goes through a track and undeploys any forces where the
+     * return date is on or before the given date.
+     */
+    public static void processTrackForceReturnDates(StratconTrackState track, LocalDate date) {
+        List<Integer> forcesToUndeploy = new ArrayList<>();
+        
+        for(int forceID : track.getAssignedForceReturnDates().keySet()) {
+            if(track.getAssignedForceReturnDates().get(forceID).equals(date) ||
+                    track.getAssignedForceReturnDates().get(forceID).isBefore(date)) {
+                forcesToUndeploy.add(forceID);
+            }
+        }
+        
+        for(int forceID : forcesToUndeploy) {
+            track.unassignForce(forceID);
         }
     }
     
@@ -892,6 +909,7 @@ public class StratconRulesManager {
                 if((contract instanceof AtBContract) && contract.isActive() && (((AtBContract) contract).getStratconCampaignState() != null)) {
                     for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
                         generateScenariosForTrack(ev.getCampaign(), (AtBContract) contract, track);
+                        processTrackForceReturnDates(track, ev.getCampaign().getLocalDate());
                     }
                 }
             }

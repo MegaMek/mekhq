@@ -303,6 +303,30 @@ public class AtBDynamicScenario extends AtBScenario {
 
     public void addScenarioModifier(AtBScenarioModifier modifier) {
         scenarioModifiers.add(modifier);
+        
+        for(String modifierKey : modifier.getLinkedModifiers().keySet()) {
+            AtBScenarioModifier subMod = AtBScenarioModifier.getScenarioModifier(modifierKey);
+            
+            // if the modifier exists and has not already been added (to avoid infinite loops, as it's possible to define those in data)
+            if((subMod != null) && !alreadyHasModifier(subMod)) {
+                // set the briefing text of the alternate modifier to the 'alternate' text supplied here
+                subMod.setAdditionalBriefingText(modifier.getLinkedModifiers().get(modifierKey));
+                addScenarioModifier(subMod);
+            }
+        }
+    }
+    
+    /**
+     * Check if the modifier list already has a modifier with the given modifier's name.
+     */
+    public boolean alreadyHasModifier(AtBScenarioModifier modifier) {
+        for(AtBScenarioModifier existingModifier : scenarioModifiers) {
+            if(existingModifier.getModifierName().equals(modifier.getModifierName())) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     @Override

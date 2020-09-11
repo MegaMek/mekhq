@@ -393,7 +393,10 @@ public class Force implements Serializable {
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scenarioId", scenarioId);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", techId);
+        
+        if(techId != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", techId);
+        }
 
         if (units.size() > 0) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "units");

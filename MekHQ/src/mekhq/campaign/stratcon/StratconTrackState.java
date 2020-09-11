@@ -1,36 +1,15 @@
 package mekhq.campaign.stratcon;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.namespace.QName;
 
-import org.w3c.dom.Node;
-
-import megamek.common.Compute;
-import megamek.common.Coords;
-import megamek.common.UnitType;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 
 /**
  * Track-level state object for a stratcon campaign.
@@ -53,6 +32,7 @@ public class StratconTrackState {
     private Map<StratconCoords, StratconFacility> facilities;   
     private Map<StratconCoords, StratconScenario> scenarios;    
     private Map<Integer, StratconCoords> assignedForceCoords;
+    private Map<Integer, LocalDate> assignedForceReturnDates;
     private Set<StratconCoords> revealedCoords;
 
     // don't serialize this
@@ -66,6 +46,7 @@ public class StratconTrackState {
         facilities = new HashMap<>();
         scenarios = new HashMap<>();
         assignedForceCoords = new HashMap<>();
+        assignedForceReturnDates = new HashMap<>();
         revealedCoords = new HashSet<>();
     }
     
@@ -177,12 +158,14 @@ public class StratconTrackState {
         this.scenarioOdds = scenarioOdds;
     }
 
-    public void assignForce(int forceID, StratconCoords coords) {
+    public void assignForce(int forceID, StratconCoords coords, LocalDate date) {
         assignedForceCoords.put(forceID, coords);
+        assignedForceReturnDates.put(forceID, date.plusDays(deploymentTime));
     }
     
     public void unassignForce(int forceID) {
         assignedForceCoords.remove(forceID);
+        assignedForceReturnDates.remove(forceID);
     }
     
     public Map<Integer, StratconCoords> getAssignedForceCoords() {
@@ -191,6 +174,14 @@ public class StratconTrackState {
 
     public void setAssignedForceCoords(Map<Integer, StratconCoords> assignedForceCoords) {
         this.assignedForceCoords = assignedForceCoords;
+    }
+    
+    public Map<Integer, LocalDate> getAssignedForceReturnDates() {
+        return assignedForceReturnDates;
+    }
+
+    public void setAssignedForceReturnDates(Map<Integer, LocalDate> assignedForceReturnDates) {
+        this.assignedForceReturnDates = assignedForceReturnDates;
     }
 
     public boolean coordsRevealed(int x, int y) {

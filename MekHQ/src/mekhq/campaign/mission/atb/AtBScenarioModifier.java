@@ -92,6 +92,8 @@ public class AtBScenarioModifier implements Cloneable {
     private Integer numExtraEvents = null;
     private List<ScenarioObjective> objectives = new ArrayList<>();
     
+    private Map<String, String> linkedModifiers = new HashMap<>(); 
+    
     public static AtBScenarioModifier generateTestModifier() {
         AtBScenarioModifier sm = new AtBScenarioModifier();
         sm.objectives = new ArrayList<>();
@@ -439,6 +441,7 @@ public class AtBScenarioModifier implements Cloneable {
         copy.switchSides = switchSides;
         copy.unitRemovalCount = unitRemovalCount;
         copy.useAmbushLogic = useAmbushLogic;
+        copy.linkedModifiers = linkedModifiers == null ? new HashMap<>() : new HashMap<>(linkedModifiers);
         return copy;
     }
     
@@ -574,6 +577,18 @@ public class AtBScenarioModifier implements Cloneable {
 
     public void setNumExtraEvents(Integer numExtraEvents) {
         this.numExtraEvents = numExtraEvents;
+    }
+    
+    /**
+     * Map containing string tuples:
+     * "Alternate" briefing description, name of file containing other modifiers associated with this one
+     */
+    public Map<String, String> getLinkedModifiers() {
+        return linkedModifiers;
+    }
+    
+    public void setLinkedModifiers(Map<String, String> linkedModifiers) {
+        this.linkedModifiers = linkedModifiers;
     }
 }
 

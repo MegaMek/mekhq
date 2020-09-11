@@ -2,10 +2,10 @@
 <scenarioModifierManifest>
 	<modifiers>
 		<modifier>
-			FacilityHostileDestroy.xml
+			FacilityHostileDestroyNonWin.xml
 		</modifier>
 		<modifier>
-			FacilityHostileCapture.xml
+			FacilityHostileCaptureNonWin.xml
 		</modifier>
 	</modifiers>
 </scenarioModifierManifest>

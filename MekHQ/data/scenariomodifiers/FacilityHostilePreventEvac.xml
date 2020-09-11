@@ -42,10 +42,20 @@
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
                 </successEffect>
+		<failureEffect>
+                    <effectType>FacilityRemoved</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
             </successEffects>
             <failureEffects>
                 <failureEffect>
                     <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+		<failureEffect>
+                    <effectType>FacilityRemoved</effectType>
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
                 </failureEffect>

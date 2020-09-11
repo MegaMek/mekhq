@@ -159,12 +159,6 @@
 		<modifier>
 			EnemyArtyGarrison.xml
 		</modifier>
-		<modifier>
-			ExtraGoodEvent.xml
-		</modifier>
-		<modifier>
-			ExtraBadEvent.xml
-		</modifier>
 
 		<!-- Facility objective modifiers -->
 		<modifier>
@@ -172,6 +166,12 @@
 		</modifier>
 		<modifier>
 			FacilityHostileCapture.xml
+		</modifier>
+		<modifier>
+			FacilityHostileDestroyNonWin.xml
+		</modifier>
+		<modifier>
+			FacilityHostileCaptureNonWin.xml
 		</modifier>
 		<modifier>
 			FacilityHostileEngage.xml

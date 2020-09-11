@@ -1,7 +1,7 @@
 <AtBScenarioModifier>
 	<additionalBriefingText>The house commanding officer will deploy alongside your units. Keep them alive.</additionalBriefingText>
 	<benefitsPlayer>true</benefitsPlayer>
-	<eventTiming>PostForceGeneration</eventTiming>
+	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>
 <actualDeploymentZone>-1</actualDeploymentZone>
 <allowAeroBombs>true</allowAeroBombs>
