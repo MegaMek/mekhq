@@ -59,6 +59,14 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
         super(tonnage, ammoType, equipNum, false, omniPodded, c);
         this.weaponType = weaponType;
         this.size = size;
+        if (weaponType != null) {
+            name = weaponType.getName() + " Ammo Bin";
+        }
+    }
+
+    @Override
+    public void restore() {
+        super.restore();
         name = weaponType.getName() + " Ammo Bin";
     }
 

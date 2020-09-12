@@ -60,7 +60,15 @@ public class InfantryAmmoBin extends AmmoBin {
                            InfantryWeapon weaponType, double size, boolean omniPodded, Campaign c) {
         super(tonnage, ammoType, equipNum, shots, false, omniPodded, c);
         this.size = size;
-        this.weaponType = weaponType;
+        if (weaponType != null) {
+            this.weaponType = weaponType;
+            name = weaponType.getName() + " Ammo Bin";
+        }
+    }
+
+    @Override
+    public void restore() {
+        super.restore();
         name = weaponType.getName() + " Ammo Bin";
     }
 
@@ -187,6 +195,11 @@ public class InfantryAmmoBin extends AmmoBin {
                     && InfantryAmmoStorage.isRightAmmo(part, thisType, weaponType))
             .mapToInt(part -> ((InfantryAmmoStorage) part).getShots())
             .sum();
+    }
+
+    @Override
+    public String getAcquisitionDisplayName() {
+        return weaponType.getName() + ": " + type.getName();
     }
 
     @Override
