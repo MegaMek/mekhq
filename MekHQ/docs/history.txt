@@ -38,7 +38,8 @@ VERSION HISTORY:
 + Issue #1983: Switching to new form of UUID save format
 + Issue #1952: Personnel Market Updates No Longer Fail in Rare Cases During Person Creation
 + Issue #1981: Fixing NPE when dragging TOE Units and Forces Around
-+ PR #1999: Fixing Clan Vehicle Option 
++ PR #1999: Fixing Clan Vehicle Option
++ Issue #2003 - Various faction startingPlanet errors in factions.xml
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
