@@ -45,6 +45,11 @@ public class InfantryAmmoStorage extends AmmoStorage {
                                InfantryWeapon weaponType, Campaign c) {
         super(tonnage, et, shots, c);
         this.weaponType = weaponType;
+        if (weaponType.hasInfernoAmmo()) {
+            this.name = weaponType.getShortName() + name;
+        } else {
+            this.name = weaponType.getShortName() + " Ammo";
+        }
     }
 
     /**
