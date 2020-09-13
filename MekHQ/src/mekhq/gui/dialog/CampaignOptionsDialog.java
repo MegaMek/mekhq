@@ -65,7 +65,6 @@ import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.Player;
-import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -4677,8 +4676,7 @@ public class CampaignOptionsDialog extends JDialog {
             return;
         }
 
-        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
-                "Saving campaign options..."); //$NON-NLS-1$
+        MekHQ.getLogger().info(this, "Saving campaign options...");
         // Choose a file...
         Optional<File> maybeFile = FileDialogs.saveCampaignOptions(null);
 
@@ -4719,15 +4717,12 @@ public class CampaignOptionsDialog extends JDialog {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
-                    "Campaign options saved to " + file); //$NON-NLS-1$
+            MekHQ.getLogger().info(this, "Campaign options saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
-            JOptionPane
-                    .showMessageDialog(
-                            null,
-                            "Whoops, for some reason the game presets could not be saved", "Could not save presets",
-                            JOptionPane.ERROR_MESSAGE);
+            MekHQ.getLogger().error(this, ex);
+            JOptionPane.showMessageDialog(null,
+                    "Whoops, for some reason the game presets could not be saved", "Could not save presets",
+                    JOptionPane.ERROR_MESSAGE);
             file.delete();
             if (backupFile.exists()) {
                 Utilities.copyfile(backupFile, file);
@@ -5097,7 +5092,6 @@ public class CampaignOptionsDialog extends JDialog {
                 }
             }
         }
-        //campaign.getSkillCosts().setScenarioXP((Integer)spnScenarioXP.getModel().getValue());
     }
 
     private void updateSkillTypes() {
