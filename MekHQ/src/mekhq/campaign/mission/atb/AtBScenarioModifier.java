@@ -97,7 +97,9 @@ public class AtBScenarioModifier implements Cloneable {
     public static AtBScenarioModifier generateTestModifier() {
         AtBScenarioModifier sm = new AtBScenarioModifier();
         sm.objectives = new ArrayList<>();
-        sm.objectives.add(new ScenarioObjective());
+        ScenarioObjective sob = new ScenarioObjective();
+        sob.addDetail("BARFO");
+        sm.objectives.add(sob);
         
         return sm;
     }
@@ -378,7 +380,7 @@ public class AtBScenarioModifier implements Cloneable {
      * @return Possibly an instance of a scenario modifier list
      */
     public static AtBScenarioModifier Deserialize(String fileName) {
-        AtBScenarioModifier resultingList = null;
+        AtBScenarioModifier resultingModifier = null;
 
         try {
             JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
@@ -391,14 +393,14 @@ public class AtBScenarioModifier implements Cloneable {
 
             try (FileInputStream fileStream = new FileInputStream(xmlFile)) {
                 Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
-                JAXBElement<AtBScenarioModifier> templateElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
-                resultingList = templateElement.getValue();
+                JAXBElement<AtBScenarioModifier> modifierElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
+                resultingModifier = modifierElement.getValue();
             }
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier: " + fileName, e);
         }
 
-        return resultingList;
+        return resultingModifier;
     }
     
     /**
@@ -442,6 +444,7 @@ public class AtBScenarioModifier implements Cloneable {
         copy.unitRemovalCount = unitRemovalCount;
         copy.useAmbushLogic = useAmbushLogic;
         copy.linkedModifiers = linkedModifiers == null ? new HashMap<>() : new HashMap<>(linkedModifiers);
+        copy.objectives = objectives == null ? new ArrayList<>() : new ArrayList<>(objectives);
         return copy;
     }
     

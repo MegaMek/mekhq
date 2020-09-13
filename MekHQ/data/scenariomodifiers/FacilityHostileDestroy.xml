@@ -35,7 +35,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails/>
-            <description>Destroy all of the following force(s) and unit(s):</description>
+            <description>Destroy all of the following force(s) and unit(s) to render the facility inoperative:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>100</percentage>

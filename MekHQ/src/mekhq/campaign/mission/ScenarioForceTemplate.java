@@ -645,4 +645,9 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
 
         return rft;
     }
+    
+    @Override
+    public String toString() {
+        return getForceName();
+    }
 }

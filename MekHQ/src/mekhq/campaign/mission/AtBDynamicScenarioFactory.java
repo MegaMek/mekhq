@@ -2268,7 +2268,7 @@ public class AtBDynamicScenarioFactory {
      * @param entityList
      */
     private static void deployArtilleryOffBoard(List<Entity> entityList) {
-        OffBoardDirection direction = OffBoardDirection.getDirection(Compute.randomInt(4) + 1);
+        OffBoardDirection direction = OffBoardDirection.getDirection(Compute.randomInt(4));
         int distance = (Compute.randomInt(2) + 1) * 17;
 
         for (Entity entity : entityList) {

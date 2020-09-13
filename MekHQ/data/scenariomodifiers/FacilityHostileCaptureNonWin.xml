@@ -26,7 +26,7 @@
 	            <additionalDetails>
 				<additionalDetail>Crippled turrets are considered intact for the purposes of this objective.</additionalDetail>
 			</additionalDetails>
-	            <description>Leave intact the following force(s) and unit(s):</description>
+	            <description>Leave intact at least 75% of the following force(s) and unit(s) in order to be able to take control of this facility:</description>
 	            <destinationEdge>NONE</destinationEdge>
 	            <objectiveCriterion>Preserve</objectiveCriterion>
 	            <percentage>75</percentage>
@@ -55,7 +55,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails/>
-            <description>Destroy, cripple or force the withdrawal of 75% of the following force(s) and unit(s):</description>
+            <description>Destroy, cripple or force the withdrawal of 75% of the following force(s) and unit(s) to take control of the facility:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>75</percentage>

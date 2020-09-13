@@ -100,7 +100,10 @@ public class StratconRulesManager {
                 coords = new StratconCoords(x, y);
             }
             
-            retVal.addFacility(new StratconCoords(x, y), sf);
+            retVal.addFacility(coords, sf);
+            if(sf.getOwner() == ForceAlignment.Allied) {
+                retVal.getRevealedCoords().add(coords);
+            }
         }
         
         return retVal;
@@ -792,7 +795,7 @@ public class StratconRulesManager {
     /**
      * Removes the facility associated with the given scenario from the relevant track/
      */
-    public static void updateFacilityForScenario(AtBScenario scenario, AtBContract contract, boolean capture) {
+    public static void updateFacilityForScenario(AtBScenario scenario, AtBContract contract, boolean destroy, boolean capture) {
         if(contract.getStratconCampaignState() == null) {
             return;
         }
@@ -806,15 +809,15 @@ public class StratconRulesManager {
                 StratconScenario potentialScenario = trackState.getScenario(coords);
                 if(potentialScenario.getBackingScenarioID() == scenario.getId()) {
                     
-                    if(!capture) {
+                    if(destroy) {
                         trackState.removeFacility(coords);
                     } else {
                         StratconFacility facility = trackState.getFacility(coords);
                         
-                        if(facility.getOwner() == ForceAlignment.Allied) {
-                            facility.setOwner(ForceAlignment.Opposing);
+                        if(capture) {
+                            facility.incrementOwnershipChangeScore();
                         } else {
-                            facility.setOwner(ForceAlignment.Allied);
+                            facility.decrementOwnershipChangeScore();
                         }
                     }
                     
@@ -844,6 +847,17 @@ public class StratconRulesManager {
                     // process VP and SO
                     
                     StratconScenario scenario = track.getBackingScenariosMap().get(rst.getScenario().getId());
+                    
+                    
+                    StratconFacility facility = track.getFacility(scenario.getCoords());
+                    
+                    if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
+                        if(facility.getOwner() == ForceAlignment.Allied) {
+                            facility.setOwner(ForceAlignment.Opposing);
+                        } else {
+                            facility.setOwner(ForceAlignment.Allied);
+                        }
+                    }
                     
                     if(scenario.isRequiredScenario()) {
                         boolean victory = rst.getScenario().getStatus() == Scenario.S_VICTORY ||

@@ -404,6 +404,14 @@ public class ScenarioObjectiveProcessor {
                     }
                 }
             case FacilityRemains:
+                if ((tracker.getMission() instanceof AtBContract) &&
+                        (tracker.getScenario() instanceof AtBScenario)) {
+                    if (dryRun) {
+                        return "This facility will not be captured.";
+                    } else {
+                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), false, false);
+                    }
+                }
                 break;
             case FacilityRemoved:
                 if ((tracker.getMission() instanceof AtBContract) &&
@@ -411,7 +419,7 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return "This facility will be destroyed.";
                     } else {
-                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), false);
+                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), true, false);
                     }
                 }
                 break;
@@ -420,7 +428,7 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return "Allied forces will control this facility.";
                     } else {
-                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), true);
+                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), false, true);
                     }
                 }
         }

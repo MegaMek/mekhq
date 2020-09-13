@@ -40,7 +40,7 @@
             <percentage>1</percentage>
             <timeLimitAtMost>false</timeLimitAtMost>
             <timeLimitScaleFactor>2</timeLimitScaleFactor>
-            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+            <timeLimitType>None</timeLimitType>
         </objective>
         </objectives>
 </AtBScenarioModifier>
