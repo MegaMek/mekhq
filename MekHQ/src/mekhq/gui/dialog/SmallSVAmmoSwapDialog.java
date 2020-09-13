@@ -94,14 +94,16 @@ public class SmallSVAmmoSwapDialog extends JDialog {
     private class WeaponRow extends JPanel {
         private final InfantryAmmoBin standardBin;
         private final InfantryAmmoBin infernoBin;
-        private final int totalClips;
+        private int totalClips;
         private final JSpinner spnInferno = new JSpinner();
         private final JLabel lblStandardClips = new JLabel();
 
         WeaponRow(InfantryAmmoBin infernoBin) {
             this.infernoBin = infernoBin;
             this.standardBin = infernoBin.findPartnerBin();
-            totalClips = (int) (infernoBin.getSize() + standardBin.getSize());
+            if (standardBin != null) {
+                totalClips = (int) (infernoBin.getSize() + standardBin.getSize());
+            }
             initUI(String.format("%s (%s)", infernoBin.getWeaponType().getName(),
                     infernoBin.getUnit().getEntity().getLocationAbbr(infernoBin.getLocation())));
         }
@@ -122,22 +124,32 @@ public class SmallSVAmmoSwapDialog extends JDialog {
                     infernoBin.getWeaponType().getShots())), gbc);
             gbc.gridx = 0;
             gbc.gridy++;
-            add(new JLabel(resourceMap.getString("standard")), gbc);
-            gbc.gridx++;
-            lblStandardClips.setText(String.valueOf((int) standardBin.getSize()));
-            add(lblStandardClips, gbc);
-            gbc.gridx++;
-            add(new JLabel(resourceMap.getString("inferno")), gbc);
-            gbc.gridx++;
-            add(spnInferno, gbc);
-            spnInferno.addChangeListener(ev ->
-                    lblStandardClips.setText(String.valueOf(totalClips - ((Integer) spnInferno.getValue()))));
+            // It should not be possible to have an inferno bin but no standard bin.
+            // If the standard ammo bin isn't found, something went wrong. Report it
+            // rather than barfing.
+            if (standardBin != null) {
+                add(new JLabel(resourceMap.getString("standard")), gbc);
+                gbc.gridx++;
+                lblStandardClips.setText(String.valueOf((int) standardBin.getSize()));
+                add(lblStandardClips, gbc);
+                gbc.gridx++;
+                add(new JLabel(resourceMap.getString("inferno")), gbc);
+                gbc.gridx++;
+                add(spnInferno, gbc);
+                spnInferno.addChangeListener(ev ->
+                        lblStandardClips.setText(String.valueOf(totalClips - ((Integer) spnInferno.getValue()))));
+            } else {
+                gbc.gridwidth = GridBagConstraints.REMAINDER;
+                add(new JLabel(resourceMap.getString("noStandardBin")), gbc);
+            }
         }
 
         void apply() {
-            int infernoClips = (Integer) spnInferno.getValue();
-            infernoBin.changeCapacity(infernoClips);
-            standardBin.changeCapacity(totalClips - infernoClips);
+            if (standardBin != null) {
+                int infernoClips = (Integer) spnInferno.getValue();
+                infernoBin.changeCapacity(infernoClips);
+                standardBin.changeCapacity(totalClips - infernoClips);
+            }
         }
     }
 }
