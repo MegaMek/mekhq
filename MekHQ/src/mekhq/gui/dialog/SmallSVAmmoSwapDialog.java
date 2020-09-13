@@ -20,6 +20,7 @@
 package mekhq.gui.dialog;
 
 import megamek.common.AmmoType;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.InfantryAmmoBin;
@@ -31,6 +32,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * Configures amount of standard and inferno ammo available to small support vehicle weapons.
@@ -39,6 +41,8 @@ public class SmallSVAmmoSwapDialog extends JDialog {
 
     private final List<WeaponRow> rows = new ArrayList<>();
     private boolean canceled = true;
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SmallSVAmmoSwapDialog",
+            new EncodeControl());
 
     public SmallSVAmmoSwapDialog(Frame frame, Unit unit) {
         super(frame, true);
@@ -59,10 +63,10 @@ public class SmallSVAmmoSwapDialog extends JDialog {
         }
 
         JPanel panButtons = new JPanel();
-        JButton button = new JButton("Cancel");
+        JButton button = new JButton(resourceMap.getString("cancel"));
         button.addActionListener(ev -> setVisible(false));
         panButtons.add(button);
-        button = new JButton("Ok");
+        button = new JButton(resourceMap.getString("ok"));
         button.addActionListener(ev -> {
             rows.forEach(WeaponRow::apply);
             canceled = false;
@@ -86,7 +90,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
         return canceled;
     }
 
-    private static class WeaponRow extends JPanel {
+    private class WeaponRow extends JPanel {
         private final InfantryAmmoBin standardBin;
         private final InfantryAmmoBin infernoBin;
         private final int totalClips;
@@ -113,15 +117,16 @@ public class SmallSVAmmoSwapDialog extends JDialog {
             add(new JLabel(title), gbc);
             gbc.gridx = 4;
             gbc.gridwidth = 1;
-            add(new JLabel(String.format("Shots per clip: %d", infernoBin.getWeaponType().getShots())), gbc);
+            add(new JLabel(String.format(resourceMap.getString("shotsPerClip.format"),
+                    infernoBin.getWeaponType().getShots())), gbc);
             gbc.gridx = 0;
             gbc.gridy++;
-            add(new JLabel("Standard"), gbc);
+            add(new JLabel(resourceMap.getString("standard")), gbc);
             gbc.gridx++;
             lblStandardClips.setText(String.valueOf((int) standardBin.getSize()));
             add(lblStandardClips, gbc);
             gbc.gridx++;
-            add(new JLabel("Inferno"), gbc);
+            add(new JLabel(resourceMap.getString("inferno")), gbc);
             gbc.gridx++;
             add(spnInferno, gbc);
             spnInferno.addChangeListener(ev ->
