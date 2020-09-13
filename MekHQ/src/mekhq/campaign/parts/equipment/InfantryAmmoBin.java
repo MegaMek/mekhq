@@ -20,6 +20,7 @@
 package mekhq.campaign.parts.equipment;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -117,13 +118,29 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public int getFullShots() {
-        if (unit != null) {
-            Mounted m = unit.getEntity().getEquipment(equipmentNum);
-            if ((m != null) && (m.getOriginalShots() > 0)) {
-                return m.getOriginalShots();
-            }
-        }
         return weaponType.getShots() * (int) getSize();
+    }
+
+    /**
+     * Changes the capacity of this bin. This is done when redistributing capacity between
+     * standard and inferno munitions.
+     *
+     * @param clips The new capacity in number of clips
+     */
+    public void changeCapacity(int clips) {
+        int current = getCurrentShots();
+        size = clips;
+        shotsNeeded = getFullShots() - current;
+        // Wait until loading/unloading to change the full number of shots on the Entity.
+    }
+
+    @Override
+    public void loadBin() {
+        super.loadBin();
+        if (unit != null) {
+            Mounted mount = unit.getEntity().getEquipment(getEquipmentNum());
+            mount.setOriginalShots(getFullShots());
+        }
     }
 
     @Override
@@ -134,6 +151,15 @@ public class InfantryAmmoBin extends AmmoBin {
     @Override
     protected int getShotsPerTon() {
         return (int) Math.floor(weaponType.getShots() / weaponType.getAmmoWeight());
+    }
+
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        super.updateConditionFromEntity(checkForDestruction);
+        if (unit != null) {
+            Mounted mount = unit.getEntity().getEquipment(getEquipmentNum());
+            shotsNeeded = mount.getOriginalShots() - mount.getBaseShotsLeft();
+        }
     }
 
     @Override
@@ -169,6 +195,35 @@ public class InfantryAmmoBin extends AmmoBin {
     }
 
     @Override
+    public boolean needsFixing() {
+        // If there is a partner bin that exceeds its capacity (following redistribution
+        // of munition types) it needs to have ammo removed before we can load this one.
+        InfantryAmmoBin partner = findPartnerBin();
+        if ((partner != null) && (partner.getShotsNeeded() < 0)) {
+            return false;
+        }
+        return shotsNeeded != 0;
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
+        if (shotsNeeded < 0) {
+            return type.getDesc() + ", remove " + (-getShotsNeeded());
+        } else {
+            return super.getDetails(includeRepairDetails);
+        }
+    }
+
+    @Override
+    public String checkFixable() {
+        // If the space for this munition has been reduced, fixing is always possible.
+        if (shotsNeeded < 0) {
+            return null;
+        }
+        return super.checkFixable();
+    }
+
+    @Override
     public void changeAmountAvailable(int amount, final AmmoType curType) {
         InfantryAmmoStorage a = (InfantryAmmoStorage) campaign.findSparePart(part ->
             InfantryAmmoStorage.isRightAmmo(part, (AmmoType) getType(), getWeaponType()));
@@ -195,6 +250,28 @@ public class InfantryAmmoBin extends AmmoBin {
                     && InfantryAmmoStorage.isRightAmmo(part, thisType, weaponType))
             .mapToInt(part -> ((InfantryAmmoStorage) part).getShots())
             .sum();
+    }
+
+    /**
+     * Weapons with configurable ammo have two ammo bin parts.
+     * @return The other bin for the same weapon, or null if there isn't one.
+     */
+    public @Nullable InfantryAmmoBin findPartnerBin() {
+        if (unit != null) {
+            Mounted mount = unit.getEntity().getEquipment(getEquipmentNum());
+            int index = -1;
+            if (mount.getLinked() != null) {
+                index = unit.getEntity().getEquipmentNum(mount.getLinked());
+            } else if (mount.getLinkedBy().getType() instanceof AmmoType) {
+                index = unit.getEntity().getEquipmentNum(mount.getLinkedBy());
+            }
+            for (Part part : unit.getParts()) {
+                if ((part instanceof InfantryAmmoBin) && (((InfantryAmmoBin) part).getEquipmentNum() == index)) {
+                    return (InfantryAmmoBin) part;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
