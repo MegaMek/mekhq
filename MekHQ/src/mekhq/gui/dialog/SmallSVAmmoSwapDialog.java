@@ -46,6 +46,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
 
     public SmallSVAmmoSwapDialog(Frame frame, Unit unit) {
         super(frame, true);
+        setTitle(unit.getName());
         getContentPane().setLayout(new BorderLayout());
         JPanel panMain = new JPanel();
         panMain.setLayout(new BoxLayout(panMain, BoxLayout.Y_AXIS));
