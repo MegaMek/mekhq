@@ -26,12 +26,10 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.*;
-import mekhq.campaign.work.IAcquisitionWork;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.util.function.Predicate;
 
 /**
  * Ammo bin for infantry weapons used by small support vehicles
@@ -181,6 +179,18 @@ public class InfantryAmmoBin extends AmmoBin {
     }
 
     @Override
+    public void fix() {
+        // If we have reconfigured the distribution between standard and inferno ammo,
+        // there may be extra that needs to be removed from the partner bin to make room.
+        // We'll do that automatically to make it simpler.
+        InfantryAmmoBin partner = findPartnerBin();
+        if ((partner != null) && (partner.getShotsNeeded() < 0)) {
+            partner.loadBin();
+        }
+        loadBin();
+    }
+
+    @Override
     public MissingPart getMissingPart() {
         return new MissingInfantryAmmoBin(getUnitTonnage(), type, equipmentNum, weaponType,
                 size, omniPodded, campaign);
@@ -195,32 +205,12 @@ public class InfantryAmmoBin extends AmmoBin {
     }
 
     @Override
-    public boolean needsFixing() {
-        // If there is a partner bin that exceeds its capacity (following redistribution
-        // of munition types) it needs to have ammo removed before we can load this one.
-        InfantryAmmoBin partner = findPartnerBin();
-        if ((partner != null) && (partner.getShotsNeeded() < 0)) {
-            return false;
-        }
-        return shotsNeeded != 0;
-    }
-
-    @Override
     public String getDetails(boolean includeRepairDetails) {
         if (shotsNeeded < 0) {
             return type.getDesc() + ", remove " + (-getShotsNeeded());
         } else {
             return super.getDetails(includeRepairDetails);
         }
-    }
-
-    @Override
-    public String checkFixable() {
-        // If the space for this munition has been reduced, fixing is always possible.
-        if (shotsNeeded < 0) {
-            return null;
-        }
-        return super.checkFixable();
     }
 
     @Override
@@ -285,7 +275,8 @@ public class InfantryAmmoBin extends AmmoBin {
     }
 
     public Part getNewPart() {
-        return new InfantryAmmoStorage(1, type, weaponType.getShots(), weaponType, campaign);
+        return new InfantryAmmoStorage(1, type, weaponType.getShots() * (int) getSize(),
+                weaponType, campaign);
     }
 
     @Override
