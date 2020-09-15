@@ -4882,7 +4882,7 @@ public class CampaignOptionsDialog extends JDialog {
             }
             MekHQ.getLogger().info(this, "Campaign options saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(this, ex);
             JOptionPane.showMessageDialog(null,
                     "Whoops, for some reason the game presets could not be saved",
                     "Could not save presets", JOptionPane.ERROR_MESSAGE);
@@ -5252,7 +5252,6 @@ public class CampaignOptionsDialog extends JDialog {
                 }
             }
         }
-        //campaign.getSkillCosts().setScenarioXP((Integer)spnScenarioXP.getModel().getValue());
     }
 
     private void updateSkillTypes() {

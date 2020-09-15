@@ -141,7 +141,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>FWL</shortname>
 		<id>4</id>
 		<fullname>Free Worlds League</fullname>
-		<startingPlanet>Atreus</startingPlanet>
+		<startingPlanet>Atreus (FWL)</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>165,94,160</colorRGB>
@@ -375,7 +375,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RP</shortname>
 		<fullname>Regulan Principality</fullname>
-		<startingPlanet>Regulas</startingPlanet>
+	    <startingPlanet>Regulus</startingPlanet>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>255,51,51</colorRGB>
 		<tags>is,minor</tags>
@@ -445,7 +445,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>RPG</shortname>
 		<id>19</id>
 		<fullname>Rim Provisional Government</fullname>
-		<startingPlanet>Apollo</startingPlanet>
+		<startingPlanet>Gotterdammerung</startingPlanet>
 		<eraMods>1,1,1,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>164,113,215</colorRGB>
@@ -1027,7 +1027,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>HL</shortname>
 		<fullname>Hanseatic League</fullname>
-		<startingPlanet>Bremen</startingPlanet>
+		<startingPlanet>Bremen (HL)</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>219,112,147</colorRGB>
@@ -1066,7 +1066,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>JF</shortname>
 		<fullname>Jarnfolk</fullname>
-		<startingPlanet>Trondheim</startingPlanet>
+		<startingPlanet>Trondheim (JF)</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>FRR</nameGenerator>
 		<colorRGB>153,50,204</colorRGB>
@@ -1125,7 +1125,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>MH</shortname>
 		<id>15</id>
 		<fullname>Marian Hegemony</fullname>
-		<startingPlanet>Alphard (Periphery)</startingPlanet>
+		<startingPlanet>Alphard (MH)</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>236,136,65</colorRGB>
@@ -1242,8 +1242,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	</faction>
 	<faction>
 		<shortname>OZP</shortname>
-		<fullname>Ohrenson-Zion Province</fullname>
-		<startingPlanet>Ohrenson</startingPlanet>
+        <fullname>Ohrensen-Zion Province</fullname>
+        <startingPlanet>Ohrensen</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>160,165,94</colorRGB>
@@ -1275,7 +1275,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>PR</shortname>
 		<fullname>Principality of Regulus</fullname>
-		<startingPlanet>Regulas</startingPlanet>
+		<startingPlanet>Regulus</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>192,143,189</colorRGB>
@@ -1306,7 +1306,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RF</shortname>
 		<fullname>Regulan Fiefs</fullname>
-		<startingPlanet>Regulas</startingPlanet>
+		<startingPlanet>Regulus</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>255,51,51</colorRGB>
@@ -1316,7 +1316,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RFS</shortname>
 		<fullname>Regulan Free States</fullname>
-		<startingPlanet>Regulas</startingPlanet>
+		<startingPlanet>Regulus</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>165,94,160</colorRGB>
@@ -1357,7 +1357,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RIM</shortname>
 		<fullname>Rim Collection</fullname>
-		<startingPlanet>Gillfillan’s Gold</startingPlanet>
+		<startingPlanet>Gillfillan's Gold</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>95,158,160</colorRGB>
@@ -1570,7 +1570,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>NIOPS</shortname>
 		<fullname>Niops Association</fullname>
-		<startingPlanet>Niops VII</startingPlanet>
+		<startingPlanet>Niops (Niops V, VI, VII)</startingPlanet>
 		<colorRGB>205,173,0</colorRGB>
 		<tags>periphery,minor</tags>
 	</faction>
@@ -1583,7 +1583,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>FOR</shortname>
 		<fullname>Fiefdom Randis</fullname>
-		<startingPlanet>Randis IV</startingPlanet>
+		<startingPlanet>Randis IV (Hope IV 2988-)</startingPlanet>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>30,144,255</colorRGB>
 		<tags>periphery,minor</tags>
