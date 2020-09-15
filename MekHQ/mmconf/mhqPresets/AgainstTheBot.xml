@@ -174,7 +174,7 @@
 		<opforLanceTypeMechs>1</opforLanceTypeMechs>
 		<opforLanceTypeMixed>2</opforLanceTypeMixed>
 		<opforLanceTypeVehicles>3</opforLanceTypeVehicles>
-		<opforUsesVTOLs>false</opforUsesVTOLs>
+		<opforUsesVTOLs>true</opforUsesVTOLs>
 		<useDropShips>false</useDropShips>
 		<skillLevel>2</skillLevel>
 		<aeroRecruitsHaveUnits>true</aeroRecruitsHaveUnits>
