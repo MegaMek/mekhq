@@ -18,1827 +18,1827 @@ shortname - this is the abbreviation that is used to identify each faction in pl
             MekHQ itself. This code must be unique.
 fullname  - the full display name for the faction.
 altNamesByYear - Identifies alternate names for a given year.
-					Format: <altNamesByYear year='XXXX'>Faction name</altNamesByYear>
+                    Format: <altNamesByYear year='XXXX'>Faction name</altNamesByYear>
 altNames - A list of alternate names for a faction, 'also known as' type of names,
-					not official designations
+                    not official designations
 startingPlanet - Identifies the starting planet if you begin a new campaign with this faction.
-				 The name of the planet must be the name as it is recognized in MekHQ.
-				 If left out, then this defaults to Terra.
+                 The name of the planet must be the name as it is recognized in MekHQ.
+                 If left out, then this defaults to Terra.
 changePlanet - Identifies the starting planet after the given year
-				 Format: <changePlanet year='XXXX'>Planet name</changePlanet>
-				 Years given in this first revision are best guesses
+                 Format: <changePlanet year='XXXX'>Planet name</changePlanet>
+                 Years given in this first revision are best guesses
 eraMods - A comma-separated 9-item list of optional modifiers to repair/replacement rolls. as per
           Strat Ops. If left out, then this defaults to 0 for all eras.
 nameGenerator - The name of the faction name generator that should be used for this faction. If
-		        left out, then this defaults to "General."
+                left out, then this defaults to "General."
 colorRGB - a comma-separated 3-item list defining the RGB codes for the color used on the map
            for this faction. Defaults to light gray if missing.
 tags - a comma-separated list of tags. Currently recognised tags: "is", "periphery", "clan",
-	"pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos"
+    "pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos"
  -->
 <factions>
-	<choosableFactionCodes>MERC,CC,DC,FS,FWL,LA,FC,ROS,CS,WOB,FRR,SIC,MOC,MH,OA,TC,SL,CDS,CGB,CHH,CJF,CNC,CSJ,CSV,CSR,CW,CBS,CCC,CCO,CFM,CGS,CIH,CSA,TH,RWR,CIR,JF,PIR,NIOPS,CDP,HL,NC,RD,ARC</choosableFactionCodes>
-	<!-- Early spaceflight factions -->
-	<faction>
-		<shortname>WA</shortname>
-		<fullname>Western Alliance</fullname>
-		<namegenerator>General</namegenerator>
-		<colorRGB>0,20,220</colorRGB>
-		<tags>is,minor</tags>
-		<start>2014</start>
-		<end>2085</end>
-		<successor>TA</successor>
-	</faction>
-	<faction>
-		<shortname>ACPS</shortname>
-		<fullname>Asian Co-Prosperity Sphere</fullname>
-		<namegenerator>CC</namegenerator>
-		<colorRGB>0,20,220</colorRGB>
-		<tags>is,minor</tags>
-		<start>2022</start>
-		<end>2024</end>
-		<successor>WA</successor>
-	</faction>
-	<!-- First exodus factions -->
-	<faction>
-		<shortname>TA</shortname>
-		<fullname>Terran Alliance</fullname>
-		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>207,119,57</colorRGB>
-		<tags>is,major</tags>
-		<start>2086</start>
-		<end>2315</end>
-		<successor>TH</successor>
-	</faction>
-	<faction>
-		<shortname>TH</shortname>
-		<id>18</id>
-		<fullname>Terran Hegemony</fullname>
-		<startingPlanet>Terra</startingPlanet>
-		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,255,255</colorRGB>
-		<tags>is,super</tags>
-		<start>2315</start>
-		<end>2790</end>
-	</faction>
-		<faction>
-		<shortname>AE</shortname>
-		<fullname>Amaris Empire</fullname>
-		<startingPlanet>Terra</startingPlanet>
-		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>142,74,123</colorRGB>
-		<tags>is,minor</tags>
-		<start>2767</start>
-		<end>2779</end>
-	</faction>
-	<faction>
-		<shortname>Alf</shortname>
-		<fullname>Alfrik</fullname>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>103,169,57</colorRGB>
-		<tags>is,minor</tags>
-		<start>2200</start> <!-- estimated -->
-	</faction>
-	<!-- Major Inner Sphere Factions -->
-	<faction>
-		<shortname>CC</shortname>
-		<id>1</id>
-		<fullname>Capellan Confederation</fullname>
-		<startingPlanet>Sian</startingPlanet>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>0,156,85</colorRGB>
-		<tags>is,major</tags>
-		<start>2367</start>
-	</faction>
-	<faction>
-		<shortname>DC</shortname>
-		<id>2</id>
-		<fullname>Draconis Combine</fullname>
-		<startingPlanet>New Samarkand</startingPlanet>
-		<changePlanet year='2619'>Luthien</changePlanet>>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>DC</nameGenerator>
-		<colorRGB>234,45,46</colorRGB>
-		<tags>is,major</tags>
-		<start>2319</start>
-	</faction>
-	<faction>
-		<shortname>FS</shortname>
-		<id>3</id>
-		<fullname>Federated Suns</fullname>
-		<startingPlanet>New Avalon</startingPlanet>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>FS</nameGenerator>
-		<colorRGB>248,212,44</colorRGB>
-		<tags>is,major</tags>
-		<start>2317</start>
-	</faction>
-	<faction>
-		<shortname>FWL</shortname>
-		<id>4</id>
-		<fullname>Free Worlds League</fullname>
-		<startingPlanet>Atreus (FWL)</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
-		<tags>is,major</tags>
-		<start>2271</start>
-	</faction>
-	<faction>
-		<shortname>LA</shortname>
-		<id>5</id>
-		<fullname>Lyran Commonwealth</fullname>
-		<startingPlanet>Tharkad</startingPlanet>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>LA</nameGenerator>
-		<colorRGB>0,124,186</colorRGB>
-		<altNamesByYear year='3058'>Lyran Alliance</altNamesByYear>
-		<altNamesByYear year='3085'>Lyran Commonwealth</altNamesByYear>
-		<tags>is,major</tags>
-		<start>2340</start>
-	</faction>
-	<!-- Star League Era factions -->
-	<faction>
-		<shortname>CRep</shortname>
-		<fullname>Capellan Republic</fullname>
-		<eraMods>1,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>2,166,79</colorRGB>
-		<tags>is,minor</tags>
-		<start>2194</start>
-		<end>2269</end>
-		<successor>CH</successor>
-	</faction>
-	<faction>
-		<shortname>CH</shortname>
-		<fullname>Capellan Hegemony</fullname>
-		<!-- Formed as a union of Capellan Republic and Capellan Co-Prosperity Sphere -->
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>2,166,79</colorRGB>
-		<tags>is,minor</tags>
-		<start>2270</start>
-		<end>2310</end>
-		<successor>CCom</successor>
-	</faction>
-	<faction>
-		<shortname>CCom</shortname>
-		<fullname>Capellan Commonality</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>242,145,197</colorRGB>
-		<tags>is,minor</tags>
-		<start>2310</start>
-		<end>2366</end>
-		<successor>CC</successor>
-	</faction>
-	<faction>
-		<shortname>TU</shortname>
-		<fullname>Tikonov Union</fullname>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>255,160,122</colorRGB>
-		<tags>is,minor</tags>
-		<start>2177</start>
-		<end>2242</end>
-		<successor>TGU</successor>
-	</faction>
-	<faction>
-		<shortname>TGU</shortname>
-		<fullname>Tikonov Grand Union</fullname>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>255,160,122</colorRGB>
-		<tags>is,minor</tags>
-		<start>2243</start>
-		<end>2366</end>
-		<successor>CC</successor>
-	</faction>
-	<faction>
-		<shortname>CTL</shortname>
-		<fullname>Chesterton Trade Federation</fullname>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>184,134,22</colorRGB>
-		<tags>is,minor</tags>
-		<start>2220</start>
-		<end>2357</end>
-		<successor>CC</successor>
-	</faction>
-	<faction>
-		<shortname>ChP</shortname>
-		<fullname>Chisholm Protectorate</fullname>
-		<startingPlanet>Elgin (Chisholm 2878-)</startingPlanet>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>224,104,32</colorRGB>
-		<tags>is,minor</tags>
-		<start>2265</start>
-		<end>2335</end>
-		<successor>CC</successor>
-	</faction>
-	<faction>
-		<shortname>SSUP</shortname>
-		<fullname>Sarna Supremacy</fullname>
-		<startingPlanet>Sarna</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>184,134,11</colorRGB>
-		<tags>is,minor</tags>
-		<start>2175</start>
-		<end>2366</end>
-		<successor>CC</successor>
-	</faction>
-	<faction>
-		<shortname>SIMA</shortname>
-		<fullname>St. Ives Mercantile Association</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>188,223,186</colorRGB>
-		<tags>is,minor</tags>
-		<start>2245</start>
-		<end>2366</end>
-		<successor>CC</successor>
-	</faction>
-	<faction>
-		<shortname>SCW</shortname>
-		<fullname>Sian Commonwealth</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>2,166,79</colorRGB>
-		<tags>is,minor</tags>
-		<start>2260</start>
-		<end>2366</end>
-		<successor>CC</successor>
-	</faction>
-	<faction>
-		<shortname>DoL</shortname>
-		<fullname>Duchy of Liao</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>2,166,79</colorRGB>
-		<tags>is,minor</tags>
-		<start>2315</start>
-		<end>2366</end>
-		<successor>CC</successor>
-	</faction>
-	<faction>
-		<shortname>AG</shortname>
-		<fullname>Alliance of Galedon</fullname>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>DC</nameGenerator>
-		<colorRGB>128,66,244</colorRGB>
-		<tags>is,minor</tags>
-		<start>2302</start>
-		<end>2319</end>
-		<successor>DC</successor>
-	</faction>
-	<faction>
-		<shortname>AC</shortname>
-		<fullname>Azami Caliphate</fullname>
-		<startingPlanet>Algedi</startingPlanet>
-		<nameGenerator>DC</nameGenerator>
-		<colorRGB>66,244,66</colorRGB>
-		<tags>is,minor</tags>
-		<start>2450</start>
-		<end>2516</end>
-		<successor>DC</successor>
-	</faction>
-	<faction>
-		<shortname>PoR</shortname>
-		<fullname>Principality of Rasalhague</fullname>
-		<startingPlanet>Rasalhague</startingPlanet>
-		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
-		<nameGenerator>FRR</nameGenerator>
-		<colorRGB>116,171,206</colorRGB>
-		<tags>is,minor</tags>
-		<start>2260</start>
-		<end>2510</end>
-		<successor>DC</successor>
-	</faction>
-	<faction>
-		<shortname>Mara</shortname>
-		<fullname>Marlette Association</fullname>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>FS</nameGenerator>
-		<colorRGB>27,98,229</colorRGB>
-		<tags>is,minor</tags>
-		<start>2278</start>
-		<end>2324</end>
-		<successor>FS</successor>
-	</faction>
+    <choosableFactionCodes>MERC,CC,DC,FS,FWL,LA,FC,ROS,CS,WOB,FRR,SIC,MOC,MH,OA,TC,SL,CDS,CGB,CHH,CJF,CNC,CSJ,CSV,CSR,CW,CBS,CCC,CCO,CFM,CGS,CIH,CSA,TH,RWR,CIR,JF,PIR,NIOPS,CDP,HL,NC,RD,ARC</choosableFactionCodes>
+    <!-- Early spaceflight factions -->
     <faction>
-		<shortname>ME</shortname>
-		<fullname>Muskegon Coalition</fullname>
-		<startingPlanet>Muskegon</startingPlanet>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>27,229,195</colorRGB>
-		<tags>is,minor</tags>
-		<start>2163</start>
-		<end>2317</end>
-		<successor>FS</successor>
+        <shortname>WA</shortname>
+        <fullname>Western Alliance</fullname>
+        <namegenerator>General</namegenerator>
+        <colorRGB>0,20,220</colorRGB>
+        <tags>is,minor</tags>
+        <start>2014</start>
+        <end>2085</end>
+        <successor>TA</successor>
     </faction>
-	<faction>
-		<shortname>UHC</shortname>
-		<fullname>United Hindu Collective</fullname>
-		<startingPlanet>Basantapur</startingPlanet>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>FS</nameGenerator>
-		<colorRGB>171,148,118</colorRGB>
-		<tags>is,minor</tags>
-		<start>2240</start>
-		<end>2540</end>
-		<successor>FS</successor>
-	</faction>
-	<faction>
-		<shortname>MRep</shortname>
-		<fullname>Marik Republic</fullname>
-		<startingPlanet>Marik</startingPlanet>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>143,190,192</colorRGB>
-		<tags>is,minor</tags>
-		<start>2238</start>
-		<end>2271</end>
-		<successor>FWL</successor>
-	</faction>
-	<faction>
-		<shortname>FoO</shortname>
-		<fullname>Federation of Oriente</fullname>
-		<startingPlanet>Oriente</startingPlanet>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>163,112,120</colorRGB>
-		<tags>is,minor</tags>
-		<start>2241</start>
-		<end>2271</end>
-		<successor>FWL</successor>
-	</faction>
-	<faction>
-		<shortname>RP</shortname>
-		<fullname>Regulan Principality</fullname>
-	    <startingPlanet>Regulus</startingPlanet>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>255,51,51</colorRGB>
-		<tags>is,minor</tags>
-		<start>2243</start>
-		<end>2271</end>
-		<successor>FWL</successor>
-	</faction>
-	<faction>
-		<shortname>SCon</shortname>
-		<fullname>Stewart Confederation</fullname>
-		<altNames>Stewart Confederation,Stewart Confederacy,Stewart Commonality</altNames>
-		<startingPlanet>Stewart</startingPlanet>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>76,0,153</colorRGB>
-		<tags>is,minor</tags>
-		<start>2259</start>
-		<end>2295</end>
-		<successor>FWL</successor>
-	</faction>
-	<faction>
-		<shortname>PD</shortname>
-		<fullname>Protectorate of Donegal</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>LA</nameGenerator>
-		<colorRGB>66,244,143</colorRGB>
-		<tags>is,minor</tags>
-		<start>2313</start>
-		<end>2341</end>
-		<successor>LA</successor>
-	</faction>
-	<faction>
-		<shortname>FoS</shortname>
-		<fullname>Federation of Skye</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>LA</nameGenerator>
-		<colorRGB>66,217,244</colorRGB>
-		<tags>is,minor</tags>
-		<start>2299</start>
-		<end>2341</end>
-		<successor>LA</successor>
-	</faction>
-	<faction>
-		<shortname>TamP</shortname>
-		<fullname>Tamar Pact</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>LA</nameGenerator>
-		<colorRGB>244,161,66</colorRGB>
-		<tags>is,minor</tags>
-		<start>2235</start>
-		<end>2341</end>
-		<successor>LA</successor>
-	</faction>
-	<faction>
-		<shortname>RWR</shortname>
-		<id>19</id>
-		<fullname>Rim Worlds Republic</fullname>
-		<startingPlanet>Apollo</startingPlanet>
-		<eraMods>1,1,1,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>232,202,173</colorRGB>
-		<altNamesByYear year='2767'>Amaris Empire</altNamesByYear>
-		<tags>periphery</tags>
-		<start>2250</start>
-		<end>2779</end>
-	</faction>
-	<faction>
-		<shortname>RPG</shortname>
-		<id>19</id>
-		<fullname>Rim Provisional Government</fullname>
-		<startingPlanet>Gotterdammerung</startingPlanet>
-		<eraMods>1,1,1,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>164,113,215</colorRGB>
-		<tags>periphery,small</tags>
-		<start>2575</start>
-		<end>2597</end>
-	</faction>
-	<faction>
-		<shortname>THW</shortname>
-		<fullname>Taurian Homeworlds</fullname>
-		<startingPlanet>Taurus</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>179,62,38</colorRGB>
-		<tags>periphery</tags>
-		<start>2253</start>
-		<end>2235</end>
-		<successor>TC</successor>
-	</faction>
-	<faction>
-		<shortname>TC</shortname>
-		<id>14</id>
-		<fullname>Taurian Concordat</fullname>
-		<startingPlanet>Taurus</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>179,62,38</colorRGB>
-		<tags>periphery</tags>
-		<start>2335</start>
-	</faction>
-	<faction>
-		<shortname>MOC</shortname>
-		<id>12</id>
-		<fullname>Magistracy of Canopus</fullname>
-		<startingPlanet>Canopus IV</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,1,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>57,158,145</colorRGB>
-		<tags>periphery</tags>
-		<start>2530</start>
-	</faction>
-	<faction>
-		<shortname>OA</shortname>
-		<id>13</id>
-		<fullname>Outworlds Alliance</fullname>
-		<startingPlanet>Alpheratz</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>210,190,153</colorRGB>
-		<altNamesByYear year='3083'>Raven Alliance</altNamesByYear>
-		<tags>periphery</tags>
-		<start>2413</start>
-		<end>3083</end>
-	</faction>
-	<faction>
-		<shortname>ABN</shortname>
-		<fullname>Abandoned</fullname>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>0,0,0</colorRGB>
-		<tags>abandoned,inactive,chaos,special</tags>
-	</faction>
-	<faction>
-		<shortname>DIS</shortname>
-		<fullname>Disputed</fullname>
-		<tags>chaos,special</tags>
-	</faction>
-	<faction>
-		<shortname>ARDC</shortname>
-		<id>17</id>
-		<fullname>Arc-Royal Defense Cordon</fullname>
-		<startingPlanet>Arc-Royal</startingPlanet>
-		<eraMods>0,0,0,1,2,3,2,0,0</eraMods>
-		<nameGenerator>LA</nameGenerator>
-		<colorRGB>218,165,32</colorRGB>
-		<tags>is,minor</tags>
-		<start>3057</start>
-		<end>3067</end>
-	</faction>
-	<faction>
-		<shortname>AB</shortname>
-		<fullname>Azami Brotherhood</fullname>
-		<startingPlanet>Algedi</startingPlanet>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>DC</nameGenerator>
-		<colorRGB>238,66,244</colorRGB>
-		<tags>is,minor</tags>
-		<start>3071</start>
-		<end>3081</end>
-	</faction>
-	<faction>
-		<shortname>OMA</shortname>
-		<fullname>Ozawa Mercantile Association</fullname>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>DC</nameGenerator>
-		<colorRGB>206,244,66</colorRGB>
-		<tags>trader</tags>
-	</faction>
-	<faction>
-		<shortname>CDP</shortname>
-		<fullname>Calderon Protectorate</fullname>
-		<startingPlanet>Erod's Escape</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>0,128,128</colorRGB>
-		<tags>periphery</tags>
-		<start>2253</start> 
-		<!-- Per Reunification War PDF, Protectorate existed prior to the Concordat, changing start from 3066 to 2253 per that source -->
-	</faction>
-	<faction>
-		<shortname>CI</shortname>
-		<fullname>Chainelane Isles</fullname>
-		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,80,93</colorRGB>
-		<tags>is,minor</tags>
-	</faction>
-	<faction>
-		<shortname>CM</shortname>
-		<id>16</id>
-		<fullname>Chaos March</fullname>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>169,169,169</colorRGB>
-		<tags>is,chaos,small</tags>
-		<start>3058</start>
-		<end>3069</end>
-	</faction>
-	<faction>
-		<shortname>CIR</shortname>
-		<fullname>Circinus Federation</fullname>
-		<startingPlanet>Circinus</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>198,36,58</colorRGB>
-		<tags>periphery</tags>
-		<start>2785</start>
-		<end>3081</end>
-	</faction>
-	<faction>
-		<shortname>CBS</shortname>
-		<fullname>Clan Blood Spirit</fullname>
-		<startingPlanet>York (Clan)</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>255,99,71</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-		<end>3085</end>
-	</faction>
-	<faction>
-		<shortname>CB</shortname>
-		<fullname>Clan Burrock</fullname>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>255,165,0</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-		<end>3059</end>
-	</faction>
-	<faction>
-		<shortname>CCC</shortname>
-		<fullname>Clan Cloud Cobra</fullname>
-		<startingPlanet>Homer</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>147,112,219</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-	</faction>
-	<faction>
-		<shortname>CCO</shortname>
-		<fullname>Clan Coyote</fullname>
-		<startingPlanet>Babylon</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>0,0,205</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-	</faction>
-	<faction>
-		<shortname>SOC</shortname>
-		<fullname>The Society</fullname>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>147,112,219</colorRGB>
-		<tags>clan</tags>
-	</faction>
-	<faction>
-		<shortname>CDS</shortname>
-		<id>26</id>
-		<fullname>Clan Sea Fox</fullname>
-		<altNamesByYear year='2984'>Clan Diamond Shark</altNamesByYear>
-		<altNamesByYear year='3100'>Clan Sea Fox</altNamesByYear>
-		<startingPlanet>Babylon</startingPlanet>
-		<changePlanet year='3065'>Twycross</changePlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>0,255,255</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-	</faction>
-	<faction>
-		<shortname>CFM</shortname>
-		<fullname>Clan Fire Mandrill</fullname>
-		<startingPlanet>Shadow</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>165,42,42</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-		<end>3073</end>
-	</faction>
-	<faction>
-		<shortname>CGB</shortname>
-		<id>23</id>
-		<fullname>Clan Ghost Bear</fullname>
-		<startingPlanet>Arcadia (Clan)</startingPlanet>
-		<changePlanet year='3060'>Alshain</changePlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>188,222,235</colorRGB>
-		<altNamesByYear year='3060'>Ghost Bear Dominion</altNamesByYear>
-		<tags>clan,major</tags>
-		<start>2807</start>
-		<end>3103</end>
-	</faction>
-	<faction>
-		<shortname>CGS</shortname>
-		<fullname>Clan Goliath Scorpion</fullname>
-		<startingPlanet>Roche</startingPlanet>
-		<altNamesByYear year='3080'>Escorpión Imperio</altNamesByYear>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>238,232,170</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-		<end>3080</end>
-	</faction>
-	<faction>
-		<shortname>CHH</shortname>
-		<id>28</id>
-		<fullname>Clan Hell's Horses</fullname>
-		<!--Original data shows CHH back on Niles during the Jihad, but I am unable to find data for that -->
-		<startingPlanet>Niles (Clan)</startingPlanet>
-		<changePlanet year='3074'>Csesztreg</changePlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>241,168,110</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-	</faction>
-	<faction>
-		<shortname>CIH</shortname>
-		<fullname>Clan Ice Hellion</fullname>
-		<startingPlanet>Hector</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>248,248,255</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-		<end>3074</end>
-	</faction>
-	<faction>
-		<shortname>CJF</shortname>
-		<id>22</id>
-		<fullname>Clan Jade Falcon</fullname>
-		<startingPlanet>Ironhold</startingPlanet>
-		<changePlanet year='3052'>Sudeten</changePlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>172,208,115</colorRGB>
-		<tags>clan,major</tags>
-		<start>2807</start>
-	</faction>
-	<faction>
-		<shortname>CMG</shortname>
-		<fullname>Clan Mongoose</fullname>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>100,149,237</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-		<end>2868</end>
-	</faction>
-	<faction>
-		<shortname>CNC</shortname>
-		<id>25</id>
-		<fullname>Clan Nova Cat</fullname>
-		<startingPlanet>Barcella</startingPlanet>
-		<changePlanet year='3057'>Irece</changePlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>245,255,250</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-		<end>3143</end>
-	</faction>
-	<faction>
-		<shortname>CSJ</shortname>
-		<id>24</id>
-		<fullname>Clan Smoke Jaguar</fullname>
-		<startingPlanet>Huntress</startingPlanet>
-		<changePlanet year='3052'>Luzerne</changePlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>152,164,129</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-		<end>3060</end>
-	</faction>
-	<faction>
-		<shortname>CSR</shortname>
-		<fullname>Clan Snow Raven</fullname>
-		<startingPlanet>Circe</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>135,206,235</colorRGB>
-		<altNamesByYear year='3083'>Raven Alliance</altNamesByYear>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-		<end>3083</end>
-	</faction>
-	<faction>
-		<shortname>CSA</shortname>
-		<fullname>Clan Star Adder</fullname>
-		<startingPlanet>Sheridan (Clan)</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>218,165,32</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-	</faction>
-	<faction>
-		<shortname>CSV</shortname>
-		<id>27</id>
-		<fullname>Clan Steel Viper</fullname>
-		<startingPlanet>Homer</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>127,255,0</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-		<end>3075</end>
-	</faction>
-	<faction>
-		<shortname>CSL</shortname>
-		<fullname>Clan Stone Lion</fullname>
-		<startingPlanet>Tokasha</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>241,168,110</colorRGB>
-		<tags>clan,minor</tags>
-		<start>3075</start>
-	</faction>
-	<faction>
-		<shortname>CWI</shortname>
-		<fullname>Clan Widowmaker</fullname>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>222,184,135</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-		<end>2834</end>
-	</faction>
-	<faction>
-		<shortname>CW</shortname>
-		<id>21</id>
-		<fullname>Clan Wolf</fullname>
-		<startingPlanet>Tranquil</startingPlanet>
-		<changePlanet year='3052'>Tamar</changePlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>207,114,58</colorRGB>
-		<tags>clan,major</tags>
-		<start>2807</start>
-		<end>3142</end>
-	</faction>
-	<faction>
-		<shortname>CWE</shortname>
-		<fullname>Wolf Empire</fullname>
-		<startingPlanet>Gienah</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>207,114,58</colorRGB>
-		<tags>clan,minor</tags>
-		<start>3142</start>
-	</faction>
-	<faction>
-		<shortname>CWIE</shortname>
-		<fullname>Clan Wolf-in-Exile</fullname>
-		<startingPlanet>Arc-Royal</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>160,82,45</colorRGB>
-		<tags>clan,small</tags>
-		<start>3057</start>
-	</faction>
-	<faction>
-		<shortname>CWOV</shortname>
-		<fullname>Clan Wolverine</fullname>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>143,188,143</colorRGB>
-		<tags>clan,minor</tags>
-		<start>2807</start>
-		<end>2823</end>
-	</faction>
-	<faction>
-		<shortname>CS</shortname>
-		<id>8</id>
-		<fullname>ComStar</fullname>
-		<startingPlanet>Terra</startingPlanet>
-		<changePlanet year='3059'>Tukayyid</changePlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,250,240</colorRGB>
-		<tags>is,inactive,major</tags>
-		<start>2788</start>
-	</faction>
-	<faction>
-		<shortname>DA</shortname>
-		<fullname>Duchy of Andurien</fullname>
-		<startingPlanet>Andurien</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>148,148,255</colorRGB>
-		<tags>is,minor</tags>
-		<start>3030</start>
-	</faction>
-	<faction>
-		<shortname>DGM</shortname>
-		<fullname>Duchy of Graham-Marik</fullname>
-		<startingPlanet>Loyalty</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>143,190,192</colorRGB>
-		<tags>is,minor</tags>
-		<start>3079</start>
-		<end>3082</end>
-	</faction>
-	<faction>
-		<shortname>DO</shortname>
-		<fullname>Duchy of Oriente</fullname>
-		<startingPlanet>Oriente</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>163,112,120</colorRGB>
-		<tags>is,minor</tags>
-		<start>3079</start>
-		<end>3086</end>
-	</faction>
-	<faction>
-		<shortname>DoO</shortname>
-		<fullname>Duchy of Orloff</fullname>
-		<startingPlanet>Vanra</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>164,94,126</colorRGB>
-		<tags>is,minor</tags>
-		<start>3079</start>
-		<end>3086</end>
-	</faction>
-	<faction>
-		<shortname>DS</shortname>
-		<fullname>Duchy of Small</fullname>
-		<startingPlanet>Small World</startingPlanet>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>107,142,35</colorRGB>
-		<tags>is,minor</tags>
-		<start>3058</start>
-		<end>3066</end>
-	</faction>
-	<faction>
-		<shortname>DTA</shortname>
-		<fullname>Duchy of Tamarind-Abbey</fullname>
-		<startingPlanet>Tamarind</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>99,94,165</colorRGB>
-		<tags>is,minor</tags>
-		<start>3078</start>
-		<end>3139</end>
-	</faction>
-		<faction>
-		<shortname>DT</shortname>
-		<fullname>Duchy of Tamarind</fullname>
-		<startingPlanet>Tamarind</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>158,60,147</colorRGB>
-		<tags>is,minor</tags>
-		<start>3071</start>
-		<end>3078</end>
-	</faction>
-	<faction>
-		<shortname>EF</shortname>
-		<fullname>Elysian Fields</fullname>
-		<startingPlanet>Nyserta</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,0,255</colorRGB>
-		<tags>periphery</tags>
-	</faction>
-	<faction>
-		<shortname>CEI</shortname>
-		<fullname>Escorpión Imperio</fullname>
-		<startingPlanet>Granda</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>238,232,170</colorRGB>
-		<tags>clan,periphery</tags>
-		<start>3080</start>
-	</faction>
-	<faction>
-		<shortname>FC</shortname>
-		<id>6</id>
-		<fullname>Federated Commonwealth</fullname>
-		<startingPlanet>New Avalon</startingPlanet>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>248,212,44</colorRGB>
-		<tags>is,super</tags>
-	</faction>
-	<faction>
-		<shortname>FVC</shortname>
-		<fullname>Filtvelt Coalition</fullname>
-		<startingPlanet>Filtvelt</startingPlanet>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>FS</nameGenerator>
-		<colorRGB>255,228,181</colorRGB>
-		<tags>periphery</tags>
-		<start>3072</start>
-	</faction>
-	<faction>
-		<shortname>FRR</shortname>
-		<id>10</id>
-		<fullname>Free Rasalhague Republic</fullname>
-		<startingPlanet>Rasalhague</startingPlanet>
-		<changePlanet year='3052'>Orestes</changePlanet>
-		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
-		<nameGenerator>FRR</nameGenerator>
-		<colorRGB>116,171,206</colorRGB>
-		<tags>is,minor</tags>
-		<start>3034</start>
-		<end>3103</end>
-	</faction>
-	<faction>
-		<shortname>FWLR</shortname>
-		<fullname>Free Worlds League Rebels</fullname>
-		<startingPlanet>New Delos</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>68,212,228</colorRGB>
-		<tags>is,rebel</tags>
-	</faction>
-	<faction>
-		<shortname>FR</shortname>
-		<fullname>Fronc Reaches</fullname>
-		<startingPlanet>Fronc</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>128,169,127</colorRGB>
-		<tags>periphery</tags>
-		<start>3066</start>
-	</faction>
-	<faction>
-		<shortname>GV</shortname>
-		<fullname>Greater Valkyrate</fullname>
-		<startingPlanet>Gotterdammerung</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,105,180</colorRGB>
-		<tags>periphery</tags>
-		<start>3028</start>
-		<end>3049</end>
-	</faction>
-	<faction>
-		<shortname>HL</shortname>
-		<fullname>Hanseatic League</fullname>
-		<startingPlanet>Bremen (HL)</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>219,112,147</colorRGB>
-		<tags>periphery</tags>
-		<start>2891</start>
-	</faction>
-	<faction>
-		<shortname>IP</shortname>
-		<fullname>Illyrian Palatinate</fullname>
-		<startingPlanet>Illyria</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>0,255,255</colorRGB>
-		<tags>periphery</tags>
-		<start>2350</start>
-		<end>3063</end>
-	</faction>
-	<faction>
-		<shortname>PIND</shortname>
-		<id>20</id>
-		<fullname>Independent (Periphery)</fullname>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>190,190,190</colorRGB>
-		<tags>periphery,chaos,small</tags>
-	</faction>
-	<faction>
-		<shortname>IND</shortname>
-		<id>29</id>
-		<fullname>Independent</fullname>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>210,210,210</colorRGB>
-		<tags>is,chaos,small</tags>
-	</faction>
-	<faction>
-		<shortname>JF</shortname>
-		<fullname>Jarnfolk</fullname>
-		<startingPlanet>Trondheim (JF)</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>FRR</nameGenerator>
-		<colorRGB>153,50,204</colorRGB>
-		<tags>is,minor</tags>
-	</faction>
-	<faction>
-		<shortname>KE</shortname>
-		<fullname>Khwarazm Empire</fullname>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>80,80,80</colorRGB>
-		<tags>periphery</tags>
-	</faction>
-	<faction>
-		<shortname>KP</shortname>
-		<fullname>Kittery Prefecture</fullname>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>FS</nameGenerator>
-		<colorRGB>224,126,39</colorRGB>
-		<tags>is,minor</tags>
-		<start>3073</start>
-		<end>3080</end>
-	</faction>
-	<faction>
-		<shortname>LR</shortname>
-		<fullname>Liao Republic</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>2,166,79</colorRGB>
-		<tags>is</tags>
-		<start>2189</start>
-		<end>2315</end>
-	</faction>
-	<faction>
-		<shortname>LL</shortname>
-		<fullname>Lothian League</fullname>
-		<startingPlanet>Lothario</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,140,0</colorRGB>
-		<tags>periphery</tags>
-		<start>2691</start>
-	</faction>
-	<faction>
-		<shortname>MC</shortname>
-		<fullname>Malagrotta Cooperative</fullname>
-		<startingPlanet>Malagrotta</startingPlanet>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>FS</nameGenerator>
-		<colorRGB>218,112,214</colorRGB>
-		<tags>periphery</tags>
-		<start>3073</start>
-		<end>3079</end>
-	</faction>
-	<faction>
-		<shortname>MH</shortname>
-		<id>15</id>
-		<fullname>Marian Hegemony</fullname>
-		<startingPlanet>Alphard (MH)</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>236,136,65</colorRGB>
-		<tags>periphery</tags>
-		<start>2920</start>
-	</faction>
-	<faction>
-		<shortname>MCM</shortname>
-		<fullname>Marik Commonwealth</fullname>
-		<startingPlanet>Marik</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
-		<tags>is</tags>
-		<start>2241</start>
-		<end>3082</end>
-	</faction>
-	<faction>
-		<shortname>MSC</shortname>
-		<fullname>Marik-Stewart Commonwealth</fullname>
-		<startingPlanet>Marik</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>117,65,113</colorRGB>
-		<tags>is</tags>
-		<start>3082</start>
-		<end>3139</end>
-	</faction>
-	<faction>
-		<shortname>MERC</shortname>
-		<id>0</id>
-		<fullname>Mercenary</fullname>
-		<startingPlanet>Solaris</startingPlanet>
-		<changePlanet year='2789'>Galatea</changePlanet>
-		<changePlanet year='3052'>Outreach</changePlanet>
-		<changePlanet year='3067'>Galatea</changePlanet>
-		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>169,169,169</colorRGB>
-		<tags>merc</tags>
-	</faction>
-	<faction>
-		<shortname>MV</shortname>
-		<fullname>Morgraine's Valkyrate</fullname>
-		<startingPlanet>Apollo</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,105,180</colorRGB>
-		<tags>periphery</tags>
-		<start>3021</start>
-		<end>3028</end>
-	</faction>
-	<faction>
-		<shortname>BoS</shortname>
-		<fullname>Barony of Strang</fullname>
-		<startingPlanet>Von Strang's World</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
-		<tags>periphery,minor</tags>
-	</faction>
-	<faction>
-		<shortname>MA</shortname>
-		<fullname>Mosiro Archipelago</fullname>
-		<startingPlanet>Mosiro</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
-		<tags>is,minor</tags>
-		<start>3079</start>
-		<end>3081</end>
-	</faction>
-	<faction>
-		<shortname>NCR</shortname>
-		<fullname>New Colony Region</fullname>
-		<startingPlanet>Fronc</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>32,178,170</colorRGB>
-		<tags>periphery</tags>
-		<start>3057</start>
-		<end>3066</end>
-	</faction>
-	<faction>
-		<shortname>NC</shortname>
-		<fullname>Nueva Castile</fullname>
-		<startingPlanet>Asturias</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>0,255,0</colorRGB>
-		<tags>periphery</tags>
-		<start>2392</start>
-		<end>3080</end>
-	</faction>
-	<faction>
-		<shortname>OC</shortname>
-		<fullname>Oberon Confederation</fullname>
-		<startingPlanet>Oberon VI</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>50,205,50</colorRGB>
-		<tags>periphery</tags>
-		<start>2775</start>
-		<end>3049</end>
-	</faction>
-	<faction>
-		<shortname>NOC</shortname>
-		<fullname>New Oberon Confederation</fullname>
-		<startingPlanet>Oberon VI</startingPlanet>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>231,178,50</colorRGB>
-		<tags>periphery</tags>
-		<start>3086</start>
-	</faction>
-	<faction>
-		<shortname>OZP</shortname>
+    <faction>
+        <shortname>ACPS</shortname>
+        <fullname>Asian Co-Prosperity Sphere</fullname>
+        <namegenerator>CC</namegenerator>
+        <colorRGB>0,20,220</colorRGB>
+        <tags>is,minor</tags>
+        <start>2022</start>
+        <end>2024</end>
+        <successor>WA</successor>
+    </faction>
+    <!-- First exodus factions -->
+    <faction>
+        <shortname>TA</shortname>
+        <fullname>Terran Alliance</fullname>
+        <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>207,119,57</colorRGB>
+        <tags>is,major</tags>
+        <start>2086</start>
+        <end>2315</end>
+        <successor>TH</successor>
+    </faction>
+    <faction>
+        <shortname>TH</shortname>
+        <id>18</id>
+        <fullname>Terran Hegemony</fullname>
+        <startingPlanet>Terra</startingPlanet>
+        <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,255,255</colorRGB>
+        <tags>is,super</tags>
+        <start>2315</start>
+        <end>2790</end>
+    </faction>
+        <faction>
+        <shortname>AE</shortname>
+        <fullname>Amaris Empire</fullname>
+        <startingPlanet>Terra</startingPlanet>
+        <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>142,74,123</colorRGB>
+        <tags>is,minor</tags>
+        <start>2767</start>
+        <end>2779</end>
+    </faction>
+    <faction>
+        <shortname>Alf</shortname>
+        <fullname>Alfrik</fullname>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>103,169,57</colorRGB>
+        <tags>is,minor</tags>
+        <start>2200</start> <!-- estimated -->
+    </faction>
+    <!-- Major Inner Sphere Factions -->
+    <faction>
+        <shortname>CC</shortname>
+        <id>1</id>
+        <fullname>Capellan Confederation</fullname>
+        <startingPlanet>Sian</startingPlanet>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>0,156,85</colorRGB>
+        <tags>is,major</tags>
+        <start>2367</start>
+    </faction>
+    <faction>
+        <shortname>DC</shortname>
+        <id>2</id>
+        <fullname>Draconis Combine</fullname>
+        <startingPlanet>New Samarkand</startingPlanet>
+        <changePlanet year='2619'>Luthien</changePlanet>>
+        <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+        <nameGenerator>DC</nameGenerator>
+        <colorRGB>234,45,46</colorRGB>
+        <tags>is,major</tags>
+        <start>2319</start>
+    </faction>
+    <faction>
+        <shortname>FS</shortname>
+        <id>3</id>
+        <fullname>Federated Suns</fullname>
+        <startingPlanet>New Avalon</startingPlanet>
+        <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+        <nameGenerator>FS</nameGenerator>
+        <colorRGB>248,212,44</colorRGB>
+        <tags>is,major</tags>
+        <start>2317</start>
+    </faction>
+    <faction>
+        <shortname>FWL</shortname>
+        <id>4</id>
+        <fullname>Free Worlds League</fullname>
+        <startingPlanet>Atreus (FWL)</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>165,94,160</colorRGB>
+        <tags>is,major</tags>
+        <start>2271</start>
+    </faction>
+    <faction>
+        <shortname>LA</shortname>
+        <id>5</id>
+        <fullname>Lyran Commonwealth</fullname>
+        <startingPlanet>Tharkad</startingPlanet>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>LA</nameGenerator>
+        <colorRGB>0,124,186</colorRGB>
+        <altNamesByYear year='3058'>Lyran Alliance</altNamesByYear>
+        <altNamesByYear year='3085'>Lyran Commonwealth</altNamesByYear>
+        <tags>is,major</tags>
+        <start>2340</start>
+    </faction>
+    <!-- Star League Era factions -->
+    <faction>
+        <shortname>CRep</shortname>
+        <fullname>Capellan Republic</fullname>
+        <eraMods>1,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>2,166,79</colorRGB>
+        <tags>is,minor</tags>
+        <start>2194</start>
+        <end>2269</end>
+        <successor>CH</successor>
+    </faction>
+    <faction>
+        <shortname>CH</shortname>
+        <fullname>Capellan Hegemony</fullname>
+        <!-- Formed as a union of Capellan Republic and Capellan Co-Prosperity Sphere -->
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>2,166,79</colorRGB>
+        <tags>is,minor</tags>
+        <start>2270</start>
+        <end>2310</end>
+        <successor>CCom</successor>
+    </faction>
+    <faction>
+        <shortname>CCom</shortname>
+        <fullname>Capellan Commonality</fullname>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>242,145,197</colorRGB>
+        <tags>is,minor</tags>
+        <start>2310</start>
+        <end>2366</end>
+        <successor>CC</successor>
+    </faction>
+    <faction>
+        <shortname>TU</shortname>
+        <fullname>Tikonov Union</fullname>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>255,160,122</colorRGB>
+        <tags>is,minor</tags>
+        <start>2177</start>
+        <end>2242</end>
+        <successor>TGU</successor>
+    </faction>
+    <faction>
+        <shortname>TGU</shortname>
+        <fullname>Tikonov Grand Union</fullname>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>255,160,122</colorRGB>
+        <tags>is,minor</tags>
+        <start>2243</start>
+        <end>2366</end>
+        <successor>CC</successor>
+    </faction>
+    <faction>
+        <shortname>CTL</shortname>
+        <fullname>Chesterton Trade Federation</fullname>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>184,134,22</colorRGB>
+        <tags>is,minor</tags>
+        <start>2220</start>
+        <end>2357</end>
+        <successor>CC</successor>
+    </faction>
+    <faction>
+        <shortname>ChP</shortname>
+        <fullname>Chisholm Protectorate</fullname>
+        <startingPlanet>Elgin (Chisholm 2878-)</startingPlanet>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>224,104,32</colorRGB>
+        <tags>is,minor</tags>
+        <start>2265</start>
+        <end>2335</end>
+        <successor>CC</successor>
+    </faction>
+    <faction>
+        <shortname>SSUP</shortname>
+        <fullname>Sarna Supremacy</fullname>
+        <startingPlanet>Sarna</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>184,134,11</colorRGB>
+        <tags>is,minor</tags>
+        <start>2175</start>
+        <end>2366</end>
+        <successor>CC</successor>
+    </faction>
+    <faction>
+        <shortname>SIMA</shortname>
+        <fullname>St. Ives Mercantile Association</fullname>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>188,223,186</colorRGB>
+        <tags>is,minor</tags>
+        <start>2245</start>
+        <end>2366</end>
+        <successor>CC</successor>
+    </faction>
+    <faction>
+        <shortname>SCW</shortname>
+        <fullname>Sian Commonwealth</fullname>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>2,166,79</colorRGB>
+        <tags>is,minor</tags>
+        <start>2260</start>
+        <end>2366</end>
+        <successor>CC</successor>
+    </faction>
+    <faction>
+        <shortname>DoL</shortname>
+        <fullname>Duchy of Liao</fullname>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>2,166,79</colorRGB>
+        <tags>is,minor</tags>
+        <start>2315</start>
+        <end>2366</end>
+        <successor>CC</successor>
+    </faction>
+    <faction>
+        <shortname>AG</shortname>
+        <fullname>Alliance of Galedon</fullname>
+        <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+        <nameGenerator>DC</nameGenerator>
+        <colorRGB>128,66,244</colorRGB>
+        <tags>is,minor</tags>
+        <start>2302</start>
+        <end>2319</end>
+        <successor>DC</successor>
+    </faction>
+    <faction>
+        <shortname>AC</shortname>
+        <fullname>Azami Caliphate</fullname>
+        <startingPlanet>Algedi</startingPlanet>
+        <nameGenerator>DC</nameGenerator>
+        <colorRGB>66,244,66</colorRGB>
+        <tags>is,minor</tags>
+        <start>2450</start>
+        <end>2516</end>
+        <successor>DC</successor>
+    </faction>
+    <faction>
+        <shortname>PoR</shortname>
+        <fullname>Principality of Rasalhague</fullname>
+        <startingPlanet>Rasalhague</startingPlanet>
+        <eraMods>0,0,0,0,0,0,2,1,0</eraMods>
+        <nameGenerator>FRR</nameGenerator>
+        <colorRGB>116,171,206</colorRGB>
+        <tags>is,minor</tags>
+        <start>2260</start>
+        <end>2510</end>
+        <successor>DC</successor>
+    </faction>
+    <faction>
+        <shortname>Mara</shortname>
+        <fullname>Marlette Association</fullname>
+        <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+        <nameGenerator>FS</nameGenerator>
+        <colorRGB>27,98,229</colorRGB>
+        <tags>is,minor</tags>
+        <start>2278</start>
+        <end>2324</end>
+        <successor>FS</successor>
+    </faction>
+    <faction>
+        <shortname>ME</shortname>
+        <fullname>Muskegon Coalition</fullname>
+        <startingPlanet>Muskegon</startingPlanet>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>27,229,195</colorRGB>
+        <tags>is,minor</tags>
+        <start>2163</start>
+        <end>2317</end>
+        <successor>FS</successor>
+    </faction>
+    <faction>
+        <shortname>UHC</shortname>
+        <fullname>United Hindu Collective</fullname>
+        <startingPlanet>Basantapur</startingPlanet>
+        <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+        <nameGenerator>FS</nameGenerator>
+        <colorRGB>171,148,118</colorRGB>
+        <tags>is,minor</tags>
+        <start>2240</start>
+        <end>2540</end>
+        <successor>FS</successor>
+    </faction>
+    <faction>
+        <shortname>MRep</shortname>
+        <fullname>Marik Republic</fullname>
+        <startingPlanet>Marik</startingPlanet>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>143,190,192</colorRGB>
+        <tags>is,minor</tags>
+        <start>2238</start>
+        <end>2271</end>
+        <successor>FWL</successor>
+    </faction>
+    <faction>
+        <shortname>FoO</shortname>
+        <fullname>Federation of Oriente</fullname>
+        <startingPlanet>Oriente</startingPlanet>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>163,112,120</colorRGB>
+        <tags>is,minor</tags>
+        <start>2241</start>
+        <end>2271</end>
+        <successor>FWL</successor>
+    </faction>
+    <faction>
+        <shortname>RP</shortname>
+        <fullname>Regulan Principality</fullname>
+        <startingPlanet>Regulus</startingPlanet>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>255,51,51</colorRGB>
+        <tags>is,minor</tags>
+        <start>2243</start>
+        <end>2271</end>
+        <successor>FWL</successor>
+    </faction>
+    <faction>
+        <shortname>SCon</shortname>
+        <fullname>Stewart Confederation</fullname>
+        <altNames>Stewart Confederation,Stewart Confederacy,Stewart Commonality</altNames>
+        <startingPlanet>Stewart</startingPlanet>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>76,0,153</colorRGB>
+        <tags>is,minor</tags>
+        <start>2259</start>
+        <end>2295</end>
+        <successor>FWL</successor>
+    </faction>
+    <faction>
+        <shortname>PD</shortname>
+        <fullname>Protectorate of Donegal</fullname>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>LA</nameGenerator>
+        <colorRGB>66,244,143</colorRGB>
+        <tags>is,minor</tags>
+        <start>2313</start>
+        <end>2341</end>
+        <successor>LA</successor>
+    </faction>
+    <faction>
+        <shortname>FoS</shortname>
+        <fullname>Federation of Skye</fullname>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>LA</nameGenerator>
+        <colorRGB>66,217,244</colorRGB>
+        <tags>is,minor</tags>
+        <start>2299</start>
+        <end>2341</end>
+        <successor>LA</successor>
+    </faction>
+    <faction>
+        <shortname>TamP</shortname>
+        <fullname>Tamar Pact</fullname>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>LA</nameGenerator>
+        <colorRGB>244,161,66</colorRGB>
+        <tags>is,minor</tags>
+        <start>2235</start>
+        <end>2341</end>
+        <successor>LA</successor>
+    </faction>
+    <faction>
+        <shortname>RWR</shortname>
+        <id>19</id>
+        <fullname>Rim Worlds Republic</fullname>
+        <startingPlanet>Apollo</startingPlanet>
+        <eraMods>1,1,1,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>232,202,173</colorRGB>
+        <altNamesByYear year='2767'>Amaris Empire</altNamesByYear>
+        <tags>periphery</tags>
+        <start>2250</start>
+        <end>2779</end>
+    </faction>
+    <faction>
+        <shortname>RPG</shortname>
+        <id>19</id>
+        <fullname>Rim Provisional Government</fullname>
+        <startingPlanet>Apollo</startingPlanet>
+        <eraMods>1,1,1,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>164,113,215</colorRGB>
+        <tags>periphery,small</tags>
+        <start>2575</start>
+        <end>2597</end>
+    </faction>
+    <faction>
+        <shortname>THW</shortname>
+        <fullname>Taurian Homeworlds</fullname>
+        <startingPlanet>Taurus</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>179,62,38</colorRGB>
+        <tags>periphery</tags>
+        <start>2253</start>
+        <end>2235</end>
+        <successor>TC</successor>
+    </faction>
+    <faction>
+        <shortname>TC</shortname>
+        <id>14</id>
+        <fullname>Taurian Concordat</fullname>
+        <startingPlanet>Taurus</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>179,62,38</colorRGB>
+        <tags>periphery</tags>
+        <start>2335</start>
+    </faction>
+    <faction>
+        <shortname>MOC</shortname>
+        <id>12</id>
+        <fullname>Magistracy of Canopus</fullname>
+        <startingPlanet>Canopus IV</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,1,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>57,158,145</colorRGB>
+        <tags>periphery</tags>
+        <start>2530</start>
+    </faction>
+    <faction>
+        <shortname>OA</shortname>
+        <id>13</id>
+        <fullname>Outworlds Alliance</fullname>
+        <startingPlanet>Alpheratz</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>210,190,153</colorRGB>
+        <altNamesByYear year='3083'>Raven Alliance</altNamesByYear>
+        <tags>periphery</tags>
+        <start>2413</start>
+        <end>3083</end>
+    </faction>
+    <faction>
+        <shortname>ABN</shortname>
+        <fullname>Abandoned</fullname>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>0,0,0</colorRGB>
+        <tags>abandoned,inactive,chaos,special</tags>
+    </faction>
+    <faction>
+        <shortname>DIS</shortname>
+        <fullname>Disputed</fullname>
+        <tags>chaos,special</tags>
+    </faction>
+    <faction>
+        <shortname>ARDC</shortname>
+        <id>17</id>
+        <fullname>Arc-Royal Defense Cordon</fullname>
+        <startingPlanet>Arc-Royal</startingPlanet>
+        <eraMods>0,0,0,1,2,3,2,0,0</eraMods>
+        <nameGenerator>LA</nameGenerator>
+        <colorRGB>218,165,32</colorRGB>
+        <tags>is,minor</tags>
+        <start>3057</start>
+        <end>3067</end>
+    </faction>
+    <faction>
+        <shortname>AB</shortname>
+        <fullname>Azami Brotherhood</fullname>
+        <startingPlanet>Algedi</startingPlanet>
+        <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+        <nameGenerator>DC</nameGenerator>
+        <colorRGB>238,66,244</colorRGB>
+        <tags>is,minor</tags>
+        <start>3071</start>
+        <end>3081</end>
+    </faction>
+    <faction>
+        <shortname>OMA</shortname>
+        <fullname>Ozawa Mercantile Association</fullname>
+        <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+        <nameGenerator>DC</nameGenerator>
+        <colorRGB>206,244,66</colorRGB>
+        <tags>trader</tags>
+    </faction>
+    <faction>
+        <shortname>CDP</shortname>
+        <fullname>Calderon Protectorate</fullname>
+        <startingPlanet>Erod's Escape</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>0,128,128</colorRGB>
+        <tags>periphery</tags>
+        <start>2253</start> 
+        <!-- Per Reunification War PDF, Protectorate existed prior to the Concordat, changing start from 3066 to 2253 per that source -->
+    </faction>
+    <faction>
+        <shortname>CI</shortname>
+        <fullname>Chainelane Isles</fullname>
+        <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,80,93</colorRGB>
+        <tags>is,minor</tags>
+    </faction>
+    <faction>
+        <shortname>CM</shortname>
+        <id>16</id>
+        <fullname>Chaos March</fullname>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>169,169,169</colorRGB>
+        <tags>is,chaos,small</tags>
+        <start>3058</start>
+        <end>3069</end>
+    </faction>
+    <faction>
+        <shortname>CIR</shortname>
+        <fullname>Circinus Federation</fullname>
+        <startingPlanet>Circinus</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>198,36,58</colorRGB>
+        <tags>periphery</tags>
+        <start>2785</start>
+        <end>3081</end>
+    </faction>
+    <faction>
+        <shortname>CBS</shortname>
+        <fullname>Clan Blood Spirit</fullname>
+        <startingPlanet>York (Clan)</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>255,99,71</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+        <end>3085</end>
+    </faction>
+    <faction>
+        <shortname>CB</shortname>
+        <fullname>Clan Burrock</fullname>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>255,165,0</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+        <end>3059</end>
+    </faction>
+    <faction>
+        <shortname>CCC</shortname>
+        <fullname>Clan Cloud Cobra</fullname>
+        <startingPlanet>Homer</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>147,112,219</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+    </faction>
+    <faction>
+        <shortname>CCO</shortname>
+        <fullname>Clan Coyote</fullname>
+        <startingPlanet>Babylon</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>0,0,205</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+    </faction>
+    <faction>
+        <shortname>SOC</shortname>
+        <fullname>The Society</fullname>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>147,112,219</colorRGB>
+        <tags>clan</tags>
+    </faction>
+    <faction>
+        <shortname>CDS</shortname>
+        <id>26</id>
+        <fullname>Clan Sea Fox</fullname>
+        <altNamesByYear year='2984'>Clan Diamond Shark</altNamesByYear>
+        <altNamesByYear year='3100'>Clan Sea Fox</altNamesByYear>
+        <startingPlanet>Babylon</startingPlanet>
+        <changePlanet year='3065'>Twycross</changePlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>0,255,255</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+    </faction>
+    <faction>
+        <shortname>CFM</shortname>
+        <fullname>Clan Fire Mandrill</fullname>
+        <startingPlanet>Shadow</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>165,42,42</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+        <end>3073</end>
+    </faction>
+    <faction>
+        <shortname>CGB</shortname>
+        <id>23</id>
+        <fullname>Clan Ghost Bear</fullname>
+        <startingPlanet>Arcadia (Clan)</startingPlanet>
+        <changePlanet year='3060'>Alshain</changePlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>188,222,235</colorRGB>
+        <altNamesByYear year='3060'>Ghost Bear Dominion</altNamesByYear>
+        <tags>clan,major</tags>
+        <start>2807</start>
+        <end>3103</end>
+    </faction>
+    <faction>
+        <shortname>CGS</shortname>
+        <fullname>Clan Goliath Scorpion</fullname>
+        <startingPlanet>Roche</startingPlanet>
+        <altNamesByYear year='3080'>Escorpión Imperio</altNamesByYear>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>238,232,170</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+        <end>3080</end>
+    </faction>
+    <faction>
+        <shortname>CHH</shortname>
+        <id>28</id>
+        <fullname>Clan Hell's Horses</fullname>
+        <!--Original data shows CHH back on Niles during the Jihad, but I am unable to find data for that -->
+        <startingPlanet>Niles (Clan)</startingPlanet>
+        <changePlanet year='3074'>Csesztreg</changePlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>241,168,110</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+    </faction>
+    <faction>
+        <shortname>CIH</shortname>
+        <fullname>Clan Ice Hellion</fullname>
+        <startingPlanet>Hector</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>248,248,255</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+        <end>3074</end>
+    </faction>
+    <faction>
+        <shortname>CJF</shortname>
+        <id>22</id>
+        <fullname>Clan Jade Falcon</fullname>
+        <startingPlanet>Ironhold</startingPlanet>
+        <changePlanet year='3052'>Sudeten</changePlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>172,208,115</colorRGB>
+        <tags>clan,major</tags>
+        <start>2807</start>
+    </faction>
+    <faction>
+        <shortname>CMG</shortname>
+        <fullname>Clan Mongoose</fullname>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>100,149,237</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+        <end>2868</end>
+    </faction>
+    <faction>
+        <shortname>CNC</shortname>
+        <id>25</id>
+        <fullname>Clan Nova Cat</fullname>
+        <startingPlanet>Barcella</startingPlanet>
+        <changePlanet year='3057'>Irece</changePlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>245,255,250</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+        <end>3143</end>
+    </faction>
+    <faction>
+        <shortname>CSJ</shortname>
+        <id>24</id>
+        <fullname>Clan Smoke Jaguar</fullname>
+        <startingPlanet>Huntress</startingPlanet>
+        <changePlanet year='3052'>Luzerne</changePlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>152,164,129</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+        <end>3060</end>
+    </faction>
+    <faction>
+        <shortname>CSR</shortname>
+        <fullname>Clan Snow Raven</fullname>
+        <startingPlanet>Circe</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>135,206,235</colorRGB>
+        <altNamesByYear year='3083'>Raven Alliance</altNamesByYear>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+        <end>3083</end>
+    </faction>
+    <faction>
+        <shortname>CSA</shortname>
+        <fullname>Clan Star Adder</fullname>
+        <startingPlanet>Sheridan (Clan)</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>218,165,32</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+    </faction>
+    <faction>
+        <shortname>CSV</shortname>
+        <id>27</id>
+        <fullname>Clan Steel Viper</fullname>
+        <startingPlanet>Homer</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>127,255,0</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+        <end>3075</end>
+    </faction>
+    <faction>
+        <shortname>CSL</shortname>
+        <fullname>Clan Stone Lion</fullname>
+        <startingPlanet>Tokasha</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>241,168,110</colorRGB>
+        <tags>clan,minor</tags>
+        <start>3075</start>
+    </faction>
+    <faction>
+        <shortname>CWI</shortname>
+        <fullname>Clan Widowmaker</fullname>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>222,184,135</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+        <end>2834</end>
+    </faction>
+    <faction>
+        <shortname>CW</shortname>
+        <id>21</id>
+        <fullname>Clan Wolf</fullname>
+        <startingPlanet>Tranquil</startingPlanet>
+        <changePlanet year='3052'>Tamar</changePlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>207,114,58</colorRGB>
+        <tags>clan,major</tags>
+        <start>2807</start>
+        <end>3142</end>
+    </faction>
+    <faction>
+        <shortname>CWE</shortname>
+        <fullname>Wolf Empire</fullname>
+        <startingPlanet>Gienah</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>207,114,58</colorRGB>
+        <tags>clan,minor</tags>
+        <start>3142</start>
+    </faction>
+    <faction>
+        <shortname>CWIE</shortname>
+        <fullname>Clan Wolf-in-Exile</fullname>
+        <startingPlanet>Arc-Royal</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>160,82,45</colorRGB>
+        <tags>clan,small</tags>
+        <start>3057</start>
+    </faction>
+    <faction>
+        <shortname>CWOV</shortname>
+        <fullname>Clan Wolverine</fullname>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>143,188,143</colorRGB>
+        <tags>clan,minor</tags>
+        <start>2807</start>
+        <end>2823</end>
+    </faction>
+    <faction>
+        <shortname>CS</shortname>
+        <id>8</id>
+        <fullname>ComStar</fullname>
+        <startingPlanet>Terra</startingPlanet>
+        <changePlanet year='3059'>Tukayyid</changePlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,250,240</colorRGB>
+        <tags>is,inactive,major</tags>
+        <start>2788</start>
+    </faction>
+    <faction>
+        <shortname>DA</shortname>
+        <fullname>Duchy of Andurien</fullname>
+        <startingPlanet>Andurien</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>148,148,255</colorRGB>
+        <tags>is,minor</tags>
+        <start>3030</start>
+    </faction>
+    <faction>
+        <shortname>DGM</shortname>
+        <fullname>Duchy of Graham-Marik</fullname>
+        <startingPlanet>Loyalty</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>143,190,192</colorRGB>
+        <tags>is,minor</tags>
+        <start>3079</start>
+        <end>3082</end>
+    </faction>
+    <faction>
+        <shortname>DO</shortname>
+        <fullname>Duchy of Oriente</fullname>
+        <startingPlanet>Oriente</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>163,112,120</colorRGB>
+        <tags>is,minor</tags>
+        <start>3079</start>
+        <end>3086</end>
+    </faction>
+    <faction>
+        <shortname>DoO</shortname>
+        <fullname>Duchy of Orloff</fullname>
+        <startingPlanet>Vanra</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>164,94,126</colorRGB>
+        <tags>is,minor</tags>
+        <start>3079</start>
+        <end>3086</end>
+    </faction>
+    <faction>
+        <shortname>DS</shortname>
+        <fullname>Duchy of Small</fullname>
+        <startingPlanet>Small World</startingPlanet>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>107,142,35</colorRGB>
+        <tags>is,minor</tags>
+        <start>3058</start>
+        <end>3066</end>
+    </faction>
+    <faction>
+        <shortname>DTA</shortname>
+        <fullname>Duchy of Tamarind-Abbey</fullname>
+        <startingPlanet>Tamarind</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>99,94,165</colorRGB>
+        <tags>is,minor</tags>
+        <start>3078</start>
+        <end>3139</end>
+    </faction>
+        <faction>
+        <shortname>DT</shortname>
+        <fullname>Duchy of Tamarind</fullname>
+        <startingPlanet>Tamarind</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>158,60,147</colorRGB>
+        <tags>is,minor</tags>
+        <start>3071</start>
+        <end>3078</end>
+    </faction>
+    <faction>
+        <shortname>EF</shortname>
+        <fullname>Elysian Fields</fullname>
+        <startingPlanet>Nyserta</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,0,255</colorRGB>
+        <tags>periphery</tags>
+    </faction>
+    <faction>
+        <shortname>CEI</shortname>
+        <fullname>Escorpión Imperio</fullname>
+        <startingPlanet>Granda</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>238,232,170</colorRGB>
+        <tags>clan,periphery</tags>
+        <start>3080</start>
+    </faction>
+    <faction>
+        <shortname>FC</shortname>
+        <id>6</id>
+        <fullname>Federated Commonwealth</fullname>
+        <startingPlanet>New Avalon</startingPlanet>
+        <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>248,212,44</colorRGB>
+        <tags>is,super</tags>
+    </faction>
+    <faction>
+        <shortname>FVC</shortname>
+        <fullname>Filtvelt Coalition</fullname>
+        <startingPlanet>Filtvelt</startingPlanet>
+        <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+        <nameGenerator>FS</nameGenerator>
+        <colorRGB>255,228,181</colorRGB>
+        <tags>periphery</tags>
+        <start>3072</start>
+    </faction>
+    <faction>
+        <shortname>FRR</shortname>
+        <id>10</id>
+        <fullname>Free Rasalhague Republic</fullname>
+        <startingPlanet>Rasalhague</startingPlanet>
+        <changePlanet year='3052'>Orestes</changePlanet>
+        <eraMods>0,0,0,0,0,0,2,1,0</eraMods>
+        <nameGenerator>FRR</nameGenerator>
+        <colorRGB>116,171,206</colorRGB>
+        <tags>is,minor</tags>
+        <start>3034</start>
+        <end>3103</end>
+    </faction>
+    <faction>
+        <shortname>FWLR</shortname>
+        <fullname>Free Worlds League Rebels</fullname>
+        <startingPlanet>New Delos</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>68,212,228</colorRGB>
+        <tags>is,rebel</tags>
+    </faction>
+    <faction>
+        <shortname>FR</shortname>
+        <fullname>Fronc Reaches</fullname>
+        <startingPlanet>Fronc</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>128,169,127</colorRGB>
+        <tags>periphery</tags>
+        <start>3066</start>
+    </faction>
+    <faction>
+        <shortname>GV</shortname>
+        <fullname>Greater Valkyrate</fullname>
+        <startingPlanet>Gotterdammerung</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,105,180</colorRGB>
+        <tags>periphery</tags>
+        <start>3028</start>
+        <end>3049</end>
+    </faction>
+    <faction>
+        <shortname>HL</shortname>
+        <fullname>Hanseatic League</fullname>
+        <startingPlanet>Bremen (HL)</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>219,112,147</colorRGB>
+        <tags>periphery</tags>
+        <start>2891</start>
+    </faction>
+    <faction>
+        <shortname>IP</shortname>
+        <fullname>Illyrian Palatinate</fullname>
+        <startingPlanet>Illyria</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>0,255,255</colorRGB>
+        <tags>periphery</tags>
+        <start>2350</start>
+        <end>3063</end>
+    </faction>
+    <faction>
+        <shortname>PIND</shortname>
+        <id>20</id>
+        <fullname>Independent (Periphery)</fullname>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>190,190,190</colorRGB>
+        <tags>periphery,chaos,small</tags>
+    </faction>
+    <faction>
+        <shortname>IND</shortname>
+        <id>29</id>
+        <fullname>Independent</fullname>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>210,210,210</colorRGB>
+        <tags>is,chaos,small</tags>
+    </faction>
+    <faction>
+        <shortname>JF</shortname>
+        <fullname>Jarnfolk</fullname>
+        <startingPlanet>Trondheim (JF)</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>FRR</nameGenerator>
+        <colorRGB>153,50,204</colorRGB>
+        <tags>is,minor</tags>
+    </faction>
+    <faction>
+        <shortname>KE</shortname>
+        <fullname>Khwarazm Empire</fullname>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>80,80,80</colorRGB>
+        <tags>periphery</tags>
+    </faction>
+    <faction>
+        <shortname>KP</shortname>
+        <fullname>Kittery Prefecture</fullname>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>FS</nameGenerator>
+        <colorRGB>224,126,39</colorRGB>
+        <tags>is,minor</tags>
+        <start>3073</start>
+        <end>3080</end>
+    </faction>
+    <faction>
+        <shortname>LR</shortname>
+        <fullname>Liao Republic</fullname>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>2,166,79</colorRGB>
+        <tags>is</tags>
+        <start>2189</start>
+        <end>2315</end>
+    </faction>
+    <faction>
+        <shortname>LL</shortname>
+        <fullname>Lothian League</fullname>
+        <startingPlanet>Lothario</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,140,0</colorRGB>
+        <tags>periphery</tags>
+        <start>2691</start>
+    </faction>
+    <faction>
+        <shortname>MC</shortname>
+        <fullname>Malagrotta Cooperative</fullname>
+        <startingPlanet>Malagrotta</startingPlanet>
+        <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+        <nameGenerator>FS</nameGenerator>
+        <colorRGB>218,112,214</colorRGB>
+        <tags>periphery</tags>
+        <start>3073</start>
+        <end>3079</end>
+    </faction>
+    <faction>
+        <shortname>MH</shortname>
+        <id>15</id>
+        <fullname>Marian Hegemony</fullname>
+        <startingPlanet>Alphard (MH)</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>236,136,65</colorRGB>
+        <tags>periphery</tags>
+        <start>2920</start>
+    </faction>
+    <faction>
+        <shortname>MCM</shortname>
+        <fullname>Marik Commonwealth</fullname>
+        <startingPlanet>Marik</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>165,94,160</colorRGB>
+        <tags>is</tags>
+        <start>2241</start>
+        <end>3082</end>
+    </faction>
+    <faction>
+        <shortname>MSC</shortname>
+        <fullname>Marik-Stewart Commonwealth</fullname>
+        <startingPlanet>Marik</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>117,65,113</colorRGB>
+        <tags>is</tags>
+        <start>3082</start>
+        <end>3139</end>
+    </faction>
+    <faction>
+        <shortname>MERC</shortname>
+        <id>0</id>
+        <fullname>Mercenary</fullname>
+        <startingPlanet>Solaris</startingPlanet>
+        <changePlanet year='2789'>Galatea</changePlanet>
+        <changePlanet year='3052'>Outreach</changePlanet>
+        <changePlanet year='3067'>Galatea</changePlanet>
+        <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>169,169,169</colorRGB>
+        <tags>merc</tags>
+    </faction>
+    <faction>
+        <shortname>MV</shortname>
+        <fullname>Morgraine's Valkyrate</fullname>
+        <startingPlanet>Gotterdammerung</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,105,180</colorRGB>
+        <tags>periphery</tags>
+        <start>3021</start>
+        <end>3028</end>
+    </faction>
+    <faction>
+        <shortname>BoS</shortname>
+        <fullname>Barony of Strang</fullname>
+        <startingPlanet>Von Strang's World</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>165,94,160</colorRGB>
+        <tags>periphery,minor</tags>
+    </faction>
+    <faction>
+        <shortname>MA</shortname>
+        <fullname>Mosiro Archipelago</fullname>
+        <startingPlanet>Mosiro</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>165,94,160</colorRGB>
+        <tags>is,minor</tags>
+        <start>3079</start>
+        <end>3081</end>
+    </faction>
+    <faction>
+        <shortname>NCR</shortname>
+        <fullname>New Colony Region</fullname>
+        <startingPlanet>Fronc</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>32,178,170</colorRGB>
+        <tags>periphery</tags>
+        <start>3057</start>
+        <end>3066</end>
+    </faction>
+    <faction>
+        <shortname>NC</shortname>
+        <fullname>Nueva Castile</fullname>
+        <startingPlanet>Asturias</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>0,255,0</colorRGB>
+        <tags>periphery</tags>
+        <start>2392</start>
+        <end>3080</end>
+    </faction>
+    <faction>
+        <shortname>OC</shortname>
+        <fullname>Oberon Confederation</fullname>
+        <startingPlanet>Oberon VI</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>50,205,50</colorRGB>
+        <tags>periphery</tags>
+        <start>2775</start>
+        <end>3049</end>
+    </faction>
+    <faction>
+        <shortname>NOC</shortname>
+        <fullname>New Oberon Confederation</fullname>
+        <startingPlanet>Oberon VI</startingPlanet>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>231,178,50</colorRGB>
+        <tags>periphery</tags>
+        <start>3086</start>
+    </faction>
+    <faction>
+        <shortname>OZP</shortname>
         <fullname>Ohrensen-Zion Province</fullname>
         <startingPlanet>Ohrensen</startingPlanet>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>160,165,94</colorRGB>
-		<tags>is,minor</tags>
-		<start>3079</start>
-		<end>3081</end>
-	</faction>
-	<faction>
-		<shortname>OP</shortname>
-		<fullname>Oriente Protectorate</fullname>
-		<startingPlanet>Oriente</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>163,112,120</colorRGB>
-		<tags>is,minor</tags>
-		<start>3086</start>
-		<end>3139</end>
-	</faction>
-	<faction>
-		<shortname>PG</shortname>
-		<fullname>Principality of Gibson</fullname>
-		<startingPlanet>Gibson</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>250,250,250</colorRGB>
-		<tags>is,minor</tags>
-		<start>3079</start>
-	</faction>
-	<faction>
-		<shortname>PR</shortname>
-		<fullname>Principality of Regulus</fullname>
-		<startingPlanet>Regulus</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>192,143,189</colorRGB>
-		<tags>is,minor</tags>
-		<start>2247</start>
-		<end>3086</end>
-	</faction>
-	<faction>
-		<shortname>RD</shortname>
-		<fullname>Rasalhague Dominion</fullname>
-		<startingPlanet>Rasalhague</startingPlanet>
-		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
-		<nameGenerator>FRR</nameGenerator>
-		<colorRGB>188,222,235</colorRGB>
-		<tags>clan,is,minor</tags>
-		<start>3103</start>
-	</faction>
-	<faction>
-		<shortname>RA</shortname>
-		<fullname>Raven Alliance</fullname>
-		<startingPlanet>Alpheratz</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>25,120,110</colorRGB>
-		<tags>clan,periphery</tags>
-		<start>3083</start>
-	</faction>
-	<faction>
-		<shortname>RF</shortname>
-		<fullname>Regulan Fiefs</fullname>
-		<startingPlanet>Regulus</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>255,51,51</colorRGB>
-		<tags>is,minor</tags>
-		<start>3086</start>
-	</faction>
-	<faction>
-		<shortname>RFS</shortname>
-		<fullname>Regulan Free States</fullname>
-		<startingPlanet>Regulus</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
-		<tags>is,minor</tags>
-		<start>3079</start>
-		<end>3086</end>
-	</faction>
-	<faction>
-		<shortname>ROS</shortname>
-		<id>7</id>
-		<fullname>Republic of the Sphere</fullname>
-		<startingPlanet>Terra</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>207,119,57</colorRGB>
-		<tags>is,major</tags>
-		<start>3081</start>
-	</faction>
-	<faction>
-		<shortname>Stone</shortname>
-		<fullname>Stone's Coalition</fullname>
-		<altNames>Coalition Forces</altNames>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>207,119,57</colorRGB>
-		<tags>is,minor</tags>
-		<start>3073</start>
-		<end>3081</end>
-	</faction>
-	<faction>
-		<shortname>RTR</shortname>
-		<fullname>Republic Territories</fullname>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>207,119,57</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>RIM</shortname>
-		<fullname>Rim Collection</fullname>
-		<startingPlanet>Gillfillan's Gold</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>95,158,160</colorRGB>
-		<tags>periphery,small</tags>
-		<start>3048</start>
-	</faction>
-	<faction>
-		<shortname>RCM</shortname>
-		<fullname>Rim Commonality</fullname>
-		<startingPlanet>Lesnovo</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>95,158,160</colorRGB>
-		<tags>periphery</tags>
-		<start>3075</start>
-		<end>3139</end>
-	</faction>
-	<faction>
-		<shortname>RT</shortname>
-		<fullname>Rim Territories</fullname>
-		<startingPlanet>Pain</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>175,238,238</colorRGB>
-		<tags>periphery</tags>
-		<start>3087</start>
-	</faction>
-	<faction>
-		<shortname>ST</shortname>
-		<fullname>Saiph Triumvirate</fullname>
-		<startingPlanet>Saiph</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>128,128,0</colorRGB>
-		<tags>is,minor</tags>
-		<start>3057</start>
-		<end>3068</end>
-	</faction>
-	<faction>
-		<shortname>SP</shortname>
-		<fullname>Sarna Protectorate</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>184,134,11</colorRGB>
-		<tags>is,minor</tags>
-	</faction>
-	<faction>
-		<shortname>SIS</shortname>
-		<fullname>Sian Supremacy</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>145,166,242</colorRGB>
-		<tags>is,minor</tags>
-	</faction>
-	<faction>
-		<shortname>SHC</shortname>
-		<fullname>Silver Hawk Coalition</fullname>
-		<startingPlanet>Amity</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>255,0,127</colorRGB>
-		<tags>is,minor</tags>
-		<start>3079</start>
-	</faction>
-	<faction>
-		<shortname>SIC</shortname>
-		<id>11</id>
-		<fullname>St. Ives Compact</fullname>
-		<startingPlanet>St. Ives</startingPlanet>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>188,223,186</colorRGB>
-		<tags>is,minor</tags>
-		<start>3029</start>
-		<end>3063</end>
-	</faction>
-	<faction>
-		<shortname>SL</shortname>
-		<fullname>Star League</fullname>
-		<startingPlanet>Terra</startingPlanet>
-		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>176,196,222</colorRGB>
-		<tags>is,super</tags>
-		<start>2570</start>
-		<end>2781</end>
-	</faction>
-	<faction>
-		<shortname>SLIE</shortname>
-		<fullname>Star League-in-Exile</fullname>
-		<startingPlanet>Strana Mechty</startingPlanet>
-		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>176,196,222</colorRGB>
-		<tags>is</tags>
-		<start>2786</start>
-		<end>2801</end>
-	</faction>
-	<faction>
-		<shortname>SC</shortname>
-		<fullname>Stewart Commonality</fullname>
-		<startingPlanet>Stewart</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>76,0,153</colorRGB>
-		<tags>is,minor</tags>
-		<start>2259</start>
-		<end>3082</end>
-	</faction>
-	<faction>
-		<shortname>SKC</shortname>
-		<fullname>Styk Commonality</fullname>
-		<startingPlanet>Styk</startingPlanet>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>0,139,139</colorRGB>
-		<tags>is,minor</tags>
-		<start>3058</start>
-		<end>3067</end>
-	</faction>
-	<faction>
-		<shortname>SKP</shortname>
-		<fullname>Styk Protectorate</fullname>
-		<startingPlanet>Styk</startingPlanet>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>0,139,139</colorRGB>
-		<tags>is,minor</tags>
-		<start>3067</start>
-	</faction>
-	<faction>
-		<shortname>TCC</shortname>
-		<fullname>Terracap Confederation</fullname>
-		<startingPlanet>Terra Firma</startingPlanet>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>233,150,122</colorRGB>
-		<tags>is,minor</tags>
-		<start>3058</start>
-		<end>3067</end>
-	</faction>
-	<faction>
-		<shortname>TB</shortname>
-		<fullname>The Barrens</fullname>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,255,224</colorRGB>
-		<tags>periphery,chaos</tags>
-		<start>3087</start>
-	</faction>
-	<faction>
-		<shortname>TP</shortname>
-		<fullname>The Protectorate</fullname>
-		<startingPlanet>New Delos</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>255,51,51</colorRGB>
-		<tags>is,minor</tags>
-		<start>3079</start>
-	</faction>
-	<faction>
-		<shortname>TFR</shortname>
-		<fullname>Tikonov Free Republic</fullname>
-		<startingPlanet>Tikonov</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>255,160,122</colorRGB>
-		<tags>is,minor</tags>
-		<start>3029</start>
-		<end>3031</end>
-	</faction>
-	<faction>
-		<shortname>TD</shortname>
-		<fullname>Tortuga Dominions</fullname>
-		<startingPlanet>Tortuga Prime</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>34,139,34</colorRGB>
-		<tags>periphery,pirate</tags>
-		<start>2577</start>
-	</faction>
-	<faction>
-		<shortname>UND</shortname>
-		<fullname>Undiscovered</fullname>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>0,0,0</colorRGB>
-		<tags>abandoned,inactive,chaos,special</tags>
-	</faction>
-	<faction>
-		<shortname>WOB</shortname>
-		<id>9</id>
-		<fullname>Word of Blake</fullname>
-		<startingPlanet>Terra</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,1,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>205,192,176</colorRGB>
-		<tags>is,minor</tags>
-		<start>3052</start>
-	</faction>
-	<faction>
-		<shortname>CLAN</shortname>
-		<fullname>All Clans</fullname>
-		<startingPlanet>Strana Mechty</startingPlanet>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>139,69,19</colorRGB>
-		<tags>clan,special</tags>
-		<start>2807</start>
-	</faction>
-	<faction>
-		<shortname>NIOPS</shortname>
-		<fullname>Niops Association</fullname>
-		<startingPlanet>Niops (Niops V, VI, VII)</startingPlanet>
-		<colorRGB>205,173,0</colorRGB>
-		<tags>periphery,minor</tags>
-	</faction>
-	<faction>
-		<shortname>NONE</shortname>
-		<fullname>Unexplored</fullname>
-		<colorRGB>0,0,0</colorRGB>
-		<tags>periphery,abandoned,inactive,chaos,special</tags>
-	</faction>
-	<faction>
-		<shortname>FOR</shortname>
-		<fullname>Fiefdom Randis</fullname>
-		<startingPlanet>Randis IV (Hope IV 2988-)</startingPlanet>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>30,144,255</colorRGB>
-		<tags>periphery,minor</tags>
-		<start>2988</start>
-	</faction>
-	<faction>
-		<shortname>MM</shortname>
-		<fullname>Mica Majority</fullname>
-		<startingPlanet>Mica II</startingPlanet>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>240,230,140</colorRGB>
-		<tags>periphery,minor</tags>
-	</faction>
-	<faction>
-		<shortname>SA</shortname>
-		<fullname>Senatorial Alliance</fullname>
-		<altNames>Senate Alliance</altNames>
-		<startingPlanet>Augustine</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,102,153</colorRGB>
-		<tags>is,minor</tags>
-		<start>3135</start>
-		<end>3142</end>
-	</faction>
-	<faction>
-		<shortname>AA</shortname>
-		<fullname>Augustine Alliance</fullname>
-		<startingPlanet>Augustine</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,102,153</colorRGB>
-		<tags>is,minor</tags>
-		<start>3142</start>
-	</faction>
-	<faction>
-		<shortname>TTU</shortname>
-		<fullname>Tall Trees Union</fullname>
-		<startingPlanet>Tall Trees</startingPlanet>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>153,153,51</colorRGB>
-		<tags>is,minor</tags>
-		<start>3136</start>
-	</faction>
-	<faction>
-		<shortname>ShA</shortname>
-		<fullname>Shiloh Alliance</fullname>
-		<startingPlanet>Shiloh</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>97,26,92</colorRGB>
-		<tags>is,minor</tags>
-		<start>3135</start>
-	</faction>
-	<faction>
-		<shortname>CvW</shortname>
-		<fullname>Covenant Worlds</fullname>
-		<startingPlanet>Bordon</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>102,51,51</colorRGB>
-		<tags>is,minor</tags>
-		<start>3137</start>
-	</faction>
-	<faction>
-		<shortname>PC</shortname>
-		<fullname>Protectorate Coalition</fullname>
-		<startingPlanet>Rochelle</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>51,51,102</colorRGB>
-		<tags>is,minor</tags>
-		<start>3136</start>
-	</faction>
-	<faction>
-		<shortname>MiC</shortname>
-		<fullname>Milton Combine</fullname>
-		<startingPlanet>Milton</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>255,0,51</colorRGB>
-		<tags>is,minor</tags>
-	</faction>
-	<faction>
-		<shortname>CP</shortname>
-		<fullname>Clan Protectorate</fullname>
-		<startingPlanet>Marik</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>Clan</nameGenerator>
-		<colorRGB>153,255,51</colorRGB>
-		<tags>clan,minor</tags>
-		<start>3138</start>
-	</faction>
-	<faction>
-		<shortname>RR</shortname>
-		<fullname>Republic Remnant</fullname>
-		<startingPlanet>Callison</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>128,40,0</colorRGB>
-		<tags>is,minor</tags>
-		<start>3135</start>
-	</faction>
-	<faction>
-		<shortname>PIR</shortname>
-		<fullname>Pirate</fullname>
-		<eraMods>2,2,2,2,2,2,2,2,2</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>128,40,0</colorRGB>
-		<tags>pirate</tags>
-	</faction>
-	<faction>
-		<shortname>UC</shortname>
-		<fullname>Umayyad Caliphate</fullname>
-		<startingPlanet>Granada</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>0,255,0</colorRGB>
-		<tags>periphery</tags>
-		<start>2830</start>
-	</faction>
-	<faction>
-		<shortname>REB</shortname>
-		<fullname>Rebels</fullname>
-		<eraMods>2,2,2,2,2,2,2,2,2</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<tags>rebel</tags>
-	</faction>
-	<faction>
-		<shortname>RON</shortname>
-		<fullname>Ronin</fullname>
-		<startingPlanet>Predlitz</startingPlanet>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>DC</nameGenerator>
-		<colorRGB>234,45,46</colorRGB>
-		<tags>is,minor</tags>
-		<start>3034</start>
-		<end>3035</end>
-	</faction>
-	<faction>
-		<shortname>AXP</shortname>
-		<fullname>Axumite Providence</fullname>
-		<startingPlanet>Thala</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>153,50,204</colorRGB>
-		<tags>periphery</tags>
-		<start>2245</start>
-	</faction>
-	<faction>
-		<shortname>CCon</shortname>
-		<fullname>Coreward Confederacy</fullname>
-		<startingPlanet>RWR Outpost #27</startingPlanet>
-		<eraMods>3,3,1,3,3,3,3,3,3</eraMods>
-		<altNamesByYear year='2371'>Autocracy of New Virginia</altNamesByYear>
-		<altNamesByYear year='2400'>Virginian Union</altNamesByYear>
-		<altNamesByYear year='2700'>Rim Worlds Republic Outpost #27</altNamesByYear>
-		<altNamesByYear year='2798'>Virginian Union</altNamesByYear>
-		<altNamesByYear year='2816'>Coreward Confederacy</altNamesByYear>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,0,0</colorRGB>
-		<tags>periphery</tags>
-		<start>2371</start>
-		<end>3075</end>
-	</faction>
-	<faction>
-		<shortname>GDL</shortname>
-		<fullname>Galatean Defense League</fullname>
-		<startingPlanet>Galatea</startingPlanet>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>102,255,255</colorRGB>
-		<tags>is,minor</tags>
-		<start>3144</start>
-	</faction>
-	<faction>
-		<shortname>GL</shortname>
-		<fullname>Galatean League</fullname>
-		<startingPlanet>Galatea</startingPlanet>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>102,255,255</colorRGB>
-		<tags>is,minor</tags>
-		<start>3144</start>
-	</faction>
-	<faction>
-		<shortname>IE</shortname>
-		<fullname>Interstellar Expeditions</fullname>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,255,102</colorRGB>
-		<tags>periphery,chaos</tags>
-	</faction>
-	<faction>
-		<shortname>NDC</shortname>
-		<fullname>New Delphi Compact</fullname>
-		<startingPlanet>New Delphi</startingPlanet>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>127,151,139</colorRGB>
-		<tags>periphery</tags>
-		<start>2602</start>
-	</faction>
-	<faction>
-		<shortname>FCo</shortname>
-		<fullname>Ferris Collective</fullname>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>191,171,120</colorRGB>
-		<tags>minor</tags>
-		<start>3087</start>
-	</faction>
-	<faction>
-		<shortname>FFR</shortname>
-		<fullname>Finmark Free Republic</fullname>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>191,171,120</colorRGB>
-		<tags>periphery,minor</tags>
-		<start>2779</start>
-		<!-- May be sooner than that, but no later -->
-		<end>2822</end>
-	</faction>
-	<faction>
-		<shortname>RU</shortname>
-		<fullname>Ragnarok Union</fullname>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>211,189,72</colorRGB>
-		<tags>periphery,minor</tags>
-		<start>3084</start>
-	</faction>
-	<faction>
-		<shortname>THa</shortname>
-		<fullname>The Havens</fullname>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>147,173,172</colorRGB>
-		<tags>periphery,minor</tags>
-		<start>3084</start>
-	</faction>
-	<faction>
-		<shortname>ARC</shortname>
-		<fullname>Aurigan Coalition</fullname>
-		<startingPlanet>Coromodir</startingPlanet>
-		<changePlanet year="3022">New Abilene</changePlanet>
-		<changePlanet year="3026">Coromodir</changePlanet>
-		<altNamesByYear year='3022'>Arano Restoration</altNamesByYear>
-		<altNamesByYear year='3026'>Aurigan Coalition</altNamesByYear>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,36,0</colorRGB>
-		<tags>periphery,minor</tags>
-		<start>2910</start>
-	</faction>
-	<faction>
-		<shortname>ARD</shortname>
-		<fullname>Aurigan Directorate</fullname>
-		<startingPlanet>Coromodir</startingPlanet>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>103,140,73</colorRGB>
-		<tags>periphery,minor</tags>
-		<start>3022</start>
-		<end>3025</end>
-	</faction>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>160,165,94</colorRGB>
+        <tags>is,minor</tags>
+        <start>3079</start>
+        <end>3081</end>
+    </faction>
+    <faction>
+        <shortname>OP</shortname>
+        <fullname>Oriente Protectorate</fullname>
+        <startingPlanet>Oriente</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>163,112,120</colorRGB>
+        <tags>is,minor</tags>
+        <start>3086</start>
+        <end>3139</end>
+    </faction>
+    <faction>
+        <shortname>PG</shortname>
+        <fullname>Principality of Gibson</fullname>
+        <startingPlanet>Gibson</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>250,250,250</colorRGB>
+        <tags>is,minor</tags>
+        <start>3079</start>
+    </faction>
+    <faction>
+        <shortname>PR</shortname>
+        <fullname>Principality of Regulus</fullname>
+        <startingPlanet>Regulus</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>192,143,189</colorRGB>
+        <tags>is,minor</tags>
+        <start>2247</start>
+        <end>3086</end>
+    </faction>
+    <faction>
+        <shortname>RD</shortname>
+        <fullname>Rasalhague Dominion</fullname>
+        <startingPlanet>Rasalhague</startingPlanet>
+        <eraMods>0,0,0,0,0,0,2,1,0</eraMods>
+        <nameGenerator>FRR</nameGenerator>
+        <colorRGB>188,222,235</colorRGB>
+        <tags>clan,is,minor</tags>
+        <start>3103</start>
+    </faction>
+    <faction>
+        <shortname>RA</shortname>
+        <fullname>Raven Alliance</fullname>
+        <startingPlanet>Alpheratz</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>25,120,110</colorRGB>
+        <tags>clan,periphery</tags>
+        <start>3083</start>
+    </faction>
+    <faction>
+        <shortname>RF</shortname>
+        <fullname>Regulan Fiefs</fullname>
+        <startingPlanet>Regulus</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>255,51,51</colorRGB>
+        <tags>is,minor</tags>
+        <start>3086</start>
+    </faction>
+    <faction>
+        <shortname>RFS</shortname>
+        <fullname>Regulan Free States</fullname>
+        <startingPlanet>Regulus</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>165,94,160</colorRGB>
+        <tags>is,minor</tags>
+        <start>3079</start>
+        <end>3086</end>
+    </faction>
+    <faction>
+        <shortname>ROS</shortname>
+        <id>7</id>
+        <fullname>Republic of the Sphere</fullname>
+        <startingPlanet>Terra</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>207,119,57</colorRGB>
+        <tags>is,major</tags>
+        <start>3081</start>
+    </faction>
+    <faction>
+        <shortname>Stone</shortname>
+        <fullname>Stone's Coalition</fullname>
+        <altNames>Coalition Forces</altNames>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>207,119,57</colorRGB>
+        <tags>is,minor</tags>
+        <start>3073</start>
+        <end>3081</end>
+    </faction>
+    <faction>
+        <shortname>RTR</shortname>
+        <fullname>Republic Territories</fullname>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>207,119,57</colorRGB>
+        <tags>is</tags>
+    </faction>
+    <faction>
+        <shortname>RIM</shortname>
+        <fullname>Rim Collection</fullname>
+        <startingPlanet>Gillfillan's Gold</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>95,158,160</colorRGB>
+        <tags>periphery,small</tags>
+        <start>3048</start>
+    </faction>
+    <faction>
+        <shortname>RCM</shortname>
+        <fullname>Rim Commonality</fullname>
+        <startingPlanet>Lesnovo</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>95,158,160</colorRGB>
+        <tags>periphery</tags>
+        <start>3075</start>
+        <end>3139</end>
+    </faction>
+    <faction>
+        <shortname>RT</shortname>
+        <fullname>Rim Territories</fullname>
+        <startingPlanet>Pain</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>175,238,238</colorRGB>
+        <tags>periphery</tags>
+        <start>3087</start>
+    </faction>
+    <faction>
+        <shortname>ST</shortname>
+        <fullname>Saiph Triumvirate</fullname>
+        <startingPlanet>Saiph</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>128,128,0</colorRGB>
+        <tags>is,minor</tags>
+        <start>3057</start>
+        <end>3068</end>
+    </faction>
+    <faction>
+        <shortname>SP</shortname>
+        <fullname>Sarna Protectorate</fullname>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>184,134,11</colorRGB>
+        <tags>is,minor</tags>
+    </faction>
+    <faction>
+        <shortname>SIS</shortname>
+        <fullname>Sian Supremacy</fullname>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>145,166,242</colorRGB>
+        <tags>is,minor</tags>
+    </faction>
+    <faction>
+        <shortname>SHC</shortname>
+        <fullname>Silver Hawk Coalition</fullname>
+        <startingPlanet>Amity</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>255,0,127</colorRGB>
+        <tags>is,minor</tags>
+        <start>3079</start>
+    </faction>
+    <faction>
+        <shortname>SIC</shortname>
+        <id>11</id>
+        <fullname>St. Ives Compact</fullname>
+        <startingPlanet>St. Ives</startingPlanet>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>188,223,186</colorRGB>
+        <tags>is,minor</tags>
+        <start>3029</start>
+        <end>3063</end>
+    </faction>
+    <faction>
+        <shortname>SL</shortname>
+        <fullname>Star League</fullname>
+        <startingPlanet>Terra</startingPlanet>
+        <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>176,196,222</colorRGB>
+        <tags>is,super</tags>
+        <start>2570</start>
+        <end>2781</end>
+    </faction>
+    <faction>
+        <shortname>SLIE</shortname>
+        <fullname>Star League-in-Exile</fullname>
+        <startingPlanet>Strana Mechty</startingPlanet>
+        <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>176,196,222</colorRGB>
+        <tags>is</tags>
+        <start>2786</start>
+        <end>2801</end>
+    </faction>
+    <faction>
+        <shortname>SC</shortname>
+        <fullname>Stewart Commonality</fullname>
+        <startingPlanet>Stewart</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>76,0,153</colorRGB>
+        <tags>is,minor</tags>
+        <start>2259</start>
+        <end>3082</end>
+    </faction>
+    <faction>
+        <shortname>SKC</shortname>
+        <fullname>Styk Commonality</fullname>
+        <startingPlanet>Styk</startingPlanet>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>0,139,139</colorRGB>
+        <tags>is,minor</tags>
+        <start>3058</start>
+        <end>3067</end>
+    </faction>
+    <faction>
+        <shortname>SKP</shortname>
+        <fullname>Styk Protectorate</fullname>
+        <startingPlanet>Styk</startingPlanet>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>0,139,139</colorRGB>
+        <tags>is,minor</tags>
+        <start>3067</start>
+    </faction>
+    <faction>
+        <shortname>TCC</shortname>
+        <fullname>Terracap Confederation</fullname>
+        <startingPlanet>Terra Firma</startingPlanet>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>233,150,122</colorRGB>
+        <tags>is,minor</tags>
+        <start>3058</start>
+        <end>3067</end>
+    </faction>
+    <faction>
+        <shortname>TB</shortname>
+        <fullname>The Barrens</fullname>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,255,224</colorRGB>
+        <tags>periphery,chaos</tags>
+        <start>3087</start>
+    </faction>
+    <faction>
+        <shortname>TP</shortname>
+        <fullname>The Protectorate</fullname>
+        <startingPlanet>New Delos</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>255,51,51</colorRGB>
+        <tags>is,minor</tags>
+        <start>3079</start>
+    </faction>
+    <faction>
+        <shortname>TFR</shortname>
+        <fullname>Tikonov Free Republic</fullname>
+        <startingPlanet>Tikonov</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>255,160,122</colorRGB>
+        <tags>is,minor</tags>
+        <start>3029</start>
+        <end>3031</end>
+    </faction>
+    <faction>
+        <shortname>TD</shortname>
+        <fullname>Tortuga Dominions</fullname>
+        <startingPlanet>Tortuga Prime</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>34,139,34</colorRGB>
+        <tags>periphery,pirate</tags>
+        <start>2577</start>
+    </faction>
+    <faction>
+        <shortname>UND</shortname>
+        <fullname>Undiscovered</fullname>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>0,0,0</colorRGB>
+        <tags>abandoned,inactive,chaos,special</tags>
+    </faction>
+    <faction>
+        <shortname>WOB</shortname>
+        <id>9</id>
+        <fullname>Word of Blake</fullname>
+        <startingPlanet>Terra</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,1,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>205,192,176</colorRGB>
+        <tags>is,minor</tags>
+        <start>3052</start>
+    </faction>
+    <faction>
+        <shortname>CLAN</shortname>
+        <fullname>All Clans</fullname>
+        <startingPlanet>Strana Mechty</startingPlanet>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>139,69,19</colorRGB>
+        <tags>clan,special</tags>
+        <start>2807</start>
+    </faction>
+    <faction>
+        <shortname>NIOPS</shortname>
+        <fullname>Niops Association</fullname>
+        <startingPlanet>Niops (Niops V, VI, VII)</startingPlanet>
+        <colorRGB>205,173,0</colorRGB>
+        <tags>periphery,minor</tags>
+    </faction>
+    <faction>
+        <shortname>NONE</shortname>
+        <fullname>Unexplored</fullname>
+        <colorRGB>0,0,0</colorRGB>
+        <tags>periphery,abandoned,inactive,chaos,special</tags>
+    </faction>
+    <faction>
+        <shortname>FOR</shortname>
+        <fullname>Fiefdom Randis</fullname>
+        <startingPlanet>Randis IV (Hope IV 2988-)</startingPlanet>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>30,144,255</colorRGB>
+        <tags>periphery,minor</tags>
+        <start>2988</start>
+    </faction>
+    <faction>
+        <shortname>MM</shortname>
+        <fullname>Mica Majority</fullname>
+        <startingPlanet>Mica II</startingPlanet>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>240,230,140</colorRGB>
+        <tags>periphery,minor</tags>
+    </faction>
+    <faction>
+        <shortname>SA</shortname>
+        <fullname>Senatorial Alliance</fullname>
+        <altNames>Senate Alliance</altNames>
+        <startingPlanet>Augustine</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,102,153</colorRGB>
+        <tags>is,minor</tags>
+        <start>3135</start>
+        <end>3142</end>
+    </faction>
+    <faction>
+        <shortname>AA</shortname>
+        <fullname>Augustine Alliance</fullname>
+        <startingPlanet>Augustine</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,102,153</colorRGB>
+        <tags>is,minor</tags>
+        <start>3142</start>
+    </faction>
+    <faction>
+        <shortname>TTU</shortname>
+        <fullname>Tall Trees Union</fullname>
+        <startingPlanet>Tall Trees</startingPlanet>
+        <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+        <nameGenerator>CC</nameGenerator>
+        <colorRGB>153,153,51</colorRGB>
+        <tags>is,minor</tags>
+        <start>3136</start>
+    </faction>
+    <faction>
+        <shortname>ShA</shortname>
+        <fullname>Shiloh Alliance</fullname>
+        <startingPlanet>Shiloh</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>97,26,92</colorRGB>
+        <tags>is,minor</tags>
+        <start>3135</start>
+    </faction>
+    <faction>
+        <shortname>CvW</shortname>
+        <fullname>Covenant Worlds</fullname>
+        <startingPlanet>Bordon</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>102,51,51</colorRGB>
+        <tags>is,minor</tags>
+        <start>3137</start>
+    </faction>
+    <faction>
+        <shortname>PC</shortname>
+        <fullname>Protectorate Coalition</fullname>
+        <startingPlanet>Rochelle</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>51,51,102</colorRGB>
+        <tags>is,minor</tags>
+        <start>3136</start>
+    </faction>
+    <faction>
+        <shortname>MiC</shortname>
+        <fullname>Milton Combine</fullname>
+        <startingPlanet>Milton</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>FWL</nameGenerator>
+        <colorRGB>255,0,51</colorRGB>
+        <tags>is,minor</tags>
+    </faction>
+    <faction>
+        <shortname>CP</shortname>
+        <fullname>Clan Protectorate</fullname>
+        <startingPlanet>Marik</startingPlanet>
+        <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+        <nameGenerator>Clan</nameGenerator>
+        <colorRGB>153,255,51</colorRGB>
+        <tags>clan,minor</tags>
+        <start>3138</start>
+    </faction>
+    <faction>
+        <shortname>RR</shortname>
+        <fullname>Republic Remnant</fullname>
+        <startingPlanet>Callison</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>128,40,0</colorRGB>
+        <tags>is,minor</tags>
+        <start>3135</start>
+    </faction>
+    <faction>
+        <shortname>PIR</shortname>
+        <fullname>Pirate</fullname>
+        <eraMods>2,2,2,2,2,2,2,2,2</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>128,40,0</colorRGB>
+        <tags>pirate</tags>
+    </faction>
+    <faction>
+        <shortname>UC</shortname>
+        <fullname>Umayyad Caliphate</fullname>
+        <startingPlanet>Granada</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>0,255,0</colorRGB>
+        <tags>periphery</tags>
+        <start>2830</start>
+    </faction>
+    <faction>
+        <shortname>REB</shortname>
+        <fullname>Rebels</fullname>
+        <eraMods>2,2,2,2,2,2,2,2,2</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <tags>rebel</tags>
+    </faction>
+    <faction>
+        <shortname>RON</shortname>
+        <fullname>Ronin</fullname>
+        <startingPlanet>Predlitz</startingPlanet>
+        <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+        <nameGenerator>DC</nameGenerator>
+        <colorRGB>234,45,46</colorRGB>
+        <tags>is,minor</tags>
+        <start>3034</start>
+        <end>3035</end>
+    </faction>
+    <faction>
+        <shortname>AXP</shortname>
+        <fullname>Axumite Providence</fullname>
+        <startingPlanet>Thala</startingPlanet>
+        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>153,50,204</colorRGB>
+        <tags>periphery</tags>
+        <start>2245</start>
+    </faction>
+    <faction>
+        <shortname>CCon</shortname>
+        <fullname>Coreward Confederacy</fullname>
+        <startingPlanet>RWR Outpost #27</startingPlanet>
+        <eraMods>3,3,1,3,3,3,3,3,3</eraMods>
+        <altNamesByYear year='2371'>Autocracy of New Virginia</altNamesByYear>
+        <altNamesByYear year='2400'>Virginian Union</altNamesByYear>
+        <altNamesByYear year='2700'>Rim Worlds Republic Outpost #27</altNamesByYear>
+        <altNamesByYear year='2798'>Virginian Union</altNamesByYear>
+        <altNamesByYear year='2816'>Coreward Confederacy</altNamesByYear>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,0,0</colorRGB>
+        <tags>periphery</tags>
+        <start>2371</start>
+        <end>3075</end>
+    </faction>
+    <faction>
+        <shortname>GDL</shortname>
+        <fullname>Galatean Defense League</fullname>
+        <startingPlanet>Galatea</startingPlanet>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>102,255,255</colorRGB>
+        <tags>is,minor</tags>
+        <start>3144</start>
+    </faction>
+    <faction>
+        <shortname>GL</shortname>
+        <fullname>Galatean League</fullname>
+        <startingPlanet>Galatea</startingPlanet>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>102,255,255</colorRGB>
+        <tags>is,minor</tags>
+        <start>3144</start>
+    </faction>
+    <faction>
+        <shortname>IE</shortname>
+        <fullname>Interstellar Expeditions</fullname>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,255,102</colorRGB>
+        <tags>periphery,chaos</tags>
+    </faction>
+    <faction>
+        <shortname>NDC</shortname>
+        <fullname>New Delphi Compact</fullname>
+        <startingPlanet>New Delphi</startingPlanet>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>127,151,139</colorRGB>
+        <tags>periphery</tags>
+        <start>2602</start>
+    </faction>
+    <faction>
+        <shortname>FCo</shortname>
+        <fullname>Ferris Collective</fullname>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>191,171,120</colorRGB>
+        <tags>minor</tags>
+        <start>3087</start>
+    </faction>
+    <faction>
+        <shortname>FFR</shortname>
+        <fullname>Finmark Free Republic</fullname>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>191,171,120</colorRGB>
+        <tags>periphery,minor</tags>
+        <start>2779</start>
+        <!-- May be sooner than that, but no later -->
+        <end>2822</end>
+    </faction>
+    <faction>
+        <shortname>RU</shortname>
+        <fullname>Ragnarok Union</fullname>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>211,189,72</colorRGB>
+        <tags>periphery,minor</tags>
+        <start>3084</start>
+    </faction>
+    <faction>
+        <shortname>THa</shortname>
+        <fullname>The Havens</fullname>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>147,173,172</colorRGB>
+        <tags>periphery,minor</tags>
+        <start>3084</start>
+    </faction>
+    <faction>
+        <shortname>ARC</shortname>
+        <fullname>Aurigan Coalition</fullname>
+        <startingPlanet>Coromodir</startingPlanet>
+        <changePlanet year="3022">New Abilene</changePlanet>
+        <changePlanet year="3026">Coromodir</changePlanet>
+        <altNamesByYear year='3022'>Arano Restoration</altNamesByYear>
+        <altNamesByYear year='3026'>Aurigan Coalition</altNamesByYear>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>255,36,0</colorRGB>
+        <tags>periphery,minor</tags>
+        <start>2910</start>
+    </faction>
+    <faction>
+        <shortname>ARD</shortname>
+        <fullname>Aurigan Directorate</fullname>
+        <startingPlanet>Coromodir</startingPlanet>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>103,140,73</colorRGB>
+        <tags>periphery,minor</tags>
+        <start>3022</start>
+        <end>3025</end>
+    </faction>
 </factions>
