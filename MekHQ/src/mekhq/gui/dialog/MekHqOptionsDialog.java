@@ -35,6 +35,10 @@ public class MekHqOptionsDialog extends BaseDialog {
     //region Display
     private JTextField optionDisplayDateFormat;
     private JTextField optionLongDisplayDateFormat;
+
+    //region Command Center Display
+    private JCheckBox optionCommandCenterUseUnitMarket;
+    //endregion Command Center Display
     //endregion Display
 
     //region Autosave
@@ -83,6 +87,13 @@ public class MekHqOptionsDialog extends BaseDialog {
                 validateDateFormat(optionLongDisplayDateFormat.getText())
                         ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText()))
                         : resources.getString("invalidDateFormat.error")));
+
+        //region Command Center Display
+        JLabel labelCommandCenterDisplay = new JLabel(resources.getString("labelCommandCenterDisplay.text"));
+
+        optionCommandCenterUseUnitMarket = new JCheckBox(resources.getString("optionCommandCenterUseUnitMarket.text"));
+        optionCommandCenterUseUnitMarket.setToolTipText(resources.getString("optionCommandCenterUseUnitMarket.toolTipText"));
+        //endregion Command Center Display
         //endregion Display
 
         //region Autosave
@@ -145,6 +156,8 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelLongDisplayDateFormat)
                             .addComponent(optionLongDisplayDateFormat)
                             .addComponent(labelLongDisplayDateFormatExample, GroupLayout.Alignment.TRAILING))
+                    .addComponent(labelCommandCenterDisplay)
+                    .addComponent(optionCommandCenterUseUnitMarket)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -170,6 +183,8 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelLongDisplayDateFormat)
                             .addComponent(optionLongDisplayDateFormat)
                             .addComponent(labelLongDisplayDateFormatExample))
+                    .addComponent(labelCommandCenterDisplay)
+                    .addComponent(optionCommandCenterUseUnitMarket)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -196,6 +211,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         if (validateDateFormat(optionLongDisplayDateFormat.getText())) {
             MekHQ.getMekHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
+        MekHQ.getMekHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
 
         MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
         MekHQ.getMekHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
@@ -211,6 +227,7 @@ public class MekHqOptionsDialog extends BaseDialog {
     private void setInitialState() {
         optionDisplayDateFormat.setText(MekHQ.getMekHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMekHQOptions().getLongDisplayDateFormat());
+        optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket());
 
         optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
         optionSaveDaily.setSelected(MekHQ.getMekHQOptions().getAutosaveDailyValue());

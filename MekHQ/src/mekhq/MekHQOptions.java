@@ -53,6 +53,16 @@ public final class MekHQOptions {
     public void setLongDisplayDateFormat(String value) {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).put(MekHqConstants.LONG_DISPLAY_DATE_FORMAT, value);
     }
+
+    //region Command Center Display
+    public boolean getCommandCenterUseUnitMarket() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
+    }
+
+    public void setCommandCenterUseUnitMarket(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, value);
+    }
+    //endregion Command Center Display
     //endregion Display
 
     //region Autosave

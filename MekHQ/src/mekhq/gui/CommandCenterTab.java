@@ -502,16 +502,23 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     /**
-     * brings up the {@link AbstractUnitSelectorDialog}
+     * brings up the {@link AbstractUnitSelectorDialog} or {@link UnitMarketDialog}, depending on
+     * the currently selected options
      */
     private void getUnit() {
-        UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(getFrame());
-        if (!MechSummaryCache.getInstance().isInitialized()) {
-            unitLoadingDialog.setVisible(true);
+        if (MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket()
+                && getCampaign().getCampaignOptions().getUseAtBUnitMarket()) {
+            UnitMarketDialog umd = new UnitMarketDialog(getFrame(), getCampaign());
+            umd.setVisible(true);
+        } else {
+            UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(getFrame());
+            if (!MechSummaryCache.getInstance().isInitialized()) {
+                unitLoadingDialog.setVisible(true);
+            }
+            AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(), unitLoadingDialog,
+                    getCampaign(), true);
+            usd.setVisible(true);
         }
-        AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(), unitLoadingDialog,
-                getCampaign(), true);
-        usd.setVisible(true);
     }
 
     /**

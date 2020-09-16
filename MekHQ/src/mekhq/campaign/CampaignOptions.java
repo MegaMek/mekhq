@@ -331,6 +331,9 @@ public class CampaignOptions implements Serializable {
     private boolean useAtB;
     private int skillLevel;
 
+    // AtB Module: Unit Market // TODO : Fully Implement Me
+    private boolean useAtBUnitMarket;
+
     // Unit Administration
     private boolean useShareSystem;
     private boolean sharesExcludeLargeCraft;
@@ -719,6 +722,9 @@ public class CampaignOptions implements Serializable {
         //region Against the Bot Tab
         useAtB = false;
         skillLevel = 2;
+
+        // AtB Module: Unit Market
+        useAtBUnitMarket = false;
 
         // Unit Administration
         useShareSystem = false;
@@ -2516,6 +2522,14 @@ public class CampaignOptions implements Serializable {
         this.useAtB = useAtB;
     }
 
+    public boolean getUseAtBUnitMarket() {
+        return useAtBUnitMarket;
+    }
+
+    public void setUseAtBUnitMarket(boolean useAtBUnitMarket) {
+        this.useAtBUnitMarket = useAtBUnitMarket;
+    }
+
     public boolean getUseAero() {
         return useAero;
     }
@@ -3353,6 +3367,8 @@ public class CampaignOptions implements Serializable {
                     + csv.toString()
                     + "</usePortraitForType>");
 
+        //region AtB Options
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAtBUnitMarket", useAtBUnitMarket);
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<rats>"
                 + MekHqXmlUtil.escape(StringUtils.join(rats, ','))
@@ -3363,13 +3379,14 @@ public class CampaignOptions implements Serializable {
         if (ignoreRatEra) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<ignoreRatEra/>");
         }
+        //endregion AtB Options
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
         final String METHOD_NAME = "generateCampaignOptionsFromXml(Node)";
 
-        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
+        MekHQ.getLogger().info(CampaignOptions.class, METHOD_NAME,
                 "Loading Campaign Options from XML...");
 
         wn.normalize();
@@ -3795,6 +3812,8 @@ public class CampaignOptions implements Serializable {
                 retVal.tougherHealing = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
                 retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBUnitMarket")) {
+                retVal.setUseAtBUnitMarket(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useAero")) {
                 retVal.useAero = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useVehicles")) {

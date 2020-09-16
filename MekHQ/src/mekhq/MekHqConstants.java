@@ -26,6 +26,9 @@ public final class MekHqConstants {
     public static final String DISPLAY_NODE = "mekhq/prefs/display";
     public static final String DISPLAY_DATE_FORMAT = "displayDateFormat";
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
+    //region Command Center
+    public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
+    //endregion Command Center
     //endregion Display
 
     //region Autosave
