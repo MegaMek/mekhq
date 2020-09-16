@@ -42,6 +42,7 @@ public final class MekHqConstants {
 
     //region Campaign XML Save Options
     public static final String XML_SAVES_NODE = "mekhq/prefs/xmlsaves";
+    public static final String PREFER_GZIPPED_CAMPAIGN_FILE = "preferGzippedCampaignFile";
     public static final String WRITE_CUSTOMS_TO_XML = "writeCustomsToXML";
     //endregion Campaign XML Save Options
     //endregion MekHQ Options

@@ -48,6 +48,7 @@ public class MekHqOptionsDialog extends BaseDialog {
     //endregion Autosave
 
     //region Campaign XML Save
+    private JCheckBox optionPreferGzippedOutput;
     private JCheckBox optionWriteCustomsToXML;
     //endregion Campaign XML Save
 
@@ -121,6 +122,9 @@ public class MekHqOptionsDialog extends BaseDialog {
         //region Campaign XML Save
         JLabel labelXMLSave = new JLabel(resources.getString("labelXMLSave.text"));
 
+        optionPreferGzippedOutput = new JCheckBox(resources.getString("optionPreferGzippedOutput.text"));
+        optionPreferGzippedOutput.setToolTipText(resources.getString("optionPreferGzippedOutput.toolTipText"));
+
         optionWriteCustomsToXML = new JCheckBox(resources.getString("optionWriteCustomsToXML.text"));
         optionWriteCustomsToXML.setMnemonic(KeyEvent.VK_C);
         //endregion Campaign XML Save
@@ -156,6 +160,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelSavedGamesCount)
                             .addComponent(spinnerSavedGamesCount, GroupLayout.Alignment.TRAILING))
                     .addComponent(labelXMLSave)
+                    .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
         );
 
@@ -181,6 +186,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelSavedGamesCount)
                             .addComponent(spinnerSavedGamesCount))
                     .addComponent(labelXMLSave)
+                    .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
         );
 
@@ -203,8 +209,9 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setAutosaveYearlyValue(optionSaveYearly.isSelected());
         MekHQ.getMekHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
         MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
-        MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
 
+        MekHQ.getMekHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
+        MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
     }
 
     private void setInitialState() {
@@ -217,6 +224,8 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionSaveYearly.setSelected(MekHQ.getMekHQOptions().getAutosaveYearlyValue());
         checkSaveBeforeMissions.setSelected(MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue());
         spinnerSavedGamesCount.setValue(MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue());
+
+        optionPreferGzippedOutput.setSelected(MekHQ.getMekHQOptions().getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
     }
 

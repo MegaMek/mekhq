@@ -161,7 +161,7 @@ import mekhq.module.atb.AtBEventProcessor;
  * @author Taharqa
  */
 public class Campaign implements Serializable, ITechManager {
-    public static final String REPORT_LINEBREAK = "<br/><br/>"; //$NON-NLS-1$
+    public static final String REPORT_LINEBREAK = "<br/><br/>";
 
     private static final long serialVersionUID = -6312434701389973056L;
 
@@ -192,9 +192,6 @@ public class Campaign implements Serializable, ITechManager {
     private int lastForceId;
     private int lastMissionId;
     private int lastScenarioId;
-
-    // indicates whether or not the campaign should be gzipped, if possible.
-    private boolean preferGzippedOutput;
 
     // I need to put a basic game object in campaign so that I can
     // assign it to the entities, otherwise some entity methods may get NPE
@@ -348,27 +345,6 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void setOverviewLoadingValue(boolean overviewLoadingValue) {
         this.overviewLoadingValue = overviewLoadingValue;
-    }
-
-    /**
-     * Gets a hint which indicates if the campaign should be written to a
-     * gzipped file, if possible.
-     * @return A value indicating if the campaign should be written to a
-     *         gzipped file, if possible.
-     */
-    public boolean getPreferGzippedOutput() {
-        return preferGzippedOutput;
-    }
-
-    /**
-     * Sets a hint indicating that the campaign should be gzipped, if possible.
-     * This allows the Save dialog to present the user with the correct file
-     * type on subsequent saves.
-     * @param preferGzip A value indicating whether or not the campaign
-     *                   should be gzipped if possible.
-     */
-    public void setPreferGzippedOutput(boolean preferGzip) {
-        preferGzippedOutput = preferGzip;
     }
 
     public Game getGame() {
