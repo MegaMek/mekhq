@@ -26,6 +26,11 @@ public final class MekHqConstants {
     public static final String DISPLAY_NODE = "mekhq/prefs/display";
     public static final String DISPLAY_DATE_FORMAT = "displayDateFormat";
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
+
+    //region Personnel Tab Display Options
+    public static final String PERSONNEL_INDIVIDUAL_ROLE_FILTERS = "personnelIndividualRoleFilters";
+    public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
+    //endregion Personnel Tab Display Options
     //endregion Display
 
     //region Autosave

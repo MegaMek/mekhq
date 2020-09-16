@@ -21,6 +21,8 @@
 package mekhq.gui.dialog;
 
 import mekhq.MekHQ;
+import mekhq.campaign.event.MekHQOptionsChangedEvent;
+import mekhq.campaign.event.PersonChangedEvent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,6 +37,11 @@ public class MekHqOptionsDialog extends BaseDialog {
     //region Display
     private JTextField optionDisplayDateFormat;
     private JTextField optionLongDisplayDateFormat;
+
+    //region Personnel Tab Display Options
+    private JCheckBox optionPersonnelIndividualRoleFilters;
+    private JCheckBox optionPersonnelFilterOnPrimaryRole;
+    //endregion Personnel Tab Display Options
     //endregion Display
 
     //region Autosave
@@ -83,6 +90,14 @@ public class MekHqOptionsDialog extends BaseDialog {
                 validateLongDisplayDate()
                         ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText()))
                         : resources.getString("invalidDateFormat.error")));
+
+        //region Personnel Tab Display Options
+        JLabel labelPersonnelDisplay = new JLabel(resources.getString("labelPersonnelDisplay.text"));
+
+        optionPersonnelIndividualRoleFilters = new JCheckBox(resources.getString("optionPersonnelIndividualRoleFilters.text"));
+
+        optionPersonnelFilterOnPrimaryRole = new JCheckBox(resources.getString("optionPersonnelFilterOnPrimaryRole.text"));
+        //endregion Personnel Tab Display Options
         //endregion Display
 
         //region Autosave
@@ -145,6 +160,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelLongDisplayDateFormat)
                             .addComponent(optionLongDisplayDateFormat)
                             .addComponent(labelLongDisplayDateFormatExample, GroupLayout.Alignment.TRAILING))
+                    .addComponent(labelPersonnelDisplay)
+                    .addComponent(optionPersonnelIndividualRoleFilters)
+                    .addComponent(optionPersonnelFilterOnPrimaryRole)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -170,6 +188,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelLongDisplayDateFormat)
                             .addComponent(optionLongDisplayDateFormat)
                             .addComponent(labelLongDisplayDateFormatExample))
+                    .addComponent(labelPersonnelDisplay)
+                    .addComponent(optionPersonnelIndividualRoleFilters)
+                    .addComponent(optionPersonnelFilterOnPrimaryRole)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -196,6 +217,9 @@ public class MekHqOptionsDialog extends BaseDialog {
         if (validateLongDisplayDate()) {
             MekHQ.getMekHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
+        MekHQ.getMekHQOptions().setPersonnelIndividualRoleFilters(optionPersonnelIndividualRoleFilters.isSelected());
+        MekHQ.getMekHQOptions().setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
+
         MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
         MekHQ.getMekHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
         MekHQ.getMekHQOptions().setAutosaveWeeklyValue(optionSaveWeekly.isSelected());
@@ -205,11 +229,15 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
         MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
 
+        MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
     }
 
     private void setInitialState() {
         optionDisplayDateFormat.setText(MekHQ.getMekHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMekHQOptions().getLongDisplayDateFormat());
+        optionPersonnelIndividualRoleFilters.setSelected(MekHQ.getMekHQOptions().getPersonnelIndividualRoleFilters());
+        optionPersonnelFilterOnPrimaryRole.setSelected(MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole());
+
         optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
         optionSaveDaily.setSelected(MekHQ.getMekHQOptions().getAutosaveDailyValue());
         optionSaveWeekly.setSelected(MekHQ.getMekHQOptions().getAutosaveWeeklyValue());
