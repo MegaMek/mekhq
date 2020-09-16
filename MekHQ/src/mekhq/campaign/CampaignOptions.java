@@ -3384,10 +3384,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-        final String METHOD_NAME = "generateCampaignOptionsFromXml(Node)";
-
-        MekHQ.getLogger().info(CampaignOptions.class, METHOD_NAME,
-                "Loading Campaign Options from XML...");
+        MekHQ.getLogger().info(CampaignOptions.class, "Loading Campaign Options from XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3402,8 +3399,7 @@ public class CampaignOptions implements Serializable {
                 continue;
             }
 
-            MekHQ.getLogger().info(CampaignOptions.class, METHOD_NAME,
-                    String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
+            MekHQ.getLogger().info(CampaignOptions.class, String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
 
             //region Repair and Maintenance Tab
             if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
@@ -3643,8 +3639,7 @@ public class CampaignOptions implements Serializable {
                 } else if (values.length == 9) {
                     migrateMarriageSurnameWeights(retVal, values);
                 } else {
-                    MekHQ.getLogger().error(CampaignOptions.class,
-                            "generateCampaignOptionsFromXml", "Unkown length of randomMarriageSurnameWeights");
+                    MekHQ.getLogger().error(CampaignOptions.class, "Unkown length of randomMarriageSurnameWeights");
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
@@ -3978,8 +3973,8 @@ public class CampaignOptions implements Serializable {
                                     continue;
                                 }
 
-                                MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                                        String.format("massRepairOption %d.%s\n\t%s", //$NON-NLS-1$
+                                MekHQ.getLogger().info(CampaignOptions.class,
+                                        String.format("massRepairOption %d.%s\n\t%s",
                                                 mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
 
                                 if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
@@ -4006,8 +4001,7 @@ public class CampaignOptions implements Serializable {
             }
         }
 
-        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                "Load Campaign Options Complete!"); //$NON-NLS-1$
+        MekHQ.getLogger().info(CampaignOptions.class, "Load Campaign Options Complete!");
 
         return retVal;
     }
