@@ -74,7 +74,7 @@ public enum PersonnelFilter {
     RETIRED("PersonnelFilter.RETIRED", false, true, true),
     MIA("PersonnelFilter.MIA", false, true, true),
     KIA("PersonnelFilter.KIA", false, true, true),
-    DEAD("PersonnelFilter.DEAD", false,  true,true);
+    DEAD("PersonnelFilter.DEAD", false, true, true);
     //endregion Expanded Personnel Tab Filters
     //endregion Personnel Filters
 

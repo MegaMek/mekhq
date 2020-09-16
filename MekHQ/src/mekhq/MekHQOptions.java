@@ -18,8 +18,6 @@
  */
 package mekhq;
 
-import mekhq.campaign.event.PersonChangedEvent;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.prefs.Preferences;

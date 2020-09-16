@@ -99,7 +99,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int T_ADMIN_TRA = 24;
     public static final int T_ADMIN_HR = 25; // End of support roles
     public static final int T_LAM_PILOT = 26; // Not a separate type, but an alias for MW + Aero pilot
-                                              // Does not count as either combat or support rol
+                                              // Does not count as either combat or support role
     public static final int T_VEHICLE_CREW = 27; // non-gunner/non-driver support vehicle crew
 
     // This value should always be +1 of the last defined role

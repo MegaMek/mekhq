@@ -22,7 +22,6 @@ package mekhq.gui.dialog;
 
 import mekhq.MekHQ;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
-import mekhq.campaign.event.PersonChangedEvent;
 
 import javax.swing.*;
 import java.awt.*;
