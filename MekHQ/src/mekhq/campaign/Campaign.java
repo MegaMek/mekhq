@@ -1630,13 +1630,10 @@ public class Campaign implements Serializable, ITechManager {
         return patients;
     }
 
-    public ArrayList<Unit> getServiceableUnits() {
-        ArrayList<Unit> service = new ArrayList<>();
+    public List<Unit> getServiceableUnits() {
+        List<Unit> service = new ArrayList<>();
         for (Unit u : getUnits()) {
-            if (!u.isAvailable()) {
-                continue;
-            }
-            if (u.isServiceable()) {
+            if (u.isAvailable() && u.isServiceable()) {
                 service.add(u);
             }
         }
@@ -1644,7 +1641,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void addPart(Part p, int transitDays) {
-        if (null != p.getUnit() && p.getUnit() instanceof TestUnit) {
+        if ((p.getUnit() != null) && (p.getUnit() instanceof TestUnit)) {
             // if this is a test unit, then we won't add the part, so there
             return;
         }

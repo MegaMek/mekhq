@@ -57,11 +57,7 @@ public class MassRepairService {
     }
 
     public static boolean isValidMRMSUnit(Unit unit) {
-        if (unit.isSelfCrewed() || !unit.isAvailable()) {
-            return false;
-        }
-
-        if (unit.isDeployed()) {
+        if (unit.isSelfCrewed()) {
             return false;
         }
 
