@@ -167,9 +167,9 @@ public class CrewSkillUpgrader {
                         spaValue = pickRandomWeapon(entity, true);
                         break;
                     default:
-                        if(entity.getCrew() == null ||
-                            entity.getCrew().getOptions() == null || 
-                            entity.getCrew().getOptions(spa.getName()) == null) {
+                        if ((entity.getCrew() == null) ||
+                                (entity.getCrew().getOptions() == null) || 
+                                (entity.getCrew().getOptions(spa.getName()) == null)) {
                             return 0;
                         }
                         
@@ -253,7 +253,7 @@ public class CrewSkillUpgrader {
      */
     private String pickRandomGunnerySpecialization(Entity entity) {
         // if you've got no weapons, tough
-        if(entity.getIndividualWeaponList().size() <= 0) {
+        if (entity.getIndividualWeaponList().size() <= 0) {
             return Crew.SPECIAL_NONE;
         }
         
