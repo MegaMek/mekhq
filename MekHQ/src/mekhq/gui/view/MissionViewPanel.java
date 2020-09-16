@@ -21,12 +21,12 @@ package mekhq.gui.view;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -40,20 +40,20 @@ import mekhq.gui.utilities.MarkdownRenderer;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissionViewPanel extends ScrollablePanel {
-	private static final long serialVersionUID = 7004741688464105277L;
+    private static final long serialVersionUID = 7004741688464105277L;
 
-	private Mission mission;
-	protected CampaignGUI gui;
+    private Mission mission;
+    protected CampaignGUI gui;
 
-	protected JPanel pnlStats;
-	protected JTextPane txtDesc;
+    protected JPanel pnlStats;
+    protected JTextPane txtDesc;
 
-	/* Basic Mission Parameters */
-	private JLabel lblStatus;
-	private JLabel lblLocation;
-	private JLabel txtLocation;
-	private JLabel lblType;
-	private JLabel txtType;
+    /* Basic Mission Parameters */
+    private JLabel lblStatus;
+    private JLabel lblLocation;
+    private JLabel txtLocation;
+    private JLabel lblType;
+    private JLabel txtType;
 
     /* Contract Parameters */
     private JLabel lblEmployer;
@@ -363,9 +363,8 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStartDate, gridBagConstraints);
 
-        txtStartDate.setName("txtStartDate"); // NOI18N
-        txtStartDate.setText(contract.getStartDate().format(DateTimeFormatter.ofPattern(gui
-                .getCampaign().getCampaignOptions().getDisplayDateFormat())));
+        txtStartDate.setName("txtStartDate");
+        txtStartDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -384,9 +383,8 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblEndDate, gridBagConstraints);
 
-        txtEndDate.setName("txtEndDate"); // NOI18N
-        txtEndDate.setText(contract.getEndingDate().format(DateTimeFormatter.ofPattern(gui
-                .getCampaign().getCampaignOptions().getDisplayDateFormat())));
+        txtEndDate.setName("txtEndDate");
+        txtEndDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getEndingDate()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -754,9 +752,8 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStartDate, gridBagConstraints);
 
-        txtStartDate.setName("txtStartDate"); // NOI18N
-        txtStartDate.setText(contract.getStartDate().format(DateTimeFormatter.ofPattern(campaign
-                .getCampaignOptions().getDisplayDateFormat())));
+        txtStartDate.setName("txtStartDate");
+        txtStartDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -775,9 +772,8 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblEndDate, gridBagConstraints);
 
-        txtEndDate.setName("txtEndDate"); // NOI18N
-        txtEndDate.setText(contract.getEndingDate().format(DateTimeFormatter.ofPattern(campaign
-                .getCampaignOptions().getDisplayDateFormat())));
+        txtEndDate.setName("txtEndDate");
+        txtEndDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getEndingDate()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -965,7 +961,7 @@ public class MissionViewPanel extends ScrollablePanel {
             pnlStats.add(txtSharePct, gridBagConstraints);
         }
 
-        lblScore.setName("lblScore"); // NOI18N
+        lblScore.setName("lblScore");
         lblScore.setText(resourceMap.getString("lblScore.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -974,7 +970,7 @@ public class MissionViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblScore, gridBagConstraints);
 
-        txtScore.setName("txtScore"); // NOI18N
+        txtScore.setName("txtScore");
         txtScore.setText(Integer.toString(contract.getScore()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;

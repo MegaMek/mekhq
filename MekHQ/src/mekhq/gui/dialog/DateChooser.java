@@ -28,7 +28,7 @@ import mekhq.preferences.PreferencesNode;
  * December 06, 2000
  *
  * DateChooser class is a general GUI based date chooser. It allows the user to
- * select an instance of GregorianCalendar defined in java.util package.
+ * select an instance of LocalDate defined in java.time package.
  *
  * Programming API is similar to JFC's JColorChooser or JFileChooser. This class
  * can be used in any application to enable the user to select a date from a
@@ -40,7 +40,7 @@ import mekhq.preferences.PreferencesNode;
  *
  * Typical usage is like:
  *
- * // initial date GregorianCalendar date = new GregorianCalendar()
+ * // initial date LocalDate date = LocalDate.now()
  *
  * // The owner is the JFrame of the application ("AppClass.this")
  *
@@ -53,9 +53,6 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     private static final long serialVersionUID = 4353945278962427075L;
     public static final int OK_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
-
-    private final DateTimeFormatter MMDDYYYY = DateTimeFormatter.ofPattern("MM/dd/yyyy"); // TODO : LocalDate : remove inline date
-    private final DateTimeFormatter ISO8601 = DateTimeFormatter.ISO_LOCAL_DATE; // TODO : LocalDate : remove inline date
 
     private static final List<String> monthNames;
     static {
@@ -90,7 +87,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      * @param owner
      *            JFrame instance, owner of DateChooser dialog
      * @param d
-     *            GregorianCalendar instance that will be the initial date for
+     *            LocalDate instance that will be the initial date for
      *            this dialog
      */
     public DateChooser(JFrame owner, LocalDate d) {
@@ -171,7 +168,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
             @Override
             public String valueToString(Object value) {
-                return ((LocalDate) value).format(MMDDYYYY);
+                return MekHQ.getMekHQOptions().getDisplayFormattedDate((LocalDate) value);
             }
         }));
         dateField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -276,7 +273,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 ready = true;
 
                 //Set the date field to the new date.
-                dateField.setText(MMDDYYYY.format(date));
+                dateField.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
                 setVisible(false);
                 break;
             }
@@ -293,7 +290,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         ready = true;
         monthLabel.setText(monthNames.get(date.getMonth().ordinal()));
         yearLabel.setText(String.valueOf(date.getYear()));
-        dateField.setText(MMDDYYYY.format(date));
+        dateField.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         updateDayGrid(true);
     }
 
@@ -357,7 +354,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         //Update the date field with the newly selected date.
         if ((dateField != null) && !fromDateField) {
             workingDate = LocalDate.of(y, m, workingDay);
-            dateField.setText(MMDDYYYY.format(workingDate));
+            dateField.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(workingDate));
         }
 
         repaint();
@@ -435,21 +432,23 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      *   LONG - January 12, 3025
      *   FULL - Tuesday, April 12, 1952 AD
      *   MEDIUM - Jan 12, 1952
-     *   MM/DD/YYYY
-     *   YYYY-MM-DD
+     *   MM/dd/yyyy
+     *   yyyy-MM-dd
      *
      * @param dateString The date to be parsed.
-     * @return the parsed datae
+     * @return the parsed date
      */
     private LocalDate parseDate(String dateString) {
         DateTimeFormatter[] dateFormats = new DateTimeFormatter[]
         {
+                DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getDisplayDateFormat()),
+                DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getLongDisplayDateFormat()),
                 DateTimeFormatter.ofPattern("MMMM d, yyyy"),
                 DateTimeFormatter.ofPattern("E, MMMM d, yyyy G"),
                 DateTimeFormatter.ofPattern("E, MMMM d, yyyy"),
                 DateTimeFormatter.ofPattern("MMM d, yyyy"),
-                MMDDYYYY,
-                ISO8601
+                DateTimeFormatter.ofPattern("MM/dd/yyyy"),
+                DateTimeFormatter.ISO_LOCAL_DATE
         };
         for (DateTimeFormatter format : dateFormats) {
             try {
@@ -493,7 +492,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     private void updateDateFromDateField() {
         LocalDate newDate = parseDate(dateField.getText());
         if (newDate == null) {
-            JOptionPane.showMessageDialog(this, "Invalid Date Format\nTry: DD/MM/YYYY or YYYY-MM-DD", "Date Format", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Invalid Date Format\nTry: yyyy-MM-dd", "Date Format", JOptionPane.WARNING_MESSAGE);
             return;
         }
         setDate(newDate);

@@ -312,9 +312,9 @@ public class PersonnelTableModel extends DataTableModel {
         Person p = getPerson(row);
         switch (col) {
             case COL_NABIL:
-                return p.getAbilityList(PilotOptions.LVL3_ADVANTAGES);
+                return p.getAbilityListAsString(PilotOptions.LVL3_ADVANTAGES);
             case COL_NIMP:
-                return p.getAbilityList(PilotOptions.MD_ADVANTAGES);
+                return p.getAbilityListAsString(PilotOptions.MD_ADVANTAGES);
             case COL_ASSIGN:
                 if ((p.getTechUnitIDs().size() > 1) && !loadAssignmentFromMarket) {
                     StringBuilder toReturn = new StringBuilder("<html>");
@@ -678,9 +678,9 @@ public class PersonnelTableModel extends DataTableModel {
                 }
                 break;
             case COL_RECRUIT_DATE:
-                return p.getRecruitmentAsString(getCampaign());
+                return p.getRecruitmentAsString();
             case COL_DEATH_DATE:
-                return p.getDeathDateAsString(getCampaign());
+                return p.getDeathDateAsString();
             case COL_TOUGH:
             default:
                return resources.getString("col_unknown.text");
@@ -785,7 +785,7 @@ public class PersonnelTableModel extends DataTableModel {
             switch(actualCol) {
                 case COL_RANK:
                     setPortrait(p);
-                    setText(p.getFullDesc(false));
+                    setText(p.getFullDesc());
                     break;
                 case COL_ASSIGN:
                     if (loadAssignmentFromMarket) {

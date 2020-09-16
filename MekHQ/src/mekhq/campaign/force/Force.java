@@ -2,6 +2,7 @@
  * Force.java
  *
  * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.force;
 
@@ -68,6 +69,7 @@ public class Force implements Serializable {
 
     private String name;
     private String desc;
+    private boolean combatForce;
     private Force parentForce;
     private Vector<Force> subForces;
     private Vector<UUID> units;
@@ -82,6 +84,7 @@ public class Force implements Serializable {
     public Force(String n) {
         this.name = n;
         this.desc = "";
+        this.combatForce = true;
         this.parentForce = null;
         this.subForces = new Vector<>();
         this.units = new Vector<>();
@@ -113,6 +116,19 @@ public class Force implements Serializable {
 
     public void setDescription(String d) {
         this.desc = d;
+    }
+
+    public boolean isCombatForce() {
+        return combatForce;
+    }
+
+    public void setCombatForce(boolean combatForce, boolean setForSubForces) {
+        this.combatForce = combatForce;
+        if (setForSubForces) {
+            for (Force force : subForces) {
+                force.setCombatForce(combatForce, true);
+            }
+        }
     }
 
     public int getScenarioId() {
@@ -197,12 +213,19 @@ public class Force implements Serializable {
     }
 
     /**
+     * @param combatForcesOnly to only include combat forces or to also include non-combat forces
      * @return all the unit ids in this force and all of its subforces
      */
-    public Vector<UUID> getAllUnits() {
-        Vector<UUID> allUnits = new Vector<>(units);
+    public Vector<UUID> getAllUnits(boolean combatForcesOnly) {
+        Vector<UUID> allUnits;
+        if (combatForcesOnly && !isCombatForce()) {
+            allUnits = new Vector<>();
+        } else {
+            allUnits = new Vector<>(units);
+        }
+
         for (Force f : subForces) {
-            allUnits.addAll(f.getAllUnits());
+            allUnits.addAll(f.getAllUnits(combatForcesOnly));
         }
         return allUnits;
     }
@@ -345,83 +368,50 @@ public class Force implements Serializable {
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<force id=\""
-                +id
-                +"\" type=\""
-                +this.getClass().getName()
-                +"\">");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<name>"
-                +MekHqXmlUtil.escape(name)
-                +"</name>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<desc>"
-                +MekHqXmlUtil.escape(desc)
-                +"</desc>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<iconCategory>"
-                +MekHqXmlUtil.escape(iconCategory)
-                +"</iconCategory>");
+        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "name", name);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", desc);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "combatForce", combatForce);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconCategory", iconCategory);
+
         if (iconCategory.equals(Force.ROOT_LAYERED)) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<iconHashMap>");
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "iconHashMap");
             for (Map.Entry<String, Vector<String>> entry : iconMap.entrySet()) {
-                if (null != entry.getValue() && !entry.getValue().isEmpty()) {
-                    pw1.println(MekHqXmlUtil.indentStr(indent+2)
-                            +"<iconentry key=\""
-                            +MekHqXmlUtil.escape(entry.getKey())
-                            +"\">");
+                if ((entry.getValue() != null) && !entry.getValue().isEmpty()) {
+                    pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<iconentry key=\"" + MekHqXmlUtil.escape(entry.getKey()) + "\">");
                     for (String value : entry.getValue()) {
-                        pw1.println(MekHqXmlUtil.indentStr(indent+3)
-                                +"<value name=\""
-                                +MekHqXmlUtil.escape(value)
-                                +"\"/>");
+                        pw1.println(MekHqXmlUtil.indentStr(indent + 2) +"<value name=\"" + MekHqXmlUtil.escape(value) + "\"/>");
                     }
-                    pw1.println(MekHqXmlUtil.indentStr(indent+2)
-                            +"</iconentry>");
+                    MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "iconentry");
                 }
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"</iconHashMap>");
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "iconHashMap");
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<iconFileName>"
-                +MekHqXmlUtil.escape(iconFileName)
-                +"</iconFileName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<scenarioId>"
-                +scenarioId
-                +"</scenarioId>");
-        if (techId != null) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<techId>"
-                    +techId.toString()
-                    +"</techId>");
-        }
+
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconFileName", iconFileName);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scenarioId", scenarioId);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", techId);
+
         if (units.size() > 0) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<units>");
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "units");
             for (UUID uid : units) {
-                pw1.println(MekHqXmlUtil.indentStr(indent+2)
-                        +"<unit id=\"" + uid + "\"/>");
+                pw1.println(MekHqXmlUtil.indentStr(indent + 1) +"<unit id=\"" + uid + "\"/>");
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"</units>");
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "units");
         }
+
         if (subForces.size() > 0) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<subforces>");
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "subforces");
             for (Force sub : subForces) {
-                sub.writeToXml(pw1, indent+2);
+                sub.writeToXml(pw1, indent + 1);
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"</subforces>");
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "subforces");
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</force>");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "force");
     }
 
     public static Force generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)";
 
         Force retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
@@ -439,6 +429,8 @@ public class Force implements Serializable {
                     retVal.name = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     retVal.desc = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
+                    retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) {
                     retVal.iconCategory = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) {
@@ -453,17 +445,18 @@ public class Force implements Serializable {
                     processUnitNodes(retVal, wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
                     NodeList nl2 = wn2.getChildNodes();
-                    for (int y=0; y<nl2.getLength(); y++) {
+                    for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE)
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
+                        }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
                             MekHQ.getLogger().log(Force.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in Forces nodes: " + wn3.getNodeName()); //$NON-NLS-1$
+                                    "Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
                             continue;
                         }
 

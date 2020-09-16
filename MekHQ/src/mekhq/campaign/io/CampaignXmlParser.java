@@ -24,12 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -68,7 +64,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
-import mekhq.campaign.AtBConfiguration;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CurrentLocation;
@@ -846,12 +842,6 @@ public class CampaignXmlParser {
                 // handle it.
                 // They're all primitives anyway...
                 if (xn.equalsIgnoreCase("calendar")) {
-                    SimpleDateFormat df = new SimpleDateFormat(
-                            "yyyy-MM-dd hh:mm:ss");
-                    GregorianCalendar c = (GregorianCalendar) GregorianCalendar
-                            .getInstance();
-                    c.setTime(parseDate(df, wn.getTextContent().trim()));
-                    retVal.setCalendar(c);
                     retVal.setLocalDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("camoCategory")) {
                     String val = wn.getTextContent().trim();
@@ -1014,14 +1004,6 @@ public class CampaignXmlParser {
             newReports.add(report);
         }
         retVal.setNewReports(newReports);
-    }
-
-    private static Date parseDate(DateFormat df, String value) throws CampaignXmlParseException {
-        try {
-            return df.parse(value);
-        } catch (ParseException e) {
-            throw new CampaignXmlParseException("Could not parse date: " + value, e);
-        }
     }
 
     private static void processLanceNodes(Campaign retVal, Node wn) {

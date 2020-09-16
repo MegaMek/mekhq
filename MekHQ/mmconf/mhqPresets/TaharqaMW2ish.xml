@@ -3,7 +3,6 @@
 	<title>Taharqa&apos;s MW2ish Presets</title>
 	<description>This preset largely affects skill levels and XP costs. Namely, all skills range from level 0 to level 6 and XP costs rise with the level of the skill such that, for example, it costs more XP to advance from Regular to Veteran than from Green to Regular. Special abilities have also been tweaked with these costs in mind.</description>
 	<campaignOptions>
-		<displayDateFormat>yyyy-MM-dd</displayDateFormat>
 		<logMaintenance>false</logMaintenance>
 		<useFactionForNames>true</useFactionForNames>
 		<repairSystem>0</repairSystem>

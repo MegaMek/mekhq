@@ -11,6 +11,37 @@ VERSION HISTORY:
 + PR #1917: Fixing the Award Tracker post-Ancestors Removal
 + Issue #1920: Fixing xml load for bad Ancestry data
 + PR #1916: Personnel Filter Enum
++ Issue #790: Implementing Non-Combat TO&E Forces
++ PR #1930: Fixing Fill Transports NPE
++ Issue #1829: Fixing Duplicated Nags in AdvanceDaysDialog
++ Issue #470: Mass Training: Rank, No Officer, and Only Officer Filters
++ Issue #1929: Scenario Resolution: Fixing Display Anchor Issues
++ PR #1932: Fixing Total Earnings Display Issues
++ Issue #1941: Person View Panel Ability and Injury Description ToolTip
++ Issue #1296, 1855: Fixed issue preventing customization of units in the meklab when ammunition is added to the unit.
++ Issue #1951: Autosave Does Not Always Initiate On First Load
++ Issue #1922: CrewSkillUpgrader Infinite Loop Fix
++ Issue #1661: Implementing Basic Russian Patronymics
++ Issue #1817: Implementing option to not save customs to XML
++ PR #1949: Fixing Genealogy Removal
++ Issue #1962: Grant kill credit to units from the player's campaign given to other players for the duration of a megamek scenario
++ Issue #1264: Allow faction capitals to change on a specific date, not just year
++ PR #1966: Fixing Duplicated Siblings
++ PR #1925: Final PR to swap MekHQ to use LocalDate
++ Issue #254: Implementing AtB Battle Chance by Role
++ Issue #1166: Possible fix for missing turrets in AtB base attack/defense missions; still no turrets prior to 2750
++ Issue #1757: Enable Ranks For Captured Prisoners
++ Data: Large dump of current data.
++ Issue #259: Implementing Customizable MekHQ Display Date Formats
++ Issue #1982: Fixing AtBBattleChance for unassigned lances
++ Issue #1984: Implementing useManualMarriages Option
++ Issue #1983: Switching to new form of UUID save format
++ Issue #1952: Personnel Market Updates No Longer Fail in Rare Cases During Person Creation
++ Issue #1981: Fixing NPE when dragging TOE Units and Forces Around
++ PR #1999: Fixing Clan Vehicle Option
++ Issue #2003: Various faction startingPlanet errors in factions.xml
++ PR #2005: AtB: OpFor Uses VTOLs is now default true
++ Issue #1939: Fixing Preset Loading and Reworking Campaign Options Initial Value Load
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format

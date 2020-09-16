@@ -29,11 +29,8 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
@@ -191,8 +188,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             panMain.add(choiceStatus, gridBagConstraints);
         }
         if (!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))) {
-            btnDate = new javax.swing.JButton();
-            btnDate.setText(date.format(DateTimeFormatter.ofPattern(campaign.getCampaignOptions().getDisplayDateFormat())));
+            btnDate = new JButton();
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
             btnDate.addActionListener(evt -> changeDate());
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
@@ -401,7 +398,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                 return;
             }
             date = dc.getDate();
-            btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(date));
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         }
     }
 

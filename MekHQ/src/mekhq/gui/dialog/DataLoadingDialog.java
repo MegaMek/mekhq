@@ -1,15 +1,21 @@
 /*
- *  MegaMek - Copyright (C) 2000-2002 Ben Mazur (bmazur@sev.org)
+ * Copyright (c) 2009 - 2000-2002 Ben Mazur (bmazur@sev.org)
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
- *  This program is free software; you can redistribute it and/or modify it
- *  under the terms of the GNU General Public License as published by the Free
- *  Software Foundation; either version 2 of the License, or (at your option)
- *  any later version.
+ * This file is part of MekHQ.
  *
- *  This program is distributed in the hope that it will be useful, but
- *  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *  or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- *  for more details.
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -21,9 +27,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
@@ -38,7 +42,6 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generators.RandomCallsignGenerator;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
-import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
@@ -58,20 +61,20 @@ import mekhq.campaign.universe.Systems;
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
     private static final long serialVersionUID = -3454307876761238915L;
     private JProgressBar progressBar;
-    Task task;
-    MekHQ app;
-    JFrame frame;
-    Campaign campaign;
-    File fileCampaign;
-    ResourceBundle resourceMap;
+    private Task task;
+    private MekHQ app;
+    private JFrame frame;
+    private Campaign campaign;
+    private File fileCampaign;
+    private ResourceBundle resourceMap;
 
     public DataLoadingDialog(MekHQ app, JFrame frame, File f) {
-        super(frame, "Data Loading"); //$NON-NLS-1$
+        super(frame, "Data Loading");
         this.frame = frame;
         this.app = app;
         this.fileCampaign = f;
 
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog", new EncodeControl());
 
         setUndecorated(true);
         progressBar = new JProgressBar(0, 4);
@@ -83,7 +86,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
         // initialize loading image
         double maxWidth = app.calculateMaxScreenWidth();
-        Image imgSplash = getToolkit().getImage(app.getIconPackage().getLoadingScreenImage((int) maxWidth)); //$NON-NLS-1$
+        Image imgSplash = getToolkit().getImage(app.getIconPackage().getLoadingScreenImage((int) maxWidth));
 
         // wait for loading image to load completely
         MediaTracker tracker = new MediaTracker(frame);
@@ -126,6 +129,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         public Void doInBackground() {
             final String METHOD_NAME = "doInBackground()";
 
+            //region Progress 0
             //Initialize progress property.
             setProgress(0);
             try {
@@ -159,6 +163,9 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             }
             RandomNameGenerator.getInstance();
             RandomCallsignGenerator.getInstance();
+            //endregion Progress 0
+
+            //region Progress 1
             setProgress(1);
             try {
                 QuirksHandler.initQuirksList();
@@ -173,12 +180,18 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                 }
             }
+            //endregion Progress 1
+
+            //region Progress 2
             setProgress(2);
             //load in directory items and tilesets
             app.getIconPackage().loadDirectories();
+            //endregion Progress 2
+
+            //region Progress 3
             setProgress(3);
             boolean newCampaign = false;
-            if (null == fileCampaign) {
+            if (fileCampaign == null) {
                 try {
                     newCampaign = true;
                     campaign = new Campaign();
@@ -234,47 +247,35 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     cancel(true);
                 }
             }
+            //endregion Progress 3
+
+            //region Progress 4
             setProgress(4);
             if (newCampaign) {
                 // show the date chooser
                 DateChooser dc = new DateChooser(frame, campaign.getLocalDate());
                 // user can either choose a date or cancel by closing
                 if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-                    LocalDate date = dc.getDate();
-                    campaign.setCalendar(new GregorianCalendar(date.getYear(), date.getMonth().ordinal(), date.getDayOfYear()));
-                    campaign.setLocalDate(date);
-                    // Ensure that the MegaMek year GameOption matches the campaign year
-                    GameOptions gameOpts = campaign.getGameOptions();
-                    int campaignYear = campaign.getGameYear();
-                    if (gameOpts.intOption("year") != campaignYear) {
-                        gameOpts.getOption("year").setValue(campaignYear);
-                    }
+                    campaign.setLocalDate(dc.getDate());
+                    campaign.getGameOptions().getOption("year").setValue(campaign.getGameYear());
                 }
 
                 // This must be after the date chooser to enable correct functionality.
                 setVisible(false);
 
                 // Game Presets
-                List<GamePreset> presets = GamePreset.getGamePresetsIn(MekHQ.PRESET_DIR);
+                GamePreset gamePreset = null;
+                List<GamePreset> presets = GamePreset.getGamePresetsIn();
                 if (!presets.isEmpty()) {
                     ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(frame, true, presets);
                     cgpd.setVisible(true);
-                    /* This code causes the new campaign process to abort after the campaign
-                     * options dialog if the user cancels the preset dialog instead of choosing
-                     * one. Since a preset is not necessary, I don't think it should abort the
-                     * process -- Neoancient */
-                    //if (cgpd.wasCancelled()) {
-                        //FIXME: why is this not working?
-                        //cancelled = true;
-                        //cancel(true);
-                    //}
-                    //else
-                    if (null != cgpd.getSelectedPreset()) {
-                        cgpd.getSelectedPreset().apply(campaign);
-                    }
+                    gamePreset = cgpd.getSelectedPreset();
                 }
-                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getIconPackage().getCamos(),
-                        app.getIconPackage().getForceIcons());
+                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true,
+                        campaign, app.getIconPackage());
+                if (gamePreset != null) {
+                    optionsDialog.applyPreset(gamePreset);
+                }
                 optionsDialog.setVisible(true);
                 if (optionsDialog.wasCancelled()) {
                     cancelled = true;
@@ -284,7 +285,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     campaign.generateNewPersonnelMarket();
                     campaign.reloadNews();
                     campaign.readNews();
-                    campaign.beginReport("<b>" + campaign.getDateAsString() + "</b>");
+                    campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
                     if (campaign.getCampaignOptions().getUseAtB()) {
                         campaign.initAtB(true);
                     }
@@ -293,6 +294,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 // Make sure campaign options event handlers get their data
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
             }
+            //endregion Progress 4
+
             return null;
         }
 
@@ -316,18 +319,22 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     public void propertyChange(PropertyChangeEvent arg0) {
         int progress = task.getProgress();
         progressBar.setValue(progress);
+
+        // If you add a new tier you MUST increase the levels of the progressBar
         switch (progress) {
-            case(0):
+            case 0:
                 progressBar.setString(resourceMap.getString("loadPlanet.text"));
                 break;
-            case(1):
+            case 1:
                 progressBar.setString(resourceMap.getString("loadUnits.text"));
                 break;
-            case(2):
+            case 2:
                 progressBar.setString(resourceMap.getString("loadImages.text"));
                 break;
-            case(3):
+            case 3:
                 progressBar.setString(resourceMap.getString("loadCampaign.text"));
+                break;
+            default:
                 break;
         }
     }

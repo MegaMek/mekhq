@@ -60,7 +60,7 @@ import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.AtBConfiguration;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -629,7 +629,7 @@ public class AtBDynamicScenarioFactory {
 
         for (int forceID : scenario.getPlayerForceTemplates().keySet()) {
             if (scenario.getPlayerForceTemplates().get(forceID).getContributesToUnitCount()) {
-                primaryUnitCount += campaign.getForce(forceID).getAllUnits().size();
+                primaryUnitCount += campaign.getForce(forceID).getAllUnits(true).size();
             }
         }
 
@@ -1133,7 +1133,12 @@ public class AtBDynamicScenarioFactory {
      * @param campaign
      * @return transportedUnits List of units being transported
      */
-    public static List<Entity> fillTransports(AtBScenario scenario, List<Entity> transports, String factionCode, int skill, int quality, Campaign campaign) {
+    public static List<Entity> fillTransports(AtBScenario scenario, List<Entity> transports,
+                                              String factionCode, int skill, int quality, Campaign campaign) {
+        if ((transports == null) || transports.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         List<Entity> transportedUnits = new ArrayList<>();
 
         UnitGeneratorParameters params = new UnitGeneratorParameters();
@@ -1151,7 +1156,8 @@ public class AtBDynamicScenarioFactory {
     /**
      * Worker function that generates a battle armor unit to attach to a unit of clan mechs
      */
-    public static List<Entity> generateBAForNova(AtBScenario scenario, List<Entity> starUnits, String factionCode, int skill, int quality, Campaign campaign) {
+    public static List<Entity> generateBAForNova(AtBScenario scenario, List<Entity> starUnits,
+                                                 String factionCode, int skill, int quality, Campaign campaign) {
         List<Entity> transportedUnits = new ArrayList<>();
 
         // determine if this should be a nova
@@ -1546,7 +1552,7 @@ public class AtBDynamicScenarioFactory {
         String factionWeightString = AtBConfiguration.ORG_IS;
         if (genFaction.isClan() || faction.equals("MH")) {
             factionWeightString = AtBConfiguration.ORG_CLAN;
-        } else if (genFaction.isComstar()) {
+        } else if (genFaction.isComStar()) {
             factionWeightString = AtBConfiguration.ORG_CS;
         }
 
@@ -1885,7 +1891,7 @@ public class AtBDynamicScenarioFactory {
         for (int forceID : scenario.getForceIDs()) {
             Force playerForce = campaign.getForce(forceID);
 
-            for (UUID unitID : playerForce.getAllUnits()) {
+            for (UUID unitID : playerForce.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
                 if (currentUnit != null && (currentUnit.getEntity().getDeployRound() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED)) {
                     staggeredEntities.add(currentUnit.getEntity());
@@ -1954,7 +1960,7 @@ public class AtBDynamicScenarioFactory {
             List<Entity> forceEntities = new ArrayList<>();
             Force playerForce = campaign.getForce(forceID);
 
-            for (UUID unitID : playerForce.getAllUnits()) {
+            for (UUID unitID : playerForce.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
                 if (currentUnit != null) {
                     forceEntities.add(currentUnit.getEntity());
@@ -2015,7 +2021,7 @@ public class AtBDynamicScenarioFactory {
             List<Entity> forceEntities = new ArrayList<>();
             Force playerForce = campaign.getForce(forceID);
 
-            for (UUID unitID : playerForce.getAllUnits()) {
+            for (UUID unitID : playerForce.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
                 if (currentUnit != null) {
                     forceEntities.add(currentUnit.getEntity());
@@ -2223,7 +2229,7 @@ public class AtBDynamicScenarioFactory {
             if (faction.isClan() || factionCode.equals("MH")) {
                 return CLAN_MH_LANCE_SIZE;
             // comstar and wobbies use a fundamental unit size of 6.
-            } else if (faction.isComstar()) {
+            } else if (faction.isComStar()) {
                 return COMSTAR_LANCE_SIZE;
             }
         }

@@ -18,22 +18,15 @@
  */
 package mekhq.gui.sorter;
 
-import mekhq.campaign.Campaign;
+import mekhq.MekHQ;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Objects;
 
 public class DateStringComparator implements Comparator<String>, Serializable {
     private static final long serialVersionUID = -6745919248211983499L;
-
-    private Campaign campaign;
-
-    public DateStringComparator(Campaign campaign) {
-        this.campaign = campaign;
-    }
 
     @Override
     public int compare(String o1, String o2) {
@@ -48,15 +41,13 @@ public class DateStringComparator implements Comparator<String>, Serializable {
         LocalDate dateA;
         LocalDate dateB;
         try {
-            dateA = LocalDate.parse(o1, DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
+            dateA = MekHQ.getMekHQOptions().parseDisplayFormattedDate(o1);
         } catch (Exception ignored) {
             return -1;
         }
 
         try {
-            dateB = LocalDate.parse(o2, DateTimeFormatter.ofPattern(
-                    campaign.getCampaignOptions().getDisplayDateFormat()));
+            dateB = MekHQ.getMekHQOptions().parseDisplayFormattedDate(o2);
         } catch (Exception ignored) {
             return 1;
         }

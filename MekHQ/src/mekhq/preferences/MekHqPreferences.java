@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.preferences;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -48,27 +47,18 @@ public class MekHqPreferences {
     }
 
     public void loadFromFile(String filePath) {
-        final String METHOD_NAME = "loadFromFile";
-
         try {
             try (FileInputStream input = new FileInputStream(filePath)) {
-                MekHQ.getLogger().info(
-                        MekHqPreferences.class,
-                        METHOD_NAME,
-                        "Loading MekHQ user preferences from: " + filePath);
+                MekHQ.getLogger().info(this, "Loading MekHQ user preferences from: " + filePath);
 
                 JsonFactory factory = new JsonFactory();
                 JsonParser parser = factory.createParser(input);
 
                 if (parser.nextToken() != JsonToken.START_OBJECT) {
                     throw new IOException("Expected an object start ({)" + getParserInformation(parser));
-                }
-
-                if (parser.nextToken() != JsonToken.FIELD_NAME && !parser.getCurrentName().equals(PREFERENCES_TOKEN)) {
+                } else if (parser.nextToken() != JsonToken.FIELD_NAME && !parser.getCurrentName().equals(PREFERENCES_TOKEN)) {
                     throw new IOException("Expected a field called (" + PREFERENCES_TOKEN + ")" + getParserInformation(parser));
-                }
-
-                if (parser.nextToken() != JsonToken.START_ARRAY) {
+                } else if (parser.nextToken() != JsonToken.START_ARRAY) {
                     throw new IOException("Expected an array start ([)" + getParserInformation(parser));
                 }
 
@@ -76,49 +66,28 @@ public class MekHqPreferences {
                 while (parser.nextToken() != JsonToken.END_ARRAY){
                     try {
                         readPreferencesNode(parser, this.nameToPreferencesMap);
-                    }
-                    catch (IOException e) {
-                        MekHQ.getLogger().error(
-                                MekHqPreferences.class,
-                                METHOD_NAME,
-                                "Error reading node. " + getParserInformation(parser),
-                                e);
+                    } catch (IOException e) {
+                        MekHQ.getLogger().error(this, "Error reading node. " + getParserInformation(parser), e);
                     }
                 }
 
                 parser.close();
 
-                MekHQ.getLogger().info(
-                        MekHqPreferences.class,
-                        METHOD_NAME,
-                        "Finished loading user preferences");
+                MekHQ.getLogger().info(this, "Finished loading user preferences");
             }
         }
         catch (FileNotFoundException e) {
-            MekHQ.getLogger().error(
-                    MekHqPreferences.class,
-                    METHOD_NAME,
-                    "No MekHQ user preferences file found: " + filePath,
-                    e);
+            MekHQ.getLogger().error(this, "No MekHQ user preferences file found: " + filePath, e);
         }
         catch (IOException e) {
-            MekHQ.getLogger().error(
-                    MekHqPreferences.class,
-                    METHOD_NAME,
-                    "Error reading from the user preferences file: " + filePath,
-                    e);
+            MekHQ.getLogger().error(this, "Error reading from the user preferences file: " + filePath, e);
         }
     }
 
     public void saveToFile(String filePath) {
-        final String METHOD_NAME = "saveToFile";
-
         try {
             try (FileOutputStream output = new FileOutputStream(filePath)) {
-                MekHQ.getLogger().debug(
-                        MekHqPreferences.class,
-                        METHOD_NAME,
-                        "Saving MekHQ nameToPreferencesMap to: " + filePath);
+                MekHQ.getLogger().debug(this, "Saving MekHQ nameToPreferencesMap to: " + filePath);
 
                 JsonFactory factory = new JsonFactory();
                 JsonGenerator writer = factory.createGenerator(output);
@@ -130,7 +99,7 @@ public class MekHqPreferences {
                 writer.writeStartArray();
 
                 // Write each PreferencesNode
-                for(Map.Entry<String, PreferencesNode> preferences : this.nameToPreferencesMap.entrySet()) {
+                for (Map.Entry<String, PreferencesNode> preferences : this.nameToPreferencesMap.entrySet()) {
                     writePreferencesNode(writer, preferences);
                 }
 
@@ -140,17 +109,9 @@ public class MekHqPreferences {
                 writer.close();
             }
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().error(
-                    MekHqPreferences.class,
-                    METHOD_NAME,
-                    "Could not save nameToPreferencesMap to: " + filePath,
-                    e);
+            MekHQ.getLogger().error(this, "Could not save nameToPreferencesMap to: " + filePath, e);
         } catch (IOException e) {
-            MekHQ.getLogger().error(
-                    MekHqPreferences.class,
-                    METHOD_NAME,
-                    "Error writing to the nameToPreferencesMap file: " + filePath,
-                    e);
+            MekHQ.getLogger().error(this, "Error writing to the nameToPreferencesMap file: " + filePath, e);
         }
     }
 
@@ -194,11 +155,8 @@ public class MekHqPreferences {
                 readPreferenceElement(parser, elements);
             }
             catch (IOException e) {
-                MekHQ.getLogger().warning(
-                        MekHqPreferences.class,
-                        METHOD_NAME,
-                        "Error reading elements for node: " + className + ".",
-                        e);
+                MekHQ.getLogger().warning(MekHqPreferences.class, METHOD_NAME,
+                        "Error reading elements for node: " + className + ".", e);
             }
         }
 
@@ -208,11 +166,8 @@ public class MekHqPreferences {
             nodes.put(node.getNodeName(), node);
         }
         catch (ClassNotFoundException e) {
-            MekHQ.getLogger().error(
-                    MekHqPreferences.class,
-                    METHOD_NAME,
-                    "No class with name " + className + " found",
-                    e);
+            MekHQ.getLogger().error(MekHqPreferences.class, METHOD_NAME,
+                    "No class with name " + className + " found", e);
         }
     }
 
@@ -266,7 +221,6 @@ public class MekHqPreferences {
     }
 
     private static String getParserInformation(JsonParser parser) throws IOException {
-
         if (parser == null) {
             return "";
         }

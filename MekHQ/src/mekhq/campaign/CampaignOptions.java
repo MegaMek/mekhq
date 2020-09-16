@@ -21,12 +21,11 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -110,7 +109,6 @@ public class CampaignOptions implements Serializable {
     //region General Tab
     private boolean useUnitRating;
     private UnitRatingMethod unitRatingMethod;
-    private String displayDateFormat; // This is currently unlisted, but will be added in the near future
     //endregion General Tab
 
     //region Repair and Maintenance Tab
@@ -216,6 +214,7 @@ public class CampaignOptions implements Serializable {
     private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
     private boolean logMarriageNameChange;
+    private boolean useManualMarriages;
     private boolean useRandomMarriages;
     private double chanceRandomMarriages;
     private int marriageAgeRange;
@@ -363,7 +362,7 @@ public class CampaignOptions implements Serializable {
     private int baseStrategyDeployment;
     private int additionalStrategyDeployment;
     private boolean adjustPaymentForStrategy;
-    private double intensity;
+    private int[] atbBattleChance;
     private boolean generateChases;
 
     // RATs
@@ -421,7 +420,6 @@ public class CampaignOptions implements Serializable {
         //region General Tab
         useUnitRating = true;
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
-        displayDateFormat = "yyyy-MM-dd";
         //endregion General Tab
 
         //region Repair and Maintenance Tab
@@ -546,6 +544,7 @@ public class CampaignOptions implements Serializable {
         minimumMarriageAge = 16;
         checkMutualAncestorsDepth = 4;
         logMarriageNameChange = false;
+        useManualMarriages = true;
         useRandomMarriages = false;
         chanceRandomMarriages = 0.00025;
         marriageAgeRange = 10;
@@ -752,7 +751,11 @@ public class CampaignOptions implements Serializable {
         baseStrategyDeployment = 3;
         additionalStrategyDeployment = 1;
         adjustPaymentForStrategy = false;
-        intensity = 1.0;
+        atbBattleChance = new int[AtBLanceRole.values().length - 1];
+        atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = 40;
+        atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = 20;
+        atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = 60;
+        atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = 10;
         generateChases = true;
 
         // RATs
@@ -789,17 +792,6 @@ public class CampaignOptions implements Serializable {
     //endregion Constructors
 
     //region General Tab
-    public String getDisplayDateFormat() {
-        return displayDateFormat;
-    }
-
-    public String getDisplayFormattedDate(LocalDate date) {
-        return date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()));
-    }
-
-    public void setDisplayDateFormat(String s) {
-        displayDateFormat = s;
-    }
     //endregion General Tab
 
     //region Repair and Maintenance Tab
@@ -1255,6 +1247,20 @@ public class CampaignOptions implements Serializable {
      */
     public void setLogMarriageNameChange(boolean b) {
         logMarriageNameChange = b;
+    }
+
+    /**
+     * @return whether or not to use manual marriages
+     */
+    public boolean useManualMarriages() {
+        return useManualMarriages;
+    }
+
+    /**
+     * @param useManualMarriages whether or not to use manual marriages
+     */
+    public void setUseManualMarriages(boolean useManualMarriages) {
+        this.useManualMarriages = useManualMarriages;
     }
 
     /**
@@ -2758,12 +2764,26 @@ public class CampaignOptions implements Serializable {
         instantUnitMarketDelivery = instant;
     }
 
-    public double getIntensity() {
-        return intensity;
+    /**
+     * @param role the {@link AtBLanceRole} to get the battle chance for
+     * @return the chance of having a battle for the specified role
+     */
+    public int getAtBBattleChance(AtBLanceRole role) {
+        return (role == AtBLanceRole.UNASSIGNED) ? 0 : atbBattleChance[role.ordinal()];
     }
 
-    public void setIntensity(double intensity) {
-        this.intensity = intensity;
+    /**
+     * @param role      the {@link AtBLanceRole} ordinal value
+     * @param frequency the frequency to set the generation to (percent chance from 0 to 100)
+     */
+    public void setAtBBattleChance(int role, int frequency) {
+        if (frequency < 0) {
+            frequency = 0;
+        } else if (frequency > 100) {
+            frequency = 100;
+        }
+
+        this.atbBattleChance[role] = frequency;
     }
 
     public boolean generateChases() {
@@ -3024,7 +3044,6 @@ public class CampaignOptions implements Serializable {
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         //region General Tab
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayDateFormat", displayDateFormat);
         //endregion General Tab
 
         //region Repair and Maintenance Tab
@@ -3126,6 +3145,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMarriageNameChange", logMarriageNameChange);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useManualMarriages", useManualMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomMarriages", useRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomMarriages", chanceRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageAgeRange", marriageAgeRange);
@@ -3239,7 +3259,10 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "attachedPlayerCamouflage", attachedPlayerCamouflage);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "playerControlsAttachedUnits", playerControlsAttachedUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "searchRadius", searchRadius);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "intensity", intensity);
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                + "<atbBattleChance>"
+                + StringUtils.join(atbBattleChance, ',')
+                + "</atbBattleChance>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "generateChases", generateChases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableContractLength", variableContractLength);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "instantUnitMarketDelivery", instantUnitMarketDelivery);
@@ -3344,10 +3367,10 @@ public class CampaignOptions implements Serializable {
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-        final String METHOD_NAME = "generateCampaignOptionsFromXml(Node)"; //$NON-NLS-1$
+        final String METHOD_NAME = "generateCampaignOptionsFromXml(Node)";
 
         MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                "Loading Campaign Options from XML..."); //$NON-NLS-1$
+                "Loading Campaign Options from XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3362,15 +3385,11 @@ public class CampaignOptions implements Serializable {
                 continue;
             }
 
-            MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
+            MekHQ.getLogger().info(CampaignOptions.class, METHOD_NAME,
                     String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
-            //region General Tab
-            if (wn2.getNodeName().equalsIgnoreCase("displayDateFormat")) {
-                retVal.displayDateFormat = wn2.getTextContent().trim();
-            //endregion General Tab
 
             //region Repair and Maintenance Tab
-            } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
+            if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
                 retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
                 retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
@@ -3590,6 +3609,8 @@ public class CampaignOptions implements Serializable {
                 retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) {
                 retVal.logMarriageNameChange = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {
+                retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
                 retVal.useRandomMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
@@ -3606,7 +3627,7 @@ public class CampaignOptions implements Serializable {
                     migrateMarriageSurnameWeights(retVal, values);
                 } else {
                     MekHQ.getLogger().error(CampaignOptions.class,
-                            "generateCampaignOptionsFromXml", "");
+                            "generateCampaignOptionsFromXml", "Unkown length of randomMarriageSurnameWeights");
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
@@ -3713,20 +3734,15 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
                 retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
-                // This cannot use PrisonerStatus::parseFromString due to former save format differences
+                String prisonerStatus = wn2.getTextContent().trim();
+
                 try {
-                    retVal.defaultPrisonerStatus = PrisonerStatus.valueOf(wn2.getTextContent().trim());
+                    prisonerStatus = String.valueOf(Integer.parseInt(prisonerStatus) + 1);
                 } catch (Exception ignored) {
-                    switch (wn2.getTextContent().trim()) {
-                        case "1":
-                            retVal.defaultPrisonerStatus = PrisonerStatus.BONDSMAN;
-                            break;
-                        case "0":
-                        default:
-                            retVal.defaultPrisonerStatus = PrisonerStatus.PRISONER;
-                            break;
-                    }
+
                 }
+
+                retVal.setDefaultPrisonerStatus(PrisonerStatus.parseFromString(prisonerStatus));
             } else if (wn2.getNodeName().equalsIgnoreCase("prisonerBabyStatus")) {
                 retVal.prisonerBabyStatus = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
@@ -3833,8 +3849,25 @@ public class CampaignOptions implements Serializable {
                 retVal.setPlayerControlsAttachedUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("searchRadius")) {
                 retVal.searchRadius = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) {
-                retVal.intensity = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
+                double intensity = Double.parseDouble(wn2.getTextContent().trim());
+
+                retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
+                retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
+                retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
+                retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
+            } else if (wn2.getNodeName().equalsIgnoreCase("atbBattleChance")) {
+                String[] values = wn2.getTextContent().split(",");
+                for (int i = 0; i < values.length; i++) {
+                    try {
+                        retVal.atbBattleChance[i] = Integer.parseInt(values[i]);
+                    } catch (Exception ignored) {
+                        // Badly coded, but this is to migrate devs and their games as the swap was
+                        // done before a release and is thus better to handle this way than through
+                        // a more code complex method
+                        retVal.atbBattleChance[i] = (int) Math.round(Double.parseDouble(values[i]));
+                    }
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("generateChases")) {
                 retVal.setGenerateChases(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {

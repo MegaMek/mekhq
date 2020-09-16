@@ -27,7 +27,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Lance;
+import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -134,7 +134,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         addBotForce(civilianForce);
 
         ArrayList<Entity> turretForce = new ArrayList<>();
-        addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce));
+        
         if (isAttacker()) {
             addTurrets(turretForce, 6, getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
                     campaign);
@@ -142,6 +142,8 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
             addTurrets(turretForce, 6, getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
                     campaign);
         }
+        
+        addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce));
 
         /* Roll 2x on bot lances roll */
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
@@ -187,8 +189,8 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
             // while completing this scenario on others just puts the morale to
             // Rout for a while
             ObjectiveEffect victoryEffect = new ObjectiveEffect();
-            if (contract.getRequiredLanceType() == Lance.ROLE_FIGHT
-                    || contract.getRequiredLanceType() == Lance.ROLE_SCOUT) {
+            if ((contract.getRequiredLanceType() == AtBLanceRole.FIGHTING)
+                    || (contract.getRequiredLanceType() == AtBLanceRole.SCOUTING)) {
                 victoryEffect.effectType = ObjectiveEffectType.ContractVictory;
                 destroyHostiles.addDetail(getResourceBundle().getString("battleDetails.baseAttack.attacker.details.winnerFightScout"));
             } else {
@@ -209,16 +211,16 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);
     }
-    
+
     @Override
     public String getBattlefieldControlDescription() {
         String retval = super.getBattlefieldControlDescription();
-        
+
         if(!isAttacker()) {
             retval += "\r\n";
             retval += getResourceBundle().getString("battleDetails.baseAttack.attacker.details.loser");
         }
-        
+
         return retval;
     }
 }

@@ -40,6 +40,15 @@ public class StaticChecks {
         return true;
     }
 
+    public static boolean areAllCombatForces(Vector<Force> forces) {
+        for (Force force : forces) {
+            if (!force.isCombatForce()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean areAllUnitsAvailable(Vector<Unit> units) {
         for (Unit unit : units) {
             if (!unit.isAvailable()) {
@@ -548,9 +557,14 @@ public class StaticChecks {
     }
 
     public static boolean areAllEligible(Person[] people) {
+        return areAllEligible(people, false);
+    }
+
+    public static boolean areAllEligible(Person[] people, boolean ignorePrisonerStatus) {
         int profession = people[0].getProfession();
         for (Person person : people) {
-            if (!person.getPrisonerStatus().isFree() || person.getProfession() != profession) {
+            if (!(person.getPrisonerStatus().isFree() || ignorePrisonerStatus)
+                    || (person.getProfession() != profession)) {
                 return false;
             }
         }

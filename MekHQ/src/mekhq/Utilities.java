@@ -37,13 +37,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -120,13 +117,11 @@ import mekhq.campaign.unit.UnitTechProgression;
 import org.w3c.dom.Node;
 
 public class Utilities {
-    private static final int MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
-
-    private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities", new EncodeControl()); //$NON-NLS-1$
+    private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities", new EncodeControl());
 
     // A couple of arrays for use in the getLevelName() method
     private static int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
-    private static String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(","); //$NON-NLS-1$ //$NON-NLS-2$
+    private static String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(",");
 
     public static int roll3d6() {
         Vector<Integer> rolls = new Vector<>();
@@ -1336,42 +1331,6 @@ public class Utilities {
             }
         }
         //TODO: Is it necessary to update armor?
-    }
-
-    public static int getDaysBetween(Date date1, Date date2) {
-        return (int) ((date2.getTime() - date1.getTime()) / MILLISECONDS_IN_DAY );
-    }
-
-    /**
-     * Calculates the number of days between start and end dates, taking
-     * into consideration leap years, year boundaries etc.
-     *
-     * @param start the start date
-     * @param end the end date, must be later than the start date
-     * @return the number of days between the start and end dates
-     */
-    public static long countDaysBetween(Date start, Date end) {
-        if (end.before(start)) {
-            throw new IllegalArgumentException("The end date must be later than the start date");
-        }
-
-        //reset all hours mins and secs to zero on start date
-        Calendar startCal = GregorianCalendar.getInstance();
-        startCal.setTime(start);
-        startCal.set(Calendar.HOUR_OF_DAY, 0);
-        startCal.set(Calendar.MINUTE, 0);
-        startCal.set(Calendar.SECOND, 0);
-        long startTime = startCal.getTimeInMillis();
-
-        //reset all hours mins and secs to zero on end date
-        Calendar endCal = GregorianCalendar.getInstance();
-        endCal.setTime(end);
-        endCal.set(Calendar.HOUR_OF_DAY, 0);
-        endCal.set(Calendar.MINUTE, 0);
-        endCal.set(Calendar.SECOND, 0);
-        long endTime = endCal.getTimeInMillis();
-
-        return (endTime - startTime) / MILLISECONDS_IN_DAY;
     }
 
     /**

@@ -246,7 +246,6 @@ public class CampaignGUI extends JPanel {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()); //$NON-NLS-1$
 
         frame = new JFrame("MekHQ"); //$NON-NLS-1$
-        MekHQ.setWindow(frame);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
@@ -1170,7 +1169,7 @@ public class CampaignGUI extends JPanel {
     public void showNews(int id) {
         NewsItem news = getCampaign().getNews().getNewsItem(id);
         if (null != news) {
-            NewsReportDialog nrd = new NewsReportDialog(frame, news, getCampaign());
+            NewsReportDialog nrd = new NewsReportDialog(frame, news);
             nrd.setVisible(true);
         }
     }
@@ -1429,7 +1428,7 @@ public class CampaignGUI extends JPanel {
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
-                getCampaign(), getIconPackage().getCamos(), getIconPackage().getForceIcons());
+                getCampaign(), getIconPackage());
         cod.setVisible(true);
         if (timeIn != getCampaign().getCampaignOptions().getUseTimeInService()) {
             if (getCampaign().getCampaignOptions().getUseTimeInService()) {
@@ -1896,8 +1895,8 @@ public class CampaignGUI extends JPanel {
                         String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            report = getCampaign().getFinances().exportFinancesToCSV(getCampaign(),
-                                    file.getPath(), format.getRecommendedExtension());
+                            report = getCampaign().getFinances().exportFinancesToCSV(file.getPath(),
+                                    format.getRecommendedExtension());
                         } else {
                             report = "Unsupported FileType in Export Finances";
                         }
@@ -2590,7 +2589,7 @@ public class CampaignGUI extends JPanel {
         String text = "<html><b>Temp Medics:</b> " + getCampaign().getMedicPool() + "</html>";
         lblTempMedics.setText(text);
     }
-    
+
     private void refreshPartsAvailability() {
         if (!getCampaign().getCampaignOptions().getUseAtB()) {
             lblPartsAvailabilityRating.setText("");
@@ -2680,12 +2679,12 @@ public class CampaignGUI extends JPanel {
     public void handleLocationChanged(LocationChangedEvent ev) {
         refreshLocation();
     }
-    
+
     @Subscribe
     public void handleMissionChanged(MissionEvent ev) {
         refreshPartsAvailability();
     }
-    
+
     @Subscribe
     public void handlePersonUpdate(PersonEvent ev) {
         // only bother recalculating AtB parts availability if a logistics admin has been changed
@@ -2694,7 +2693,7 @@ public class CampaignGUI extends JPanel {
             refreshPartsAvailability();
         }
     }
-    
+
     public void refreshLocation() {
         lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
     }
@@ -2749,6 +2748,13 @@ public class CampaignGUI extends JPanel {
         MekHQ.triggerEvent(new DeploymentChangedEvent(u, s));
     }
 
+    public void undeployForces(Vector<Force> forces) {
+        for (Force force : forces) {
+            undeployForce(force);
+            undeployForces(force.getSubForces());
+        }
+    }
+
     public void undeployForce(Force f) {
         undeployForce(f, true);
     }
@@ -2760,7 +2766,7 @@ public class CampaignGUI extends JPanel {
             f.clearScenarioIds(getCampaign(), killSubs);
             scenario.removeForce(f.getId());
             if (killSubs) {
-                for (UUID uid : f.getAllUnits()) {
+                for (UUID uid : f.getAllUnits(false)) {
                     Unit u = getCampaign().getUnit(uid);
                     if (null != u) {
                         scenario.removeUnit(u.getId());

@@ -200,7 +200,8 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             factions.put(2.0, campaign.getFaction());
         } else {
             // There is a good chance they're a merc!
-            factions.put(total + total * getFactionWeight(mercenaries), mercenaries);
+            // The 1.0 prevents no weight calculations
+            factions.put((total == 0.0) ? 1.0 : total + total * getFactionWeight(mercenaries), mercenaries);
         }
 
         cachedDate = now;
@@ -232,7 +233,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
      * @return A weight to apply to the given {@link Faction}.
      */
     private double getFactionWeight(Faction faction) {
-        if (faction.isComstar() || faction.getShortName().equals("WOB")) {
+        if (faction.isComStar() || faction.getShortName().equals("WOB")) {
             return 0.05;
         } else if (faction.is(Tag.MERC) || faction.is(Tag.SUPER) || faction.is(Tag.MAJOR)) {
             return 1.0;
