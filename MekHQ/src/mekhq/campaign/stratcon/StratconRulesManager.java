@@ -134,7 +134,7 @@ public class StratconRulesManager {
         for(int scenarioIndex = 0; scenarioIndex < track.getRequiredLanceCount(); scenarioIndex++) {
             // if we haven't already used all the player forces and are required to randomly generate a scenario
             if((availableForceIDs.size() > 0) &&
-                    (Compute.randomInt(100) < track.getScenarioOdds())) {
+                    (Compute.randomInt(100) > track.getScenarioOdds())) {
                 // pick random coordinates and force to drive the scenario
                 int x = Compute.randomInt(track.getWidth());
                 int y = Compute.randomInt(track.getHeight());                
@@ -361,7 +361,7 @@ public class StratconRulesManager {
      * adds it to the track
      * 
      */
-    private static void commitPrimaryForces(Campaign campaign, AtBContract contract, StratconScenario scenario, StratconTrackState trackState) {
+    public static void commitPrimaryForces(Campaign campaign, AtBContract contract, StratconScenario scenario, StratconTrackState trackState) {
         // order of operations is important here, we need a valid scenario ID prior to adding the scenario to the track.
         campaign.addScenario(scenario.getBackingScenario(), contract);
         scenario.setBackingScenarioID(scenario.getBackingScenario().getId());
@@ -863,6 +863,10 @@ public class StratconRulesManager {
                         boolean victory = rst.getScenario().getStatus() == Scenario.S_VICTORY ||
                                 rst.getScenario().getStatus() == Scenario.S_MVICTORY;
                         campaignState.updateVictoryPoints(victory ? 1 : -1);
+                        
+                        if(scenario.isStrategicObjective()) {
+                            campaignState.incrementStrategicObjectiveCompletedCount();
+                        }
                     }
                     
                     processTrackForceReturnDates(track, rst.getCampaign().getLocalDate());
@@ -898,15 +902,43 @@ public class StratconRulesManager {
      */
     public static void processIgnoredScenario(StratconScenario scenario, StratconCampaignState campaignState) {
         for(StratconTrackState track : campaignState.getTracks()) {
-            if(track.getScenarios().containsKey(scenario.getCoords())) {
-                
+            if(track.getScenarios().containsKey(scenario.getCoords())) {                
                 // subtract VP if scenario is 'required'
                 if(scenario.isRequiredScenario()) {
                     campaignState.updateVictoryPoints(-1);
                 }
                 
-                // move scenario towards nearest allied facility
-                // or add its forces to track reinforcement pool 
+                StratconFacility localFacility = track.getFacility(scenario.getCoords());
+                if(localFacility != null) {
+                    // if the ignored scenario was on top of an allied facility
+                    // then it'll get captured, and the player will possibly lose a SO
+                    if(localFacility.getOwner() == ForceAlignment.Allied) {
+                        localFacility.setOwner(ForceAlignment.Opposing);
+                        
+                        if(localFacility.isStrategicObjective()) {
+                            campaignState.decrementStrategicObjectiveCompletedCount();
+                        }
+                    }
+                    
+                    track.removeScenario(scenario);
+                } else {
+                    // if it's an open-field
+                    // move scenario towards nearest allied facility
+                    StratconCoords closestAlliedFacilityCoords = track.findClosestAlliedFacilityCoords(scenario.getCoords());
+                    
+                    if(closestAlliedFacilityCoords != null) {
+                        StratconCoords newCoords = scenario.getCoords().translate(scenario.getCoords().direction(closestAlliedFacilityCoords));
+                        scenario.setCoords(newCoords);
+                        
+                        // TODO: if the allied facility is in the new coords, replace this scenario
+                        // with a facility defense, with the opfor coming directly from all hostiles assigned to this scenario
+                        
+                        scenario.setCurrentState(ScenarioState.UNRESOLVED);
+                    } else {
+                        // TODO: if there's no allied facilities here, add its forces to track reinforcement pool
+                        
+                    }
+                }
             }
         }
     }

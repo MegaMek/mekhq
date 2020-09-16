@@ -36,6 +36,7 @@ public class StratconCampaignState {
     private int supportPoints;
     private int victoryPoints;
     private int strategicObjectivePoints;
+    private int completedStrategicObjectives;
     
     @XmlElementWrapper(name="campaignTracks")
     @XmlElement(name="campaignTrack")
@@ -82,7 +83,11 @@ public class StratconCampaignState {
     public int getSupportPoints() {
         return supportPoints;
     }
-
+    
+    public void addSupportPoints(int number) {
+        supportPoints += number;
+    }
+    
     public void setSupportPoints(int supportPoints) {
         this.supportPoints = supportPoints;
     }
@@ -105,6 +110,22 @@ public class StratconCampaignState {
 
     public void setStrategicObjectivePoints(int strategicObjectivePoints) {
         this.strategicObjectivePoints = strategicObjectivePoints;
+    }
+    
+    public void incrementStrategicObjectivePoints() {
+        strategicObjectivePoints++;
+    }
+    
+    public int getStrategicObjectiveCompletedCount() {
+        return completedStrategicObjectives;
+    }
+    
+    public void incrementStrategicObjectiveCompletedCount() {
+        this.completedStrategicObjectives++;
+    }
+    
+    public void decrementStrategicObjectiveCompletedCount() {
+        this.completedStrategicObjectives--;
     }
     
     public void useSupportPoint() {

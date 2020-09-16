@@ -60,9 +60,10 @@ public class StratconFacility implements Cloneable {
     private List<String> sharedModifiers = new ArrayList<>();
     private List<String> localModifiers = new ArrayList<>();
     private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
+    private boolean isStrategicObjective;
     
     /**
-     * A temporary variable used to track situations where changin the ownership of this facility
+     * A temporary variable used to track situations where changing the ownership of this facility
      * hinges upon multiple objectives
      */
     private transient int ownershipChangeScore;
@@ -154,6 +155,14 @@ public class StratconFacility implements Cloneable {
     
     public void setAggroRating(int rating) {
         aggroRating = rating;
+    }
+    
+    public boolean isStrategicObjective() {
+        return isStrategicObjective;
+    }
+    
+    public void setStrategicObjectiveRating(boolean isStrategicObjective) {
+        this.isStrategicObjective = isStrategicObjective;
     }
     
     public void incrementOwnershipChangeScore() {

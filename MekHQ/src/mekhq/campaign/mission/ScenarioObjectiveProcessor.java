@@ -368,6 +368,19 @@ public class ScenarioObjectiveProcessor {
                 }
                 break;
             case SupportPointUpdate:
+                if (tracker.getMission() instanceof AtBContract) {
+                    AtBContract contract = (AtBContract) tracker.getMission();
+                    
+                    if(contract.getStratconCampaignState() != null) {
+                        int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
+                        int numSupportPoints = effect.howMuch * effectMultiplier;
+                        if (dryRun) {
+                            return String.format("%d support points will be added", numSupportPoints);
+                        } else {
+                            contract.getStratconCampaignState().addSupportPoints(numSupportPoints);
+                        }
+                    }
+                }
                 break;
             case ContractMoraleUpdate:
                 break;

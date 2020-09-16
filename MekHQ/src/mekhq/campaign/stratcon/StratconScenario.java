@@ -125,6 +125,14 @@ public class StratconScenario implements IStratconDisplayable {
         stateBuilder.append(backingScenario.getTemplate().shortBriefing);
         stateBuilder.append(html ? "<br/>" : "");
         
+        if(this.isRequiredScenario()) {
+            stateBuilder.append("<span color='red'>Deployment required by contract</span>").append(html ? "<br/>" : "");
+        }
+        
+        if(this.isStrategicObjective) {
+            stateBuilder.append("<span color='red'>Contract objective located</span>").append(html ? "<br/>" : "");
+        }
+        
         stateBuilder.append("Status: ");
         stateBuilder.append(scenarioStateNames.get(currentState));
         stateBuilder.append("<br/>");

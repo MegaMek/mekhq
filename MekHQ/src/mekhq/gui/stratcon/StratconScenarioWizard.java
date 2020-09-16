@@ -25,7 +25,9 @@ import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.personnel.Person;
@@ -408,6 +410,7 @@ public class StratconScenarioWizard extends JDialog {
             for(Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
                 currentScenario.addForce(force.getId(), templateID);
                 force.setScenarioId(currentScenario.getBackingScenarioID());
+                MekHQ.triggerEvent(new DeploymentChangedEvent(force, currentScenario.getBackingScenario()));
             }
         }
         
@@ -415,12 +418,14 @@ public class StratconScenarioWizard extends JDialog {
             for(Unit unit : availableUnitLists.get(templateID).getSelectedValuesList()) {
                 currentScenario.addUnit(unit.getId(), templateID);
                 unit.setScenarioId(currentScenario.getBackingScenarioID());
+                MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario.getBackingScenario()));
             }
         }
         
         for(Unit unit : availableInfantryUnits.getSelectedValuesList()) {
             currentScenario.addUnit(unit.getId(), ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
             unit.setScenarioId(currentScenario.getBackingScenarioID());
+            MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario.getBackingScenario()));
         }
         
         // every force that's been deployed to this scenario gets assigned to the track
@@ -432,7 +437,7 @@ public class StratconScenarioWizard extends JDialog {
         // and the scenario gets published to the campaign and may be played immediately from the briefing room
         // that being said, give the player a chance to commit reinforcements too
         if(currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
-            currentScenario.commitPrimaryForces(campaign, currentCampaignState.getContract());
+            StratconRulesManager.commitPrimaryForces(campaign, currentCampaignState.getContract(), currentScenario, currentTrackState);
             setCurrentScenario(currentScenario, currentTrackState, currentCampaignState);
         // if we've just committed reinforcements then simply close it down
         } else {

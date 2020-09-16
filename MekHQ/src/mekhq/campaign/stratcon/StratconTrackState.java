@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+
 
 /**
  * Track-level state object for a stratcon campaign.
@@ -202,6 +204,27 @@ public class StratconTrackState {
     
     public void removeFacility(StratconCoords coords) {
         facilities.remove(coords);
+    }
+    
+    /**
+     * Returns the allied facility coordinates closest to the given coordinates. Null if no allied facilities on the board.
+     */
+    public StratconCoords findClosestAlliedFacilityCoords(StratconCoords coords) {
+        int minDistance = Integer.MAX_VALUE;
+        StratconCoords closestFacilityCoords = null;
+        
+        for (StratconCoords facilityCoords : facilities.keySet()) {
+            if (facilities.get(facilityCoords).getOwner() == ForceAlignment.Allied) {
+                int distance = facilityCoords.direction(coords);
+                
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestFacilityCoords = facilityCoords;
+                }
+            }
+        }
+        
+        return closestFacilityCoords;        
     }
     
     /**

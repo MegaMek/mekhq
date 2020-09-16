@@ -16,6 +16,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 
@@ -29,6 +30,7 @@ public class StratconTab extends CampaignGuiTab {
     private JPanel infoPanel;
     private JComboBox<TrackDropdownItem> cboCurrentTrack;
     private JLabel infoPanelText;
+    private JLabel campaignStatusText;
 
     StratconTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
@@ -37,7 +39,9 @@ public class StratconTab extends CampaignGuiTab {
     @Override
     public void initTab() { 
         removeAll();
+        
         infoPanelText = new JLabel();
+        campaignStatusText = new JLabel();
         
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -67,9 +71,12 @@ public class StratconTab extends CampaignGuiTab {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         
-        infoPanel.add(new JLabel("Info"), gbc);
+        infoPanel.add(new JLabel("Current Campaign Status:"), gbc);
         
         gbc.gridwidth = 1;
+        gbc.gridy++;
+        
+        infoPanel.add(campaignStatusText, gbc);        
         gbc.gridy++;
         
         JLabel lblCurrentTrack = new JLabel("Current Track:");
@@ -99,13 +106,51 @@ public class StratconTab extends CampaignGuiTab {
     }
     
     @Override
+    public void repaint() {
+        updateCampaignState();
+    }
+    
+    @Override
     public void refreshAll() {
         stratconPanel.repaint();
+        updateCampaignState();
     }
 
     @Override
     public GuiTabType tabType() {
         return GuiTabType.STRATCON;
+    }
+    
+    private void updateCampaignState() {
+        if ((cboCurrentTrack == null) || (campaignStatusText == null)) {
+            return;
+        }
+        
+        // campaign state text should contain:
+        // list of remaining objectives, percentage remaining
+        // current VP
+        // current support points
+        TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
+        if(currentTDI == null) {
+            return;
+        }
+        AtBContract currentContract = currentTDI.contract;
+        StratconCampaignState campaignState = currentContract.getStratconCampaignState();
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>");
+        
+        sb.append(currentContract.getMissionTypeName()).append(": ").append(currentContract.getName());
+        sb.append("<br/>Strategic Objectives: ").append(campaignState.getStrategicObjectiveCompletedCount())
+            .append("/").append(campaignState.getStrategicObjectivePoints());
+        
+        sb.append("<br/>Victory Points: ").append(campaignState.getVictoryPoints());
+        
+        sb.append("<br/>Support Points: ").append(campaignState.getSupportPoints());
+        
+        sb.append("</html>");
+        
+        campaignStatusText.setText(sb.toString());
     }
     
     private void repopulateTrackList() {
@@ -144,6 +189,7 @@ public class StratconTab extends CampaignGuiTab {
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
         repopulateTrackList();
+        updateCampaignState();
     }
     
     /**
