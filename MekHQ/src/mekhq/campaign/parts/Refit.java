@@ -899,10 +899,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             // We're only concerned with heat sinks that have to be installed in excess of what
             // may be provided by the engine.
             if (oldUnit.getEntity().hasEngine()) {
-                oldHS = Math.max(0, oldHS - oldUnit.getEntity().getEngine().integralHeatSinkCapacity(false));
+                oldHS = Math.max(0, oldHS - oldUnit.getEntity().getEngine().getWeightFreeEngineHeatSinks());
             }
             if (newEntity.hasEngine()) {
-                newHS = Math.max(0, newHS - newEntity.getEngine().integralHeatSinkCapacity(false));
+                newHS = Math.max(0, newHS - newEntity.getEngine().getWeightFreeEngineHeatSinks());
             }
             if (oldHS != newHS) {
                 Part hsPart = heatSinkPart(newEntity); // only single HS allowed, so they have to be of the same type
