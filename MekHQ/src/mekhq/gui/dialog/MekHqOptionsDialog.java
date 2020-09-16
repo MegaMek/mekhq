@@ -21,6 +21,7 @@
 package mekhq.gui.dialog;
 
 import mekhq.MekHQ;
+import mekhq.campaign.event.MekHQOptionsChangedEvent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -229,6 +230,8 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
 
         MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
+
+        MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
     }
 
     private void setInitialState() {

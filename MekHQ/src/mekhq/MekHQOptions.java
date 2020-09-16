@@ -18,8 +18,6 @@
  */
 package mekhq;
 
-import mekhq.campaign.event.MekHQOptionsChangedEvent;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.prefs.Preferences;
@@ -71,7 +69,6 @@ public final class MekHQOptions {
 
     public void setCommandCenterMRMS(boolean value) {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_MRMS, value);
-        MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
     }
     //endregion Command Center Display
     //endregion Display
