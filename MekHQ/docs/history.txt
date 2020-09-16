@@ -41,6 +41,7 @@ VERSION HISTORY:
 + PR #1999: Fixing Clan Vehicle Option
 + Issue #2003: Various faction startingPlanet errors in factions.xml
 + PR #2005: AtB: OpFor Uses VTOLs is now default true
++ Issue #1939: Fixing Preset Loading and Reworking Campaign Options Initial Value Load
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
