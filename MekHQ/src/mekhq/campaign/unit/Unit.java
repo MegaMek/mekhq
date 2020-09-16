@@ -34,6 +34,7 @@ import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.*;
 
+import mekhq.campaign.parts.equipment.*;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -56,20 +57,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.BattleArmorAmmoBin;
-import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.InfantryWeaponPart;
-import mekhq.campaign.parts.equipment.JumpJet;
-import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
-import mekhq.campaign.parts.equipment.MASC;
-import mekhq.campaign.parts.equipment.MissingAmmoBin;
-import mekhq.campaign.parts.equipment.MissingBattleArmorEquipmentPart;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.parts.equipment.MissingHeatSink;
-import mekhq.campaign.parts.equipment.MissingJumpJet;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
@@ -2627,8 +2614,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         for (Mounted m : entity.getEquipment()) {
-            if (m.getLocation() == Entity.LOC_NONE) {
-                //FIXME: is this ok? - are there any valid parts in LOC_NONE?
+            if ((m.getLocation() == Entity.LOC_NONE) && !(m.getType() instanceof AmmoType)) {
                 continue;
             }
             // We want to ignore weapon groups so that we don't get phantom weapons
@@ -2654,12 +2640,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (m.getType() instanceof AmmoType) {
                 int eqnum = entity.getEquipmentNum(m);
                 Part apart = ammoParts.get(eqnum);
-                int fullShots = ((AmmoType)m.getType()).getShots();
-                boolean oneShot = false;
-                if (m.getLocation() == Entity.LOC_NONE) {
-                    fullShots = 1;
-                    oneShot = true;
-                }
+                boolean oneShot = m.isOneShotAmmo();
+                int fullShots = oneShot ? 1 : ((AmmoType) m.getType()).getShots();
                 if (null == apart) {
                     if (entity instanceof BattleArmor) {
                         apart = new BattleArmorAmmoBin((int) entity.getWeight(), m.getType(), eqnum,
@@ -2667,8 +2649,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                                 oneShot, getCampaign());
                     } else if (entity.usesWeaponBays()) {
                         apart = new LargeCraftAmmoBin((int) entity.getWeight(), m.getType(), eqnum,
-                                fullShots - m.getBaseShotsLeft(), m.getAmmoCapacity(), getCampaign());
+                                fullShots - m.getBaseShotsLeft(), m.getSize(), getCampaign());
                         ((LargeCraftAmmoBin) apart).setBay(entity.getBayByAmmo(m));
+                    } else if (entity.isSupportVehicle()
+                            && (((AmmoType) m.getType()).getAmmoType() == AmmoType.T_INFANTRY)) {
+                        Mounted weapon = m.getLinkedBy();
+                        while (weapon.getType() instanceof AmmoType) {
+                            weapon = weapon.getLinkedBy();
+                        }
+                        int size = m.getOriginalShots() / ((InfantryWeapon) weapon.getType()).getShots();
+                        apart = new InfantryAmmoBin((int) entity.getWeight(), m.getType(), eqnum,
+                                m.getOriginalShots() - m.getBaseShotsLeft(),
+                                (InfantryWeapon) weapon.getType(), size, weapon.isOmniPodMounted(), getCampaign());
                     } else {
                         apart = new AmmoBin((int) entity.getWeight(), m.getType(), eqnum,
                                 fullShots - m.getBaseShotsLeft(), oneShot, m.isOmniPodMounted(), getCampaign());
