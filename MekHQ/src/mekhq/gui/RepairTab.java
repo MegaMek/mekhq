@@ -153,7 +153,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnMRMSInstantAll.setText("Instant Mass Repair/Salvage All");
         btnMRMSInstantAll.setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
         btnMRMSInstantAll.setName("btnMRMSInstantAll");
-        btnMRMSInstantAll.addActionListener(ev -> MassRepairService.massRepairSalvageAllUnits(getCampaignGui()));
+        btnMRMSInstantAll.addActionListener(ev -> {
+            MassRepairService.massRepairSalvageAllUnits(getCampaign());
+            JOptionPane.showMessageDialog(getCampaignGui().getFrame(), "Mass Repair/Salvage complete.",
+                    "Complete", JOptionPane.INFORMATION_MESSAGE);
+        });
 
         btnAcquisitions = new JButton();
         btnAcquisitions.setText("Parts");

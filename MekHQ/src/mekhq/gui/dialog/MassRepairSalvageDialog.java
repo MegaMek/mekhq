@@ -1076,7 +1076,7 @@ public class MassRepairSalvageDialog extends JDialog {
             MassRepairService.MassRepairConfiguredOptions configuredOptions = new MassRepairService.MassRepairConfiguredOptions();
             configuredOptions.setup(this);
 
-            MassRepairService.massRepairSalvageUnits(campaignGUI, units, activeMROs);
+            MassRepairService.massRepairSalvageUnits(campaignGUI.getCampaign(), units, activeMROs);
 
             filterUnits();
         } else if (isModeWarehouse()) {
@@ -1110,7 +1110,8 @@ public class MassRepairSalvageDialog extends JDialog {
             configuredOptions.setup(this);
             configuredOptions.setScrapImpossible(false);
 
-            MassRepairPartSet partSet = MassRepairService.performWarehouseMassRepair(parts, activeMROs, configuredOptions, campaignGUI);
+            MassRepairPartSet partSet = MassRepairService.performWarehouseMassRepair(parts, activeMROs,
+                    configuredOptions, campaignGUI.getCampaign());
 
             String msg = "Mass Repair complete";
 
