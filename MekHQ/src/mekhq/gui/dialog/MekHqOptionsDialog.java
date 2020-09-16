@@ -47,6 +47,10 @@ public class MekHqOptionsDialog extends BaseDialog {
     private JSpinner spinnerSavedGamesCount;
     //endregion Autosave
 
+    //region New Day
+    private JCheckBox optionNewDayMRMS;
+    //endregion New Day
+
     //region Campaign XML Save
     private JCheckBox optionWriteCustomsToXML;
     //endregion Campaign XML Save
@@ -118,6 +122,12 @@ public class MekHqOptionsDialog extends BaseDialog {
         labelSavedGamesCount.setLabelFor(spinnerSavedGamesCount);
         //endregion Autosave
 
+        //region New Day
+        JLabel labelNewDay = new JLabel(resources.getString("labelNewDay.text"));
+
+        optionNewDayMRMS = new JCheckBox(resources.getString("optionNewDayMRMS.text"));
+        //endregion New Day
+
         //region Campaign XML Save
         JLabel labelXMLSave = new JLabel(resources.getString("labelXMLSave.text"));
 
@@ -155,6 +165,8 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(labelSavedGamesCount)
                             .addComponent(spinnerSavedGamesCount, GroupLayout.Alignment.TRAILING))
+                    .addComponent(labelNewDay)
+                    .addComponent(optionNewDayMRMS)
                     .addComponent(labelXMLSave)
                     .addComponent(optionWriteCustomsToXML)
         );
@@ -180,6 +192,8 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addGroup(layout.createSequentialGroup()
                             .addComponent(labelSavedGamesCount)
                             .addComponent(spinnerSavedGamesCount))
+                    .addComponent(labelNewDay)
+                    .addComponent(optionNewDayMRMS)
                     .addComponent(labelXMLSave)
                     .addComponent(optionWriteCustomsToXML)
         );
@@ -196,6 +210,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         if (validateLongDisplayDate()) {
             MekHQ.getMekHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
+
         MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
         MekHQ.getMekHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
         MekHQ.getMekHQOptions().setAutosaveWeeklyValue(optionSaveWeekly.isSelected());
@@ -203,13 +218,16 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setAutosaveYearlyValue(optionSaveYearly.isSelected());
         MekHQ.getMekHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
         MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
-        MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
 
+        MekHQ.getMekHQOptions().setNewDayMRMS(optionNewDayMRMS.isSelected());
+
+        MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
     }
 
     private void setInitialState() {
         optionDisplayDateFormat.setText(MekHQ.getMekHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMekHQOptions().getLongDisplayDateFormat());
+
         optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
         optionSaveDaily.setSelected(MekHQ.getMekHQOptions().getAutosaveDailyValue());
         optionSaveWeekly.setSelected(MekHQ.getMekHQOptions().getAutosaveWeeklyValue());
@@ -217,6 +235,9 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionSaveYearly.setSelected(MekHQ.getMekHQOptions().getAutosaveYearlyValue());
         checkSaveBeforeMissions.setSelected(MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue());
         spinnerSavedGamesCount.setValue(MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue());
+
+        optionNewDayMRMS.setSelected(MekHQ.getMekHQOptions().getNewDayMRMS());
+
         optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
     }
 

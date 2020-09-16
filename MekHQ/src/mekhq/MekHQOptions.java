@@ -114,6 +114,16 @@ public final class MekHQOptions {
     }
     //endregion Autosave
 
+    //region New Day
+    public boolean getNewDayMRMS() {
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_MRMS, false);
+    }
+
+    public void setNewDayMRMS(boolean value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_MRMS, value);
+    }
+    //endregion New Day
+
     //region Campaign XML Save Options
     public boolean getWriteCustomsToXML() {
         return userPreferences.node(MekHqConstants.XML_SAVES_NODE).getBoolean(MekHqConstants.WRITE_CUSTOMS_TO_XML, true);
