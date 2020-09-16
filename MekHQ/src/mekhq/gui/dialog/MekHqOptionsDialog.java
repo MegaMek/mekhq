@@ -72,7 +72,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         JLabel labelDisplayDateFormatExample = new JLabel();
         optionDisplayDateFormat = new JTextField();
         optionDisplayDateFormat.addActionListener(evt -> labelDisplayDateFormatExample.setText(
-                validateDisplayDate()
+                validateDateFormat(optionDisplayDateFormat.getText())
                         ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionDisplayDateFormat.getText()))
                         : resources.getString("invalidDateFormat.error")));
 
@@ -80,7 +80,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         JLabel labelLongDisplayDateFormatExample = new JLabel();
         optionLongDisplayDateFormat = new JTextField();
         optionLongDisplayDateFormat.addActionListener(evt -> labelLongDisplayDateFormatExample.setText(
-                validateLongDisplayDate()
+                validateDateFormat(optionLongDisplayDateFormat.getText())
                         ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText()))
                         : resources.getString("invalidDateFormat.error")));
         //endregion Display
@@ -189,13 +189,14 @@ public class MekHqOptionsDialog extends BaseDialog {
 
     @Override
     protected void okAction() {
-        if (validateDisplayDate()) {
+        if (validateDateFormat(optionDisplayDateFormat.getText())) {
             MekHQ.getMekHQOptions().setDisplayDateFormat(optionDisplayDateFormat.getText());
         }
 
-        if (validateLongDisplayDate()) {
+        if (validateDateFormat(optionLongDisplayDateFormat.getText())) {
             MekHQ.getMekHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
+
         MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
         MekHQ.getMekHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
         MekHQ.getMekHQOptions().setAutosaveWeeklyValue(optionSaveWeekly.isSelected());
@@ -203,13 +204,14 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setAutosaveYearlyValue(optionSaveYearly.isSelected());
         MekHQ.getMekHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
         MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
-        MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
 
+        MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
     }
 
     private void setInitialState() {
         optionDisplayDateFormat.setText(MekHQ.getMekHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMekHQOptions().getLongDisplayDateFormat());
+
         optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
         optionSaveDaily.setSelected(MekHQ.getMekHQOptions().getAutosaveDailyValue());
         optionSaveWeekly.setSelected(MekHQ.getMekHQOptions().getAutosaveWeeklyValue());
@@ -217,22 +219,14 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionSaveYearly.setSelected(MekHQ.getMekHQOptions().getAutosaveYearlyValue());
         checkSaveBeforeMissions.setSelected(MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue());
         spinnerSavedGamesCount.setValue(MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue());
+
         optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
     }
 
     //region Data Validation
-    private boolean validateDisplayDate() {
+    private boolean validateDateFormat(String format) {
         try {
-            LocalDate.now().format(DateTimeFormatter.ofPattern(optionDisplayDateFormat.getText()));
-        } catch (Exception ignored) {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean validateLongDisplayDate() {
-        try {
-            LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText()));
+            LocalDate.now().format(DateTimeFormatter.ofPattern(format));
         } catch (Exception ignored) {
             return false;
         }
