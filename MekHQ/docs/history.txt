@@ -42,6 +42,8 @@ VERSION HISTORY:
 + Issue #2003: Various faction startingPlanet errors in factions.xml
 + PR #2005: AtB: OpFor Uses VTOLs is now default true
 + Issue #1939: Fixing Preset Loading and Reworking Campaign Options Initial Value Load
++ PR #2008: Avoid several process-stopping errors when upgrading bot units with SPAs
++ Issue #2007: Correct required heat sink calculation for refits
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
