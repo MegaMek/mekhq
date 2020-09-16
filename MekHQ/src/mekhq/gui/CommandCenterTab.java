@@ -33,6 +33,7 @@ import mekhq.gui.dialog.*;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
+import mekhq.service.MassRepairService;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -72,6 +73,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JButton btnGetParts;
     private JButton btnNeededParts;
     private JButton btnPartsReport;
+    private JButton btnMRMSDialog;
+    private JButton btnMRMSInstant;
 
     // available reports
     private JPanel panReports;
@@ -281,7 +284,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     private void initProcurementPanel() {
         /* shopping buttons */
-        JPanel panProcurementButtons = new JPanel(new GridLayout(4, 1));
+        JPanel panProcurementButtons = new JPanel(new GridLayout(6, 1));
         btnGetUnit = new JButton(resourceMap.getString("btnGetUnit.text"));
         btnGetUnit.setToolTipText(resourceMap.getString("btnGetUnit.toolTipText"));
         btnGetUnit.addActionListener(ev -> getUnit());
@@ -307,6 +310,24 @@ public final class CommandCenterTab extends CampaignGuiTab {
             dlg.setVisible(true);
         });
         panProcurementButtons.add(btnPartsReport);
+
+        btnMRMSDialog = new JButton(resourceMap.getString("btnMRMSDialog.text"));
+        btnMRMSDialog.setToolTipText(resourceMap.getString("btnMRMSDialog.toolTipText"));
+        btnMRMSDialog.setName("btnMRMSDialog");
+        btnMRMSDialog.addActionListener(ev -> {
+            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(getFrame(), true,
+                    getCampaignGui(), null, MassRepairSalvageDialog.MODE.UNITS);
+            dlg.setVisible(true);
+        });
+        btnMRMSDialog.setVisible(MekHQ.getMekHQOptions().getCommandCenterMRMS());
+        panProcurementButtons.add(btnMRMSDialog);
+
+        btnMRMSInstant = new JButton(resourceMap.getString("btnMRMSInstant.text"));
+        btnMRMSInstant.setToolTipText(resourceMap.getString("btnMRMSInstant.toolTipText"));
+        btnMRMSInstant.setName("btnMRMSInstant");
+        btnMRMSInstant.addActionListener(ev -> MassRepairService.massRepairSalvageAllUnits(getCampaignGui()));
+        btnMRMSInstant.setVisible(MekHQ.getMekHQOptions().getCommandCenterMRMS());
+        panProcurementButtons.add(btnMRMSInstant);
 
         /* shopping table */
         procurementModel = new ProcurementTableModel(getCampaign());
@@ -580,6 +601,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
         basicInfoScheduler.schedule();
         procurementListScheduler.schedule();
         setIcon();
+    }
+
+    @Subscribe
+    public void handle(MekHQOptionsChangedEvent evt) {
+        btnMRMSDialog.setVisible(MekHQ.getMekHQOptions().getCommandCenterMRMS());
+        btnMRMSInstant.setVisible(MekHQ.getMekHQOptions().getCommandCenterMRMS());
     }
 
     @Subscribe

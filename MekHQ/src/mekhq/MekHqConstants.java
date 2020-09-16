@@ -28,6 +28,7 @@ public final class MekHqConstants {
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
     //region Command Center
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
+    public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
     //endregion Command Center
     //endregion Display
 

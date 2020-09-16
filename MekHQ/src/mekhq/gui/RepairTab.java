@@ -143,49 +143,41 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         // Add panel for action buttons
         JPanel actionButtons = new JPanel(new GridBagLayout());
 
-        JButton btnMRMSDialog = new JButton();
-        btnMRMSDialog.setText("Mass Repair/Salvage"); // NOI18N
+        JButton btnMRMSDialog = new JButton("Mass Repair/Salvage");
         btnMRMSDialog.setToolTipText("Start Mass Repair/Salvage from dialog");
-        btnMRMSDialog.setName("btnMRMSDialog"); // NOI18N
+        btnMRMSDialog.setName("btnMRMSDialog");
         btnMRMSDialog.addActionListener(ev -> {
             MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(getFrame(), true, getCampaignGui(), null,
                     MassRepairSalvageDialog.MODE.UNITS);
             dlg.setVisible(true);
         });
 
-        JButton btnMRMSInstantAll = new JButton();
-        btnMRMSInstantAll.setText("Instant Mass Repair/Salvage All"); // NOI18N
+        JButton btnMRMSInstantAll = new JButton("Instant Mass Repair/Salvage All");
         btnMRMSInstantAll
                 .setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
-        btnMRMSInstantAll.setName("btnMRMSInstantAll"); // NOI18N
-        btnMRMSInstantAll.addActionListener(ev -> {
-            MassRepairService.massRepairSalvageAllUnits(getCampaignGui());
-        });
+        btnMRMSInstantAll.setName("btnMRMSInstantAll");
+        btnMRMSInstantAll.addActionListener(ev -> MassRepairService.massRepairSalvageAllUnits(getCampaignGui()));
 
-		btnAcquisitions = new JButton();
-		btnAcquisitions.setText("Parts"); // NOI18N
+		btnAcquisitions = new JButton("Parts");
 		btnAcquisitions.setToolTipText("Show missing/in transit/on order parts");
-		btnAcquisitions.setName("btnAcquisitions"); // NOI18N
+		btnAcquisitions.setName("btnAcquisitions");
 		btnAcquisitions.addActionListener(ev -> {
 			AcquisitionsDialog dlg = new AcquisitionsDialog(getFrame(), true, getCampaignGui());
 			dlg.setVisible(true);
 		});
-		btnAcquisitions.addPropertyChangeListener("counts", new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				String txt = "Parts Acquisition";
+		btnAcquisitions.addPropertyChangeListener("counts", evt -> {
+            String txt = "Parts Acquisition";
 
-				if (PartsAcquisitionService.getMissingCount() > 0) {
-					if (PartsAcquisitionService.getUnavailableCount() > 0) {
-						txt += String.format(" (%s missing, %s unavailable)", PartsAcquisitionService.getMissingCount(), PartsAcquisitionService.getUnavailableCount());
-					} else {
-						txt += String.format(" (%s missing)", PartsAcquisitionService.getMissingCount());
-					}
-				}
-				btnAcquisitions.setText(txt);
-				btnAcquisitions.repaint();
-			}
-		});
+            if (PartsAcquisitionService.getMissingCount() > 0) {
+                if (PartsAcquisitionService.getUnavailableCount() > 0) {
+                    txt += String.format(" (%s missing, %s unavailable)", PartsAcquisitionService.getMissingCount(), PartsAcquisitionService.getUnavailableCount());
+                } else {
+                    txt += String.format(" (%s missing)", PartsAcquisitionService.getMissingCount());
+                }
+            }
+            btnAcquisitions.setText(txt);
+            btnAcquisitions.repaint();
+        });
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

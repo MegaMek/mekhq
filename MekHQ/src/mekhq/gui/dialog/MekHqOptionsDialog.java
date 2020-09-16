@@ -38,6 +38,7 @@ public class MekHqOptionsDialog extends BaseDialog {
 
     //region Command Center Display
     private JCheckBox optionCommandCenterUseUnitMarket;
+    private JCheckBox optionCommandCenterMRMS;
     //endregion Command Center Display
     //endregion Display
 
@@ -93,6 +94,9 @@ public class MekHqOptionsDialog extends BaseDialog {
 
         optionCommandCenterUseUnitMarket = new JCheckBox(resources.getString("optionCommandCenterUseUnitMarket.text"));
         optionCommandCenterUseUnitMarket.setToolTipText(resources.getString("optionCommandCenterUseUnitMarket.toolTipText"));
+
+        optionCommandCenterMRMS = new JCheckBox(resources.getString("optionCommandCenterMRMS.text"));
+        optionCommandCenterMRMS.setToolTipText(resources.getString("optionCommandCenterMRMS.toolTipText"));
         //endregion Command Center Display
         //endregion Display
 
@@ -158,6 +162,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelLongDisplayDateFormatExample, GroupLayout.Alignment.TRAILING))
                     .addComponent(labelCommandCenterDisplay)
                     .addComponent(optionCommandCenterUseUnitMarket)
+                    .addComponent(optionCommandCenterMRMS)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -185,6 +190,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelLongDisplayDateFormatExample))
                     .addComponent(labelCommandCenterDisplay)
                     .addComponent(optionCommandCenterUseUnitMarket)
+                    .addComponent(optionCommandCenterMRMS)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -212,6 +218,7 @@ public class MekHqOptionsDialog extends BaseDialog {
             MekHQ.getMekHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
         MekHQ.getMekHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
+        MekHQ.getMekHQOptions().setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
 
         MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
         MekHQ.getMekHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
@@ -228,6 +235,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionDisplayDateFormat.setText(MekHQ.getMekHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMekHQOptions().getLongDisplayDateFormat());
         optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket());
+        optionCommandCenterMRMS.setSelected(MekHQ.getMekHQOptions().getCommandCenterMRMS());
 
         optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
         optionSaveDaily.setSelected(MekHQ.getMekHQOptions().getAutosaveDailyValue());
