@@ -84,7 +84,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     // this is a transient variable meant to keep track of a single jump path while the contract
     // runs through initial calculations, as the same jump path is referenced multiple times
     // and calculating it each time is expensive. No need to preserve it in save date.
-    private JumpPath cachedJumpPath;
+    private transient JumpPath cachedJumpPath;
 
     // need to keep track of total value salvaged for salvage rights
     private Money salvagedByUnit = Money.zero();
