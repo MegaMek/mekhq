@@ -35,6 +35,7 @@ public class MekHqOptionsDialog extends BaseDialog {
     //region Display
     private JTextField optionDisplayDateFormat;
     private JTextField optionLongDisplayDateFormat;
+    private JCheckBox optionHistoricalDailyLog;
     //endregion Display
 
     //region Autosave
@@ -52,6 +53,7 @@ public class MekHqOptionsDialog extends BaseDialog {
     //endregion New Day
 
     //region Campaign XML Save
+    private JCheckBox optionPreferGzippedOutput;
     private JCheckBox optionWriteCustomsToXML;
     //endregion Campaign XML Save
 
@@ -87,6 +89,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                 validateLongDisplayDate()
                         ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText()))
                         : resources.getString("invalidDateFormat.error")));
+
+        optionHistoricalDailyLog = new JCheckBox(resources.getString("optionHistoricalDailyLog.text"));
+        optionHistoricalDailyLog.setToolTipText(resources.getString("optionHistoricalDailyLog.toolTipText"));
         //endregion Display
 
         //region Autosave
@@ -131,6 +136,9 @@ public class MekHqOptionsDialog extends BaseDialog {
         //region Campaign XML Save
         JLabel labelXMLSave = new JLabel(resources.getString("labelXMLSave.text"));
 
+        optionPreferGzippedOutput = new JCheckBox(resources.getString("optionPreferGzippedOutput.text"));
+        optionPreferGzippedOutput.setToolTipText(resources.getString("optionPreferGzippedOutput.toolTipText"));
+
         optionWriteCustomsToXML = new JCheckBox(resources.getString("optionWriteCustomsToXML.text"));
         optionWriteCustomsToXML.setMnemonic(KeyEvent.VK_C);
         //endregion Campaign XML Save
@@ -155,6 +163,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelLongDisplayDateFormat)
                             .addComponent(optionLongDisplayDateFormat)
                             .addComponent(labelLongDisplayDateFormatExample, GroupLayout.Alignment.TRAILING))
+                    .addComponent(optionHistoricalDailyLog)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -168,6 +177,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(labelNewDay)
                     .addComponent(optionNewDayMRMS)
                     .addComponent(labelXMLSave)
+                    .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
         );
 
@@ -182,6 +192,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelLongDisplayDateFormat)
                             .addComponent(optionLongDisplayDateFormat)
                             .addComponent(labelLongDisplayDateFormatExample))
+                    .addComponent(optionHistoricalDailyLog)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -195,6 +206,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(labelNewDay)
                     .addComponent(optionNewDayMRMS)
                     .addComponent(labelXMLSave)
+                    .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
         );
 
@@ -206,10 +218,10 @@ public class MekHqOptionsDialog extends BaseDialog {
         if (validateDisplayDate()) {
             MekHQ.getMekHQOptions().setDisplayDateFormat(optionDisplayDateFormat.getText());
         }
-
         if (validateLongDisplayDate()) {
             MekHQ.getMekHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
+        MekHQ.getMekHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
 
         MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
         MekHQ.getMekHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
@@ -221,12 +233,14 @@ public class MekHqOptionsDialog extends BaseDialog {
 
         MekHQ.getMekHQOptions().setNewDayMRMS(optionNewDayMRMS.isSelected());
 
+        MekHQ.getMekHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
         MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
     }
 
     private void setInitialState() {
         optionDisplayDateFormat.setText(MekHQ.getMekHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMekHQOptions().getLongDisplayDateFormat());
+        optionHistoricalDailyLog.setSelected(MekHQ.getMekHQOptions().getHistoricalDailyLog());
 
         optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
         optionSaveDaily.setSelected(MekHQ.getMekHQOptions().getAutosaveDailyValue());
@@ -238,6 +252,7 @@ public class MekHqOptionsDialog extends BaseDialog {
 
         optionNewDayMRMS.setSelected(MekHQ.getMekHQOptions().getNewDayMRMS());
 
+        optionPreferGzippedOutput.setSelected(MekHQ.getMekHQOptions().getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
     }
 
