@@ -1378,10 +1378,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private String getExtensionForSaveFile(Campaign c) {
-        if (c.getPreferGzippedOutput()) {
-            return ".cpnx.gz";
-        }
-        return ".cpnx";
+        return MekHQ.getMekHQOptions().getPreferGzippedOutput() ? ".cpnx.gz" : ".cpnx";
     }
 
     private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {
