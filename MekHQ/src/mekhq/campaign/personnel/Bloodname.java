@@ -423,7 +423,8 @@ public class Bloodname implements Serializable {
             doc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
-            MekHQ.getLogger().error(Bloodname.class, "Could not parse bloodnames.xml", ex);
+            MekHQ.getLogger().error(Bloodname.class, "Could not parse bloodnames.xml");
+            MekHQ.getLogger().error(Bloodname.class, ex);
             return;
         }
 

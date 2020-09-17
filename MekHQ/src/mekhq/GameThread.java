@@ -81,8 +81,7 @@ class GameThread extends Thread implements CloseClientListener {
         try {
             client.connect();
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, "MegaMek client failed to connect to server");
-            MekHQ.getLogger().error(getClass(), ex);
+            MekHQ.getLogger().error(this, "MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -95,11 +94,11 @@ class GameThread extends Thread implements CloseClientListener {
             // phase
             for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error(getClass(), "run", "Thread in unknown stage" );
+                MekHQ.getLogger().error(this, "Thread in unknown stage");
             }
 
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-                MekHQ.getLogger().info(getClass(), "run","Thread in lounge" );
+                MekHQ.getLogger().info(this,"Thread in lounge");
                 client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
 
@@ -129,7 +128,7 @@ class GameThread extends Thread implements CloseClientListener {
                 Thread.sleep(50);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "run()", e);
+            MekHQ.getLogger().error(this, e);
         }
         finally {
             client.die();
@@ -153,15 +152,13 @@ class GameThread extends Thread implements CloseClientListener {
         try {
             WeaponOrderHandler.saveWeaponOrderFile();
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "requestStop",
-                    "Error saving custom weapon orders!", e);
+            MekHQ.getLogger().error(this, "Error saving custom weapon orders!", e);
         }
 
         try {
             QuirksHandler.saveCustomQuirksList();
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "requestStop",
-                    "Error saving quirks override!", e);
+            MekHQ.getLogger().error(this, "Error saving quirks override!", e);
         }
 
         stop = true;

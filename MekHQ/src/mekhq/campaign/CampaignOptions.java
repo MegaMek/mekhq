@@ -3364,8 +3364,7 @@ public class CampaignOptions implements Serializable {
                 continue;
             }
 
-            MekHQ.getLogger().info(CampaignOptions.class, METHOD_NAME,
-                    String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
+            MekHQ.getLogger().info(CampaignOptions.class, String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
 
             //region Repair and Maintenance Tab
             if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {

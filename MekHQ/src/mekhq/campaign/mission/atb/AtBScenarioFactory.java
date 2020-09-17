@@ -106,8 +106,8 @@ public class AtBScenarioFactory {
             s.initialize(c, lance, attacker, date);
 
             return s;
-        } catch (InstantiationException | IllegalAccessException e) {
-            MekHQ.getLogger().error(AtBScenarioFactory.class, "createScenario", e);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(AtBScenarioFactory.class, e);
         }
 
         return null;
@@ -115,8 +115,6 @@ public class AtBScenarioFactory {
 
     @SuppressWarnings("unchecked")
     public static void registerScenario(IAtBScenario scenario) {
-        final String METHOD_NAME = "registerScenario(IAtBScenario)";
-
         if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
             MekHQ.getLogger().error(AtBScenarioFactory.class,
                     String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.",
@@ -312,13 +310,11 @@ public class AtBScenarioFactory {
                             assignedLances.add(lance.getForceId());
                         }
                     } else {
-                        MekHQ.getLogger().error(AtBScenarioFactory.class, "createScenariosForNewWeek",
-                                "Unable to generate Base Attack scenario.");
+                        MekHQ.getLogger().error(AtBScenarioFactory.class, "Unable to generate Base Attack scenario.");
                     }
                 } else {
-                    MekHQ.getLogger().warning(AtBScenarioFactory.class, "createScenariosForNewWeek",
-                            "No lances assigned to mission " + atbContract.getName() +
-                                    ". Can't generate an Invincible Morale base defence mission for this force.");
+                    MekHQ.getLogger().warning(AtBScenarioFactory.class, "No lances assigned to mission "
+                            + atbContract.getName() + ". Can't generate an Invincible Morale base defence mission for this force.");
                 }
             }
             //endregion Invincible Morale Missions

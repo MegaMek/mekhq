@@ -174,7 +174,8 @@ public class CustomOption {
                     break;
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(CustomOption.class, "Error parsing custom ability " + retVal.name, ex);
+            MekHQ.getLogger().error(CustomOption.class, "Error parsing custom ability " + retVal.name);
+            MekHQ.getLogger().error(CustomOption.class, ex);
         }
 
         return retVal;

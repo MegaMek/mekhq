@@ -1968,7 +1968,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().error(Unit.class, "Could not parse unit " + idNode.getTextContent().trim(), ex);
+            MekHQ.getLogger().error(Unit.class, "Could not parse unit " + idNode.getTextContent().trim());
+            MekHQ.getLogger().error(Unit.class, ex);
             return null;
         }
 
@@ -3278,7 +3279,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             getCampaign().addPart(bin, 0);
             return bin;
         } catch (LocationFullException ex) {
-            MekHQ.getLogger().error(Unit.class, "Location full exception attempting to add " + etype.getDesc() + " to unit " + getName(), ex);
+            MekHQ.getLogger().error(Unit.class, "Location full exception attempting to add " + etype.getDesc() + " to unit " + getName());
+            MekHQ.getLogger().error(Unit.class, ex);
             return null;
         }
 

@@ -1360,7 +1360,7 @@ public class Utilities {
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
         } catch(Exception ioe) {
-            MekHQ.getLogger().error(Utilities.class,  "Error exporting JTable");
+            MekHQ.getLogger().error(Utilities.class, "Error exporting JTable");
             report = "Error exporting JTable. See log for details.";
         }
         return report;
@@ -1494,6 +1494,7 @@ public class Utilities {
                         } catch (Exception ex) {
                             // Ignore this file then
                             MekHQ.getLogger().error(Utilities.class, "Exception trying to parse " + file.getPath() + " - ignoring.");
+                            MekHQ.getLogger().error(Utilities.class, ex);
                         }
                     }
                 }

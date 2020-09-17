@@ -513,7 +513,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      *         if the given element parses to multiple entities
      */
     public static Entity parseSingleEntityMul(Element element) {
-        MekHQ.getLogger().trace(MekHqXmlUtil.class,  "Executing getEntityFromXmlString(Node)...");
+        MekHQ.getLogger().trace(MekHqXmlUtil.class, "Executing getEntityFromXmlString(Node)...");
 
         MULParser prs = new MULParser();
         prs.parse(element);
