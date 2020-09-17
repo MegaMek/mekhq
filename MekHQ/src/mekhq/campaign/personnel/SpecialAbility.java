@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.personnel;
 
 import java.io.FileInputStream;
@@ -40,7 +39,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
@@ -126,36 +124,36 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
-	public SpecialAbility clone() {
-    	SpecialAbility clone = new SpecialAbility(lookupName);
-    	clone.displayName = this.displayName;
-    	clone.desc = this.desc;
-    	clone.xpCost = this.xpCost;
-    	clone.weight = this.weight;
-    	clone.prereqAbilities = (Vector<String>)this.prereqAbilities.clone();
-    	clone.invalidAbilities = (Vector<String>)this.invalidAbilities.clone();
-    	clone.removeAbilities = (Vector<String>)this.removeAbilities.clone();
-    	clone.choiceValues = (Vector<String>)this.choiceValues.clone();
-    	clone.prereqSkills = (Vector<SkillPrereq>)this.prereqSkills.clone();
-    	clone.prereqMisc = new HashMap<>(this.prereqMisc);
-    	return clone;
+    public SpecialAbility clone() {
+        SpecialAbility clone = new SpecialAbility(lookupName);
+        clone.displayName = this.displayName;
+        clone.desc = this.desc;
+        clone.xpCost = this.xpCost;
+        clone.weight = this.weight;
+        clone.prereqAbilities = (Vector<String>)this.prereqAbilities.clone();
+        clone.invalidAbilities = (Vector<String>)this.invalidAbilities.clone();
+        clone.removeAbilities = (Vector<String>)this.removeAbilities.clone();
+        clone.choiceValues = (Vector<String>)this.choiceValues.clone();
+        clone.prereqSkills = (Vector<SkillPrereq>)this.prereqSkills.clone();
+        clone.prereqMisc = new HashMap<>(this.prereqMisc);
+        return clone;
     }
 
     public boolean isEligible(Person p) {
-        for(SkillPrereq sp : prereqSkills) {
-            if(!sp.qualifies(p)) {
+        for (SkillPrereq sp : prereqSkills) {
+            if (!sp.qualifies(p)) {
                 return false;
             }
         }
-        for(String ability : prereqAbilities) {
+        for (String ability : prereqAbilities) {
             //TODO: will this work for choice options like weapon specialist?
-            if(!p.getOptions().booleanOption(ability)) {
+            if (!p.getOptions().booleanOption(ability)) {
                 return false;
             }
         }
-        for(String ability : invalidAbilities) {
+        for (String ability : invalidAbilities) {
             //TODO: will this work for choice options like weapon specialist?
-            if(p.getOptions().booleanOption(ability)) {
+            if (p.getOptions().booleanOption(ability)) {
                 return false;
             }
         }
@@ -164,20 +162,20 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public boolean isEligible(boolean isClanner, Skills skills, PersonnelOptions options) {
-        for(SkillPrereq sp : prereqSkills) {
-            if(!sp.qualifies(skills)) {
+        for (SkillPrereq sp : prereqSkills) {
+            if (!sp.qualifies(skills)) {
                 return false;
             }
         }
-        for(String ability : prereqAbilities) {
+        for (String ability : prereqAbilities) {
             //TODO: will this work for choice options like weapon specialist?
-            if(!options.booleanOption(ability)) {
+            if (!options.booleanOption(ability)) {
                 return false;
             }
         }
-        for(String ability : invalidAbilities) {
+        for (String ability : invalidAbilities) {
             //TODO: will this work for choice options like weapon specialist?
-            if(options.booleanOption(ability)) {
+            if (options.booleanOption(ability)) {
                 return false;
             }
         }
@@ -186,8 +184,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public boolean isEligible(int unitType) {
-        for(SkillPrereq sp : prereqSkills) {
-            if(!sp.qualifies(unitType)) {
+        for (SkillPrereq sp : prereqSkills) {
+            if (!sp.qualifies(unitType)) {
                 return false;
             }
         }
@@ -212,7 +210,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public void setCost(int cost) {
-    	xpCost = cost;
+        xpCost = cost;
     }
 
     public int getWeight() {
@@ -220,7 +218,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public void setWeight(int weight) {
-    	this.weight = weight;
+        this.weight = weight;
     }
 
     public Vector<SkillPrereq> getPrereqSkills() {
@@ -228,7 +226,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public void setPrereqSkills(Vector<SkillPrereq> prereq) {
-    	prereqSkills = prereq;
+        prereqSkills = prereq;
     }
 
     public Vector<String> getPrereqAbilities() {
@@ -236,14 +234,14 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public void setPrereqAbilities(Vector<String> prereq) {
-    	prereqAbilities = prereq;
+        prereqAbilities = prereq;
     }
 
-    public Map<String,String> getPrereqMisc() {
+    public Map<String, String> getPrereqMisc() {
         return prereqMisc;
     }
 
-    public void setPrereqMisc(Map<String,String> prereq) {
+    public void setPrereqMisc(Map<String, String> prereq) {
         prereqMisc = new HashMap<>(prereq);
     }
 
@@ -252,7 +250,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public void setInvalidAbilities(Vector<String> invalid) {
-    	invalidAbilities = invalid;
+        invalidAbilities = invalid;
     }
 
     public Vector<String> getRemovedAbilities() {
@@ -260,7 +258,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public void setRemovedAbilities(Vector<String> remove) {
-    	removeAbilities = remove;
+        removeAbilities = remove;
     }
 
     public Vector<String> getChoiceValues() {
@@ -318,7 +316,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 +"<choiceValues>"
                 +Utilities.combineString(choiceValues, "::")
                 +"</choiceValues>");
-        for(SkillPrereq skillpre : prereqSkills) {
+        for (SkillPrereq skillpre : prereqSkills) {
             skillpre.writeToXml(pw1, indent+1);
         }
         for (String pre : prereqMisc.keySet()) {
@@ -361,7 +359,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
                     retVal.choiceValues = Utilities.splitString(wn2.getTextContent(), "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
                     SkillPrereq skill = SkillPrereq.generateInstanceFromXML(wn2);
-                    if(!skill.isEmpty()) {
+                    if (!skill.isEmpty()) {
                         retVal.prereqSkills.add(skill);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("miscPrereq")) {
@@ -370,16 +368,16 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 }
             }
 
-            if(retVal.displayName.isEmpty()) {
+            if (retVal.displayName.isEmpty()) {
                 IOption option = options.getOption(retVal.lookupName);
-                if(null != option) {
+                if (null != option) {
                     retVal.displayName = option.getDisplayableName();
                 }
             }
 
-            if(retVal.desc.isEmpty()) {
+            if (retVal.desc.isEmpty()) {
                 IOption option = options.getOption(retVal.lookupName);
-                if(null != option) {
+                if (null != option) {
                     retVal.desc = option.getDescription();
                 }
             }
@@ -438,7 +436,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
                     retVal.choiceValues = Utilities.splitString(wn2.getTextContent(), "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
                     SkillPrereq skill = SkillPrereq.generateInstanceFromXML(wn2);
-                    if(!skill.isEmpty()) {
+                    if (!skill.isEmpty()) {
                         retVal.prereqSkills.add(skill);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("miscPrereq")) {
@@ -447,16 +445,16 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 }
             }
 
-            if(retVal.displayName.isEmpty()) {
+            if (retVal.displayName.isEmpty()) {
                 IOption option = options.getOption(retVal.lookupName);
-                if(null != option) {
+                if (null != option) {
                     retVal.displayName = option.getDisplayableName();
                 }
             }
 
-            if(retVal.desc.isEmpty()) {
+            if (retVal.desc.isEmpty()) {
                 IOption option = options.getOption(retVal.lookupName);
-                if(null != option) {
+                if (null != option) {
                     retVal.desc = option.getDescription();
                 }
             }
@@ -559,7 +557,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static void replaceSpecialAbilities(Hashtable<String, SpecialAbility> spas) {
-    	specialAbilities = spas;
+        specialAbilities = spas;
     }
 
     public static SpecialAbility getOption(String name) {
@@ -584,72 +582,72 @@ public class SpecialAbility implements MekHqXmlSerializable {
         ArrayList<String> candidates = new ArrayList<>();
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
-            
-            if(!isWeaponEligibleForSPA(et, type, clusterOnly)) {
+
+            if (!isWeaponEligibleForSPA(et, type, clusterOnly)) {
                 continue;
             }
-            
+
             WeaponType wt = (WeaponType) et;
-            
-            if(TechConstants.isClan(wt.getTechLevel(year)) != isClan) {
+
+            if (TechConstants.isClan(wt.getTechLevel(year)) != isClan) {
                 continue;
             }
-            
+
             int lvl = wt.getTechLevel(year);
-            if(lvl < 0) {
+            if (lvl < 0) {
                 continue;
             }
-            
-            if(techLvl < Utilities.getSimpleTechLevel(lvl)) {
+
+            if (techLvl < Utilities.getSimpleTechLevel(lvl)) {
                 continue;
             }
-            
-            if(techLvl == TechConstants.T_IS_UNOFFICIAL) {
+
+            if (techLvl == TechConstants.T_IS_UNOFFICIAL) {
                 continue;
             }
-            
+
             int ntimes = 10;
-            if(techLvl >= TechConstants.T_IS_ADVANCED) {
+            if (techLvl >= TechConstants.T_IS_ADVANCED) {
                 ntimes = 1;
             }
-            
-            while(ntimes > 0) {
+
+            while (ntimes > 0) {
                 candidates.add(et.getName());
                 ntimes--;
             }
         }
-        if(candidates.isEmpty()) {
+        if (candidates.isEmpty()) {
             return "??";
         }
         return Utilities.getRandomItem(candidates);
     }
-    
+
     /**
-     * Worker function that determines if a piece of equipment is eligible 
+     * Worker function that determines if a piece of equipment is eligible
      * for being selected for an SPA.
      * @param et Equipment type to check
      * @param type Person role, e.g. Person.T_MECHWARRIOR. This check is ignored if Person.T_NONE is passed in.
      * @param clusterOnly All weapon types or just ones that do rolls on the cluster table
      */
     public static boolean isWeaponEligibleForSPA(EquipmentType et, int type, boolean clusterOnly) {
-        if(!(et instanceof WeaponType)) {
+        if (!(et instanceof WeaponType)) {
             return false;
         }
-        if(et instanceof InfantryWeapon
+        if (et instanceof InfantryWeapon
                 || et instanceof BayWeapon
                 || et instanceof InfantryAttack) {
             return false;
         }
         WeaponType wt = (WeaponType)et;
-        if(wt.isCapital()
+        if (wt.isCapital()
                 || wt.isSubCapital()
                 || wt.hasFlag(WeaponType.F_INFANTRY)
                 || wt.hasFlag(WeaponType.F_ONESHOT)
                 || wt.hasFlag(WeaponType.F_PROTOTYPE)) {
             return false;
         }
-        
-        if(type > Person.T_NONE && 
+
+        if (type > Person.T_NONE &&
                 !((wt.hasFlag(WeaponType.F_MECH_WEAPON) && type == Person.T_MECHWARRIOR)
                 || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && type != Person.T_AERO_PILOT)
                 || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !(type == Person.T_VEE_GUNNER
@@ -660,78 +658,78 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && type != Person.T_PROTO_PILOT))) {
             return false;
         }
-        
-        if(wt.getAtClass() == WeaponType.CLASS_NONE ||
+
+        if (wt.getAtClass() == WeaponType.CLASS_NONE ||
                 wt.getAtClass() == WeaponType.CLASS_POINT_DEFENSE ||
                 wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER) {
             return false;
         }
-        
-        if(clusterOnly && !(
+
+        if (clusterOnly && !(
                 (wt.getDamage() == WeaponType.DAMAGE_BY_CLUSTERTABLE) ||
                 (wt instanceof ACWeapon) ||
                 (wt instanceof UACWeapon) ||
                 (wt instanceof LBXACWeapon))) {
             return false;
         }
-        
+
         return true;
     }
 
     public String getAllPrereqDesc() {
         String toReturn = "";
-        for(String prereq : prereqAbilities) {
+        for (String prereq : prereqAbilities) {
             toReturn += getDisplayName(prereq) + "<br>";
         }
-        for(SkillPrereq skPr : prereqSkills) {
+        for (SkillPrereq skPr : prereqSkills) {
             toReturn += skPr.toString() + "<br>";
         }
         for (String pr : prereqMisc.keySet()) {
             toReturn += pr + ": " + prereqMisc.get(pr) + "<br/>";
         }
-        if(toReturn.isEmpty()) {
-        	toReturn = "None";
+        if (toReturn.isEmpty()) {
+            toReturn = "None";
         }
         return toReturn;
     }
 
     public String getPrereqAbilDesc() {
         String toReturn = "";
-        for(String prereq : prereqAbilities) {
+        for (String prereq : prereqAbilities) {
             toReturn += getDisplayName(prereq) + "<br>";
         }
-        if(toReturn.isEmpty()) {
-        	toReturn = "None";
+        if (toReturn.isEmpty()) {
+            toReturn = "None";
         }
         return toReturn;
     }
 
     public String getInvalidDesc() {
         String toReturn = "";
-        for(String invalid : invalidAbilities) {
+        for (String invalid : invalidAbilities) {
             toReturn += getDisplayName(invalid) + "<br>";
         }
-        if(toReturn.isEmpty()) {
-        	toReturn = "None";
+        if (toReturn.isEmpty()) {
+            toReturn = "None";
         }
         return toReturn;
     }
 
     public String getRemovedDesc() {
-        String toReturn = "";
-        for(String remove : removeAbilities) {
-            toReturn += getDisplayName(remove) + "<br>";
+        StringBuilder toReturn = new StringBuilder();
+        for (String remove : removeAbilities) {
+            toReturn.append(getDisplayName(remove)).append("<br>");
         }
-        if(toReturn.isEmpty()) {
-        	toReturn = "None";
+        if (toReturn.length() == 0) {
+            toReturn = new StringBuilder("None");
         }
-        return toReturn;
+        return toReturn.toString();
     }
 
     public static String getDisplayName(String name) {
         PilotOptions options = new PilotOptions();
         IOption option = options.getOption(name);
-        if(null != option) {
+        if (null != option) {
             return option.getDisplayableName();
         }
         return "??";
@@ -751,7 +749,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static void setSpecialAbilities(Hashtable<String, SpecialAbility> spHash) {
-    	specialAbilities = spHash;
+        specialAbilities = spHash;
     }
 
     public static List<SpecialAbility> getWeightedSpecialAbilities() {

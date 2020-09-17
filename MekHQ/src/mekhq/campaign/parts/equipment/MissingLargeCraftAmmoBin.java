@@ -129,7 +129,8 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
         return false;
     }
 
-    private int getFullShots() {
+    @Override
+    protected int getFullShots() {
         return (int) Math.floor(size * ((AmmoType) type).getShots() / type.getTonnage(null));
     }
 
