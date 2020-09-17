@@ -915,17 +915,17 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
         }
         time += (oldIntegratedHS.size() + newIntegratedHS.size()) * 90;
-        for(Part nHsPart : newIntegratedHS) {
+        for (Part nHsPart : newIntegratedHS) {
             // Check warehouse for spare heat sinks before adding to shopping list
-            Part replacement = ((MissingPart)nHsPart).findReplacement(true);
+            Part replacement = ((MissingPart) nHsPart).findReplacement(true);
             //check quantity
-            if((null != replacement) && (null == partQuantity.get(replacement.getId()))) {
+            if ((null != replacement) && (null == partQuantity.get(replacement.getId()))) {
                 partQuantity.put(replacement.getId(), replacement.getQuantity());
             }
-            if((null != replacement) && (partQuantity.get(replacement.getId())) > 0) {
+            if ((null != replacement) && (partQuantity.get(replacement.getId())) > 0) {
                 newUnitParts.add(replacement.getId());
                 //adjust quantity
-                partQuantity.put(replacement.getId(), partQuantity.get(replacement.getId())-1);
+                partQuantity.put(replacement.getId(), partQuantity.get(replacement.getId()) - 1);
                 //If the quantity is now 0 set usedForRefitPlanning flag so findReplacement ignores this item
                 if (partQuantity.get(replacement.getId()) == 0) {
                     replacement.setUsedForRefitPlanning(true);
