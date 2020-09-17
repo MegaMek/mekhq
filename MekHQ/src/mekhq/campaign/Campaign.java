@@ -161,7 +161,7 @@ import mekhq.module.atb.AtBEventProcessor;
  * @author Taharqa
  */
 public class Campaign implements Serializable, ITechManager {
-    public static final String REPORT_LINEBREAK = "<br/><br/>"; //$NON-NLS-1$
+    public static final String REPORT_LINEBREAK = "<br/><br/>";
 
     private static final long serialVersionUID = -6312434701389973056L;
 
@@ -192,9 +192,6 @@ public class Campaign implements Serializable, ITechManager {
     private int lastForceId;
     private int lastMissionId;
     private int lastScenarioId;
-
-    // indicates whether or not the campaign should be gzipped, if possible.
-    private boolean preferGzippedOutput;
 
     // I need to put a basic game object in campaign so that I can
     // assign it to the entities, otherwise some entity methods may get NPE
@@ -348,27 +345,6 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void setOverviewLoadingValue(boolean overviewLoadingValue) {
         this.overviewLoadingValue = overviewLoadingValue;
-    }
-
-    /**
-     * Gets a hint which indicates if the campaign should be written to a
-     * gzipped file, if possible.
-     * @return A value indicating if the campaign should be written to a
-     *         gzipped file, if possible.
-     */
-    public boolean getPreferGzippedOutput() {
-        return preferGzippedOutput;
-    }
-
-    /**
-     * Sets a hint indicating that the campaign should be gzipped, if possible.
-     * This allows the Save dialog to present the user with the correct file
-     * type on subsequent saves.
-     * @param preferGzip A value indicating whether or not the campaign
-     *                   should be gzipped if possible.
-     */
-    public void setPreferGzippedOutput(boolean preferGzip) {
-        preferGzippedOutput = preferGzip;
     }
 
     public Game getGame() {
@@ -4204,7 +4180,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private void addInMemoryLogHistory(LogEntry le) {
         if (inMemoryLogHistory.size() != 0) {
-            while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) > HistoricalDailyReportDialog.MAX_DAYS_HISTORY) {
+            while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) > MekHqConstants.MAX_HISTORICAL_LOG_DAYS) {
                 //we've hit the max size for the in-memory based on the UI display limit prune the oldest entry
                 inMemoryLogHistory.remove(0);
             }
@@ -4217,7 +4193,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param r - the report String
      */
     public void beginReport(String r) {
-        if (this.getCampaignOptions().historicalDailyLog()) {
+        if (MekHQ.getMekHQOptions().getHistoricalDailyLog()) {
             //add the new items to our in-memory cache
             addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), ""));
         }
@@ -4229,7 +4205,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param r - the report String
      */
     public void addReport(String r) {
-        if (this.getCampaignOptions().historicalDailyLog()) {
+        if (MekHQ.getMekHQOptions().getHistoricalDailyLog()) {
             addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), r));
         }
         addReportInternal(r);
