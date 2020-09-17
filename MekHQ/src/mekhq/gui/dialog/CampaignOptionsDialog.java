@@ -489,11 +489,6 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUseAtBCapture;
     private JSpinner spnStartGameDelay;
     //endregion Against the Bot Tab
-
-    //region Miscellaneous Tab
-    private JPanel panMisc;
-    private JCheckBox chkHistoricalDailyLog;
-    //endregion Miscellaneous Tab
     //endregion Variable Declarations
 
     public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c, IconPackage icons) {
@@ -615,9 +610,6 @@ public class CampaignOptionsDialog extends JDialog {
         reverseQualityNames = new JCheckBox();
 
         chkSupportStaffOnly = new JCheckBox();
-
-        panMisc = new JPanel();
-        chkHistoricalDailyLog = new JCheckBox();
 
         GridBagConstraints gridBagConstraints;
         int gridy = 0;
@@ -4139,7 +4131,7 @@ public class CampaignOptionsDialog extends JDialog {
         JPanel panOpforLocal = new JPanel();
         chkOpforUsesLocalForces.setText(resourceMap.getString("chkOpforUsesLocalForces.text"));
         chkOpforUsesLocalForces.setToolTipText(resourceMap.getString("chkOpforUsesLocalForces.toolTipText"));
-        JLabel lblOpforLocalForceChance = new JLabel(resourceMap.getString("lblOpforAeroLikelihood.text"));
+        JLabel lblOpforLocalForceChance = new JLabel(resourceMap.getString("lblOpforLocalForceLikelihood.text"));
         lblOpforLocalForceChance.setToolTipText(resourceMap.getString("lblOpforLocalForceLikelihood.toolTipText"));
         spnOpforLocalForceChance.setModel(new SpinnerNumberModel(0, 0, 6, 1));
         panOpforLocal.add(chkOpforUsesLocalForces);
@@ -4263,22 +4255,6 @@ public class CampaignOptionsDialog extends JDialog {
             scrAtB.getVerticalScrollBar().setValue(0);
         });
         //endregion Against the Bot Tab
-
-        //region Miscellaneous Tab
-        JScrollPane scrMisc = new JScrollPane(panMisc);
-        scrMisc.setPreferredSize(new java.awt.Dimension(500, 400));
-
-        chkHistoricalDailyLog.setText(resourceMap.getString("chkShowHistoricalDailyReport.text"));
-        chkHistoricalDailyLog.setToolTipText(resourceMap.getString("chkShowHistoricalDailyReport.toolTipText"));
-        chkHistoricalDailyLog.setName("chkHistoricalDailyLog");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMisc.add(chkHistoricalDailyLog, gridBagConstraints);
-
-        tabOptions.addTab(resourceMap.getString("misc.TabConstraints.tabTitle"), scrMisc);
-        //endregion Miscellaneous Tab
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -4755,10 +4731,6 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseAtBCapture.setSelected(options.getUseAtBCapture());
         spnStartGameDelay.setValue(options.getStartGameDelay());
         //endregion Against the Bot Tab
-
-        //region Miscellaneous Tab
-        chkHistoricalDailyLog.setSelected(options.historicalDailyLog());
-        //endregion Miscellaneous Tab
     }
 
     public static String[][] getSkillCostsArray(Hashtable<String, SkillType> skillHash) {
@@ -5223,13 +5195,8 @@ public class CampaignOptionsDialog extends JDialog {
         options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
         options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
         options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
-        options.setContractMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
-
+        options.setUnitMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
         // End Against the Bot
-
-        //region Miscellaneous Tab
-        options.setHistoricalDailyLog(chkHistoricalDailyLog.isSelected());
-        //endregion Miscellaneous Tab
 
         MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
     }
