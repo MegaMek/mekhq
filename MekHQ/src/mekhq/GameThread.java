@@ -175,7 +175,7 @@ class GameThread extends Thread implements CloseClientListener {
         System.gc();
     }
 
-    public void createController(){
+    public void createController() {
         controller = new MegaMekController();
         KeyboardFocusManager kbfm =
                 KeyboardFocusManager.getCurrentKeyboardFocusManager();

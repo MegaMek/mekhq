@@ -1090,7 +1090,7 @@ public class Utilities {
     }
 
     //copied from http://www.roseindia.net/java/beginners/copyfile.shtml
-    public static void copyfile(File inFile, File outFile){
+    public static void copyfile(File inFile, File outFile) {
         try {
             InputStream in = new FileInputStream(inFile);
 
@@ -1102,7 +1102,7 @@ public class Utilities {
 
             byte[] buf = new byte[1024];
             int len;
-            while ((len = in.read(buf)) > 0){
+            while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
             }
             in.close();

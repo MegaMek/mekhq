@@ -105,7 +105,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public String getLocationName() {
         if (unit != null
                 && unit.getEntity() instanceof Aero
-                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
             return "Fuselage";
         }
         return super.getLocationName();
@@ -115,7 +115,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public int getLocation() {
         if (unit != null
                 && unit.getEntity() instanceof Aero
-                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
             return Aero.LOC_NONE;
         }
         return super.getLocation();

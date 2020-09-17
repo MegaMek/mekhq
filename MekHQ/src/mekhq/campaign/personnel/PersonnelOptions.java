@@ -222,7 +222,7 @@ public class PersonnelOptions extends PilotOptions {
             SpecialAbility spa = SpecialAbility.getOption(name);
             if (null != spa) {
                 return spa.getDisplayName();
-            } else if (null != mmOptions.getOption(name)){
+            } else if (null != mmOptions.getOption(name)) {
                 return mmOptions.getOption(name).getDisplayableName();
             } else {
                 return name;
@@ -234,7 +234,7 @@ public class PersonnelOptions extends PilotOptions {
             SpecialAbility spa = SpecialAbility.getOption(name);
             if (null != spa) {
                 return spa.getDisplayName();
-            } else if (null != mmOptions.getOption(name)){
+            } else if (null != mmOptions.getOption(name)) {
                 return mmOptions.getOption(name).getDisplayableName();
             } else {
                 return name;
@@ -246,7 +246,7 @@ public class PersonnelOptions extends PilotOptions {
             SpecialAbility spa = SpecialAbility.getOption(name);
             if (null != spa) {
                 return spa.getDescription();
-            } else if (null != mmOptions.getOption(name)){
+            } else if (null != mmOptions.getOption(name)) {
                 return mmOptions.getOption(name).getDescription();
             } else {
                 return name;

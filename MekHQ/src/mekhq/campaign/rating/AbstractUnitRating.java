@@ -269,7 +269,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             return 0;
         }
         Skill skill = commander.getSkill(skillName);
-        if (skill == null){
+        if (skill == null) {
             return 0;
         }
         return skill.getBonus();
@@ -284,7 +284,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             return 0;
         }
         Skill skill = commander.getSkill(skillName);
-        if (skill == null){
+        if (skill == null) {
             return 0;
         }
         return skill.getLevel() + skill.getBonus();

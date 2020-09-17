@@ -849,7 +849,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
 
-        if (transportNeeded.compareTo(BigDecimal.ZERO) == 0){
+        if (transportNeeded.compareTo(BigDecimal.ZERO) == 0) {
             //If all units are transported, return 100%
             return HUNDRED;
         }

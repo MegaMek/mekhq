@@ -151,7 +151,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         Document xmlDoc;
         DocumentBuilder db;
 
-        try (FileInputStream fis = new FileInputStream(f)){
+        try (FileInputStream fis = new FileInputStream(f)) {
             db = MekHqXmlUtil.newSafeDocumentBuilder();
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
