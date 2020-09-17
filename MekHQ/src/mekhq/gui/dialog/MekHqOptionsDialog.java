@@ -36,6 +36,7 @@ public class MekHqOptionsDialog extends BaseDialog {
     //region Display
     private JTextField optionDisplayDateFormat;
     private JTextField optionLongDisplayDateFormat;
+    private JCheckBox optionHistoricalDailyLog;
 
     //region Personnel Tab Display Options
     private JCheckBox optionPersonnelIndividualRoleFilters;
@@ -54,6 +55,7 @@ public class MekHqOptionsDialog extends BaseDialog {
     //endregion Autosave
 
     //region Campaign XML Save
+    private JCheckBox optionPreferGzippedOutput;
     private JCheckBox optionWriteCustomsToXML;
     //endregion Campaign XML Save
 
@@ -89,6 +91,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                 validateLongDisplayDate()
                         ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText()))
                         : resources.getString("invalidDateFormat.error")));
+
+        optionHistoricalDailyLog = new JCheckBox(resources.getString("optionHistoricalDailyLog.text"));
+        optionHistoricalDailyLog.setToolTipText(resources.getString("optionHistoricalDailyLog.toolTipText"));
 
         //region Personnel Tab Display Options
         JLabel labelPersonnelDisplay = new JLabel(resources.getString("labelPersonnelDisplay.text"));
@@ -135,6 +140,9 @@ public class MekHqOptionsDialog extends BaseDialog {
         //region Campaign XML Save
         JLabel labelXMLSave = new JLabel(resources.getString("labelXMLSave.text"));
 
+        optionPreferGzippedOutput = new JCheckBox(resources.getString("optionPreferGzippedOutput.text"));
+        optionPreferGzippedOutput.setToolTipText(resources.getString("optionPreferGzippedOutput.toolTipText"));
+
         optionWriteCustomsToXML = new JCheckBox(resources.getString("optionWriteCustomsToXML.text"));
         optionWriteCustomsToXML.setMnemonic(KeyEvent.VK_C);
         //endregion Campaign XML Save
@@ -159,6 +167,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelLongDisplayDateFormat)
                             .addComponent(optionLongDisplayDateFormat)
                             .addComponent(labelLongDisplayDateFormatExample, GroupLayout.Alignment.TRAILING))
+                    .addComponent(optionHistoricalDailyLog)
                     .addComponent(labelPersonnelDisplay)
                     .addComponent(optionPersonnelIndividualRoleFilters)
                     .addComponent(optionPersonnelFilterOnPrimaryRole)
@@ -173,6 +182,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelSavedGamesCount)
                             .addComponent(spinnerSavedGamesCount, GroupLayout.Alignment.TRAILING))
                     .addComponent(labelXMLSave)
+                    .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
         );
 
@@ -187,6 +197,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelLongDisplayDateFormat)
                             .addComponent(optionLongDisplayDateFormat)
                             .addComponent(labelLongDisplayDateFormatExample))
+                    .addComponent(optionHistoricalDailyLog)
                     .addComponent(labelPersonnelDisplay)
                     .addComponent(optionPersonnelIndividualRoleFilters)
                     .addComponent(optionPersonnelFilterOnPrimaryRole)
@@ -201,6 +212,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(labelSavedGamesCount)
                             .addComponent(spinnerSavedGamesCount))
                     .addComponent(labelXMLSave)
+                    .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
         );
 
@@ -212,10 +224,10 @@ public class MekHqOptionsDialog extends BaseDialog {
         if (validateDisplayDate()) {
             MekHQ.getMekHQOptions().setDisplayDateFormat(optionDisplayDateFormat.getText());
         }
-
         if (validateLongDisplayDate()) {
             MekHQ.getMekHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
+        MekHQ.getMekHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
         MekHQ.getMekHQOptions().setPersonnelIndividualRoleFilters(optionPersonnelIndividualRoleFilters.isSelected());
         MekHQ.getMekHQOptions().setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
 
@@ -226,6 +238,8 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setAutosaveYearlyValue(optionSaveYearly.isSelected());
         MekHQ.getMekHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
         MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
+
+        MekHQ.getMekHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
         MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
 
         MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
@@ -234,6 +248,7 @@ public class MekHqOptionsDialog extends BaseDialog {
     private void setInitialState() {
         optionDisplayDateFormat.setText(MekHQ.getMekHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMekHQOptions().getLongDisplayDateFormat());
+        optionHistoricalDailyLog.setSelected(MekHQ.getMekHQOptions().getHistoricalDailyLog());
         optionPersonnelIndividualRoleFilters.setSelected(MekHQ.getMekHQOptions().getPersonnelIndividualRoleFilters());
         optionPersonnelFilterOnPrimaryRole.setSelected(MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole());
 
@@ -244,6 +259,8 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionSaveYearly.setSelected(MekHQ.getMekHQOptions().getAutosaveYearlyValue());
         checkSaveBeforeMissions.setSelected(MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue());
         spinnerSavedGamesCount.setValue(MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue());
+
+        optionPreferGzippedOutput.setSelected(MekHQ.getMekHQOptions().getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
     }
 
