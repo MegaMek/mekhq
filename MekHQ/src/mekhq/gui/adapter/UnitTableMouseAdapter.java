@@ -46,6 +46,7 @@ import megamek.common.*;
 import megamek.common.loaders.BLKFile;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
+import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
@@ -58,6 +59,7 @@ import mekhq.campaign.parts.MissingThrusters;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.InfantryAmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -69,12 +71,7 @@ import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.MekLabTab;
-import mekhq.gui.dialog.BombsDialog;
-import mekhq.gui.dialog.CamoChoiceDialog;
-import mekhq.gui.dialog.ChooseRefitDialog;
-import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
-import mekhq.gui.dialog.MarkdownEditorDialog;
-import mekhq.gui.dialog.QuirksDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -98,6 +95,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     // Ammo Swap Commands
     public static final String COMMAND_LC_SWAP_AMMO = "LC_SWAP_AMMO";
     public static final String COMMAND_SWAP_AMMO = "SWAP_AMMO";
+    public static final String COMMAND_SMALL_SV_SWAP_AMMO = "SMALL_SV_SWAP_AMMO";
     // Repair Commands
     public static final String COMMAND_REPAIR = "REPAIR";
     public static final String COMMAND_SALVAGE = "SALVAGE";
@@ -260,6 +258,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             }
         } else if (command.equals(COMMAND_LC_SWAP_AMMO)) { // Single Unit only
             LargeCraftAmmoSwapDialog dialog = new LargeCraftAmmoSwapDialog(gui.getFrame(), selectedUnit);
+            dialog.setVisible(true);
+            if (!dialog.wasCanceled()) {
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+            }
+        } else if (command.equals(COMMAND_SMALL_SV_SWAP_AMMO)) {
+            SmallSVAmmoSwapDialog dialog = new SmallSVAmmoSwapDialog(gui.getFrame(), selectedUnit);
             dialog.setVisible(true);
             if (!dialog.wasCanceled()) {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
@@ -733,6 +737,18 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         menuItem.setActionCommand(COMMAND_LC_SWAP_AMMO);
                         menuItem.addActionListener(this);
                         popup.add(menuItem);
+                    } else if (unit.getEntity().isSupportVehicle()
+                                && unit.getEntity().getWeightClass() == EntityWeightClass.WEIGHT_SMALL_SUPPORT) {
+                        // Small SVs can configure ammo only if they have weapons that have
+                        // inferno ammo available
+                        if (unit.getEntity().getWeaponList().stream()
+                                .anyMatch(m -> (m.getType() instanceof InfantryWeapon)
+                                        && ((InfantryWeapon) m.getType()).hasInfernoAmmo())) {
+                            menuItem = new JMenuItem("Swap ammo...");
+                            menuItem.setActionCommand(COMMAND_SMALL_SV_SWAP_AMMO);
+                            menuItem.addActionListener(this);
+                            popup.add(menuItem);
+                        }
                     } else {
                         menu = new JMenu("Swap ammo");
                         JMenu ammoMenu;

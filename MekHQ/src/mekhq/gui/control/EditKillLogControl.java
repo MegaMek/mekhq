@@ -47,7 +47,7 @@ public class EditKillLogControl extends JPanel {
         this.campaign = campaign;
         this.person = person;
 
-        this.killModel = new KillTableModel(campaign, campaign.getKillsFor(this.person.getId()));
+        this.killModel = new KillTableModel(campaign.getKillsFor(this.person.getId()));
 
         initComponents();
     }
@@ -107,7 +107,7 @@ public class EditKillLogControl extends JPanel {
     }
 
     private void addKill() {
-        AddOrEditKillEntryDialog dialog = new AddOrEditKillEntryDialog(parent, true, campaign,
+        AddOrEditKillEntryDialog dialog = new AddOrEditKillEntryDialog(parent, true,
                 person.getId(), "", campaign.getLocalDate());
         dialog.setVisible(true);
         if (dialog.getKill().isPresent()) {
@@ -119,7 +119,7 @@ public class EditKillLogControl extends JPanel {
     private void editKill() {
         Kill kill = killModel.getKillAt(killTable.getSelectedRow());
         if (null != kill) {
-            AddOrEditKillEntryDialog dialog = new AddOrEditKillEntryDialog(parent, true, campaign, kill);
+            AddOrEditKillEntryDialog dialog = new AddOrEditKillEntryDialog(parent, true, kill);
             dialog.setVisible(true);
             refreshTable();
         }
@@ -137,7 +137,7 @@ public class EditKillLogControl extends JPanel {
         if (selectedRow != -1) {
             if (killTable.getRowCount() > 0) {
                 if (killTable.getRowCount() == selectedRow) {
-                    killTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
+                    killTable.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
                 } else {
                     killTable.setRowSelectionInterval(selectedRow, selectedRow);
                 }

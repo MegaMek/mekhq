@@ -33,7 +33,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.Campaign;
+import mekhq.MekHQ;
 import mekhq.campaign.Kill;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
@@ -47,13 +47,11 @@ public class PersonnelKillLogModel extends DataTableModel {
 
     private ResourceBundle resourceMap;
     private final int dateTextWidth;
-    private Campaign campaign;
 
-    public PersonnelKillLogModel(Campaign campaign) {
+    public PersonnelKillLogModel() {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel", new EncodeControl());
-        this.campaign = campaign;
         data = new ArrayList<Kill>();
-        dateTextWidth = getRenderer().metrics.stringWidth(campaign.getCampaignOptions().getDisplayFormattedDate(LocalDate.now())) + 10;
+        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMekHQOptions().getDisplayFormattedDate(LocalDate.now())) + 10;
     }
 
     @Override
@@ -83,7 +81,7 @@ public class PersonnelKillLogModel extends DataTableModel {
         Kill kill = getKill(row);
         switch (column) {
             case COL_DATE:
-                return campaign.getCampaignOptions().getDisplayFormattedDate(kill.getDate());
+                return MekHQ.getMekHQOptions().getDisplayFormattedDate(kill.getDate());
             case COL_TEXT:
                 return String.format(resourceMap.getString("killDetail.format"), kill.getWhatKilled(), kill.getKilledByWhat());
             default:

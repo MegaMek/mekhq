@@ -336,7 +336,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         JLabel lblAdvance = new JLabel(resourceMap.getString("lblAdvance.text"));
 
 
-        btnDate = new JButton(campaign.getCampaignOptions().getDisplayFormattedDate(contract.getStartDate()));
+        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeStartDate());
 
@@ -675,7 +675,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         	}
             contract.setStartDate(dc.getDate());
             contract.calculateContract(campaign);
-            btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(contract.getStartDate()));
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         }
     }
 
@@ -780,6 +780,6 @@ public class NewContractDialog extends javax.swing.JDialog {
 
         contract.calculateContract(campaign);
         contractPaymentBreakdown.refresh();
-        btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(contract.getStartDate()));
+        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
     }
 }

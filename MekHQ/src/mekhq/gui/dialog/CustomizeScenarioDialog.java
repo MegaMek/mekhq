@@ -189,7 +189,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         }
         if (!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))) {
             btnDate = new JButton();
-            btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(date));
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
             btnDate.addActionListener(evt -> changeDate());
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
@@ -398,7 +398,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                 return;
             }
             date = dc.getDate();
-            btnDate.setText(campaign.getCampaignOptions().getDisplayFormattedDate(date));
+            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         }
     }
 

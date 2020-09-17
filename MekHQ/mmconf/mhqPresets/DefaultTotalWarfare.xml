@@ -3,7 +3,6 @@
 	<title>TW Standard Default</title>
 	<description>This is the default settings used by MHQ. It is intended to follow the Total Warfare line of rulebooks whenever possible, and for rules outside of this scope it uses Field Manual: Mercenaries, revised rules.</description>
 	<campaignOptions>
-		<displayDateFormat>yyyy-MM-dd</displayDateFormat>
 		<logMaintenance>false</logMaintenance>
 		<useFactionForNames>true</useFactionForNames>
 		<repairSystem>0</repairSystem>

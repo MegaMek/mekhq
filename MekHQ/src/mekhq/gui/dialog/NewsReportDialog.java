@@ -38,11 +38,11 @@ public class NewsReportDialog extends JDialog {
 
     private JTextPane txtNews;
 
-    public NewsReportDialog(JFrame parent, NewsItem news, Campaign campaign) {
+    public NewsReportDialog(JFrame parent, NewsItem news) {
         super(parent, false);
         setTitle(news.getHeadline());
         initComponents();
-        txtNews.setText(news.getFullDescription(campaign));
+        txtNews.setText(news.getFullDescription());
         txtNews.setCaretPosition(0);
         setMinimumSize(new Dimension(500, 300));
         setPreferredSize(new Dimension(500, 300));

@@ -72,7 +72,7 @@ public abstract class AbstractUnitGenerator {
                 turretRatYears.add(year);
 
                 if(!turretRatNames.containsKey(year)) {
-                    turretRatNames.put(year, new HashMap<String, String>());
+                    turretRatNames.put(year, new HashMap<>());
                 }
 
                 turretRatNames.get(year).put(turretQuality, currentName);
@@ -96,7 +96,6 @@ public abstract class AbstractUnitGenerator {
         String ratName = turretRatNames.get(ratYear).get(ratRatingMappings.get(quality));
 
         RandomUnitGenerator.getInstance().setChosenRAT(ratName);
-        ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(num);
-        return msl;
+        return RandomUnitGenerator.getInstance().generate(num);
     }
 }

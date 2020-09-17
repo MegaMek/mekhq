@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
@@ -126,8 +125,8 @@ public class SkillType implements Serializable {
     public static void setSkillTypes(Hashtable<String, SkillType> skills) {
         //we are going to cycle through all skills in case ones have been added since this hash
         //was created
-        for(String name : skillList) {
-            if(null != skills.get(name)) {
+        for (String name : skillList) {
+            if (null != skills.get(name)) {
                 lookupHash.put(name, skills.get(name));
             }
         }
@@ -167,19 +166,19 @@ public class SkillType implements Serializable {
     }
 
     public int getLevelFromExperience(int expLvl) {
-        switch(expLvl) {
-        case(EXP_REGULAR):
-            return regLvl;
-        case(EXP_VETERAN):
-            return vetLvl;
-        case(EXP_ELITE):
-            return eliteLvl;
-        case(EXP_GREEN):
-            return greenLvl;
-        default:
-            //for ultra-green we take the midpoint between green and 0, rounding down.
-            //If the user has set green as zero, then this will be the same
-            return (int)Math.floor(greenLvl/2.0);
+        switch (expLvl) {
+            case EXP_REGULAR:
+                return regLvl;
+            case EXP_VETERAN:
+                return vetLvl;
+            case EXP_ELITE:
+                return eliteLvl;
+            case EXP_GREEN:
+                return greenLvl;
+            default:
+                //for ultra-green we take the midpoint between green and 0, rounding down.
+                //If the user has set green as zero, then this will be the same
+                return (int) Math.floor(greenLvl / 2.0);
         }
     }
 
@@ -216,25 +215,27 @@ public class SkillType implements Serializable {
     }
 
     public int getCost(int lvl) {
-        if(lvl > 10 || lvl < 0) {
+        if ((lvl > 10) || (lvl < 0)) {
             return -1;
+        } else {
+            return costs[lvl];
         }
-        return costs[lvl];
     }
 
     /** @return the maximum level of that skill (the last one not set to cost = -1, or 10) */
     public int getMaxLevel() {
-        for(int lvl = 0; lvl < costs.length; ++ lvl) {
-            if(costs[lvl] < 0) {
+        for (int lvl = 0; lvl < costs.length; ++ lvl) {
+            if (costs[lvl] < 0) {
                 return lvl - 1;
             }
         }
+
         return costs.length - 1;
     }
 
     public static void setCost(String name, int cost, int lvl) {
         SkillType type = lookupHash.get(name);
-        if(null != name && lvl < 11) {
+        if ((name != null) && (lvl < 11)) {
             type.costs[lvl] = cost;
         }
     }
@@ -255,28 +256,21 @@ public class SkillType implements Serializable {
     }
 
     public int getExperienceLevel(int lvl) {
-        if(lvl >= eliteLvl) {
+        if (lvl >= eliteLvl) {
             return EXP_ELITE;
-        }
-        else if(lvl >= vetLvl) {
+        } else if (lvl >= vetLvl) {
             return EXP_VETERAN;
-        }
-        else if(lvl >= regLvl) {
+        } else if (lvl >= regLvl) {
             return EXP_REGULAR;
-        }
-        else if(lvl >= greenLvl) {
+        } else if (lvl >= greenLvl) {
             return EXP_GREEN;
+        } else {
+            return EXP_ULTRA_GREEN;
         }
-        return EXP_ULTRA_GREEN;
-    }
-
-    public int getExperienceLevelFromTarget(int tgt) {
-        int level = target - tgt;
-        return getExperienceLevel(level);
     }
 
     public static void initializeTypes() {
-        lookupHash = new Hashtable<String, SkillType>();
+        lookupHash = new Hashtable<>();
         lookupHash.put(S_PILOT_MECH, createPilotingMech());
         lookupHash.put(S_GUN_MECH, createGunneryMech());
         lookupHash.put(S_PILOT_AERO, createPilotingAero());
@@ -313,7 +307,7 @@ public class SkillType implements Serializable {
 
     public static SkillType getType(String t) {
         //legacy check for typo in earlier version
-        if(t.equalsIgnoreCase("administation")) {
+        if (t.equalsIgnoreCase("administation")) {
             return lookupHash.get(S_ADMIN);
         }
         return lookupHash.get(t);
@@ -339,120 +333,69 @@ public class SkillType implements Serializable {
     }
 
     public static String getDrivingSkillFor(Entity en) {
-        if(en instanceof Tank) {
+        if (en instanceof Tank) {
             switch (en.getMovementMode()) {
-            case VTOL:
-                return S_PILOT_VTOL;
-            case NAVAL:
-            case HYDROFOIL:
-            case SUBMARINE:
-                return S_PILOT_NVEE;
-            default:
-                return S_PILOT_GVEE;
+                case VTOL:
+                    return S_PILOT_VTOL;
+                case NAVAL:
+                case HYDROFOIL:
+                case SUBMARINE:
+                    return S_PILOT_NVEE;
+                default:
+                    return S_PILOT_GVEE;
             }
-            /*
-            if(en instanceof VTOL) {
-                return S_PILOT_VTOL;
-            }
-            //TODO: identify naval vessel
-            return S_PILOT_GVEE;
-            */
-        }
-        else if(en instanceof SmallCraft || en instanceof Jumpship) {
+        } else if ((en instanceof SmallCraft) || (en instanceof Jumpship)) {
             return S_PILOT_SPACE;
-        }
-        else if(en instanceof ConvFighter) {
+        } else if (en instanceof ConvFighter) {
             return S_PILOT_JET;
-        }
-        else if(en instanceof Aero) {
+        } else if (en instanceof Aero) {
             return S_PILOT_AERO;
-        }
-        else if(en instanceof Infantry) {
+        } else if (en instanceof Infantry) {
             return S_ANTI_MECH;
-        }
-        else if(en instanceof Protomech) {
+        } else if (en instanceof Protomech) {
             return S_GUN_PROTO;
+        } else {
+            return S_PILOT_MECH;
         }
-        return S_PILOT_MECH;
     }
 
     public static String getGunnerySkillFor(Entity en) {
-        if(en instanceof Tank) {
+        if (en instanceof Tank) {
             return S_GUN_VEE;
-        }
-        else if(en instanceof SmallCraft || en instanceof Jumpship) {
+        } else if ((en instanceof SmallCraft) || (en instanceof Jumpship)) {
             return S_GUN_SPACE;
-        }
-        else if(en instanceof ConvFighter) {
+        } else if (en instanceof ConvFighter) {
             return S_GUN_JET;
-        }
-        else if(en instanceof Aero) {
+        } else if (en instanceof Aero) {
             return S_GUN_AERO;
-        }
-        else if(en instanceof Infantry) {
-            if(en instanceof BattleArmor) {
+        } else if (en instanceof Infantry) {
+            if (en instanceof BattleArmor) {
                 return S_GUN_BA;
+            } else {
+                return S_SMALL_ARMS;
             }
-            return S_SMALL_ARMS;
-        }
-        else if(en instanceof Protomech) {
+        } else if (en instanceof Protomech) {
             return S_GUN_PROTO;
+        } else {
+            return S_GUN_MECH;
         }
-        return S_GUN_MECH;
-    }
-
-    public static String[][] getSkillCostsArray() {
-        String[][] array = new String[skillList.length][11];
-        int i = 0;
-        for(String name : skillList) {
-            SkillType type = lookupHash.get(name);
-            for(int j = 0; j< 11; j++) {
-                array[i][j] = Integer.toString(type.getCost(j));
-            }
-            i++;
-        }
-        return array;
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<skillType>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<name>"
-                +name
-                +"</name>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<target>"
-                +target
-                +"</target>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<countUp>"
-                +countUp
-                +"</countUp>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<greenLvl>"
-                +greenLvl
-                +"</greenLvl>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<regLvl>"
-                +regLvl
-                +"</regLvl>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<vetLvl>"
-                +vetLvl
-                +"</vetLvl>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<eliteLvl>"
-                +eliteLvl
-                +"</eliteLvl>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<costs>"
-                + StringUtils.join(costs, ',')
-                +"</costs>");
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</skillType>");
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "skillType");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "name", name);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "target", target);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "countUp", countUp);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "greenLvl", greenLvl);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "regLvl", regLvl);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "vetLvl", vetLvl);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "eliteLvl", eliteLvl);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "costs", StringUtils.join(costs, ','));
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "skillType");
     }
 
     public static void generateInstanceFromXML(Node wn, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)";
 
         try {
             SkillType retVal = new SkillType();
@@ -473,23 +416,19 @@ public class SkillType implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("eliteLvl")) {
                     retVal.eliteLvl = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("countUp")) {
-                    if(wn2.getTextContent().equalsIgnoreCase(("true"))) {
-                        retVal.countUp = true;
-                    } else {
-                        retVal.countUp = false;
-                    }
+                    retVal.countUp = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("costs")) {
                     String[] values = wn2.getTextContent().split(",");
-                    for(int i = 0; i < values.length; i++) {
+                    for (int i = 0; i < values.length; i++) {
                         retVal.costs[i] = Integer.parseInt(values[i]);
                     }
                 }
             }
 
-            if(version.getMinorVersion() < 3) {
+            if (version.getMinorVersion() < 3) {
                 //need to change negotiation and scrounge to be countUp=false with
                 //TNs of 10
-                if(retVal.name.equals(SkillType.S_NEG) || retVal.name.equals(SkillType.S_SCROUNGE)) {
+                if (retVal.name.equals(SkillType.S_NEG) || retVal.name.equals(SkillType.S_SCROUNGE)) {
                     retVal.countUp = false;
                     retVal.target = 10;
                 }
@@ -504,7 +443,7 @@ public class SkillType implements Serializable {
     }
 
     public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SkillType> hash) {
-        final String METHOD_NAME = "generateSeparateInstanceFromXML(Node,Hashtable<String, SkillType>)"; //$NON-NLS-1$
+        final String METHOD_NAME = "generateSeparateInstanceFromXML(Node,Hashtable<String, SkillType>)";
 
         try {
             SkillType retVal = new SkillType();
@@ -525,14 +464,10 @@ public class SkillType implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("eliteLvl")) {
                     retVal.eliteLvl = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("countUp")) {
-                    if(wn2.getTextContent().equalsIgnoreCase(("true"))) {
-                        retVal.countUp = true;
-                    } else {
-                        retVal.countUp = false;
-                    }
+                    retVal.countUp = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("costs")) {
                     String[] values = wn2.getTextContent().split(",");
-                    for(int i = 0; i < values.length; i++) {
+                    for (int i = 0; i < values.length; i++) {
                         retVal.costs[i] = Integer.parseInt(values[i]);
                     }
                 }
