@@ -53,6 +53,14 @@ public final class MekHQOptions {
     public void setLongDisplayDateFormat(String value) {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).put(MekHqConstants.LONG_DISPLAY_DATE_FORMAT, value);
     }
+
+    public boolean getHistoricalDailyLog() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.HISTORICAL_DAILY_LOG, false);
+    }
+
+    public void setHistoricalDailyLog(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.HISTORICAL_DAILY_LOG, value);
+    }
     //endregion Display
 
     //region Autosave
