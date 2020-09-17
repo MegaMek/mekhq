@@ -375,9 +375,9 @@ public class Scenario implements Serializable {
 
         try {
             // Instantiate the correct child class, and call its parsing function.
-        	if (className.equals(AtBScenario.class.getName())) {
-            	//Backwards compatibility when AtBScenarios were all part of the same class
-        		//Find the battle type and then load it through the AtBScenarioFactory
+            if (className.equals(AtBScenario.class.getName())) {
+                //Backwards compatibility when AtBScenarios were all part of the same class
+                //Find the battle type and then load it through the AtBScenarioFactory
 
                 NodeList nl = wn.getChildNodes();
                 int battleType = -1;
@@ -394,7 +394,7 @@ public class Scenario implements Serializable {
                 if (battleType == -1) {
                     MekHQ.getLogger().log(Scenario.class, METHOD_NAME, LogLevel.ERROR,
                             "Unable to load an old AtBScenario because we could not determine the battle type"); //$NON-NLS-1$
-                	return null;
+                    return null;
                 }
 
                 List<Class<IAtBScenario>> scenarioClassList = AtBScenarioFactory.getScenarios(battleType);
@@ -402,13 +402,13 @@ public class Scenario implements Serializable {
                 if ((null == scenarioClassList) || scenarioClassList.isEmpty()) {
                     MekHQ.getLogger().log(Scenario.class, METHOD_NAME, LogLevel.ERROR,
                             "Unable to load an old AtBScenario of battle type " + battleType); //$NON-NLS-1$
-                	return null;
+                    return null;
                 }
 
                 retVal = (Scenario) scenarioClassList.get(0).newInstance();
-        	} else {
-        		retVal = (Scenario) Class.forName(className).newInstance();
-        	}
+            } else {
+                retVal = (Scenario) Class.forName(className).newInstance();
+            }
 
             retVal.loadFieldsFromXmlNode(wn);
             retVal.scenarioObjectives = new ArrayList<>();

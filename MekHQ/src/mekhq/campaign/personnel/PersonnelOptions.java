@@ -18,7 +18,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-import megamek.common.logging.LogLevel;
 import megamek.common.options.AbstractOptionsInfo;
 import megamek.common.options.IBasicOptionGroup;
 import megamek.common.options.IOption;
@@ -34,13 +33,8 @@ import mekhq.MekHQ;
  * from the MM option.
  *
  * @author Neoancient
- *
  */
 public class PersonnelOptions extends PilotOptions {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -4376899952366335620L;
 
     public static final String EDGE_MEDICAL = "edge_when_heal_crit_fail";
@@ -55,10 +49,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String TECH_ENGINEER = "tech_engineer";
     public static final String TECH_FIXER = "tech_fixer";
 
-
     @Override
     public void initialize() {
-        final String METHOD_NAME = "initialize()"; //$NON-NLS-1$
         super.initialize();
 
         IBasicOptionGroup l3a = null;
@@ -77,22 +69,19 @@ public class PersonnelOptions extends PilotOptions {
 
         if (null == l3a) {
             // This really shouldn't happen.
-            MekHQ.getLogger().log(PersonnelOptions.class, METHOD_NAME,
-                    LogLevel.WARNING, "Could not find L3Advantage group"); //$NON-NLS-1$
-            l3a = addGroup("adv", PilotOptions.LVL3_ADVANTAGES); // $NON-NLS-1$
+            MekHQ.getLogger().warning(PersonnelOptions.class, "Could not find L3Advantage group");
+            l3a = addGroup("adv", PilotOptions.LVL3_ADVANTAGES);
         }
         if (null == edge) {
             // This really shouldn't happen.
-            MekHQ.getLogger().log(PersonnelOptions.class, METHOD_NAME,
-                    LogLevel.WARNING, "Could not find edge group"); //$NON-NLS-1$
-            edge = addGroup("edge", PilotOptions.EDGE_ADVANTAGES); // $NON-NLS-1$
+            MekHQ.getLogger().warning(PersonnelOptions.class, "Could not find edge group");
+            edge = addGroup("edge", PilotOptions.EDGE_ADVANTAGES);
             addOption(edge, OptionsConstants.EDGE, 0);
         }
         if (null == md) {
             // This really shouldn't happen.
-            MekHQ.getLogger().log(PersonnelOptions.class, METHOD_NAME,
-                    LogLevel.WARNING, "Could not find augmentation (MD) group"); //$NON-NLS-1$
-            md = addGroup("md", PilotOptions.MD_ADVANTAGES); // $NON-NLS-1$
+            MekHQ.getLogger().warning(PersonnelOptions.class, "Could not find augmentation (MD) group");
+            md = addGroup("md", PilotOptions.MD_ADVANTAGES);
         }
 
         // Add MekHQ-specific options
@@ -103,8 +92,6 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, TECH_ENGINEER, false);
         addOption(l3a, TECH_FIXER, false);
 
-
-
         addOption(edge, EDGE_MEDICAL, false);
         addOption(edge, EDGE_REPAIR_BREAK_PART, false);
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, false);
@@ -112,12 +99,16 @@ public class PersonnelOptions extends PilotOptions {
 
         List<CustomOption> customs = CustomOption.getCustomAbilities();
         for (CustomOption option : customs) {
-            if (option.getGroup().equals(PilotOptions.LVL3_ADVANTAGES)) {
-                addOption(l3a, option.getName(), option.getType(), option.getDefault());
-            } else if (option.getGroup().equals(PilotOptions.EDGE_ADVANTAGES)) {
-                addOption(edge, option.getName(), option.getType(), option.getDefault());
-            } else if (option.getGroup().equals(PilotOptions.MD_ADVANTAGES)) {
-                addOption(md, option.getName(), option.getType(), option.getDefault());
+            switch (option.getGroup()) {
+                case PilotOptions.LVL3_ADVANTAGES:
+                    addOption(l3a, option.getName(), option.getType(), option.getDefault());
+                    break;
+                case PilotOptions.EDGE_ADVANTAGES:
+                    addOption(edge, option.getName(), option.getType(), option.getDefault());
+                    break;
+                case PilotOptions.MD_ADVANTAGES:
+                    addOption(md, option.getName(), option.getType(), option.getDefault());
+                    break;
             }
         }
     }
@@ -127,8 +118,7 @@ public class PersonnelOptions extends PilotOptions {
      * provide a different source for display name and description.
      */
     @Override
-    protected void addOption(IBasicOptionGroup group, String name, int type,
-            Object defaultValue) {
+    protected void addOption(IBasicOptionGroup group, String name, int type, Object defaultValue) {
         super.addOption(group, name, type, defaultValue);
         ((PersonnelOptionsInfo)getOptionsInfoImp()).setOptionInfo(name);
     }
@@ -153,7 +143,7 @@ public class PersonnelOptions extends PilotOptions {
         //we might also need to remove some prior abilities
         SpecialAbility spa = SpecialAbility.getAbility(name);
         Vector<String> toRemove = new Vector<>();
-        if(null != spa) {
+        if (null != spa) {
             toRemove = spa.getRemovedAbilities();
         }
         for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
@@ -161,7 +151,7 @@ public class PersonnelOptions extends PilotOptions {
             if (ability.getName().equals(name)) {
                 ability.setValue(value);
             } else {
-                for(String remove : toRemove) {
+                for (String remove : toRemove) {
                     if (ability.getName().equals(remove)) {
                         ability.setValue(ability.getDefault());
                     }
@@ -181,7 +171,6 @@ public class PersonnelOptions extends PilotOptions {
      * so we can provide names and descriptions for the MekHQ-specific options.
      *
      * @author Neoancient
-     *
      */
     private static class PersonnelOptionsInfo extends AbstractOptionsInfo {
         private static boolean initialized = false;
@@ -200,9 +189,10 @@ public class PersonnelOptions extends PilotOptions {
         }
 
         protected PersonnelOptionsInfo() {
-            super("PersonnelOptionsInfo"); //$NON-NLS-1$
+            super("PersonnelOptionsInfo");
         }
 
+        @Override
         public IOptionInfo getOptionInfo(String name) {
             return optionsHash.get(name);
         }
@@ -218,10 +208,8 @@ public class PersonnelOptions extends PilotOptions {
      * in either place, returns the lookup key instead.
      *
      * @author Neoancient
-     *
      */
     private static class PersonnelOptionInfo implements IOptionInfo {
-
         private String name;
         private static PilotOptions mmOptions = new PilotOptions();
 
@@ -274,6 +262,5 @@ public class PersonnelOptions extends PilotOptions {
         public boolean isLabelBeforeTextField() {
             return false;
         }
-
     }
 }
