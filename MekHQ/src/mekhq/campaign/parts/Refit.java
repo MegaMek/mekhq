@@ -881,6 +881,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     oldIntegratedHS.add(oldHS.clone());
                 }
                 for (int i = 0; i < newCount - oldCount; i++) {
+                    // Heat sink added for supply chain tracking purposes and removed from refit later
                     newIntegratedHS.add(newHS.clone().getMissingPart());
                 }
             } else {
@@ -888,6 +889,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     oldIntegratedHS.add(oldHS.clone());
                 }
                 for (int i = 0; i < newCount; i++) {
+                    // Heat sink added for supply chain tracking purposes and removed from refit later
                     newIntegratedHS.add(newHS.clone().getMissingPart());
                 }
                 updateRefitClass(CLASS_D);
@@ -907,6 +909,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             if (oldHS != newHS) {
                 Part hsPart = heatSinkPart(newEntity); // only single HS allowed, so they have to be of the same type
                 for (int i = oldHS; i < newHS; i++) {
+                    // Heat sink added for supply chain tracking purposes and removed from refit later
                     newIntegratedHS.add(hsPart.clone().getMissingPart());
                 }
                 for (int i = newHS; i < oldHS; i++) {
@@ -1424,6 +1427,16 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         Utilities.unscrambleEquipmentNumbers(oldUnit, true);
         assignArmActuators();
         assignBayParts();
+
+        for (Iterator<Part> partsIter = oldUnit.getParts().iterator(); partsIter.hasNext();) {
+            final Part part = partsIter.next();
+            if ((part instanceof HeatSink) && (part.getLocation() == Entity.LOC_NONE)) {
+                // Remove heat sink parts added for supply chain tracking purposes
+                oldUnit.getCampaign().removePart(part);
+                partsIter.remove();
+            }
+        }
+
         for (Part p : newParts) {
             if (p instanceof LargeCraftAmmoBin) {
                 //All large craft ammo got unloaded into the warehouse earlier, though the part IDs have now changed.
