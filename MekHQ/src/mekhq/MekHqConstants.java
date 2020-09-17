@@ -26,6 +26,8 @@ public final class MekHqConstants {
     public static final String DISPLAY_NODE = "mekhq/prefs/display";
     public static final String DISPLAY_DATE_FORMAT = "displayDateFormat";
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
+    public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
+    public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history, also used as a limit in the UI
     //endregion Display
 
     //region Autosave
