@@ -334,7 +334,6 @@ public class MekHQ implements GameListener {
     }
 
     private void showInfo() {
-        final String METHOD_NAME = "showInfo";
         final long TIMESTAMP = new File(PreferenceManager.getClientPreferences().getLogDirectory()
                 + File.separator + "timestamp").lastModified();
         // echo some useful stuff
