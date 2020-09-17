@@ -32,7 +32,6 @@ import megamek.common.BattleArmor;
 import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -1157,7 +1156,7 @@ public class MassRepairService {
             msg = String.format(msg, replacements);
         }
 
-        MekHQ.getLogger().log(MassRepairService.class, methodName, LogLevel.DEBUG, msg);
+        MekHQ.getLogger().debug(MassRepairService.class, methodName, msg);
     }
 
     private static class WorkTimeCalculation {
