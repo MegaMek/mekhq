@@ -38,7 +38,6 @@ import javax.swing.table.TableRowSorter;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.event.Subscribe;
-import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -438,8 +437,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     private void deleteMission() {
         Mission mission = getCampaign().getMission(selectedMission);
-        MekHQ.getLogger().log(getClass(), "deleteMission()", LogLevel.DEBUG,
-                "Attempting to Delete Mission, Mission ID: " + mission.getId()); //$NON-NLS-1$
+        MekHQ.getLogger().debug(this, "Attempting to Delete Mission, Mission ID: " + mission.getId());
         if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this mission?", "Delete mission?",
                 JOptionPane.YES_NO_OPTION)) {
             return;

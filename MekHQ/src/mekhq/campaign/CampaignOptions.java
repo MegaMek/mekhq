@@ -33,7 +33,6 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -3350,10 +3349,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-        final String METHOD_NAME = "generateCampaignOptionsFromXml(Node)";
-
-        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                "Loading Campaign Options from XML...");
+        MekHQ.getLogger().info(CampaignOptions.class, "Loading Campaign Options from XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3942,9 +3938,8 @@ public class CampaignOptions implements Serializable {
                                     continue;
                                 }
 
-                                MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                                        String.format("massRepairOption %d.%s\n\t%s", //$NON-NLS-1$
-                                                mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
+                                MekHQ.getLogger().info(CampaignOptions.class, String.format("massRepairOption %d.%s\n\t%s",
+                                        mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
 
                                 if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
                                     mro.setType(Integer.parseInt(mroItemNode.getTextContent().trim()));
@@ -3970,8 +3965,7 @@ public class CampaignOptions implements Serializable {
             }
         }
 
-        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                "Load Campaign Options Complete!"); //$NON-NLS-1$
+        MekHQ.getLogger().info(CampaignOptions.class, "Load Campaign Options Complete!");
 
         return retVal;
     }

@@ -8,8 +8,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +20,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import megamek.common.logging.LogLevel;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -45,9 +42,7 @@ import mekhq.service.PartsAcquisitionService.PartCountInfo;
 
 /**
  * @author Kipsta
- *
  */
-
 public class AcquisitionsDialog extends JDialog {
     private static final long serialVersionUID = -1942823778220741544L;
 
@@ -121,18 +116,15 @@ public class AcquisitionsDialog extends JDialog {
         pnlSummary.setLayout(new GridBagLayout());
         pnlSummary.setBorder(BorderFactory.createTitledBorder("Acquisition Summary"));
 
-        pnlSummary.addPropertyChangeListener("counts", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                PartsAcquisitionService.buildPartsList(campaignGUI.getCampaign());
+        pnlSummary.addPropertyChangeListener("counts", evt -> {
+            PartsAcquisitionService.buildPartsList(campaignGUI.getCampaign());
 
-                lblSummary.setText(generateSummaryText());
+            lblSummary.setText(generateSummaryText());
 
-                btnSummary.firePropertyChange("missingCount", -1, PartsAcquisitionService.getMissingCount());
+            btnSummary.firePropertyChange("missingCount", -1, PartsAcquisitionService.getMissingCount());
 
-                if (campaignGUI.getTab(GuiTabType.REPAIR) != null) {
-                    ((RepairTab) campaignGUI.getTab(GuiTabType.REPAIR)).refreshPartsAcquisitionService(false);
-                }
+            if (campaignGUI.getTab(GuiTabType.REPAIR) != null) {
+                ((RepairTab) campaignGUI.getTab(GuiTabType.REPAIR)).refreshPartsAcquisitionService(false);
             }
         });
 
@@ -161,19 +153,16 @@ public class AcquisitionsDialog extends JDialog {
                 pnl.orderAllMissing();
             }
         });
-        btnSummary.addPropertyChangeListener("missingCount", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                boolean visible = false;
+        btnSummary.addPropertyChangeListener("missingCount", evt -> {
+            boolean visible = false;
 
-                if ((PartsAcquisitionService.getMissingCount() > 0) && (PartsAcquisitionService
-                        .getMissingCount() > PartsAcquisitionService.getUnavailableCount())) {
-                    visible = true;
-                }
+            if ((PartsAcquisitionService.getMissingCount() > 0) && (PartsAcquisitionService
+                    .getMissingCount() > PartsAcquisitionService.getUnavailableCount())) {
+                visible = true;
+            }
 
-                if (!visible) {
-                    btnSummary.setVisible(false);
-                }
+            if (!visible) {
+                btnSummary.setVisible(false);
             }
         });
 
@@ -326,8 +315,7 @@ public class AcquisitionsDialog extends JDialog {
                 }
 
                 if (null == contract) {
-                    MekHQ.getLogger().log(getClass(), "useBonusPart()", LogLevel.ERROR, //$NON-NLS-1$
-                            "AtB: used bonus part but no contract has bonus parts available."); //$NON-NLS-1$
+                    MekHQ.getLogger().error(this, "AtB: used bonus part but no contract has bonus parts available.");
                 } else {
                     contract.useBonusPart();
                 }
@@ -344,7 +332,7 @@ public class AcquisitionsDialog extends JDialog {
             partCountInfo = PartsAcquisitionService.getPartCountInfoMap().get(targetWork.getAcquisitionDisplayName());
 
             if (null == partCountInfo) {
-                ((AcquisitionPanel) this).setVisible(false);
+                this.setVisible(false);
             } else {
                 lblText.setText(generateText());
 
@@ -359,18 +347,14 @@ public class AcquisitionsDialog extends JDialog {
                     }
                 }
 
-                if (partCountInfo.getOmniPodCount() == 0) {
-                    btnDepod.setVisible(false);
-                } else {
-                    btnDepod.setVisible(true);
-                }
+                btnDepod.setVisible(partCountInfo.getOmniPodCount() != 0);
 
                 if (numBonusParts == 0) {
                     btnUseBonus.setVisible(false);
                 } else {
                     btnUseBonus.setText(String.format("Use Bonus Part (%s)", numBonusParts));
                     btnUseBonus.setVisible(true);
-                }			
+                }
             }
         }
 
@@ -558,7 +542,7 @@ public class AcquisitionsDialog extends JDialog {
                 btnOrderOne.addActionListener(ev -> {
                     campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(), 1,
                             campaignGUI.getCampaign());
-                    
+
                     refresh();
                 });
 
@@ -578,7 +562,7 @@ public class AcquisitionsDialog extends JDialog {
                 }
             }
 
-            if (partCountInfo.getOmniPodCount() > 0) {				
+            if (partCountInfo.getOmniPodCount() > 0) {
                 btnDepod.setText("Remove One From Pod"); // NOI18N
                 btnDepod.setToolTipText("Remove replacement from pod");
                 btnDepod.setName("btnDepod"); // NOI18N

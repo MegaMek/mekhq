@@ -1,7 +1,7 @@
 /*
  * GMToolsDialog.java
  *
- * Copyright (c) 2013-2018 MegaMek Team.
+ * Copyright (c) 2013-2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.Frame;
@@ -28,7 +27,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -48,7 +46,6 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -165,7 +162,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                 new FactionChoice(faction, year));
         }
 
-        Collections.sort(factionChoices, (a, b) -> a.name.compareToIgnoreCase(b.name));
+        factionChoices.sort((a, b) -> a.name.compareToIgnoreCase(b.name));
 
         return factionChoices;
     }
@@ -334,17 +331,15 @@ public class GMToolsDialog extends JDialog implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        final String METHOD_NAME = "actionPerformed(ActionEvent)"; //$NON-NLS-1$
-
-        if(event.getActionCommand().equals(GM_TOOL_DICE)) {
+        if (event.getActionCommand().equals(GM_TOOL_DICE)) {
             performDiceRoll();
         }
 
-        if(event.getActionCommand().equals(RAT_ROLLER_TOOL)) {
+        if (event.getActionCommand().equals(RAT_ROLLER_TOOL)) {
             lastRolledUnit = performRollRat();
         }
 
-        if(event.getActionCommand().equals(RAT_ADDER_TOOL)) {
+        if (event.getActionCommand().equals(RAT_ADDER_TOOL)) {
             if (lastRolledUnit == null) {
                 lastRolledUnit = performRollRat();
             }
@@ -360,10 +355,10 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                         setVisible(false);
                     }
                     lastRolledUnit = null;
-                } catch (EntityLoadingException e1) {
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                            "Failed to load entity " + lastRolledUnit.getName() + " from " + lastRolledUnit.getSourceFile().toString()); //$NON-NLS-1$
-                    MekHQ.getLogger().error(getClass(), METHOD_NAME, e1);
+                } catch (EntityLoadingException ex) {
+                    MekHQ.getLogger().error(this, "Failed to load entity "
+                            + lastRolledUnit.getName() + " from " + lastRolledUnit.getSourceFile().toString());
+                    MekHQ.getLogger().error(this, ex);
                     unitPicked.setText("Failed to load entity " + lastRolledUnit.getName());
                 }
             }
@@ -383,9 +378,9 @@ public class GMToolsDialog extends JDialog implements ActionListener {
 
             Campaign campaign = gui.getCampaign();
             Predicate<MechSummary> test = ms ->
-                	(!campaign.getCampaignOptions().limitByYear() || targetYear > ms.getYear())
-                		&& (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
-                		&& (ms.isClan() || campaign.getCampaignOptions().allowISPurchases());
+                    (!campaign.getCampaignOptions().limitByYear() || targetYear > ms.getYear())
+                        && (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
+                        && (ms.isClan() || campaign.getCampaignOptions().allowISPurchases());
             MechSummary ms = ug.generate(((FactionChoice) factionPicker.getSelectedItem()).id, unitType, unitWeight, targetYear, unitQuality, test);
             if (ms != null) {
                 unitPicked.setText(ms.getName());

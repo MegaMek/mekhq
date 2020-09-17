@@ -102,7 +102,6 @@ import megamek.common.Tank;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.VTOL;
-import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
@@ -360,7 +359,6 @@ public class Utilities {
     }
 
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
-        final String METHOD_NAME = "getAllVariants(Entity, Campaign)"; // $NON-NLS-1$
         CampaignOptions options = campaign.getCampaignOptions();
         ArrayList<String> variants = new ArrayList<>();
         for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
@@ -393,9 +391,8 @@ public class Utilities {
             if (null == techProg) {
                 // This should never happen unless there was an exception thrown when calculating the progression.
                 // In such a case we will log it and take the least restrictive action, which is to let it through.
-                MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.WARNING,
-                        "Could not determine tech progression for " + summary.getName() // $NON-NLS-1$
-                                + ", including among available refits."); // $NON-NLS-1$
+                MekHQ.getLogger().warning(Utilities.class, "Could not determine tech progression for " + summary.getName()
+                                + ", including among available refits.");
             } else if (!campaign.isLegal(techProg)) {
                 continue;
             }
@@ -1110,12 +1107,11 @@ public class Utilities {
             }
             in.close();
             out.close();
-            MekHQ.getLogger().info(Utilities.class, "copyFile", "File copied."); //$NON-NLS-1$
+            MekHQ.getLogger().info(Utilities.class, "File copied.");
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().error(Utilities.class, "copyFile",
-                    e.getMessage() + " in the specified directory."); //$NON-NLS-1$
+            MekHQ.getLogger().error(Utilities.class, e.getMessage() + " in the specified directory.");
         } catch (IOException e) {
-            MekHQ.getLogger().error(Utilities.class, "copyFile", e.getMessage());
+            MekHQ.getLogger().error(Utilities.class, e.getMessage());
         }
     }
 
@@ -1267,7 +1263,7 @@ public class Utilities {
                 boolean isAvailable = equipNums.contains(equipNum);
                 builder.append(String.format(" %d: %s %s%s\r\n", equipNum, m.getName(), mType.getName(), isAvailable ? " (Available)" : ""));
             }
-            MekHQ.getLogger().log(Utilities.class, "unscrambleEquipmentNumbers", LogLevel.WARNING, builder.toString());
+            MekHQ.getLogger().warning(Utilities.class, builder.toString());
         }
     }
 
@@ -1364,7 +1360,7 @@ public class Utilities {
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
         } catch(Exception ioe) {
-            MekHQ.getLogger().log(Utilities.class, "exportTableToCSV", LogLevel.INFO, "Error exporting JTable");
+            MekHQ.getLogger().error(Utilities.class,  "Error exporting JTable");
             report = "Error exporting JTable. See log for details.";
         }
         return report;
@@ -1481,16 +1477,12 @@ public class Utilities {
      * Run through the directory and call parser.parse(fis) for each XML file found.
      */
     public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser, boolean recurse) {
-        final String METHOD_NAME = "parseXMLFiles(String,FileParser,boolean)"; //$NON-NLS-1$
-
         if ((null == dirName) || (null == parser)) {
             throw new NullPointerException();
         }
         File dir = new File(dirName);
         if (dir.isDirectory()) {
-            File[] files = dir.listFiles((dir1, name) -> {
-                return name.toLowerCase(Locale.ROOT).endsWith(".xml"); //$NON-NLS-1$
-            });
+            File[] files = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".xml"));
             if ((null != files) && (files.length > 0)) {
                 // Case-insensitive sorting. Yes, even on Windows. Deal with it.
                 Arrays.sort(files, Comparator.comparing(File::getPath));
@@ -1501,9 +1493,7 @@ public class Utilities {
                             parser.accept(fis);
                         } catch (Exception ex) {
                             // Ignore this file then
-                            MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
-                            MekHQ.getLogger().error(Utilities.class, METHOD_NAME, ex);
+                            MekHQ.getLogger().error(Utilities.class, "Exception trying to parse " + file.getPath() + " - ignoring.");
                         }
                     }
                 }
@@ -1560,9 +1550,8 @@ public class Utilities {
      * @param loadFighters - Should aero type units be loaded?
      * @param loadGround - should ground units be loaded?
      */
-    public static void loadPlayerTransports(int trnId, Set<Integer> toLoad,
-                Client client, boolean loadFighters, boolean loadGround) {
-        String METHOD_NAME = "loadPlayerTransports(int,Set<Integer>,Client,boolean,boolean)";
+    public static void loadPlayerTransports(int trnId, Set<Integer> toLoad, Client client,
+                                            boolean loadFighters, boolean loadGround) {
         if (!loadFighters && !loadGround) {
             //Nothing to do. Get outta here!
             return;
@@ -1590,7 +1579,7 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(Utilities.class, METHOD_NAME, e); //$NON-NLS-1$
+                    MekHQ.getLogger().error(Utilities.class, e);
                 }
             } else if(loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
                 client.sendLoadEntity(id, trnId, cargo.getTargetBay());
@@ -1598,7 +1587,7 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(Utilities.class, METHOD_NAME, e); //$NON-NLS-1$
+                    MekHQ.getLogger().error(Utilities.class, e);
                 }
             }
         }

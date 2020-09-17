@@ -43,7 +43,6 @@ import megamek.common.MechSummary;
 import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -703,12 +702,11 @@ public class AtBContract extends Contract implements Serializable {
                     en = new MechFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
                 } catch (EntityLoadingException ex) {
                     en = null;
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                            "Unable to load entity: " + msl.get(0).getSourceFile() + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                    MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+                    MekHQ.getLogger().error(this, "Unable to load entity: " + msl.get(0).getSourceFile()
+                            + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage(), ex);
                 }
-
             }
+
             if (null != en) {
                 c.addUnit(en, false, 0);
             } else {

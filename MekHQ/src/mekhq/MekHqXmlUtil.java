@@ -52,7 +52,6 @@ import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.Tank;
-import megamek.common.logging.LogLevel;
 
 public class MekHqXmlUtil extends MegaMekXmlUtil {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
@@ -514,7 +513,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      *         if the given element parses to multiple entities
      */
     public static Entity parseSingleEntityMul(Element element) {
-        MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(Element)", LogLevel.TRACE, "Executing getEntityFromXmlString(Node)..."); //$NON-NLS-2$
+        MekHQ.getLogger().trace(MekHqXmlUtil.class,  "Executing getEntityFromXmlString(Node)...");
 
         MULParser prs = new MULParser();
         prs.parse(element);
@@ -525,7 +524,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
                 return null;
             case 1:
                 Entity entity = entities.get(0);
-                MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(Element)", LogLevel.TRACE, "Returning " + entity + " from getEntityFromXmlString(String)..."); //$NON-NLS-1$
+                MekHQ.getLogger().trace(MekHqXmlUtil.class, "Returning " + entity + " from getEntityFromXmlString(String)...");
                 return entity;
             default:
                 throw new IllegalArgumentException("More than one entity contained in XML string!  Expecting a single entity.");

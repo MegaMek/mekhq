@@ -38,7 +38,6 @@ import org.w3c.dom.NodeList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -514,7 +513,7 @@ public class Finances implements Serializable {
 
             report = transactions.size() + " " + resourceMap.getString("FinanceExport.text");
         } catch (IOException ioe) {
-            MekHQ.getLogger().log(getClass(), "exportFinances", LogLevel.INFO, "Error exporting finances to " + format);
+            MekHQ.getLogger().info(this, "Error exporting finances to " + format);
             report = "Error exporting finances. See log for details.";
         }
 

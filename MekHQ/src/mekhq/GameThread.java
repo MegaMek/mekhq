@@ -24,7 +24,6 @@ import megamek.common.IGame;
 import megamek.common.KeyBindParser;
 import megamek.common.QuirksHandler;
 import megamek.common.WeaponOrderHandler;
-import megamek.common.logging.LogLevel;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
@@ -82,9 +81,8 @@ class GameThread extends Thread implements CloseClientListener {
         try {
             client.connect();
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), "run()", LogLevel.ERROR,
-                    "MegaMek client failed to connect to server"); //$NON-NLS-1$
-            MekHQ.getLogger().error(getClass(), "run()", ex);
+            MekHQ.getLogger().error(this, "MegaMek client failed to connect to server");
+            MekHQ.getLogger().error(getClass(), ex);
             return;
         }
 

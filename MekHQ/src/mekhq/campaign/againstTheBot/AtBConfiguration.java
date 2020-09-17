@@ -48,7 +48,6 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
@@ -67,7 +66,7 @@ import mekhq.campaign.universe.Faction;
 public class AtBConfiguration implements Serializable {
     private static final long serialVersionUID = 515628415152924457L;
 
-    /* Used to indicate size of lance or equivalent in opfor forces */
+    /* Used to indicate size of lance or equivalent in OpFor forces */
     public static final String ORG_IS = "IS";
     public static final String ORG_CLAN = "CLAN";
     public static final String ORG_CS = "CS";
@@ -80,8 +79,8 @@ public class AtBConfiguration implements Serializable {
     public static final char WEIGHT_SUPER_HEAVY = 'V';
 
     /* Scenario generation */
-    private HashMap<String,ArrayList<WeightedTable<String>>> botForceTables = new HashMap<>();
-    private HashMap<String,ArrayList<WeightedTable<String>>> botLanceTables = new HashMap<>();
+    private HashMap<String, List<WeightedTable<String>>> botForceTables = new HashMap<>();
+    private HashMap<String, List<WeightedTable<String>>> botLanceTables = new HashMap<>();
 
     /* Contract generation */
     private ArrayList<DatedRecord<String>> hiringHalls;
@@ -110,18 +109,15 @@ public class AtBConfiguration implements Serializable {
      */
 
     private WeightedTable<String> getDefaultForceTable(String key, int index) {
-        final String METHOD_NAME = "getDefaultForceTable(String,int)"; //$NON-NLS-1$
         if (index < 0) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME,
-                    LogLevel.ERROR, "Default force tables don't support negative weights, limiting to 0"); //$NON-NLS-1$
+            MekHQ.getLogger().error(this, "Default force tables don't support negative weights, limiting to 0");
             index = 0;
         }
         String property = defaultProperties.getString(key);
-        String[] fields = property.split("\\|"); //$NON-NLS-1$
+        String[] fields = property.split("\\|");
         if (index >= fields.length) {
             // Deal with too short field lengths
-            MekHQ.getLogger().log(getClass(), METHOD_NAME,
-                    LogLevel.ERROR,  String.format("Default force tables have %d weight entries; limiting the original value of %d.", fields.length, index)); //$NON-NLS-1$
+            MekHQ.getLogger().error(this, String.format("Default force tables have %d weight entries; limiting the original value of %d.", fields.length, index));
             index = fields.length - 1;
         }
         return parseDefaultWeightedTable(fields[index]);
@@ -228,29 +224,25 @@ public class AtBConfiguration implements Serializable {
     }
 
     public String selectBotLances(String org, int weightClass, float rollMod) {
-        final String METHOD_NAME = "selectBotLances(String,int,float)"; //$NON-NLS-1$
         if (botForceTables.containsKey(org)) {
             final List<WeightedTable<String>> botForceTable = botForceTables.get(org);
             int weightClassIndex = weightClassIndex(weightClass);
             WeightedTable<String> table;
             if ((weightClassIndex < 0) || (weightClassIndex >= botForceTable.size())) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                        String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass)); //$NON-NLS-1$
+                MekHQ.getLogger().error(this, String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass));
                 weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
             }
             table = botForceTable.get(weightClassIndex);
             if (null == table) {
                 table = getDefaultForceTable("botForce." + org, weightClassIndex);
                 if (null == table) {
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                            String.format("Default (fallback) bot force table for organization \"%s\" and weight class %d doesn't exist, ignoring", org, weightClass)); //$NON-NLS-1$
+                    MekHQ.getLogger().error(this, String.format("Default (fallback) bot force table for organization \"%s\" and weight class %d doesn't exist, ignoring", org, weightClass));
                     return null;
                 }
             }
             return table.select(rollMod);
         } else {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    String.format("Bot force tables for organization \"%s\" not found, ignoring", org)); //$NON-NLS-1$
+            MekHQ.getLogger().error(this, String.format("Bot force tables for organization \"%s\" not found, ignoring", org));
             return null;
         }
     }
@@ -395,11 +387,9 @@ public class AtBConfiguration implements Serializable {
     }
 
     public static AtBConfiguration loadFromXml() {
-        final String METHOD_NAME = "loadFromXml()";
         AtBConfiguration retVal = new AtBConfiguration();
 
-        MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, LogLevel.INFO,
-                "Starting load of AtB configuration data from XML...");
+        MekHQ.getLogger().info(AtBConfiguration.class, "Starting load of AtB configuration data from XML...");
 
         Document xmlDoc;
         try (InputStream is = new FileInputStream("data/universe/atbconfig.xml")) {
@@ -407,12 +397,11 @@ public class AtBConfiguration implements Serializable {
 
             xmlDoc = db.parse(is);
         } catch (FileNotFoundException ex) {
-            MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, LogLevel.INFO,
-                    "File data/universe/atbconfig.xml not found. Loading defaults.");
+            MekHQ.getLogger().info(AtBConfiguration.class, "File data/universe/atbconfig.xml not found. Loading defaults.");
             retVal.setAllValuesToDefaults();
             return retVal;
         } catch (Exception ex) {
-            MekHQ.getLogger().error(AtBConfiguration.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(AtBConfiguration.class, ex);
             return retVal;
         }
 
@@ -443,7 +432,7 @@ public class AtBConfiguration implements Serializable {
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
             String[] orgs;
-            ArrayList<WeightedTable<String>> list;
+            List<WeightedTable<String>> list;
             switch (wn.getNodeName()) {
                 case "botForce":
                     if (wn.getAttributes().getNamedItem("org") == null) {
@@ -473,9 +462,8 @@ public class AtBConfiguration implements Serializable {
         }
     }
 
-    private ArrayList<WeightedTable<String>> loadForceTableFromXml(Node node) {
-        final String METHOD_NAME = "loadForceTableFromXml(Node)"; //$NON-NLS-1$
-        ArrayList<WeightedTable<String>> retVal = new ArrayList<>();
+    private List<WeightedTable<String>> loadForceTableFromXml(Node node) {
+        List<WeightedTable<String>> retVal = new ArrayList<>();
         NodeList nl = node.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
@@ -488,9 +476,7 @@ public class AtBConfiguration implements Serializable {
                     }
                     retVal.set(weightClass, loadWeightedTableFromXml(wn));
                 } catch (Exception ex) {
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                            "Could not parse weight class attribute for enemy forces table");
-                    MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+                    MekHQ.getLogger().error(this, "Could not parse weight class attribute for enemy forces table", ex);
                 }
             }
         }

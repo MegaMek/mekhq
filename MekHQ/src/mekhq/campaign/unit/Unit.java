@@ -40,7 +40,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
@@ -1216,7 +1215,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param unitWeight double Weight in tons of the unit's entity. Important for tanks and infantry
      */
     public double getCorrectBayCapacity(int unitType, double unitWeight) {
-        final String METHOD_NAME = "getCorrectBayCapacity(unitType,unitWeight)";
         switch (unitType) {
             case UnitType.MEK:
                 return getCurrentMechCapacity();
@@ -1258,8 +1256,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     return getCurrentSuperHeavyVehicleCapacity();
                 }
             default:
-                MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                        "No transport bay defined for specified unit type.");
+                MekHQ.getLogger().error(this, "No transport bay defined for specified unit type.");
                 return 0;
         }
     }
@@ -1274,7 +1271,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param bayNumber integer representing the bay number that has been assigned to a cargo entity
      */
     public void updateBayCapacity(int unitType, double unitWeight, boolean addUnit, int bayNumber) {
-        final String METHOD_NAME = "updateBayCapacity(unitType,unitWeight,addUnit)"; //$NON-NLS-1$
         // Default. Consume 1 bay of the appropriate type
         int amount = -1;
         if (addUnit) {
@@ -1299,14 +1295,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         break;
                     } else {
                         //This shouldn't happen
-                        MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                                "Fighter got assigned to a non-ASF, non-SC bay."); //$NON-NLS-1$
+                        MekHQ.getLogger().error(Unit.class, "Fighter got assigned to a non-ASF, non-SC bay.");
                         break;
                     }
                 }
                 //This shouldn't happen either
-                MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                        "Fighter's bay number assignment produced a null bay"); //$NON-NLS-1$
+                MekHQ.getLogger().error(Unit.class, "Fighter's bay number assignment produced a null bay");
                 break;
             case UnitType.DROPSHIP:
                 setDocks(Math.min((getCurrentDocks() + amount),getDocks()));
@@ -1338,14 +1332,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         break;
                     } else {
                         //This shouldn't happen
-                        MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                                "Vehicle got assigned to a non-light/heavy/super heavy vehicle bay."); //$NON-NLS-1$
+                        MekHQ.getLogger().error(Unit.class, "Vehicle got assigned to a non-light/heavy/super heavy vehicle bay.");
                         break;
                     }
                 }
                 //This shouldn't happen either
-                MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                        "Vehicle's bay number assignment produced a null bay"); //$NON-NLS-1$
+                MekHQ.getLogger().error(Unit.class, "Vehicle's bay number assignment produced a null bay");
                 break;
         }
     }
@@ -1829,8 +1821,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public static Unit generateInstanceFromXML(Node wn, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
-
         Unit retVal = new Unit();
         NamedNodeMap attrs = wn.getAttributes();
         Node idNode = attrs.getNamedItem("id");
@@ -1847,7 +1837,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         NodeList nl = wn.getChildNodes();
 
         try {
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("site")) {
@@ -1978,13 +1968,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().error(Unit.class, METHOD_NAME, "Could not parse unit " + idNode.getTextContent().trim(), ex);
+            MekHQ.getLogger().error(Unit.class, "Could not parse unit " + idNode.getTextContent().trim(), ex);
             return null;
         }
 
         if (retVal.id == null) {
-            MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.WARNING,
-                    "ID not pre-defined; generating unit's ID."); //$NON-NLS-1$
+            MekHQ.getLogger().warning(Unit.class, "ID not pre-defined; generating unit's ID.");
             retVal.id = UUID.randomUUID();
         }
 
@@ -3289,16 +3278,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             getCampaign().addPart(bin, 0);
             return bin;
         } catch (LocationFullException ex) {
-            MekHQ.getLogger().log(Unit.class, "addBayAmmoBin(EquipmentType, Mounted)",
-                    LogLevel.ERROR, "Location full exception attempting to add " + etype.getDesc()
-                    + " to unit " + getName());
-            MekHQ.getLogger().error(Unit.class, "addBayAmmoBin(EquipmentType, Mounted)", ex);
+            MekHQ.getLogger().error(Unit.class, "Location full exception attempting to add " + etype.getDesc() + " to unit " + getName(), ex);
             return null;
         }
 
     }
 
-    public ArrayList<Part> getParts() {
+    public List<Part> getParts() {
         return parts;
     }
 
@@ -3306,7 +3292,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         parts = newParts;
     }
 
-    public ArrayList<PodSpace> getPodSpace() {
+    public List<PodSpace> getPodSpace() {
         return podSpace;
     }
 
@@ -3314,8 +3300,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         podSpace.forEach(ps -> ps.updateConditionFromEntity(false));
     }
 
-    public ArrayList<AmmoBin> getWorkingAmmoBins() {
-        ArrayList<AmmoBin> ammo = new ArrayList<>();
+    public List<AmmoBin> getWorkingAmmoBins() {
+        List<AmmoBin> ammo = new ArrayList<>();
         for (Part part : parts) {
             if (part instanceof AmmoBin) {
                 ammo.add((AmmoBin)part);
@@ -4270,8 +4256,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public void setTech(Person p) {
         if (null != tech) {
-            MekHQ.getLogger().log(Unit.class, "setTech(Person)", LogLevel.WARNING,
-                String.format("New tech assigned %s without removing previous tech %s", p.getFullName(), tech));
+            MekHQ.getLogger().warning(Unit.class, String.format("New tech assigned %s without removing previous tech %s", p.getFullName(), tech));
         }
         ensurePersonIsRegistered(p);
         tech = p.getId();
@@ -4295,8 +4280,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Objects.requireNonNull(p);
         if (null == getCampaign().getPerson(p.getId())) {
             getCampaign().recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), true,  false);
-            MekHQ.getLogger().log(Unit.class, "ensurePersonIsRegistered(Person)", LogLevel.WARNING,
-                String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
+            MekHQ.getLogger().warning(Unit.class, String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
         }
     }
 
@@ -5083,7 +5067,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public Money getSparePartsCost() {
-        final String METHOD_NAME = "getSparePartsCost()"; //$NON-NLS-1$
         Money partsCost = Money.zero();
 
         entity = getEntity();
@@ -5109,16 +5092,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsCost = partsCost.plus(6 * .002 * 10000);
             } else {
                 partsCost = partsCost.plus(entity.getWeight() * .002 * 10000);
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                        getName() + " is not a generic CI. Movement mode is "
-                        + entity.getMovementModeAsString());
+                MekHQ.getLogger().error(this, getName() + " is not a generic CI. Movement mode is " + entity.getMovementModeAsString());
             }
         } else {
-            // Only protomechs should fall here. Anything else needs to be logged
+            // Only ProtoMechs should fall here. Anything else needs to be logged
             if (!(entity instanceof Protomech)) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                        getName() + " has no Spare Parts value for unit type "
-                        + Entity.getEntityTypeName(entity.getEntityType()));
+                MekHQ.getLogger().error(this, getName() + " has no Spare Parts value for unit type " + Entity.getEntityTypeName(entity.getEntityType()));
             }
         }
 

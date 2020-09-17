@@ -21,7 +21,6 @@ package mekhq.campaign.mission.atb;
 import java.time.LocalDate;
 import java.util.*;
 
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -116,12 +115,12 @@ public class AtBScenarioFactory {
 
     @SuppressWarnings("unchecked")
     public static void registerScenario(IAtBScenario scenario) {
-        final String METHOD_NAME = "registerScenario(IAtBScenario)"; //$NON-NLS-1$
+        final String METHOD_NAME = "registerScenario(IAtBScenario)";
 
         if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
-            MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
-                    String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.", //$NON-NLS-1$
-            scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
+            MekHQ.getLogger().error(AtBScenarioFactory.class,
+                    String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.",
+                            scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
         } else {
             int type = scenario.getScenarioType();
             List<Class<IAtBScenario>> list = scenarioMap.computeIfAbsent(type, k -> new ArrayList<>());
