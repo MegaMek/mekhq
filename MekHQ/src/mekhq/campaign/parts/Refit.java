@@ -881,14 +881,14 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     oldIntegratedHS.add(oldHS.clone());
                 }
                 for (int i = 0; i < newCount - oldCount; i++) {
-                    newIntegratedHS.add(oldHS.clone());
+                    newIntegratedHS.add(newHS.clone().getMissingPart());
                 }
             } else {
                 for (int i = 0; i < oldCount; i++) {
                     oldIntegratedHS.add(oldHS.clone());
                 }
                 for (int i = 0; i < newCount; i++) {
-                    newIntegratedHS.add(newHS.clone());
+                    newIntegratedHS.add(newHS.clone().getMissingPart());
                 }
                 updateRefitClass(CLASS_D);
             }
@@ -907,7 +907,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             if (oldHS != newHS) {
                 Part hsPart = heatSinkPart(newEntity); // only single HS allowed, so they have to be of the same type
                 for (int i = oldHS; i < newHS; i++) {
-                    newIntegratedHS.add(hsPart.clone());
+                    newIntegratedHS.add(hsPart.clone().getMissingPart());
                 }
                 for (int i = newHS; i < oldHS; i++) {
                     oldIntegratedHS.add(hsPart.clone());
