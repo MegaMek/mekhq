@@ -864,6 +864,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
          * the heat sink type or heat sinks required for energy weapons for vehicles and
          * conventional fighters.
          */
+        // TODO: handle any special cases for BattleArmor, Protomechs, SupportVehicles, SmallCraft, DropShips, etc.
         if ((newEntity instanceof Mech)
                 || ((newEntity instanceof Aero) && !(newEntity instanceof ConvFighter))) {
             Part oldHS = heatSinkPart(oldUnit.getEntity());
@@ -1435,6 +1436,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                         "part with id " + pid + " not found for refit of " + getDesc()); //$NON-NLS-1$
                 continue;
             }
+            if (((part instanceof HeatSink) || (part instanceof AeroHeatSink)) &&
+                    ((newEntity instanceof Tank) || (newEntity instanceof Aero))) {
+                // Tanks and Aeros do not track heat sink parts (Mechs handled later)
+                // Remove heat sink parts added for supply chain tracking purposes
+                oldUnit.getCampaign().removePart(part);
+                continue;
+            }
             part.setUnit(oldUnit);
             part.setRefitId(null);
             newParts.add(part);
@@ -1448,12 +1456,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         assignArmActuators();
         assignBayParts();
 
-        for (Iterator<Part> partsIter = oldUnit.getParts().iterator(); partsIter.hasNext();) {
-            final Part part = partsIter.next();
-            if ((part instanceof HeatSink) && (part.getLocation() == Entity.LOC_NONE)) {
-                // Remove heat sink parts added for supply chain tracking purposes
-                oldUnit.getCampaign().removePart(part);
-                partsIter.remove();
+        if (newEntity instanceof Mech) {
+            // Now that Mech part locations have been set
+            // Remove heat sink parts added for supply chain tracking purposes
+            for (Iterator<Part> partsIter = oldUnit.getParts().iterator(); partsIter.hasNext();) {
+                final Part part = partsIter.next();
+                if ((part instanceof HeatSink) && (part.getLocation() == Entity.LOC_NONE)) {
+                    oldUnit.getCampaign().removePart(part);
+                    partsIter.remove();
+                }
             }
         }
 
