@@ -36,7 +36,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Entity;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
@@ -366,8 +365,6 @@ public class Scenario implements Serializable {
     }
 
     public static Scenario generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
-
         Scenario retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
@@ -382,7 +379,7 @@ public class Scenario implements Serializable {
                 NodeList nl = wn.getChildNodes();
                 int battleType = -1;
 
-                for (int x=0; x<nl.getLength(); x++) {
+                for (int x = 0; x < nl.getLength(); x++) {
                     Node wn2 = nl.item(x);
 
                     if (wn2.getNodeName().equalsIgnoreCase("battleType")) {
@@ -392,16 +389,14 @@ public class Scenario implements Serializable {
                 }
 
                 if (battleType == -1) {
-                    MekHQ.getLogger().log(Scenario.class, METHOD_NAME, LogLevel.ERROR,
-                            "Unable to load an old AtBScenario because we could not determine the battle type"); //$NON-NLS-1$
+                    MekHQ.getLogger().error(Scenario.class, "Unable to load an old AtBScenario because we could not determine the battle type");
                     return null;
                 }
 
                 List<Class<IAtBScenario>> scenarioClassList = AtBScenarioFactory.getScenarios(battleType);
 
                 if ((null == scenarioClassList) || scenarioClassList.isEmpty()) {
-                    MekHQ.getLogger().log(Scenario.class, METHOD_NAME, LogLevel.ERROR,
-                            "Unable to load an old AtBScenario of battle type " + battleType); //$NON-NLS-1$
+                    MekHQ.getLogger().error(Scenario.class, "Unable to load an old AtBScenario of battle type " + battleType);
                     return null;
                 }
 
@@ -416,7 +411,7 @@ public class Scenario implements Serializable {
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
@@ -435,7 +430,7 @@ public class Scenario implements Serializable {
                     retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("loots")) {
                     NodeList nl2 = wn2.getChildNodes();
-                    for (int y=0; y<nl2.getLength(); y++) {
+                    for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         // If it's not an element node, we ignore it.
                         if (wn3.getNodeType() != Node.ELEMENT_NODE)
@@ -444,8 +439,7 @@ public class Scenario implements Serializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("loot")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.getLogger().log(Scenario.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName()); //$NON-NLS-1$
+                            MekHQ.getLogger().error(Scenario.class, "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
                             continue;
                         }
                         Loot loot = Loot.generateInstanceFromXML(wn3, c, version);
@@ -459,7 +453,7 @@ public class Scenario implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(Scenario.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Scenario.class, ex);
         }
 
         return retVal;

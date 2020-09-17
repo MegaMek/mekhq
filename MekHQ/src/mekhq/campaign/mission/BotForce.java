@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.mission;
 
@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import megamek.common.logging.LogLevel;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -36,7 +37,6 @@ import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Player;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -58,9 +58,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
-            MekHQ.getLogger().log(getClass(), "BotForce()", LogLevel.ERROR, //$NON-NLS-1$
-                    "Error getting Princess default behaviors"); //$NON-NLS-1$
-            MekHQ.getLogger().error(getClass(), "BotForce()", ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(this, "Error getting Princess default behaviors", ex);
         }
     }
 
@@ -73,8 +71,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     }
 
     public BotForce(String name, int team, int start, int home, List<Entity> entityList,
-            String camoCategory, String camoFileName, int colorIndex) {
-        final String METHOD_NAME = "BotForce(String,int,int,int,ArrayList<Entity>,String,String,int)"; //$NON-NLS-1$
+                    String camoCategory, String camoFileName, int colorIndex) {
         this.name = name;
         this.team = team;
         this.start = start;
@@ -86,9 +83,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Error getting Princess default behaviors"); //$NON-NLS-1$
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(this, "Error getting Princess default behaviors", ex);
         }
         behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST_OR_NONE);
         behaviorSettings.setDestinationEdge(CardinalEdge.NEAREST_OR_NONE);
@@ -178,13 +173,11 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     }
 
     public int getTotalBV() {
-        final String METHOD_NAME = "getTotalBV";
-
         int bv = 0;
 
-        for(Entity entity : getEntityList()) {
+        for (Entity entity : getEntityList()) {
             if (entity == null) {
-                MekHQ.getLogger().error(BotForce.class, METHOD_NAME, "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+                MekHQ.getLogger().error(BotForce.class, "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
             }
@@ -211,7 +204,6 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        final String METHOD_NAME = "writeToXml";
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "name", name);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "team", team);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "start", start);
@@ -222,7 +214,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<entities>");
         for (Entity en : entityList) {
             if (en == null) {
-                MekHQ.getLogger().error(BotForce.class, METHOD_NAME, "Null entity when saving a bot force, we should never find a null here. Please investigate");
+                MekHQ.getLogger().error(BotForce.class, "Null entity when saving a bot force, we should never find a null here. Please investigate");
             } else {
                 pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent + 2, entityList));
             }
@@ -244,8 +236,6 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     }
 
     public void setFieldsFromXmlNode(Node wn) {
-        final String METHOD_NAME = "setFieldsFromXmlNode(Node)"; //$NON-NLS-1$
-
         NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -270,9 +260,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                         try {
                             en = MekHqXmlUtil.getEntityFromXmlString(wn3);
                         } catch (Exception e) {
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                                    "Error loading allied unit in scenario"); //$NON-NLS-1$
-                            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+                            MekHQ.getLogger().error(this, "Error loading allied unit in scenario", e);
                         }
                         if (en != null) {
                             entityList.add(en);

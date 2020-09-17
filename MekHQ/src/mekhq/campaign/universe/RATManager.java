@@ -50,7 +50,6 @@ import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.OptionsChangedEvent;
@@ -135,10 +134,8 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
     }
 
     private boolean loadCollection(String name) {
-        final String METHOD_NAME = "loadCollection(String)"; //$NON-NLS-1$
-
         if (!fileNames.containsKey(name)) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, "RAT collection " + name + " not found in " + RATINFO_DIR); //$NON-NLS-1$
+            MekHQ.getLogger().error(this, "RAT collection " + name + " not found in " + RATINFO_DIR);
             return false;
         }
         /* Need RUG to be loaded for validation */
@@ -146,23 +143,19 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+                MekHQ.getLogger().error(this, e);
             }
         }
         File f = new File(RATINFO_DIR, fileNames.get(name));
-        FileInputStream fis;
 
         Document xmlDoc;
         DocumentBuilder db;
 
-        try {
-            fis = new FileInputStream(f);
+        try (FileInputStream fis = new FileInputStream(f)){
             db = MekHqXmlUtil.newSafeDocumentBuilder();
             xmlDoc = db.parse(fis);
-            fis.close();
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, "While loading RAT info from " + f.getName() + ": "); //$NON-NLS-1$
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(this, "While loading RAT info from " + f.getName() + ": ", ex);
             return false;
         }
 
@@ -187,16 +180,16 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                             allRATs.get(name).put(era, new ArrayList<>());
                             parseEraNode(eraNode, name, era);
                         } catch (NumberFormatException ex) {
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, "Could not parse year " + year + " in " + name); //$NON-NLS-1$
+                            MekHQ.getLogger().error(this, "Could not parse year " + year + " in " + name);
                         }
                     } else {
-                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, "year attribute not found for era in RAT collection " + name); //$NON-NLS-1$
+                        MekHQ.getLogger().error(this, "year attribute not found for era in RAT collection " + name);
                     }
                 }
             }
             return allRATs.get(name).size() > 0;
         } else {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, "source attribute not found for RAT data in " + f.getName()); //$NON-NLS-1$
+            MekHQ.getLogger().error(this, "source attribute not found for RAT data in " + f.getName());
             return false;
         }
     }
@@ -220,24 +213,18 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
      * RAT before checking generic ones.
      */
     private void loadAltFactions() {
-        final String METHOD_NAME = "loadAltFactions()"; //$NON-NLS-1$
-
         altFactions = new HashMap<>();
 
         File f = new File(ALT_FACTION);
-        FileInputStream fis;
 
         Document xmlDoc;
         DocumentBuilder db;
 
-        try {
-            fis = new FileInputStream(f);
+        try (FileInputStream fis = new FileInputStream(f)) {
             db = MekHqXmlUtil.newSafeDocumentBuilder();
             xmlDoc = db.parse(fis);
-            fis.close();
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, "While loading altFactions: "); //$NON-NLS-1$
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(this, "While loading altFactions: ", ex);
             return;
         }
 
@@ -273,8 +260,6 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
      * to provide a list.
      */
     public static void populateCollectionNames() {
-        final String METHOD_NAME = "populateCollectionNames()"; //$NON-NLS-1$
-
         allCollections = new HashMap<>();
 
         Document xmlDoc;
@@ -284,7 +269,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         FileInputStream fis;
 
         if (!dir.isDirectory()) {
-            MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR, "Ratinfo directory not found"); //$NON-NLS-1$
+            MekHQ.getLogger().error(RATManager.class, "Ratinfo directory not found");
             return;
         }
         for (File f : dir.listFiles()) {
@@ -295,9 +280,8 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                     xmlDoc = db.parse(fis);
                     fis.close();
                 } catch (Exception ex) {
-                    MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
-                            "While loading RAT info from " + f.getName() + ": "); //$NON-NLS-1$
-                    MekHQ.getLogger().error(RATManager.class, METHOD_NAME, ex);
+                    MekHQ.getLogger().error(RATManager.class, "While loading RAT info from " + f.getName() + ": ");
+                    MekHQ.getLogger().error(RATManager.class, ex);
                     continue;
                 }
                 Element elem = xmlDoc.getDocumentElement();
@@ -305,7 +289,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                 elem.normalize();
 
                 String name;
-                ArrayList<Integer> eras = new ArrayList<>();
+                List<Integer> eras = new ArrayList<>();
 
                 if (elem.getAttributes().getNamedItem("source") != null) {
                     name = elem.getAttributes().getNamedItem("source").getTextContent();
@@ -317,12 +301,10 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                                 try {
                                     eras.add(Integer.parseInt(year));
                                 } catch (NumberFormatException ex) {
-                                    MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
-                                            "Could not parse year " + year + " in " + f.getName()); //$NON-NLS-1$
+                                    MekHQ.getLogger().error(RATManager.class, "Could not parse year " + year + " in " + f.getName());
                                 }
                             } else {
-                                MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
-                                        "year attribute not found for era in " + f.getName()); //$NON-NLS-1$
+                                MekHQ.getLogger().error(RATManager.class, "year attribute not found for era in " + f.getName());
                             }
                         }
                     }
@@ -330,8 +312,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                     Collections.sort(eras);
                     allCollections.put(name, eras);
                 } else {
-                    MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
-                            "source attribute not found for RAT data in " + f.getName()); //$NON-NLS-1$
+                    MekHQ.getLogger().error(RATManager.class, "source attribute not found for RAT data in " + f.getName());
                 }
             }
         }
@@ -541,12 +522,9 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         }
 
         public static RAT createFromXml(Node node) {
-            final String METHOD_NAME = "createFromXml(Node)"; //$NON-NLS-1$
-
             RAT retVal = new RAT();
             if (node.getAttributes().getNamedItem("name") == null) {
-                MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
-                        "name attribute missing"); //$NON-NLS-1$
+                MekHQ.getLogger().error(RATManager.class, "name attribute missing");
                 return null;
             }
             retVal.ratName = node.getAttributes().getNamedItem("name").getTextContent();
