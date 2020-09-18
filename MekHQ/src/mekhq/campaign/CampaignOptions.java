@@ -2962,7 +2962,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public List<MassRepairOption> getMassRepairOptions() {
-        return massRepairOptions;
+        return (massRepairOptions != null) ? massRepairOptions : new ArrayList<>();
     }
 
     public void setMassRepairOptions(List<MassRepairOption> massRepairOptions) {
