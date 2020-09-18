@@ -303,7 +303,7 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getBattleArmorCount());
         assertEquals(28, spyReputation.getInfantryCount());
         assertEquals(200, spyReputation.getNonAdminPersonnelCount());
-        assertEquals(1, spyReputation.getDropshipCount());
+        assertEquals(1, spyReputation.getDropShipCount());
         BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkillLevels(), 2);
         assertEquals(4, spyReputation.getMechTechTeamsNeeded());
         assertEquals(2, spyReputation.getAeroTechTeamsNeeded());
@@ -324,7 +324,7 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getBattleArmorCount());
         assertEquals(28, spyReputation.getInfantryCount());
         assertEquals(200, spyReputation.getNonAdminPersonnelCount());
-        assertEquals(1, spyReputation.getDropshipCount());
+        assertEquals(1, spyReputation.getDropShipCount());
         BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkillLevels(), 2);
         assertEquals(4, spyReputation.getMechTechTeamsNeeded());
         assertEquals(2, spyReputation.getAeroTechTeamsNeeded());
@@ -344,7 +344,7 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getBattleArmorCount());
         assertEquals(0, spyReputation.getInfantryCount());
         assertEquals(0, spyReputation.getNonAdminPersonnelCount());
-        assertEquals(0, spyReputation.getDropshipCount());
+        assertEquals(0, spyReputation.getDropShipCount());
         BigDecimalAssert.assertEquals(BigDecimal.ZERO, spyReputation.getTotalSkillLevels(), 2);
         assertEquals(0, spyReputation.getMechTechTeamsNeeded());
         assertEquals(0, spyReputation.getAeroTechTeamsNeeded());
@@ -414,7 +414,7 @@ public class CampaignOpsReputationTest {
         assertEquals(20, spyReputation.getTransportValue());
 
         // Test not having any DropShips (though we still have a JumpShip).
-        doReturn(0).when(spyReputation).getDropshipCount();
+        doReturn(0).when(spyReputation).getDropShipCount();
         doReturn(0).when(spyReputation).getMechBayCount();
         doReturn(0).when(spyReputation).getInfantryBayCount();
         doReturn(0).when(spyReputation).getLightVeeBayCount();
