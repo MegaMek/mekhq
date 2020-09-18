@@ -879,7 +879,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 }
                 for (int i = 0; i < newCount - oldCount; i++) {
                     // Heat sink added for supply chain tracking purposes and removed from refit later
-                    newIntegratedHS.add(newHS.clone().getMissingPart());
+                    newIntegratedHS.add(newHS.getMissingPart());
                 }
             } else {
                 for (int i = 0; i < oldCount; i++) {
@@ -887,7 +887,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 }
                 for (int i = 0; i < newCount; i++) {
                     // Heat sink added for supply chain tracking purposes and removed from refit later
-                    newIntegratedHS.add(newHS.clone().getMissingPart());
+                    newIntegratedHS.add(newHS.getMissingPart());
                 }
                 updateRefitClass(CLASS_D);
             }
@@ -907,7 +907,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 Part hsPart = heatSinkPart(newEntity); // only single HS allowed, so they have to be of the same type
                 for (int i = oldHS; i < newHS; i++) {
                     // Heat sink added for supply chain tracking purposes and removed from refit later
-                    newIntegratedHS.add(hsPart.clone().getMissingPart());
+                    newIntegratedHS.add(hsPart.getMissingPart());
                 }
                 for (int i = newHS; i < oldHS; i++) {
                     oldIntegratedHS.add(hsPart.clone());
