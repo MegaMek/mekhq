@@ -53,7 +53,7 @@ import mekhq.gui.preferences.JTextFieldPreference;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
-public class GMToolsDialog extends JDialog implements ActionListener {
+public class GMToolsDialog extends JDialog {
     private static final long serialVersionUID = 7724064095803583812L;
 
     private JLabel diceResults;
@@ -78,10 +78,6 @@ public class GMToolsDialog extends JDialog implements ActionListener {
 
     private static final String[] QUALITY_NAMES = {"F", "D", "C", "B", "A", "A*"};
     private static final String[] WEIGHT_NAMES = {"Light", "Medium", "Heavy", "Assault"};
-
-    private static final String GM_TOOL_DICE = "gmToolDice";
-    private static final String RAT_ROLLER_TOOL = "ratRollerTool";
-    private static final String RAT_ADDER_TOOL = "ratAdderTool";
 
     /**
      * Creates a generic GM Tools dialog, with a dice roller
@@ -124,8 +120,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         dicePanel.add(sizeDice, newGridBagConstraints(2, 0));
 
         JButton dice = new JButton("Roll");
-        dice.setActionCommand(GM_TOOL_DICE);
-        dice.addActionListener(this);
+        dice.addActionListener(evt -> performDiceRoll());
         dicePanel.add(dice, newGridBagConstraints(0, 1, 3, 1));
 
         diceResults = new JLabel(String.format("Result: %5d", 0));
@@ -222,14 +217,12 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         ratPanel.add(unitPicked, newGridBagConstraints(0, 2, 4, 1));
 
         JButton roll = new JButton("Roll For RAT");
-        roll.setActionCommand(RAT_ROLLER_TOOL);
-        roll.addActionListener(this);
+        roll.addActionListener(evt -> lastRolledUnit = performRollRat());
         ratPanel.add(roll, newGridBagConstraints(5, 3));
 
         if (gui.getCampaign().isGM()) {
             JButton roll2 = new JButton("Add Random Unit");
-            roll2.setActionCommand(RAT_ADDER_TOOL);
-            roll2.addActionListener(this);
+            roll2.addActionListener(evt -> addRATRolledUnit());
             ratPanel.add(roll2, newGridBagConstraints(6, 3));
         }
         return ratPanel;
@@ -312,39 +305,10 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         preferences.manage(new JWindowPreference(this));
     }
 
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        if (event.getActionCommand().equals(GM_TOOL_DICE)) {
-            performDiceRoll();
-        }
-
-        if (event.getActionCommand().equals(RAT_ROLLER_TOOL)) {
-            lastRolledUnit = performRollRat();
-        }
-
-        if (event.getActionCommand().equals(RAT_ADDER_TOOL)) {
-            if (lastRolledUnit == null) {
-                lastRolledUnit = performRollRat();
-            }
-
-            if (lastRolledUnit != null) {
-                Entity e;
-                try {
-                    e = new MechFileParser(lastRolledUnit.getSourceFile(), lastRolledUnit.getEntryName()).getEntity();
-                    Unit u = gui.getCampaign().addUnit(e, false, 0);
-                    if (person != null) {
-                        u.addPilotOrSoldier(person);
-                        person.setOriginalUnit(u);
-                        setVisible(false);
-                    }
-                    lastRolledUnit = null;
-                } catch (Exception ex) {
-                    MekHQ.getLogger().error(this, "Failed to load entity "
-                            + lastRolledUnit.getName() + " from " + lastRolledUnit.getSourceFile().toString(), ex);
-                    unitPicked.setText("Failed to load entity " + lastRolledUnit.getName());
-                }
-            }
-        }
+    //region ActionEvent Handlers
+    public void performDiceRoll() {
+        diceResults.setText(String.format("Result: %5d", Utilities.dice((Integer) numDice.getValue(),
+                (Integer) sizeDice.getValue())));
     }
 
     private MechSummary performRollRat() {
@@ -376,10 +340,30 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         return null;
     }
 
-    public void performDiceRoll() {
-        diceResults.setText(String.format("Result: %5d", Utilities.dice((Integer) numDice.getValue(),
-                (Integer) sizeDice.getValue())));
+    private void addRATRolledUnit() {
+        if (lastRolledUnit == null) {
+            lastRolledUnit = performRollRat();
+        }
+
+        if (lastRolledUnit != null) {
+            Entity e;
+            try {
+                e = new MechFileParser(lastRolledUnit.getSourceFile(), lastRolledUnit.getEntryName()).getEntity();
+                Unit u = gui.getCampaign().addUnit(e, false, 0);
+                if (person != null) {
+                    u.addPilotOrSoldier(person);
+                    person.setOriginalUnit(u);
+                    setVisible(false);
+                }
+                lastRolledUnit = null;
+            } catch (Exception ex) {
+                MekHQ.getLogger().error(this, "Failed to load entity "
+                        + lastRolledUnit.getName() + " from " + lastRolledUnit.getSourceFile().toString(), ex);
+                unitPicked.setText("Failed to load entity " + lastRolledUnit.getName());
+            }
+        }
     }
+    //endregion ActionEvent Handlers
 
     private static class FactionChoice {
         public final String name;
