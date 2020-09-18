@@ -24,8 +24,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -79,6 +77,7 @@ public class GMToolsDialog extends JDialog {
     private static final String[] QUALITY_NAMES = {"F", "D", "C", "B", "A", "A*"};
     private static final String[] WEIGHT_NAMES = {"Light", "Medium", "Heavy", "Assault"};
 
+    //region Constructors
     /**
      * Creates a generic GM Tools dialog, with a dice roller
      * and a RAT roller that can add units to the campaign.
@@ -104,7 +103,15 @@ public class GMToolsDialog extends JDialog {
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
+    //endregion Constructors
 
+    //region Initialization
+    private void initComponents() {
+        getContentPane().add(getDiceRoller(), newGridBagConstraints(0,0));
+        getContentPane().add(getRATRoller(), newGridBagConstraints(0,1));
+    }
+
+    //region Dice Panel Initialization
     private JPanel getDiceRoller() {
         JPanel dicePanel = new JPanel(new GridBagLayout());
         dicePanel.setBorder(BorderFactory.createTitledBorder("Dice Roller"));
@@ -127,48 +134,9 @@ public class GMToolsDialog extends JDialog {
         dicePanel.add(diceResults, newGridBagConstraints(0, 2, 3, 1));
         return dicePanel;
     }
+    //endregion Dice Panel Initialization
 
-    /**
-     * Gets a list of factions sorted by name.
-     */
-    private List<FactionChoice> getFactionChoices() {
-        List<FactionChoice> factionChoices = new ArrayList<>();
-
-        int year = gui.getCampaign().getGameYear();
-        for (Faction faction : Faction.getFactions()) {
-            factionChoices.add(new FactionChoice(faction, year));
-        }
-
-        factionChoices.sort((a, b) -> a.name.compareToIgnoreCase(b.name));
-
-        return factionChoices;
-    }
-
-    /**
-     * Finds the initial faction, which is either the person's faction (if
-     * the dialog was launched for a specific person) or the campaign's
-     * faction.
-     */
-    private int findInitialSelectedFaction(Iterable<FactionChoice> factionChoices) {
-        String factionId = (person != null)
-            ? person.getOriginFaction().getShortName()
-            : gui.getCampaign().getFactionCode();
-        if ((factionId == null) || factionId.isEmpty()) {
-            return 0;
-        }
-
-        int index = 0;
-        for (FactionChoice factionChoice : factionChoices) {
-            if (factionChoice.id.equalsIgnoreCase(factionId)) {
-                return index;
-            }
-
-            index++;
-        }
-
-        return 0;
-    }
-
+    //region RAT Roller Initialization
     private JPanel getRATRoller() {
         JPanel ratPanel = new JPanel(new GridBagLayout());
         ratPanel.setBorder(BorderFactory.createTitledBorder("RAT Roller"));
@@ -229,6 +197,47 @@ public class GMToolsDialog extends JDialog {
     }
 
     /**
+     * Gets a list of factions sorted by name.
+     */
+    private List<FactionChoice> getFactionChoices() {
+        List<FactionChoice> factionChoices = new ArrayList<>();
+
+        int year = gui.getCampaign().getGameYear();
+        for (Faction faction : Faction.getFactions()) {
+            factionChoices.add(new FactionChoice(faction, year));
+        }
+
+        factionChoices.sort((a, b) -> a.name.compareToIgnoreCase(b.name));
+
+        return factionChoices;
+    }
+
+    /**
+     * Finds the initial faction, which is either the person's faction (if
+     * the dialog was launched for a specific person) or the campaign's
+     * faction.
+     */
+    private int findInitialSelectedFaction(Iterable<FactionChoice> factionChoices) {
+        String factionId = (person != null)
+                ? person.getOriginFaction().getShortName()
+                : gui.getCampaign().getFactionCode();
+        if ((factionId == null) || factionId.isEmpty()) {
+            return 0;
+        }
+
+        int index = 0;
+        for (FactionChoice factionChoice : factionChoices) {
+            if (factionChoice.id.equalsIgnoreCase(factionId)) {
+                return index;
+            }
+
+            index++;
+        }
+
+        return 0;
+    }
+
+    /**
      * Determine if a person's primary role supports operating a
      * given unit type.
      */
@@ -262,7 +271,9 @@ public class GMToolsDialog extends JDialog {
                 return false;
         }
     }
+    //endregion RAT Roller Initialization
 
+    //region GridBagConstraint Simplification Methods
     private GridBagConstraints newGridBagConstraints(int x, int y) {
         return newGridBagConstraints(x, y, 1, 1);
     }
@@ -271,11 +282,7 @@ public class GMToolsDialog extends JDialog {
         return new GridBagConstraints(x, y, width, height, 1.0, 1.0,
             GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0, 3, 0, 3), 0, 0);
     }
-
-    private void initComponents() {
-        getContentPane().add(getDiceRoller(), newGridBagConstraints(0,0));
-        getContentPane().add(getRATRoller(), newGridBagConstraints(0,1));
-    }
+    //endregion GridBagConstraint Simplification Methods
 
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(GMToolsDialog.class);
@@ -304,6 +311,7 @@ public class GMToolsDialog extends JDialog {
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
+    //endregion Initialization
 
     //region ActionEvent Handlers
     public void performDiceRoll() {
