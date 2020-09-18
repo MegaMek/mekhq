@@ -109,6 +109,7 @@ public class CampaignOptions implements Serializable {
     //region General Tab
     private boolean useUnitRating;
     private UnitRatingMethod unitRatingMethod;
+    private int manualUnitRatingModifier;
     //endregion General Tab
 
     //region Repair and Maintenance Tab
@@ -416,6 +417,7 @@ public class CampaignOptions implements Serializable {
         //region General Tab
         useUnitRating = true;
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
+        manualUnitRatingModifier = 0;
         //endregion General Tab
 
         //region Repair and Maintenance Tab
@@ -784,6 +786,27 @@ public class CampaignOptions implements Serializable {
     //endregion Constructors
 
     //region General Tab
+    /**
+     * @return the method of unit rating to use
+     */
+    public UnitRatingMethod getUnitRatingMethod() {
+        return unitRatingMethod;
+    }
+
+    /**
+     * @param method the method of unit rating to use
+     */
+    public void setUnitRatingMethod(UnitRatingMethod method) {
+        this.unitRatingMethod = method;
+    }
+
+    public int getManualUnitRatingModifier() {
+        return manualUnitRatingModifier;
+    }
+
+    public void setManualUnitRatingModifier(int manualUnitRatingModifier) {
+        this.manualUnitRatingModifier = manualUnitRatingModifier;
+    }
     //endregion General Tab
 
     //region Repair and Maintenance Tab
@@ -1784,20 +1807,6 @@ public class CampaignOptions implements Serializable {
         this.canceledOrderReimbursement = d;
     }
     //endregion Finances Tab
-
-    /**
-     * @return the method of unit rating to use
-     */
-    public UnitRatingMethod getUnitRatingMethod() {
-        return unitRatingMethod;
-    }
-
-    /**
-     * @param method the method of unit rating to use
-     */
-    public void setUnitRatingMethod(UnitRatingMethod method) {
-        this.unitRatingMethod = method;
-    }
 
     public static String getRepairSystemName(int repairSystem) {
         return REPAIR_SYSTEM_NAMES[repairSystem];
@@ -3038,6 +3047,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnitRating", useUnitRating);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.getDescription());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "manualUnitRatingModifier", getManualUnitRatingModifier());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignedTechFirst", assignedTechFirst);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "resetToFirstTech", resetToFirstTech);
@@ -3562,8 +3572,10 @@ public class CampaignOptions implements Serializable {
                     UnitRatingMethod method = UnitRatingMethod.getUnitRatingMethod(wn2.getTextContent());
                     retVal.setUnitRatingMethod((method != null) ? method : UnitRatingMethod.CAMPAIGN_OPS);
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("manualUnitRatingModifier")) {
+                retVal.setManualUnitRatingModifier(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
-                String[] values = wn2.getTextContent().split(","); //$NON-NLS-1$
+                String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
                     if (i < retVal.usePortraitForType.length) {
                         retVal.usePortraitForType[i] = Boolean.parseBoolean(values[i].trim());

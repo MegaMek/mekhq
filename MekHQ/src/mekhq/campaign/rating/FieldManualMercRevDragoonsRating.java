@@ -846,17 +846,19 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                                                  .getFailedCollateral());
     }
 
-    @Override
     public String getDetails() {
+        final boolean useManualUnitRatingModifier = getCampaign().getCampaignOptions().getManualUnitRatingModifier() != 0;
         return String.format("%-" + HEADER_LENGTH + "s %s", "Dragoons Rating:",
-                             getUnitRating()) + "\n" +
-               getQualityDetails() + "\n\n" +
-               getCommandDetails() + "\n\n" +
-               getCombatRecordDetails() + "\n\n" +
-               getTransportationDetails() + "\n\n" +
-               getTechnologyDetails() + "\n\n" +
-               getSupportDetails() + "\n\n" +
-               getFinancialDetails();
+                getUnitRating()) + "\n" +
+                "    Method: FM: Mercenaries (rev)\n\n" +
+                (useManualUnitRatingModifier ? "" : "") +
+                getQualityDetails() + "\n\n" +
+                getCommandDetails() + "\n\n" +
+                getCombatRecordDetails() + "\n\n" +
+                getTransportationDetails() + "\n\n" +
+                getTechnologyDetails() + "\n\n" +
+                getSupportDetails() + "\n\n" +
+                getFinancialDetails();
     }
 
     public String getHelpText() {
