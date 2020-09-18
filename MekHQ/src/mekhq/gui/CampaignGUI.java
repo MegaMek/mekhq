@@ -1239,6 +1239,8 @@ public class CampaignGUI extends JPanel {
     }
 
     public boolean nagOutstandingScenarios() {
+        nagUnresolvedStratconContacts();
+        
         for (Mission m : getCampaign().getMissions()) {
             if (!m.isActive() || !(m instanceof AtBContract)) {
                 continue;

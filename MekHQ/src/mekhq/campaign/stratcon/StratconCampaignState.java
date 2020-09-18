@@ -1,5 +1,6 @@
 package mekhq.campaign.stratcon;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +36,8 @@ public class StratconCampaignState {
     private double globalOpforBVMultiplier;
     private int supportPoints;
     private int victoryPoints;
-    private int strategicObjectivePoints;
-    private int completedStrategicObjectives;
+    private int pendingStrategicObjectiveCount;
+    private int completedStrategicObjectiveCount;
     
     @XmlElementWrapper(name="campaignTracks")
     @XmlElement(name="campaignTrack")
@@ -104,28 +105,28 @@ public class StratconCampaignState {
         victoryPoints += increment;
     }
 
-    public int getStrategicObjectivePoints() {
-        return strategicObjectivePoints;
+    public int getPendingStrategicObjectiveCount() {
+        return pendingStrategicObjectiveCount;
     }
 
-    public void setStrategicObjectivePoints(int strategicObjectivePoints) {
-        this.strategicObjectivePoints = strategicObjectivePoints;
+    public void setPendingStrategicObjectiveCount(int pendingStrategicObjectiveCount) {
+        this.pendingStrategicObjectiveCount = pendingStrategicObjectiveCount;
     }
     
-    public void incrementStrategicObjectivePoints() {
-        strategicObjectivePoints++;
+    public void incrementPendingStrategicObjectiveCount() {
+        pendingStrategicObjectiveCount++;
     }
     
     public int getStrategicObjectiveCompletedCount() {
-        return completedStrategicObjectives;
+        return completedStrategicObjectiveCount;
     }
     
     public void incrementStrategicObjectiveCompletedCount() {
-        this.completedStrategicObjectives++;
+        completedStrategicObjectiveCount++;
     }
     
     public void decrementStrategicObjectiveCompletedCount() {
-        this.completedStrategicObjectives--;
+        completedStrategicObjectiveCount--;
     }
     
     public void useSupportPoint() {
@@ -135,10 +136,6 @@ public class StratconCampaignState {
     public void convertVictoryToSupportPoint() {
         victoryPoints--;
         supportPoints++;
-    }
-    
-    public void addStrategicObjectivePoint() {
-        strategicObjectivePoints++;
     }
     
     /**
@@ -179,7 +176,7 @@ public class StratconCampaignState {
      * @param xmlNode The node with the campaign state
      * @return Possibly an instance of a StratconCampaignState
      */
-    public static StratconCampaignState Deserialize(Node xmlNode) {
+    public static StratconCampaignState Deserialize(Node xmlNode) {        
         StratconCampaignState resultingCampaignState = null;
         
         try {
