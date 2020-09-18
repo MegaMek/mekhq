@@ -2,6 +2,7 @@
  * Money.java
  *
  * Copyright (c) 2019 Vicente Cartas Espinel <vicente.cartas at outlook.com>. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,7 +40,6 @@ public class Money implements Comparable<Money> {
         assert money != null;
         this.wrapped = money;
     }
-
 
     public BigMoney getWrapped() {
         return wrapped;
