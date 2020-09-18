@@ -527,15 +527,9 @@ public class CampaignOptionsDialog extends JDialog {
     private void initComponents() {
         //region Variable Declaration and Initialisation
         tabOptions = new JTabbedPane();
-        panGeneral = new JPanel();
-        txtName = new JTextField();
-        btnDate = new JButton();
-        comboFaction = new JComboBox<>();
-        comboFactionNames = new JComboBox<>();
         comboRanks = new JComboBox<>();
+        comboFactionNames = new JComboBox<>();
         sldGender = new JSlider(SwingConstants.HORIZONTAL);
-        btnCamo = new JButton();
-        btnIcon = new JButton();
         panRepair = new JPanel();
         panSupplies = new JPanel();
         panPersonnel = new JPanel();
@@ -551,8 +545,6 @@ public class CampaignOptionsDialog extends JDialog {
         useEraModsCheckBox = new JCheckBox();
         assignedTechFirstCheckBox = new JCheckBox();
         resetToFirstTechCheckBox = new JCheckBox();
-        useUnitRatingCheckBox = new JCheckBox();
-        unitRatingMethodCombo = new JComboBox<>(UnitRatingMethod.getUnitRatingMethodNames());
         JLabel clanPriceModifierLabel = new JLabel();
         JLabel usedPartsValueLabel = new JLabel();
         JLabel damagedPartsValueLabel = new JLabel();
@@ -613,6 +605,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         GridBagConstraints gridBagConstraints;
         int gridy = 0;
+        int gridx = 0;
         //endregion Variable Declaration and Initialisation
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
@@ -624,53 +617,29 @@ public class CampaignOptionsDialog extends JDialog {
         tabOptions.setName("tabOptions");
 
         //region General Tab
+        panGeneral = new JPanel(new GridBagLayout());
         panGeneral.setName("panGeneral");
-        panGeneral.setLayout(new GridBagLayout());
-
-        txtName.setText(campaign.getName());
-        txtName.setMinimumSize(new Dimension(500, 30));
-        txtName.setName("txtName");
-        txtName.setPreferredSize(new java.awt.Dimension(500, 30));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panGeneral.add(txtName, gridBagConstraints);
 
         JLabel lblName = new JLabel(resourceMap.getString("lblName.text"));
         lblName.setName("lblName");
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(lblName, gridBagConstraints);
 
+        txtName = new JTextField(campaign.getName());
+        txtName.setName("txtName");
+        txtName.setMinimumSize(new Dimension(500, 30));
+        txtName.setPreferredSize(new Dimension(500, 30));
+        gridBagConstraints.gridx = gridx--;
+        panGeneral.add(txtName, gridBagConstraints);
+
         JLabel lblFaction = new JLabel(resourceMap.getString("lblFaction.text"));
         lblFaction.setName("lblFaction");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridy = gridy++;
         panGeneral.add(lblFaction, gridBagConstraints);
-
-        JLabel lblDate = new JLabel(resourceMap.getString("lblDate.text"));
-        lblDate.setName("lblDate");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panGeneral.add(lblDate, gridBagConstraints);
-
-        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
-        btnDate.setMinimumSize(new Dimension(400, 30));
-        btnDate.setName("btnDate");
-        btnDate.setPreferredSize(new Dimension(400, 30));
-        btnDate.addActionListener(this::btnDateActionPerformed);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panGeneral.add(btnDate, gridBagConstraints);
 
         factionModel = new SortedComboBoxModel<>();
         for (String sName : Faction.getChoosableFactionCodes()) {
@@ -680,19 +649,17 @@ public class CampaignOptionsDialog extends JDialog {
             }
         }
         factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
+        comboFaction = new JComboBox<>();
+        comboFaction.setName("comboFaction");
         comboFaction.setModel(factionModel);
         comboFaction.setMinimumSize(new Dimension(400, 30));
-        comboFaction.setName("comboFaction");
         comboFaction.setPreferredSize(new Dimension(400, 30));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.gridx = gridx--;
         panGeneral.add(comboFaction, gridBagConstraints);
 
         JPanel unitRatingPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
 
-        useUnitRatingCheckBox.setText(resourceMap.getString("useUnitRatingCheckBox.text"));
+        useUnitRatingCheckBox = new JCheckBox(resourceMap.getString("useUnitRatingCheckBox.text"));
         useUnitRatingCheckBox.setName("useUnitRatingCheckBox");
         unitRatingPanel.add(useUnitRatingCheckBox);
 
@@ -702,52 +669,63 @@ public class CampaignOptionsDialog extends JDialog {
         unitRatingMethodLabel.setName("unitRatingMethodLabel");
         unitRatingPanel.add(unitRatingMethodLabel);
 
+        unitRatingMethodCombo = new JComboBox<>(UnitRatingMethod.getUnitRatingMethodNames());
         unitRatingMethodCombo.setName("unitRatingMethodCombo");
         unitRatingPanel.add(unitRatingMethodCombo);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridx = gridx;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panGeneral.add(unitRatingPanel, gridBagConstraints);
 
-        btnCamo.setMaximumSize(new java.awt.Dimension(84, 72));
-        btnCamo.setMinimumSize(new java.awt.Dimension(84, 72));
-        btnCamo.setName("btnCamo"); // NOI18N
-        btnCamo.setPreferredSize(new java.awt.Dimension(84, 72));
-        btnCamo.addActionListener(this::btnCamoActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panGeneral.add(btnCamo, gridBagConstraints);
+        JLabel lblDate = new JLabel(resourceMap.getString("lblDate.text"));
+        lblDate.setName("lblDate");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridy = gridy++;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panGeneral.add(lblDate, gridBagConstraints);
+
+        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+        btnDate.setName("btnDate");
+        btnDate.setMinimumSize(new Dimension(400, 30));
+        btnDate.setPreferredSize(new Dimension(400, 30));
+        btnDate.addActionListener(this::btnDateActionPerformed);
+        gridBagConstraints.gridx = gridx--;
+        panGeneral.add(btnDate, gridBagConstraints);
 
         JLabel lblCamo = new JLabel(resourceMap.getString("lblCamo.text"));
         lblCamo.setName("lblCamo");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridy = gridy++;
         panGeneral.add(lblCamo, gridBagConstraints);
 
-        btnIcon.setMaximumSize(new java.awt.Dimension(84, 72));
-        btnIcon.setMinimumSize(new java.awt.Dimension(84, 72));
-        btnIcon.setPreferredSize(new java.awt.Dimension(84, 72));
-        btnIcon.addActionListener(this::btnIconActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        btnCamo = new JButton();
+        btnCamo.setName("btnCamo");
+        btnCamo.setMinimumSize(new Dimension(84, 72));
+        btnCamo.setPreferredSize(new Dimension(84, 72));
+        btnCamo.setMaximumSize(new Dimension(84, 72));
+        btnCamo.addActionListener(this::btnCamoActionPerformed);
+        gridBagConstraints.gridx = gridx--;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panGeneral.add(btnIcon, gridBagConstraints);
+        panGeneral.add(btnCamo, gridBagConstraints);
 
         JLabel lblIcon = new JLabel(resourceMap.getString("lblIcon.text"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridy = gridy++;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(lblIcon, gridBagConstraints);
+
+        btnIcon = new JButton();
+        btnIcon.addActionListener(this::btnIconActionPerformed);
+        btnIcon.setMinimumSize(new Dimension(84, 72));
+        btnIcon.setPreferredSize(new Dimension(84, 72));
+        btnIcon.setMaximumSize(new Dimension(84, 72));
+        gridBagConstraints.gridx = gridx--;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panGeneral.add(btnIcon, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panGeneral.TabConstraints.tabTitle"), panGeneral);
         //endregion General Tab
