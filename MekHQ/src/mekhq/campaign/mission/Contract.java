@@ -272,6 +272,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         salvagedByUnit = salvagedByUnit.plus(l);
     }
 
+    public void subtractSalvageByUnit(Money money) {
+        salvagedByUnit = salvagedByUnit.minus(money);
+    }
+
     public Money getSalvagedByEmployer() {
         return salvagedByEmployer;
     }
