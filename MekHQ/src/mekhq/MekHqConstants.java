@@ -47,6 +47,11 @@ public final class MekHqConstants {
     public static final int DEFAULT_NUMBER_SAVES = 5;
     //endregion Autosave
 
+    //region New Day
+    public static final String NEW_DAY_NODE = "mekhq/prefs/newDay";
+    public static final String NEW_DAY_MRMS = "newDayMRMS";
+    //endregion New Day
+
     //region Campaign XML Save Options
     public static final String XML_SAVES_NODE = "mekhq/prefs/xmlsaves";
     public static final String PREFER_GZIPPED_CAMPAIGN_FILE = "preferGzippedCampaignFile";
