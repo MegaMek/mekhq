@@ -44,6 +44,10 @@ VERSION HISTORY:
 + Issue #1939: Fixing Preset Loading and Reworking Campaign Options Initial Value Load
 + PR #2008: Avoid several process-stopping errors when upgrading bot units with SPAs
 + Issue #2007: Correct required heat sink calculation for refits
++ PR #2009: Moving the Misc Tab to MekHQOptions, Fixing UnitMarketReportRefresh, Properly Localizing lblOpforLocalForceLikelihood
++ Issue #2001: Fixing Lance Display Ordinal Comparison
++ PR #2013: Adding MekHQ option to prefer GZIP in campaign saves
++ Issue #1866: Implementing New Day MRMS Option
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format

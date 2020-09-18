@@ -53,6 +53,14 @@ public final class MekHQOptions {
     public void setLongDisplayDateFormat(String value) {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).put(MekHqConstants.LONG_DISPLAY_DATE_FORMAT, value);
     }
+
+    public boolean getHistoricalDailyLog() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.HISTORICAL_DAILY_LOG, false);
+    }
+
+    public void setHistoricalDailyLog(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.HISTORICAL_DAILY_LOG, value);
+    }
     //endregion Display
 
     //region Autosave
@@ -114,7 +122,35 @@ public final class MekHQOptions {
     }
     //endregion Autosave
 
+    //region New Day
+    public boolean getNewDayMRMS() {
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_MRMS, false);
+    }
+
+    public void setNewDayMRMS(boolean value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_MRMS, value);
+    }
+    //endregion New Day
+
     //region Campaign XML Save Options
+    /**
+     * @return A value indicating if the campaign should be written to a gzipped file, if possible.
+     */
+    public boolean getPreferGzippedOutput() {
+        return userPreferences.node(MekHqConstants.XML_SAVES_NODE).getBoolean(MekHqConstants.PREFER_GZIPPED_CAMPAIGN_FILE, true);
+    }
+
+    /**
+     * Sets a hint indicating that the campaign should be gzipped, if possible.
+     * This allows the Save dialog to present the user with the correct file
+     * type on subsequent saves.
+     *
+     * @param value A value indicating whether or not the campaign should be gzipped if possible.
+     */
+    public void setPreferGzippedOutput(boolean value) {
+        userPreferences.node(MekHqConstants.XML_SAVES_NODE).putBoolean(MekHqConstants.PREFER_GZIPPED_CAMPAIGN_FILE, value);
+    }
+
     public boolean getWriteCustomsToXML() {
         return userPreferences.node(MekHqConstants.XML_SAVES_NODE).getBoolean(MekHqConstants.WRITE_CUSTOMS_TO_XML, true);
     }

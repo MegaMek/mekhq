@@ -392,10 +392,6 @@ public class CampaignOptions implements Serializable {
     private boolean useAtBCapture; // TODO : merge me with the Personnel Option capturePrisoners
     private int startGameDelay;
     //endregion Against the Bot Tab
-
-    //region Miscellaneous Tab
-    private boolean historicalDailyLog;
-    //endregion Miscellaneous Tab
     //endregion Variable Declarations
 
     //region Constructors
@@ -786,10 +782,6 @@ public class CampaignOptions implements Serializable {
         useAtBCapture = false;
         startGameDelay = 500;
         //endregion Against the Bot Tab
-
-        //region Miscellaneous Tab
-        historicalDailyLog = false;
-        //endregion Miscellaneous Tab
     }
     //endregion Constructors
 
@@ -2204,14 +2196,6 @@ public class CampaignOptions implements Serializable {
         adminXPPeriod = m;
     }
 
-    public boolean historicalDailyLog() {
-        return historicalDailyLog;
-    }
-
-    public void setHistoricalDailyLog(boolean b) {
-        this.historicalDailyLog = b;
-    }
-
     public int getEdgeCost() {
         return edgeCost;
     }
@@ -2988,7 +2972,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public List<MassRepairOption> getMassRepairOptions() {
-        return massRepairOptions;
+        return (massRepairOptions != null) ? massRepairOptions : new ArrayList<>();
     }
 
     public void setMassRepairOptions(List<MassRepairOption> massRepairOptions) {
@@ -3297,7 +3281,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "historicalDailyLog", historicalDailyLog);
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseExtraTime", massRepairUseExtraTime);
@@ -3925,8 +3908,8 @@ public class CampaignOptions implements Serializable {
                 retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
                 retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) {
-                retVal.historicalDailyLog = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
+                MekHQ.getMekHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
                 retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
@@ -4066,7 +4049,7 @@ public class CampaignOptions implements Serializable {
             this.bthMax = bthMax;
         }
 
-        public static int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO,
+        public static final int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO,
                 Part.REPAIR_PART_TYPE.WEAPON, Part.REPAIR_PART_TYPE.GENERAL_LOCATION, Part.REPAIR_PART_TYPE.ENGINE,
                 Part.REPAIR_PART_TYPE.GYRO, Part.REPAIR_PART_TYPE.ACTUATOR, Part.REPAIR_PART_TYPE.ELECTRONICS,
                 Part.REPAIR_PART_TYPE.POD_SPACE, Part.REPAIR_PART_TYPE.GENERAL };

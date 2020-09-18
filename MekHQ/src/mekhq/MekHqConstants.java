@@ -26,6 +26,8 @@ public final class MekHqConstants {
     public static final String DISPLAY_NODE = "mekhq/prefs/display";
     public static final String DISPLAY_DATE_FORMAT = "displayDateFormat";
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
+    public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
+    public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history, also used as a limit in the UI
     //endregion Display
 
     //region Autosave
@@ -40,8 +42,14 @@ public final class MekHqConstants {
     public static final int DEFAULT_NUMBER_SAVES = 5;
     //endregion Autosave
 
+    //region New Day
+    public static final String NEW_DAY_NODE = "mekhq/prefs/newDay";
+    public static final String NEW_DAY_MRMS = "newDayMRMS";
+    //endregion New Day
+
     //region Campaign XML Save Options
     public static final String XML_SAVES_NODE = "mekhq/prefs/xmlsaves";
+    public static final String PREFER_GZIPPED_CAMPAIGN_FILE = "preferGzippedCampaignFile";
     public static final String WRITE_CUSTOMS_TO_XML = "writeCustomsToXML";
     //endregion Campaign XML Save Options
     //endregion MekHQ Options
