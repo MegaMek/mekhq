@@ -122,6 +122,16 @@ public final class MekHQOptions {
     }
     //endregion Autosave
 
+    //region New Day
+    public boolean getNewDayMRMS() {
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_MRMS, false);
+    }
+
+    public void setNewDayMRMS(boolean value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_MRMS, value);
+    }
+    //endregion New Day
+
     //region Campaign XML Save Options
     /**
      * @return A value indicating if the campaign should be written to a gzipped file, if possible.

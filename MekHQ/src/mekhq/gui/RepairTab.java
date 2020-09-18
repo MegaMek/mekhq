@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,18 +10,15 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -65,6 +62,7 @@ import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
+import mekhq.service.MassRepairMassSalvageMode;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
@@ -80,7 +78,6 @@ import mekhq.service.PartsAcquisitionService;
 
 /**
  * Shows damaged units and controls for repair.
- *
  */
 public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
@@ -132,8 +129,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      */
     @Override
     public void initTab() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$ ;
-                new EncodeControl());
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridLayout());
@@ -144,48 +140,46 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         JPanel actionButtons = new JPanel(new GridBagLayout());
 
         JButton btnMRMSDialog = new JButton();
-        btnMRMSDialog.setText("Mass Repair/Salvage"); // NOI18N
+        btnMRMSDialog.setText("Mass Repair/Salvage");
         btnMRMSDialog.setToolTipText("Start Mass Repair/Salvage from dialog");
-        btnMRMSDialog.setName("btnMRMSDialog"); // NOI18N
+        btnMRMSDialog.setName("btnMRMSDialog");
         btnMRMSDialog.addActionListener(ev -> {
-            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(getFrame(), true, getCampaignGui(), null,
-                    MassRepairSalvageDialog.MODE.UNITS);
+            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(getFrame(), true,
+                    getCampaignGui(), null, MassRepairMassSalvageMode.UNITS);
             dlg.setVisible(true);
         });
 
         JButton btnMRMSInstantAll = new JButton();
-        btnMRMSInstantAll.setText("Instant Mass Repair/Salvage All"); // NOI18N
-        btnMRMSInstantAll
-                .setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
-        btnMRMSInstantAll.setName("btnMRMSInstantAll"); // NOI18N
+        btnMRMSInstantAll.setText("Instant Mass Repair/Salvage All");
+        btnMRMSInstantAll.setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
+        btnMRMSInstantAll.setName("btnMRMSInstantAll");
         btnMRMSInstantAll.addActionListener(ev -> {
-            MassRepairService.massRepairSalvageAllUnits(getCampaignGui());
+            MassRepairService.massRepairSalvageAllUnits(getCampaign());
+            JOptionPane.showMessageDialog(getCampaignGui().getFrame(), "Mass Repair/Salvage complete.",
+                    "Complete", JOptionPane.INFORMATION_MESSAGE);
         });
 
-		btnAcquisitions = new JButton();
-		btnAcquisitions.setText("Parts"); // NOI18N
-		btnAcquisitions.setToolTipText("Show missing/in transit/on order parts");
-		btnAcquisitions.setName("btnAcquisitions"); // NOI18N
-		btnAcquisitions.addActionListener(ev -> {
-			AcquisitionsDialog dlg = new AcquisitionsDialog(getFrame(), true, getCampaignGui());
-			dlg.setVisible(true);
-		});
-		btnAcquisitions.addPropertyChangeListener("counts", new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				String txt = "Parts Acquisition";
+        btnAcquisitions = new JButton();
+        btnAcquisitions.setText("Parts");
+        btnAcquisitions.setToolTipText("Show missing/in transit/on order parts");
+        btnAcquisitions.setName("btnAcquisitions");
+        btnAcquisitions.addActionListener(ev -> {
+            AcquisitionsDialog dlg = new AcquisitionsDialog(getFrame(), true, getCampaignGui());
+            dlg.setVisible(true);
+        });
+        btnAcquisitions.addPropertyChangeListener("counts", evt -> {
+            String txt = "Parts Acquisition";
 
-				if (PartsAcquisitionService.getMissingCount() > 0) {
-					if (PartsAcquisitionService.getUnavailableCount() > 0) {
-						txt += String.format(" (%s missing, %s unavailable)", PartsAcquisitionService.getMissingCount(), PartsAcquisitionService.getUnavailableCount());
-					} else {
-						txt += String.format(" (%s missing)", PartsAcquisitionService.getMissingCount());
-					}
-				}
-				btnAcquisitions.setText(txt);
-				btnAcquisitions.repaint();
-			}
-		});
+            if (PartsAcquisitionService.getMissingCount() > 0) {
+                if (PartsAcquisitionService.getUnavailableCount() > 0) {
+                    txt += String.format(" (%s missing, %s unavailable)", PartsAcquisitionService.getMissingCount(), PartsAcquisitionService.getUnavailableCount());
+                } else {
+                    txt += String.format(" (%s missing)", PartsAcquisitionService.getMissingCount());
+                }
+            }
+            btnAcquisitions.setText(txt);
+            btnAcquisitions.repaint();
+        });
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -201,14 +195,14 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         actionButtons.add(btnMRMSInstantAll, gridBagConstraints);
 
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.weighty = 1;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		actionButtons.add(btnAcquisitions, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weighty = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        actionButtons.add(btnAcquisitions, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -223,14 +217,14 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         servicedUnitTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         servicedUnitTable.setColumnModel(new XTableColumnModel());
         servicedUnitTable.createDefaultColumnsFromModel();
-        servicedUnitSorter = new TableRowSorter<UnitTableModel>(servicedUnitModel);
+        servicedUnitSorter = new TableRowSorter<>(servicedUnitModel);
         servicedUnitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         servicedUnitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
         servicedUnitTable.setRowSorter(servicedUnitSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
         servicedUnitSorter.setSortKeys(sortKeys);
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = ((XTableColumnModel) servicedUnitTable.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(servicedUnitModel.getColumnWidth(i));
@@ -242,7 +236,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         }
         servicedUnitTable.setIntercellSpacing(new Dimension(0, 0));
         servicedUnitTable.setShowGrid(false);
-        servicedUnitTable.getSelectionModel().addListSelectionListener(ev -> servicedUnitTableValueChanged(ev));
+        servicedUnitTable.getSelectionModel().addListSelectionListener(this::servicedUnitTableValueChanged);
         servicedUnitTable.addMouseListener(new ServicedUnitsTableMouseAdapter(getCampaignGui(),
                 servicedUnitTable, servicedUnitModel));
         JScrollPane scrollServicedUnitTable = new JScrollPane(servicedUnitTable);
@@ -273,11 +267,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         techTable = new JTable(techsModel);
         techTable.setRowHeight(60);
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer(getIconPackage()));
-        techTable.getSelectionModel().addListSelectionListener(ev -> techTableValueChanged(ev));
-        techSorter = new TableRowSorter<TechTableModel>(techsModel);
+        techTable.getSelectionModel().addListSelectionListener(this::techTableValueChanged);
+        techSorter = new TableRowSorter<>(techsModel);
         techSorter.setComparator(0, new TechSorter());
         techTable.setRowSorter(techSorter);
-        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         techSorter.setSortKeys(sortKeys);
         JScrollPane scrollTechTable = new JScrollPane(techTable);
@@ -391,10 +385,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         taskTable.setRowHeight(70);
         taskTable.getColumnModel().getColumn(0).setCellRenderer(taskModel.getRenderer(getIconPackage()));
         taskTable.getSelectionModel().addListSelectionListener(ev -> taskTableValueChanged());
-        taskSorter = new TableRowSorter<TaskTableModel>(taskModel);
+        taskSorter = new TableRowSorter<>(taskModel);
         taskSorter.setComparator(0, new TaskSorter());
         taskTable.setRowSorter(taskSorter);
-        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         taskSorter.setSortKeys(sortKeys);
         taskTable.addMouseListener(new TaskTableMouseAdapter(getCampaignGui(),
@@ -887,13 +881,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         refreshPartsAcquisitionService(true);
     }
 
-	public void refreshPartsAcquisitionService(boolean rebuildPartsList) {
-		if (rebuildPartsList) {
-			PartsAcquisitionService.buildPartsList(getCampaign());
-		}
+    public void refreshPartsAcquisitionService(boolean rebuildPartsList) {
+        if (rebuildPartsList) {
+            PartsAcquisitionService.buildPartsList(getCampaign());
+        }
 
-		btnAcquisitions.firePropertyChange("counts", -1, 0);
-	}
+        btnAcquisitions.firePropertyChange("counts", -1, 0);
+    }
 
     private ActionScheduler servicedUnitListScheduler = new ActionScheduler(this::refreshServicedUnitList);
     private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
