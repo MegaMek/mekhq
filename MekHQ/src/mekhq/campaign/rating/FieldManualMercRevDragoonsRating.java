@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.rating;
 
@@ -54,7 +54,6 @@ import mekhq.campaign.unit.Unit;
  * @since 3/12/2012
  */
 public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
-
     private BigDecimal highTechPercent = BigDecimal.ZERO;
     private BigDecimal numberIS2 = BigDecimal.ZERO;
     private BigDecimal numberClan = BigDecimal.ZERO;
@@ -130,7 +129,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
             updateBayCount(u.getEntity());
 
-            updateJumpships(u.getEntity());
+            updateJumpShips(u.getEntity());
 
             updateTechSupportNeeds(u);
         }
@@ -157,15 +156,15 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         }
     }
 
-    private void updateJumpships(Entity en) {
+    private void updateJumpShips(Entity en) {
         if (en instanceof Warship) {
             if (en.getDocks() > 0) {
-                setWarshipWithDocsOwner(true);
+                setWarShipWithDocsOwner(true);
             } else {
-                setWarshipOwner(true);
+                setWarShipOwner(true);
             }
         } else if (en instanceof Jumpship) {
-            setJumpshipOwner(true);
+            setJumpShipOwner(true);
         }
     }
 
@@ -752,9 +751,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         .append(" (plus ").append(excessHeavyVeeBays).append(" excess Heavy and ").append(excessSuperHeavyVeeBays).append(" excess Super Heavy)")
         .append("\n").append(String.format(TEMPLATE_TWO, "Battle Armor Bays:", getNumberBaSquads(), getBaBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()))
-        .append("\n").append(String.format(TEMPLATE, "JumpShip?", (isJumpshipOwner() ? "Yes" : "No")))
-        .append("\n").append(String.format(TEMPLATE, "WarShip w/out Collar?", (isWarshipOwner() ? "Yes" : "No")))
-        .append("\n").append(String.format(TEMPLATE, "WarShip w/ Collar?", (isWarshipWithDocsOwner() ? "Yes" : "No")));
+        .append("\n").append(String.format(TEMPLATE, "JumpShip?", (isJumpShipOwner() ? "Yes" : "No")))
+        .append("\n").append(String.format(TEMPLATE, "WarShip w/out Collar?", (isWarShipOwner() ? "Yes" : "No")))
+        .append("\n").append(String.format(TEMPLATE, "WarShip w/ Collar?", (isWarShipWithDocsOwner() ? "Yes" : "No")));
 
         return out.toString();
     }
@@ -847,10 +846,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                                                  .getFailedCollateral());
     }
 
+    @Override
     public String getDetails() {
         return String.format("%-" + HEADER_LENGTH + "s %s", "Dragoons Rating:",
                              getUnitRating()) + "\n" +
-               "    Method: FM: Mercenaries (rev)\n\n" +
                getQualityDetails() + "\n\n" +
                getCommandDetails() + "\n\n" +
                getCombatRecordDetails() + "\n\n" +
@@ -948,7 +947,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                getLightVeeCount() +
                getHeavyVeeCount() + getSuperHeavyVeeCount() +
                getNumberBaSquads() + getSmallCraftCount() +
-               getDropshipCount() + getWarshipCount() + getJumpshipCount();
+               getDropShipCount() + getWarShipCount() + getJumpShipCount();
     }
 
     @Override

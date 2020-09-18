@@ -173,8 +173,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             antiMek = gunnery + 1;
         }
 
-        BigDecimal skillLevel = BigDecimal.valueOf(gunnery)
-                                    .add(BigDecimal.valueOf(antiMek));
+        BigDecimal skillLevel = BigDecimal.valueOf(gunnery).add(BigDecimal.valueOf(antiMek));
 
         incrementSkillRatingCounts(getExperienceLevelName(skillLevel));
         setTotalSkillLevels(getTotalSkillLevels(false).add(skillLevel));
@@ -215,8 +214,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             skillLevel = skillLevel.add(BigDecimal.valueOf(piloting));
         } else {
             // Assume a piloting equal to Gunnery +1.
-            skillLevel = skillLevel.add(BigDecimal.valueOf(gunnery))
-                                   .add(BigDecimal.ONE);
+            skillLevel = skillLevel.add(BigDecimal.valueOf(gunnery)).add(BigDecimal.ONE);
         }
 
         incrementSkillRatingCounts(getExperienceLevelName(skillLevel));
@@ -235,7 +233,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         totalCombatUnits += getVeeCount();
         totalCombatUnits += getNumberBaSquads();
         totalCombatUnits += getInfantryUnitCount();
-        totalCombatUnits += getDropshipCount();
+        totalCombatUnits += getDropShipCount();
         totalCombatUnits += getSmallCraftCount();
         return totalCombatUnits;
     }
@@ -366,9 +364,9 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         setBattleArmorCount(0);
         setInfantryCount(0);
         setFighterCount(0);
-        setDropshipCount(0);
+        setDropShipCount(0);
         setSmallCraftCount(0);
-        setJumpshipCount(0);
+        setJumpShipCount(0);
         setDockingCollarCount(0);
         clearCraftWithoutCrew();
 
@@ -549,7 +547,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             totalValue -= 5;
         }
 
-        if (getDropshipCount() < 1) {
+        if (getDropShipCount() < 1) {
             totalValue -= 5;
         }
 
@@ -557,16 +555,16 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         // According to Campaign Ops, this will require tracking bay personnel
         // & passenger quarters.
 
-        if (getJumpshipCount() > 0) {
+        if (getJumpShipCount() > 0) {
             totalValue += 10;
         }
-        if (getWarshipCount() > 0) {
+        if (getWarShipCount() > 0) {
             totalValue += 10;
             if (getCampaign().getLocalDate().isAfter(LocalDate.of(2800, 1, 1))) {
                 totalValue += 5;
             }
         }
-        if ((getDropshipCount() > 0) && (getDockingCollarCount() >= getDropshipCount())) {
+        if ((getDropShipCount() > 0) && (getDockingCollarCount() >= getDropShipCount())) {
             totalValue += 5;
         }
 
@@ -671,8 +669,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     private int calcLargeCraftSupportValue() {
         boolean crewShortage = false;
         for (Unit u : getCampaign().getCopyOfUnits()) {
-            if (u.getEntity() instanceof SmallCraft ||
-                u.getEntity() instanceof Jumpship) {
+            if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
                 if (u.getActiveCrew().size() < u.getFullCrewSize()) {
                     crewShortage = true;
                     break;
@@ -802,11 +799,11 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                      " (plus " + excessHeavyVeeBays + " excess Heavy and " + excessSuperHeavyVeeBays + " excess Super Heavy)" +
                      "\n" + String.format(TEMPLATE, "Battle Armor Bays:", getBattleArmorCount() / 5, getBaBayCount()) +
                      "\n" + String.format(TEMPLATE, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()) +
-                     "\n" + String.format(TEMPLATE, "Docking Collars:", getDropshipCount(), getDockingCollarCount());
+                     "\n" + String.format(TEMPLATE, "Docking Collars:", getDropShipCount(), getDockingCollarCount());
 
         final String TEMPLATE_2 = "    %-" + CATEGORY_LENGTH + "s %3s";
-        out += "\n" + String.format(TEMPLATE_2, "Has JumpShips?", getJumpshipCount() > 0 ? "Yes" : "No");
-        out += "\n" + String.format(TEMPLATE_2, "Has WarShips?", getWarshipCount() > 0 ? "Yes" : "No");
+        out += "\n" + String.format(TEMPLATE_2, "Has JumpShips?", getJumpShipCount() > 0 ? "Yes" : "No");
+        out += "\n" + String.format(TEMPLATE_2, "Has WarShips?", getWarShipCount() > 0 ? "Yes" : "No");
 
         return out;
     }
