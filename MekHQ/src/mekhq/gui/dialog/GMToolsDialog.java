@@ -37,6 +37,7 @@ import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
+import megamek.common.Messages;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -64,7 +65,6 @@ public class GMToolsDialog extends JDialog {
     private JLabel diceResults;
     private JSpinner numDice;
     private JSpinner sizeDice;
-    private JLabel d = new JLabel("d");
 
     private JComboBox<FactionChoice> factionPicker;
     private JTextField yearPicker;
@@ -146,23 +146,30 @@ public class GMToolsDialog extends JDialog {
     //region Dice Panel Initialization
     private JPanel getDiceRoller() {
         JPanel dicePanel = new JPanel(new GridBagLayout());
-        dicePanel.setBorder(BorderFactory.createTitledBorder("Dice Roller"));
+        dicePanel.setName("dicePanel");
+        dicePanel.setBorder(BorderFactory.createTitledBorder(resources.getString("dicePanel.text")));
 
         numDice = new JSpinner(new SpinnerNumberModel(2, 1, 50, 1));
+        numDice.setName("numDice");
         ((JSpinner.DefaultEditor) numDice.getEditor()).getTextField().setEditable(true);
-        dicePanel.add(numDice, newGridBagConstraints(0,0));
+        dicePanel.add(numDice, newGridBagConstraints(0, 0));
 
-        dicePanel.add(d, newGridBagConstraints(1,0));
+        JLabel sides = new JLabel(resources.getString("sides.text"));
+        sides.setName("sides");
+        dicePanel.add(sides, newGridBagConstraints(1, 0));
 
         sizeDice = new JSpinner(new SpinnerNumberModel(6, 1, 200, 1));
+        sizeDice.setName("sizeDice");
         ((JSpinner.DefaultEditor) sizeDice.getEditor()).getTextField().setEditable(true);
         dicePanel.add(sizeDice, newGridBagConstraints(2, 0));
 
-        JButton dice = new JButton("Roll");
-        dice.addActionListener(evt -> performDiceRoll());
-        dicePanel.add(dice, newGridBagConstraints(0, 1, 3, 1));
+        JButton diceRoll = new JButton(resources.getString("diceRoll.text"));
+        diceRoll.setName("diceRoll");
+        diceRoll.addActionListener(evt -> performDiceRoll());
+        dicePanel.add(diceRoll, newGridBagConstraints(0, 1, 3, 1));
 
-        diceResults = new JLabel(String.format("Result: %5d", 0));
+        diceResults = new JLabel(String.format(resources.getString("diceResults.format"), 0));
+        diceResults.setName("diceResults");
         dicePanel.add(diceResults, newGridBagConstraints(0, 2, 3, 1));
         return dicePanel;
     }
@@ -171,57 +178,80 @@ public class GMToolsDialog extends JDialog {
     //region RAT Roller Initialization
     private JPanel getRATRoller() {
         JPanel ratPanel = new JPanel(new GridBagLayout());
-        ratPanel.setBorder(BorderFactory.createTitledBorder("RAT Roller"));
+        ratPanel.setName("ratPanel");
+        ratPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("ratPanel.text")));
+
+        JLabel yearLabel = new JLabel(resources.getString("yearLabel.text"));
+        yearLabel.setName("yearLabel");
+        ratPanel.add(yearLabel, newGridBagConstraints(0, 0));
+
+        yearPicker = new JTextField(5);
+        yearPicker.setText(String.valueOf(getGUI().getCampaign().getGameYear()));
+        yearPicker.setName("yearPicker");
+        ratPanel.add(yearPicker, newGridBagConstraints(0, 1));
+
+        JLabel factionLabel = new JLabel(resources.getString("factionLabel.text"));
+        factionLabel.setName("factionLabel");
+        ratPanel.add(factionLabel, newGridBagConstraints(1, 0, 2, 1));
 
         List<FactionChoice> factionChoices = getFactionChoices((person == null)
                 ? getGUI().getCampaign().getGameYear() : person.getBirthday().getYear());
         DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>();
         factionModel.addAll(factionChoices);
         factionPicker = new JComboBox<>(factionModel);
+        factionPicker.setName("factionPicker");
         factionPicker.setSelectedIndex(0);
-
-        yearPicker = new JTextField(5);
-        yearPicker.setText(String.valueOf(getGUI().getCampaign().getGameYear()));
-        qualityPicker = new JComboBox<>(QUALITY_NAMES);
-        unitWeightPicker = new JComboBox<>(WEIGHT_NAMES);
-        unitTypePicker = new JComboBox<>();
-        for (int ut = 0; ut < UnitType.SIZE; ut++) {
-            if (getGUI().getCampaign().getUnitGenerator().isSupportedUnitType(ut)) {
-                unitTypePicker.addItem(UnitType.getTypeName(ut));
-            }
-        }
-        unitTypePicker.addItemListener(ev ->
-            unitWeightPicker.setEnabled(unitTypePicker.getSelectedItem().equals("Mek")
-                    || unitTypePicker.getSelectedItem().equals("Tank")
-                    || unitTypePicker.getSelectedItem().equals("Aero"))
-        );
-        unitPicked = new JLabel("-");
-
-        ratPanel.add(new JLabel("Year"), newGridBagConstraints(0, 0));
-        ratPanel.add(yearPicker, newGridBagConstraints(0, 1));
-
-        ratPanel.add(new JLabel("Faction"), newGridBagConstraints(1, 0, 2, 1));
         ratPanel.add(factionPicker, newGridBagConstraints(1, 1, 2, 1));
 
-        ratPanel.add(new JLabel("Quality"), newGridBagConstraints(3, 0));
+        JLabel qualityLabel = new JLabel(resources.getString("qualityLabel.text"));
+        qualityLabel.setName("qualityLabel");
+        ratPanel.add(qualityLabel, newGridBagConstraints(3, 0));
+
+        qualityPicker = new JComboBox<>(QUALITY_NAMES);
+        qualityPicker.setName("qualityPicker");
         ratPanel.add(qualityPicker, newGridBagConstraints(3, 1));
 
-        ratPanel.add(new JLabel("Unit Type"), newGridBagConstraints(4, 0));
+        JLabel unitTypeLabel = new JLabel(resources.getString("unitTypeLabel.text"));
+        unitTypeLabel.setName("unitTypeLabel");
+        ratPanel.add(unitTypeLabel, newGridBagConstraints(4, 0));
+
+        DefaultComboBoxModel<String> unitTypeModel = new DefaultComboBoxModel<>();
+        for (int ut = 0; ut < UnitType.SIZE; ut++) {
+            if (getGUI().getCampaign().getUnitGenerator().isSupportedUnitType(ut)) {
+                unitTypeModel.addElement(UnitType.getTypeName(ut));
+            }
+        }
+        unitTypePicker = new JComboBox<>(unitTypeModel);
+        unitTypePicker.setName("unitTypePicker");
+        unitTypePicker.addItemListener(ev ->
+                unitWeightPicker.setEnabled(unitTypePicker.getSelectedItem().equals("Mek")
+                        || unitTypePicker.getSelectedItem().equals("Tank")
+                        || unitTypePicker.getSelectedItem().equals("Aero"))
+        );
         ratPanel.add(unitTypePicker, newGridBagConstraints(4, 1));
 
-        ratPanel.add(new JLabel("Weight"), newGridBagConstraints(5, 0));
+        JLabel unitWeightLabel = new JLabel(resources.getString("unitWeightLabel.text"));
+        unitWeightLabel.setName("unitWeightLabel");
+        ratPanel.add(unitWeightLabel, newGridBagConstraints(5, 0));
+
+        unitWeightPicker = new JComboBox<>(WEIGHT_NAMES);
+        unitWeightPicker.setName("unitWeightPicker");
         ratPanel.add(unitWeightPicker, newGridBagConstraints(5, 1));
 
+        unitPicked = new JLabel("-");
+        unitPicked.setName("unitPicked");
         ratPanel.add(unitPicked, newGridBagConstraints(0, 2, 4, 1));
 
-        JButton roll = new JButton("Roll For RAT");
-        roll.addActionListener(evt -> setLastRolledUnit(performRollRat()));
-        ratPanel.add(roll, newGridBagConstraints(5, 3));
+        JButton ratRoll = new JButton(resources.getString("ratRoll.text"));
+        ratRoll.setName("ratRoll");
+        ratRoll.addActionListener(evt -> setLastRolledUnit(performRollRat()));
+        ratPanel.add(ratRoll, newGridBagConstraints(5, 3));
 
         if (getGUI().getCampaign().isGM()) {
-            JButton roll2 = new JButton("Add Random Unit");
-            roll2.addActionListener(evt -> addRATRolledUnit());
-            ratPanel.add(roll2, newGridBagConstraints(6, 3));
+            JButton addRandomUnit = new JButton(resources.getString("addRandomUnit.text"));
+            addRandomUnit.setName("addRandomUnit");
+            addRandomUnit.addActionListener(evt -> addRATRolledUnit());
+            ratPanel.add(addRandomUnit, newGridBagConstraints(6, 3));
         }
         return ratPanel;
     }
@@ -230,20 +260,24 @@ public class GMToolsDialog extends JDialog {
     //region Name Generator Panel Initialization
     private JPanel getNameGenerator() {
         JPanel namePanel = new JPanel(new GridBagLayout());
+        namePanel.setName("namePanel");
         namePanel.setBorder(BorderFactory.createTitledBorder(resources.getString("namePanel.text")));
 
         int gridx = 0, gridxMax;
 
         JLabel genderLabel = new JLabel(resources.getString("genderLabel.text"));
+        genderLabel.setName("genderLabel");
         namePanel.add(genderLabel, newGridBagConstraints(gridx, 0));
 
         DefaultComboBoxModel<Gender> genderModel = new DefaultComboBoxModel<>();
         genderModel.addAll(Gender.getExternalOptions());
         genderPicker = new JComboBox<>(genderModel);
+        genderPicker.setName("genderPicker");
         genderPicker.setSelectedIndex(0);
         namePanel.add(genderPicker, newGridBagConstraints(gridx++, 1));
 
         JLabel originFactionLabel = new JLabel(resources.getString("originFactionLabel.text"));
+        originFactionLabel.setName("originFactionLabel");
         namePanel.add(originFactionLabel, newGridBagConstraints(gridx, 0));
 
         List<FactionChoice> factionChoices = getFactionChoices((person == null)
@@ -251,21 +285,25 @@ public class GMToolsDialog extends JDialog {
         DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>();
         factionModel.addAll(factionChoices);
         nameGeneratorFactionPicker = new JComboBox<>(factionModel);
+        nameGeneratorFactionPicker.setName("nameGeneratorFactionPicker");
         nameGeneratorFactionPicker.setSelectedIndex(0);
         namePanel.add(nameGeneratorFactionPicker, newGridBagConstraints(gridx++, 1));
 
         JLabel historicalEthnicityLabel = new JLabel(resources.getString("historicalEthnicityLabel.text"));
+        historicalEthnicityLabel.setName("historicalEthnicityLabel");
         namePanel.add(historicalEthnicityLabel, newGridBagConstraints(gridx, 0));
 
         DefaultComboBoxModel<String> historicalEthnicityModel = new DefaultComboBoxModel<>();
         historicalEthnicityModel.addElement(resources.getString("factionWeighted.text"));
         historicalEthnicityModel.addAll(RandomNameGenerator.getInstance().getHistoricalEthnicity().values());
         ethnicCodePicker = new JComboBox<>(historicalEthnicityModel);
+        ethnicCodePicker.setName("ethnicCodePicker");
         ethnicCodePicker.setSelectedIndex(0);
         ethnicCodePicker.addActionListener(evt -> nameGeneratorFactionPicker.setEnabled(ethnicCodePicker.getSelectedIndex() == 0));
         namePanel.add(ethnicCodePicker, newGridBagConstraints(gridx++, 1));
 
         JLabel clannerLabel = new JLabel(resources.getString("clannerLabel.text"));
+        clannerLabel.setName("clannerLabel");
         namePanel.add(clannerLabel, newGridBagConstraints(gridx, 0));
 
         clannerPicker = new JCheckBox();
@@ -278,25 +316,31 @@ public class GMToolsDialog extends JDialog {
 
         if (person != null) {
             JLabel currentNameLabel = new JLabel(resources.getString("currentNameLabel.text"));
+            currentNameLabel.setName("currentNameLabel");
             namePanel.add(currentNameLabel, newGridBagConstraints(gridx++, 3));
 
             currentName = new JLabel("-");
+            currentName.setName("currentName");
             namePanel.add(currentName, newGridBagConstraints(gridx++, 3));
         }
 
         JLabel nameGeneratedLabel = new JLabel(resources.getString("nameGeneratedLabel.text"));
+        nameGeneratedLabel.setName("nameGeneratedLabel");
         namePanel.add(nameGeneratedLabel, newGridBagConstraints(gridx++, 3));
 
         nameGenerated = new JLabel("-");
+        nameGenerated.setName("nameGenerated");
         namePanel.add(nameGenerated, newGridBagConstraints(gridx++, 3));
 
         if (person != null) {
             JButton assignNameButton = new JButton(resources.getString("assignNameButton.text"));
+            assignNameButton.setName("assignNameButton");
             assignNameButton.addActionListener(evt -> assignName());
             namePanel.add(assignNameButton, newGridBagConstraints(gridxMax--, 4));
         }
 
         JButton generateNameButton = new JButton(resources.getString("generateNameButton.text"));
+        generateNameButton.setName("generateNameButton");
         generateNameButton.addActionListener(evt -> generateName());
         namePanel.add(generateNameButton, newGridBagConstraints(gridxMax--, 4));
 
@@ -307,33 +351,40 @@ public class GMToolsDialog extends JDialog {
     //region Callsign Generator Panel Initialization
     private JPanel getCallsignGenerator() {
         JPanel callsignPanel = new JPanel(new GridBagLayout());
+        callsignPanel.setName("callsignPanel");
         callsignPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("callsignPanel.text")));
 
         int gridx = 0, gridy = 0;
 
         if (person != null) {
             JLabel currentCallsignLabel = new JLabel(resources.getString("currentCallsignLabel.text"));
+            currentCallsignLabel.setName("currentCallsignLabel");
             callsignPanel.add(currentCallsignLabel, newGridBagConstraints(gridx++, gridy));
 
             currentCallsign = new JLabel("-");
+            currentCallsign.setName("currentCallsign");
             callsignPanel.add(currentCallsign, newGridBagConstraints(gridx++, gridy));
         }
 
         JLabel callsignGeneratedLabel = new JLabel(resources.getString("callsignGeneratedLabel.text"));
+        callsignGeneratedLabel.setName("callsignGeneratedLabel");
         callsignPanel.add(callsignGeneratedLabel, newGridBagConstraints(gridx++, gridy));
 
         callsignGenerated = new JLabel("-");
+        callsignGenerated.setName("callsignGenerated");
         callsignPanel.add(callsignGenerated, newGridBagConstraints(gridx++, gridy));
 
         gridy++;
 
         if (person != null) {
             JButton assignCallsignButton = new JButton(resources.getString("assignCallsignButton.text"));
+            assignCallsignButton.setName("assignCallsignButton");
             assignCallsignButton.addActionListener(evt -> assignCallsign());
             callsignPanel.add(assignCallsignButton, newGridBagConstraints(gridx--, gridy));
         }
 
         JButton generateCallsignButton = new JButton(resources.getString("generateCallsignButton.text"));
+        generateCallsignButton.setName("generateCallsignButton");
         generateCallsignButton.addActionListener(evt -> generateCallsign());
         callsignPanel.add(generateCallsignButton, newGridBagConstraints(gridx--, gridy));
 
@@ -370,25 +421,18 @@ public class GMToolsDialog extends JDialog {
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(GMToolsDialog.class);
 
-        numDice.setName("numDice");
         preferences.manage(new JIntNumberSpinnerPreference(numDice));
 
-        sizeDice.setName("sizeDice");
         preferences.manage(new JIntNumberSpinnerPreference(sizeDice));
 
-        yearPicker.setName("year");
         preferences.manage(new JTextFieldPreference(yearPicker));
 
-        factionPicker.setName("faction");
         preferences.manage(new JComboBoxPreference(factionPicker));
 
-        qualityPicker.setName("quality");
         preferences.manage(new JComboBoxPreference(qualityPicker));
 
-        unitTypePicker.setName("unitType");
         preferences.manage(new JComboBoxPreference(unitTypePicker));
 
-        unitWeightPicker.setName("unitWeight");
         preferences.manage(new JComboBoxPreference(unitWeightPicker));
 
         this.setName("dialog");
@@ -537,8 +581,8 @@ public class GMToolsDialog extends JDialog {
 
     //region ActionEvent Handlers
     public void performDiceRoll() {
-        diceResults.setText(String.format("Result: %5d", Utilities.dice((Integer) numDice.getValue(),
-                (Integer) sizeDice.getValue())));
+        diceResults.setText(String.format(resources.getString("diceResults.format"),
+                Utilities.dice((Integer) numDice.getValue(), (Integer) sizeDice.getValue())));
     }
 
     private MechSummary performRollRat() {
@@ -564,10 +608,10 @@ public class GMToolsDialog extends JDialog {
                 return ms;
             }
         } catch (Exception e) {
-            unitPicked.setText("Please enter a valid year");
+            unitPicked.setText(Messages.getString("invalidYear.error"));
             return null;
         }
-        unitPicked.setText("No unit matching criteria and purchase restrictions.");
+        unitPicked.setText(Messages.getString("noValidUnit.error"));
         return null;
     }
 
@@ -591,7 +635,7 @@ public class GMToolsDialog extends JDialog {
             } catch (Exception ex) {
                 MekHQ.getLogger().error(this, "Failed to load entity "
                         + getLastRolledUnit().getName() + " from " + getLastRolledUnit().getSourceFile().toString(), ex);
-                unitPicked.setText("Failed to load entity " + getLastRolledUnit().getName());
+                unitPicked.setText(String.format(Messages.getString("entityLoadFailure.error"), getLastRolledUnit().getName()));
             }
         }
     }
