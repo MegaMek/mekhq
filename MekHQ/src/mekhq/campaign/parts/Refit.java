@@ -497,9 +497,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         HashMap<Integer,Integer> partQuantity = new HashMap<>();
         List<Part> plannedReplacementParts = new ArrayList<>();
         for(Part nPart : newPartList) {
-            //TODO: I don't think we need this here anymore
-            nPart.setUnit(oldUnit);
-
             //We don't actually want to order new BA suits; we're just pretending that we're altering the
             //existing suits.
             if (nPart instanceof MissingBattleArmorSuit) {
