@@ -49,6 +49,7 @@ VERSION HISTORY:
 + PR #2013: Adding MekHQ option to prefer GZIP in campaign saves
 + Issue #1866: Implementing New Day MRMS Option
 + Issue #630: Improved tracking of integrated heat sink changes during refit
++ Issue #1252: Spare "Targeting Computer" not used on config change, new one ordered instead
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format
