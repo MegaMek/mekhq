@@ -196,8 +196,7 @@ public class GMToolsDialog extends JDialog {
 
         List<FactionChoice> factionChoices = getFactionChoices((person == null)
                 ? getGUI().getCampaign().getGameYear() : person.getBirthday().getYear());
-        DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>();
-        factionModel.addAll(factionChoices);
+        DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>((FactionChoice[]) factionChoices.toArray());
         factionPicker = new JComboBox<>(factionModel);
         factionPicker.setName("factionPicker");
         factionPicker.setSelectedIndex(0);
@@ -269,8 +268,7 @@ public class GMToolsDialog extends JDialog {
         genderLabel.setName("genderLabel");
         namePanel.add(genderLabel, newGridBagConstraints(gridx, 0));
 
-        DefaultComboBoxModel<Gender> genderModel = new DefaultComboBoxModel<>();
-        genderModel.addAll(Gender.getExternalOptions());
+        DefaultComboBoxModel<Gender> genderModel = new DefaultComboBoxModel<>((Gender[]) Gender.getExternalOptions().toArray());
         genderPicker = new JComboBox<>(genderModel);
         genderPicker.setName("genderPicker");
         genderPicker.setSelectedIndex(0);
@@ -282,8 +280,7 @@ public class GMToolsDialog extends JDialog {
 
         List<FactionChoice> factionChoices = getFactionChoices((person == null)
                 ? getGUI().getCampaign().getGameYear() : person.getBirthday().getYear());
-        DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>();
-        factionModel.addAll(factionChoices);
+        DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>((FactionChoice[]) factionChoices.toArray());
         nameGeneratorFactionPicker = new JComboBox<>(factionModel);
         nameGeneratorFactionPicker.setName("nameGeneratorFactionPicker");
         nameGeneratorFactionPicker.setSelectedIndex(0);
@@ -295,7 +292,9 @@ public class GMToolsDialog extends JDialog {
 
         DefaultComboBoxModel<String> historicalEthnicityModel = new DefaultComboBoxModel<>();
         historicalEthnicityModel.addElement(resources.getString("factionWeighted.text"));
-        historicalEthnicityModel.addAll(RandomNameGenerator.getInstance().getHistoricalEthnicity().values());
+        for (String historicalEthnicity : RandomNameGenerator.getInstance().getHistoricalEthnicity().values()) {
+            historicalEthnicityModel.addElement(historicalEthnicity);
+        }
         ethnicCodePicker = new JComboBox<>(historicalEthnicityModel);
         ethnicCodePicker.setName("ethnicCodePicker");
         ethnicCodePicker.setSelectedIndex(0);
