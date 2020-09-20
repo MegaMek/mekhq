@@ -803,20 +803,24 @@ public class Campaign implements Serializable, ITechManager {
      * @param id
      */
     public void addUnitToForce(Unit u, int id) {
+        Force force = forceIds.get(id);
         Force prevForce = forceIds.get(u.getForceId());
+        boolean useTransfers = false;
+        boolean transferLog = !getCampaignOptions().useTransfers();
+
         if (null != prevForce) {
-            prevForce.removeUnit(u.getId());
-            MekHQ.triggerEvent(new OrganizationChangedEvent(prevForce, u));
             if (null != prevForce.getTechID()) {
                 u.removeTech();
             }
+            // We log removal if we don't use transfers or if it can't be assigned to a new force
+            prevForce.removeUnit(this, u.getId(), transferLog || (force == null));
+            useTransfers = !transferLog;
+            MekHQ.triggerEvent(new OrganizationChangedEvent(prevForce, u));
         }
-        Force force = forceIds.get(id);
+
         if (null != force) {
             u.setForceId(id);
-            force.addUnit(u.getId());
             u.setScenarioId(force.getScenarioId());
-            MekHQ.triggerEvent(new OrganizationChangedEvent(force, u));
             if (null != force.getTechID()) {
                 Person forceTech = getPerson(force.getTechID());
                 if (forceTech.canTech(u.getEntity())) {
@@ -831,6 +835,8 @@ public class Campaign implements Serializable, ITechManager {
                     JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                 }
             }
+            force.addUnit(this, u.getId(), useTransfers, prevForce);
+            MekHQ.triggerEvent(new OrganizationChangedEvent(force, u));
         }
 
         if (campaignOptions.getUseAtB()) {
@@ -3974,7 +3980,7 @@ public class Campaign implements Serializable, ITechManager {
     public void removeUnitFromForce(Unit u) {
         Force force = getForce(u.getForceId());
         if (null != force) {
-            force.removeUnit(u.getId());
+            force.removeUnit(this, u.getId(), true);
             u.setForceId(Force.FORCE_NONE);
             u.setScenarioId(-1);
             if (u.getEntity().hasNavalC3()
@@ -4126,7 +4132,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             for (UUID unitID : orphanForceUnitIDs) {
-                force.removeUnit(unitID);
+                force.removeUnit(this, unitID, false);
             }
         }
 

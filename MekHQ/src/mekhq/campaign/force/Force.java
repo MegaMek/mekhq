@@ -32,6 +32,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.Vector;
 
+import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.personnel.Person;
 import mekhq.gui.enums.LayeredForceIcon;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -238,7 +240,26 @@ public class Force implements Serializable {
      * @param uid
      */
     public void addUnit(UUID uid) {
+        addUnit(null, uid, false, null);
+    }
+
+    public void addUnit(Campaign campaign, UUID uid, boolean useTransfers, Force oldForce) {
         units.add(uid);
+
+        if (campaign == null) {
+            return;
+        }
+
+        Unit unit = campaign.getUnit(uid);
+        if (unit != null) {
+            for (Person person : unit.getCrew()) {
+                if (useTransfers) {
+                    ServiceLogger.reassignedTOEForce(campaign, person, campaign.getLocalDate(), oldForce, this);
+                } else {
+                    ServiceLogger.removedFromTOEForce(campaign, person, campaign.getLocalDate(), this);
+                }
+            }
+        }
     }
 
     /**
@@ -246,7 +267,7 @@ public class Force implements Serializable {
      * instead
      * @param id
      */
-    public void removeUnit(UUID id) {
+    public void removeUnit(Campaign campaign, UUID id, boolean log) {
         int idx = 0;
         boolean found = false;
         for (UUID uid : getUnits()) {
@@ -258,6 +279,15 @@ public class Force implements Serializable {
         }
         if (found) {
             units.remove(idx);
+
+            if (log) {
+                Unit unit = campaign.getUnit(id);
+                if (unit != null) {
+                    for (Person person : unit.getCrew()) {
+                        ServiceLogger.removedFromTOEForce(campaign, person, campaign.getLocalDate(), this);
+                    }
+                }
+            }
         }
     }
 

@@ -219,8 +219,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         person.setManeiDominiClass(mdClass);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(getClass(), "actionPerformed",
-                            "Failed to assign Manei Domini Class", e);
+                    MekHQ.getLogger().error(this, "Failed to assign Manei Domini Class", e);
                 }
                 break;
             }
@@ -231,8 +230,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         person.setPrimaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(getClass(), "actionPerformed",
-                            "Failed to assign ROM designator", e);
+                    MekHQ.getLogger().error(this, "Failed to assign ROM designator", e);
                 }
                 break;
             }
@@ -243,8 +241,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         person.setSecondaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(getClass(), "actionPerformed",
-                            "Failed to assign ROM secondary designator", e);
+                    MekHQ.getLogger().error(this, "Failed to assign ROM secondary designator", e);
                 }
                 break;
             }
@@ -310,7 +307,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
                 }
                 if (null != u) {
-                    u.addPilotOrSoldier(selectedPerson, useTransfers);
+                    u.addPilotOrSoldier(selectedPerson, useTransfers, oldUnit);
                     u.resetPilotAndEntity();
                     u.runDiagnostic(false);
                 }
@@ -329,7 +326,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                                 oldUnit.remove(p, transferLog);
                                 useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
                             }
-                            u.addPilotOrSoldier(p, useTransfers);
+                            u.addPilotOrSoldier(p, useTransfers, oldUnit);
                         }
                     }
 
@@ -522,7 +519,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                                     gui.getCampaign().getLocalDate());
                         }
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(getClass(), "actionPerformed", "Could not remove award.", e);
+                        MekHQ.getLogger().error(this, "Could not remove award.", e);
                     }
                 }
                 break;
@@ -646,8 +643,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         }
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(getClass(), "actionPerformed",
-                            "Unknown PrisonerStatus Option. No changes will be made.", e);
+                    MekHQ.getLogger().error(this, "Unknown PrisonerStatus Option. No changes will be made.", e);
                 }
                 break;
             }

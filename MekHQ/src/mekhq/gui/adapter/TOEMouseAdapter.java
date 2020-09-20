@@ -787,8 +787,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     final List<Integer> svTypes = Arrays.asList(UnitType.TANK,
                             UnitType.VTOL, UnitType.NAVAL, UnitType.CONV_FIGHTER);
 
-                    for (int i = 0; i < UnitType.SIZE; i++)
-                    {
+                    for (int i = 0; i < UnitType.SIZE; i++) {
                         String unittype = UnitType.getTypeName(i);
                         String displayname = UnitType.getTypeDisplayableName(i);
                         unitTypeMenus.put(unittype, new JMenu(displayname));

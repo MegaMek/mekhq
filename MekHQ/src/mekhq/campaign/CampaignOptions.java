@@ -33,7 +33,6 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -197,6 +196,7 @@ public class CampaignOptions implements Serializable {
     private boolean useRandomHitsForVees;
     private boolean tougherHealing;
     private boolean useTransfers;
+    private boolean useExtendedTOEForceName;
     private boolean useTimeInService;
     private TimeInDisplayFormat timeInServiceDisplayFormat;
     private boolean useTimeInRank;
@@ -526,6 +526,7 @@ public class CampaignOptions implements Serializable {
         useRandomHitsForVees = false;
         tougherHealing = false;
         useTransfers = true;
+        useExtendedTOEForceName = false;
         useTimeInService = false;
         timeInServiceDisplayFormat = TimeInDisplayFormat.YEARS;
         useTimeInRank = false;
@@ -1017,6 +1018,14 @@ public class CampaignOptions implements Serializable {
 
     public void setUseTransfers(boolean b) {
         useTransfers = b;
+    }
+
+    public boolean getUseExtendedTOEForceName() {
+        return useExtendedTOEForceName;
+    }
+
+    public void setUseExtendedTOEForceName(boolean useExtendedTOEForceName) {
+        this.useExtendedTOEForceName = useExtendedTOEForceName;
     }
 
     /**
@@ -3199,6 +3208,7 @@ public class CampaignOptions implements Serializable {
         //endregion Finances Tab
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useExtendedTOEForceName", useExtendedTOEForceName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInService", useTimeInService);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "timeInServiceDisplayFormat", timeInServiceDisplayFormat.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInRank", useTimeInRank);
@@ -3714,6 +3724,8 @@ public class CampaignOptions implements Serializable {
 
             } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
                 retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useExtendedTOEForceName")) {
+                retVal.setUseExtendedTOEForceName(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {
                 retVal.useTimeInService = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("timeInServiceDisplayFormat")) {

@@ -19,6 +19,8 @@
 package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 
@@ -148,5 +150,38 @@ public class ServiceLogger {
     public static void removedFrom(Person person, LocalDate date, String unitName) {
         String message = logEntriesResourceMap.getString("removedFrom.text");
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, unitName)));
+    }
+
+    public static void addedToTOEForce(Campaign campaign, Person person, LocalDate date, Force force) {
+        if (force != null) {
+            String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
+            person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
+                    campaign.getCampaignOptions().getUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
+        }
+    }
+
+    public static void reassignedTOEForce(Campaign campaign, Person person, LocalDate date, Force oldForce, Force newForce) {
+        if ((oldForce == null) && (newForce == null)) {
+            return;
+        }
+
+        if ((oldForce != null) && (newForce != null)) {
+            String message = logEntriesResourceMap.getString("reassignedTOEForce.text");
+            person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
+                    campaign.getCampaignOptions().getUseExtendedTOEForceName() ? oldForce.getFullName() : oldForce.getName(),
+                    campaign.getCampaignOptions().getUseExtendedTOEForceName() ? newForce.getFullName() : newForce.getName())));
+        } else if (oldForce == null) {
+            addedToTOEForce(campaign, person, date, newForce);
+        } else {
+            removedFromTOEForce(campaign, person, date, oldForce);
+        }
+    }
+
+    public static void removedFromTOEForce(Campaign campaign, Person person, LocalDate date, Force force) {
+        if (force != null) {
+            String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
+            person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
+                    campaign.getCampaignOptions().getUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
+        }
     }
 }

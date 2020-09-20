@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.*;
@@ -4302,6 +4303,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addPilotOrSoldier(Person p, boolean useTransfers) {
+        addPilotOrSoldier(p, useTransfers, null);
+    }
+
+    public void addPilotOrSoldier(Person p, boolean useTransfers, Unit oldUnit) {
         ensurePersonIsRegistered(p);
         drivers.add(p.getId());
         //Multi-crew cockpits should not set the pilot to the gunner position
@@ -4312,8 +4317,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTOEForce(getCampaign(), p, getCampaign().getLocalDate(),
+                    getCampaign().getForceFor(oldUnit), getCampaign().getForceFor(this));
         } else {
             ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.addedToTOEForce(getCampaign(), p, getCampaign().getLocalDate(),
+                    getCampaign().getForceFor(this));
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -4339,8 +4348,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             resetPilotAndEntity();
             MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
         }
+
         if (log) {
             ServiceLogger.removedFrom(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.removedFromTOEForce(getCampaign(), p, getCampaign().getLocalDate(),
+                    getCampaign().getForceFor(this));
         }
     }
 
@@ -4364,8 +4376,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.scenarioId = i;
     }
 
-    public ArrayList<Person> getCrew() {
-        ArrayList<Person> crew = new ArrayList<>();
+    public List<Person> getCrew() {
+        List<Person> crew = new ArrayList<>();
         for (UUID id : drivers) {
             Person p = getCampaign().getPerson(id);
             if (null != p) {
@@ -4614,8 +4626,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         setMothballed(isMothballed());
     }
 
-    public ArrayList<Person> getActiveCrew() {
-        ArrayList<Person> crew = new ArrayList<>();
+    public List<Person> getActiveCrew() {
+        List<Person> crew = new ArrayList<>();
         for (UUID id : drivers) {
             Person p = getCampaign().getPerson(id);
             if (null != p) {

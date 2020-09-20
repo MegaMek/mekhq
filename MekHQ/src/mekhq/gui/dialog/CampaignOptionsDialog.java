@@ -242,6 +242,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox useRandomHitsForVees;
     private JCheckBox useTougherHealing;
     private JCheckBox chkUseTransfers;
+    private JCheckBox chkUseExtendedTOEForceName;
     private JCheckBox chkUseTimeInService;
     private JComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
     private JCheckBox chkUseTimeInRank;
@@ -1626,6 +1627,11 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseTransfers = new JCheckBox(resourceMap.getString("useTransfers.text"));
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkUseTransfers, gridBagConstraints);
+
+        chkUseExtendedTOEForceName = new JCheckBox(resourceMap.getString("useExtendedTOEForceName.text"));
+        chkUseExtendedTOEForceName.setToolTipText(resourceMap.getString("useExtendedTOEForceName.toolTipText"));
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkUseExtendedTOEForceName, gridBagConstraints);
 
         chkUseTimeInService = new JCheckBox(resourceMap.getString("useTimeInService.text"));
         gridBagConstraints.gridy = ++gridy;
@@ -4469,6 +4475,7 @@ public class CampaignOptionsDialog extends JDialog {
         useRandomHitsForVees.setSelected(options.useRandomHitsForVees());
         useTougherHealing.setSelected(options.useTougherHealing());
         chkUseTransfers.setSelected(options.useTransfers());
+        chkUseExtendedTOEForceName.setSelected(options.getUseExtendedTOEForceName());
         chkUseTimeInService.setSelected(options.getUseTimeInService());
         comboTimeInServiceDisplayFormat.setSelectedItem(options.getTimeInServiceDisplayFormat());
         chkUseTimeInRank.setSelected(options.getUseTimeInRank());
@@ -5066,6 +5073,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setUseRandomHitsForVees(useRandomHitsForVees.isSelected());
         options.setTougherHealing(useTougherHealing.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
+        options.setUseExtendedTOEForceName(chkUseExtendedTOEForceName.isSelected());
         options.setUseTimeInService(chkUseTimeInService.isSelected());
         options.setTimeInServiceDisplayFormat((TimeInDisplayFormat) comboTimeInServiceDisplayFormat.getSelectedItem());
         options.setUseTimeInRank(chkUseTimeInRank.isSelected());

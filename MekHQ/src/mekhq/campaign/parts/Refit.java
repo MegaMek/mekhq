@@ -1173,7 +1173,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 if (part instanceof MissingPart) {
                     replacement = ((MissingPart)part).findReplacement(true);
                 }
-                
+
                 if (null != replacement) {
                     if(replacement.getQuantity() > 1) {
                         Part actualReplacement = replacement.clone();
@@ -1190,12 +1190,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 }
             }
         }
-        
+
         // Cycle through newUnitParts, find any ammo bins and see if we have the ammo to load them
         boolean missingAmmo = false;
         for (int pid : newUnitParts) {
             Part part = getCampaign().getPart(pid);
-            
+
             if (part instanceof AmmoBin) {
                 AmmoBin bin = (AmmoBin) part;
                 Part foundAmmo = getCampaign().findSparePart(campaignPart -> AmmoStorage.IsRightAmmo(campaignPart, (AmmoType) bin.getType()));
@@ -1333,21 +1333,21 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         boolean aclan = false;
         oldUnit.setRefit(null);
         Entity oldEntity = oldUnit.getEntity();
-        ArrayList<Person> soldiers = new ArrayList<>();
+        List<Person> soldiers = new ArrayList<>();
         //unload any soldiers to reload later, because troop size may have changed
-        if(oldEntity instanceof Infantry) {
+        if (oldEntity instanceof Infantry) {
             soldiers = oldUnit.getCrew();
             for(Person soldier : soldiers) {
                 oldUnit.remove(soldier, true);
             }
         }
         //add old parts to the warehouse
-        for(int pid : oldUnitParts) {
+        for (int pid : oldUnitParts) {
             Part part = oldUnit.getCampaign().getPart(pid);
             if (part instanceof TransportBayPart) {
                 part.removeAllChildParts();
             }
-            if(null == part) {
+            if (null == part) {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                         "old part with id " + pid + " not found for refit of " + getDesc()); //$NON-NLS-1$
                 continue;
