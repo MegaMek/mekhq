@@ -256,7 +256,7 @@ public class Force implements Serializable {
                 if (useTransfers) {
                     ServiceLogger.reassignedTOEForce(campaign, person, campaign.getLocalDate(), oldForce, this);
                 } else {
-                    ServiceLogger.removedFromTOEForce(campaign, person, campaign.getLocalDate(), this);
+                    ServiceLogger.addedToTOEForce(campaign, person, campaign.getLocalDate(), this);
                 }
             }
         }

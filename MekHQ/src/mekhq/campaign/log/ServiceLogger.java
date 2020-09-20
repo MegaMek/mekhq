@@ -154,7 +154,7 @@ public class ServiceLogger {
 
     public static void addedToTOEForce(Campaign campaign, Person person, LocalDate date, Force force) {
         if (force != null) {
-            String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
+            String message = logEntriesResourceMap.getString("addToTOEForce.text");
             person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
                     campaign.getCampaignOptions().getUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
         }
