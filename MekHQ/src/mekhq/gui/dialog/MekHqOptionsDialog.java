@@ -21,6 +21,7 @@
 package mekhq.gui.dialog;
 
 import mekhq.MekHQ;
+import mekhq.campaign.event.MekHQOptionsChangedEvent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,6 +37,11 @@ public class MekHqOptionsDialog extends BaseDialog {
     private JTextField optionDisplayDateFormat;
     private JTextField optionLongDisplayDateFormat;
     private JCheckBox optionHistoricalDailyLog;
+
+    //region Command Center Display
+    private JCheckBox optionCommandCenterUseUnitMarket;
+    private JCheckBox optionCommandCenterMRMS;
+    //endregion Command Center Display
     //endregion Display
 
     //region Autosave
@@ -47,6 +53,10 @@ public class MekHqOptionsDialog extends BaseDialog {
     private JCheckBox checkSaveBeforeMissions;
     private JSpinner spinnerSavedGamesCount;
     //endregion Autosave
+
+    //region New Day
+    private JCheckBox optionNewDayMRMS;
+    //endregion New Day
 
     //region Campaign XML Save
     private JCheckBox optionPreferGzippedOutput;
@@ -75,7 +85,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         JLabel labelDisplayDateFormatExample = new JLabel();
         optionDisplayDateFormat = new JTextField();
         optionDisplayDateFormat.addActionListener(evt -> labelDisplayDateFormatExample.setText(
-                validateDisplayDate()
+                validateDateFormat(optionDisplayDateFormat.getText())
                         ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionDisplayDateFormat.getText()))
                         : resources.getString("invalidDateFormat.error")));
 
@@ -83,12 +93,22 @@ public class MekHqOptionsDialog extends BaseDialog {
         JLabel labelLongDisplayDateFormatExample = new JLabel();
         optionLongDisplayDateFormat = new JTextField();
         optionLongDisplayDateFormat.addActionListener(evt -> labelLongDisplayDateFormatExample.setText(
-                validateLongDisplayDate()
+                validateDateFormat(optionLongDisplayDateFormat.getText())
                         ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText()))
                         : resources.getString("invalidDateFormat.error")));
 
         optionHistoricalDailyLog = new JCheckBox(resources.getString("optionHistoricalDailyLog.text"));
         optionHistoricalDailyLog.setToolTipText(resources.getString("optionHistoricalDailyLog.toolTipText"));
+
+        //region Command Center Display
+        JLabel labelCommandCenterDisplay = new JLabel(resources.getString("labelCommandCenterDisplay.text"));
+
+        optionCommandCenterUseUnitMarket = new JCheckBox(resources.getString("optionCommandCenterUseUnitMarket.text"));
+        optionCommandCenterUseUnitMarket.setToolTipText(resources.getString("optionCommandCenterUseUnitMarket.toolTipText"));
+
+        optionCommandCenterMRMS = new JCheckBox(resources.getString("optionCommandCenterMRMS.text"));
+        optionCommandCenterMRMS.setToolTipText(resources.getString("optionCommandCenterMRMS.toolTipText"));
+        //endregion Command Center Display
         //endregion Display
 
         //region Autosave
@@ -123,6 +143,12 @@ public class MekHqOptionsDialog extends BaseDialog {
         spinnerSavedGamesCount = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
         labelSavedGamesCount.setLabelFor(spinnerSavedGamesCount);
         //endregion Autosave
+
+        //region New Day
+        JLabel labelNewDay = new JLabel(resources.getString("labelNewDay.text"));
+
+        optionNewDayMRMS = new JCheckBox(resources.getString("optionNewDayMRMS.text"));
+        //endregion New Day
 
         //region Campaign XML Save
         JLabel labelXMLSave = new JLabel(resources.getString("labelXMLSave.text"));
@@ -159,6 +185,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(optionLongDisplayDateFormat)
                             .addComponent(labelLongDisplayDateFormatExample, GroupLayout.Alignment.TRAILING))
                     .addComponent(optionHistoricalDailyLog)
+                    .addComponent(labelCommandCenterDisplay)
+                    .addComponent(optionCommandCenterUseUnitMarket)
+                    .addComponent(optionCommandCenterMRMS)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -169,6 +198,8 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(labelSavedGamesCount)
                             .addComponent(spinnerSavedGamesCount, GroupLayout.Alignment.TRAILING))
+                    .addComponent(labelNewDay)
+                    .addComponent(optionNewDayMRMS)
                     .addComponent(labelXMLSave)
                     .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
@@ -187,6 +218,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                             .addComponent(optionLongDisplayDateFormat)
                             .addComponent(labelLongDisplayDateFormatExample))
                     .addComponent(optionHistoricalDailyLog)
+                    .addComponent(labelCommandCenterDisplay)
+                    .addComponent(optionCommandCenterUseUnitMarket)
+                    .addComponent(optionCommandCenterMRMS)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -197,6 +231,8 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addGroup(layout.createSequentialGroup()
                             .addComponent(labelSavedGamesCount)
                             .addComponent(spinnerSavedGamesCount))
+                    .addComponent(labelNewDay)
+                    .addComponent(optionNewDayMRMS)
                     .addComponent(labelXMLSave)
                     .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
@@ -208,13 +244,15 @@ public class MekHqOptionsDialog extends BaseDialog {
 
     @Override
     protected void okAction() {
-        if (validateDisplayDate()) {
+        if (validateDateFormat(optionDisplayDateFormat.getText())) {
             MekHQ.getMekHQOptions().setDisplayDateFormat(optionDisplayDateFormat.getText());
         }
-        if (validateLongDisplayDate()) {
+        if (validateDateFormat(optionLongDisplayDateFormat.getText())) {
             MekHQ.getMekHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
         MekHQ.getMekHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
+        MekHQ.getMekHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
+        MekHQ.getMekHQOptions().setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
 
         MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
         MekHQ.getMekHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
@@ -224,15 +262,21 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
         MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
 
+        MekHQ.getMekHQOptions().setNewDayMRMS(optionNewDayMRMS.isSelected());
+
         MekHQ.getMekHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
         MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
         MekHQ.getMekHQOptions().setSaveMothballState(optionSaveMothballState.isSelected());
+
+        MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
     }
 
     private void setInitialState() {
         optionDisplayDateFormat.setText(MekHQ.getMekHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMekHQOptions().getLongDisplayDateFormat());
         optionHistoricalDailyLog.setSelected(MekHQ.getMekHQOptions().getHistoricalDailyLog());
+        optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket());
+        optionCommandCenterMRMS.setSelected(MekHQ.getMekHQOptions().getCommandCenterMRMS());
 
         optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
         optionSaveDaily.setSelected(MekHQ.getMekHQOptions().getAutosaveDailyValue());
@@ -242,24 +286,17 @@ public class MekHqOptionsDialog extends BaseDialog {
         checkSaveBeforeMissions.setSelected(MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue());
         spinnerSavedGamesCount.setValue(MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue());
 
+        optionNewDayMRMS.setSelected(MekHQ.getMekHQOptions().getNewDayMRMS());
+
         optionPreferGzippedOutput.setSelected(MekHQ.getMekHQOptions().getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
         optionSaveMothballState.setSelected(MekHQ.getMekHQOptions().getSaveMothballState());
     }
 
     //region Data Validation
-    private boolean validateDisplayDate() {
+    private boolean validateDateFormat(String format) {
         try {
-            LocalDate.now().format(DateTimeFormatter.ofPattern(optionDisplayDateFormat.getText()));
-        } catch (Exception ignored) {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean validateLongDisplayDate() {
-        try {
-            LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText()));
+            LocalDate.now().format(DateTimeFormatter.ofPattern(format));
         } catch (Exception ignored) {
             return false;
         }

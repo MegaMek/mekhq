@@ -61,6 +61,24 @@ public final class MekHQOptions {
     public void setHistoricalDailyLog(boolean value) {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.HISTORICAL_DAILY_LOG, value);
     }
+
+    //region Command Center Display
+    public boolean getCommandCenterUseUnitMarket() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
+    }
+
+    public void setCommandCenterUseUnitMarket(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, value);
+    }
+
+    public boolean getCommandCenterMRMS() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_MRMS, false);
+    }
+
+    public void setCommandCenterMRMS(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_MRMS, value);
+    }
+    //endregion Command Center Display
     //endregion Display
 
     //region Autosave
@@ -121,6 +139,16 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.AUTOSAVE_NODE).putInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY, value);
     }
     //endregion Autosave
+
+    //region New Day
+    public boolean getNewDayMRMS() {
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_MRMS, false);
+    }
+
+    public void setNewDayMRMS(boolean value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_MRMS, value);
+    }
+    //endregion New Day
 
     //region Campaign XML Save Options
     /**
