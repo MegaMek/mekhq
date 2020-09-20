@@ -29,7 +29,7 @@ import java.io.*;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
@@ -39,6 +39,7 @@ import megamek.MegaMek;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.common.event.EventBus;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
@@ -334,7 +335,6 @@ public class MekHQ implements GameListener {
     }
 
     private void showInfo() {
-        final String METHOD_NAME = "showInfo";
         final long TIMESTAMP = new File(PreferenceManager.getClientPreferences().getLogDirectory()
                 + File.separator + "timestamp").lastModified();
         // echo some useful stuff
@@ -413,16 +413,17 @@ public class MekHQ implements GameListener {
         this.campaigngui = campaigngui;
     }
 
-    public void joinGame(Scenario scenario, ArrayList<Unit> meks) {
-        LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), false, getCampaign());
-        lgd.setVisible(true);
+    public void joinGame(Scenario scenario, List<Unit> meks) {
+        ConnectDialog joinGameDialog = new ConnectDialog(campaigngui.getFrame(), campaigngui.getCampaign().getName());
+        joinGameDialog.setVisible(true);
 
-        if (lgd.cancelled) {
+        if (!joinGameDialog.dataValidation("MegaMek.ConnectDialog.title")) {
             return;
         }
 
         try {
-            client = new Client(lgd.playerName, lgd.serverAddr, lgd.port);
+            client = new Client(joinGameDialog.getPlayerName(), joinGameDialog.getServerAddress(),
+                    joinGameDialog.getPort());
         } catch (Exception e) {
             getLogger().error(this, "Failed to connect to server properly", e);
             return;
@@ -432,29 +433,28 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
 
         //Start the game thread
-        gameThread = new GameThread(lgd.playerName, client, this, meks, false);
+        gameThread = new GameThread(joinGameDialog.getPlayerName(), client, this, meks, false);
         gameThread.start();
     }
 
-    public void startHost(Scenario scenario, boolean loadSavegame, ArrayList<Unit> meks) {
+    public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks) {
         int port;
         String playerName;
-        {
-            LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), true, getCampaign());
-            lgd.setVisible(true);
-            if (lgd.cancelled) {
-                stopHost();
-                return;
-            } else {
-                this.autosaveService.requestBeforeMissionAutosave(getCampaign());
-                port = lgd.port;
-                playerName = lgd.playerName;
-            }
-            lgd.dispose(); // Force cleanup of the current modal, since we are
-                           // (possibly) about to display a new one and MacOS
-                           // seems to struggle with that.
-                           // (see https://github.com/MegaMek/mekhq/issues/953)
+
+        LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), true, getCampaign());
+        lgd.setVisible(true);
+        if (lgd.cancelled) {
+            stopHost();
+            return;
+        } else {
+            this.autosaveService.requestBeforeMissionAutosave(getCampaign());
+            port = lgd.port;
+            playerName = lgd.playerName;
         }
+        lgd.dispose(); // Force cleanup of the current modal, since we are
+                       // (possibly) about to display a new one and MacOS
+                       // seems to struggle with that.
+                       // (see https://github.com/MegaMek/mekhq/issues/953)
 
         try {
             myServer = new Server("", port);
@@ -475,7 +475,7 @@ public class MekHQ implements GameListener {
             stopHost();
             return;
         } catch (Exception ex) {
-            MekHQ.getLogger().error(getClass(), "startHost", "Failed to start up server", ex);
+            MekHQ.getLogger().error(this, "Failed to start up server", ex);
             stopHost();
             return;
         }
@@ -496,7 +496,7 @@ public class MekHQ implements GameListener {
 
     // Stop & send the close game event to the Server
     public synchronized void stopHost() {
-       if (null != getMyServer()) {
+       if (getMyServer() != null) {
            getMyServer().die();
            myServer = null;
        }
