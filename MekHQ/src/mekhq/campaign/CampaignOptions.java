@@ -331,6 +331,9 @@ public class CampaignOptions implements Serializable {
     private boolean useAtB;
     private int skillLevel;
 
+    // AtB Module: Unit Market // TODO : Fully Implement Me
+    private boolean useAtBUnitMarket;
+
     // Unit Administration
     private boolean useShareSystem;
     private boolean sharesExcludeLargeCraft;
@@ -714,6 +717,9 @@ public class CampaignOptions implements Serializable {
         //region Against the Bot Tab
         useAtB = false;
         skillLevel = 2;
+
+        // AtB Module: Unit Market
+        useAtBUnitMarket = false;
 
         // Unit Administration
         useShareSystem = false;
@@ -2498,6 +2504,14 @@ public class CampaignOptions implements Serializable {
         this.useAtB = useAtB;
     }
 
+    public boolean getUseAtBUnitMarket() {
+        return useAtBUnitMarket;
+    }
+
+    public void setUseAtBUnitMarket(boolean useAtBUnitMarket) {
+        this.useAtBUnitMarket = useAtBUnitMarket;
+    }
+
     public boolean getUseAero() {
         return useAero;
     }
@@ -3326,6 +3340,8 @@ public class CampaignOptions implements Serializable {
                     + csv.toString()
                     + "</usePortraitForType>");
 
+        //region AtB Options
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAtBUnitMarket", useAtBUnitMarket);
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<rats>"
                 + MekHqXmlUtil.escape(StringUtils.join(rats, ','))
@@ -3336,14 +3352,12 @@ public class CampaignOptions implements Serializable {
         if (ignoreRatEra) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<ignoreRatEra/>");
         }
+        //endregion AtB Options
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-        final String METHOD_NAME = "generateCampaignOptionsFromXml(Node)";
-
-        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                "Loading Campaign Options from XML...");
+        MekHQ.getLogger().info(CampaignOptions.class, "Loading Campaign Options from XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3358,8 +3372,7 @@ public class CampaignOptions implements Serializable {
                 continue;
             }
 
-            MekHQ.getLogger().info(CampaignOptions.class, METHOD_NAME,
-                    String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
+            MekHQ.getLogger().info(CampaignOptions.class, String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
 
             //region Repair and Maintenance Tab
             if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
@@ -3599,8 +3612,7 @@ public class CampaignOptions implements Serializable {
                 } else if (values.length == 9) {
                     migrateMarriageSurnameWeights(retVal, values);
                 } else {
-                    MekHQ.getLogger().error(CampaignOptions.class,
-                            "generateCampaignOptionsFromXml", "Unkown length of randomMarriageSurnameWeights");
+                    MekHQ.getLogger().error(CampaignOptions.class, "Unkown length of randomMarriageSurnameWeights");
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
@@ -3768,6 +3780,8 @@ public class CampaignOptions implements Serializable {
                 retVal.tougherHealing = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
                 retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBUnitMarket")) {
+                retVal.setUseAtBUnitMarket(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useAero")) {
                 retVal.useAero = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useVehicles")) {
@@ -3932,8 +3946,8 @@ public class CampaignOptions implements Serializable {
                                     continue;
                                 }
 
-                                MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                                        String.format("massRepairOption %d.%s\n\t%s", //$NON-NLS-1$
+                                MekHQ.getLogger().info(CampaignOptions.class,
+                                        String.format("massRepairOption %d.%s\n\t%s",
                                                 mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
 
                                 if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
@@ -3960,8 +3974,7 @@ public class CampaignOptions implements Serializable {
             }
         }
 
-        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                "Load Campaign Options Complete!"); //$NON-NLS-1$
+        MekHQ.getLogger().info(CampaignOptions.class, "Load Campaign Options Complete!");
 
         return retVal;
     }

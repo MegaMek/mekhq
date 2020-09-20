@@ -61,6 +61,24 @@ public final class MekHQOptions {
     public void setHistoricalDailyLog(boolean value) {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.HISTORICAL_DAILY_LOG, value);
     }
+
+    //region Command Center Display
+    public boolean getCommandCenterUseUnitMarket() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
+    }
+
+    public void setCommandCenterUseUnitMarket(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, value);
+    }
+
+    public boolean getCommandCenterMRMS() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_MRMS, false);
+    }
+
+    public void setCommandCenterMRMS(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_MRMS, value);
+    }
+    //endregion Command Center Display
     //endregion Display
 
     //region Autosave
