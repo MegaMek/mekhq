@@ -5134,6 +5134,7 @@ public class CampaignOptionsDialog extends JDialog {
         // Start Against the Bot
         options.setUseAtB(chkUseAtB.isSelected());
         options.setSkillLevel(cbSkillLevel.getSelectedIndex());
+        options.setUseAtBUnitMarket(chkUseAtB.isSelected()); // TODO : add fully modular capabilities
         options.setUseShareSystem(chkUseShareSystem.isSelected());
         options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
         options.setSharesForAll(chkSharesForAll.isSelected());

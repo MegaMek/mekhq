@@ -236,10 +236,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @return
      */
     public boolean isAvailable(boolean ignoreRefit) {
-        if (ignoreRefit) {
-            return isPresent() && !isDeployed() && !isMothballing() && !isMothballed();
-        }
-        return isPresent() && !isDeployed() && !isRefitting() && !isMothballing() && !isMothballed();
+        return isPresent() && !isDeployed() && (ignoreRefit || !isRefitting()) && !isMothballing() && !isMothballed();
     }
 
     public String getStatus() {

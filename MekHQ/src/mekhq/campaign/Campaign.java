@@ -154,6 +154,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.dialog.HistoricalDailyReportDialog;
 import mekhq.gui.utilities.PortraitFileFactory;
 import mekhq.module.atb.AtBEventProcessor;
+import mekhq.service.MassRepairService;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -1599,13 +1600,10 @@ public class Campaign implements Serializable, ITechManager {
         return patients;
     }
 
-    public ArrayList<Unit> getServiceableUnits() {
-        ArrayList<Unit> service = new ArrayList<>();
+    public List<Unit> getServiceableUnits() {
+        List<Unit> service = new ArrayList<>();
         for (Unit u : getUnits()) {
-            if (!u.isAvailable()) {
-                continue;
-            }
-            if (u.isServiceable()) {
+            if (u.isAvailable() && u.isServiceable()) {
                 service.add(u);
             }
         }
@@ -1613,7 +1611,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void addPart(Part p, int transitDays) {
-        if (null != p.getUnit() && p.getUnit() instanceof TestUnit) {
+        if ((p.getUnit() != null) && (p.getUnit() instanceof TestUnit)) {
             // if this is a test unit, then we won't add the part, so there
             return;
         }
@@ -3532,6 +3530,11 @@ public class Campaign implements Serializable, ITechManager {
         }
         // Remove any unrepairable, unsalvageable units
         unitsToRemove.forEach(this::removeUnit);
+
+        // Finally, run Mass Repair Mass Salvage if desired
+        if (MekHQ.getMekHQOptions().getNewDayMRMS()) {
+            MassRepairService.massRepairSalvageAllUnits(this);
+        }
     }
 
     /** @return <code>true</code> if the new day arrived */
