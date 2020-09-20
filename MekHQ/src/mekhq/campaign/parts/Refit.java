@@ -1385,6 +1385,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     oldUnit.getCampaign().removePart(part);
                 }
             }
+            else if (part instanceof MissingPart) {
+                // Don't add missing or destroyed parts to warehouse
+                part.setUnit(null);
+                oldUnit.getCampaign().removePart(part);
+                continue;
+            }
             else {
                 if(part instanceof AmmoBin) {
                     ((AmmoBin) part).unload();
