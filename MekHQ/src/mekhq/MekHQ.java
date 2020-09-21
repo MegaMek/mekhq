@@ -40,6 +40,7 @@ import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
+import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.common.event.EventBus;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
@@ -79,7 +80,6 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.StartUpGUI;
-import mekhq.gui.dialog.LaunchGameDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.preferences.StringPreference;
@@ -421,9 +421,13 @@ public class MekHQ implements GameListener {
             return;
         }
 
+        final String playerName = joinGameDialog.getPlayerName();
+        final String serverAddress = joinGameDialog.getServerAddress();
+        final int port = joinGameDialog.getPort();
+        joinGameDialog.dispose();
+
         try {
-            client = new Client(joinGameDialog.getPlayerName(), joinGameDialog.getServerAddress(),
-                    joinGameDialog.getPort());
+            client = new Client(playerName, serverAddress, port);
         } catch (Exception e) {
             getLogger().error(this, "Failed to connect to server properly", e);
             return;
@@ -433,31 +437,33 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
 
         //Start the game thread
-        gameThread = new GameThread(joinGameDialog.getPlayerName(), client, this, meks, false);
+        gameThread = new GameThread(playerName, client, this, meks, false);
         gameThread.start();
     }
 
     public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks) {
-        int port;
-        String playerName;
+        HostDialog hostDialog = new HostDialog(campaigngui.getFrame(), getCampaign().getName());
+        hostDialog.setVisible(true);
 
-        LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), true, getCampaign());
-        lgd.setVisible(true);
-        if (lgd.cancelled) {
+        if (!hostDialog.dataValidation("MegaMek.HostGameAlert.title")) {
             stopHost();
             return;
-        } else {
-            this.autosaveService.requestBeforeMissionAutosave(getCampaign());
-            port = lgd.port;
-            playerName = lgd.playerName;
         }
-        lgd.dispose(); // Force cleanup of the current modal, since we are
-                       // (possibly) about to display a new one and MacOS
-                       // seems to struggle with that.
-                       // (see https://github.com/MegaMek/mekhq/issues/953)
+
+        this.autosaveService.requestBeforeMissionAutosave(getCampaign());
+
+        final String playerName = hostDialog.getPlayerName();
+        final String password = hostDialog.getServerPass();
+        final int port = hostDialog.getPort();
+        final boolean register = hostDialog.isRegister();
+        final String metaserver = register ? hostDialog.getMetaserver() : "";
+
+        // Force cleanup of the current modal, since we are (possibly) about to display a new one and MacOS
+        // seems to struggle with that (see https://github.com/MegaMek/mekhq/issues/953)
+        hostDialog.dispose();
 
         try {
-            myServer = new Server("", port);
+            myServer = new Server(password, port, register, metaserver);
             if (loadSavegame) {
                 FileDialog f = new FileDialog(campaigngui.getFrame(), "Load Savegame");
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");
