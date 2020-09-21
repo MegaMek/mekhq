@@ -36,6 +36,7 @@ import megamek.common.LightVehicleBay;
 import megamek.common.MechBay;
 import megamek.common.Tank;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
@@ -52,6 +53,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Vector;
 
 import static org.mockito.Mockito.*;
@@ -68,10 +70,11 @@ import static org.junit.Assert.*;
 public class CampaignOpsReputationTest {
 
     private Campaign mockCampaign;
-    private ArrayList<Unit> unitList;
-    private ArrayList<Person> personnelList;
-    private ArrayList<Person> activePersonnelList;
-    private ArrayList<Mission> missionList;
+    private CampaignOptions mockCampaignOptions;
+    private List<Unit> unitList;
+    private List<Person> personnelList;
+    private List<Person> activePersonnelList;
+    private List<Mission> missionList;
 
     // Mothballed units.
     private Unit mockMechMothballed;
@@ -205,6 +208,10 @@ public class CampaignOpsReputationTest {
         Faction mockFaction = mock(Faction.class);
         when(mockFaction.is(any())).thenReturn(true);
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
+
+        mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaignOptions.getManualUnitRatingModifier()).thenReturn(0);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         spyReputation = spy(new CampaignOpsReputation(mockCampaign));
 
         int astechs = 0;
