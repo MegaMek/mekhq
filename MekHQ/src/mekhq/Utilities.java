@@ -1171,15 +1171,11 @@ public class Utilities {
                             if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                                 epart.setEquipmentNum(equipNum);
                                 AmmoBin bin = (AmmoBin) epart;
+                                // Ensure Entity is synch'd with part
+                                bin.updateConditionFromPart();
                                 // Unload bin before munition change
-                                // TODO: if part's unit is set, both .unload() and .changeMunition check entity's
-                                // TODO: bin instead of unit's bin. The bins can be out of sync here,
-                                // TODO: resulting in full bins replacing empty bins
-                                // TODO: work-around is to clear then restore part's unit
-                                bin.setUnit(null);
                                 bin.unload();
                                 bin.changeMunition(m.getType());
-                                bin.setUnit(unit);
                                 found = true;
                                 break;
                             }
