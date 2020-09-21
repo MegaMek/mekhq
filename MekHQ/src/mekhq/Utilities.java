@@ -1170,7 +1170,12 @@ public class Utilities {
                         if (refit) {
                             if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                                 epart.setEquipmentNum(equipNum);
-                                ((AmmoBin) epart).changeMunition(m.getType());
+                                AmmoBin bin = (AmmoBin) epart;
+                                // Ensure Entity is synch'd with part
+                                bin.updateConditionFromPart();
+                                // Unload bin before munition change
+                                bin.unload();
+                                bin.changeMunition(m.getType());
                                 found = true;
                                 break;
                             }
