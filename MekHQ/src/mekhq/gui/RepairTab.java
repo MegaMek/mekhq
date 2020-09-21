@@ -139,8 +139,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         // Add panel for action buttons
         JPanel actionButtons = new JPanel(new GridBagLayout());
 
-        JButton btnMRMSDialog = new JButton();
-        btnMRMSDialog.setText("Mass Repair/Salvage");
+        JButton btnMRMSDialog = new JButton("Mass Repair/Salvage");
         btnMRMSDialog.setToolTipText("Start Mass Repair/Salvage from dialog");
         btnMRMSDialog.setName("btnMRMSDialog");
         btnMRMSDialog.addActionListener(ev -> {
@@ -149,8 +148,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             dlg.setVisible(true);
         });
 
-        JButton btnMRMSInstantAll = new JButton();
-        btnMRMSInstantAll.setText("Instant Mass Repair/Salvage All");
+        JButton btnMRMSInstantAll = new JButton("Instant Mass Repair/Salvage All");
         btnMRMSInstantAll.setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
         btnMRMSInstantAll.setName("btnMRMSInstantAll");
         btnMRMSInstantAll.addActionListener(ev -> {
@@ -159,8 +157,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                     "Complete", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        btnAcquisitions = new JButton();
-        btnAcquisitions.setText("Parts");
+        btnAcquisitions = new JButton("Parts");
         btnAcquisitions.setToolTipText("Show missing/in transit/on order parts");
         btnAcquisitions.setName("btnAcquisitions");
         btnAcquisitions.addActionListener(ev -> {
