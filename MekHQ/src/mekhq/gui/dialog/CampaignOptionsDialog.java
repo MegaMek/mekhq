@@ -21,7 +21,6 @@ package mekhq.gui.dialog;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -149,7 +148,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JComboBox<String> comboFaction;
     SortedComboBoxModel<String> factionModel;
     private JCheckBox useUnitRatingCheckBox;
-    private JComboBox<String> unitRatingMethodCombo;
+    private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JSpinner manualUnitRatingModifier;
     private JButton btnDate;
     private JButton btnCamo;
@@ -673,7 +672,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridx = 1;
         unitRatingPanel.add(unitRatingMethodLabel, gridBagConstraints);
 
-        unitRatingMethodCombo = new JComboBox<>(UnitRatingMethod.getUnitRatingMethodNames());
+        unitRatingMethodCombo = new JComboBox<>(UnitRatingMethod.values());
         unitRatingMethodCombo.setName("unitRatingMethodCombo");
         gridBagConstraints.gridx = 2;
         unitRatingPanel.add(unitRatingMethodCombo, gridBagConstraints);
@@ -4370,7 +4369,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         //region General Tab
         useUnitRatingCheckBox.setSelected(options.useDragoonRating());
-        unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod().getDescription());
+        unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod());
         manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
         //endregion General Tab
 
@@ -4905,7 +4904,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setDamagedPartsValue((Double) spnDamagedPartsValue.getModel().getValue());
         options.setCanceledOrderReimbursement((Double) spnOrderRefund.getModel().getValue());
         options.setDragoonRating(useUnitRatingCheckBox.isSelected());
-        options.setUnitRatingMethod(UnitRatingMethod.getUnitRatingMethod((String) unitRatingMethodCombo.getSelectedItem()));
+        options.setUnitRatingMethod((UnitRatingMethod) unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((Integer) manualUnitRatingModifier.getValue());
         options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
         options.setUseTactics(useTacticsBox.isSelected());
