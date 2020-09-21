@@ -494,6 +494,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         int score = 0;
 
+        score += getCampaign().getCampaignOptions().getManualUnitRatingModifier();
         score += getExperienceValue();
         score += getCommanderValue();
         score += getCombatRecordValue();
@@ -846,12 +847,14 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                                                  .getFailedCollateral());
     }
 
+    @Override
     public String getDetails() {
         final boolean useManualUnitRatingModifier = getCampaign().getCampaignOptions().getManualUnitRatingModifier() != 0;
-        return String.format("%-" + HEADER_LENGTH + "s %s", "Dragoons Rating:",
-                getUnitRating()) + "\n" +
-                "    Method: FM: Mercenaries (rev)\n\n" +
-                (useManualUnitRatingModifier ? "" : "") +
+        return String.format("%-" + HEADER_LENGTH + "s %s", "Dragoons Rating:", getUnitRating()) + "\n" +
+                "    Method: FM: Mercenaries (rev)\n" +
+                (useManualUnitRatingModifier
+                        ? ("    Manual Modifier: " + getCampaign().getCampaignOptions().getManualUnitRatingModifier() + "\n")
+                        : "") + "\n" +
                 getQualityDetails() + "\n\n" +
                 getCommandDetails() + "\n\n" +
                 getCombatRecordDetails() + "\n\n" +
@@ -861,6 +864,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                 getFinancialDetails();
     }
 
+    @Override
     public String getHelpText() {
         return "Method: FM: Mercenaries (rev)\n" +
                "An attempt to match the FM: Mercenaries (rev) method for " +

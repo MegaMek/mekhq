@@ -150,6 +150,7 @@ public class CampaignOptionsDialog extends JDialog {
     SortedComboBoxModel<String> factionModel;
     private JCheckBox useUnitRatingCheckBox;
     private JComboBox<String> unitRatingMethodCombo;
+    private JSpinner manualUnitRatingModifier;
     private JButton btnDate;
     private JButton btnCamo;
     private JButton btnIcon;
@@ -657,22 +658,36 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridx = gridx--;
         panGeneral.add(comboFaction, gridBagConstraints);
 
-        JPanel unitRatingPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
+        JPanel unitRatingPanel = new JPanel(new GridBagLayout());
 
         useUnitRatingCheckBox = new JCheckBox(resourceMap.getString("useUnitRatingCheckBox.text"));
         useUnitRatingCheckBox.setName("useUnitRatingCheckBox");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         unitRatingPanel.add(useUnitRatingCheckBox);
 
-        unitRatingPanel.add(Box.createHorizontalStrut(10));
-
-        JLabel unitRatingMethodLabel = new JLabel("Unit Rating Method:");
+        JLabel unitRatingMethodLabel = new JLabel(resourceMap.getString("unitRatingMethodLabel.text"));
         unitRatingMethodLabel.setName("unitRatingMethodLabel");
-        unitRatingPanel.add(unitRatingMethodLabel);
+        gridBagConstraints.gridx = 1;
+        unitRatingPanel.add(unitRatingMethodLabel, gridBagConstraints);
 
         unitRatingMethodCombo = new JComboBox<>(UnitRatingMethod.getUnitRatingMethodNames());
         unitRatingMethodCombo.setName("unitRatingMethodCombo");
-        unitRatingPanel.add(unitRatingMethodCombo);
+        gridBagConstraints.gridx = 2;
+        unitRatingPanel.add(unitRatingMethodCombo, gridBagConstraints);
 
+        JLabel manualUnitRatingModifierLabel = new JLabel(resourceMap.getString("manualUnitRatingModifierLabel.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        unitRatingPanel.add(manualUnitRatingModifierLabel, gridBagConstraints);
+
+        manualUnitRatingModifier = new JSpinner(new SpinnerNumberModel(0, -100, 100, 1));
+        gridBagConstraints.gridx = 1;
+        unitRatingPanel.add(manualUnitRatingModifier, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = gridx;
         gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
@@ -4356,6 +4371,7 @@ public class CampaignOptionsDialog extends JDialog {
         //region General Tab
         useUnitRatingCheckBox.setSelected(options.useDragoonRating());
         unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod().getDescription());
+        manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
         //endregion General Tab
 
         //region Repair and Maintenance Tab
@@ -4890,6 +4906,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setCanceledOrderReimbursement((Double) spnOrderRefund.getModel().getValue());
         options.setDragoonRating(useUnitRatingCheckBox.isSelected());
         options.setUnitRatingMethod(UnitRatingMethod.getUnitRatingMethod((String) unitRatingMethodCombo.getSelectedItem()));
+        options.setManualUnitRatingModifier((Integer) manualUnitRatingModifier.getValue());
         options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
         options.setUseTactics(useTacticsBox.isSelected());
         campaign.getGameOptions().getOption("command_init").setValue(useTacticsBox.isSelected());

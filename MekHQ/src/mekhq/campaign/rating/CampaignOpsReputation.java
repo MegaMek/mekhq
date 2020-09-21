@@ -379,6 +379,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     @Override
     protected int calculateUnitRatingScore() {
         int totalScore = getExperienceValue();
+        totalScore += getCampaign().getCampaignOptions().getManualUnitRatingModifier();
         totalScore += getCommanderValue();
         totalScore += getCombatRecordValue();
         totalScore += getTransportValue();
@@ -862,9 +863,14 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         final String TEMPLATE = "%-" + HEADER_LENGTH + "s %s";
         initValues();
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(TEMPLATE, "Unit Reputation:",
-                                calculateUnitRatingScore()));
-        sb.append("\n").append("    Method: Campaign Operations\n\n");
+        sb.append(String.format(TEMPLATE, "Unit Reputation:", calculateUnitRatingScore()));
+        sb.append("\n").append("    Method: Campaign Operations\n");
+        if (getCampaign().getCampaignOptions().getManualUnitRatingModifier() != 0) {
+            sb.append("    Manual Modifier: ")
+                    .append(getCampaign().getCampaignOptions().getManualUnitRatingModifier())
+                    .append("\n");
+        }
+        sb.append("\n");
         sb.append(getExperienceDetails()).append("\n\n");
         sb.append(getCommanderDetails()).append("\n\n");
         sb.append(getCombatRecordDetails()).append("\n\n");
