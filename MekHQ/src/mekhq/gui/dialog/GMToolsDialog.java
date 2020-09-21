@@ -196,7 +196,7 @@ public class GMToolsDialog extends JDialog {
 
         List<FactionChoice> factionChoices = getFactionChoices((person == null)
                 ? getGUI().getCampaign().getGameYear() : person.getBirthday().getYear());
-        DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>((FactionChoice[]) factionChoices.toArray());
+        DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>(factionChoices.toArray(new FactionChoice[]{}));
         factionPicker = new JComboBox<>(factionModel);
         factionPicker.setName("factionPicker");
         factionPicker.setSelectedIndex(0);
@@ -268,7 +268,7 @@ public class GMToolsDialog extends JDialog {
         genderLabel.setName("genderLabel");
         namePanel.add(genderLabel, newGridBagConstraints(gridx, 0));
 
-        DefaultComboBoxModel<Gender> genderModel = new DefaultComboBoxModel<>((Gender[]) Gender.getExternalOptions().toArray());
+        DefaultComboBoxModel<Gender> genderModel = new DefaultComboBoxModel<>(Gender.getExternalOptions().toArray(new Gender[]{}));
         genderPicker = new JComboBox<>(genderModel);
         genderPicker.setName("genderPicker");
         genderPicker.setSelectedIndex(0);
@@ -280,7 +280,7 @@ public class GMToolsDialog extends JDialog {
 
         List<FactionChoice> factionChoices = getFactionChoices((person == null)
                 ? getGUI().getCampaign().getGameYear() : person.getBirthday().getYear());
-        DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>((FactionChoice[]) factionChoices.toArray());
+        DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>(factionChoices.toArray(new FactionChoice[]{}));
         nameGeneratorFactionPicker = new JComboBox<>(factionModel);
         nameGeneratorFactionPicker.setName("nameGeneratorFactionPicker");
         nameGeneratorFactionPicker.setSelectedIndex(0);
