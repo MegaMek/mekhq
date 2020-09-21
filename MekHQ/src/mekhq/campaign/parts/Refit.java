@@ -497,9 +497,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         HashMap<Integer,Integer> partQuantity = new HashMap<>();
         List<Part> plannedReplacementParts = new ArrayList<>();
         for(Part nPart : newPartList) {
-            //TODO: I don't think we need this here anymore
-            nPart.setUnit(oldUnit);
-
             //We don't actually want to order new BA suits; we're just pretending that we're altering the
             //existing suits.
             if (nPart instanceof MissingBattleArmorSuit) {
@@ -1387,6 +1384,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     part.setUnit(null);
                     oldUnit.getCampaign().removePart(part);
                 }
+            }
+            else if (part instanceof MissingPart) {
+                // Don't add missing or destroyed parts to warehouse
+                part.setUnit(null);
+                oldUnit.getCampaign().removePart(part);
+                continue;
             }
             else {
                 if(part instanceof AmmoBin) {

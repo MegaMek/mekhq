@@ -166,6 +166,7 @@
 		<probPhenoVee>0</probPhenoVee>
 		<tougherHealing>true</tougherHealing>
 		<useAtB>true</useAtB>
+        <useAtBUnitMarket>true</useAtBUnitMarket>
 		<useAero>true</useAero>
 		<useVehicles>true</useVehicles>
 		<clanVehicles>true</clanVehicles>
