@@ -97,18 +97,18 @@ class GameThread extends Thread implements CloseClientListener {
             // phase
             for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error(getClass(), "run", "Thread in unknown stage" );
+                MekHQ.getLogger().error(this, "Thread in unknown stage" );
             }
 
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-                MekHQ.getLogger().info(getClass(), "run","Thread in lounge" );
+                MekHQ.getLogger().info(this,"Thread in lounge" );
                 client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
 
                 if (started) {
                     client.getGame().getOptions().loadOptions();
                     client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
                 for (Unit unit : units) {
@@ -121,7 +121,7 @@ class GameThread extends Thread implements CloseClientListener {
                     // Add Mek to game
                     client.sendAddEntity(entity);
                     // Wait a few secs to not overuse bandwith
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
                 client.sendPlayerInfo();
