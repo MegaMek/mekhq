@@ -1,7 +1,7 @@
 /*
  * MekHqOptionsDialog.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -31,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 public class MekHqOptionsDialog extends BaseDialog {
+    //region Variable Declaration
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog");
 
     //region Display
@@ -67,6 +68,11 @@ public class MekHqOptionsDialog extends BaseDialog {
     private JCheckBox optionPreferGzippedOutput;
     private JCheckBox optionWriteCustomsToXML;
     //endregion Campaign XML Save
+
+    //region Miscellaneous
+    private JSpinner optionStartGameDelay;
+    //endregion Miscellaneous
+    //endregion Variable Declaration
 
     public MekHqOptionsDialog(JFrame parent) {
         super(parent);
@@ -171,6 +177,16 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionWriteCustomsToXML = new JCheckBox(resources.getString("optionWriteCustomsToXML.text"));
         optionWriteCustomsToXML.setMnemonic(KeyEvent.VK_C);
         //endregion Campaign XML Save
+
+        //region Miscellaneous Options
+        JLabel labelMiscellaneous = new JLabel(resources.getString("labelMiscellaneous.text"));
+
+        JLabel labelStartGameDelay = new JLabel(resources.getString("labelStartGameDelay.text"));
+        labelStartGameDelay.setToolTipText(resources.getString("optionStartGameDelay.toolTipText"));
+
+        optionStartGameDelay = new JSpinner(new SpinnerNumberModel(0, 0, 2500, 25));
+        optionStartGameDelay.setToolTipText(resources.getString("optionStartGameDelay.toolTipText"));
+        //endregion Miscellaneous Options
         //endregion Create UI components
 
         // Layout the UI
@@ -214,6 +230,10 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(labelXMLSave)
                     .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
+                    .addComponent(labelMiscellaneous)
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelStartGameDelay)
+                            .addComponent(optionStartGameDelay, GroupLayout.Alignment.TRAILING))
         );
 
         layout.setHorizontalGroup(
@@ -249,6 +269,10 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(labelXMLSave)
                     .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
+                    .addComponent(labelMiscellaneous)
+                    .addGroup(layout.createSequentialGroup()
+                            .addComponent(labelStartGameDelay)
+                            .addComponent(optionStartGameDelay))
         );
 
         return body;
@@ -281,6 +305,8 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
         MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
 
+        MekHQ.getMekHQOptions().setStartGameDelay((Integer) optionStartGameDelay.getValue());
+
         MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
     }
 
@@ -305,6 +331,8 @@ public class MekHqOptionsDialog extends BaseDialog {
 
         optionPreferGzippedOutput.setSelected(MekHQ.getMekHQOptions().getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
+
+        optionStartGameDelay.setValue(MekHQ.getMekHQOptions().getStartGameDelay());
     }
 
     //region Data Validation
