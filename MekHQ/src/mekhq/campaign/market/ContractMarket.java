@@ -173,18 +173,17 @@ public class ContractMarket implements Serializable {
 			}
 
 			boolean inBackwater = true;
-            if( currentFactions.size() > 1 )
-            {
+            if (currentFactions.size() > 1) {
                 // More than one faction, if any is *not* periphery, we're not in backwater either
-                for( Faction f : currentFactions ) {
-                    if( !f.isPeriphery() ) {
+                for (Faction f : currentFactions) {
+                    if (!f.isPeriphery()) {
                         inBackwater = false;
                     }
                 }
             } else {
                 // Just one faction. Are there any others nearby?
                 Faction onlyFaction = currentFactions.iterator().next();
-                if( !onlyFaction.isPeriphery() ) {
+                if (!onlyFaction.isPeriphery()) {
                     for (PlanetarySystem key : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(), 30)) {
                         for (Faction f : key.getFactionSet(campaign.getLocalDate())) {
                             if (!onlyFaction.equals(f)) {
@@ -258,8 +257,8 @@ public class ContractMarket implements Serializable {
 		if (contract.getMissionType() == AtBContract.MT_GARRISONDUTY) {
 			int numSubcontracts = 0;
 			for (Mission m : campaign.getMissions()) {
-				if (m instanceof AtBContract &&
-                        ((AtBContract) m).getParentContract().equals(contract)) {
+				if ((m instanceof AtBContract) &&
+                        contract.equals(((AtBContract) m).getParentContract())) {
 					numSubcontracts++;
 				}
 			}
