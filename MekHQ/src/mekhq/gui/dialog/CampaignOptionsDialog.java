@@ -4386,13 +4386,13 @@ public class CampaignOptionsDialog extends JDialog {
         resetToFirstTechCheckBox.setSelected(options.useResetToFirstTech());
         useQuirksBox.setSelected(options.useQuirks());
         useAeroSystemHitsBox.setSelected(options.useAeroSystemHits());
-        if (options.isDestroyByMargin()) {
+        if (useDamageMargin.isSelected() != options.isDestroyByMargin()) {
             useDamageMargin.doClick();
         }
         spnDamageMargin.setValue(options.getDestroyMargin());
         spnDestroyPartTarget.setValue(options.getDestroyPartTarget());
 
-        if (options.checkMaintenance()) {
+        if (checkMaintenance.isSelected() != options.checkMaintenance()) {
             checkMaintenance.doClick();
         }
         spnMaintenanceDays.setValue(options.getMaintenanceCycleDays());
@@ -4434,7 +4434,7 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Supplies and Acquisitions Tab
 
         //region Tech Limits Tab
-        if (options.limitByYear()) {
+        if (limitByYearBox.isSelected() != options.limitByYear()) {
             limitByYearBox.doClick();
         }
         disallowExtinctStuffBox.setSelected(options.disallowExtinctStuff());
@@ -4613,7 +4613,7 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Rank System Tab
 
         //region Name and Portrait Generation Tab
-        if (options.useOriginFactionForNames()) {
+        if (chkUseOriginFactionForNames.isSelected() != options.useOriginFactionForNames()) {
             chkUseOriginFactionForNames.doClick();
         }
 
@@ -4628,9 +4628,9 @@ public class CampaignOptionsDialog extends JDialog {
                 allSelected = false;
             }
         }
-        if (allSelected) {
+        if (allSelected && !allPortraitsBox.isSelected()) {
             allPortraitsBox.doClick();
-        } else if (noneSelected) {
+        } else if (noneSelected && !noPortraitsBox.isSelected()) {
             noPortraitsBox.doClick();
         }
 
@@ -4649,7 +4649,7 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Personnel Market Tab
 
         //region Against the Bot Tab
-        if (options.getUseAtB()) {
+        if (chkUseAtB.isSelected() != options.getUseAtB()) {
             chkUseAtB.doClick();
         }
         cbSkillLevel.setSelectedIndex(options.getSkillLevel());
@@ -5198,6 +5198,8 @@ public class CampaignOptionsDialog extends JDialog {
         options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
         options.setUnitMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
         // End Against the Bot
+
+        campaign.setCampaignOptions(options);
 
         MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
     }
