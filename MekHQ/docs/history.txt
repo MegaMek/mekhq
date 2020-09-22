@@ -2,6 +2,7 @@ VERSION HISTORY:
 ----------------
 0.47.11-SNAPSHOT
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo
++ Issue #2032: Fixing Campaign Options Save following Preset Load
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
