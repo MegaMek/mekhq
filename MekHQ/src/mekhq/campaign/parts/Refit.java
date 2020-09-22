@@ -902,9 +902,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
             if (oldHS != newHS) {
                 Part hsPart = heatSinkPart(newEntity); // only single HS allowed, so they have to be of the same type
-                if (isOmniRefit) {
-                    hsPart.setOmniPodded(true);
-                }
+                hsPart.setOmniPodded(isOmniRefit);
                 for (int i = oldHS; i < newHS; i++) {
                     // Heat sink added for supply chain tracking purposes and removed from refit later
                     newIntegratedHS.add(hsPart.getMissingPart());
