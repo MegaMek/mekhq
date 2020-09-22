@@ -487,7 +487,6 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
     private JCheckBox chkUseAtBCapture;
-    private JSpinner spnStartGameDelay;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -3584,7 +3583,6 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseLightConditions = new JCheckBox();
         chkUsePlanetaryConditions = new JCheckBox();
         chkUseAtBCapture = new JCheckBox();
-        spnStartGameDelay = new JSpinner();
 
         chkAeroRecruitsHaveUnits = new JCheckBox();
         chkInstantUnitMarketDelivery = new JCheckBox();
@@ -4209,40 +4207,6 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUseAtBCapture, gridBagConstraints);
 
-        JTextArea txtStartGameDelay = new JTextArea();
-        txtStartGameDelay.setText(resourceMap.getString("txtStartGameDelay.text"));
-        txtStartGameDelay.setName("txtStartGameDelay");
-        txtStartGameDelay.setEditable(false);
-        txtStartGameDelay.setLineWrap(true);
-        txtStartGameDelay.setWrapStyleWord(true);
-        txtStartGameDelay.setOpaque(false);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = yTablePosition++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(txtStartGameDelay, gridBagConstraints);
-
-        JLabel lblStartGameDelay = new JLabel(resourceMap.getString("spnStartGameDelay.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = yTablePosition;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(lblStartGameDelay, gridBagConstraints);
-
-        spnStartGameDelay.setModel(new SpinnerNumberModel(0, 0, 1500, 25));
-        spnStartGameDelay.setToolTipText(resourceMap.getString("spnStartGameDelay.toolTipText"));
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = yTablePosition;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(spnStartGameDelay, gridBagConstraints);
-
         JScrollPane scrAtB = new JScrollPane(panAtB);
         scrAtB.setPreferredSize(new java.awt.Dimension(500, 400));
 
@@ -4256,12 +4220,12 @@ public class CampaignOptionsDialog extends JDialog {
         });
         //endregion Against the Bot Tab
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(tabOptions, gridBagConstraints);
@@ -4729,7 +4693,6 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseLightConditions.setSelected(options.getUseLightConditions());
         chkUsePlanetaryConditions.setSelected(options.getUsePlanetaryConditions());
         chkUseAtBCapture.setSelected(options.getUseAtBCapture());
-        spnStartGameDelay.setValue(options.getStartGameDelay());
         //endregion Against the Bot Tab
     }
 
@@ -5191,7 +5154,6 @@ public class CampaignOptionsDialog extends JDialog {
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
         options.setUseAtBCapture(chkUseAtBCapture.isSelected());
-        options.setStartGameDelay((Integer) spnStartGameDelay.getValue());
 
         options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
         options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());

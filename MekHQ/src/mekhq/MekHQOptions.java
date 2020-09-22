@@ -177,4 +177,14 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.XML_SAVES_NODE).putBoolean(MekHqConstants.WRITE_CUSTOMS_TO_XML, value);
     }
     //endregion Campaign XML Save Options
+
+    //region Miscellaneous Options
+    public int getStartGameDelay() {
+        return userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).getInt(MekHqConstants.START_GAME_DELAY, 500);
+    }
+
+    public void setStartGameDelay(int startGameDelay) {
+        userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).putInt(MekHqConstants.START_GAME_DELAY, startGameDelay);
+    }
+    //endregion Miscellaneous Options
 }
