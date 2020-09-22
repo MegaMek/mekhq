@@ -391,7 +391,6 @@ public class CampaignOptions implements Serializable {
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
     private boolean useAtBCapture; // TODO : merge me with the Personnel Option capturePrisoners
-    private int startGameDelay;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -783,7 +782,6 @@ public class CampaignOptions implements Serializable {
         useLightConditions = true;
         usePlanetaryConditions = false;
         useAtBCapture = false;
-        startGameDelay = 500;
         //endregion Against the Bot Tab
     }
     //endregion Constructors
@@ -2911,13 +2909,6 @@ public class CampaignOptions implements Serializable {
         unitMarketReportRefresh = refresh;
     }
 
-    public int getStartGameDelay() {
-        return startGameDelay;
-    }
-
-    public void setStartGameDelay(int delay) {
-        startGameDelay = delay;
-    }
     public boolean massRepairUseExtraTime() {
         return massRepairUseExtraTime;
     }
@@ -3277,7 +3268,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBCapture", useAtBCapture);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "startGameDelay", startGameDelay);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforAeros", allowOpforAeros);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
@@ -3898,8 +3888,8 @@ public class CampaignOptions implements Serializable {
                 retVal.contractMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
                 retVal.unitMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) {
-                retVal.startGameDelay = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
+                MekHQ.getMekHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforLocalUnits")) {
                 retVal.allowOpforLocalUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforAeros")) {
