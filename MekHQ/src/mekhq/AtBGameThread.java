@@ -123,7 +123,7 @@ public class AtBGameThread extends GameThread {
                 if (started) {
                     client.getGame().getOptions().loadOptions();
                     client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
                 MapSettings mapSettings = MapSettings.getInstance();
@@ -152,7 +152,7 @@ public class AtBGameThread extends GameThread {
                 mapSettings.getBoardsSelectedVector().clear();
                 mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 client.sendMapSettings(mapSettings);
-                Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
 
                 PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
@@ -162,7 +162,7 @@ public class AtBGameThread extends GameThread {
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
                 planetaryConditions.setGravity(scenario.getGravity());
                 client.sendPlanetaryConditions(planetaryConditions);
-                Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
 
                 client.getLocalPlayer().setStartingPos(scenario.getStart());
                 client.getLocalPlayer().setTeam(1);
@@ -231,7 +231,7 @@ public class AtBGameThread extends GameThread {
                     // Add Mek to game
                     client.sendAddEntity(entity);
                     // Wait a few secs to not overuse bandwidth
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
                 // Run through the units again. This time add transported units to the correct linkage,
                 // but only if the transport itself is in the game too.
@@ -290,7 +290,7 @@ public class AtBGameThread extends GameThread {
 
                     entity.setDeployRound(deploymentRound);
                     client.sendAddEntity(entity);
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
                 client.sendPlayerInfo();
@@ -405,7 +405,7 @@ public class AtBGameThread extends GameThread {
                     }
                     entity.setOwner(botClient.getLocalPlayer());
                     botClient.sendAddEntity(entity);
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());

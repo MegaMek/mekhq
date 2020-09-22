@@ -58,6 +58,11 @@ public final class MekHqConstants {
     public static final String WRITE_CUSTOMS_TO_XML = "writeCustomsToXML";
     public static final String SAVE_MOTHBALL_STATE = "saveMothballState";
     //endregion Campaign XML Save Options
+
+    //region Miscellaneous Options
+    public static final String MISCELLANEOUS_NODE = "mekhq/prefs/miscellaneous";
+    public static final String START_GAME_DELAY = "startGameDelay";
+    //endregion Miscellaneous Options
     //endregion MekHQ Options
 
     /** This is used in creating the name of save files, e.g. the MekHQ campaign file */
