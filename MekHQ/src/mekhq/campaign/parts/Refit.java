@@ -2462,7 +2462,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             return Math.min(((Mech) entity).heatSinks(), entity.getEngine().integralHeatSinkCapacity(((Mech) entity).hasCompactHeatSinks()));
         } else if ((entity instanceof Aero)
                 && (entity.getEntityType() & (Entity.ETYPE_CONV_FIGHTER | Entity.ETYPE_SMALL_CRAFT | Entity.ETYPE_JUMPSHIP)) == 0) {
-            return entity.getEngine().integralHeatSinkCapacity(false);
+            return entity.getEngine().getWeightFreeEngineHeatSinks();
         } else {
             EntityVerifier verifier = EntityVerifier.getInstance(new File(
                     "data/mechfiles/UnitVerifierOptions.xml"));
