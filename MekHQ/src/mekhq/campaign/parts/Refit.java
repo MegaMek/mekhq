@@ -1433,8 +1433,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
         }
         int expectedHeatSinkParts = 0;
-        if ((newEntity instanceof Aero) && ((newEntity.getEntityType() &
-                (Entity.ETYPE_CONV_FIGHTER | Entity.ETYPE_SMALL_CRAFT | Entity.ETYPE_JUMPSHIP)) == 0)) {
+        if (newEntity.getClass() == Aero.class) { // Aero but not subclasses
             // Only Aerospace Fighters are expected to have heat sink parts (Mechs handled separately)
             // SmallCraft, Dropship, Jumpship, Warship, and SpaceStation use SpacecraftCoolingSystem instead
             expectedHeatSinkParts = ((Aero) newEntity).getHeatSinks() - ((Aero) newEntity).getPodHeatSinks() -
@@ -2476,8 +2475,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     private int untrackedHeatSinkCount(Entity entity) {
         if (entity instanceof Mech) {
             return Math.min(((Mech) entity).heatSinks(), entity.getEngine().integralHeatSinkCapacity(((Mech) entity).hasCompactHeatSinks()));
-        } else if ((entity instanceof Aero)
-                && (entity.getEntityType() & (Entity.ETYPE_CONV_FIGHTER | Entity.ETYPE_SMALL_CRAFT | Entity.ETYPE_JUMPSHIP)) == 0) {
+        } else if (newEntity.getClass() == Aero.class) { // Aero but not subclasses
             return entity.getEngine().getWeightFreeEngineHeatSinks();
         } else {
             EntityVerifier verifier = EntityVerifier.getInstance(new File(
