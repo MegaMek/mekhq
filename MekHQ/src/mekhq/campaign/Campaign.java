@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
@@ -266,7 +267,7 @@ public class Campaign implements Serializable, ITechManager {
     private IUnitRating unitRating;
     private CampaignSummary campaignSummary;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.campaign");
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.campaign", new EncodeControl());
 
     /** This is used to determine if the player has an active AtB Contract, and is recalculated on load */
     private transient boolean hasActiveContract;
