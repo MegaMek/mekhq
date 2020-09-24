@@ -229,7 +229,7 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioSorter = new TableRowSorter<>(scenarioModel);
         scenarioSorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
         scenarioSorter.setComparator(ScenarioTableModel.COL_STATUS, new ScenarioStatusComparator());
-        scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator(getCampaign()));
+        scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator());
         scenarioTable.setRowSorter(scenarioSorter);
         scenarioTable.setShowGrid(false);
         scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(getCampaignGui(), scenarioTable, scenarioModel));
@@ -248,26 +248,26 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panScenario.add(panScenarioButtons, gridBagConstraints);
 
-        btnStartGame = new JButton(resourceMap.getString("btnStartGame.text")); // NOI18N
-        btnStartGame.setToolTipText(resourceMap.getString("btnStartGame.toolTipText")); // NOI18N
+        btnStartGame = new JButton(resourceMap.getString("btnStartGame.text"));
+        btnStartGame.setToolTipText(resourceMap.getString("btnStartGame.toolTipText"));
         btnStartGame.addActionListener(ev -> startScenario());
         btnStartGame.setEnabled(false);
         panScenarioButtons.add(btnStartGame);
 
-        btnJoinGame = new JButton(resourceMap.getString("btnJoinGame.text")); // NOI18N
-        btnJoinGame.setToolTipText(resourceMap.getString("btnJoinGame.toolTipText")); // NOI18N
+        btnJoinGame = new JButton(resourceMap.getString("btnJoinGame.text"));
+        btnJoinGame.setToolTipText(resourceMap.getString("btnJoinGame.toolTipText"));
         btnJoinGame.addActionListener(ev -> joinScenario());
         btnJoinGame.setEnabled(false);
         panScenarioButtons.add(btnJoinGame);
 
-        btnLoadGame = new JButton(resourceMap.getString("btnLoadGame.text")); // NOI18N
-        btnLoadGame.setToolTipText(resourceMap.getString("btnLoadGame.toolTipText")); // NOI18N
+        btnLoadGame = new JButton(resourceMap.getString("btnLoadGame.text"));
+        btnLoadGame.setToolTipText(resourceMap.getString("btnLoadGame.toolTipText"));
         btnLoadGame.addActionListener(ev -> loadScenario());
         btnLoadGame.setEnabled(false);
         panScenarioButtons.add(btnLoadGame);
 
-        btnPrintRS = new JButton(resourceMap.getString("btnPrintRS.text")); // NOI18N
-        btnPrintRS.setToolTipText(resourceMap.getString("btnPrintRS.toolTipText")); // NOI18N
+        btnPrintRS = new JButton(resourceMap.getString("btnPrintRS.text"));
+        btnPrintRS.setToolTipText(resourceMap.getString("btnPrintRS.toolTipText"));
         btnPrintRS.addActionListener(ev -> printRecordSheets());
         btnPrintRS.setEnabled(false);
         panScenarioButtons.add(btnPrintRS);
@@ -594,14 +594,12 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        ArrayList<Unit> chosen = new ArrayList<>();
-        // ArrayList<Unit> toDeploy = new ArrayList<>();
+        List<Unit> chosen = new ArrayList<>();
         StringBuilder undeployed = new StringBuilder();
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
-            if ((null != u) &&
-                    (null != u.getEntity())) {
+            if ((null != u) && (null != u.getEntity())) {
                 if (null == u.checkDeployment()) {
                     // Make sure the unit's entity and pilot are fully up to
                     // date!
@@ -616,7 +614,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if(scenario instanceof AtBDynamicScenario) {
+        if (scenario instanceof AtBDynamicScenario) {
             AtBDynamicScenarioFactory.setPlayerDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
             AtBDynamicScenarioFactory.finalizeStaggeredDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
             AtBDynamicScenarioFactory.setPlayerDeploymentZones((AtBDynamicScenario) scenario, getCampaign());
@@ -634,19 +632,19 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // code to support deployment of reinforcements for legacy ATB scenarios.
-        if((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
+        if ((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
             Lance assignedLance = ((AtBScenario) scenario).getLance(getCampaign());
-            if(assignedLance != null) {
+            if (assignedLance != null) {
                 int assignedForceId = assignedLance.getForceId();
                 int cmdrStrategy = 0;
                 Person commander = getCampaign().getPerson(Lance.findCommander(assignedForceId, getCampaign()));
-                if (null != commander && null != commander.getSkill(SkillType.S_STRATEGY)) {
+                if ((null != commander) && (null != commander.getSkill(SkillType.S_STRATEGY))) {
                     cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
                 }
                 List<Entity> reinforcementEntities = new ArrayList<>();
 
-                for(Unit unit : chosen) {
-                    if(unit.getForceId() != assignedForceId) {
+                for (Unit unit : chosen) {
+                    if (unit.getForceId() != assignedForceId) {
                         reinforcementEntities.add(unit.getEntity());
                     }
                 }
@@ -655,17 +653,13 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
+        if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
             ((AtBScenario) scenario).refresh(getCampaign());
         }
 
         if (chosen.size() > 0) {
             // Ensure that the MegaMek year GameOption matches the campaign year
-            GameOptions gameOpts = getCampaign().getGameOptions();
-            int campaignYear = getCampaign().getGameYear();
-            if (gameOpts.intOption("year") != campaignYear) {
-                gameOpts.getOption("year").setValue(campaignYear);
-            }
+            getCampaign().getGameOptions().getOption("year").setValue(getCampaign().getGameYear());
             getCampaignGui().getApplication().startHost(scenario, false, chosen);
         }
     }

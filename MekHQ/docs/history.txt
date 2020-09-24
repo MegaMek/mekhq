@@ -1,6 +1,17 @@
 VERSION HISTORY:
 ----------------
-0.47.10-SNAPSHOT
+0.47.11-SNAPSHOT
++ Issue #2029: AmmoBin from warehouse can rarely come with free ammo
++ Issue #2032: Fixing Campaign Options Save following Preset Load
++ PR #2023: Moving StartGameDelay to MekHQOptions
++ Issue #2036: OmniVehicle config changes require omnipod heat sinks
++ Issue #2039: Subcontract Check NPE
++ Issue #1892: Launch Game Dialog Standardization
++ PR #2022: GM Tools Name and Callsign Generation
++ PR #2046: Fixing duplicated MekHQUnitSelectorDialog Display
++ PR #2045: Aero Fighter refit heat sink tracking improvements
+
+0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
 + Issue #1888: Founder Filter in Personnel Tab
 + Data: Numerous fixes to RATS, Mechfiles, Sprites, and update Unit Roles.
@@ -32,6 +43,26 @@ VERSION HISTORY:
 + Issue #1166: Possible fix for missing turrets in AtB base attack/defense missions; still no turrets prior to 2750
 + Issue #1757: Enable Ranks For Captured Prisoners
 + Data: Large dump of current data.
++ Issue #259: Implementing Customizable MekHQ Display Date Formats
++ Issue #1982: Fixing AtBBattleChance for unassigned lances
++ Issue #1984: Implementing useManualMarriages Option
++ Issue #1983: Switching to new form of UUID save format
++ Issue #1952: Personnel Market Updates No Longer Fail in Rare Cases During Person Creation
++ Issue #1981: Fixing NPE when dragging TOE Units and Forces Around
++ PR #1999: Fixing Clan Vehicle Option
++ Issue #2003: Various faction startingPlanet errors in factions.xml
++ PR #2005: AtB: OpFor Uses VTOLs is now default true
++ Issue #1939: Fixing Preset Loading and Reworking Campaign Options Initial Value Load
++ PR #2008: Avoid several process-stopping errors when upgrading bot units with SPAs
++ Issue #2007: Correct required heat sink calculation for refits
++ PR #2009: Moving the Misc Tab to MekHQOptions, Fixing UnitMarketReportRefresh, Properly Localizing lblOpforLocalForceLikelihood
++ Issue #2001: Fixing Lance Display Ordinal Comparison
++ PR #2013: Adding MekHQ option to prefer GZIP in campaign saves
++ Issue #1866: Implementing New Day MRMS Option
++ Issue #630: Improved tracking of integrated heat sink changes during refit
++ Issue #1252: Spare "Targeting Computer" not used on config change, new one ordered instead
++ Issue #2026: Don't add phantom parts to warehouse when refitting unit
++ PR #2011: Command Center Unit Market and MRMS MekHQ Display Options
 
 0.47.9 (2020-08-07 1830 UTC)
 + Issue #1894: Adding additional legacy date format

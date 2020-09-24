@@ -18,7 +18,7 @@
  */
 package mekhq.gui.model;
 
-import mekhq.campaign.Campaign;
+import mekhq.MekHQ;
 import mekhq.campaign.Kill;
 
 import javax.swing.*;
@@ -30,7 +30,6 @@ import java.util.List;
 public class KillTableModel extends AbstractTableModel {
     private static final long serialVersionUID = -58915479895694545L;
 
-    private Campaign campaign;
     protected List<Kill> data;
 
     public final static int COL_DATE    = 0;
@@ -38,10 +37,9 @@ public class KillTableModel extends AbstractTableModel {
     public final static int COL_KILLER  = 2;
     public final static int N_COL       = 3;
 
-    public KillTableModel(Campaign campaign, List<Kill> entries) {
+    public KillTableModel(List<Kill> entries) {
         assert entries != null;
         data = entries;
-        this.campaign = campaign;
     }
 
     @Override
@@ -78,7 +76,7 @@ public class KillTableModel extends AbstractTableModel {
         }
         switch (col) {
             case COL_DATE:
-                return campaign.getCampaignOptions().getDisplayFormattedDate(kill.getDate());
+                return MekHQ.getMekHQOptions().getDisplayFormattedDate(kill.getDate());
             case COL_KILLED:
                 return kill.getWhatKilled();
             case COL_KILLER:

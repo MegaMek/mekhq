@@ -3,7 +3,6 @@
 	<title>Simple Presets</title>
 	<description>This set of presets attempts to provide the simplest rules settings possible for those who just want to get into the action. Acquisitions are automatic and maintenance is turned off.</description>
 	<campaignOptions>
-		<displayDateFormat>yyyy-MM-dd</displayDateFormat>
 		<logMaintenance>false</logMaintenance>
 		<useFactionForNames>true</useFactionForNames>
 		<repairSystem>0</repairSystem>

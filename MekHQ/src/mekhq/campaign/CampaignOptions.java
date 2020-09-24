@@ -21,8 +21,6 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -111,7 +109,6 @@ public class CampaignOptions implements Serializable {
     //region General Tab
     private boolean useUnitRating;
     private UnitRatingMethod unitRatingMethod;
-    private String displayDateFormat; // This is currently unlisted, but will be added in the near future
     //endregion General Tab
 
     //region Repair and Maintenance Tab
@@ -217,6 +214,7 @@ public class CampaignOptions implements Serializable {
     private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
     private boolean logMarriageNameChange;
+    private boolean useManualMarriages;
     private boolean useRandomMarriages;
     private double chanceRandomMarriages;
     private int marriageAgeRange;
@@ -333,6 +331,9 @@ public class CampaignOptions implements Serializable {
     private boolean useAtB;
     private int skillLevel;
 
+    // AtB Module: Unit Market // TODO : Fully Implement Me
+    private boolean useAtBUnitMarket;
+
     // Unit Administration
     private boolean useShareSystem;
     private boolean sharesExcludeLargeCraft;
@@ -364,7 +365,7 @@ public class CampaignOptions implements Serializable {
     private int baseStrategyDeployment;
     private int additionalStrategyDeployment;
     private boolean adjustPaymentForStrategy;
-    private double[] atbBattleChance;
+    private int[] atbBattleChance;
     private boolean generateChases;
 
     // RATs
@@ -391,12 +392,7 @@ public class CampaignOptions implements Serializable {
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
     private boolean useAtBCapture; // TODO : merge me with the Personnel Option capturePrisoners
-    private int startGameDelay;
     //endregion Against the Bot Tab
-
-    //region Miscellaneous Tab
-    private boolean historicalDailyLog;
-    //endregion Miscellaneous Tab
     //endregion Variable Declarations
 
     //region Constructors
@@ -422,7 +418,6 @@ public class CampaignOptions implements Serializable {
         //region General Tab
         useUnitRating = true;
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
-        displayDateFormat = "yyyy-MM-dd";
         //endregion General Tab
 
         //region Repair and Maintenance Tab
@@ -547,6 +542,7 @@ public class CampaignOptions implements Serializable {
         minimumMarriageAge = 16;
         checkMutualAncestorsDepth = 4;
         logMarriageNameChange = false;
+        useManualMarriages = true;
         useRandomMarriages = false;
         chanceRandomMarriages = 0.00025;
         marriageAgeRange = 10;
@@ -722,6 +718,9 @@ public class CampaignOptions implements Serializable {
         useAtB = false;
         skillLevel = 2;
 
+        // AtB Module: Unit Market
+        useAtBUnitMarket = false;
+
         // Unit Administration
         useShareSystem = false;
         sharesExcludeLargeCraft = false;
@@ -753,7 +752,7 @@ public class CampaignOptions implements Serializable {
         baseStrategyDeployment = 3;
         additionalStrategyDeployment = 1;
         adjustPaymentForStrategy = false;
-        atbBattleChance = new double[AtBLanceRole.values().length - 1];
+        atbBattleChance = new int[AtBLanceRole.values().length - 1];
         atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = 40;
         atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = 20;
         atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = 60;
@@ -784,27 +783,11 @@ public class CampaignOptions implements Serializable {
         useLightConditions = true;
         usePlanetaryConditions = false;
         useAtBCapture = false;
-        startGameDelay = 500;
         //endregion Against the Bot Tab
-
-        //region Miscellaneous Tab
-        historicalDailyLog = false;
-        //endregion Miscellaneous Tab
     }
     //endregion Constructors
 
     //region General Tab
-    public String getDisplayDateFormat() {
-        return displayDateFormat;
-    }
-
-    public String getDisplayFormattedDate(LocalDate date) {
-        return date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()));
-    }
-
-    public void setDisplayDateFormat(String s) {
-        displayDateFormat = s;
-    }
     //endregion General Tab
 
     //region Repair and Maintenance Tab
@@ -1260,6 +1243,20 @@ public class CampaignOptions implements Serializable {
      */
     public void setLogMarriageNameChange(boolean b) {
         logMarriageNameChange = b;
+    }
+
+    /**
+     * @return whether or not to use manual marriages
+     */
+    public boolean useManualMarriages() {
+        return useManualMarriages;
+    }
+
+    /**
+     * @param useManualMarriages whether or not to use manual marriages
+     */
+    public void setUseManualMarriages(boolean useManualMarriages) {
+        this.useManualMarriages = useManualMarriages;
     }
 
     /**
@@ -2201,14 +2198,6 @@ public class CampaignOptions implements Serializable {
         adminXPPeriod = m;
     }
 
-    public boolean historicalDailyLog() {
-        return historicalDailyLog;
-    }
-
-    public void setHistoricalDailyLog(boolean b) {
-        this.historicalDailyLog = b;
-    }
-
     public int getEdgeCost() {
         return edgeCost;
     }
@@ -2515,6 +2504,14 @@ public class CampaignOptions implements Serializable {
         this.useAtB = useAtB;
     }
 
+    public boolean getUseAtBUnitMarket() {
+        return useAtBUnitMarket;
+    }
+
+    public void setUseAtBUnitMarket(boolean useAtBUnitMarket) {
+        this.useAtBUnitMarket = useAtBUnitMarket;
+    }
+
     public boolean getUseAero() {
         return useAero;
     }
@@ -2767,19 +2764,19 @@ public class CampaignOptions implements Serializable {
      * @param role the {@link AtBLanceRole} to get the battle chance for
      * @return the chance of having a battle for the specified role
      */
-    public double getAtBBattleChance(AtBLanceRole role) {
-        return atbBattleChance[role.ordinal()];
+    public int getAtBBattleChance(AtBLanceRole role) {
+        return (role == AtBLanceRole.UNASSIGNED) ? 0 : atbBattleChance[role.ordinal()];
     }
 
     /**
      * @param role      the {@link AtBLanceRole} ordinal value
-     * @param frequency the frequency to set the generation to (chance from 0 to 1)
+     * @param frequency the frequency to set the generation to (percent chance from 0 to 100)
      */
-    public void setAtBBattleChance(int role, Double frequency) {
-        if (frequency < 0.0) {
-            frequency = 0.0;
-        } else if (frequency > 1.0) {
-            frequency = 1.0;
+    public void setAtBBattleChance(int role, int frequency) {
+        if (frequency < 0) {
+            frequency = 0;
+        } else if (frequency > 100) {
+            frequency = 100;
         }
 
         this.atbBattleChance[role] = frequency;
@@ -2913,13 +2910,6 @@ public class CampaignOptions implements Serializable {
         unitMarketReportRefresh = refresh;
     }
 
-    public int getStartGameDelay() {
-        return startGameDelay;
-    }
-
-    public void setStartGameDelay(int delay) {
-        startGameDelay = delay;
-    }
     public boolean massRepairUseExtraTime() {
         return massRepairUseExtraTime;
     }
@@ -2977,7 +2967,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public List<MassRepairOption> getMassRepairOptions() {
-        return massRepairOptions;
+        return (massRepairOptions != null) ? massRepairOptions : new ArrayList<>();
     }
 
     public void setMassRepairOptions(List<MassRepairOption> massRepairOptions) {
@@ -3043,7 +3033,6 @@ public class CampaignOptions implements Serializable {
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         //region General Tab
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayDateFormat", displayDateFormat);
         //endregion General Tab
 
         //region Repair and Maintenance Tab
@@ -3145,6 +3134,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMarriageNameChange", logMarriageNameChange);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useManualMarriages", useManualMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomMarriages", useRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomMarriages", chanceRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageAgeRange", marriageAgeRange);
@@ -3279,13 +3269,11 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBCapture", useAtBCapture);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "startGameDelay", startGameDelay);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforAeros", allowOpforAeros);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "historicalDailyLog", historicalDailyLog);
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseExtraTime", massRepairUseExtraTime);
@@ -3352,6 +3340,8 @@ public class CampaignOptions implements Serializable {
                     + csv.toString()
                     + "</usePortraitForType>");
 
+        //region AtB Options
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAtBUnitMarket", useAtBUnitMarket);
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<rats>"
                 + MekHqXmlUtil.escape(StringUtils.join(rats, ','))
@@ -3362,14 +3352,12 @@ public class CampaignOptions implements Serializable {
         if (ignoreRatEra) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<ignoreRatEra/>");
         }
+        //endregion AtB Options
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-        final String METHOD_NAME = "generateCampaignOptionsFromXml(Node)";
-
-        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                "Loading Campaign Options from XML...");
+        MekHQ.getLogger().info(CampaignOptions.class, "Loading Campaign Options from XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3384,15 +3372,10 @@ public class CampaignOptions implements Serializable {
                 continue;
             }
 
-            MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                    String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
-            //region General Tab
-            if (wn2.getNodeName().equalsIgnoreCase("displayDateFormat")) {
-                retVal.displayDateFormat = wn2.getTextContent().trim();
-            //endregion General Tab
+            MekHQ.getLogger().info(CampaignOptions.class, String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
 
             //region Repair and Maintenance Tab
-            } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
+            if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
                 retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
                 retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
@@ -3612,6 +3595,8 @@ public class CampaignOptions implements Serializable {
                 retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) {
                 retVal.logMarriageNameChange = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {
+                retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
                 retVal.useRandomMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
@@ -3627,8 +3612,7 @@ public class CampaignOptions implements Serializable {
                 } else if (values.length == 9) {
                     migrateMarriageSurnameWeights(retVal, values);
                 } else {
-                    MekHQ.getLogger().error(CampaignOptions.class,
-                            "generateCampaignOptionsFromXml", "");
+                    MekHQ.getLogger().error(CampaignOptions.class, "Unkown length of randomMarriageSurnameWeights");
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
@@ -3796,6 +3780,8 @@ public class CampaignOptions implements Serializable {
                 retVal.tougherHealing = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
                 retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBUnitMarket")) {
+                retVal.setUseAtBUnitMarket(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useAero")) {
                 retVal.useAero = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useVehicles")) {
@@ -3853,14 +3839,21 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
                 double intensity = Double.parseDouble(wn2.getTextContent().trim());
 
-                retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = ((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5;
-                retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = ((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5;
-                retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = ((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5;
-                retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = ((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5;
+                retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
+                retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
+                retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
+                retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
             } else if (wn2.getNodeName().equalsIgnoreCase("atbBattleChance")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
-                    retVal.atbBattleChance[i] = Double.parseDouble(values[i]);
+                    try {
+                        retVal.atbBattleChance[i] = Integer.parseInt(values[i]);
+                    } catch (Exception ignored) {
+                        // Badly coded, but this is to migrate devs and their games as the swap was
+                        // done before a release and is thus better to handle this way than through
+                        // a more code complex method
+                        retVal.atbBattleChance[i] = (int) Math.round(Double.parseDouble(values[i]));
+                    }
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("generateChases")) {
                 retVal.setGenerateChases(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -3896,8 +3889,8 @@ public class CampaignOptions implements Serializable {
                 retVal.contractMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
                 retVal.unitMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) {
-                retVal.startGameDelay = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
+                MekHQ.getMekHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforLocalUnits")) {
                 retVal.allowOpforLocalUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforAeros")) {
@@ -3906,8 +3899,8 @@ public class CampaignOptions implements Serializable {
                 retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
                 retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) {
-                retVal.historicalDailyLog = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
+                MekHQ.getMekHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
                 retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
@@ -3953,8 +3946,8 @@ public class CampaignOptions implements Serializable {
                                     continue;
                                 }
 
-                                MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                                        String.format("massRepairOption %d.%s\n\t%s", //$NON-NLS-1$
+                                MekHQ.getLogger().info(CampaignOptions.class,
+                                        String.format("massRepairOption %d.%s\n\t%s",
                                                 mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
 
                                 if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
@@ -3981,8 +3974,7 @@ public class CampaignOptions implements Serializable {
             }
         }
 
-        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                "Load Campaign Options Complete!"); //$NON-NLS-1$
+        MekHQ.getLogger().info(CampaignOptions.class, "Load Campaign Options Complete!");
 
         return retVal;
     }
@@ -4047,7 +4039,7 @@ public class CampaignOptions implements Serializable {
             this.bthMax = bthMax;
         }
 
-        public static int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO,
+        public static final int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO,
                 Part.REPAIR_PART_TYPE.WEAPON, Part.REPAIR_PART_TYPE.GENERAL_LOCATION, Part.REPAIR_PART_TYPE.ENGINE,
                 Part.REPAIR_PART_TYPE.GYRO, Part.REPAIR_PART_TYPE.ACTUATOR, Part.REPAIR_PART_TYPE.ELECTRONICS,
                 Part.REPAIR_PART_TYPE.POD_SPACE, Part.REPAIR_PART_TYPE.GENERAL };

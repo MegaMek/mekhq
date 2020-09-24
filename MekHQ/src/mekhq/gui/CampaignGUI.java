@@ -246,7 +246,6 @@ public class CampaignGUI extends JPanel {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()); //$NON-NLS-1$
 
         frame = new JFrame("MekHQ"); //$NON-NLS-1$
-        MekHQ.setWindow(frame);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
@@ -1170,7 +1169,7 @@ public class CampaignGUI extends JPanel {
     public void showNews(int id) {
         NewsItem news = getCampaign().getNews().getNewsItem(id);
         if (null != news) {
-            NewsReportDialog nrd = new NewsReportDialog(frame, news, getCampaign());
+            NewsReportDialog nrd = new NewsReportDialog(frame, news);
             nrd.setVisible(true);
         }
     }
@@ -1379,10 +1378,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private String getExtensionForSaveFile(Campaign c) {
-        if (c.getPreferGzippedOutput()) {
-            return ".cpnx.gz";
-        }
-        return ".cpnx";
+        return MekHQ.getMekHQOptions().getPreferGzippedOutput() ? ".cpnx.gz" : ".cpnx";
     }
 
     private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1429,7 +1425,7 @@ public class CampaignGUI extends JPanel {
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
-                getCampaign(), getIconPackage().getCamos(), getIconPackage().getForceIcons());
+                getCampaign(), getIconPackage());
         cod.setVisible(true);
         if (timeIn != getCampaign().getCampaignOptions().getUseTimeInService()) {
             if (getCampaign().getCampaignOptions().getUseTimeInService()) {
@@ -1586,6 +1582,7 @@ public class CampaignGUI extends JPanel {
         }
         AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(), unitLoadingDialog,
                 getCampaign(), true);
+        usd.setVisible(true);
     }
 
     private void buyParts() {
@@ -1896,8 +1893,8 @@ public class CampaignGUI extends JPanel {
                         String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            report = getCampaign().getFinances().exportFinancesToCSV(getCampaign(),
-                                    file.getPath(), format.getRecommendedExtension());
+                            report = getCampaign().getFinances().exportFinancesToCSV(file.getPath(),
+                                    format.getRecommendedExtension());
                         } else {
                             report = "Unsupported FileType in Export Finances";
                         }

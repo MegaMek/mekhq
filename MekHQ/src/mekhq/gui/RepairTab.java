@@ -19,8 +19,6 @@
 package mekhq.gui;
 
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -64,6 +62,7 @@ import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
+import mekhq.service.MassRepairMassSalvageMode;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
@@ -140,32 +139,32 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         // Add panel for action buttons
         JPanel actionButtons = new JPanel(new GridBagLayout());
 
-        JButton btnMRMSDialog = new JButton();
-        btnMRMSDialog.setText("Mass Repair/Salvage");
+        JButton btnMRMSDialog = new JButton("Mass Repair/Salvage");
         btnMRMSDialog.setToolTipText("Start Mass Repair/Salvage from dialog");
         btnMRMSDialog.setName("btnMRMSDialog");
         btnMRMSDialog.addActionListener(ev -> {
             MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(getFrame(), true,
-                    getCampaignGui(), null, MassRepairSalvageDialog.MODE.UNITS);
+                    getCampaignGui(), null, MassRepairMassSalvageMode.UNITS);
             dlg.setVisible(true);
         });
 
-        JButton btnMRMSInstantAll = new JButton();
-        btnMRMSInstantAll.setText("Instant Mass Repair/Salvage All");
-        btnMRMSInstantAll
-                .setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
+        JButton btnMRMSInstantAll = new JButton("Instant Mass Repair/Salvage All");
+        btnMRMSInstantAll.setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
         btnMRMSInstantAll.setName("btnMRMSInstantAll");
-        btnMRMSInstantAll.addActionListener(ev -> MassRepairService.massRepairSalvageAllUnits(getCampaignGui()));
+        btnMRMSInstantAll.addActionListener(ev -> {
+            MassRepairService.massRepairSalvageAllUnits(getCampaign());
+            JOptionPane.showMessageDialog(getCampaignGui().getFrame(), "Mass Repair/Salvage complete.",
+                    "Complete", JOptionPane.INFORMATION_MESSAGE);
+        });
 
-		btnAcquisitions = new JButton();
-		btnAcquisitions.setText("Parts");
-		btnAcquisitions.setToolTipText("Show missing/in transit/on order parts");
-		btnAcquisitions.setName("btnAcquisitions");
-		btnAcquisitions.addActionListener(ev -> {
-			AcquisitionsDialog dlg = new AcquisitionsDialog(getFrame(), true, getCampaignGui());
-			dlg.setVisible(true);
-		});
-		btnAcquisitions.addPropertyChangeListener("counts", evt -> {
+        btnAcquisitions = new JButton("Parts");
+        btnAcquisitions.setToolTipText("Show missing/in transit/on order parts");
+        btnAcquisitions.setName("btnAcquisitions");
+        btnAcquisitions.addActionListener(ev -> {
+            AcquisitionsDialog dlg = new AcquisitionsDialog(getFrame(), true, getCampaignGui());
+            dlg.setVisible(true);
+        });
+        btnAcquisitions.addPropertyChangeListener("counts", evt -> {
             String txt = "Parts Acquisition";
 
             if (PartsAcquisitionService.getMissingCount() > 0) {
@@ -195,14 +194,14 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         actionButtons.add(btnMRMSInstantAll, gridBagConstraints);
 
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.weighty = 1;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		actionButtons.add(btnAcquisitions, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weighty = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        actionButtons.add(btnAcquisitions, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -872,13 +871,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         refreshPartsAcquisitionService(true);
     }
 
-	public void refreshPartsAcquisitionService(boolean rebuildPartsList) {
-		if (rebuildPartsList) {
-			PartsAcquisitionService.buildPartsList(getCampaign());
-		}
+    public void refreshPartsAcquisitionService(boolean rebuildPartsList) {
+        if (rebuildPartsList) {
+            PartsAcquisitionService.buildPartsList(getCampaign());
+        }
 
-		btnAcquisitions.firePropertyChange("counts", -1, 0);
-	}
+        btnAcquisitions.firePropertyChange("counts", -1, 0);
+    }
 
     private ActionScheduler servicedUnitListScheduler = new ActionScheduler(this::refreshServicedUnitList);
     private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);

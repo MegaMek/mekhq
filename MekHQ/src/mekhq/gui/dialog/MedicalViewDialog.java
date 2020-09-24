@@ -335,7 +335,7 @@ public class MedicalViewDialog extends JDialog {
             surname = p.getBloodname();
         }
 
-        String birthdayString = campaign.getCampaignOptions().getDisplayFormattedDate(p.getBirthday());
+        String birthdayString = MekHQ.getMekHQOptions().getDisplayFormattedDate(p.getBirthday());
 
         Period age = Period.between(p.getBirthday(), c.getLocalDate());
 
@@ -381,7 +381,7 @@ public class MedicalViewDialog extends JDialog {
         Map<String, List<LogEntry>> groupedEntries = p.getPersonnelLog().stream()
             .filter(entry -> entry.getType() == LogEntryType.MEDICAL)
             .sorted(Comparator.comparing(LogEntry::getDate))
-            .collect(Collectors.groupingBy(entry -> c.getCampaignOptions().getDisplayFormattedDate(entry.getDate())));
+            .collect(Collectors.groupingBy(entry -> MekHQ.getMekHQOptions().getDisplayFormattedDate(entry.getDate())));
         groupedEntries.entrySet().stream()
             .filter(e -> !e.getValue().isEmpty())
             .sorted(Map.Entry.comparingByKey())
@@ -394,11 +394,11 @@ public class MedicalViewDialog extends JDialog {
                         wrapper.setOpaque(false);
                         wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
                         wrapper.add(Box.createHorizontalStrut(60));
-                        wrapper.add(genWrittenText(String.format(resourceMap.getString("historyText.format"), entry.getDesc()))); //$NON-NLS-1$
+                        wrapper.add(genWrittenText(String.format(resourceMap.getString("historyText.format"), entry.getDesc())));
                         panel.add(wrapper);
                     });
                 } else {
-                    panel.add(genWrittenText(String.format(resourceMap.getString("historyDateAndText.format"), e.getKey(), e.getValue().get(0).getDesc()))); //$NON-NLS-1$
+                    panel.add(genWrittenText(String.format(resourceMap.getString("historyDateAndText.format"), e.getKey(), e.getValue().get(0).getDesc())));
                 }
             });
         return panel;
@@ -464,15 +464,15 @@ public class MedicalViewDialog extends JDialog {
                     if (inj.getType().isPermanent()) {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesText.format"),
                                 inj.getType().getSimpleName(),
-                                c.getCampaignOptions().getDisplayFormattedDate(inj.getStart())));
+                                MekHQ.getMekHQOptions().getDisplayFormattedDate(inj.getStart())));
                     } else if (inj.isPermanent() || (inj.getTime() <= 0)) {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesPermanent.format"),
                                 inj.getType().getSimpleName(),
-                                c.getCampaignOptions().getDisplayFormattedDate(inj.getStart())));
+                                MekHQ.getMekHQOptions().getDisplayFormattedDate(inj.getStart())));
                     } else {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesTextAndDuration.format"),
                                 inj.getType().getSimpleName(),
-                                c.getCampaignOptions().getDisplayFormattedDate(inj.getStart()),
+                                MekHQ.getMekHQOptions().getDisplayFormattedDate(inj.getStart()),
                                 genTimePeriod(inj.getTime())));
                     }
 

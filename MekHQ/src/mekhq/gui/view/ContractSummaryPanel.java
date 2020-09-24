@@ -29,6 +29,7 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.ContractMarket;
@@ -265,7 +266,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblStartDate, gridBagConstraintsLabels);
 
-        JLabel txtStartDate = new JLabel(campaign.getCampaignOptions().getDisplayFormattedDate(contract.getStartDate()));
+        JLabel txtStartDate = new JLabel(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         txtStartDate.setName("txtStartDate");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtStartDate, gridBagConstraintsText);

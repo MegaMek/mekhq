@@ -292,7 +292,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public AtBScenario checkForBattle(Campaign c) {
         // Make sure there is a battle first
-        if ((c.getCampaignOptions().getAtBBattleChance(role) == 0.0)
+        if ((c.getCampaignOptions().getAtBBattleChance(role) == 0)
                 || (Compute.randomInt(100) > c.getCampaignOptions().getAtBBattleChance(role))) {
             // No battle
             return null;
@@ -469,7 +469,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "forceId", forceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "missionId", missionId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "role", role.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commanderId", commanderId.toString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commanderId", commanderId);
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "lance");
     }
 

@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.campaign.log.LogEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
@@ -46,9 +47,6 @@ import mekhq.preferences.PreferencesNode;
 
 public class HistoricalDailyReportDialog extends JDialog {
     private static final long serialVersionUID = -4373796917722483042L;
-
-    // max number of days that will be stored in the history, also used as a limit in the UI
-    public static final int MAX_DAYS_HISTORY = 120;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HistoricalDailyReportDialog", new EncodeControl()); //$NON-NLS-1$
 
@@ -81,9 +79,9 @@ public class HistoricalDailyReportDialog extends JDialog {
 
         getContentPane().setLayout(new GridBagLayout());
 
-        if (gui.getCampaign().getCampaignOptions().historicalDailyLog()) {
+        if (MekHQ.getMekHQOptions().getHistoricalDailyLog()) {
             pickTimeLabel = new JLabel(resourceMap.getString("pickTime.text"));
-            Integer[] days = new Integer[] {7, 30, 60, 90, MAX_DAYS_HISTORY};
+            Integer[] days = new Integer[] {7, 30, 60, 90, MekHqConstants.MAX_HISTORICAL_LOG_DAYS};
             pickTime = new JComboBox<>(days);
             logPanel = new DailyReportLogPanel(gui);
             daysLabel = new JLabel(resourceMap.getString("days.text"));
@@ -155,7 +153,7 @@ public class HistoricalDailyReportDialog extends JDialog {
                 if (!log.getDate().equals(trackDay)) {
                     logPanel.appendLog(Collections.singletonList("<hr>"));
                     logPanel.appendLog(Collections.singletonList("<b>"
-                            + gui.getCampaign().getCampaignOptions().getDisplayFormattedDate(log.getDate())
+                            + MekHQ.getMekHQOptions().getDisplayFormattedDate(log.getDate())
                             + "</b>"));
                     logPanel.appendLog(Collections.singletonList("<br><br>"));
                     trackDay = log.getDate();

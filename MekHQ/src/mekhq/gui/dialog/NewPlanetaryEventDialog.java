@@ -154,7 +154,7 @@ public class NewPlanetaryEventDialog extends JDialog {
                 } else {
                     date = date.minusDays(1);
                 }
-                updateDate(campaign);
+                updateDate();
             }
         }), gbc);
 
@@ -171,7 +171,7 @@ public class NewPlanetaryEventDialog extends JDialog {
                 DateChooser dc = new DateChooser((content instanceof JFrame) ? (JFrame) content : null, date);
                 if (dc.showDateChooser() == DateChooser.OK_OPTION) {
                     date = dc.getDate();
-                    updateDate(campaign);
+                    updateDate();
                 }
             }
         });
@@ -197,7 +197,7 @@ public class NewPlanetaryEventDialog extends JDialog {
                 } else {
                     date = date.plusDays(1);
                 }
-                updateDate(campaign);
+                updateDate();
             }
         }), gbc);
 
@@ -243,7 +243,7 @@ public class NewPlanetaryEventDialog extends JDialog {
             }
         }), gbc);
 
-        updateDate(campaign);
+        updateDate();
         pack();
     }
 
@@ -256,13 +256,13 @@ public class NewPlanetaryEventDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateEvent((Component) e.getSource(), planet.getOrCreateEvent(date));
-                updateDate(campaign);
+                updateDate();
             }
         };
 
         ChangeListener changeListener = e -> {
             updateEvent((Component) e.getSource(), planet.getOrCreateEvent(date));
-            updateDate(campaign);
+            updateDate();
         };
 
         Action noChangeAction = new AbstractAction() {
@@ -274,7 +274,7 @@ public class NewPlanetaryEventDialog extends JDialog {
                 String field = check.getName();
                 if (check.isSelected()) {
                     cleanEventField(getCurrentEvent(), field);
-                    updateDate(campaign);
+                    updateDate();
                 }
             }
         };
@@ -381,7 +381,7 @@ public class NewPlanetaryEventDialog extends JDialog {
                     event.faction = chooser.getResult();
                     event.custom = true;
                     planet.refreshEvents();
-                    updateDate(campaign);
+                    updateDate();
                 }
             }
         });
@@ -469,8 +469,8 @@ public class NewPlanetaryEventDialog extends JDialog {
         return planet.getEvent(date);
     }
 
-    private void updateDate(Campaign campaign) {
-        dateButton.setText(campaign.getCampaignOptions().getDisplayFormattedDate(date));
+    private void updateDate() {
+        dateButton.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         Planet.PlanetaryEvent event = getCurrentEvent();
 
         messageField.setText((null != event) ? event.message : null);
