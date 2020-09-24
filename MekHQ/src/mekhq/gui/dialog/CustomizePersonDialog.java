@@ -110,6 +110,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private Campaign campaign;
 
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog",
+            new EncodeControl());
+
     /** Creates new form CustomizePilotDialog */
     public CustomizePersonDialog(JFrame parent, boolean modal, Person person, Campaign campaign) {
         super(parent, modal);
@@ -169,7 +172,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JButton btnRandomName = new JButton();
         JButton btnRandomBloodname = new JButton();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title")); // NOI18N
@@ -350,8 +352,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choiceFaction.setSelectedIndex(factionsModel.getIndexOf(person.getOriginFaction()));
         choiceFaction.addActionListener(evt -> {
             // Update the clan check box based on the new selected faction
-            Faction selectedFaction = (Faction)choiceFaction.getSelectedItem();
-            chkClan.setSelected(selectedFaction.is(Tag.CLAN));
+            Faction selectedFaction = (Faction) choiceFaction.getSelectedItem();
+            if (selectedFaction != null) {
+                chkClan.setSelected(selectedFaction.isClan());
+            }
 
             // We don't have to call backgroundChanged because it is already
             // called when we update the chkClan checkbox.
@@ -393,7 +397,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 super.getListCellRendererComponent(list, value, index, isSelected,
                                                    cellHasFocus);
                 if (value instanceof PlanetarySystem) {
-                    PlanetarySystem system = (PlanetarySystem)value;
+                    PlanetarySystem system = (PlanetarySystem) value;
                     setText(system.getName(campaign.getLocalDate()));
                 }
 
@@ -453,7 +457,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 super.getListCellRendererComponent(list, value, index, isSelected,
                                                    cellHasFocus);
                 if (value instanceof Planet) {
-                    Planet planet = (Planet)value;
+                    Planet planet = (Planet) value;
                     setText(planet.getName(campaign.getLocalDate()));
                 }
 
@@ -663,7 +667,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 if (null == value) {
                     setText("None");
                 } else {
-                    setText(((Unit)value).getName());
+                    setText(((Unit) value).getName());
                 }
                 return this;
             }
@@ -821,7 +825,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         getContentPane().add(panButtons, gridBagConstraints);
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(CustomizePersonDialog.class);
@@ -921,16 +925,17 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
     }
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(ActionEvent evt) {
         setVisible(false);
-    }// GEN-LAST:event_btnCloseActionPerformed
+    }
 
-    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOkActionPerformed
+    private void btnOkActionPerformed(ActionEvent evt) {
         person.setGivenName(textGivenName.getText());
         person.setSurname(textSurname.getText());
         person.setHonorific(textHonorific.getText());
         person.setCallsign(textNickname.getText());
-        person.setBloodname(textBloodname.getText());
+        person.setBloodname(textBloodname.getText().equals(resourceMap.getString("textBloodname.error"))
+                ? "" : textBloodname.getText());
         person.setBiography(txtBio.getText());
         if (choiceGender.getSelectedItem() != null) {
             person.setGender(person.getGender().isInternal()
@@ -956,13 +961,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
             person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
         } else {
-            person.setOriginalUnitId(((Unit)choiceOriginalUnit.getSelectedItem()).getId());
+            person.setOriginalUnitId(((Unit) choiceOriginalUnit.getSelectedItem()).getId());
         }
         person.setFounder(chkFounder.isSelected());
         setSkills();
         setOptions();
         setVisible(false);
-    }//GEN-LAST:event_btnOkActionPerformed
+    }
 
     private void randomName() {
         String factionCode = campaign.getCampaignOptions().useOriginFactionForNames()
@@ -976,14 +981,14 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void randomBloodname() {
-        textBloodname.setText(Bloodname.randomBloodname(campaign.getFaction().isClan()
-                ? campaign.getFactionCode() : person.getOriginFaction().getShortName(),
-                person.getPhenotype(), campaign.getGameYear()).getName());
+        Faction faction = campaign.getFaction().isClan() ? campaign.getFaction()
+                : (Faction) choiceFaction.getSelectedItem();
+        faction = ((faction != null) && faction.isClan()) ? faction : person.getOriginFaction();
+        Bloodname bloodname = Bloodname.randomBloodname(faction.getShortName(), person.getPhenotype(), campaign.getGameYear());
+        textBloodname.setText((bloodname != null) ? bloodname.getName() : resourceMap.getString("textBloodname.error"));
     }
 
     public void refreshSkills() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog",
-                new EncodeControl());
         panSkills.removeAll();
 
         JCheckBox chkSkill;
@@ -1137,8 +1142,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void addGroup(IOptionGroup group, GridBagLayout gridBag, GridBagConstraints c) {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog", new EncodeControl()); //$NON-NLS-1$
-        JLabel groupLabel = new JLabel(resourceMap.getString("optionGroup." + group.getKey())); //$NON-NLS-1$
+        JLabel groupLabel = new JLabel(resourceMap.getString("optionGroup." + group.getKey()));
 
         gridBag.setConstraints(groupLabel, c);
         panOptions.add(groupLabel);
@@ -1147,7 +1151,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private void addOption(IOption option, GridBagLayout gridBag, GridBagConstraints c, boolean editable) {
         DialogOptionComponent optionComp = new DialogOptionComponent(this, option, editable);
 
-        if (OptionsConstants.GUNNERY_WEAPON_SPECIALIST.equals(option.getName())) { //$NON-NLS-1$
+        if (OptionsConstants.GUNNERY_WEAPON_SPECIALIST.equals(option.getName())) {
             optionComp.addValue(Crew.SPECIAL_NONE);
             //holy crap, do we really need to add every weapon?
             for (Enumeration<EquipmentType> i = EquipmentType.getAllTypes(); i.hasMoreElements();) {
@@ -1238,7 +1242,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void btnDateActionPerformed(ActionEvent evt) {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog", new EncodeControl());
         // show the date chooser
         DateChooser dc = new DateChooser(frame, birthdate);
         // user can either choose a date or cancel by closing
