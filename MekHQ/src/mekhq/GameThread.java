@@ -13,7 +13,7 @@ package mekhq;
 
 import java.awt.KeyboardFocusManager;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import megamek.client.Client;
 import megamek.client.CloseClientListener;
@@ -38,17 +38,17 @@ class GameThread extends Thread implements CloseClientListener {
     protected Campaign campaign;
     protected boolean started;
 
-    protected ArrayList<Unit> units;
+    protected List<Unit> units;
 
     protected volatile boolean stop = false;
     //endregion Variable Declarations
 
     //region Constructors
-    public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units) {
+    public GameThread(String name, Client c, MekHQ app, List<Unit> units) {
         this(name, c, app, units, true);
     }
 
-    public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, boolean started) {
+    public GameThread(String name, Client c, MekHQ app, List<Unit> units, boolean started) {
         super(name);
         myname = name.trim();
         this.client = c;

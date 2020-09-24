@@ -4,6 +4,11 @@ VERSION HISTORY:
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo
 + Issue #2032: Fixing Campaign Options Save following Preset Load
 + PR #2023: Moving StartGameDelay to MekHQOptions
++ Issue #2036: OmniVehicle config changes require omnipod heat sinks
++ Issue #2039: Subcontract Check NPE
++ Issue #1892: Launch Game Dialog Standardization
++ PR #2022: GM Tools Name and Callsign Generation
++ PR #2046: Fixing duplicated MekHQUnitSelectorDialog Display
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
