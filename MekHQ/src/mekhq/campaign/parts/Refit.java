@@ -1453,7 +1453,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 oldUnit.getCampaign().removePart(part);
                 continue;
             }
-            else if (part instanceof AeroHeatSink && newEntity instanceof Aero && !part.isOmniPodded()) {
+            else if ((part instanceof AeroHeatSink) && (newEntity instanceof Aero) && !part.isOmniPodded()) {
                 if (expectedHeatSinkParts > 0) {
                     expectedHeatSinkParts--;
                 } else {
