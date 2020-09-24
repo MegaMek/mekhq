@@ -483,10 +483,8 @@ public class AcquisitionsDialog extends JDialog {
             btnUseBonus = new JButton(String.format("Use Bonus Part (%s)", numBonusParts));
             btnUseBonus.setToolTipText("Use a bonus part to acquire this item");
             btnUseBonus.setName("btnUseBonus");
-            btnUseBonus.addActionListener(ev -> useBonusPart());
             btnUseBonus.setVisible(numBonusParts > 0);
-
-
+            btnUseBonus.addActionListener(ev -> useBonusPart());
             actionButtons.add(btnUseBonus, gbcActions);
             gbcActions.gridy++;
 
@@ -499,43 +497,36 @@ public class AcquisitionsDialog extends JDialog {
                             1, campaignGUI.getCampaign());
                     refresh();
                 });
-
                 actionButtons.add(btnOrderOne, gbcActions);
                 gbcActions.gridy++;
 
                 btnOrderAll = new JButton("Order All (" + partCountInfo.getMissingCount() + ")");
                 btnOrderAll.setToolTipText("Order all missing");
                 btnOrderAll.setName("btnOrderAll");
+                btnOrderAll.setVisible(partCountInfo.getMissingCount() > 1);
                 btnOrderAll.addActionListener(ev -> orderAllMissing());
-
                 actionButtons.add(btnOrderAll, gbcActions);
                 gbcActions.gridy++;
+            }
 
-                if (partCountInfo.getMissingCount() <= 1) {
-                    btnOrderAll.setVisible(false);
+            btnDepod = new JButton("Remove One From Pod");
+            btnDepod.setToolTipText("Remove replacement from pod");
+            btnDepod.setName("btnDepod");
+            btnDepod.setVisible(partCountInfo.getOmniPodCount() > 0);
+            btnDepod.addActionListener(ev -> {
+                MissingPart podded = part.getMissingPart();
+                podded.setOmniPodded(true);
+                Part replacement = podded.findReplacement(false);
+
+                if (replacement != null) {
+                    campaignGUI.getCampaign().depodPart(replacement, 1);
+                    MekHQ.triggerEvent(new PartChangedEvent(replacement));
                 }
-            }
 
-            if (partCountInfo.getOmniPodCount() > 0) {
-                btnDepod = new JButton("Remove One From Pod");
-                btnDepod.setToolTipText("Remove replacement from pod");
-                btnDepod.setName("btnDepod");
-                btnDepod.addActionListener(ev -> {
-                    MissingPart podded = part.getMissingPart();
-                    podded.setOmniPodded(true);
-                    Part replacement = podded.findReplacement(false);
-
-                    if (replacement != null) {
-                        campaignGUI.getCampaign().depodPart(replacement, 1);
-                        MekHQ.triggerEvent(new PartChangedEvent(replacement));
-                    }
-
-                    refresh();
-                });
-
-                actionButtons.add(btnDepod, gbcActions);
-                gbcActions.gridy++;
-            }
+                refresh();
+            });
+            actionButtons.add(btnDepod, gbcActions);
+            gbcActions.gridy++;
 
             if (campaignGUI.getCampaign().isGM()) {
                 JButton btnGM = new JButton("[GM] Acquire Instantly");
@@ -557,7 +548,6 @@ public class AcquisitionsDialog extends JDialog {
 
                     refresh();
                 });
-
                 actionButtons.add(btnGM, gbcActions);
                 gbcActions.gridy++;
             }

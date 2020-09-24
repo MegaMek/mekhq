@@ -294,9 +294,6 @@ public class PartsStoreDialog extends JDialog {
                     if (partsTable.getSelectedRowCount() > 0) {
                         int[] selectedRow = partsTable.getSelectedRows();
                         for (int i : selectedRow) {
-                            if (campaign.totalBonusParts() > 0) {
-                                campaign.addReport(resourceMap.getString("bonusPartLog.text") + " " + partsModel.getPartAt(partsTable.convertRowIndexToModel(i)).getPartName());
-                            }
                             PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
                             addPart(true, campaign.totalBonusParts() > 0, partProxy.getPart(), 1);
                             partProxy.updateTargetAndInventories();

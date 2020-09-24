@@ -152,7 +152,6 @@ import mekhq.campaign.universe.RangedPlanetSelector;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.gui.dialog.HistoricalDailyReportDialog;
 import mekhq.gui.utilities.PortraitFileFactory;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.MassRepairService;
@@ -266,6 +265,8 @@ public class Campaign implements Serializable, ITechManager {
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
     private CampaignSummary campaignSummary;
+
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.campaign");
 
     /** This is used to determine if the player has an active AtB Contract, and is recalculated on load */
     private transient boolean hasActiveContract;
@@ -503,7 +504,7 @@ public class Campaign implements Serializable, ITechManager {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    MekHQ.getLogger().error(getClass(), "initUnitGenerator", e);
+                    MekHQ.getLogger().error(this, e);
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());
@@ -5697,6 +5698,7 @@ public class Campaign implements Serializable, ITechManager {
             if (contract == null) {
                 MekHQ.getLogger().error(this, "AtB: used bonus part but no contract has bonus parts available.");
             } else {
+                addReport(resources.getString("bonusPartLog.text") + " " + targetWork.getAcquisitionPart().getPartName());
                 contract.useBonusPart();
             }
         }
