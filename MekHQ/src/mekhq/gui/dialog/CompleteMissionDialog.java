@@ -131,15 +131,10 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
     	return status;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDone;
     private javax.swing.JButton btnCancel;
     private javax.swing.JLabel lblOutcome;
     private javax.swing.JComboBox<String> choiceOutcome;
     // End of variables declaration//GEN-END:variables
-
 }
