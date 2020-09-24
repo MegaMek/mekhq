@@ -1437,7 +1437,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 (Entity.ETYPE_CONV_FIGHTER | Entity.ETYPE_SMALL_CRAFT | Entity.ETYPE_JUMPSHIP)) == 0)) {
             // Only Aerospace Fighters are expected to have heat sink parts (Mechs handled separately)
             // SmallCraft, Dropship, Jumpship, Warship, and SpaceStation use SpacecraftCoolingSystem instead
-            expectedHeatSinkParts = ((Aero)newEntity).getHeatSinks() - ((Aero)newEntity).getPodHeatSinks() -
+            expectedHeatSinkParts = ((Aero) newEntity).getHeatSinks() - ((Aero) newEntity).getPodHeatSinks() -
                     untrackedHeatSinkCount(newEntity);
         }
         for(int pid : newUnitParts) {
@@ -1447,7 +1447,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                         "part with id " + pid + " not found for refit of " + getDesc()); //$NON-NLS-1$
                 continue;
             }
-            if (part instanceof HeatSink && newEntity instanceof Tank) {
+            if ((part instanceof HeatSink) && (newEntity instanceof Tank)) {
                 // Unit should not have heat sink parts
                 // Remove heat sink parts added for supply chain tracking purposes
                 oldUnit.getCampaign().removePart(part);
