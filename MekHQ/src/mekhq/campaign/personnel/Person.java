@@ -433,8 +433,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return bloodname;
     }
 
-    public void setBloodname(String bn) {
-        bloodname = bn;
+    public void setBloodname(String bloodname) {
+        this.bloodname = bloodname;
+        setFullName();
     }
 
     public Faction getOriginFaction() {
