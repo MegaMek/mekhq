@@ -266,7 +266,7 @@ public class Campaign implements Serializable, ITechManager {
     private IUnitRating unitRating;
     private CampaignSummary campaignSummary;
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.campaign");
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.campaign");
 
     /** This is used to determine if the player has an active AtB Contract, and is recalculated on load */
     private transient boolean hasActiveContract;
