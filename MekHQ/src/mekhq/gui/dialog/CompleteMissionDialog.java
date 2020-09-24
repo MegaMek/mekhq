@@ -21,12 +21,12 @@ import mekhq.preferences.PreferencesNode;
  */
 public class CompleteMissionDialog extends javax.swing.JDialog {
 
-	private static final long serialVersionUID = 8376874926997734492L;
+    private static final long serialVersionUID = 8376874926997734492L;
 
-	Mission mission;
-	int status;
+    Mission mission;
+    int status;
 
-	/** Creates new form */
+    /** Creates new form */
     public CompleteMissionDialog(java.awt.Frame parent, boolean modal, Mission m) {
         super(parent, modal);
         this.mission = m;
@@ -37,7 +37,7 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-    	java.awt.GridBagConstraints gridBagConstraints;
+        java.awt.GridBagConstraints gridBagConstraints;
 
         btnDone = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
@@ -62,13 +62,13 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
         getContentPane().add(lblOutcome, gridBagConstraints);
 
         DefaultComboBoxModel<String> outcomeModel = new DefaultComboBoxModel<String>();
-		for (int i = 1; i < Mission.S_NUM; i++) {
-			outcomeModel.addElement(Mission.getStatusName(i));
-		}
-		choiceOutcome.setModel(outcomeModel);
-		choiceOutcome.setName("choiceOutcome"); // NOI18N
-		choiceOutcome.setSelectedIndex(0);
-		gridBagConstraints = new java.awt.GridBagConstraints();
+        for (int i = 1; i < Mission.S_NUM; i++) {
+            outcomeModel.addElement(Mission.getStatusName(i));
+        }
+        choiceOutcome.setModel(outcomeModel);
+        choiceOutcome.setName("choiceOutcome"); // NOI18N
+        choiceOutcome.setSelectedIndex(0);
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
@@ -118,17 +118,17 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
     }
 
     private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
-    	status = choiceOutcome.getSelectedIndex()+1;
-    	this.setVisible(false);
+        status = choiceOutcome.getSelectedIndex()+1;
+        this.setVisible(false);
     }
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
         status = -1;
-    	this.setVisible(false);
+        this.setVisible(false);
     }
 
     public int getStatus() {
-    	return status;
+        return status;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
