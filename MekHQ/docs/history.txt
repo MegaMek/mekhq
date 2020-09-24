@@ -9,6 +9,7 @@ VERSION HISTORY:
 + Issue #1892: Launch Game Dialog Standardization
 + PR #2022: GM Tools Name and Callsign Generation
 + PR #2046: Fixing duplicated MekHQUnitSelectorDialog Display
++ PR #2045: Aero Fighter refit heat sink tracking improvements
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
