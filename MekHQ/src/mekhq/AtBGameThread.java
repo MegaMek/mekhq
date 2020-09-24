@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -43,7 +44,6 @@ import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
-import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
@@ -55,17 +55,16 @@ import mekhq.campaign.unit.Unit;
  *
  * Enhanced version of GameThread which imports settings and non-player
  * units into the MM game
- *
  */
 public class AtBGameThread extends GameThread {
 
     AtBScenario scenario;
 
-    public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, AtBScenario scenario) {
+    public AtBGameThread(String name, Client c, MekHQ app, List<Unit> units, AtBScenario scenario) {
         this(name, c, app, units, scenario, true);
     }
 
-    public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, AtBScenario scenario, boolean started) {
+    public AtBGameThread(String name, Client c, MekHQ app, List<Unit> units, AtBScenario scenario, boolean started) {
         super(name, c, app, units, started);
         this.scenario = scenario;
     }
