@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
@@ -151,7 +152,6 @@ import mekhq.campaign.universe.RangedPlanetSelector;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.gui.dialog.HistoricalDailyReportDialog;
 import mekhq.gui.utilities.PortraitFileFactory;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.MassRepairService;
@@ -265,6 +265,8 @@ public class Campaign implements Serializable, ITechManager {
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
     private CampaignSummary campaignSummary;
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
 
     /** This is used to determine if the player has an active AtB Contract, and is recalculated on load */
     private transient boolean hasActiveContract;
@@ -5655,12 +5657,45 @@ public class Campaign implements Serializable, ITechManager {
      */
     public int totalBonusParts() {
         int retVal = 0;
-        for (Mission m : getMissions()) {
-            if (m.isActive() && m instanceof AtBContract) {
-                retVal += ((AtBContract) m).getNumBonusParts();
+        if (hasActiveContract()) {
+            for (Contract c : getActiveContracts()) {
+                if (c instanceof AtBContract) {
+                    retVal += ((AtBContract) c).getNumBonusParts();
+                }
             }
         }
         return retVal;
+    }
+
+    public void spendBonusPart(IAcquisitionWork targetWork) {
+        // Can only spend from active contracts, so if there are none we can't spend a bonus part
+        if (!hasActiveContract()) {
+            return;
+        }
+
+        String report = targetWork.find(0);
+
+        if (report.endsWith("0 days.")) {
+            // First, try to spend from the contact the Acquisition's unit is attached to
+            AtBContract contract = getAttachedAtBContract(targetWork.getUnit());
+
+            if (contract == null) {
+                // Then, just the first free one that is active
+                for (Contract c : getActiveContracts()) {
+                    if (((AtBContract) c).getNumBonusParts() > 0) {
+                        contract = (AtBContract) c;
+                        break;
+                    }
+                }
+            }
+
+            if (contract == null) {
+                MekHQ.getLogger().error(this, "AtB: used bonus part but no contract has bonus parts available.");
+            } else {
+                addReport(resources.getString("bonusPartLog.text") + " " + targetWork.getAcquisitionPart().getPartName());
+                contract.useBonusPart();
+            }
+        }
     }
 
     public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {
