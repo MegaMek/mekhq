@@ -2629,10 +2629,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
 
-                    menuItem = new JMenuItem(resourceMap.getString("rollForUnit.text"));
-                    menuItem.setActionCommand(CMD_ROLL_MECH);
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
+                    if (person.getUnitId() != null) {
+                        menuItem = new JMenuItem(resourceMap.getString("rollForUnit.text"));
+                        menuItem.setActionCommand(CMD_ROLL_MECH);
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
+                    }
                 }
                 if (gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
                     menuItem = new JMenuItem(resourceMap.getString("removeAllInjuries.text"));
