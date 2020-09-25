@@ -13,6 +13,7 @@ VERSION HISTORY:
 + PR #2047: Fixing Name Set after Adding a Bloodname
 + PR #2048: Fixing Random Bloodname NPEs when Editing Personnel
 + PR #2050: Fixing Person Tech Unit Id Concurrent Modification Error
++ Issue #2024: Can Repeatedly Complete Missions by Cancelling Retirement Dialog
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
