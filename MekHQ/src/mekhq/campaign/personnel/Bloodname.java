@@ -243,11 +243,14 @@ public class Bloodname implements Serializable {
      * considerable amount of speculation.
      */
     public static @Nullable Bloodname randomBloodname(Clan faction, Phenotype phenotype, int year) {
-        if (null == faction) {
-            MekHQ.getLogger().log(Bloodname.class, "randomBloodname(Clan,int,int)", LogLevel.ERROR, //$NON-NLS-1$
-                    "Random Bloodname attempted for a clan that does not exist." //$NON-NLS-1$
+        if (faction == null) {
+            MekHQ.getLogger().error(Bloodname.class,
+                    "Random Bloodname attempted for a clan that does not exist."
                     + System.lineSeparator()
-                    + "Please ensure that your clan exists in both the clans.xml and bloodnames.xml files as appropriate."); //$NON-NLS-1$
+                    + "Please ensure that your clan exists in both the clans.xml and bloodnames.xml files as appropriate.");
+            return null;
+        } else if (phenotype == null) {
+            MekHQ.getLogger().error(Bloodname.class, "Random Bloodname attempted for an unknown phenotype. Please open a bug report so this issue may be fixed.");
             return null;
         }
 
@@ -378,7 +381,7 @@ public class Bloodname implements Serializable {
         if (year >= 3100) {
             nonExclusivesWeight = nameList.size() / 10.0;
         }
-        int roll = Compute.randomInt(nameList.size() + (int)(nonExclusivesWeight + 0.5));
+        int roll = Compute.randomInt(nameList.size() + (int) (nonExclusivesWeight + 0.5));
         if (roll > nameList.size() - 1) {
             return nonExclusives.get(Compute.randomInt(nonExclusives.size()));
         }

@@ -168,6 +168,7 @@ public class GMToolsDialog extends JDialog {
         setLocationRelativeTo(parent);
         setUserPreferences();
         setValuesFromPerson();
+        validateBloodnameInput();
     }
     //endregion Constructors
 
@@ -231,8 +232,8 @@ public class GMToolsDialog extends JDialog {
         factionLabel.setName("factionLabel");
         ratPanel.add(factionLabel, newGridBagConstraints(1, 0, 2, 1));
 
-        List<FactionChoice> factionChoices = getFactionChoices((person == null)
-                ? getGUI().getCampaign().getGameYear() : person.getBirthday().getYear());
+        List<FactionChoice> factionChoices = getFactionChoices((getPerson() == null)
+                ? getGUI().getCampaign().getGameYear() : getPerson().getBirthday().getYear());
         DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>(factionChoices.toArray(new FactionChoice[]{}));
         factionPicker = new JComboBox<>(factionModel);
         factionPicker.setName("factionPicker");
@@ -315,8 +316,8 @@ public class GMToolsDialog extends JDialog {
         originFactionLabel.setName("originFactionLabel");
         namePanel.add(originFactionLabel, newGridBagConstraints(gridx, 0));
 
-        List<FactionChoice> factionChoices = getFactionChoices((person == null)
-                ? getGUI().getCampaign().getGameYear() : person.getBirthday().getYear());
+        List<FactionChoice> factionChoices = getFactionChoices((getPerson() == null)
+                ? getGUI().getCampaign().getGameYear() : getPerson().getBirthday().getYear());
         DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>(factionChoices.toArray(new FactionChoice[]{}));
         nameGeneratorFactionPicker = new JComboBox<>(factionModel);
         nameGeneratorFactionPicker.setName("nameGeneratorFactionPicker");
@@ -350,7 +351,7 @@ public class GMToolsDialog extends JDialog {
         gridxMax = gridx - 1;
         gridx = 0;
 
-        if (person != null) {
+        if (getPerson() != null) {
             JLabel currentNameLabel = new JLabel(resources.getString("currentNameLabel.text"));
             currentNameLabel.setName("currentNameLabel");
             namePanel.add(currentNameLabel, newGridBagConstraints(gridx++, 3));
@@ -368,7 +369,7 @@ public class GMToolsDialog extends JDialog {
         nameGenerated.setName("nameGenerated");
         namePanel.add(nameGenerated, newGridBagConstraints(gridx++, 3));
 
-        if (person != null) {
+        if (getPerson() != null) {
             JButton assignNameButton = new JButton(resources.getString("assignNameButton.text"));
             assignNameButton.setName("assignNameButton");
             assignNameButton.addActionListener(evt -> assignName());
@@ -392,7 +393,7 @@ public class GMToolsDialog extends JDialog {
 
         int gridx = 0, gridy = 0;
 
-        if (person != null) {
+        if (getPerson() != null) {
             JLabel currentCallsignLabel = new JLabel(resources.getString("currentCallsignLabel.text"));
             currentCallsignLabel.setName("currentCallsignLabel");
             callsignPanel.add(currentCallsignLabel, newGridBagConstraints(gridx++, gridy));
@@ -412,7 +413,7 @@ public class GMToolsDialog extends JDialog {
 
         gridy++;
 
-        if (person != null) {
+        if (getPerson() != null) {
             JButton assignCallsignButton = new JButton(resources.getString("assignCallsignButton.text"));
             assignCallsignButton.setName("assignCallsignButton");
             assignCallsignButton.addActionListener(evt -> assignCallsign());
@@ -473,7 +474,7 @@ public class GMToolsDialog extends JDialog {
         }
         phenotypePicker = new JComboBox<>(phenotypeModel);
         phenotypePicker.setName("phenotypePicker");
-        phenotypePicker.setSelectedIndex(0);
+        phenotypePicker.setSelectedItem(Phenotype.GENERAL);
         phenotypePicker.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
@@ -513,7 +514,7 @@ public class GMToolsDialog extends JDialog {
         gridx = 0;
         gridy = 2;
 
-        if (person != null) {
+        if (getPerson() != null) {
             JLabel currentBloodnameLabel = new JLabel(resources.getString("currentBloodnameLabel.text"));
             currentBloodnameLabel.setName("currentBloodnameLabel");
             namePanel.add(currentBloodnameLabel, newGridBagConstraints(gridx++, gridy));
@@ -557,7 +558,7 @@ public class GMToolsDialog extends JDialog {
         gridBagConstraints.gridwidth = 2;
         namePanel.add(bloodnameWarningLabel, gridBagConstraints);
 
-        if (person != null) {
+        if (getPerson() != null) {
             JButton assignBloodnameButton = new JButton(resources.getString("assignBloodnameButton.text"));
             assignBloodnameButton.setName("assignBloodnameButton");
             assignBloodnameButton.addActionListener(evt -> assignBloodname());
@@ -671,8 +672,6 @@ public class GMToolsDialog extends JDialog {
                 ? gui.getCampaign().getFaction() : getPerson().getOriginFaction()).getFullName(year));
 
         phenotypePicker.setSelectedItem(getPerson().getPhenotype());
-
-        validateBloodnameInput();
     }
 
     /**
@@ -699,7 +698,6 @@ public class GMToolsDialog extends JDialog {
 
         return 0;
     }
-
 
     /**
      * Determine if a person's primary role supports operating a
@@ -895,11 +893,11 @@ public class GMToolsDialog extends JDialog {
     }
 
     private void generateBloodname() {
-        Bloodname bloodname = Bloodname.randomBloodname(clans.get(originClan).getGenerationCode(),
+        Bloodname bloodname = Bloodname.randomBloodname(clans.get(originClan),
                 selectedPhenotype, bloodnameYear);
         if (bloodname != null) {
             bloodnameGenerated.setText(bloodname.getName() + " (" + bloodname.getFounder() + ")");
-            originClanGenerated.setText(Faction.getFaction(bloodname.getOrigClan()).getFullName(bloodnameYear));
+            originClanGenerated.setText(Clan.getClan(bloodname.getOrigClan()).getFullName(bloodnameYear));
             phenotypeGenerated.setText(bloodname.getPhenotype().getGroupingName());
             setLastGeneratedBloodname(bloodname.getName());
         }
