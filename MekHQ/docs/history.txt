@@ -15,6 +15,7 @@ VERSION HISTORY:
 + PR #2050: Fixing Person Tech Unit Id Concurrent Modification Error
 + Issue #2024: Can Repeatedly Complete Missions by Cancelling Retirement Dialog
 + Issue #1971: Fixing Repair Bay Bonus Parts
++ PR #2054: Fixing Erroneous Newline after Unit Loading Failure
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
