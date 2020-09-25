@@ -49,10 +49,8 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -410,7 +408,6 @@ public final class BatchXPDialog extends JDialog {
 
                 // Improve the skill and deduce the cost
                 p.improveSkill(skillName);
-                campaign.personUpdated(p);
                 p.awardXP(-cost);
 
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
@@ -430,7 +427,7 @@ public final class BatchXPDialog extends JDialog {
                         }
                     }
                 }
-                MekHQ.triggerEvent(new PersonChangedEvent(p));
+                campaign.personUpdated(p);
             }
             // Refresh the filter and continue if we still have anyone available
             updatePersonnelTable();
