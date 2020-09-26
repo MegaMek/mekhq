@@ -720,12 +720,10 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     private String getExperienceDetails() {
         StringBuilder out = new StringBuilder();
-        out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Experience:",
-                                 getExperienceValue())).append("\n");
-        out.append(String.format("    %-" + SUBHEADER_LENGTH + "s %3s",
-                                 "Average Experience:",
-                                 getExperienceLevelName(calcAverageExperience())))
-           .append("\n");
+        out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Experience:", getExperienceValue()))
+                .append("\n")
+                .append(String.format("    %-" + SUBHEADER_LENGTH + "s %3s", "Average Experience:", getAverageExperience()))
+                .append("\n");
 
         final String TEMPLATE = "        #%-" + CATEGORY_LENGTH + "s %3d";
         Map<String, Integer> skillRatingCounts = getSkillRatingCounts();
