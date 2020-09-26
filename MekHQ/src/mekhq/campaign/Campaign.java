@@ -937,6 +937,10 @@ public class Campaign implements Serializable, ITechManager {
         }
         m.addScenario(s);
         scenarios.put(id, s);
+
+        addReport(String.format("New scenario '%s' will occur on %s.",
+            s.getName(), MekHQ.getMekHQOptions().getDisplayFormattedDate(s.getDate())));
+
         MekHQ.triggerEvent(new ScenarioNewEvent(s));
     }
 
@@ -3244,8 +3248,16 @@ public class Campaign implements Serializable, ITechManager {
                                     u.setScenarioId(s.getId());
                                 }
                             }
+                            addReport(String.format("Scenario '%s' is today, %s has been deployed!",
+                                s.getName(), forceIds.get(forceId).getName()));
                             MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), s));
+                        } else {
+                            addReport(String.format("Scenario '%s' is today, deploy a force from your TOE!",
+                                s.getName()));
                         }
+                    } else {
+                        addReport(String.format("Scenario '%s' is today, deploy a force from your TOE!",
+                            s.getName()));
                     }
                 }
             }
