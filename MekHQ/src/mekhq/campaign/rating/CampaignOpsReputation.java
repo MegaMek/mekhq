@@ -398,13 +398,13 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             return SkillType.getExperienceLevelName(-1);
         }
         switch (getExperienceValue()) {
-            case 0:
-                return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
             case 5:
-                return SkillType.getExperienceLevelName(SkillType.EXP_REGULAR);
+                return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
             case 10:
-                return SkillType.getExperienceLevelName(SkillType.EXP_VETERAN);
+                return SkillType.getExperienceLevelName(SkillType.EXP_REGULAR);
             case 20:
+                return SkillType.getExperienceLevelName(SkillType.EXP_VETERAN);
+            case 40:
                 return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
             default:
                 return SkillType.getExperienceLevelName(-1);
