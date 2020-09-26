@@ -610,7 +610,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             JMenuItem menuItem;
             JMenu menu;
             JTree tree = (JTree) e.getSource();
-            if (tree == null || tree.getSelectionPaths() == null) {
+            if ((tree == null) || (tree.getSelectionPaths() == null)) {
                 return;
             }
             // this is a little tricky because we want to
