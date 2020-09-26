@@ -17,6 +17,7 @@ VERSION HISTORY:
 + Issue #1971: Fixing Repair Bay Bonus Parts
 + PR #2054: Fixing Erroneous Newline after Unit Loading Failure
 + PR #2055: Swapping MekHQ to use the proper GUI to edit DropShip/JumpShip/WarShips
++ PR #2060: Fix NPE when getSelectionPaths is null in TOEMouseAdapter
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
