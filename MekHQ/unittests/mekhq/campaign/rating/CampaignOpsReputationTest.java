@@ -478,7 +478,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetAverageExperience() {
         spyReputation.initValues();
-        assertEquals(SkillType.getExperienceLevelName(SkillType.EXP_VETERAN),
+        assertEquals(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR),
                      spyReputation.getAverageExperience());
 
         // Test a brand new campaign.
