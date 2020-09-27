@@ -23,6 +23,7 @@ package mekhq.campaign;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -937,6 +938,11 @@ public class Campaign implements Serializable, ITechManager {
         }
         m.addScenario(s);
         scenarios.put(id, s);
+
+        addReport(MessageFormat.format(
+            resources.getString("newAtBMission.format"),
+            s.getName(), MekHQ.getMekHQOptions().getDisplayFormattedDate(s.getDate())));
+
         MekHQ.triggerEvent(new ScenarioNewEvent(s));
     }
 
@@ -3244,8 +3250,18 @@ public class Campaign implements Serializable, ITechManager {
                                     u.setScenarioId(s.getId());
                                 }
                             }
+
+                            addReport(MessageFormat.format(
+                                resources.getString("atbMissionTodayWithForce.format"),
+                                s.getName(), forceIds.get(forceId).getName()));
                             MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), s));
+                        } else {
+                            addReport(MessageFormat.format(
+                                resources.getString("atbMissionToday.format"), s.getName()));
                         }
+                    } else {
+                        addReport(MessageFormat.format(
+                            resources.getString("atbMissionToday.format"), s.getName()));
                     }
                 }
             }
