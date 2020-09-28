@@ -1956,12 +1956,22 @@ public class CampaignOptionsDialog extends JDialog {
         panPersonnel.add(panSalary, gridBagConstraints);
         //endregion Salary
 
-        gridy = 0;
-
         //region Prisoners
         comboPrisonerCaptureStyle = new JComboBox<>(PrisonerCaptureStyle.values());
-        JPanel pnlPrisonerCaptureStyle = new JPanel(new GridLayout(1, 2));
-        pnlPrisonerCaptureStyle.add(comboPrisonerCaptureStyle);
+        comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
+            private static final long serialVersionUID = -543354619818226314L;
+
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (isSelected && (index > -1) && (list.getSelectedValue() instanceof PrisonerCaptureStyle)) {
+                    list.setToolTipText(((PrisonerCaptureStyle) list.getSelectedValue()).getToolTip());
+                }
+
+                return this;
+            }
+        });
 
         JLabel prisonerCaptureStyleLabel = new JLabel(resourceMap.getString("prisonerCaptureStyle.text"));
 
