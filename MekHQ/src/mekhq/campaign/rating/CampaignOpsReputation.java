@@ -394,7 +394,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     public String getAverageExperience() {
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+        if (!hasUnits()) {
             return SkillType.getExperienceLevelName(-1);
         }
         switch (getExperienceValue()) {
@@ -413,7 +413,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     protected String getExperienceLevelName(BigDecimal experience) {
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+        if (!hasUnits()) {
             return SkillType.getExperienceLevelName(-1);
         }
 
@@ -433,25 +433,22 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     public int getExperienceValue() {
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+        if (!hasUnits()) {
             return 0;
         }
-
         BigDecimal averageExp = calcAverageExperience();
         String level = getExperienceLevelName(averageExp);
         if (SkillType.getExperienceLevelName(-1).equalsIgnoreCase(level)) {
             return 0;
-        } else if (SkillType.getExperienceLevelName(SkillType.EXP_GREEN)
-                            .equalsIgnoreCase(level)) {
+        } else if (SkillType.getExperienceLevelName(SkillType.EXP_GREEN).equalsIgnoreCase(level)) {
             return 5;
-        } else if (SkillType.getExperienceLevelName(SkillType.EXP_REGULAR)
-                            .equalsIgnoreCase(level)) {
+        } else if (SkillType.getExperienceLevelName(SkillType.EXP_REGULAR).equalsIgnoreCase(level)) {
             return 10;
-        } else if (SkillType.getExperienceLevelName(SkillType.EXP_VETERAN)
-                            .equalsIgnoreCase(level)) {
+        } else if (SkillType.getExperienceLevelName(SkillType.EXP_VETERAN).equalsIgnoreCase(level)) {
             return 20;
+        } else {
+            return 40;
         }
-        return 40;
     }
 
     @Override
@@ -496,7 +493,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     public int getTransportValue() {
-        if (getTotalCombatUnits() == 0) {
+        if (!hasUnits()) {
             return 0;
         }
 
@@ -697,6 +694,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         return BigDecimal.ZERO;
     }
 
+    @Override
     public int getFinancialValue() {
         return getCampaign().getFinances().isInDebt() ? -10 : 0;
     }
