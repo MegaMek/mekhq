@@ -21,6 +21,7 @@ VERSION HISTORY:
 + Issue #2059: Fixing Incorrect Campaign Operations Unit Rating Experience Calculation Method
 + PR #2063: Preventing null entities in AtBScenario
 + PR #2061: Add daily report entries for AtB scenarios
++ PR #2067: Improved refit handling of internals for Aeros and Tanks
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
