@@ -91,6 +91,7 @@ import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.Marriage;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
@@ -230,9 +231,6 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox useEdgeBox;
     private JCheckBox useSupportEdgeBox;
     private JCheckBox useImplantsBox;
-    private JCheckBox chkCapturePrisoners;
-    private JComboBox<PrisonerStatus> comboPrisonerStatus;
-    private JCheckBox chkPrisonerBabyStatus;
     private JCheckBox altQualityAveragingCheckBox;
     private JCheckBox useAdvancedMedicalBox;
     private JCheckBox useDylansRandomXpBox;
@@ -281,6 +279,12 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner spnSalaryAntiMek;
     private JSpinner[] spnSalaryXp;
     private JSpinner[] spnSalaryBase;
+    //Prisoners
+    private JComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
+    private JComboBox<PrisonerStatus> comboPrisonerStatus;
+    private JCheckBox chkPrisonerBabyStatus;
+    private JCheckBox chkAtBPrisonerDefection;
+    private JCheckBox chkAtBPrisonerRansom;
     //endregion Personnel Tab
 
     //region Finances Tab
@@ -486,7 +490,6 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
-    private JCheckBox chkUseAtBCapture;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -563,7 +566,6 @@ public class CampaignOptionsDialog extends JDialog {
         useEdgeBox = new JCheckBox();
         useSupportEdgeBox = new JCheckBox();
         useImplantsBox = new JCheckBox();
-        chkCapturePrisoners = new JCheckBox();
         useAdvancedMedicalBox = new JCheckBox();
         useDylansRandomXpBox = new JCheckBox();
         payForPartsBox = new JCheckBox();
@@ -1499,12 +1501,12 @@ public class CampaignOptionsDialog extends JDialog {
         useTacticsBox.setText(resourceMap.getString("useTacticsBox.text"));
         useTacticsBox.setToolTipText(resourceMap.getString("useTacticsBox.toolTipText"));
         useTacticsBox.setName("useTacticsBox");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panPersonnel.add(useTacticsBox, gridBagConstraints);
 
         useInitBonusBox.setText(resourceMap.getString("useInitBonusBox.text"));
@@ -1548,26 +1550,6 @@ public class CampaignOptionsDialog extends JDialog {
         useImplantsBox.setName("useImplantsBox");
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(useImplantsBox, gridBagConstraints);
-
-        chkCapturePrisoners.setText(resourceMap.getString("chkCapturePrisoners.text"));
-        chkCapturePrisoners.setToolTipText(resourceMap.getString("chkCapturePrisoners.toolTipText"));
-        gridBagConstraints.gridy = ++gridy;
-        panPersonnel.add(chkCapturePrisoners, gridBagConstraints);
-
-        DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
-        prisonerStatusModel.removeElement(PrisonerStatus.FREE); // we don't want this as a standard use case for prisoners
-        comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
-        JPanel pnlPrisonerStatus = new JPanel();
-        pnlPrisonerStatus.add(comboPrisonerStatus);
-        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisonerStatus.text")));
-        gridBagConstraints.gridy = ++gridy;
-        panPersonnel.add(pnlPrisonerStatus, gridBagConstraints);
-
-        chkPrisonerBabyStatus = new JCheckBox(resourceMap.getString("prisonerBabyStatus.text"));
-        chkPrisonerBabyStatus.setToolTipText(resourceMap.getString("prisonerBabyStatus.toolTipText"));
-        chkPrisonerBabyStatus.setName("chkPrisonerBabyStatus");
-        gridBagConstraints.gridy = ++gridy;
-        panPersonnel.add(chkPrisonerBabyStatus, gridBagConstraints);
 
         altQualityAveragingCheckBox = new JCheckBox(resourceMap.getString("altQualityAveragingCheckBox.text"));
         altQualityAveragingCheckBox.setToolTipText(resourceMap.getString("altQualityAveragingCheckBox.toolTipText"));
@@ -1680,7 +1662,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(panOriginSearchRadius, gridBagConstraints);
 
-        //Family
+        //region Family
         JPanel panFamily = new JPanel(new GridBagLayout());
         panFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("FamilyTab.text")));
         int panFamilyGridY = ++gridy;
@@ -1862,8 +1844,9 @@ public class CampaignOptionsDialog extends JDialog {
 
         gridBagConstraints.gridy = panFamilyGridY;
         panPersonnel.add(panFamily, gridBagConstraints);
+        //endregion Family
 
-        //Salary
+        //region Salary
         JPanel panSalary = new JPanel(new GridBagLayout());
         panSalary.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("SalaryTab.text")));
 
@@ -1971,6 +1954,77 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(panSalary, gridBagConstraints);
+        //endregion Salary
+
+        gridy = 0;
+
+        //region Prisoners
+        comboPrisonerCaptureStyle = new JComboBox<>(PrisonerCaptureStyle.values());
+        JPanel pnlPrisonerCaptureStyle = new JPanel(new GridLayout(1, 2));
+        pnlPrisonerCaptureStyle.add(comboPrisonerCaptureStyle);
+
+        JLabel prisonerCaptureStyleLabel = new JLabel(resourceMap.getString("prisonerCaptureStyle.text"));
+
+        DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
+        prisonerStatusModel.removeElement(PrisonerStatus.FREE); // we don't want this as a standard use case for prisoners
+        comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
+
+        JLabel prisonerStatusLabel = new JLabel(resourceMap.getString("prisonerStatus.text"));
+
+        chkPrisonerBabyStatus = new JCheckBox(resourceMap.getString("prisonerBabyStatus.text"));
+        chkPrisonerBabyStatus.setToolTipText(resourceMap.getString("prisonerBabyStatus.toolTipText"));
+        chkPrisonerBabyStatus.setName("chkPrisonerBabyStatus");
+
+        chkAtBPrisonerDefection = new JCheckBox(resourceMap.getString("chkAtBPrisonerDefection.text"));
+        chkAtBPrisonerDefection.setToolTipText(resourceMap.getString("chkAtBPrisonerDefection.toolTipText"));
+        chkAtBPrisonerDefection.setName("chkAtBPrisonerDefection");
+
+        chkAtBPrisonerRansom = new JCheckBox(resourceMap.getString("chkAtBPrisonerRansom.text"));
+        chkAtBPrisonerRansom.setName("chkAtBPrisonerRansom");
+
+        // Layout the Panel
+        JPanel panPrisoners = new JPanel();
+        panPrisoners.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panPrisoners.text")));
+        GroupLayout layout = new GroupLayout(panPrisoners);
+        panPrisoners.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(prisonerCaptureStyleLabel)
+                                .addComponent(comboPrisonerCaptureStyle, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(prisonerStatusLabel)
+                                .addComponent(comboPrisonerStatus, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkPrisonerBabyStatus)
+                        .addComponent(chkAtBPrisonerDefection)
+                        .addComponent(chkAtBPrisonerRansom)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(prisonerCaptureStyleLabel)
+                                .addComponent(comboPrisonerCaptureStyle))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(prisonerStatusLabel)
+                                .addComponent(comboPrisonerStatus))
+                        .addComponent(chkPrisonerBabyStatus)
+                        .addComponent(chkAtBPrisonerDefection)
+                        .addComponent(chkAtBPrisonerRansom)
+        );
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 23;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panPersonnel.add(panPrisoners, gridBagConstraints);
+        //endregion Prisoners
 
         JScrollPane scrollPersonnel = new JScrollPane(panPersonnel);
         scrollPersonnel.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -3582,7 +3636,6 @@ public class CampaignOptionsDialog extends JDialog {
         chkRestrictPartsByMission = new JCheckBox();
         chkUseLightConditions = new JCheckBox();
         chkUsePlanetaryConditions = new JCheckBox();
-        chkUseAtBCapture = new JCheckBox();
 
         chkAeroRecruitsHaveUnits = new JCheckBox();
         chkInstantUnitMarketDelivery = new JCheckBox();
@@ -4197,16 +4250,6 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUsePlanetaryConditions, gridBagConstraints);
 
-        chkUseAtBCapture.setText(resourceMap.getString("chkUseAtBCapture.text"));
-        chkUseAtBCapture.setToolTipText(resourceMap.getString("chkUseAtBCapture.toolTipText"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = yTablePosition++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(chkUseAtBCapture, gridBagConstraints);
-
         JScrollPane scrAtB = new JScrollPane(panAtB);
         scrAtB.setPreferredSize(new java.awt.Dimension(500, 400));
 
@@ -4421,9 +4464,6 @@ public class CampaignOptionsDialog extends JDialog {
         useEdgeBox.setSelected(options.useEdge());
         useSupportEdgeBox.setSelected(options.useSupportEdge());
         useImplantsBox.setSelected(options.useImplants());
-        chkCapturePrisoners.setSelected(options.capturePrisoners());
-        comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
-        chkPrisonerBabyStatus.setSelected(options.getPrisonerBabyStatus());
         altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
         useAdvancedMedicalBox.setSelected(options.useAdvancedMedical());
         useDylansRandomXpBox.setSelected(options.useDylansRandomXp());
@@ -4444,6 +4484,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
         spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
 
+        //Family
         spnMinimumMarriageAge.setValue(options.getMinimumMarriageAge());
         spnCheckMutualAncestorsDepth.setValue(options.checkMutualAncestorsDepth());
         chkLogMarriageNameChange.setSelected(options.logMarriageNameChange());
@@ -4469,6 +4510,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseRandomDeaths.setSelected(options.useRandomDeaths());
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
 
+        //Salary
         spnSalaryCommission.setValue(options.getSalaryCommissionMultiplier());
         spnSalaryEnlisted.setValue(options.getSalaryEnlistedMultiplier());
         spnSalaryAntiMek.setValue(options.getSalaryAntiMekMultiplier());
@@ -4478,6 +4520,13 @@ public class CampaignOptionsDialog extends JDialog {
         for (int i = 1; i < spnSalaryBase.length; i++) {
             spnSalaryBase[i].setValue(options.getBaseSalary(i));
         }
+
+        //Prisoners
+        comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
+        comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
+        chkPrisonerBabyStatus.setSelected(options.getPrisonerBabyStatus());
+        chkAtBPrisonerDefection.setSelected(options.useAtBPrisonerDefection());
+        chkAtBPrisonerRansom.setSelected(options.useAtBPrisonerRansom());
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -4692,7 +4741,6 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseWeatherConditions.setSelected(options.getUseWeatherConditions());
         chkUseLightConditions.setSelected(options.getUseLightConditions());
         chkUsePlanetaryConditions.setSelected(options.getUsePlanetaryConditions());
-        chkUseAtBCapture.setSelected(options.getUseAtBCapture());
         //endregion Against the Bot Tab
     }
 
@@ -5015,9 +5063,6 @@ public class CampaignOptionsDialog extends JDialog {
         options.setSupportEdge(useSupportEdgeBox.isSelected());
         options.setImplants(useImplantsBox.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
-        options.setCapturePrisoners(chkCapturePrisoners.isSelected());
-        options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
-        options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
         options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
         options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
@@ -5077,6 +5122,12 @@ public class CampaignOptionsDialog extends JDialog {
                 options.setBaseSalary(i, (double) spnSalaryBase[i].getValue());
             } catch (Exception ignored) { }
         }
+        //Prisoners
+        options.setPrisonerCaptureStyle((PrisonerCaptureStyle) comboPrisonerCaptureStyle.getSelectedItem());
+        options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
+        options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
+        options.setUseAtBPrisonerDefection(chkAtBPrisonerDefection.isSelected());
+        options.setUseAtBPrisonerRansom(chkAtBPrisonerRansom.isSelected());
         //endregion Personnel Tab
 
         //start SPA
@@ -5153,7 +5204,6 @@ public class CampaignOptionsDialog extends JDialog {
         options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
-        options.setUseAtBCapture(chkUseAtBCapture.isSelected());
 
         options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
         options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());

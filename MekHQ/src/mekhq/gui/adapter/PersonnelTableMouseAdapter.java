@@ -1302,17 +1302,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE));
             }
 
-            if (gui.getCampaign().getCampaignOptions().getUseAtB()
-                    && (gui.getCampaign().getCampaignOptions().getUseAtBCapture()
-                    || gui.getCampaign().getCampaignOptions().capturePrisoners())
+            if (gui.getCampaign().getCampaignOptions().useAtBPrisonerRansom()
                     && StaticChecks.areAllPrisoners(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("ransom.text"), CMD_RANSOM));
             }
 
-            if (gui.getCampaign().getCampaignOptions().getUseAtB()
-                    && (gui.getCampaign().getCampaignOptions().getUseAtBCapture()
-                    || gui.getCampaign().getCampaignOptions().capturePrisoners())
-                    && StaticChecks.areAnyWillingToDefect(selected)) {
+            if (StaticChecks.areAnyWillingToDefect(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT));
             }
 
