@@ -208,7 +208,7 @@ public class StructuralIntegrity extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        //you can't replace this part, so don't do anything here
+        ((Aero) unit.getEntity()).setSI(((Aero) unit.getEntity()).get0SI() - pointsNeeded);
     }
 
     @Override
