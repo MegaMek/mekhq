@@ -281,7 +281,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             for (Unit unit : unitsByType.get(unitType)) {
                 UUID id = selectedTechs.get(techIndex).getId();
                 if (isMothballing) {
-                    unit.startMothballing(campaign, id);
+                    unit.startMothballing(id);
                 } else {
                     unit.startActivating(id);
                 }
