@@ -569,7 +569,7 @@ public class EquipmentPart extends Part {
         }
         if (varCost.isZero()) {
             // if we don't know what it is...
-            MekHQ.getLogger().log(EquipmentPart.class, "resolveVariableCost", LogLevel.WARNING,
+            MekHQ.getLogger().debug(EquipmentPart.class,
                     "I don't know how much " + name + " costs.");
         }
         return varCost;

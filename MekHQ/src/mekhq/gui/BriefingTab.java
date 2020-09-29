@@ -39,7 +39,6 @@ import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.event.Subscribe;
 import megamek.common.logging.LogLevel;
-import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.com.util.UnitPrintManager;
@@ -248,26 +247,26 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panScenario.add(panScenarioButtons, gridBagConstraints);
 
-        btnStartGame = new JButton(resourceMap.getString("btnStartGame.text")); // NOI18N
-        btnStartGame.setToolTipText(resourceMap.getString("btnStartGame.toolTipText")); // NOI18N
+        btnStartGame = new JButton(resourceMap.getString("btnStartGame.text"));
+        btnStartGame.setToolTipText(resourceMap.getString("btnStartGame.toolTipText"));
         btnStartGame.addActionListener(ev -> startScenario());
         btnStartGame.setEnabled(false);
         panScenarioButtons.add(btnStartGame);
 
-        btnJoinGame = new JButton(resourceMap.getString("btnJoinGame.text")); // NOI18N
-        btnJoinGame.setToolTipText(resourceMap.getString("btnJoinGame.toolTipText")); // NOI18N
+        btnJoinGame = new JButton(resourceMap.getString("btnJoinGame.text"));
+        btnJoinGame.setToolTipText(resourceMap.getString("btnJoinGame.toolTipText"));
         btnJoinGame.addActionListener(ev -> joinScenario());
         btnJoinGame.setEnabled(false);
         panScenarioButtons.add(btnJoinGame);
 
-        btnLoadGame = new JButton(resourceMap.getString("btnLoadGame.text")); // NOI18N
-        btnLoadGame.setToolTipText(resourceMap.getString("btnLoadGame.toolTipText")); // NOI18N
+        btnLoadGame = new JButton(resourceMap.getString("btnLoadGame.text"));
+        btnLoadGame.setToolTipText(resourceMap.getString("btnLoadGame.toolTipText"));
         btnLoadGame.addActionListener(ev -> loadScenario());
         btnLoadGame.setEnabled(false);
         panScenarioButtons.add(btnLoadGame);
 
-        btnPrintRS = new JButton(resourceMap.getString("btnPrintRS.text")); // NOI18N
-        btnPrintRS.setToolTipText(resourceMap.getString("btnPrintRS.toolTipText")); // NOI18N
+        btnPrintRS = new JButton(resourceMap.getString("btnPrintRS.text"));
+        btnPrintRS.setToolTipText(resourceMap.getString("btnPrintRS.toolTipText"));
         btnPrintRS.addActionListener(ev -> printRecordSheets());
         btnPrintRS.setEnabled(false);
         panScenarioButtons.add(btnPrintRS);
@@ -368,71 +367,70 @@ public final class BriefingTab extends CampaignGuiTab {
 
     private void completeMission() {
         Mission mission = getCampaign().getMission(selectedMission);
-        if (null != mission) {
-            if (mission.hasPendingScenarios()) {
-                JOptionPane.showMessageDialog(getFrame(), "You cannot complete a mission that has pending scenarios",
-                        "Pending Scenarios", JOptionPane.WARNING_MESSAGE);
-            } else {
-                CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
-                cmd.setVisible(true);
-                if (cmd.getStatus() > Mission.S_ACTIVE) {
-                    getCampaign().completeMission(mission.getId(), cmd.getStatus());
+        if (mission == null) {
+            return;
+        } else if (mission.hasPendingScenarios()) {
+            JOptionPane.showMessageDialog(getFrame(), "You cannot complete a mission that has pending scenarios",
+                    "Pending Scenarios", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
-                    if (getCampaign().getCampaignOptions().getUseAtB() && mission instanceof AtBContract) {
-                        if (((AtBContract) mission).contractExtended(getCampaign())) {
-                            mission.setStatus(Mission.S_ACTIVE);
-                        } else {
-                            if (getCampaign().getCampaignOptions().doRetirementRolls()) {
-                                RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
-                                        (AtBContract) mission, true);
-                                rdd.setVisible(true);
-                                if (rdd.wasAborted()) {
-                                    /*
-                                     * Once the retirement rolls have been made,
-                                     * the outstanding payouts can be resolved
-                                     * without reference to the contract and the
-                                     * dialog can be accessed through the menu.
-                                     */
-                                    if (!getCampaign().getRetirementDefectionTracker().isOutstanding(mission.getId())) {
-                                        mission.setStatus(Mission.S_ACTIVE);
-                                    }
-                                } else {
-                                    if (null != getCampaign().getRetirementDefectionTracker().getRetirees((AtBContract) mission) &&
-                                            getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
-                                        final int[] admins = { Person.T_ADMIN_COM, Person.T_ADMIN_HR,
-                                                Person.T_ADMIN_LOG, Person.T_ADMIN_TRA };
-                                        for (int role : admins) {
-                                            Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
-                                            if (admin != null) {
-                                                admin.awardXP(1);
-                                                getCampaign().addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
-                                            }
-                                        }
-                                    }
-                                    if (!getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments())) {
-                                        mission.setStatus(Mission.S_ACTIVE);
-                                    }
-                                }
+        CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
+        cmd.setVisible(true);
+        if (cmd.getStatus() <= Mission.S_ACTIVE) {
+            return;
+        }
+
+        if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {
+            if (((AtBContract) mission).contractExtended(getCampaign())) {
+                return;
+            }
+
+            if (getCampaign().getCampaignOptions().doRetirementRolls()) {
+                RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
+                        (AtBContract) mission, true);
+                rdd.setVisible(true);
+                if (rdd.wasAborted()) {
+                    /*
+                     * Once the retirement rolls have been made, the outstanding payouts can be resolved
+                     * without reference to the contract and the dialog can be accessed through the menu
+                     * provided they aren't still assigned to the mission in question.
+                     */
+                    if (!getCampaign().getRetirementDefectionTracker().isOutstanding(mission.getId())) {
+                        return;
+                    }
+                } else {
+                    if ((getCampaign().getRetirementDefectionTracker().getRetirees((AtBContract) mission) != null)
+                            && getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
+                        final int[] admins = {Person.T_ADMIN_COM, Person.T_ADMIN_HR,
+                                Person.T_ADMIN_LOG, Person.T_ADMIN_TRA};
+                        for (int role : admins) {
+                            Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
+                            if (admin != null) {
+                                admin.awardXP(1);
+                                getCampaign().addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
                             }
                         }
                     }
 
-                    if (mission.getStatus() != Mission.S_ACTIVE) {
-                        MekHQ.triggerEvent(new MissionCompletedEvent(mission));
-                    }
-                }
-
-                if (!mission.isActive()) {
-                    if (getCampaign().getCampaignOptions().getUseAtB() && mission instanceof AtBContract) {
-                        ((AtBContract) mission).checkForFollowup(getCampaign());
-                    }
-                    if (getCampaign().getSortedMissions().size() > 0) {
-                        selectedMission = getCampaign().getSortedMissions().get(0).getId();
-                    } else {
-                        selectedMission = -1;
+                    if (!getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments())) {
+                        return;
                     }
                 }
             }
+        }
+
+        getCampaign().completeMission(mission.getId(), cmd.getStatus());
+        MekHQ.triggerEvent(new MissionCompletedEvent(mission));
+
+        if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {
+            ((AtBContract) mission).checkForFollowup(getCampaign());
+        }
+
+        if (getCampaign().getSortedMissions().size() > 0) {
+            selectedMission = getCampaign().getSortedMissions().get(0).getId();
+        } else {
+            selectedMission = -1;
         }
     }
 
@@ -594,14 +592,12 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        ArrayList<Unit> chosen = new ArrayList<>();
-        // ArrayList<Unit> toDeploy = new ArrayList<>();
+        List<Unit> chosen = new ArrayList<>();
         StringBuilder undeployed = new StringBuilder();
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
-            if ((null != u) &&
-                    (null != u.getEntity())) {
+            if ((null != u) && (null != u.getEntity())) {
                 if (null == u.checkDeployment()) {
                     // Make sure the unit's entity and pilot are fully up to
                     // date!
@@ -616,7 +612,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if(scenario instanceof AtBDynamicScenario) {
+        if (scenario instanceof AtBDynamicScenario) {
             AtBDynamicScenarioFactory.setPlayerDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
             AtBDynamicScenarioFactory.finalizeStaggeredDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
             AtBDynamicScenarioFactory.setPlayerDeploymentZones((AtBDynamicScenario) scenario, getCampaign());
@@ -634,19 +630,19 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // code to support deployment of reinforcements for legacy ATB scenarios.
-        if((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
+        if ((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
             Lance assignedLance = ((AtBScenario) scenario).getLance(getCampaign());
-            if(assignedLance != null) {
+            if (assignedLance != null) {
                 int assignedForceId = assignedLance.getForceId();
                 int cmdrStrategy = 0;
                 Person commander = getCampaign().getPerson(Lance.findCommander(assignedForceId, getCampaign()));
-                if (null != commander && null != commander.getSkill(SkillType.S_STRATEGY)) {
+                if ((null != commander) && (null != commander.getSkill(SkillType.S_STRATEGY))) {
                     cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
                 }
                 List<Entity> reinforcementEntities = new ArrayList<>();
 
-                for(Unit unit : chosen) {
-                    if(unit.getForceId() != assignedForceId) {
+                for (Unit unit : chosen) {
+                    if (unit.getForceId() != assignedForceId) {
                         reinforcementEntities.add(unit.getEntity());
                     }
                 }
@@ -655,17 +651,13 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
+        if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
             ((AtBScenario) scenario).refresh(getCampaign());
         }
 
         if (chosen.size() > 0) {
             // Ensure that the MegaMek year GameOption matches the campaign year
-            GameOptions gameOpts = getCampaign().getGameOptions();
-            int campaignYear = getCampaign().getGameYear();
-            if (gameOpts.intOption("year") != campaignYear) {
-                gameOpts.getOption("year").setValue(campaignYear);
-            }
+            getCampaign().getGameOptions().getOption("year").setValue(getCampaign().getGameYear());
             getCampaignGui().getApplication().startHost(scenario, false, chosen);
         }
     }
@@ -787,7 +779,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // FIXME: this is not working
             EntityListFile.saveTo(unitFile, chosen);
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "deployListFile", e);
+            MekHQ.getLogger().error(this, e);
         }
 
         if (undeployed.length() > 0) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -51,7 +51,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         updateOptionValues();
         initialize();
         run();
-        setVisible(true);
     }
 
     @Override
@@ -78,8 +77,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
         if (addToCampaign) {
             // This is used for the buy command in MekHQ, named buttonSelect because of how it is used elsewhere
-            buttonSelect = new JButton(Messages.getString("MechSelectorDialog.Buy",
-                    new Object[]{TARGET_UNKNOWN}));
+            buttonSelect = new JButton(Messages.getString("MechSelectorDialog.Buy", TARGET_UNKNOWN));
             buttonSelect.setName("buttonBuy");
             buttonSelect.addActionListener(this);
             panelButtons.add(buttonSelect, new GridBagConstraints());
@@ -146,16 +144,15 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         if (entity == null) {
             selectedUnit = null;
             buttonSelect.setEnabled(false);
-            buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy",
-                    new Object[]{TARGET_UNKNOWN}));
+            buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy", TARGET_UNKNOWN));
             buttonSelect.setToolTipText(null);
         } else {
             selectedUnit = new UnitOrder(entity, campaign);
             buttonSelect.setEnabled(true);
             Person logisticsPerson = campaign.getLogisticsPerson();
             buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy",
-                    new Object[]{campaign.getTargetForAcquisition(selectedUnit, logisticsPerson,
-                            false).getValueAsString()}));
+                    campaign.getTargetForAcquisition(selectedUnit, logisticsPerson, false)
+                            .getValueAsString()));
             buttonSelect.setToolTipText(campaign.getTargetForAcquisition(selectedUnit,
                     logisticsPerson, false).getDesc());
         }

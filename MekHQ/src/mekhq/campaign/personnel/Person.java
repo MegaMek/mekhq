@@ -433,8 +433,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return bloodname;
     }
 
-    public void setBloodname(String bn) {
-        bloodname = bn;
+    public void setBloodname(String bloodname) {
+        this.bloodname = bloodname;
+        setFullName();
     }
 
     public Faction getOriginFaction() {
@@ -950,12 +951,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
 
             // If we're assigned as a tech for any unit, remove us from it/them
-            List<UUID> techIds = getTechUnitIDs();
-            if (!techIds.isEmpty()) {
-                for (UUID tUUID : techIds) {
-                    unit = campaign.getUnit(tUUID);
-                    unit.remove(this, true);
-                }
+            for (UUID techUnitId : new ArrayList<>(getTechUnitIDs())) {
+                unit = campaign.getUnit(techUnitId);
+                unit.remove(this, true);
             }
             // If we're assigned to any repairs or refits, remove that assignment
             for (Part part : campaign.getParts()) {
