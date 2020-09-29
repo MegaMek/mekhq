@@ -68,9 +68,10 @@ public class GMToolsDialog extends JDialog {
     private static final long serialVersionUID = 7724064095803583812L;
 
     //region GUI Variables
-    private JLabel diceResults;
     private JSpinner numDice;
     private JSpinner sizeDice;
+    private JLabel totalDiceResult;
+    private JTextPane individualDiceResults;
 
     private JComboBox<FactionChoice> factionPicker;
     private JTextField yearPicker;
@@ -183,32 +184,53 @@ public class GMToolsDialog extends JDialog {
 
     //region Dice Panel Initialization
     private JPanel getDiceRoller() {
+        int gridx = 0, gridy = 0;
+
         JPanel dicePanel = new JPanel(new GridBagLayout());
         dicePanel.setName("dicePanel");
         dicePanel.setBorder(BorderFactory.createTitledBorder(resources.getString("dicePanel.text")));
 
-        numDice = new JSpinner(new SpinnerNumberModel(2, 1, 50, 1));
+        numDice = new JSpinner(new SpinnerNumberModel(2, 1, 100, 1));
         numDice.setName("numDice");
         ((JSpinner.DefaultEditor) numDice.getEditor()).getTextField().setEditable(true);
-        dicePanel.add(numDice, newGridBagConstraints(0, 0));
+        dicePanel.add(numDice, newGridBagConstraints(gridx++, gridy));
 
         JLabel sides = new JLabel(resources.getString("sides.text"));
         sides.setName("sides");
-        dicePanel.add(sides, newGridBagConstraints(1, 0));
+        dicePanel.add(sides, newGridBagConstraints(gridx++, gridy));
 
         sizeDice = new JSpinner(new SpinnerNumberModel(6, 1, 200, 1));
         sizeDice.setName("sizeDice");
         ((JSpinner.DefaultEditor) sizeDice.getEditor()).getTextField().setEditable(true);
-        dicePanel.add(sizeDice, newGridBagConstraints(2, 0));
+        dicePanel.add(sizeDice, newGridBagConstraints(gridx++, gridy++));
+
+        gridx = 0;
+
+        JLabel totalDiceResultLabel = new JLabel(resources.getString("totalDiceResultsLabel.text"));
+        totalDiceResultLabel.setName("totalDiceResultsLabel");
+        dicePanel.add(totalDiceResultLabel, newGridBagConstraints(gridx++, gridy));
+
+        totalDiceResult = new JLabel("-");
+        totalDiceResult.setName("totalDiceResult");
+        dicePanel.add(totalDiceResult, newGridBagConstraints(gridx++, gridy));
 
         JButton diceRoll = new JButton(resources.getString("diceRoll.text"));
         diceRoll.setName("diceRoll");
         diceRoll.addActionListener(evt -> performDiceRoll());
-        dicePanel.add(diceRoll, newGridBagConstraints(0, 1, 3, 1));
+        dicePanel.add(diceRoll, newGridBagConstraints(gridx++, gridy++, 2, 1));
 
-        diceResults = new JLabel(String.format(resources.getString("diceResults.format"), 0));
-        diceResults.setName("diceResults");
-        dicePanel.add(diceResults, newGridBagConstraints(0, 2, 3, 1));
+        gridx = 0;
+
+        JLabel individualDiceResultsLabel = new JLabel(resources.getString("individualDiceResultsLabel.text"));
+        individualDiceResultsLabel.setName("individualDiceResultsLabel");
+        dicePanel.add(individualDiceResultsLabel, newGridBagConstraints(gridx++, gridy));
+
+        individualDiceResults = new JTextPane();
+        individualDiceResults.setText("-");
+        individualDiceResults.setName("individualDiceResults");
+        individualDiceResults.setEditable(false);
+        dicePanel.add(individualDiceResults, newGridBagConstraints(gridx++, gridy, 3, 1));
+
         return dicePanel;
     }
     //endregion Dice Panel Initialization
@@ -787,8 +809,21 @@ public class GMToolsDialog extends JDialog {
 
     //region ActionEvent Handlers
     public void performDiceRoll() {
-        diceResults.setText(String.format(resources.getString("diceResults.format"),
-                Utilities.dice((Integer) numDice.getValue(), (Integer) sizeDice.getValue())));
+        List<Integer> individualDice = Utilities.individualDice((Integer) numDice.getValue(),
+                (Integer) sizeDice.getValue());
+        totalDiceResult.setText(String.format(resources.getString("totalDiceResult.text"),
+                individualDice.get(0)));
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i < individualDice.size() - 1; i++) {
+            sb.append(individualDice.get(i)).append(", ");
+        }
+        sb.append(individualDice.get(individualDice.size() - 1));
+
+        if (sb.length() > 0) {
+            individualDiceResults.setText(sb.toString());
+        } else {
+            individualDiceResults.setText("-");
+        }
     }
 
     private MechSummary performRollRat() {
@@ -832,7 +867,7 @@ public class GMToolsDialog extends JDialog {
                 e = new MechFileParser(getLastRolledUnit().getSourceFile(),
                         getLastRolledUnit().getEntryName()).getEntity();
                 Unit u = getGUI().getCampaign().addUnit(e, false, 0);
-                if (getPerson() != null) {
+                if ((getPerson() != null) && (getPerson().getUnitId() == null)) {
                     u.addPilotOrSoldier(getPerson());
                     getPerson().setOriginalUnit(u);
                     setVisible(false);

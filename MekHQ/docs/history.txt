@@ -14,6 +14,18 @@ VERSION HISTORY:
 + PR #2048: Fixing Random Bloodname NPEs when Editing Personnel
 + PR #2050: Fixing Person Tech Unit Id Concurrent Modification Error
 + Issue #2024: Can Repeatedly Complete Missions by Cancelling Retirement Dialog
++ Issue #1971: Fixing Repair Bay Bonus Parts
++ PR #2054: Fixing Erroneous Newline after Unit Loading Failure
++ PR #2055: Swapping MekHQ to use the proper GUI to edit DropShip/JumpShip/WarShips
++ PR #2060: Fix NPE when getSelectionPaths is null in TOEMouseAdapter
++ Issue #2059: Fixing Incorrect Campaign Operations Unit Rating Experience Calculation Method
++ PR #2063: Preventing null entities in AtBScenario
++ PR #2061: Add daily report entries for AtB scenarios
++ PR #2067: Improved refit handling of internals for Aeros and Tanks
++ PR #2057: Personnel Table GM Tool Access
++ Issue #1369: Unit Rating FM:M(r): Default Quality Value is no longer Elite
++ Issue #171: Manual Unit Rating Modifier
++ PR #2058: Implementing individual dice roll display in the GMTools Dialog
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues

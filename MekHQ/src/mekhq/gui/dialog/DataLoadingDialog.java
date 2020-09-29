@@ -127,31 +127,29 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
         @Override
         public Void doInBackground() {
-            final String METHOD_NAME = "doInBackground()";
-
             //region Progress 0
             //Initialize progress property.
             setProgress(0);
             try {
                 Faction.generateFactions();
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+                MekHQ.getLogger().error(this, e);
             }
             try {
                 CurrencyManager.getInstance().loadCurrencies();
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+                MekHQ.getLogger().error(this, e);
             }
             try {
                 Bloodname.loadBloodnameData();
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+                MekHQ.getLogger().error(this, e);
             }
             try {
                 //Load values needed for CampaignOptionsDialog
                 RATManager.populateCollectionNames();
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+                MekHQ.getLogger().error(this, e);
             }
             while (!Systems.getInstance().isInitialized()) {
                 //Sleep for up to one second.
@@ -170,14 +168,14 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             try {
                 QuirksHandler.initQuirksList();
             } catch (IOException e) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+                MekHQ.getLogger().error(this, e);
             }
             while (!MechSummaryCache.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+                    MekHQ.getLogger().error(this, e);
                 }
             }
             //endregion Progress 1
@@ -199,10 +197,10 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     InjuryTypes.registerAll();
                     campaign.setApp(app);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+                    MekHQ.getLogger().error(this, e);
                 }
             } else {
-                MekHQ.getLogger().info(getClass(), METHOD_NAME, "Loading campaign file from XML...");
+                MekHQ.getLogger().info(this, "Loading campaign file from XML...");
 
                 // And then load the campaign object from it.
                 FileInputStream fis;
@@ -222,14 +220,14 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                                     + "listed are not customs, then try deleting the file data/mechfiles/units.cache "
                                     + "and restarting MekHQ.\nIt is also possible that unit chassi "
                                     + "and model names have changed across versions of MegaMek. "
-                                    + "You can check this by\nopening up MegaMek and searching for the units. "
+                                    + "You can check this by opening up MegaMek and searching for the units. "
                                     + "Chassis and models can be edited in your MekHQ save file with a text editor.",
                             "Unit Loading Error",
                             JOptionPane.ERROR_MESSAGE);
                     cancelled = true;
                     cancel(true);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+                    MekHQ.getLogger().error(this, e);
                     JOptionPane.showMessageDialog(null,
                             "The campaign file could not be loaded. \nPlease check the log file for details.",
                             "Campaign Loading Error",
