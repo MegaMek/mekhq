@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -43,7 +44,6 @@ import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
-import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
@@ -55,17 +55,16 @@ import mekhq.campaign.unit.Unit;
  *
  * Enhanced version of GameThread which imports settings and non-player
  * units into the MM game
- *
  */
 public class AtBGameThread extends GameThread {
 
     AtBScenario scenario;
 
-    public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, AtBScenario scenario) {
+    public AtBGameThread(String name, Client c, MekHQ app, List<Unit> units, AtBScenario scenario) {
         this(name, c, app, units, scenario, true);
     }
 
-    public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, AtBScenario scenario, boolean started) {
+    public AtBGameThread(String name, Client c, MekHQ app, List<Unit> units, AtBScenario scenario, boolean started) {
         super(name, c, app, units, started);
         this.scenario = scenario;
     }
@@ -123,7 +122,7 @@ public class AtBGameThread extends GameThread {
                 if (started) {
                     client.getGame().getOptions().loadOptions();
                     client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
                 MapSettings mapSettings = MapSettings.getInstance();
@@ -152,7 +151,7 @@ public class AtBGameThread extends GameThread {
                 mapSettings.getBoardsSelectedVector().clear();
                 mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 client.sendMapSettings(mapSettings);
-                Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
 
                 PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
@@ -162,7 +161,7 @@ public class AtBGameThread extends GameThread {
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
                 planetaryConditions.setGravity(scenario.getGravity());
                 client.sendPlanetaryConditions(planetaryConditions);
-                Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
 
                 client.getLocalPlayer().setStartingPos(scenario.getStart());
                 client.getLocalPlayer().setTeam(1);
@@ -231,7 +230,7 @@ public class AtBGameThread extends GameThread {
                     // Add Mek to game
                     client.sendAddEntity(entity);
                     // Wait a few secs to not overuse bandwidth
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
                 // Run through the units again. This time add transported units to the correct linkage,
                 // but only if the transport itself is in the game too.
@@ -290,7 +289,7 @@ public class AtBGameThread extends GameThread {
 
                     entity.setDeployRound(deploymentRound);
                     client.sendAddEntity(entity);
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
                 client.sendPlayerInfo();
@@ -405,7 +404,7 @@ public class AtBGameThread extends GameThread {
                     }
                     entity.setOwner(botClient.getLocalPlayer());
                     botClient.sendAddEntity(entity);
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());

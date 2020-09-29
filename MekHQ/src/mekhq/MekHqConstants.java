@@ -28,6 +28,11 @@ public final class MekHqConstants {
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history, also used as a limit in the UI
+
+    // region Command Center
+    public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
+    public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
+    //endregion Command Center
     //endregion Display
 
     //region Autosave
@@ -52,6 +57,11 @@ public final class MekHqConstants {
     public static final String PREFER_GZIPPED_CAMPAIGN_FILE = "preferGzippedCampaignFile";
     public static final String WRITE_CUSTOMS_TO_XML = "writeCustomsToXML";
     //endregion Campaign XML Save Options
+
+    //region Miscellaneous Options
+    public static final String MISCELLANEOUS_NODE = "mekhq/prefs/miscellaneous";
+    public static final String START_GAME_DELAY = "startGameDelay";
+    //endregion Miscellaneous Options
     //endregion MekHQ Options
 
     /** This is used in creating the name of save files, e.g. the MekHQ campaign file */

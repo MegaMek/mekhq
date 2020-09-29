@@ -13,7 +13,7 @@ package mekhq;
 
 import java.awt.KeyboardFocusManager;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import megamek.client.Client;
 import megamek.client.CloseClientListener;
@@ -39,17 +39,17 @@ class GameThread extends Thread implements CloseClientListener {
     protected Campaign campaign;
     protected boolean started;
 
-    protected ArrayList<Unit> units;
+    protected List<Unit> units;
 
     protected volatile boolean stop = false;
     //endregion Variable Declarations
 
     //region Constructors
-    public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units) {
+    public GameThread(String name, Client c, MekHQ app, List<Unit> units) {
         this(name, c, app, units, true);
     }
 
-    public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, boolean started) {
+    public GameThread(String name, Client c, MekHQ app, List<Unit> units, boolean started) {
         super(name);
         myname = name.trim();
         this.client = c;
@@ -97,18 +97,18 @@ class GameThread extends Thread implements CloseClientListener {
             // phase
             for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error(getClass(), "run", "Thread in unknown stage" );
+                MekHQ.getLogger().error(this, "Thread in unknown stage" );
             }
 
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-                MekHQ.getLogger().info(getClass(), "run","Thread in lounge" );
+                MekHQ.getLogger().info(this,"Thread in lounge" );
                 client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
 
                 if (started) {
                     client.getGame().getOptions().loadOptions();
                     client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
                 for (Unit unit : units) {
@@ -121,7 +121,7 @@ class GameThread extends Thread implements CloseClientListener {
                     // Add Mek to game
                     client.sendAddEntity(entity);
                     // Wait a few secs to not overuse bandwith
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
                 client.sendPlayerInfo();

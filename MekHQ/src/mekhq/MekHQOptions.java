@@ -61,6 +61,24 @@ public final class MekHQOptions {
     public void setHistoricalDailyLog(boolean value) {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.HISTORICAL_DAILY_LOG, value);
     }
+
+    //region Command Center Display
+    public boolean getCommandCenterUseUnitMarket() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
+    }
+
+    public void setCommandCenterUseUnitMarket(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, value);
+    }
+
+    public boolean getCommandCenterMRMS() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_MRMS, false);
+    }
+
+    public void setCommandCenterMRMS(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_MRMS, value);
+    }
+    //endregion Command Center Display
     //endregion Display
 
     //region Autosave
@@ -159,4 +177,14 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.XML_SAVES_NODE).putBoolean(MekHqConstants.WRITE_CUSTOMS_TO_XML, value);
     }
     //endregion Campaign XML Save Options
+
+    //region Miscellaneous Options
+    public int getStartGameDelay() {
+        return userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).getInt(MekHqConstants.START_GAME_DELAY, 500);
+    }
+
+    public void setStartGameDelay(int startGameDelay) {
+        userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).putInt(MekHqConstants.START_GAME_DELAY, startGameDelay);
+    }
+    //endregion Miscellaneous Options
 }

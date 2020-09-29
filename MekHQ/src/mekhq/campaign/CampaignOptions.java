@@ -33,7 +33,6 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -109,6 +108,7 @@ public class CampaignOptions implements Serializable {
     //region General Tab
     private boolean useUnitRating;
     private UnitRatingMethod unitRatingMethod;
+    private int manualUnitRatingModifier;
     //endregion General Tab
 
     //region Repair and Maintenance Tab
@@ -332,6 +332,9 @@ public class CampaignOptions implements Serializable {
     private boolean useAtB;
     private int skillLevel;
 
+    // AtB Module: Unit Market // TODO : Fully Implement Me
+    private boolean useAtBUnitMarket;
+
     // Unit Administration
     private boolean useShareSystem;
     private boolean sharesExcludeLargeCraft;
@@ -390,7 +393,6 @@ public class CampaignOptions implements Serializable {
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
     private boolean useAtBCapture; // TODO : merge me with the Personnel Option capturePrisoners
-    private int startGameDelay;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -417,6 +419,7 @@ public class CampaignOptions implements Serializable {
         //region General Tab
         useUnitRating = true;
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
+        manualUnitRatingModifier = 0;
         //endregion General Tab
 
         //region Repair and Maintenance Tab
@@ -718,6 +721,9 @@ public class CampaignOptions implements Serializable {
         useAtB = false;
         skillLevel = 2;
 
+        // AtB Module: Unit Market
+        useAtBUnitMarket = false;
+
         // Unit Administration
         useShareSystem = false;
         sharesExcludeLargeCraft = false;
@@ -780,12 +786,32 @@ public class CampaignOptions implements Serializable {
         useLightConditions = true;
         usePlanetaryConditions = false;
         useAtBCapture = false;
-        startGameDelay = 500;
         //endregion Against the Bot Tab
     }
     //endregion Constructors
 
     //region General Tab
+    /**
+     * @return the method of unit rating to use
+     */
+    public UnitRatingMethod getUnitRatingMethod() {
+        return unitRatingMethod;
+    }
+
+    /**
+     * @param method the method of unit rating to use
+     */
+    public void setUnitRatingMethod(UnitRatingMethod method) {
+        this.unitRatingMethod = method;
+    }
+
+    public int getManualUnitRatingModifier() {
+        return manualUnitRatingModifier;
+    }
+
+    public void setManualUnitRatingModifier(int manualUnitRatingModifier) {
+        this.manualUnitRatingModifier = manualUnitRatingModifier;
+    }
     //endregion General Tab
 
     //region Repair and Maintenance Tab
@@ -1787,20 +1813,6 @@ public class CampaignOptions implements Serializable {
     }
     //endregion Finances Tab
 
-    /**
-     * @return the method of unit rating to use
-     */
-    public UnitRatingMethod getUnitRatingMethod() {
-        return unitRatingMethod;
-    }
-
-    /**
-     * @param method the method of unit rating to use
-     */
-    public void setUnitRatingMethod(UnitRatingMethod method) {
-        this.unitRatingMethod = method;
-    }
-
     public static String getRepairSystemName(int repairSystem) {
         return REPAIR_SYSTEM_NAMES[repairSystem];
     }
@@ -2510,6 +2522,14 @@ public class CampaignOptions implements Serializable {
         this.useAtB = useAtB;
     }
 
+    public boolean getUseAtBUnitMarket() {
+        return useAtBUnitMarket;
+    }
+
+    public void setUseAtBUnitMarket(boolean useAtBUnitMarket) {
+        this.useAtBUnitMarket = useAtBUnitMarket;
+    }
+
     public boolean getUseAero() {
         return useAero;
     }
@@ -2908,13 +2928,6 @@ public class CampaignOptions implements Serializable {
         unitMarketReportRefresh = refresh;
     }
 
-    public int getStartGameDelay() {
-        return startGameDelay;
-    }
-
-    public void setStartGameDelay(int delay) {
-        startGameDelay = delay;
-    }
     public boolean massRepairUseExtraTime() {
         return massRepairUseExtraTime;
     }
@@ -3038,6 +3051,7 @@ public class CampaignOptions implements Serializable {
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         //region General Tab
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "manualUnitRatingModifier", getManualUnitRatingModifier());
         //endregion General Tab
 
         //region Repair and Maintenance Tab
@@ -3047,7 +3061,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useOriginFactionForNames);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnitRating", useUnitRating);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.getDescription());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignedTechFirst", assignedTechFirst);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "resetToFirstTech", resetToFirstTech);
@@ -3275,7 +3289,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBCapture", useAtBCapture);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "startGameDelay", startGameDelay);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforAeros", allowOpforAeros);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
@@ -3347,6 +3360,8 @@ public class CampaignOptions implements Serializable {
                     + csv.toString()
                     + "</usePortraitForType>");
 
+        //region AtB Options
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAtBUnitMarket", useAtBUnitMarket);
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<rats>"
                 + MekHqXmlUtil.escape(StringUtils.join(rats, ','))
@@ -3357,14 +3372,12 @@ public class CampaignOptions implements Serializable {
         if (ignoreRatEra) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<ignoreRatEra/>");
         }
+        //endregion AtB Options
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-        final String METHOD_NAME = "generateCampaignOptionsFromXml(Node)";
-
-        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                "Loading Campaign Options from XML...");
+        MekHQ.getLogger().info(CampaignOptions.class, "Loading Campaign Options from XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3379,8 +3392,7 @@ public class CampaignOptions implements Serializable {
                 continue;
             }
 
-            MekHQ.getLogger().info(CampaignOptions.class, METHOD_NAME,
-                    String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
+            MekHQ.getLogger().info(CampaignOptions.class, String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
 
             //region Repair and Maintenance Tab
             if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
@@ -3566,17 +3578,16 @@ public class CampaignOptions implements Serializable {
                 retVal.factionIntroDate = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
                 retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") || wn2.getNodeName().equalsIgnoreCase
-                    ("useDragoonRating")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating")
+                    || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) {
                 retVal.useUnitRating = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod") || wn2.getNodeName().equalsIgnoreCase
-                    ("dragoonsRatingMethod")) {
-                if (!wn2.getTextContent().isEmpty() && (wn2.getTextContent() != null)) {
-                    UnitRatingMethod method = UnitRatingMethod.getUnitRatingMethod(wn2.getTextContent());
-                    retVal.setUnitRatingMethod((method != null) ? method : UnitRatingMethod.CAMPAIGN_OPS);
-                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod")
+                    || wn2.getNodeName().equalsIgnoreCase("dragoonsRatingMethod")) {
+                retVal.setUnitRatingMethod(UnitRatingMethod.parseFromString(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("manualUnitRatingModifier")) {
+                retVal.setManualUnitRatingModifier(Integer.parseInt(wn2.getTextContent()));
             } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
-                String[] values = wn2.getTextContent().split(","); //$NON-NLS-1$
+                String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
                     if (i < retVal.usePortraitForType.length) {
                         retVal.usePortraitForType[i] = Boolean.parseBoolean(values[i].trim());
@@ -3622,8 +3633,7 @@ public class CampaignOptions implements Serializable {
                 } else if (values.length == 9) {
                     migrateMarriageSurnameWeights(retVal, values);
                 } else {
-                    MekHQ.getLogger().error(CampaignOptions.class,
-                            "generateCampaignOptionsFromXml", "Unkown length of randomMarriageSurnameWeights");
+                    MekHQ.getLogger().error(CampaignOptions.class, "Unkown length of randomMarriageSurnameWeights");
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
@@ -3791,6 +3801,8 @@ public class CampaignOptions implements Serializable {
                 retVal.tougherHealing = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
                 retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBUnitMarket")) {
+                retVal.setUseAtBUnitMarket(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useAero")) {
                 retVal.useAero = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useVehicles")) {
@@ -3898,8 +3910,8 @@ public class CampaignOptions implements Serializable {
                 retVal.contractMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
                 retVal.unitMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) {
-                retVal.startGameDelay = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
+                MekHQ.getMekHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforLocalUnits")) {
                 retVal.allowOpforLocalUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforAeros")) {
@@ -3955,8 +3967,8 @@ public class CampaignOptions implements Serializable {
                                     continue;
                                 }
 
-                                MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                                        String.format("massRepairOption %d.%s\n\t%s", //$NON-NLS-1$
+                                MekHQ.getLogger().info(CampaignOptions.class,
+                                        String.format("massRepairOption %d.%s\n\t%s",
                                                 mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
 
                                 if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
@@ -3983,8 +3995,7 @@ public class CampaignOptions implements Serializable {
             }
         }
 
-        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                "Load Campaign Options Complete!"); //$NON-NLS-1$
+        MekHQ.getLogger().info(CampaignOptions.class, "Load Campaign Options Complete!");
 
         return retVal;
     }
