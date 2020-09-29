@@ -1091,18 +1091,19 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             Entity en = getEntity(faction, skill, quality, unitTypes[i],
                     AtBConfiguration.decodeWeightStr(weights, i),
                     campaign);
-            if (null != en) {
+            if (en != null) {
                 en.setDeployRound(arrivalTurn);
+                list.add(en);
             }
-            list.add(en);
-            if (unitTypes[i] == UnitType.TANK && campaign.getCampaignOptions().getDoubleVehicles()) {
+
+            if ((unitTypes[i] == UnitType.TANK) && campaign.getCampaignOptions().getDoubleVehicles()) {
                 en = getEntity(faction, skill, quality, unitTypes[i],
                         AtBConfiguration.decodeWeightStr(weights, i),
                         campaign);
-                if (null != en) {
+                if (en != null) {
                     en.setDeployRound(arrivalTurn);
+                    list.add(en);
                 }
-                list.add(en);
             }
         }
     }
@@ -1185,21 +1186,22 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 Entity en = getEntity(faction, skill, tmpQuality, unitType,
                         AtBConfiguration.decodeWeightStr(weights, point),
                         campaign);
-                if (null != en) {
+                if (en != null) {
                     en.setDeployRound(arrivalTurn);
+                    list.add(en);
                 }
-                list.add(en);
             }
         }
+
         if (forceType == FORCE_NOVA) {
             unitType = UnitType.BATTLE_ARMOR;
             for (int i = 0; i < 5; i++) {
                 Entity en = getEntity(faction, skill, quality,
                         unitType, -1, campaign);
-                if (null != en) {
+                if (en != null) {
                     en.setDeployRound(arrivalTurn);
+                    list.add(en);
                 }
-                list.add(en);
             }
         }
     }
@@ -1248,18 +1250,19 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             Entity en = getEntity(faction, skill, quality, unitTypes[i],
                     AtBConfiguration.decodeWeightStr(weights, i),
                     campaign);
-            if (null != en) {
+            if (en != null) {
                 en.setDeployRound(arrivalTurn);
+                list.add(en);
             }
-            list.add(en);
+
             if (unitTypes[i] == UnitType.TANK && campaign.getCampaignOptions().getDoubleVehicles()) {
                 en = getEntity(faction, skill, quality, unitTypes[i],
                         AtBConfiguration.decodeWeightStr(weights, i),
                         campaign);
-                if (null != en) {
+                if (en != null) {
                     en.setDeployRound(arrivalTurn);
+                    list.add(en);
                 }
-                list.add(en);
             }
         }
     }

@@ -568,7 +568,7 @@ public class EquipmentPart extends Part {
         }
         if (varCost.isZero()) {
             // if we don't know what it is...
-            MekHQ.getLogger().warning(EquipmentPart.class, "I don't know how much " + name + " costs.");
+            MekHQ.getLogger().debug(EquipmentPart.class, "I don't know how much " + name + " costs.");
         }
         return varCost;
     }

@@ -87,9 +87,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int infantryCount = 0;
     private int infantryUnitCount = 0;
     private int smallCraftCount = 0;
-    private int dropshipCount = 0;
-    private int warshipCount = 0;
-    private int jumpshipCount = 0;
+    private int dropShipCount = 0;
+    private int warShipCount = 0;
+    private int jumpShipCount = 0;
     private int mechBayCount = 0;
     private int protoBayCount = 0;
     private int fighterBayCount = 0;
@@ -100,9 +100,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int baBayCount = 0;
     private int infantryBayCount = 0;
     private int dockingCollarCount = 0;
-    private boolean warshipWithDocsOwner = false;
-    private boolean warshipOwner = false;
-    private boolean jumpshipOwner = false;
+    private boolean warShipWithDocsOwner = false;
+    private boolean warShipOwner = false;
+    private boolean jumpShipOwner = false;
     private Person commander = null;
     private int breachCount = 0;
     private int successCount = 0;
@@ -170,12 +170,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * Returns the average experience level for all combat personnel.
      */
     protected BigDecimal calcAverageExperience() {
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) > 0) {
-            return getTotalSkillLevels().divide(getNumberUnits(), PRECISION,
-                                                HALF_EVEN);
-        }
-
-        return BigDecimal.ZERO;
+        return hasUnits() ? getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN)
+                : BigDecimal.ZERO;
     }
 
     /**
@@ -246,36 +242,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     *  Returns the Commander's Skill Level for the specified skill
-     */
-    int getCommanderSkill(String skillName) {
-        Person commander = getCommander();
-        if (commander == null) {
-            return 0;
-        }
-        Skill skill = commander.getSkill(skillName);
-        if (skill == null) {
-            return 0;
-        }
-        return skill.getLevel();
-    }
-
-    /**
-     * Returns the Commander's Skill Bonus for the specified skill
-     */
-    int getCommanderBonus(String skillName) {
-        Person commander = getCommander();
-        if (commander == null) {
-            return 0;
-        }
-        Skill skill = commander.getSkill(skillName);
-        if (skill == null) {
-            return 0;
-        }
-        return skill.getBonus();
-    }
-
-    /**
      *  Returns the Commander's Skill Level with Bonus for the specified skill
      */
     int getCommanderSkillLevelWithBonus(String skillName) {
@@ -297,6 +263,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return failCount;
     }
 
+    @Override
     public int getTechValue() {
         return 0;
     }
@@ -320,6 +287,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
     public int getTransportValue() {
         int value = 0;
 
+        if (!hasUnits()) {
+            return 0;
+        }
+
         //Find the percentage of units that are transported.
         setTransportPercent(getTransportPercent());
 
@@ -339,11 +310,11 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
         //Only the highest of these values should be used, regardless of how
         // many are actually owned.
-        if (isWarshipWithDocsOwner()) {
+        if (isWarShipWithDocsOwner()) {
             value += 30;
-        } else if (isWarshipOwner()) {
+        } else if (isWarShipOwner()) {
             value += 20;
-        } else if (isJumpshipOwner()) {
+        } else if (isJumpShipOwner()) {
             value += 10;
         }
 
@@ -454,6 +425,13 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return numberUnits;
     }
 
+    /**
+     * @return if the the unit has any units
+     */
+    protected boolean hasUnits() {
+        return getNumberUnits().compareTo(BigDecimal.ZERO) != 0;
+    }
+
     protected abstract String getExperienceLevelName(BigDecimal experience);
 
     /**
@@ -483,9 +461,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setNumberBaSquads(0);
         setInfantryCount(0);
         setInfantryUnitCount(0);
-        setDropshipCount(0);
-        setJumpshipCount(0);
-        setWarshipCount(0);
+        setDropShipCount(0);
+        setJumpShipCount(0);
+        setWarShipCount(0);
 
         setMechBayCount(0);
         setFighterBayCount(0);
@@ -498,9 +476,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setInfantryBayCount(0);
         setDockingCollarCount(0);
 
-        setWarshipWithDocsOwner(false);
-        setWarshipOwner(false);
-        setJumpshipOwner(false);
+        setWarShipWithDocsOwner(false);
+        setWarShipOwner(false);
+        setJumpShipOwner(false);
 
         setCommander(null);
         setBreachCount(0);
@@ -542,9 +520,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
         }
     }
 
-    void updateDockingCollarCount(Jumpship jumpship) {
-        setDockingCollarCount(getDockingCollarCount() +
-                              jumpship.getDockingCollars().size());
+    void updateDockingCollarCount(Jumpship jumpShip) {
+        setDockingCollarCount(getDockingCollarCount() + jumpShip.getDockingCollars().size());
     }
 
     protected Campaign getCampaign() {
@@ -722,16 +699,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return (int) Math.ceil((double) getInfantryCount() / 28);
     }
 
-    int getDropshipCount() {
-        return dropshipCount;
+    int getDropShipCount() {
+        return dropShipCount;
     }
 
-    void setDropshipCount(int dropshipCount) {
-        this.dropshipCount = dropshipCount;
+    void setDropShipCount(int dropShipCount) {
+        this.dropShipCount = dropShipCount;
     }
 
-    private void incrementDropshipCount() {
-        dropshipCount++;
+    private void incrementDropShipCount() {
+        dropShipCount++;
     }
 
     int getSmallCraftCount() {
@@ -746,28 +723,28 @@ public abstract class AbstractUnitRating implements IUnitRating {
         smallCraftCount++;
     }
 
-    int getWarshipCount() {
-        return warshipCount;
+    int getWarShipCount() {
+        return warShipCount;
     }
 
-    private void setWarshipCount(int warshipCount) {
-        this.warshipCount = warshipCount;
+    private void setWarShipCount(int warShipCount) {
+        this.warShipCount = warShipCount;
     }
 
-    private void incrementWarshipCount() {
-        warshipCount++;
+    private void incrementWarShipCount() {
+        warShipCount++;
     }
 
-    int getJumpshipCount() {
-        return jumpshipCount;
+    int getJumpShipCount() {
+        return jumpShipCount;
     }
 
-    void setJumpshipCount(int jumpshipCount) {
-        this.jumpshipCount = jumpshipCount;
+    void setJumpShipCount(int jumpShipCount) {
+        this.jumpShipCount = jumpShipCount;
     }
 
-    private void incrementJumpshipCount() {
-        jumpshipCount++;
+    private void incrementJumpShipCount() {
+        jumpShipCount++;
     }
 
     int getMechBayCount() {
@@ -850,28 +827,28 @@ public abstract class AbstractUnitRating implements IUnitRating {
         this.dockingCollarCount = dockingCollarCount;
     }
 
-    boolean isWarshipWithDocsOwner() {
-        return warshipWithDocsOwner;
+    boolean isWarShipWithDocsOwner() {
+        return warShipWithDocsOwner;
     }
 
-    void setWarshipWithDocsOwner(boolean warshipWithDocsOwner) {
-        this.warshipWithDocsOwner = warshipWithDocsOwner;
+    void setWarShipWithDocsOwner(boolean warShipWithDocsOwner) {
+        this.warShipWithDocsOwner = warShipWithDocsOwner;
     }
 
-    boolean isWarshipOwner() {
-        return warshipOwner;
+    boolean isWarShipOwner() {
+        return warShipOwner;
     }
 
-    void setWarshipOwner(boolean warshipOwner) {
-        this.warshipOwner = warshipOwner;
+    void setWarShipOwner(boolean warShipOwner) {
+        this.warShipOwner = warShipOwner;
     }
 
-    boolean isJumpshipOwner() {
-        return jumpshipOwner;
+    boolean isJumpShipOwner() {
+        return jumpShipOwner;
     }
 
-    void setJumpshipOwner(boolean jumpshipOwner) {
-        this.jumpshipOwner = jumpshipOwner;
+    void setJumpShipOwner(boolean jumpShipOwner) {
+        this.jumpShipOwner = jumpShipOwner;
     }
 
     protected void setCommander(Person commander) {
@@ -938,16 +915,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 }
                 break;
             case UnitType.DROPSHIP:
-                incrementDropshipCount();
+                incrementDropShipCount();
                 break;
             case UnitType.SMALL_CRAFT:
                 incrementSmallCraftCount();
                 break;
             case UnitType.WARSHIP:
-                incrementWarshipCount();
+                incrementWarShipCount();
                 break;
             case UnitType.JUMPSHIP:
-                incrementJumpshipCount();
+                incrementJumpShipCount();
                 break;
             case UnitType.AERO:
             case UnitType.CONV_FIGHTER:

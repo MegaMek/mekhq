@@ -53,7 +53,6 @@ import mekhq.campaign.unit.Unit;
  * @since 3/12/2012
  */
 public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
-
     private BigDecimal highTechPercent = BigDecimal.ZERO;
     private BigDecimal numberIS2 = BigDecimal.ZERO;
     private BigDecimal numberClan = BigDecimal.ZERO;
@@ -118,7 +117,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
             updateBayCount(u.getEntity());
 
-            updateJumpships(u.getEntity());
+            updateJumpShips(u.getEntity());
 
             updateTechSupportNeeds(u);
         }
@@ -140,15 +139,15 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         }
     }
 
-    private void updateJumpships(Entity en) {
+    private void updateJumpShips(Entity en) {
         if (en instanceof Warship) {
             if (en.getDocks() > 0) {
-                setWarshipWithDocsOwner(true);
+                setWarShipWithDocsOwner(true);
             } else {
-                setWarshipOwner(true);
+                setWarShipOwner(true);
             }
         } else if (en instanceof Jumpship) {
-            setJumpshipOwner(true);
+            setJumpShipOwner(true);
         }
     }
 
@@ -428,6 +427,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         int score = 0;
 
+        score += getCampaign().getCampaignOptions().getManualUnitRatingModifier();
         score += getExperienceValue();
         score += getCommanderValue();
         score += getCombatRecordValue();
@@ -441,6 +441,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     @Override
     public int getExperienceValue() {
+        if (!hasUnits()) {
+            return 0;
+        }
         BigDecimal averageExperience = calcAverageExperience();
         if (averageExperience.compareTo(greenThreshold) >= 0) {
             return 5;
@@ -448,8 +451,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return 10;
         } else if (averageExperience.compareTo(veteranThreshold) >= 0) {
             return 20;
+        } else {
+            return 40;
         }
-        return 40;
     }
 
     @Override
@@ -587,7 +591,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     @Override
     public int getSupportValue() {
-        return getTechSupportValue() + getMedicalSupportValue() + getAdminValue();
+        return hasUnits() ? getTechSupportValue() + getMedicalSupportValue() + getAdminValue() : 0;
     }
 
     private int getYearsInDebt() {
@@ -689,9 +693,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         .append(" (plus ").append(excessHeavyVeeBays).append(" excess Heavy and ").append(excessSuperHeavyVeeBays).append(" excess Super Heavy)")
         .append("\n").append(String.format(TEMPLATE_TWO, "Battle Armor Bays:", getNumberBaSquads(), getBaBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()))
-        .append("\n").append(String.format(TEMPLATE, "JumpShip?", (isJumpshipOwner() ? "Yes" : "No")))
-        .append("\n").append(String.format(TEMPLATE, "WarShip w/out Collar?", (isWarshipOwner() ? "Yes" : "No")))
-        .append("\n").append(String.format(TEMPLATE, "WarShip w/ Collar?", (isWarshipWithDocsOwner() ? "Yes" : "No")));
+        .append("\n").append(String.format(TEMPLATE, "JumpShip?", (isJumpShipOwner() ? "Yes" : "No")))
+        .append("\n").append(String.format(TEMPLATE, "WarShip w/out Collar?", (isWarShipOwner() ? "Yes" : "No")))
+        .append("\n").append(String.format(TEMPLATE, "WarShip w/ Collar?", (isWarShipWithDocsOwner() ? "Yes" : "No")));
 
         return out.toString();
     }
@@ -786,16 +790,19 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     @Override
     public String getDetails() {
-        return String.format("%-" + HEADER_LENGTH + "s %s", "Dragoons Rating:",
-                             getUnitRating()) + "\n" +
-               "    Method: FM: Mercenaries (rev)\n\n" +
-               getQualityDetails() + "\n\n" +
-               getCommandDetails() + "\n\n" +
-               getCombatRecordDetails() + "\n\n" +
-               getTransportationDetails() + "\n\n" +
-               getTechnologyDetails() + "\n\n" +
-               getSupportDetails() + "\n\n" +
-               getFinancialDetails();
+        final boolean useManualUnitRatingModifier = getCampaign().getCampaignOptions().getManualUnitRatingModifier() != 0;
+        return String.format("%-" + HEADER_LENGTH + "s %s", "Dragoons Rating:", getUnitRating()) + "\n" +
+                "    Method: FM: Mercenaries (rev)\n" +
+                (useManualUnitRatingModifier
+                        ? ("    Manual Modifier: " + getCampaign().getCampaignOptions().getManualUnitRatingModifier() + "\n")
+                        : "") + "\n" +
+                getQualityDetails() + "\n\n" +
+                getCommandDetails() + "\n\n" +
+                getCombatRecordDetails() + "\n\n" +
+                getTransportationDetails() + "\n\n" +
+                getTechnologyDetails() + "\n\n" +
+                getSupportDetails() + "\n\n" +
+                getFinancialDetails();
     }
 
     @Override
@@ -867,17 +874,17 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     @Override
     protected String getExperienceLevelName(BigDecimal experience) {
-        if (experience.compareTo(greenThreshold) >= 0) {
+        if (!hasUnits()) {
+            return SkillType.getExperienceLevelName(-1);
+        } else if (experience.compareTo(greenThreshold) >= 0) {
             return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
-        }
-        if (experience.compareTo(regularThreshold) >= 0) {
+        } else if (experience.compareTo(regularThreshold) >= 0) {
             return SkillType.getExperienceLevelName(SkillType.EXP_REGULAR);
-        }
-        if (experience.compareTo(veteranThreshold) >= 0) {
+        } else if (experience.compareTo(veteranThreshold) >= 0) {
             return SkillType.getExperienceLevelName(SkillType.EXP_VETERAN);
+        } else {
+            return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
         }
-
-        return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
     }
 
     private int getTechRatedUnits() {
@@ -885,13 +892,13 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                getLightVeeCount() +
                getHeavyVeeCount() + getSuperHeavyVeeCount() +
                getNumberBaSquads() + getSmallCraftCount() +
-               getDropshipCount() + getWarshipCount() + getJumpshipCount();
+               getDropShipCount() + getWarShipCount() + getJumpShipCount();
     }
 
     @Override
     public int getTechValue() {
         //Make sure we have units.
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+        if (!hasUnits()) {
             return 0;
         }
 
