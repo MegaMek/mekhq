@@ -51,10 +51,6 @@ public enum PrisonerCaptureStyle {
     public boolean isAtB() {
         return this == ATB;
     }
-
-    public boolean isTaharqa() {
-        return this == TAHARQA;
-    }
     //endregion Boolean Comparisons
 
     @Override
