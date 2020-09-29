@@ -522,7 +522,6 @@ public class AcquisitionsDialog extends JDialog {
                     campaignGUI.getCampaign().depodPart(replacement, 1);
                     MekHQ.triggerEvent(new PartChangedEvent(replacement));
                 }
-
                 refresh();
             });
             actionButtons.add(btnDepod, gbcActions);

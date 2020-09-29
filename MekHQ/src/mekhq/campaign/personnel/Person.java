@@ -1859,8 +1859,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
-
         Person retVal = new Person(c);
 
         try {
@@ -2048,7 +2046,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     type = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("skill")) {
                     Skill s = Skill.generateInstanceFromXML(wn2);
-                    if (null != s && null != s.getType()) {
+                    if ((s != null) && (s.getType() != null)) {
                         retVal.skills.addSkill(s.getType().getName(), s);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("techUnitIds")) {
@@ -2061,10 +2059,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().error(Person.class, METHOD_NAME,
-                                    "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error(Person.class, "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.addTechUnitID(UUID.fromString(wn3.getTextContent()));
@@ -2079,10 +2074,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().error(Person.class, METHOD_NAME,
-                                    "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error(Person.class, "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -2111,10 +2103,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().error(Person.class, METHOD_NAME,
-                                    "Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error(Person.class, "Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
@@ -2130,8 +2119,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            MekHQ.getLogger().error(Person.class, METHOD_NAME,
-                                    "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error(Person.class, "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -2148,10 +2136,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().error(Person.class, METHOD_NAME,
-                                    "Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error(Person.class, "Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
@@ -2255,7 +2240,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(Person.class, METHOD_NAME, "Error restoring advantage: " + adv);
+                        MekHQ.getLogger().error(Person.class, "Error restoring advantage: " + adv);
                     }
                 }
             }
@@ -2269,7 +2254,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(Person.class, METHOD_NAME, "Error restoring edge: " + adv);
+                        MekHQ.getLogger().error(Person.class, "Error restoring edge: " + adv);
                     }
                 }
             }
@@ -2283,7 +2268,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(Person.class, METHOD_NAME, "Error restoring implants: " + adv);
+                        MekHQ.getLogger().error(Person.class, "Error restoring implants: " + adv);
                     }
                 }
             }
@@ -2329,8 +2314,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 retVal.setRankNumeric(0);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(Person.class, METHOD_NAME, "Failed to read person "
-                    + retVal.getFullName() + " from file", e);
+            MekHQ.getLogger().error(Person.class, "Failed to read person " + retVal.getFullName() + " from file");
+            MekHQ.getLogger().error(Person.class, e);
             retVal = null;
         }
 

@@ -320,16 +320,15 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
             if (null != scenario.getLance(campaign)) {
                 lblForceDesc.setText(campaign.getForce(scenario.getLanceForceId()).getFullName());
-            } else if(scenario instanceof AtBDynamicScenario){
-
+            } else if (scenario instanceof AtBDynamicScenario) {
                 StringBuilder forceBuilder = new StringBuilder();
                 forceBuilder.append("<html>");
                 boolean chop = false;
-                for(int forceID : scenario.getForceIDs()) {
+                for (int forceID : scenario.getForceIDs()) {
                     forceBuilder.append(campaign.getForce(forceID).getFullName());
                     forceBuilder.append("<br/>");
                     ScenarioForceTemplate template = ((AtBDynamicScenario) scenario).getPlayerForceTemplates().get(forceID);
-                    if(template != null && template.getActualDeploymentZone() >= 0) {
+                    if (template != null && template.getActualDeploymentZone() >= 0) {
                         forceBuilder.append("Deploy: ");
                         forceBuilder.append(IStartingPositions.START_LOCATION_NAMES[template.getActualDeploymentZone()]);
                         forceBuilder.append("<br/>");
@@ -337,7 +336,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                     chop = true;
                 }
 
-                if(chop) {
+                if (chop) {
                     forceBuilder.delete(forceBuilder.length() - 5, forceBuilder.length());
                 }
                 forceBuilder.append("</html>");

@@ -94,9 +94,7 @@ public class AtBGameThread extends GameThread {
         try {
             client.connect();
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
-                    "MegaMek client failed to connect to server"); //$NON-NLS-1$
-            MekHQ.getLogger().error(getClass(), "run", ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(this, "MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -109,11 +107,11 @@ public class AtBGameThread extends GameThread {
             // phase
             for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error(getClass(), "run", "Thread in unknown stage" );
+                MekHQ.getLogger().error(this, "Thread in unknown stage" );
             }
 
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-                MekHQ.getLogger().info(getClass(), "run", "Thread in lounge" );
+                MekHQ.getLogger().info(this, "Thread in lounge" );
 
                 client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
@@ -136,9 +134,7 @@ public class AtBGameThread extends GameThread {
                     try (InputStream is = new FileInputStream(mapgenFile)) {
                         mapSettings = MapSettings.getInstance(is);
                     } catch (FileNotFoundException ex) {
-                        MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
-                                "Could not load map file data/mapgen/" + scenario.getMap() + ".xml"); //$NON-NLS-1$
-                        MekHQ.getLogger().error(getClass(), "run", ex); //$NON-NLS-1$
+                        MekHQ.getLogger().error(this, "Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
                     }
 
                     if(scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
@@ -310,9 +306,7 @@ public class AtBGameThread extends GameThread {
                     try {
                         botClient.connect();
                     } catch (Exception e) {
-                        MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
-                                "Could not connect with Bot name " + bf.getName()); //$NON-NLS-1$
-                        MekHQ.getLogger().error(getClass(), "run", e); //$NON-NLS-1$
+                        MekHQ.getLogger().error(this, "Could not connect with Bot name " + bf.getName(), e);
                     }
                     swingGui.getBots().put(name, botClient);
 
@@ -367,7 +361,7 @@ public class AtBGameThread extends GameThread {
                 Thread.sleep(50);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "run", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(this, e);
         }
         finally {
             client.die();
@@ -395,8 +389,7 @@ public class AtBGameThread extends GameThread {
                 sleep(50);
             }
             if (null == botClient.getLocalPlayer()) {
-                MekHQ.getLogger().log(getClass(), "configureBot", LogLevel.ERROR, //$NON-NLS-1$
-                        "Could not configure bot " + botClient.getName()); //$NON-NLS-1$
+                MekHQ.getLogger().error(this, "Could not configure bot " + botClient.getName());
             } else {
                 for (Entity entity : botForce.getEntityList()) {
                     if (null == entity) {
@@ -421,7 +414,7 @@ public class AtBGameThread extends GameThread {
                 botClient.sendPlayerInfo();
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "configureBot", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(this, e);
         }
     }
 }

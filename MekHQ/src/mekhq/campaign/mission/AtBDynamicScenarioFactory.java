@@ -57,7 +57,6 @@ import megamek.common.PlanetaryConditions;
 import megamek.common.Transporter;
 import megamek.common.TroopSpace;
 import megamek.common.UnitType;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
@@ -221,7 +220,6 @@ public class AtBDynamicScenarioFactory {
      * @return How many "lances" or other individual units were generated.
      */
     private static int generateForces(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign, int weightClass) {
-
         int generatedLanceCount = 0;
         List<ScenarioForceTemplate> forceTemplates = scenario.getTemplate().getAllScenarioForces();
 
@@ -309,7 +307,7 @@ public class AtBDynamicScenarioFactory {
                 quality = scenario.getEffectiveOpforQuality();
                 break;
             default:
-                MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, "generateForce", LogLevel.WARNING,
+                MekHQ.getLogger().warning(AtBDynamicScenarioFactory.class,
                         String.format("Invalid force alignment %d", forceTemplate.getForceAlignment()));
         }
 
@@ -397,7 +395,7 @@ public class AtBDynamicScenarioFactory {
             // no reason to go into an endless loop if we can't generate a lance
             if (generatedLance.isEmpty()) {
                 stopGenerating = true;
-                MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, "generateForces", LogLevel.WARNING,
+                MekHQ.getLogger().warning(AtBDynamicScenarioFactory.class,
                         String.format("Unable to generate units from RAT: %s, type %d, max weight %d",
                                 factionCode, forceTemplate.getAllowedUnitType(), weightClass));
                 continue;
@@ -1262,8 +1260,6 @@ public class AtBDynamicScenarioFactory {
      */
     @SuppressWarnings(value = "unused")
     private static Entity getEntityByName(String name, String factionCode, int skill, Campaign campaign) {
-        final String METHOD_NAME = "getEntityByName(String,String,int,Campaign)";
-
         MechSummary mechSummary = MechSummaryCache.getInstance().getMech(name);
         if (mechSummary == null) {
             return null;
@@ -1280,14 +1276,12 @@ public class AtBDynamicScenarioFactory {
      * @return An crewed entity
      */
     public static Entity createEntityWithCrew(String factionCode, int skill, Campaign campaign, MechSummary ms) {
-        final String METHOD_NAME = "createEntityWithCrew(String,int,Campaign,MechSummary)";
         Entity en;
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         } catch (Exception ex) {
-            MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
-                    "Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
-            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class, "Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
+            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class, ex);
             return null;
         }
 
@@ -1724,7 +1718,7 @@ public class AtBDynamicScenarioFactory {
         // if so, we log a warning, then generate what we can.
         // having a longer weight string is not an issue, as we simply generate the first N units where N is the size of unitTypes.
         if (unitTypeSize > weights.length()) {
-            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class, "generateLance",
+            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class,
                     String.format("More unit types (%d) provided than weights (%d). Truncating generated lance.", unitTypes.size(), weights.length()));
             unitTypeSize = weights.length();
         }
@@ -2130,7 +2124,7 @@ public class AtBDynamicScenarioFactory {
      * @param entityList The list of entities to process.
      */
     private static void setDeploymentTurnsStaggeredByLance(List<Entity> entityList) {
-        MekHQ.getLogger().warning(AtBDynamicScenarioFactory.class, "setDeploymentTurnsStaggeredByLance", "Deployment Turn - Staggered by Lance not implemented");
+        MekHQ.getLogger().warning(AtBDynamicScenarioFactory.class, "Deployment Turn - Staggered by Lance not implemented");
     }
 
     /**

@@ -38,7 +38,6 @@ import javax.swing.JTabbedPane;
 
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import megamek.common.verifier.*;
 import megameklab.com.MegaMekLab;
 import megameklab.com.ui.EntitySource;
@@ -95,8 +94,7 @@ public class MekLabTab extends CampaignGuiTab {
         entityVerifier = EntityVerifier.getInstance(new File("data/mechfiles/UnitVerifierOptions.xml"));
         new CConfig();
         UnitUtil.loadFonts();
-        MekHQ.getLogger().log(getClass(), "initTab()", LogLevel.INFO, //$NON-NLS-1$
-                "Starting MegaMekLab version: " + MegaMekLab.VERSION); //$NON-NLS-1$
+        MekHQ.getLogger().info(this, "Starting MegaMekLab version: " + MegaMekLab.VERSION);
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();

@@ -37,7 +37,6 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 
@@ -410,8 +409,6 @@ public class Bloodname implements Serializable {
     }
 
     public static void loadBloodnameData() {
-        final String METHOD_NAME = "loadBloodnameData()"; //$NON-NLS-1$
-
         Clan.loadClanData();
         bloodnames = new ArrayList<>();
 
@@ -420,8 +417,7 @@ public class Bloodname implements Serializable {
         try {
             fis = new FileInputStream(f);
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().log(Bloodname.class, METHOD_NAME, LogLevel.ERROR,
-                    "Cannot find file bloodnames.xml"); //$NON-NLS-1$
+            MekHQ.getLogger().error(Bloodname.class, "Cannot find file bloodnames.xml");
             return;
         }
 
@@ -432,7 +428,8 @@ public class Bloodname implements Serializable {
             doc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
-            MekHQ.getLogger().error(Bloodname.class, METHOD_NAME, "Could not parse bloodnames.xml", ex);
+            MekHQ.getLogger().error(Bloodname.class, "Could not parse bloodnames.xml");
+            MekHQ.getLogger().error(Bloodname.class, ex);
             return;
         }
 
@@ -448,8 +445,7 @@ public class Bloodname implements Serializable {
                 }
             }
         }
-        MekHQ.getLogger().log(Bloodname.class, METHOD_NAME, LogLevel.INFO,
-                "Loaded " + bloodnames.size() + " Bloodname records."); //$NON-NLS-1$
+        MekHQ.getLogger().info(Bloodname.class, "Loaded " + bloodnames.size() + " Bloodname records.");
     }
 
     private static class NameAcquired {

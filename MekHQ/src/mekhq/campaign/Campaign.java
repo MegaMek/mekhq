@@ -61,7 +61,6 @@ import megamek.client.generator.RandomGenderGenerator;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
@@ -656,12 +655,9 @@ public class Campaign implements Serializable, ITechManager {
 
         MechFileParser mechFileParser;
         try {
-            mechFileParser = new MechFileParser(ms.getSourceFile(),
-                    ms.getEntryName());
+            mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Unable to load unit: " + ms.getEntryName());
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(this, "Unable to load unit: " + ms.getEntryName(), ex);
             return;
         }
         Entity en = mechFileParser.getEntity();
@@ -978,8 +974,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private void addUnit(Unit u) {
-        MekHQ.getLogger().log(getClass(), "addUnit()", LogLevel.INFO, //$NON-NLS-1$
-                "Adding unit: (" + u.getId() + "):" + u); //$NON-NLS-1$
+        MekHQ.getLogger().info(this, "Adding unit: (" + u.getId() + "):" + u);
         units.put(u.getId(), u);
         checkDuplicateNamesDuringAdd(u.getEntity());
 
@@ -1003,8 +998,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param id - The unique ID of the ship we want to add to this Set
      */
     public void addTransportShip(UUID id) {
-        MekHQ.getLogger().log(getClass(), "addTransportShip()", LogLevel.INFO, //$NON-NLS-1$
-                "Adding Dropship/Warship: " + id); //$NON-NLS-1$
+        MekHQ.getLogger().info(this, "Adding DropShip/WarShip: " + id);
         transportShips.add(id);
     }
 
@@ -1014,8 +1008,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param id - The unique ID of the ship we want to remove from this Set
      */
     public void removeTransportShip(UUID id) {
-        MekHQ.getLogger().log(getClass(), "removeTransportShip()", LogLevel.INFO, //$NON-NLS-1$
-                "Removing Dropship/Warship: " + id); //$NON-NLS-1$
+        MekHQ.getLogger().info(this, "Removing DropShip/WarShip: " + id);
         transportShips.remove(id);
     }
 
