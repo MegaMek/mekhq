@@ -258,7 +258,7 @@ public class TankLocation extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        //shouldn't get here
+        ((Tank) unit.getEntity()).setInternal(((Tank) unit.getEntity()).getOInternal(loc) - damage, loc);
     }
 
     @Override

@@ -104,7 +104,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
     private static final String CMD_EDIT_PORTRAIT = "PORTRAIT"; //$NON-NLS-1$
     private static final String CMD_EDIT_HITS = "EDIT_HITS"; //$NON-NLS-1$
     private static final String CMD_EDIT = "EDIT"; //$NON-NLS-1$
-    private static final String CMD_ROLL_MECH = "ROLL_MECH"; //$NON-NLS-1$
     private static final String CMD_SACK = "SACK"; //$NON-NLS-1$
     private static final String CMD_REMOVE = "REMOVE"; //$NON-NLS-1$
     private static final String CMD_EDGE_TRIGGER = "EDGE"; //$NON-NLS-1$
@@ -219,8 +218,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         person.setManeiDominiClass(mdClass);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(getClass(), "actionPerformed",
-                            "Failed to assign Manei Domini Class", e);
+                    MekHQ.getLogger().error(this, "Failed to assign Manei Domini Class", e);
                 }
                 break;
             }
@@ -231,8 +229,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         person.setPrimaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(getClass(), "actionPerformed",
-                            "Failed to assign ROM designator", e);
+                    MekHQ.getLogger().error(this, "Failed to assign ROM designator", e);
                 }
                 break;
             }
@@ -243,8 +240,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         person.setSecondaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(getClass(), "actionPerformed",
-                            "Failed to assign ROM secondary designator", e);
+                    MekHQ.getLogger().error(this, "Failed to assign ROM secondary designator", e);
                 }
                 break;
             }
@@ -522,7 +518,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                                     gui.getCampaign().getLocalDate());
                         }
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(getClass(), "actionPerformed", "Could not remove award.", e);
+                        MekHQ.getLogger().error(this, "Could not remove award.", e);
                     }
                 }
                 break;
@@ -639,8 +635,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         }
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(getClass(), "actionPerformed",
-                            "Unknown PrisonerStatus Option. No changes will be made.", e);
+                    MekHQ.getLogger().error(this, "Unknown PrisonerStatus Option. No changes will be made.", e);
                 }
                 break;
             }
@@ -776,12 +771,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 CustomizePersonDialog npd = new CustomizePersonDialog(
                         gui.getFrame(), true, selectedPerson, gui.getCampaign());
                 npd.setVisible(true);
-                gui.getCampaign().personUpdated(selectedPerson);
-                break;
-            }
-            case CMD_ROLL_MECH: {
-                GMToolsDialog gmToolsDialog = new GMToolsDialog(gui.getFrame(), gui, selectedPerson);
-                gmToolsDialog.setVisible(true);
                 gui.getCampaign().personUpdated(selectedPerson);
                 break;
             }
@@ -1113,6 +1102,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             default:
                 break;
         }
+    }
+
+    private void loadGMToolsForPerson(Person person) {
+        GMToolsDialog gmToolsDialog = new GMToolsDialog(gui.getFrame(), gui, person);
+        gmToolsDialog.setVisible(true);
+        gui.getCampaign().personUpdated(person);
     }
 
     @Override
@@ -2624,12 +2619,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
 
-                    if (person.getUnitId() != null) {
-                        menuItem = new JMenuItem(resourceMap.getString("rollForUnit.text"));
-                        menuItem.setActionCommand(CMD_ROLL_MECH);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
+                    menuItem = new JMenuItem(resourceMap.getString("loadGMTools.text"));
+                    menuItem.addActionListener(evt -> loadGMToolsForPerson(person));
+                    menu.add(menuItem);
                 }
                 if (gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
                     menuItem = new JMenuItem(resourceMap.getString("removeAllInjuries.text"));
