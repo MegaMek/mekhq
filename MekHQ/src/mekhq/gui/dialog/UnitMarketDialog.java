@@ -47,7 +47,6 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -417,7 +416,7 @@ public class UnitMarketDialog extends JDialog {
          } else {
              mechViewPanel.setMech(selectedEntity, true);
             //This odd code is to make sure that the scrollbar stays at the top
-            //I cant just call it here, because it ends up getting reset somewhere later
+            //I can't just call it here, because it ends up getting reset somewhere later
             javax.swing.SwingUtilities.invokeLater(() -> scrollUnitView.getVerticalScrollBar().setValue(0));
          }
          btnPurchase.setEnabled(null != selectedEntity);

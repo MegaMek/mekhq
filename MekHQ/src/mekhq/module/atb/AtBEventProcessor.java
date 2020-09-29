@@ -20,7 +20,6 @@ package mekhq.module.atb;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import megamek.client.ratgenerator.MissionRole;
 import megamek.common.Compute;
@@ -33,7 +32,6 @@ import megamek.common.MechSummaryCache;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -146,7 +144,6 @@ public class AtBEventProcessor {
     }
 
     private void addRecruitUnit(Person p) {
-        final String METHOD_NAME = "addRecruitUnit(Person)"; //$NON-NLS-1$
         UnitGeneratorParameters params = new UnitGeneratorParameters();
 
         int unitType;
@@ -215,21 +212,18 @@ public class AtBEventProcessor {
             if (Faction.getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
                 String name = "Clan " + ms.getName().replaceAll("Platoon", "Point");
                 ms = MechSummaryCache.getInstance().getMech(name);
-                MekHQ.getLogger().info(getClass(), METHOD_NAME, "looking for Clan infantry " + name);
+                MekHQ.getLogger().info(this, "looking for Clan infantry " + name);
             }
             try {
                 en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             } catch (EntityLoadingException ex) {
                 en = null;
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                        "Unable to load entity: " + ms.getSourceFile() + ": " //$NON-NLS-1$
-                        + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error(this, "Unable to load entity: "
+                        + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage(), ex);
             }
         } else {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Personnel market could not find " //$NON-NLS-1$
-                    + UnitType.getTypeName(unitType) + " for recruit from faction " + faction); //$NON-NLS-1$
+            MekHQ.getLogger().error(this, "Personnel market could not find "
+                    + UnitType.getTypeName(unitType) + " for recruit from faction " + faction);
             return;
         }
 

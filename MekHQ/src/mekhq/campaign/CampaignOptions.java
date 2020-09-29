@@ -3953,10 +3953,8 @@ public class CampaignOptions implements Serializable {
                                 if (mroItemNode.getNodeType() != Node.ELEMENT_NODE) {
                                     continue;
                                 }
-
-                                MekHQ.getLogger().info(CampaignOptions.class,
-                                        String.format("massRepairOption %d.%s\n\t%s",
-                                                mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
+                                MekHQ.getLogger().info(CampaignOptions.class, String.format("massRepairOption %d.%s\n\t%s",
+                                        mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
 
                                 if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
                                     mro.setType(Integer.parseInt(mroItemNode.getTextContent().trim()));

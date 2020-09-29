@@ -29,7 +29,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.LocationChangedEvent;
@@ -279,8 +278,6 @@ public class CurrentLocation implements Serializable {
     }
 
     public static CurrentLocation generateInstanceFromXML(Node wn, Campaign c) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign)"; //$NON-NLS-1$
-
         CurrentLocation retVal = null;
 
         try {
@@ -295,8 +292,7 @@ public class CurrentLocation implements Serializable {
                     PlanetarySystem p = Systems.getInstance().getSystemById(wn2.getTextContent());
                     if (null == p) {
                         //whoops we cant find your planet man, back to Earth
-                        MekHQ.getLogger().log(CurrentLocation.class, METHOD_NAME, LogLevel.ERROR,
-                                "Couldn't find planet named " + wn2.getTextContent()); //$NON-NLS-1$
+                        MekHQ.getLogger().error(CurrentLocation.class, "Couldn't find planet named " + wn2.getTextContent());
                         p = c.getSystemByName("Terra");
                         if (null == p) {
                             //if that doesn't work then give the first planet we have
@@ -318,7 +314,7 @@ public class CurrentLocation implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(CurrentLocation.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(CurrentLocation.class, ex);
         }
 
         return retVal;

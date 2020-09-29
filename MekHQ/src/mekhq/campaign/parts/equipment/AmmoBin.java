@@ -41,7 +41,6 @@ import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -106,7 +105,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public String getLocationName() {
         if (unit != null
                 && unit.getEntity() instanceof Aero
-                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
             return "Fuselage";
         }
         return super.getLocationName();
@@ -116,7 +115,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public int getLocation() {
         if (unit != null
                 && unit.getEntity() instanceof Aero
-                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
             return Aero.LOC_NONE;
         }
         return super.getLocation();
@@ -341,7 +340,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                     shotsNeeded -= shots;
                 }
                 else {
-                    MekHQ.getLogger().log(AmmoBin.class, "loadBin", LogLevel.WARNING, mType.getName() + " is not valid equipment for " + getName() + " to restock ammo on unit " + unit.getName());
+                    MekHQ.getLogger().warning(AmmoBin.class, mType.getName() + " is not valid equipment for " + getName() + " to restock ammo on unit " + unit.getName());
                 }
             }
         }

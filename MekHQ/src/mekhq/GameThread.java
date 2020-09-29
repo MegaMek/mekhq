@@ -24,7 +24,6 @@ import megamek.common.IGame;
 import megamek.common.KeyBindParser;
 import megamek.common.QuirksHandler;
 import megamek.common.WeaponOrderHandler;
-import megamek.common.logging.LogLevel;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
@@ -82,9 +81,7 @@ class GameThread extends Thread implements CloseClientListener {
         try {
             client.connect();
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), "run()", LogLevel.ERROR,
-                    "MegaMek client failed to connect to server"); //$NON-NLS-1$
-            MekHQ.getLogger().error(getClass(), "run()", ex);
+            MekHQ.getLogger().error(this, "MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -131,7 +128,7 @@ class GameThread extends Thread implements CloseClientListener {
                 Thread.sleep(50);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "run()", e);
+            MekHQ.getLogger().error(this, e);
         }
         finally {
             client.die();
@@ -155,15 +152,13 @@ class GameThread extends Thread implements CloseClientListener {
         try {
             WeaponOrderHandler.saveWeaponOrderFile();
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "requestStop",
-                    "Error saving custom weapon orders!", e);
+            MekHQ.getLogger().error(this, "Error saving custom weapon orders!", e);
         }
 
         try {
             QuirksHandler.saveCustomQuirksList();
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "requestStop",
-                    "Error saving quirks override!", e);
+            MekHQ.getLogger().error(this, "Error saving quirks override!", e);
         }
 
         stop = true;
@@ -180,7 +175,7 @@ class GameThread extends Thread implements CloseClientListener {
         System.gc();
     }
 
-    public void createController(){
+    public void createController() {
         controller = new MegaMekController();
         KeyboardFocusManager kbfm =
                 KeyboardFocusManager.getCurrentKeyboardFocusManager();

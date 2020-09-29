@@ -25,7 +25,6 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 
 /**
@@ -118,23 +117,22 @@ public class UnitTechProgression {
         } catch (InterruptedException e) {
             task.cancel(true);
         } catch (ExecutionException e) {
-            MekHQ.getLogger().error(UnitTechProgression.class, "getProgression(MechSummary,int,boolean)", e);
+            MekHQ.getLogger().error(UnitTechProgression.class, e);
         }
         return null;
     }
 
     private static ITechnology calcTechProgression(MechSummary ms, int techFaction) {
-        final String METHOD_NAME = "calcTechProgression(MechSummary, int)"; // $NON-NLS-1$
         try {
             Entity en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             if (null == en) {
-                MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR, "Entity was null: " + ms.getName());
+                MekHQ.getLogger().error(BuildMapTask.class, "Entity was null: " + ms.getName());
                 return null;
             }
             return en.factionTechLevel(techFaction);
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR, "Exception loading entity " + ms.getName());
-            MekHQ.getLogger().error(BuildMapTask.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(BuildMapTask.class, "Exception loading entity " + ms.getName());
+            MekHQ.getLogger().error(BuildMapTask.class, ex);
             return null;
         }
     }

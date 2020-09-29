@@ -34,7 +34,6 @@ import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.UnitType;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -338,8 +337,6 @@ public class UnitMarket implements Serializable {
     }
 
     public static UnitMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
-
         UnitMarket retVal = null;
 
         try {
@@ -361,10 +358,7 @@ public class UnitMarket implements Serializable {
                 if (!wn2.getNodeName().equalsIgnoreCase("offer")) {
                     // Error condition of sorts!
                     // Errr, what should we do here?
-                    MekHQ.getLogger().log(UnitMarket.class, METHOD_NAME, LogLevel.ERROR,
-                            "Unknown node type not loaded in offer nodes: " //$NON-NLS-1$
-                            + wn2.getNodeName());
-
+                    MekHQ.getLogger().error(UnitMarket.class, "Unknown node type not loaded in offer nodes: " + wn2.getNodeName());
                     continue;
                 }
 
@@ -394,7 +388,7 @@ public class UnitMarket implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(UnitMarket.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(UnitMarket.class, ex);
         }
 
         return retVal;

@@ -587,7 +587,7 @@ public class GMToolsDialog extends JDialog {
         return lastGeneratedName;
     }
 
-    public void setLastGeneratedName(String[] lastGeneratedName) {
+    public void setLastGeneratedName(String... lastGeneratedName) {
         this.lastGeneratedName = lastGeneratedName;
     }
 

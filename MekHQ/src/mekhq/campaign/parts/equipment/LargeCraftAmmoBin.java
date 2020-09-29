@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - The MegaMek Team
+ * Copyright (c) 2017 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts.equipment;
 
@@ -29,7 +29,6 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -48,13 +47,8 @@ import mekhq.campaign.work.IAcquisitionWork;
  * the capacity of the appropriate bin in the same bay.
  *
  * @author Neoancient
- *
  */
 public class LargeCraftAmmoBin extends AmmoBin {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -7931419849350769887L;
 
     private int bayEqNum;
@@ -84,7 +78,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
      *         or null if there is no unit or the ammo bin is not in any bay.
      */
     public @Nullable Mounted getBay() {
-        final String METHOD_NAME = "getBay()"; //$NON-NLS-1$
         if ((null != bay) || (null == unit)) {
             return null;
         }
@@ -100,8 +93,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
                 return m;
             }
         }
-        MekHQ.getLogger().log(LargeCraftAmmoBin.class, METHOD_NAME, LogLevel.WARNING,
-                "Could not find weapon bay for " + typeName + " for " + unit.getName());
+        MekHQ.getLogger().warning(LargeCraftAmmoBin.class, "Could not find weapon bay for " + typeName + " for " + unit.getName());
         return null;
     }
 
@@ -207,9 +199,9 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     public void loadBinSingle() {
         int shots = Math.min(getAmountAvailable(), Math.min(shotsNeeded, ((AmmoType) type).getShots()));
-        if(null != unit) {
+        if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted && mounted.getType() instanceof AmmoType) {
+            if (null != mounted && mounted.getType() instanceof AmmoType) {
                 mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
             }
         }
@@ -222,14 +214,14 @@ public class LargeCraftAmmoBin extends AmmoBin {
         AmmoType curType = (AmmoType)type;
         if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted && mounted.getType() instanceof AmmoType) {
+            if (null != mounted && mounted.getType() instanceof AmmoType) {
                 shots = Math.min(mounted.getBaseShotsLeft(), shots);
                 mounted.setShotsLeft(mounted.getBaseShotsLeft() - shots);
                 curType = (AmmoType)mounted.getType();
             }
         }
         shotsNeeded += shots;
-        if(shots > 0) {
+        if (shots > 0) {
             changeAmountAvailable(shots, curType);
         }
     }
@@ -253,21 +245,20 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        final String METHOD_NAME = "updateConditionFromEntity()"; //$NON-NLS-1$
-        if(null != unit) {
+        if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
             if (mounted == null) {
-                MekHQ.getLogger().log(LargeCraftAmmoBin.class, METHOD_NAME, LogLevel.WARNING,
+                MekHQ.getLogger().warning(LargeCraftAmmoBin.class,
                         unit.getName() + " has a null Mounted at equipment number " + equipmentNum);
                 return;
             }
             if (!(mounted.getType() instanceof AmmoType)) {
-                MekHQ.getLogger().log(LargeCraftAmmoBin.class, METHOD_NAME, LogLevel.WARNING,
-                        unit.getName() + " has an " + mounted.getName() + " that thinks it's an ammo bin at equipment number " + equipmentNum);
+                MekHQ.getLogger().warning(LargeCraftAmmoBin.class, unit.getName() + " has an "
+                        + mounted.getName() + " that thinks it's an ammo bin at equipment number " + equipmentNum);
             } else {
                 size = mounted.getSize();
                 type = mounted.getType();
-                if(mounted.isMissing() || mounted.isDestroyed()) {
+                if (mounted.isMissing() || mounted.isDestroyed()) {
                     mounted.setShotsLeft(0);
                     return;
                 }
@@ -294,9 +285,9 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
+        if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
+            if (null != mounted) {
                 mounted.setHit(false);
                 mounted.setDestroyed(false);
                 mounted.setRepairable(true);
@@ -375,15 +366,15 @@ public class LargeCraftAmmoBin extends AmmoBin {
             return super.getDetails(includeRepairDetails);
         }
         if (shotsNeeded < 0) {
-            return ((AmmoType) type).getDesc() + ", " + (-shotsNeeded) + " shots to remove";
+            return type.getDesc() + ", " + (-shotsNeeded) + " shots to remove";
         }
         if (null != unit) {
             String availability = "";
             int shotsAvailable = getAmountAvailable();
             PartInventory inventories = campaign.getPartInventory(getNewPart());
-            if(shotsAvailable == 0) {
+            if (shotsAvailable == 0) {
                 availability = "<br><font color='red'>No ammo ("+ inventories.getTransitOrderedDetails() + ")</font>";
-            } else if(shotsAvailable < shotsNeeded) {
+            } else if (shotsAvailable < shotsNeeded) {
                 availability = "<br><font color='red'>Only " + shotsAvailable + " available ("+ inventories.getTransitOrderedDetails() + ")</font>";
             }
             return ((AmmoType)type).getDesc() + ", " + shotsNeeded + " shots needed" + availability;
@@ -396,7 +387,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
     public IAcquisitionWork getAcquisitionWork() {
         int shots = 1;
         if (type instanceof AmmoType) {
-            shots = ((AmmoType)type).getShots() * (int) Math.floor(getUnusedCapacity() / type.getTonnage(null));
+            shots = ((AmmoType) type).getShots() * (int) Math.floor(getUnusedCapacity() / type.getTonnage(null));
         }
         return new AmmoStorage(1, type, shots, campaign);
     }
