@@ -22,6 +22,8 @@ VERSION HISTORY:
 + PR #2063: Preventing null entities in AtBScenario
 + PR #2061: Add daily report entries for AtB scenarios
 + PR #2067: Improved refit handling of internals for Aeros and Tanks
++ PR #2057: Personnel Table GM Tool Access
++ Issue #1369: Unit Rating FM:M(r): Default Quality Value is no longer Elite
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
