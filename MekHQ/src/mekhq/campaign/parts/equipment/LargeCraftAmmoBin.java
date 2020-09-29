@@ -176,7 +176,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
         }
 
         return getPricePerTon()
-                .multipliedBy(size)
                 .multipliedBy(getCurrentShots())
                 .dividedBy(getShotsPerTon());
     }
