@@ -1582,6 +1582,7 @@ public class CampaignGUI extends JPanel {
         }
         AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(), unitLoadingDialog,
                 getCampaign(), true);
+        usd.setVisible(true);
     }
 
     private void buyParts() {

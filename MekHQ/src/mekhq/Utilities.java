@@ -147,6 +147,27 @@ public class Utilities {
     }
 
     /**
+     * @param num   the number of dice to roll
+     * @param faces the number of faces on those dice
+     * @return an Integer list of every dice roll, with index 0 containing the summed result
+     */
+    public static List<Integer> individualDice(int num, int faces) {
+        List<Integer> individualRolls = new ArrayList<>();
+        int result = 0, roll;
+        individualRolls.add(result);
+
+        for (int i = 0; i < num; i++) {
+            roll = Compute.randomInt(faces) + 1;
+            individualRolls.add(roll);
+            result += roll;
+        }
+
+        individualRolls.set(0, result);
+
+        return individualRolls;
+    }
+
+    /**
      * Get a random element out of a collection, with equal probability.
      * <p>
      * This is the same as calling the following code, only plays nicely with
@@ -1170,7 +1191,12 @@ public class Utilities {
                         if (refit) {
                             if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                                 epart.setEquipmentNum(equipNum);
-                                ((AmmoBin) epart).changeMunition(m.getType());
+                                AmmoBin bin = (AmmoBin) epart;
+                                // Ensure Entity is synch'd with part
+                                bin.updateConditionFromPart();
+                                // Unload bin before munition change
+                                bin.unload();
+                                bin.changeMunition(m.getType());
                                 found = true;
                                 break;
                             }

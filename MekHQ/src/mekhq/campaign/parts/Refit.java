@@ -861,7 +861,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
          * the heat sink type or heat sinks required for energy weapons for vehicles and
          * conventional fighters.
          */
-        // TODO: handle any special cases for BattleArmor, Protomechs, SupportVehicles, SmallCraft, DropShips, etc.
         if ((newEntity instanceof Mech)
                 || ((newEntity instanceof Aero) && !(newEntity instanceof ConvFighter))) {
             Part oldHS = heatSinkPart(oldUnit.getEntity());
@@ -902,6 +901,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
             if (oldHS != newHS) {
                 Part hsPart = heatSinkPart(newEntity); // only single HS allowed, so they have to be of the same type
+                hsPart.setOmniPodded(isOmniRefit);
                 for (int i = oldHS; i < newHS; i++) {
                     // Heat sink added for supply chain tracking purposes and removed from refit later
                     newIntegratedHS.add(hsPart.getMissingPart());
@@ -1432,6 +1432,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 suit.setUnit(oldUnit);
             }
         }
+        int expectedHeatSinkParts = 0;
+        if (newEntity.getClass() == Aero.class) { // Aero but not subclasses
+            // Only Aerospace Fighters are expected to have heat sink parts (Mechs handled separately)
+            // SmallCraft, Dropship, Jumpship, Warship, and SpaceStation use SpacecraftCoolingSystem instead
+            expectedHeatSinkParts = ((Aero) newEntity).getHeatSinks() - ((Aero) newEntity).getPodHeatSinks() -
+                    untrackedHeatSinkCount(newEntity);
+        }
         for(int pid : newUnitParts) {
             Part part = oldUnit.getCampaign().getPart(pid);
             if(null == part) {
@@ -1439,12 +1446,21 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                         "part with id " + pid + " not found for refit of " + getDesc()); //$NON-NLS-1$
                 continue;
             }
-            if (((part instanceof HeatSink) || (part instanceof AeroHeatSink)) &&
-                    ((newEntity instanceof Tank) || (newEntity instanceof Aero))) {
-                // Tanks and Aeros do not track heat sink parts (Mechs handled later)
+            if ((part instanceof HeatSink) && (newEntity instanceof Tank)) {
+                // Unit should not have heat sink parts
                 // Remove heat sink parts added for supply chain tracking purposes
                 oldUnit.getCampaign().removePart(part);
                 continue;
+            }
+            else if ((part instanceof AeroHeatSink) && (newEntity instanceof Aero) && !part.isOmniPodded()) {
+                if (expectedHeatSinkParts > 0) {
+                    expectedHeatSinkParts--;
+                } else {
+                    // Unit has too many heat sink parts
+                    // Remove heat sink parts added for supply chain tracking purposes
+                    oldUnit.getCampaign().removePart(part);
+                    continue;
+                }
             }
             part.setUnit(oldUnit);
             part.setRefitId(null);
@@ -2459,9 +2475,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     private int untrackedHeatSinkCount(Entity entity) {
         if (entity instanceof Mech) {
             return Math.min(((Mech) entity).heatSinks(), entity.getEngine().integralHeatSinkCapacity(((Mech) entity).hasCompactHeatSinks()));
-        } else if ((entity instanceof Aero)
-                && (entity.getEntityType() & (Entity.ETYPE_CONV_FIGHTER | Entity.ETYPE_SMALL_CRAFT | Entity.ETYPE_JUMPSHIP)) == 0) {
-            return entity.getEngine().integralHeatSinkCapacity(false);
+        } else if (newEntity.getClass() == Aero.class) { // Aero but not subclasses
+            return entity.getEngine().getWeightFreeEngineHeatSinks();
         } else {
             EntityVerifier verifier = EntityVerifier.getInstance(new File(
                     "data/mechfiles/UnitVerifierOptions.xml"));

@@ -104,7 +104,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
     private static final String CMD_EDIT_PORTRAIT = "PORTRAIT"; //$NON-NLS-1$
     private static final String CMD_EDIT_HITS = "EDIT_HITS"; //$NON-NLS-1$
     private static final String CMD_EDIT = "EDIT"; //$NON-NLS-1$
-    private static final String CMD_ROLL_MECH = "ROLL_MECH"; //$NON-NLS-1$
     private static final String CMD_SACK = "SACK"; //$NON-NLS-1$
     private static final String CMD_REMOVE = "REMOVE"; //$NON-NLS-1$
     private static final String CMD_EDGE_TRIGGER = "EDGE"; //$NON-NLS-1$
@@ -529,10 +528,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 int cost = Integer.parseInt(data[2]);
                 int oldExpLevel = selectedPerson.getExperienceLevel(false);
                 selectedPerson.improveSkill(type);
-                gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.awardXP(-cost);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
-                gui.getCampaign().addReport(String.format(resourceMap.getString("improved.format"), selectedPerson.getHyperlinkedName(), type)); //$NON-NLS-1$
+                gui.getCampaign().personUpdated(selectedPerson);
+
+                gui.getCampaign().addReport(String.format(resourceMap.getString("improved.format"), selectedPerson.getHyperlinkedName(), type));
                 if (gui.getCampaign().getCampaignOptions().getUseAtB()
                         && gui.getCampaign().getCampaignOptions().useAbilities()) {
                     if (selectedPerson.getPrimaryRole() > Person.T_NONE
@@ -543,10 +542,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         String spa = spaGenerator.rollSPA(selectedPerson);
                         if (null == spa) {
                             if (gui.getCampaign().getCampaignOptions().useEdge()) {
-                                selectedPerson.getOptions().acquireAbility(
-                                        PilotOptions.EDGE_ADVANTAGES, "edge", //$NON-NLS-1$
-                                        selectedPerson.getEdge() + 1);
-                                gui.getCampaign().addReport(String.format(resourceMap.getString("gainedEdge.format"), selectedPerson.getHyperlinkedName())); //$NON-NLS-1$
+                                selectedPerson.getOptions().acquireAbility(PilotOptions.EDGE_ADVANTAGES,
+                                        "edge", selectedPerson.getEdge() + 1);
+                                gui.getCampaign().addReport(String.format(resourceMap.getString("gainedEdge.format"), selectedPerson.getHyperlinkedName()));
                             }
                         } else {
                             gui.getCampaign().addReport(String.format(resourceMap.getString("gained.format"), //$NON-NLS-1$
@@ -561,9 +559,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         selected, true);
-                gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.awardXP(-cost);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                gui.getCampaign().personUpdated(selectedPerson);
                 // TODO: add personnelTab.getCampaign() report
                 break;
             }
@@ -572,9 +569,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         "weapon_specialist", selected);
-                gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.awardXP(-cost);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                gui.getCampaign().personUpdated(selectedPerson);
                 // TODO: add campaign report
                 break;
             }
@@ -583,9 +579,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         "specialist", selected);
-                gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.awardXP(-cost);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                gui.getCampaign().personUpdated(selectedPerson);
                 // TODO: add campaign report
                 break;
             }
@@ -594,9 +589,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         "range_master", selected);
-                gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.awardXP(-cost);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                gui.getCampaign().personUpdated(selectedPerson);
                 // TODO: add campaign report
                 break;
             }
@@ -605,9 +599,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         "human_tro", selected);
-                gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.awardXP(-cost);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                gui.getCampaign().personUpdated(selectedPerson);
                 // TODO: add campaign report
                 break;
             }
@@ -617,9 +610,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 String ability = data[3];
                 selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         ability, selected);
-                gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.awardXP(-cost);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                gui.getCampaign().personUpdated(selectedPerson);
                 // TODO: add campaign report
                 break;
             }
@@ -780,14 +772,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         gui.getFrame(), true, selectedPerson, gui.getCampaign());
                 npd.setVisible(true);
                 gui.getCampaign().personUpdated(selectedPerson);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
-                break;
-            }
-            case CMD_ROLL_MECH: {
-                GMToolsDialog gmToolsDialog = new GMToolsDialog(gui.getFrame(), gui, selectedPerson);
-                gmToolsDialog.setVisible(true);
-                gui.getCampaign().personUpdated(selectedPerson);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             }
             case CMD_EDIT_HITS: {
@@ -798,14 +782,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                             .getNaturalHealingWaitingPeriod());
                 }
                 gui.getCampaign().personUpdated(selectedPerson);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             }
             case CMD_RANDOM_PORTRAIT: {
                 for (Person person : people) {
                     gui.getCampaign().assignRandomPortraitFor(person);
                     gui.getCampaign().personUpdated(person);
-                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             }
@@ -825,7 +807,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         person.setPortraitCategory(category);
                         person.setPortraitFileName(fileName);
                         gui.getCampaign().personUpdated(person);
-                        MekHQ.triggerEvent(new PersonChangedEvent(person));
                     }
                 }
                 break;
@@ -887,7 +868,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     //Make the new edge point available to support personnel, but don't reset until the week ends
                     person.setCurrentEdge(person.getCurrentEdge() + 1);
                     gui.getCampaign().personUpdated(person);
-                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             }
@@ -905,7 +885,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     //Reset currentEdge for support people
                     person.resetCurrentEdge();
                     gui.getCampaign().personUpdated(person);
-                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             }
@@ -990,12 +969,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                             p.setCommander(false);
                             gui.getCampaign().addReport(String.format(resourceMap.getString("removedCommander.format"), p.getHyperlinkedFullTitle())); //$NON-NLS-1$
                             gui.getCampaign().personUpdated(p);
-                            MekHQ.triggerEvent(new PersonChangedEvent(p));
                         }
                     }
                     gui.getCampaign().addReport(String.format(resourceMap.getString("setAsCommander.format"), selectedPerson.getHyperlinkedFullTitle())); //$NON-NLS-1$
                     gui.getCampaign().personUpdated(selectedPerson);
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
             }
@@ -1005,12 +982,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     for (Person person : people) {
                         person.setDependent(status);
                         gui.getCampaign().personUpdated(person);
-                        MekHQ.triggerEvent(new PersonChangedEvent(person));
                     }
                 } else {
                     selectedPerson.setDependent(!selectedPerson.isDependent());
                     gui.getCampaign().personUpdated(selectedPerson);
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
             }
@@ -1020,12 +995,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     for (Person person : people) {
                         person.setTryingToMarry(status);
                         gui.getCampaign().personUpdated(person);
-                        MekHQ.triggerEvent(new PersonChangedEvent(person));
                     }
                 } else {
                     selectedPerson.setTryingToMarry(!selectedPerson.isTryingToMarry());
                     gui.getCampaign().personUpdated(selectedPerson);
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
             }
@@ -1035,12 +1008,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     for (Person person : people) {
                         person.setTryingToConceive(status);
                         gui.getCampaign().personUpdated(person);
-                        MekHQ.triggerEvent(new PersonChangedEvent(person));
                     }
                 } else {
                     selectedPerson.setTryingToConceive(!selectedPerson.isTryingToConceive());
                     gui.getCampaign().personUpdated(selectedPerson);
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
             }
@@ -1050,23 +1021,20 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     for (Person person : people) {
                         person.setFounder(status);
                         gui.getCampaign().personUpdated(person);
-                        MekHQ.triggerEvent(new PersonChangedEvent(person));
                     }
                 } else {
                     selectedPerson.setFounder(!selectedPerson.isFounder());
                     gui.getCampaign().personUpdated(selectedPerson);
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
             }
             case CMD_CALLSIGN: {
                 String s = (String) JOptionPane.showInputDialog(gui.getFrame(),
-                        resourceMap.getString("enterNewCallsign.text"), resourceMap.getString("editCallsign.text"), //$NON-NLS-1$ //$NON-NLS-2$
+                        resourceMap.getString("enterNewCallsign.text"), resourceMap.getString("editCallsign.text"),
                         JOptionPane.PLAIN_MESSAGE, null, null,
                         selectedPerson.getCallsign());
                 if (null != s) {
                     selectedPerson.setCallsign(s);
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                     gui.getCampaign().personUpdated(selectedPerson);
                 }
                 break;
@@ -1134,6 +1102,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             default:
                 break;
         }
+    }
+
+    private void loadGMToolsForPerson(Person person) {
+        GMToolsDialog gmToolsDialog = new GMToolsDialog(gui.getFrame(), gui, person);
+        gmToolsDialog.setVisible(true);
+        gui.getCampaign().personUpdated(person);
     }
 
     @Override
@@ -2650,12 +2624,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
 
-                    if (person.getUnitId() == null) {
-                        menuItem = new JMenuItem(resourceMap.getString("rollForUnit.text"));
-                        menuItem.setActionCommand(CMD_ROLL_MECH);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
+                    menuItem = new JMenuItem(resourceMap.getString("loadGMTools.text"));
+                    menuItem.addActionListener(evt -> loadGMToolsForPerson(person));
+                    menu.add(menuItem);
                 }
                 if (gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
                     menuItem = new JMenuItem(resourceMap.getString("removeAllInjuries.text"));

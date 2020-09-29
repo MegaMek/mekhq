@@ -2,7 +2,7 @@
  * PartsStoreDialog.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -45,13 +45,10 @@ import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
-import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
@@ -271,7 +268,8 @@ public class PartsStoreDialog extends JDialog {
                         PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
                         int quantity = 1;
                         PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
-                                true, "How Many " + partProxy.getName() + "?", quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                                true, "How Many " + partProxy.getName() + "?", quantity,
+                                1, CampaignGUI.MAX_QUANTITY_SPINNER);
                         pcd.setVisible(true);
                         quantity = pcd.getValue();
 
@@ -290,16 +288,12 @@ public class PartsStoreDialog extends JDialog {
             //endregion Buy Bulk
 
             //region Bonus Part
-            if (campaign.getCampaignOptions().getUseAtB()) {
-                btnUseBonusPart = new JButton();
-                btnUseBonusPart.setText(resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
+            if (campaign.getCampaignOptions().getUseAtB() && campaign.hasActiveContract()) {
+                btnUseBonusPart = new JButton(resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
                 btnUseBonusPart.addActionListener(evt -> {
                     if (partsTable.getSelectedRowCount() > 0) {
                         int[] selectedRow = partsTable.getSelectedRows();
                         for (int i : selectedRow) {
-                            if (campaign.totalBonusParts() > 0) {
-                                campaign.addReport(resourceMap.getString("bonusPartLog.text") + " " + partsModel.getPartAt(partsTable.convertRowIndexToModel(i)).getPartName());
-                            }
                             PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
                             addPart(true, campaign.totalBonusParts() > 0, partProxy.getPart(), 1);
                             partProxy.updateTargetAndInventories();
@@ -350,7 +344,8 @@ public class PartsStoreDialog extends JDialog {
 
                         int quantity = 1;
                         PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
-                                true, "How Many " + partProxy.getName() + "?", quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                                true, "How Many " + partProxy.getName() + "?", quantity,
+                                1, CampaignGUI.MAX_QUANTITY_SPINNER);
                         pcd.setVisible(true);
                         quantity = pcd.getValue();
 
@@ -506,26 +501,8 @@ public class PartsStoreDialog extends JDialog {
     }
 
     private void addPart(boolean purchase, boolean bonus, Part part, int quantity) {
-        final String METHOD_NAME = "addPart(boolean,boolean,Part,int)"; //$NON-NLS-1$
-
         if (bonus) {
-            String report = part.getAcquisitionWork().find(0);
-            if (report.endsWith("0 days.")) {
-                AtBContract contract = null;
-                for (Mission m : campaign.getMissions()) {
-                    if (m.isActive() && (m instanceof AtBContract)
-                            && (((AtBContract) m).getNumBonusParts() > 0)) {
-                        contract = (AtBContract) m;
-                        break;
-                    }
-                }
-                if (null == contract) {
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                            "AtB: used bonus part but no contract has bonus parts available."); //$NON-NLS-1$
-                } else {
-                    contract.useBonusPart();
-                }
-            }
+            campaign.spendBonusPart(part.getAcquisitionWork());
         } else if (purchase) {
             campaign.getShoppingList().addShoppingItem(part.getAcquisitionWork(), quantity, campaign);
         } else {
