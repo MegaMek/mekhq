@@ -778,10 +778,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     public void refreshServicedUnitList() {
-        UUID uuid = null;
-        if (null != getSelectedServicedUnit()) {
-            uuid = getSelectedServicedUnit().getId();
-        }
+        UUID uuid = (getSelectedServicedUnit() != null) ? getSelectedServicedUnit().getId() : null;
 
         ignoreUnitTable = true;
         servicedUnitModel.setData(getCampaign().getServiceableUnits());
