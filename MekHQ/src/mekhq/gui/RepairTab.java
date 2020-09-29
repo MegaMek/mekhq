@@ -755,7 +755,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         techSorter.setRowFilter(techTypeFilter);
     }
 
-    public void focusOnUnit(UUID id) {
+    /**
+     * Focuses on the unit with the given ID if it exists.
+     * @param id The unique identifier of the unit.
+     * @return A value indicating whether or not the unit
+     *         was focused.
+     */
+    public boolean focusOnUnit(UUID id) {
         int row = -1;
         for (int i = 0; i < servicedUnitTable.getRowCount(); i++) {
             if (servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(i)).getId().equals(id)) {
@@ -766,21 +772,19 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         if (row != -1) {
             servicedUnitTable.setRowSelectionInterval(row, row);
             servicedUnitTable.scrollRectToVisible(servicedUnitTable.getCellRect(row, 0, true));
+            return true;
         }
+        return false;
     }
 
     public void refreshServicedUnitList() {
-        int selected = servicedUnitTable.getSelectedRow();
+        UUID uuid = (getSelectedServicedUnit() != null) ? getSelectedServicedUnit().getId() : null;
+
         ignoreUnitTable = true;
         servicedUnitModel.setData(getCampaign().getServiceableUnits());
         ignoreUnitTable = false;
-        if (selected == servicedUnitTable.getRowCount()) {
-            selected--;
-        }
 
-        if ((selected > -1) && (selected < servicedUnitTable.getRowCount())) {
-            servicedUnitTable.setRowSelectionInterval(selected, selected);
-        } else {
+        if (!focusOnUnit(uuid)) {
             refreshTaskList();
             txtServicedUnitView.setText("");
         }
