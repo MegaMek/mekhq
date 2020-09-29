@@ -170,18 +170,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
 
     @Override
-    public Money getStickerPrice() {
-        if (getShotsPerTon() <= 0) {
-            return Money.zero();
-        }
-
-        return getPricePerTon()
-                .multipliedBy(size)
-                .multipliedBy(getCurrentShots())
-                .dividedBy(getShotsPerTon());
-    }
-
-    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
