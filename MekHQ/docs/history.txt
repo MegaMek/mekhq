@@ -24,6 +24,8 @@ VERSION HISTORY:
 + PR #2067: Improved refit handling of internals for Aeros and Tanks
 + PR #2057: Personnel Table GM Tool Access
 + Issue #1369: Unit Rating FM:M(r): Default Quality Value is no longer Elite
++ Issue #171: Manual Unit Rating Modifier
++ PR #2058: Implementing individual dice roll display in the GMTools Dialog
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
