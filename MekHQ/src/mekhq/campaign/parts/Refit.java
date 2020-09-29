@@ -848,7 +848,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         for (AmmoType type : ammoNeeded.keySet()) {
             int shotsNeeded = Math.max(ammoNeeded.get(type) - getAmmoAvailable(type), 0);
             int shotsPerTon = type.getShots();
-            cost = cost.plus(Money.of(type.getCost(newEntity, false, -1) * ((double)shotsNeeded/shotsPerTon)));
+            if (shotsNeeded > 0 && shotsPerTon > 0) {
+                cost = cost.plus(Money.of(type.getCost(newEntity, false, -1) * ((double)shotsNeeded/shotsPerTon)));
+            }
         }
 
         /*
