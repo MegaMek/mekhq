@@ -28,6 +28,7 @@ VERSION HISTORY:
 + PR #2058: Implementing individual dice roll display in the GMTools Dialog
 + PR #2071: Fix campaign ops dropship maintenance costs
 + Issue #2017: Keep focus on unit during repairs
++ Issue #2066: Do not add zero or NaN costs for ammo during Refits
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
