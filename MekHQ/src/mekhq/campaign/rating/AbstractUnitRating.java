@@ -171,12 +171,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * Returns the average experience level for all combat personnel.
      */
     protected BigDecimal calcAverageExperience() {
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) > 0) {
-            return getTotalSkillLevels().divide(getNumberUnits(), PRECISION,
-                                                HALF_EVEN);
-        }
-
-        return BigDecimal.ZERO;
+        return hasUnits() ? getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN)
+                : BigDecimal.ZERO;
     }
 
     /**
@@ -247,36 +243,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     *  Returns the Commander's Skill Level for the specified skill
-     */
-    int getCommanderSkill(String skillName) {
-        Person commander = getCommander();
-        if (commander == null) {
-            return 0;
-        }
-        Skill skill = commander.getSkill(skillName);
-        if (skill == null) {
-            return 0;
-        }
-        return skill.getLevel();
-    }
-
-    /**
-     * Returns the Commander's Skill Bonus for the specified skill
-     */
-    int getCommanderBonus(String skillName) {
-        Person commander = getCommander();
-        if (commander == null) {
-            return 0;
-        }
-        Skill skill = commander.getSkill(skillName);
-        if (skill == null){
-            return 0;
-        }
-        return skill.getBonus();
-    }
-
-    /**
      *  Returns the Commander's Skill Level with Bonus for the specified skill
      */
     int getCommanderSkillLevelWithBonus(String skillName) {
@@ -320,6 +286,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
     @Override
     public int getTransportValue() {
         int value = 0;
+
+        if (!hasUnits()) {
+            return 0;
+        }
 
         //Find the percentage of units that are transported.
         setTransportPercent(getTransportPercent());
@@ -453,6 +423,13 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     protected BigDecimal getNumberUnits() {
         return numberUnits;
+    }
+
+    /**
+     * @return if the the unit has any units
+     */
+    protected boolean hasUnits() {
+        return getNumberUnits().compareTo(BigDecimal.ZERO) != 0;
     }
 
     protected abstract String getExperienceLevelName(BigDecimal experience);

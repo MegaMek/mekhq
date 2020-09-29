@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.rating;
 
@@ -80,13 +80,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     @Override
     protected void initValues() {
-        final String METHOD_NAME = "initValues()";
-
         if (isInitialized()) {
             return;
         }
-
-        MekHQ.getLogger().methodBegin(getClass(), METHOD_NAME);
 
         super.initValues();
         setHighTechPercent(BigDecimal.ZERO);
@@ -99,28 +95,21 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             if ((null == u) || !u.isPresent()) {
                 continue;
             }
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                            "Processing unit " + u.getName());
+            MekHQ.getLogger().debug(this, "Processing unit " + u.getName());
             if (u.isMothballed()) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                                "Unit " + u.getName() +
-                                " is mothballed.  Skipping.");
+                MekHQ.getLogger().debug(this, "Unit " + u.getName() + " is mothballed.  Skipping.");
                 continue;
             }
 
             updateUnitCounts(u);
             BigDecimal value = getUnitValue(u);
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                            "Unit " + u.getName() + " -- Value = " +
-                            value.toPlainString());
+            MekHQ.getLogger().debug(this, "Unit " + u.getName() + " -- Value = " + value.toPlainString());
             setNumberUnits(getNumberUnits().add(value));
 
             Person p = u.getCommander();
             if (null != p) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                                "Unit " + u.getName() +
-                                " -- Adding commander (" + p.getFullTitle() + "" +
-                                ") to commander list.");
+                MekHQ.getLogger().debug(this, "Unit " + u.getName()
+                        + " -- Adding commander (" + p.getFullTitle() + "" + ") to commander list.");
                 getCommanderList().add(p);
             }
 
@@ -139,13 +128,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         calcMedicalSupportHoursNeeded();
         calcAdminSupportHoursNeeded();
 
-        MekHQ.getLogger().methodEnd(getClass(), METHOD_NAME);
     }
 
     void updateAvailableSupport() {
-        final String METHOD_NAME = "updateAvailableSupport()";
-
-        MekHQ.getLogger().methodCalled(getClass(), METHOD_NAME);
         for (Person p : getCampaign().getActivePersonnel()) {
             if (p.isTech()) {
                 updateTechSupportHours(p);
@@ -264,8 +249,6 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private void updateDropJumpShipSupportNeeds(Entity en) {
-        final String METHOD_NAME = "updateDropJumpShipSupportNeeds(Entity)";
-
         double hours = 0;
         if (en instanceof Warship) {
             hours += 5000;
@@ -288,9 +271,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                 hours *= 1.2;
             }
         }
-        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Unit " + en.getId() + " needs " + hours +
-                        " ship tech hours.");
+        MekHQ.getLogger().debug(this, "Unit " + en.getId() + " needs " + hours + " ship tech hours.");
 
         dropJumpShipSupportNeeded += (int) Math.ceil(hours);
     }
@@ -506,7 +487,11 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return score;
     }
 
+    @Override
     public int getExperienceValue() {
+        if (!hasUnits()) {
+            return 0;
+        }
         BigDecimal averageExperience = calcAverageExperience();
         if (averageExperience.compareTo(greenThreshold) >= 0) {
             return 5;
@@ -514,10 +499,12 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return 10;
         } else if (averageExperience.compareTo(veteranThreshold) >= 0) {
             return 20;
+        } else {
+            return 40;
         }
-        return 40;
     }
 
+    @Override
     public int getCommanderValue() {
         if (getCommander() == null) {
             return 0;
@@ -650,8 +637,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return percent.setScale(0, RoundingMode.DOWN).intValue() * 5;
     }
 
+    @Override
     public int getSupportValue() {
-        return getTechSupportValue() + getMedicalSupportValue() + getAdminValue();
+        return hasUnits() ? getTechSupportValue() + getMedicalSupportValue() + getAdminValue() : 0;
     }
 
     private int getYearsInDebt() {
@@ -660,6 +648,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return yearsInDebt;
     }
 
+    @Override
     public int getFinancialValue() {
         int score = getYearsInDebt() * -10;
         score -= 25 * getCampaign().getFinances().getLoanDefaults();
@@ -847,6 +836,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                                                  .getFailedCollateral());
     }
 
+    @Override
     public String getDetails() {
         return String.format("%-" + HEADER_LENGTH + "s %s", "Dragoons Rating:",
                              getUnitRating()) + "\n" +
@@ -860,6 +850,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                getFinancialDetails();
     }
 
+    @Override
     public String getHelpText() {
         return "Method: FM: Mercenaries (rev)\n" +
                "An attempt to match the FM: Mercenaries (rev) method for " +
@@ -930,17 +921,17 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     @Override
     protected String getExperienceLevelName(BigDecimal experience) {
-        if (experience.compareTo(greenThreshold) >= 0) {
+        if (!hasUnits()) {
+            return SkillType.getExperienceLevelName(-1);
+        } else if (experience.compareTo(greenThreshold) >= 0) {
             return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
-        }
-        if (experience.compareTo(regularThreshold) >= 0) {
+        } else if (experience.compareTo(regularThreshold) >= 0) {
             return SkillType.getExperienceLevelName(SkillType.EXP_REGULAR);
-        }
-        if (experience.compareTo(veteranThreshold) >= 0) {
+        } else if (experience.compareTo(veteranThreshold) >= 0) {
             return SkillType.getExperienceLevelName(SkillType.EXP_VETERAN);
+        } else {
+            return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
         }
-
-        return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
     }
 
     private int getTechRatedUnits() {
@@ -954,7 +945,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     @Override
     public int getTechValue() {
         //Make sure we have units.
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+        if (!hasUnits()) {
             return 0;
         }
 
@@ -1097,6 +1088,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return countClan;
     }
 
+    @Override
     public UnitRatingMethod getUnitRatingMethod() {
         return UnitRatingMethod.FLD_MAN_MERCS_REV;
     }
