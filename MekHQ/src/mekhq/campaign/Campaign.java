@@ -2735,7 +2735,7 @@ public class Campaign implements Serializable, ITechManager {
 
         String report = tech.getHyperlinkedFullTitle() + " spent " + minutes + " minutes mothballing " + u.getHyperlinkedName();
         if (!u.isMothballing()) {
-            completeMothball(u);
+            u.completeMothball();
             report += ". Mothballing complete.";
         } else {
             report += ". " + u.getMothballTime() + " minutes remaining.";
@@ -2748,15 +2748,6 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         addReport(report);
-    }
-
-    /**
-     * Completes the mothballing of a unit.
-     * @param u The unit which should now be mothballed.
-     */
-    public void completeMothball(Unit u) {
-        u.setMothballTime(0);
-        u.setMothballed(true);
     }
 
     /**
@@ -2790,28 +2781,20 @@ public class Campaign implements Serializable, ITechManager {
         u.setMothballTime(u.getMothballTime() - minutes);
 
         String report = tech.getHyperlinkedFullTitle() + " spent " + minutes + " minutes activating " + u.getHyperlinkedName();
-        if (!u.isMothballing()) {
-            completeActivation(u);
-            report += ". Activation complete.";
-        } else {
-            report += ". " + u.getMothballTime() + " minutes remaining.";
-        }
 
         tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
         if (!u.isSelfCrewed()) {
             astechPoolMinutes -= 6 * minutes;
         }
 
-        addReport(report);
-    }
+        if (!u.isMothballing()) {
+            u.completeActivation();
+            report += ". Activation complete.";
+        } else {
+            report += ". " + u.getMothballTime() + " minutes remaining.";
+        }
 
-    /**
-     * Completes the activation of a unit.
-     * @param u The unit which should now be activated.
-     */
-    public void completeActivation(Unit u) {
-        u.setMothballTime(0);
-        u.setMothballed(false);
+        addReport(report);
     }
 
     public void refit(Refit r) {
