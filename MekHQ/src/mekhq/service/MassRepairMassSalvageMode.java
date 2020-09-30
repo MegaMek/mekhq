@@ -20,5 +20,13 @@ package mekhq.service;
 
 public enum MassRepairMassSalvageMode {
     UNITS,
-    WAREHOUSE
+    WAREHOUSE;
+
+    public boolean isUnits() {
+        return this == UNITS;
+    }
+
+    public boolean isWarehouse() {
+        return this == WAREHOUSE;
+    }
 }
