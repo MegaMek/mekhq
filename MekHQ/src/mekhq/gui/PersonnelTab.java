@@ -20,6 +20,7 @@ package mekhq.gui;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -44,6 +45,7 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OvertimeModeEvent;
 import mekhq.campaign.event.PartWorkEvent;
@@ -115,8 +117,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(new JLabel(resourceMap.getString("lblPersonChoice.text")), gridBagConstraints);
 
-        DefaultComboBoxModel<PersonnelFilter> personGroupModel = new DefaultComboBoxModel<>(PersonnelFilter.values());
-        choicePerson = new JComboBox<>(personGroupModel);
+        choicePerson = new JComboBox<>(createPersonGroupModel());
         choicePerson.setSelectedIndex(0);
         choicePerson.addActionListener(ev -> filterPersonnel());
         gridBagConstraints = new GridBagConstraints();
@@ -242,6 +243,18 @@ public final class PersonnelTab extends CampaignGuiTab {
         add(splitPersonnel, gridBagConstraints);
 
         filterPersonnel();
+    }
+
+    private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {
+        DefaultComboBoxModel<PersonnelFilter> personGroupModel = new DefaultComboBoxModel<>();
+
+        List<PersonnelFilter> personnelFilters = MekHQ.getMekHQOptions().getPersonnelIndividualRoleFilters()
+                ? PersonnelFilter.getIndividualRolesExpandedPersonnelFilters()
+                : PersonnelFilter.getExpandedPersonnelFilters();
+        for (PersonnelFilter filter : personnelFilters) {
+            personGroupModel.addElement(filter);
+        }
+        return personGroupModel;
     }
 
     private void setUserPreferences() {
@@ -833,6 +846,12 @@ public final class PersonnelTab extends CampaignGuiTab {
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
         changePersonnelView();
+        personnelListScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(MekHQOptionsChangedEvent evt) {
+        choicePerson.setModel(createPersonGroupModel());
         personnelListScheduler.schedule();
     }
 

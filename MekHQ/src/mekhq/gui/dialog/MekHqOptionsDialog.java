@@ -43,6 +43,11 @@ public class MekHqOptionsDialog extends BaseDialog {
     private JCheckBox optionCommandCenterUseUnitMarket;
     private JCheckBox optionCommandCenterMRMS;
     //endregion Command Center Display
+
+    //region Personnel Tab Display Options
+    private JCheckBox optionPersonnelIndividualRoleFilters;
+    private JCheckBox optionPersonnelFilterOnPrimaryRole;
+    //endregion Personnel Tab Display Options
     //endregion Display
 
     //region Autosave
@@ -115,6 +120,14 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionCommandCenterMRMS = new JCheckBox(resources.getString("optionCommandCenterMRMS.text"));
         optionCommandCenterMRMS.setToolTipText(resources.getString("optionCommandCenterMRMS.toolTipText"));
         //endregion Command Center Display
+
+        //region Personnel Tab Display Options
+        JLabel labelPersonnelDisplay = new JLabel(resources.getString("labelPersonnelDisplay.text"));
+
+        optionPersonnelIndividualRoleFilters = new JCheckBox(resources.getString("optionPersonnelIndividualRoleFilters.text"));
+
+        optionPersonnelFilterOnPrimaryRole = new JCheckBox(resources.getString("optionPersonnelFilterOnPrimaryRole.text"));
+        //endregion Personnel Tab Display Options
         //endregion Display
 
         //region Autosave
@@ -204,6 +217,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(labelCommandCenterDisplay)
                     .addComponent(optionCommandCenterUseUnitMarket)
                     .addComponent(optionCommandCenterMRMS)
+                    .addComponent(labelPersonnelDisplay)
+                    .addComponent(optionPersonnelIndividualRoleFilters)
+                    .addComponent(optionPersonnelFilterOnPrimaryRole)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -241,6 +257,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(labelCommandCenterDisplay)
                     .addComponent(optionCommandCenterUseUnitMarket)
                     .addComponent(optionCommandCenterMRMS)
+                    .addComponent(labelPersonnelDisplay)
+                    .addComponent(optionPersonnelIndividualRoleFilters)
+                    .addComponent(optionPersonnelFilterOnPrimaryRole)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -277,6 +296,8 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
         MekHQ.getMekHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
         MekHQ.getMekHQOptions().setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
+        MekHQ.getMekHQOptions().setPersonnelIndividualRoleFilters(optionPersonnelIndividualRoleFilters.isSelected());
+        MekHQ.getMekHQOptions().setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
 
         MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
         MekHQ.getMekHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
@@ -303,6 +324,8 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionHistoricalDailyLog.setSelected(MekHQ.getMekHQOptions().getHistoricalDailyLog());
         optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket());
         optionCommandCenterMRMS.setSelected(MekHQ.getMekHQOptions().getCommandCenterMRMS());
+        optionPersonnelIndividualRoleFilters.setSelected(MekHQ.getMekHQOptions().getPersonnelIndividualRoleFilters());
+        optionPersonnelFilterOnPrimaryRole.setSelected(MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole());
 
         optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
         optionSaveDaily.setSelected(MekHQ.getMekHQOptions().getAutosaveDailyValue());
