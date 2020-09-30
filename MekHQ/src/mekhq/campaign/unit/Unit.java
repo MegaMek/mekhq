@@ -4417,6 +4417,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return null;
     }
 
+    //region Mothballing/Activation
     /**
      * Gets a value indicating whether or not the unit is being mothballed
      * or activated.
@@ -4516,9 +4517,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             setMothballTime(getMothballOrActivationTime());
             getCampaign().mothball(this);
         } else {
-            getCampaign().completeMothball(this);
             getCampaign().addReport(getHyperlinkedName() + " has been mothballed (GM)");
         }
+    }
+
+    /**
+     * Completes the mothballing of a unit.
+     */
+    public void completeMothball() {
+        if (getTech() != null) {
+            remove(getTech(), false);
+        }
+
+        setMothballTime(0);
+        setMothballed(true);
     }
 
     /**
@@ -4541,15 +4553,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return;
         }
 
-        // if we previously mothballed this unit, attempt to restore its pre-mothball state
-        if (mothballInfo != null) {
-            mothballInfo.restorePreMothballInfo(this, getCampaign());
-            mothballInfo = null;
-        }
-
         //set this person as tech
-        if (!isSelfCrewed() && null != tech && !tech.equals(id)) {
-            if (null != getTech()) {
+        if (!isSelfCrewed() && (tech != null) && !tech.equals(id)) {
+            if (getTech() != null) {
                 remove(getTech(), true);
             }
         }
@@ -4559,8 +4565,26 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             setMothballTime(getMothballOrActivationTime());
             getCampaign().activate(this);
         } else {
-            getCampaign().completeActivation(this);
+            completeActivation();
             getCampaign().addReport(getHyperlinkedName() + " has been activated (GM)");
+        }
+    }
+
+    /**
+     * Completes the activation of a unit.
+     */
+    public void completeActivation() {
+        if (getTech() != null) {
+            remove(getTech(), false);
+        }
+
+        setMothballTime(0);
+        setMothballed(false);
+
+        // if we previously mothballed this unit, attempt to restore its pre-mothball state
+        if (mothballInfo != null) {
+            mothballInfo.restorePreMothballInfo(this, getCampaign());
+            mothballInfo = null;
         }
     }
 
@@ -4572,8 +4596,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //set mothballing time
         if (getEntity() instanceof Infantry) {
             return TECH_WORK_DAY;
-        } else if (getEntity() instanceof Dropship || getEntity() instanceof Jumpship) {
-            return TECH_WORK_DAY * (int)Math.ceil(getEntity().getWeight()/500.0);
+        } else if ((getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship)) {
+            return TECH_WORK_DAY * (int) Math.ceil(getEntity().getWeight() / 500.0);
         } else if (isMothballed()) {
             return TECH_WORK_DAY;
         } else {
@@ -4591,14 +4615,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         setMothballTime(0);
 
-        // ...if we were activating, save our crew
-        if (isMothballed()) {
-            mothballInfo = new MothballInfo(this);
+        // ...if we were mothballing, restore our crew
+        if (!isMothballed()) {
+            mothballInfo.restorePreMothballInfo(this, getCampaign());
+            mothballInfo = null;
         }
 
         // reset our mothball status
         setMothballed(isMothballed());
     }
+    //endregion Mothballing/Activation
 
     public ArrayList<Person> getActiveCrew() {
         ArrayList<Person> crew = new ArrayList<>();
