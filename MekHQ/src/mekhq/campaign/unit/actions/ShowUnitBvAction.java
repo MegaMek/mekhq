@@ -36,8 +36,8 @@ import mekhq.campaign.unit.Unit;
  */
 public class ShowUnitBvAction implements IUnitAction {
 
-	@Override
-	public void Execute(Campaign campaign, Unit unit) {
+    @Override
+    public void Execute(Campaign campaign, Unit unit) {
         if (unit == null) {
             return;
         }
@@ -63,6 +63,6 @@ public class ShowUnitBvAction implements IUnitAction {
 
         JOptionPane.showMessageDialog(null, scrollPane, "BV",
             JOptionPane.INFORMATION_MESSAGE, null);
-	}
+    }
 
 }
