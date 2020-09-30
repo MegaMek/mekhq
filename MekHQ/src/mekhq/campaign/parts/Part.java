@@ -675,6 +675,13 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             .append(replacementId)
             .append("</replacementId>")
             .append(NL);
+        if (reserveId != null) {
+            builder.append(level1)
+                .append("<reserveId>")
+                .append(reserveId)
+                .append("</reserveId>")
+                .append(NL);
+        }
         builder.append(level1)
             .append("<quality>")
             .append(quality)
@@ -809,6 +816,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                     retVal.parentPartId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("childPartId")) {
                     retVal.childPartIds.add(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("reserveId")) {
+                    retVal.reserveId = UUID.fromString(wn2.getTextContent());
                 }
             }
 
