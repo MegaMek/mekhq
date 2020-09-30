@@ -31,6 +31,7 @@ VERSION HISTORY:
 + Issue #2066: Do not add zero or NaN costs for ammo during Refits
 + Issue #1481: Adding Option to Disable Mothball Information Save
 + PR #2073: MRMS Dialog Localization
++ PR #2075: Fixing Scenario Template Date NPEs
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
