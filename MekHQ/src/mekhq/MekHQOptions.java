@@ -31,7 +31,7 @@ public final class MekHQOptions {
     }
 
     public String getDisplayFormattedDate(LocalDate date) {
-        return date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()));
+        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat())) : "";
     }
 
     public void setDisplayDateFormat(String value) {
@@ -47,7 +47,7 @@ public final class MekHQOptions {
     }
 
     public String getLongDisplayFormattedDate(LocalDate date) {
-        return date.format(DateTimeFormatter.ofPattern(getLongDisplayDateFormat()));
+        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getLongDisplayDateFormat())) : "";
     }
 
     public void setLongDisplayDateFormat(String value) {

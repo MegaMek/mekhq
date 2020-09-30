@@ -111,10 +111,11 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             newScenario = false;
         }
         campaign = c;
-        date = scenario.getDate();
-        if (null == date) {
-            date = campaign.getLocalDate();
+        if (scenario.getDate() == null) {
+            scenario.setDate(campaign.getLocalDate());
         }
+        date = scenario.getDate();
+
         loots = new ArrayList<>();
         for (Loot loot : scenario.getLoot()) {
             loots.add((Loot)loot.clone());
@@ -347,6 +348,10 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         }
 
         AtBDynamicScenario scenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(scenarioTemplate, (AtBContract) mission, campaign);
+        if (scenario.getDate() == null) {
+            scenario.setDate(date);
+        }
+
         if (newScenario) {
             campaign.addScenario(scenario, mission);
         }
