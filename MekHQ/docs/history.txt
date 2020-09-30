@@ -29,6 +29,8 @@ VERSION HISTORY:
 + PR #2071: Fix campaign ops dropship maintenance costs
 + Issue #2017: Keep focus on unit during repairs
 + Issue #2066: Do not add zero or NaN costs for ammo during Refits
++ Issue #1481: Adding Option to Disable Mothball Information Save
++ PR #2073: MRMS Dialog Localization
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
