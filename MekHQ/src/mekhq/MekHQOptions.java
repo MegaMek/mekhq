@@ -79,6 +79,24 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_MRMS, value);
     }
     //endregion Command Center Display
+
+    //region Personnel Tab Display Options
+    public boolean getPersonnelIndividualRoleFilters() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.PERSONNEL_INDIVIDUAL_ROLE_FILTERS, false);
+    }
+
+    public void setPersonnelIndividualRoleFilters(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.PERSONNEL_INDIVIDUAL_ROLE_FILTERS, value);
+    }
+
+    public boolean getPersonnelFilterOnPrimaryRole() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, false);
+    }
+
+    public void setPersonnelFilterOnPrimaryRole(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, value);
+    }
+    //endregion Personnel Tab Display Options
     //endregion Display
 
     //region Autosave

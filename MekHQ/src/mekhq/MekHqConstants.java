@@ -33,6 +33,11 @@ public final class MekHqConstants {
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
     //endregion Command Center
+
+    //region Personnel Tab Display Options
+    public static final String PERSONNEL_INDIVIDUAL_ROLE_FILTERS = "personnelIndividualRoleFilters";
+    public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
+    //endregion Personnel Tab Display Options
     //endregion Display
 
     //region Autosave

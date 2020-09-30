@@ -755,7 +755,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if the person has the specific role either as their primary or secondary role
      */
     public boolean hasRole(int role) {
-        return (getPrimaryRole() == role) || (getSecondaryRole() == role);
+        return hasPrimaryRole(role) || hasSecondaryRole(role);
+    }
+
+    /**
+     * @param role the role to determine
+     * @return true if the person has the specific role as their primary role
+     */
+    public boolean hasPrimaryRole(int role) {
+        return getPrimaryRole() == role;
+    }
+
+    /**
+     * @param role the role to determine
+     * @return true if the person has the specific role as their secondary role
+     */
+    public boolean hasSecondaryRole(int role) {
+        return getSecondaryRole() == role;
     }
 
     /**
@@ -824,7 +840,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if the person has a primary support role
      */
     public boolean hasPrimarySupportRole(boolean includeNoRole) {
-        return hasPrimaryRoleWithin(T_MECH_TECH, T_ADMIN_HR) || (includeNoRole && (getPrimaryRole() == T_NONE));
+        return hasPrimaryRoleWithin(T_MECH_TECH, T_ADMIN_HR) || (includeNoRole && hasPrimaryRole(T_NONE));
     }
 
     /**
