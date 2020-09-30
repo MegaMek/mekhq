@@ -650,12 +650,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             case CMD_FREE: {
                 // TODO: Warn in particular for "freeing" in deep space, leading to Geneva Conventions violation (#1400 adding Crime to MekHQ)
                 // TODO: Record the people into some NPC pool, if still alive
-                if (0 == JOptionPane.showConfirmDialog(
-                        null,
-                        String.format(resourceMap.getString("confirmFree.format"), selectedPerson.getFullTitle()),
+                String title = (people.length == 1) ? people[0].getFullTitle()
+                        : String.format(resourceMap.getString("numPrisoners.text"), people.length);
+                if (0 == JOptionPane.showConfirmDialog(null,
+                        String.format(resourceMap.getString("confirmFree.format"), title),
                         resourceMap.getString("freeQ.text"),
                         JOptionPane.YES_NO_OPTION)) {
-                    gui.getCampaign().removePerson(selectedPerson.getId());
+                    for (Person person : people) {
+                        gui.getCampaign().removePerson(person.getId());
+                    }
                 }
                 break;
             }
@@ -701,10 +704,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_REMOVE: {
-                String title = String.format(resourceMap.getString("numPersonnel.text"), people.length);
-                if (people.length == 1) {
-                    title = people[0].getFullTitle();
-                }
+                String title = (people.length == 1) ? people[0].getFullTitle()
+                        : String.format(resourceMap.getString("numPersonnel.text"), people.length);
                 if (0 == JOptionPane.showConfirmDialog(null,
                         String.format(resourceMap.getString("confirmRemove.format"), title),
                         resourceMap.getString("removeQ.text"),
@@ -1291,9 +1292,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
 
             if (StaticChecks.areAnyFree(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON));
-            }
-
-            if (oneSelected && !person.getPrisonerStatus().isFree()) {
+            } else {
+                // If none are free, then we can put the Free option
                 popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE));
             }
 
