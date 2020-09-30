@@ -63,11 +63,12 @@ import mekhq.campaign.parts.equipment.InfantryAmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.actions.StripUnitAction;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.CancelMothballUnitAction;
 import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
+import mekhq.campaign.unit.actions.ShowUnitBvAction;
+import mekhq.campaign.unit.actions.StripUnitAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.MekLabTab;
@@ -127,6 +128,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     public static final String COMMAND_REFURBISH = "REFURBISH";
     public static final String COMMAND_REFIT_KIT = "REFIT_KIT";
     public static final String COMMAND_FLUFF_NAME = "FLUFF_NAME";
+    public static final String COMMAND_SHOW_BV_CALC = "SHOW_BV_CALC";
     //endregion Standard Commands
 
     //region GM Commands
@@ -457,6 +459,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     selectedUnit.getFluffName() == null ? "" : selectedUnit.getFluffName());
             selectedUnit.setFluffName(fluffName);
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+        } else if (command.equals(COMMAND_SHOW_BV_CALC)) {
+            IUnitAction showUnitBvAction = new ShowUnitBvAction();
+            showUnitBvAction.Execute(gui.getCampaign(), selectedUnit);
         } else if (command.equals(COMMAND_RESTORE_UNIT)) {
             for (Unit unit : units) {
                 unit.setSalvage(false);
@@ -1029,6 +1034,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 if (oneSelected) {
                     menuItem = new JMenuItem("Name Unit");
                     menuItem.setActionCommand(COMMAND_FLUFF_NAME);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
+
+                if (oneSelected) {
+                    menuItem = new JMenuItem("Show BV Calculation");
+                    menuItem.setActionCommand(COMMAND_SHOW_BV_CALC);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
                 }
