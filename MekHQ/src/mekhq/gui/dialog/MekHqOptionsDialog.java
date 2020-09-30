@@ -62,6 +62,7 @@ public class MekHqOptionsDialog extends BaseDialog {
     //region Campaign XML Save
     private JCheckBox optionPreferGzippedOutput;
     private JCheckBox optionWriteCustomsToXML;
+    private JCheckBox optionSaveMothballState;
     //endregion Campaign XML Save
 
     //region Miscellaneous
@@ -78,7 +79,7 @@ public class MekHqOptionsDialog extends BaseDialog {
 
     /**
      * This dialog uses the following Mnemonics:
-     * C, D, M, M, S, W, Y
+     * C, D, M, M, S, U, W, Y
      */
     @Override
     protected Container createCustomUI() {
@@ -163,6 +164,10 @@ public class MekHqOptionsDialog extends BaseDialog {
 
         optionWriteCustomsToXML = new JCheckBox(resources.getString("optionWriteCustomsToXML.text"));
         optionWriteCustomsToXML.setMnemonic(KeyEvent.VK_C);
+
+        optionSaveMothballState = new JCheckBox(resources.getString("optionSaveMothballState.text"));
+        optionSaveMothballState.setToolTipText(resources.getString("optionSaveMothballState.toolTipText"));
+        optionSaveMothballState.setMnemonic(KeyEvent.VK_U);
         //endregion Campaign XML Save
 
         //region Miscellaneous Options
@@ -214,6 +219,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(labelXMLSave)
                     .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
+                    .addComponent(optionSaveMothballState)
                     .addComponent(labelMiscellaneous)
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(labelStartGameDelay)
@@ -250,6 +256,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(labelXMLSave)
                     .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
+                    .addComponent(optionSaveMothballState)
                     .addComponent(labelMiscellaneous)
                     .addGroup(layout.createSequentialGroup()
                             .addComponent(labelStartGameDelay)
@@ -283,6 +290,7 @@ public class MekHqOptionsDialog extends BaseDialog {
 
         MekHQ.getMekHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
         MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
+        MekHQ.getMekHQOptions().setSaveMothballState(optionSaveMothballState.isSelected());
 
         MekHQ.getMekHQOptions().setStartGameDelay((Integer) optionStartGameDelay.getValue());
 
@@ -308,6 +316,7 @@ public class MekHqOptionsDialog extends BaseDialog {
 
         optionPreferGzippedOutput.setSelected(MekHQ.getMekHQOptions().getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
+        optionSaveMothballState.setSelected(MekHQ.getMekHQOptions().getSaveMothballState());
 
         optionStartGameDelay.setValue(MekHQ.getMekHQOptions().getStartGameDelay());
     }

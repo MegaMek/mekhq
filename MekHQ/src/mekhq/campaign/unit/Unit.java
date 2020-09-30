@@ -1810,8 +1810,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     +"]]></lastMaintenanceReport>");
         }
 
-        if (null != mothballInfo) {
-            mothballInfo.writeToXml(pw1, indentLvl);
+        if (mothballInfo != null) {
+            mothballInfo.writeToXml(pw1, indentLvl + 1);
         }
 
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
@@ -4492,19 +4492,19 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      *             be performed immediately by the GM.
      */
     public void startMothballing(UUID id, boolean isGM) {
-        if (!isMothballed()) {
+        if (!isMothballed() && MekHQ.getMekHQOptions().getSaveMothballState()) {
             mothballInfo = new MothballInfo(this);
         }
 
         //set this person as tech
-        if (!isSelfCrewed() && null != tech && !tech.equals(id)) {
+        if (!isSelfCrewed() && (null != tech) && !tech.equals(id)) {
             if (null != getTech()) {
                 remove(getTech(), true);
             }
         }
         tech = id;
 
-        //dont remove personnel yet, because self crewed units need their crews to mothball
+        //don't remove personnel yet, because self crewed units need their crews to mothball
         getCampaign().removeUnitFromForce(this);
 
         //clear any assigned tasks

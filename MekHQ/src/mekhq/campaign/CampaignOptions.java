@@ -3045,7 +3045,9 @@ public class CampaignOptions implements Serializable {
         //endregion General Tab
 
         //region Repair and Maintenance Tab
+        //region Maintenance
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMaintenance", logMaintenance);
+        //endregion Maintenance
         //endregion Repair and Maintenance Tab
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useOriginFactionForNames);

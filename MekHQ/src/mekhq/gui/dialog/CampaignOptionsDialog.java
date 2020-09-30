@@ -744,7 +744,7 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion General Tab
 
         //region Repair and Maintenance Tab
-        panRepair.setName("panRules");
+        panRepair.setName("panRepair");
         panRepair.setLayout(new java.awt.GridBagLayout());
 
         JPanel panSubRepair = new JPanel(new GridBagLayout());
@@ -753,29 +753,20 @@ public class CampaignOptionsDialog extends JDialog {
         panSubRepair.setBorder(BorderFactory.createTitledBorder("Repair"));
         panSubMaintenance.setBorder(BorderFactory.createTitledBorder("Maintenance"));
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = .5;
+        gridBagConstraints.weightx = 0.5;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         panRepair.add(panSubRepair, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         panRepair.add(panSubMaintenance, gridBagConstraints);
-
-        //We want the new mass repair panel to span two cells
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.weighty = 1;
-        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-
 
         useEraModsCheckBox.setText(resourceMap.getString("useEraModsCheckBox.text")); // NOI18N
         useEraModsCheckBox.setToolTipText(resourceMap.getString("useEraModsCheckBox.toolTipText")); // NOI18N
