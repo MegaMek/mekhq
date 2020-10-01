@@ -1180,7 +1180,7 @@ public class CampaignGUI extends JPanel {
         Vector<Unit> notMaintained = new Vector<>();
         int totalAstechMinutesNeeded = 0;
         for (Unit u : getCampaign().getUnits()) {
-            if (u.requiresMaintenance() && (u.getTech() == null)) {
+            if (u.isUnmaintained()) {
                 notMaintained.add(u);
             } else if (u.isPresent() && (u.getEngineer() == null)) {
                 // only add astech minutes for non-crewed units who are present

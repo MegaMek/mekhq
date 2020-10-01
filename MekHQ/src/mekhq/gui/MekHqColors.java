@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui;
 
@@ -52,6 +52,7 @@ public class MekHqColors {
     private static ColorPreference notRepairableColors;
     private static ColorPreference nonfunctionalColors;
     private static ColorPreference needsPartsFixedColors;
+    private static ColorPreference unmaintainedColors;
     private static ColorPreference uncrewedColors;
 
     //
@@ -83,7 +84,8 @@ public class MekHqColors {
         notRepairableColors = new ColorPreference("notRepairable", new Color(190, 150, 55), Color.BLACK);
         nonfunctionalColors = new ColorPreference("nonfunctional", new Color(205, 92, 92), Color.BLACK);
         needsPartsFixedColors = new ColorPreference("needsPartsFixed", new Color(238, 238, 0), Color.BLACK);
-        uncrewedColors = new ColorPreference("uncrewed", Color.RED, Color.BLACK);
+        unmaintainedColors = new ColorPreference("unmaintainedColors", Color.ORANGE, Color.BLACK);
+        uncrewedColors = new ColorPreference("uncrewed", Color.MAGENTA, Color.BLACK);
 
         loanOverdueColors = new ColorPreference("loanOverdue", Color.RED, Color.BLACK);
 
@@ -91,9 +93,11 @@ public class MekHqColors {
         healedInjuriesColors = new ColorPreference("healed", new Color(0xee9a00), Color.BLACK);
         paidRetirementColors = new ColorPreference("paidRetirement", Color.LIGHT_GRAY, Color.BLACK);
 
-        preferences.manage(iconButtonColors, deployedColors, belowContractMinimumColors, inTransitColors, refittingColors,
-            mothballingColors, mothballedColors, notRepairableColors, nonfunctionalColors, needsPartsFixedColors,
-            uncrewedColors, loanOverdueColors, injuredColors, healedInjuriesColors, paidRetirementColors);
+        preferences.manage(iconButtonColors, deployedColors, belowContractMinimumColors,
+                inTransitColors, refittingColors, mothballingColors, mothballedColors,
+                notRepairableColors, nonfunctionalColors, needsPartsFixedColors, unmaintainedColors,
+                uncrewedColors, loanOverdueColors, injuredColors, healedInjuriesColors,
+                paidRetirementColors);
     }
 
     public ColorPreference getIconButton() {
@@ -134,6 +138,10 @@ public class MekHqColors {
 
     public ColorPreference getNeedsPartsFixed() {
         return needsPartsFixedColors;
+    }
+
+    public ColorPreference getUnmaintained() {
+        return unmaintainedColors;
     }
 
     public ColorPreference getUncrewed() {
