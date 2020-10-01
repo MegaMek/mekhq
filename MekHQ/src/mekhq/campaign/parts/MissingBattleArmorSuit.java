@@ -230,11 +230,9 @@ public class MissingBattleArmorSuit extends MissingPart {
         	BattleArmorSuit newSuit = (BattleArmorSuit)replacement.clone();
             //lets also clone the subparts
             unit.addPart(newSuit);
-            //this is admittedly hacky, but lets go ahead and add something to the newSuit
-            //so it doesnt generate a whole new set of parts
-            newSuit.childPartIds.add(1);
+            newSuit.isReplacement(true);
             campaign.addPart(newSuit, 0);
-            newSuit.childPartIds.clear();
+            newSuit.isReplacement(false);
             newSuit.setTrooper(trooper);
             newSuit.updateConditionFromPart();
             //cycle through MissingBattleArmorEquipmentPart for trooper and replace
@@ -253,14 +251,13 @@ public class MissingBattleArmorSuit extends MissingPart {
                 }
                 missingStuff.add(missingBaEquip);
             }
-            for(int childId : replacement.getChildPartIds()) {
-        		Part childPart = campaign.getPart(childId);
-        		if(childPart instanceof BaArmor && null != origArmor) {
+            for (Part childPart : replacement.getChildParts()) {
+        		if (childPart instanceof BaArmor && null != origArmor) {
         			unit.getEntity().setArmor(((BaArmor)childPart).getAmount(), trooper);
         			origArmor.updateConditionFromEntity(false);
-        		} else if(childPart instanceof BattleArmorEquipmentPart) {
-        			for(MissingBattleArmorEquipmentPart p : missingStuff) {
-	            		if(null != p.getUnit() && p.isAcceptableReplacement(childPart, false)) {
+        		} else if (childPart instanceof BattleArmorEquipmentPart) {
+        			for (MissingBattleArmorEquipmentPart p : missingStuff) {
+	            		if (null != p.getUnit() && p.isAcceptableReplacement(childPart, false)) {
 	            			//then add child part and remove current part from unit and campaign
 	            			Part newPart = childPart.clone();
 	            			unit.addPart(newPart);
@@ -332,25 +329,19 @@ public class MissingBattleArmorSuit extends MissingPart {
 					int currentPartArmor = 0;
 					int bestPartQuantity = 0;
 					int currentPartQuantity = 0;
-					for(int childId : bestPart.childPartIds) {
-						Part p = campaign.getPart(childId);
-						if(p != null) {
-							if(p instanceof BaArmor) {
-								bestPartArmor = ((BaArmor)p).getAmount();
-							} else {
-								bestPartQuantity++;
-							}
-						}
+					for(Part p : bestPart.getChildParts()) {
+                        if (p instanceof BaArmor) {
+                            bestPartArmor = ((BaArmor)p).getAmount();
+                        } else {
+                            bestPartQuantity++;
+                        }
 					}
-					for(int childId : part.childPartIds) {
-						Part p = campaign.getPart(childId);
-						if(p != null) {
-							if(p instanceof BaArmor) {
-								currentPartArmor = ((BaArmor)p).getAmount();
-							} else {
-								currentPartQuantity++;
-							}
-						}
+					for (Part p : part.getChildParts()) {
+                        if (p instanceof BaArmor) {
+                            currentPartArmor = ((BaArmor)p).getAmount();
+                        } else {
+                            currentPartQuantity++;
+                        }
 					}
 					if(currentPartQuantity > bestPartQuantity) {
 						bestPart = part;

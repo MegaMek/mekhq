@@ -198,8 +198,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
      * not show up independently. Currently (8/8/2015), we are only using this for BA suits
      * We need a parent part id and a vector of children parts to represent this.
      */
-    protected int parentPartId;
-    protected ArrayList<Integer> childPartIds;
+    protected Part parentPart;
+    protected ArrayList<Part> childParts;
 
     /**
      * The number of parts in exactly the same condition,
@@ -243,8 +243,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         this.quantity = 1;
         this.replacementId = -1;
         this.quality = QUALITY_D;
-        this.parentPartId = -1;
-        this.childPartIds = new ArrayList<>();
+        this.parentPart = null;
+        this.childParts = new ArrayList<>();
         this.isTeamSalvaging = false;
     }
 
@@ -692,15 +692,17 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             .append(isTeamSalvaging)
             .append("</isTeamSalvaging>")
             .append(NL);
-        builder.append(level1)
-            .append("<parentPartId>")
-            .append(parentPartId)
-            .append("</parentPartId>")
-            .append(NL);
-        for (int childId : childPartIds) {
+        if (parentPart != null) {
+            builder.append(level1)
+                .append("<parentPartId>")
+                .append(parentPart.getId())
+                .append("</parentPartId>")
+                .append(NL);
+        }
+        for (Part childPart : childParts) {
             builder.append(level1)
                 .append("<childPartId>")
-                .append(childId)
+                .append(childPart.getId())
                 .append("</childPartId>")
                 .append(NL);
         }
@@ -813,9 +815,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 } else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
                     retVal.quality = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("parentPartId")) {
-                    retVal.parentPartId = Integer.parseInt(wn2.getTextContent());
+                    retVal.parentPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("childPartId")) {
-                    retVal.childPartIds.add(Integer.parseInt(wn2.getTextContent()));
+                    int childPartId = Integer.parseInt(wn2.getTextContent());
+                    if (childPartId > 0) {
+                        retVal.childParts.add(new PartRef(childPartId));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("reserveId")) {
                     retVal.reserveId = UUID.fromString(wn2.getTextContent());
                 }
@@ -1311,11 +1316,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public void decrementQuantity() {
         quantity--;
         if (quantity <= 0) {
-            for (int childId : childPartIds) {
-                Part p = campaign.getPart(childId);
-                if (null != p) {
-                    campaign.removePart(p);
-                }
+            for (Part childPart : childParts) {
+                campaign.removePart(childPart);
             }
             campaign.removePart(this);
         }
@@ -1328,18 +1330,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public void setQuantity(int number) {
         quantity = number;
         if (quantity <= 0) {
-            for (int childId : childPartIds) {
-                Part p = campaign.getPart(childId);
-                if (null != p) {
-                    campaign.removePart(p);
-                }
+            for (Part childPart : childParts) {
+                campaign.removePart(childPart);
             }
             campaign.removePart(this);
         }
     }
 
     public boolean isSpare() {
-        return null == unitId && parentPartId == -1;
+        return unitId == null && parentPart == null;
     }
 
     public boolean isRightTechType(String skillType) {
@@ -1423,50 +1422,37 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public abstract String getLocationName();
 
-    public void setParentPartId(int id) {
-        parentPartId = id;
+    public void setParentPart(Part part) {
+        parentPart = part;
     }
 
-    public int getParentPartId() {
-        return parentPartId;
+    public Part getParentPart() {
+        return parentPart;
     }
 
     public boolean hasParentPart() {
-        return parentPartId != -1;
+        return parentPart != null;
     }
 
-    public ArrayList<Integer> getChildPartIds() {
-        return childPartIds;
+    public ArrayList<Part> getChildParts() {
+        return childParts;
     }
 
     public void addChildPart(Part child) {
-        childPartIds.add(child.getId());
-        child.setParentPartId(id);
+        childParts.add(child);
+        child.setParentPart(this);
     }
 
-    public void removeChildPart(int childId) {
-        ArrayList<Integer> tempArray = new ArrayList<>();
-        for (int cid : childPartIds) {
-            if (cid == childId) {
-                Part part = campaign.getPart(childId);
-                if (null != part) {
-                    part.setParentPartId(-1);
-                }
-            } else {
-                tempArray.add(cid);
-            }
-        }
-        childPartIds = tempArray;
+    public void removeChildPart(Part childPart) {
+        childPart.setParentPart(null);
+        childParts.remove(childPart);
     }
 
     public void removeAllChildParts() {
-        for (int childId : childPartIds) {
-            Part part = campaign.getPart(childId);
-            if (null != part) {
-                part.setParentPartId(-1);
-            }
+        for (Part childPart : childParts) {
+            childPart.setParentPart(null);
         }
-        childPartIds = new ArrayList<>();
+        childParts = new ArrayList<>();
     }
 
     /**
@@ -1774,5 +1760,145 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                     SimpleTechLevel.STANDARD);
         }
         return getTechAdvancement().getStaticTechLevel();
+    }
+
+    public void fixupPartReferences(Map<Integer, Part> knownParts) {
+        if (parentPart instanceof PartRef) {
+            int id = parentPart.getId();
+            parentPart = knownParts.get(id);
+            if (parentPart == null) {
+                MekHQ.getLogger().error(PartRef.class,
+                    String.format("Part %d ('%s') references missing parent part %d",
+                        getId(), getName(), id));
+            }
+        }
+
+        for (int ii = childParts.size() - 1; ii >= 0; --ii) {
+            Part childPart = childParts.get(ii);
+            if (childPart instanceof PartRef) {
+                Part realPart = knownParts.get(childPart.getId());
+                if (realPart != null) {
+                    childParts.set(ii, realPart);
+                } else {
+                    MekHQ.getLogger().error(PartRef.class,
+                        String.format("Part %d ('%s') references missing child part %d",
+                            getId(), getName(), id));
+                    childParts.remove(ii);
+                }
+            }
+        }
+    }
+
+    public static class PartRef extends Part {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
+
+        public PartRef(int id) {
+            this.id = id;
+        }
+
+        @Override
+        public int getBaseTime() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public void updateConditionFromEntity(boolean checkForDestruction) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void updateConditionFromPart() {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void remove(boolean salvage) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public MissingPart getMissingPart() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public int getLocation() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public String checkFixable() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean needsFixing() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public int getDifficulty() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public Money getStickerPrice() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public double getTonnage() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public boolean isSamePartType(Part part) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public void writeToXml(PrintWriter pw1, int indent) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        protected void loadFieldsFromXmlNode(Node wn) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public Part clone() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public String getLocationName() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public ITechnology getTechAdvancement() {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
 }

@@ -2766,8 +2766,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                 }
             } else {
-                List<Part> doors = bayPart.getChildPartIds().stream()
-                        .map(id -> getCampaign().getPart(id))
+                List<Part> doors = bayPart.getChildParts().stream()
                         .filter(p -> ((p instanceof BayDoor) || (p instanceof MissingBayDoor)))
                         .collect(Collectors.toList());
                 while (bay.getDoors() > doors.size()) {
@@ -2778,8 +2777,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     doors.add(door);
                 }
                 if (btype.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
-                    List<Part> cubicles = bayPart.getChildPartIds().stream()
-                            .map(id -> getCampaign().getPart(id))
+                    List<Part> cubicles = bayPart.getChildParts().stream()
                             .filter(p -> ((p instanceof Cubicle) || (p instanceof MissingCubicle)))
                             .collect(Collectors.toList());
                     while (bay.getCapacity() > cubicles.size()) {
