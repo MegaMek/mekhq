@@ -1798,103 +1798,81 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
         @Override
         public int getBaseTime() {
-            // TODO Auto-generated method stub
             return 0;
         }
 
         @Override
         public void updateConditionFromEntity(boolean checkForDestruction) {
-            // TODO Auto-generated method stub
-
         }
 
         @Override
         public void updateConditionFromPart() {
-            // TODO Auto-generated method stub
-
         }
 
         @Override
         public void remove(boolean salvage) {
-            // TODO Auto-generated method stub
-
         }
 
         @Override
         public MissingPart getMissingPart() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public int getLocation() {
-            // TODO Auto-generated method stub
             return 0;
         }
 
         @Override
         public String checkFixable() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public boolean needsFixing() {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public int getDifficulty() {
-            // TODO Auto-generated method stub
             return 0;
         }
 
         @Override
         public Money getStickerPrice() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public double getTonnage() {
-            // TODO Auto-generated method stub
             return 0;
         }
 
         @Override
         public boolean isSamePartType(Part part) {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public void writeToXml(PrintWriter pw1, int indent) {
-            // TODO Auto-generated method stub
-
         }
 
         @Override
         protected void loadFieldsFromXmlNode(Node wn) {
-            // TODO Auto-generated method stub
-
         }
 
         @Override
         public Part clone() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public String getLocationName() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public ITechnology getTechAdvancement() {
-            // TODO Auto-generated method stub
             return null;
         }
     }
