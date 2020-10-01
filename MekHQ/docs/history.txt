@@ -38,6 +38,7 @@ VERSION HISTORY:
 + Issue #1953 Part 1: Fixing mothballing and activation tech restore
 + Issue #2079: Implementing Bulk Free in Personnel Tab
 + Issues #1595/1805: Adding filters in Hangar Tab
++ Issue #1376: Hangar Tab Line Colours For Unmaintained and Uncrewed Units
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
