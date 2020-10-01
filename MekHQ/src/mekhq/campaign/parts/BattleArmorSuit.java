@@ -140,7 +140,7 @@ public class BattleArmorSuit extends Part {
     public double getTonnage() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
-        if(null == unit && getChildParts().isEmpty()) {
+        if ((null == unit) && getChildParts().isEmpty()) {
             return alternateTon;
         }
         double tons = 0;
@@ -219,10 +219,10 @@ public class BattleArmorSuit extends Part {
         }
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded extra costs
-        if(null == unit && getChildParts().isEmpty()) {
+        if ((null == unit) && getChildParts().isEmpty()) {
             tons += alternateTon;
         }
-        for(Part p : getChildParts()) {
+        for (Part p : getChildParts()) {
             if (!(p instanceof BattleArmorSuit)) {
                 tons += p.getTonnage();
             }
@@ -234,7 +234,7 @@ public class BattleArmorSuit extends Part {
     public Money getStickerPrice() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
-        if(null == unit && getChildParts().isEmpty()) {
+        if ((null == unit) && getChildParts().isEmpty()) {
             return alternateCost;
         }
         Money cost = Money.zero();
@@ -267,7 +267,7 @@ public class BattleArmorSuit extends Part {
             cost = cost.plus(50000 * (jumpMP + 1));
         }
         cost = cost.plus(25000 * (groundMP-1));
-        for(Part p : getChildParts()) {
+        for (Part p : getChildParts()) {
             if (p instanceof BaArmor) {
                 cost = cost.plus(p.getCurrentValue());
             } else if (!(p instanceof BattleArmorSuit)) {

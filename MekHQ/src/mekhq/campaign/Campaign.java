@@ -1634,7 +1634,7 @@ public class Campaign implements Serializable, ITechManager {
             p.setId(-1);
             return;
         }
-        if (null == p.getUnit() && !p.hasParentPart()) {
+        if ((null == p.getUnit()) && !p.hasParentPart()) {
             Part spare = checkForExistingSparePart(p);
             if (null != spare) {
                 if (p instanceof Armor) {

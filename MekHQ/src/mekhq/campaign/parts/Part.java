@@ -1790,9 +1790,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public static class PartRef extends Part {
-        /**
-         *
-         */
         private static final long serialVersionUID = 1L;
 
         public PartRef(int id) {
