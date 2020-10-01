@@ -77,7 +77,7 @@ public class MekHqColors {
         deployedColors = new ColorPreference("deployed", Color.LIGHT_GRAY, Color.BLACK);
         belowContractMinimumColors = new ColorPreference("belowContractMinimum", UIManager.getColor("Table.background"), Color.RED);
 
-        inTransitColors = new ColorPreference("inTransit", Color.ORANGE, Color.BLACK);
+        inTransitColors = new ColorPreference("inTransit", Color.MAGENTA, Color.BLACK);
         refittingColors = new ColorPreference("refitting", Color.CYAN, Color.BLACK);
         mothballingColors = new ColorPreference("mothballing", new Color(153,153,255), Color.BLACK);
         mothballedColors = new ColorPreference("mothballed", new Color(204, 204, 255), Color.BLACK);
@@ -85,7 +85,7 @@ public class MekHqColors {
         nonfunctionalColors = new ColorPreference("nonfunctional", new Color(205, 92, 92), Color.BLACK);
         needsPartsFixedColors = new ColorPreference("needsPartsFixed", new Color(238, 238, 0), Color.BLACK);
         unmaintainedColors = new ColorPreference("unmaintainedColors", Color.ORANGE, Color.BLACK);
-        uncrewedColors = new ColorPreference("uncrewed", Color.MAGENTA, Color.BLACK);
+        uncrewedColors = new ColorPreference("uncrewed", new Color(218, 130, 255), Color.BLACK);
 
         loanOverdueColors = new ColorPreference("loanOverdue", Color.RED, Color.BLACK);
 
