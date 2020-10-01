@@ -246,26 +246,19 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else {
                 return "Mothballing (" + getMothballTime() + "m)";
             }
-        }
-        if (isMothballed()) {
+        } else if (isMothballed()) {
             return "Mothballed";
-        }
-        if (isDeployed()) {
+        } else if (isDeployed()) {
             return "Deployed";
-        }
-        if (!isPresent()) {
+        } else if (!isPresent()) {
             return "In transit (" + getDaysToArrival() + " days)";
-        }
-        if (isRefitting()) {
+        } else if (isRefitting()) {
             return "Refitting";
-        }
-        if (!isRepairable()) {
+        } else if (!isRepairable()) {
             return "Salvage";
-        }
-        else if (!isFunctional()) {
+        } else if (!isFunctional()) {
             return "Inoperable";
-        }
-        else {
+        } else {
             return getDamageStateName(getDamageState());
         }
     }
@@ -1679,10 +1672,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             cost = cost.multipliedBy(getCampaign().getCampaignOptions().getClanPriceModifier());
         }
         return cost;
-    }
-
-    public int getDamageState() {
-        return getDamageState(getEntity());
     }
 
     @Override
@@ -4121,7 +4110,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean canTakeTech() {
-        return tech == null && requiresMaintenance() && !isSelfCrewed();
+        return isUnmaintained() && !isSelfCrewed();
     }
 
     // TODO : Switch similar tables in person to use this one instead
@@ -5003,6 +4992,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor;
     }
 
+    public boolean isUnmaintained() {
+        return requiresMaintenance() && (getTech() == null);
+    }
+
     public boolean isSelfCrewed() {
         return (getEntity() instanceof Dropship || getEntity() instanceof Jumpship
                 || getEntity() instanceof Infantry && !(getEntity() instanceof BattleArmor));
@@ -5023,6 +5016,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public void setLastMaintenanceReport(String r) {
         lastMaintenanceReport = r;
+    }
+
+
+    public int getDamageState() {
+        return getDamageState(getEntity());
     }
 
     public static int getDamageState(Entity en) {

@@ -291,7 +291,7 @@ public final class HangarTab extends CampaignGuiTab {
                     return unit.isMothballed();
                 } else if (resourceMap.getString("choiceUnit.UnmaintainedUnits.filter")
                         .equals(choiceUnit.getSelectedItem())) {
-                    return unit.requiresMaintenance() && (unit.getTech() == null);
+                    return unit.isUnmaintained();
                 } else {
                     return false;
                 }
