@@ -40,6 +40,8 @@ VERSION HISTORY:
 + Issues #1595/1805: Adding filters in Hangar Tab
 + Issue #1376: Hangar Tab Line Colours For Unmaintained and Uncrewed Units
 + Issue #2089: fix procuring vehicle engines from the parts store
++ Issue #2091: Fixing missing requirement of addToCampaign
++ PR #2094: AtB Bot Camo Load Swapover
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues

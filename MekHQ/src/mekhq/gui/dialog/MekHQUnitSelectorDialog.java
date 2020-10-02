@@ -146,10 +146,12 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         Entity entity = super.getSelectedEntity();
         if (entity == null) {
             selectedUnit = null;
-            buttonSelect.setEnabled(false);
-            buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy", TARGET_UNKNOWN));
-            buttonSelect.setToolTipText(null);
-        } else {
+            if (addToCampaign) {
+                buttonSelect.setEnabled(false);
+                buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy", TARGET_UNKNOWN));
+                buttonSelect.setToolTipText(null);
+            }
+        } else if (addToCampaign) {
             selectedUnit = new UnitOrder(entity, campaign);
             buttonSelect.setEnabled(true);
             Person logisticsPerson = campaign.getLogisticsPerson();
@@ -159,6 +161,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             buttonSelect.setToolTipText(campaign.getTargetForAcquisition(selectedUnit,
                     logisticsPerson, false).getDesc());
         }
+
         return entity;
     }
 

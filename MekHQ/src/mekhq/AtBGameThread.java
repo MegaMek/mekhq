@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq;
 
@@ -385,20 +385,12 @@ public class AtBGameThread extends GameThread {
              * rather than blocking
              */
             int retries = 50;
-            while (retries-- > 0 && null == botClient.getLocalPlayer()) {
+            while ((retries-- > 0) && (null == botClient.getLocalPlayer())) {
                 sleep(50);
             }
             if (null == botClient.getLocalPlayer()) {
                 MekHQ.getLogger().error(this, "Could not configure bot " + botClient.getName());
             } else {
-                for (Entity entity : botForce.getEntityList()) {
-                    if (null == entity) {
-                        continue;
-                    }
-                    entity.setOwner(botClient.getLocalPlayer());
-                    botClient.sendAddEntity(entity);
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
-                }
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
@@ -412,6 +404,15 @@ public class AtBGameThread extends GameThread {
                 }
 
                 botClient.sendPlayerInfo();
+
+                for (Entity entity : botForce.getEntityList()) {
+                    if (null == entity) {
+                        continue;
+                    }
+                    entity.setOwner(botClient.getLocalPlayer());
+                    botClient.sendAddEntity(entity);
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                }
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(this, e);
