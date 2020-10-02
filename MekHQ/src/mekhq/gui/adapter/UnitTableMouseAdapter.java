@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2020 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2014, 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.adapter;
 
@@ -59,7 +59,6 @@ import mekhq.campaign.parts.MissingThrusters;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.InfantryAmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -979,7 +978,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
 
                 // fill with personnel
                 if (oneAvailableUnitBelowMaxCrew) {
-                    menuItem = new JMenuItem("Hire full complement");
+                    menuItem = new JMenuItem(resourceMap.getString("hireMinimumComplement.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
@@ -1085,7 +1084,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         menu.add(menuItem);
                     }
                     if (oneAvailableUnitBelowMaxCrew) {
-                        menuItem = new JMenuItem("Add full complement");
+                        menuItem = new JMenuItem(resourceMap.getString("addMinimumComplement.text"));
                         menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
                         menuItem.addActionListener(this);
                         menu.add(menuItem);
