@@ -42,6 +42,8 @@ VERSION HISTORY:
 + Issue #2089: fix procuring vehicle engines from the parts store
 + Issue #2091: Fixing missing requirement of addToCampaign
 + PR #2094: AtB Bot Camo Load Swapover
++ PR #2097: Finances credit/debit capitalization fixes
++ PR #2098: Personnel Table: Hide Assign to Unit
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
