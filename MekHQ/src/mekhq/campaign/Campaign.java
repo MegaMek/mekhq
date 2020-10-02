@@ -6204,6 +6204,17 @@ public class Campaign implements Serializable, ITechManager {
                         : rating.getModifier();
     }
 
+    /**
+     * This is a better method for pairing AtB with IOpts with regards to Prisoner Capture
+     */
+    public int getUnitRatingAsInteger() {
+        if (getCampaignOptions().useDragoonRating()) {
+            return getUnitRating().getUnitRatingAsInteger();
+        } else {
+            return IUnitRating.DRAGOON_C;
+        }
+    }
+
     public RandomSkillPreferences getRandomSkillPreferences() {
         return rskillPrefs;
     }
