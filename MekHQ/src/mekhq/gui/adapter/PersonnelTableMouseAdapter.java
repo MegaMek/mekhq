@@ -1738,11 +1738,16 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 JMenuHelpers.addMenuIfNonEmpty(menu, techMenu, MAX_POPUP_ITEMS);
 
                 // and we always include the None checkbox
-                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("none.text")); //$NON-NLS-1$
-                cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1")); //$NON-NLS-1$
+                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("none.text"));
+                cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1"));
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
-                popup.add(menu);
+                Unit u = gui.getCampaign().getUnit(person.getUnitId());
+
+                if ((menu.getItemCount() > 1) || (gui.getCampaign().getUnit(person.getUnitId()) != null)
+                        || (person.getTechUnitIDs().size() > 0)) {
+                    JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+                }
             }
 
             if (oneSelected && person.getStatus().isActive()) {
@@ -1796,9 +1801,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         JMenuHelpers.addMenuIfNonEmpty(menu, femaleMenu, MAX_POPUP_ITEMS);
                     }
 
-                    if (menu.getItemCount() > 0) {
-                        popup.add(menu);
-                    }
+                    JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
                 }
 
                 if (person.getGenealogy().hasSpouse()) {
