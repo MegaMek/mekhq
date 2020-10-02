@@ -161,12 +161,10 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		Part bestPart = null;
 
 		//check to see if we already have a replacement assigned
-		if(replacementId > -1) {
-			bestPart = campaign.getPart(replacementId);
-			if(null != bestPart) {
-				return bestPart;
-			}
-		}
+		if (hasReplacementPart()) {
+			return getReplacementPart();
+        }
+
 		// don't just return with the first part if it is damaged
 		for(Part part : campaign.getSpareParts()) {
 			if (part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent() || part.hasParentPart() || part.isUsedForRefitPlanning()) {
@@ -347,11 +345,13 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<daysToWait>"
 				+daysToWait
-				+"</daysToWait>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<replacementId>"
-				+replacementId
-				+"</replacementId>");
+                +"</daysToWait>");
+        if (hasReplacementPart()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                    +"<replacementId>"
+                    + getReplacementPart().getId()
+                    +"</replacementId>");
+        }
 	}
 
 	@Override
@@ -402,16 +402,16 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		//shouldn't be null, but it never hurts to check
 		Part replacement = findReplacement(false);
 		UUID teamId = getTeamId();
-		if(null != replacement && null != teamId) {
-			if(replacement.getQuantity() > 1) {
+		if ((null != replacement) &&(null != teamId)) {
+			if (replacement.getQuantity() > 1) {
 				Part actualReplacement = replacement.clone();
 				actualReplacement.setReserveId(teamId);
-				campaign.addPart(actualReplacement, 0);
-				replacementId = actualReplacement.getId();
+                campaign.addPart(actualReplacement, 0);
+                setReplacementPart(actualReplacement);
 				replacement.decrementQuantity();
 			} else {
-				replacement.setReserveId(teamId);
-				replacementId = replacement.getId();
+                replacement.setReserveId(teamId);
+                setReplacementPart(replacement);
 			}
 		}
 	}
@@ -419,12 +419,12 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	@Override
 	public void cancelReservation() {
 		Part replacement = findReplacement(false);
-		if(replacementId > -1 && null != replacement) {
-			replacementId = -1;
+		if (hasReplacementPart() && null != replacement) {
+			setReplacementPart(null);
 			replacement.setReserveId(null);
-			if(replacement.isSpare()) {
+			if (replacement.isSpare()) {
 				Part spare = campaign.checkForExistingSparePart(replacement);
-				if(null != spare) {
+				if (null != spare) {
 					spare.incrementQuantity();
 					campaign.removePart(replacement);
 				}
