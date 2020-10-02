@@ -46,6 +46,7 @@ VERSION HISTORY:
 + PR #2098: Personnel Table: Hide Assign to Unit
 + Issues #297/1248: Prisoner Capture Consolidation
 + PR #2088: explicitly track child parts
++ PR #2096: Fixing Missing Unit Selector Unit Sprite in MekHQ
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
