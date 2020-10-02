@@ -123,6 +123,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     private boolean customJob;
     private boolean isRefurbishing;
     private boolean kitFound;
+    private boolean replacingLocations;
     private String fixableString;
 
     private List<Integer> oldUnitParts;
@@ -167,6 +168,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         timeSpent = 0;
         fixableString = null;
         kitFound = false;
+        replacingLocations = false;
         campaign = oldUnit.getCampaign();
         calculate();
         if (customJob) {
@@ -294,7 +296,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     && (newEntity.getArmorTechRating() == oldUnit.getEntity().getArmorTechRating());
         }
         int recycledArmorPoints = 0;
-        boolean replacingLocations = false;
         boolean[] locationHasNewStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
         boolean[] locationLostOldStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
         HashMap<AmmoType,Integer> ammoNeeded = new HashMap<>();
@@ -1434,7 +1435,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 MekHQ.getLogger().error(this, "part with id " + pid + " not found for refit of " + getDesc());
                 continue;
             }
-            if (part instanceof MekLocation) {
+            if ((!replacingLocations) && (part instanceof MekLocation)) {
                 // Preserve any hip or shoulder damage
                 int loc = ((MekLocation) part).getLoc();
                 if ((oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc) > 0) ||
