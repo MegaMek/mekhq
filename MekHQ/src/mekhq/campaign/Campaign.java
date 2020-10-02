@@ -1634,7 +1634,7 @@ public class Campaign implements Serializable, ITechManager {
             p.setId(-1);
             return;
         }
-        if (null == p.getUnit()) {
+        if ((null == p.getUnit()) && !p.hasParentPart()) {
             Part spare = checkForExistingSparePart(p);
             if (null != spare) {
                 if (p instanceof Armor) {
@@ -1713,14 +1713,23 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+
+
     /**
-     * Imports a {@link Part} into the campaign.
+     * Imports a collection of parts into the campaign.
      *
-     * @param p The {@link Part} to import into the campaign.
+     * @param newParts The collection of {@link Part} instances
+     *                 to import into the campaign.
      */
-    public void importPart(Part p) {
-        p.setCampaign(this);
-        addPartWithoutId(p);
+    public void importParts(Collection<Part> newParts) {
+        for (Part p : newParts) {
+            p.setCampaign(this);
+            addPartWithoutId(p);
+        }
+
+        for (Part p : newParts) {
+            p.fixupPartReferences(parts);
+        }
     }
 
     public void addPartWithoutId(Part p) {
@@ -3906,11 +3915,8 @@ public class Campaign implements Serializable, ITechManager {
         }
         parts.remove(part.getId());
         //remove child parts as well
-        for (int childId : part.getChildPartIds()) {
-            Part childPart = getPart(childId);
-            if (null != childPart) {
-                removePart(childPart);
-            }
+        for (Part childPart : part.getChildParts()) {
+            removePart(childPart);
         }
         MekHQ.triggerEvent(new PartRemovedEvent(part));
     }

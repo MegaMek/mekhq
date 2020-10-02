@@ -150,9 +150,8 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 			unit.removePart(this);
 		}
 		setUnit(null);
-		Part parentPart = campaign.getPart(parentPartId);
 		if (null != parentPart) {
-		    parentPart.removeChildPart(this.getId());
+		    parentPart.removeChildPart(this);
 		}
 	}
 
