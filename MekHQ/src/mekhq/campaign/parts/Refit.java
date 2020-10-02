@@ -49,6 +49,7 @@ import megamek.common.Bay;
 import megamek.common.BayType;
 import megamek.common.BipedMech;
 import megamek.common.ConvFighter;
+import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -1432,6 +1433,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             if (null == part) {
                 MekHQ.getLogger().error(this, "part with id " + pid + " not found for refit of " + getDesc());
                 continue;
+            }
+            if (part instanceof MekLocation) {
+                // Preserve any hip or shoulder damage
+                int loc = ((MekLocation) part).getLoc();
+                if ((oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc) > 0) ||
+                        (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0)) {
+                    // Apply damage to hip or shoulder at slot 0
+                    newEntity.getCritical(loc, 0).setDestroyed(true);
+                }
             }
             if ((part instanceof HeatSink) && (newEntity instanceof Tank)) {
                 // Unit should not have heat sink parts
