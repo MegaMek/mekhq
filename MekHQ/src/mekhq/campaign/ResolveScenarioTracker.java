@@ -1576,7 +1576,7 @@ public class ResolveScenarioTracker {
             }
             if (((Contract) getMission()).isSalvageExchange()) {
                 value = value.multipliedBy(((Contract) getMission()).getSalvagePct()).dividedBy(100);
-                campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for "
+                campaign.getFinances().credit(value, Transaction.C_SALVAGE, "Salvage exchange for "
                         + scenario.getName(),  campaign.getLocalDate());
                 campaign.addReport(value.toAmountAndSymbolString() + " have been credited to your account for salvage exchange.");
             } else {
