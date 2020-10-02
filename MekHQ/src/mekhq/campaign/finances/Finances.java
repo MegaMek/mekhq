@@ -250,14 +250,14 @@ public class Finances implements Serializable {
         // Handle assets
         for (Asset asset : assets) {
             if ((asset.getSchedule() == SCHEDULE_YEARLY) && (campaign.getLocalDate().getDayOfYear() == 1)) {
-                credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(),
+                credit(asset.getIncome(), Transaction.C_MISC, "Income from " + asset.getName(),
                         campaign.getLocalDate());
                 campaign.addReport(String.format(
                         resourceMap.getString("AssetPayment.text"),
                         asset.getIncome().toAmountAndSymbolString(),
                         asset.getName()));
             } else if ((asset.getSchedule() == SCHEDULE_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1)) {
-                credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(),
+                credit(asset.getIncome(), Transaction.C_MISC, "Income from " + asset.getName(),
                         campaign.getLocalDate());
                 campaign.addReport(String.format(
                         resourceMap.getString("AssetPayment.text"),

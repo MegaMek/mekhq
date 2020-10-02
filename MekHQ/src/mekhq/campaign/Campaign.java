@@ -1321,7 +1321,7 @@ public class Campaign implements Serializable, ITechManager {
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
         if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && prisonerStatus.isFree()) {
             if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
-                    "recruitment of " + p.getFullName(), getLocalDate())) {
+                    "Recruitment of " + p.getFullName(), getLocalDate())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
                         + p.getFullName() + "</b></font>");
                 return false;
