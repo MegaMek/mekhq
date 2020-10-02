@@ -1742,7 +1742,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1"));
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
-                Unit u = gui.getCampaign().getUnit(person.getUnitId());
 
                 if ((menu.getItemCount() > 1) || (gui.getCampaign().getUnit(person.getUnitId()) != null)
                         || (person.getTechUnitIDs().size() > 0)) {
