@@ -102,6 +102,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JComboBox<Planet> choicePlanet;
     private JCheckBox chkClan;
     private JComboBox<Phenotype> choicePhenotype;
+    private Phenotype phenotype;
 
     /* Against the Bot */
     private JComboBox<String> choiceUnitWeight;
@@ -139,6 +140,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         if (person.getRetirement() != null) {
             retirement = person.getRetirement();
         }
+
+        phenotype = person.getPhenotype();
         options = person.getOptions();
         initComponents();
     }
@@ -494,7 +497,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             phenotypeModel.addElement(phenotype);
         }
         choicePhenotype = new JComboBox<>(phenotypeModel);
-        choicePhenotype.setSelectedItem(person.getPhenotype());
+        choicePhenotype.setSelectedItem(phenotype);
         choicePhenotype.addActionListener(evt -> backgroundChanged());
         choicePhenotype.setEnabled(person.isClanner());
         gridBagConstraints = new GridBagConstraints();
@@ -986,7 +989,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         Faction faction = campaign.getFaction().isClan() ? campaign.getFaction()
                 : (Faction) choiceFaction.getSelectedItem();
         faction = ((faction != null) && faction.isClan()) ? faction : person.getOriginFaction();
-        Bloodname bloodname = Bloodname.randomBloodname(faction.getShortName(), person.getPhenotype(), campaign.getGameYear());
+        Bloodname bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype, campaign.getGameYear());
         textBloodname.setText((bloodname != null) ? bloodname.getName() : resourceMap.getString("textBloodname.error"));
     }
 
@@ -1290,35 +1293,80 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void backgroundChanged() {
-        boolean clanner = chkClan.isSelected();
-        clearAllPhenotypeBonuses();
-        if (clanner) {
-            final Phenotype phenotype = (Phenotype) choicePhenotype.getSelectedItem();
-            if (phenotype != null) {
-                // TODO : Windchild should there be more bonus' here for the other phenotypes?
+        final Phenotype newPhenotype = (Phenotype) choicePhenotype.getSelectedItem();
+        if (chkClan.isSelected() || (newPhenotype == Phenotype.NONE)) {
+            if ((newPhenotype != null) && (newPhenotype != phenotype)) {
                 switch (phenotype) {
                     case MECHWARRIOR:
-                        skillBonus.get(SkillType.S_GUN_MECH).setValue(1);
-                        skillBonus.get(SkillType.S_PILOT_MECH).setValue(1);
-                        break;
-                    case AEROSPACE:
-                        skillBonus.get(SkillType.S_GUN_AERO).setValue(1);
-                        skillBonus.get(SkillType.S_PILOT_AERO).setValue(1);
-                        skillBonus.get(SkillType.S_GUN_JET).setValue(1);
-                        skillBonus.get(SkillType.S_PILOT_JET).setValue(1);
-                        skillBonus.get(SkillType.S_GUN_PROTO).setValue(1);
+                        decreasePhenotypeBonus(SkillType.S_GUN_MECH);
+                        decreasePhenotypeBonus(SkillType.S_PILOT_MECH);
                         break;
                     case ELEMENTAL:
-                        skillBonus.get(SkillType.S_GUN_BA).setValue(1);
+                        decreasePhenotypeBonus(SkillType.S_GUN_BA);
+                        decreasePhenotypeBonus(SkillType.S_ANTI_MECH);
+                        break;
+                    case AEROSPACE:
+                        decreasePhenotypeBonus(SkillType.S_GUN_AERO);
+                        decreasePhenotypeBonus(SkillType.S_PILOT_AERO);
+                        decreasePhenotypeBonus(SkillType.S_GUN_JET);
+                        decreasePhenotypeBonus(SkillType.S_PILOT_JET);
                         break;
                     case VEHICLE:
-                        skillBonus.get(SkillType.S_GUN_VEE).setValue(1);
-                        skillBonus.get(SkillType.S_PILOT_GVEE).setValue(1);
-                        skillBonus.get(SkillType.S_PILOT_NVEE).setValue(1);
-                        skillBonus.get(SkillType.S_PILOT_VTOL).setValue(1);
+                        decreasePhenotypeBonus(SkillType.S_GUN_VEE);
+                        decreasePhenotypeBonus(SkillType.S_PILOT_GVEE);
+                        decreasePhenotypeBonus(SkillType.S_PILOT_NVEE);
+                        decreasePhenotypeBonus(SkillType.S_PILOT_VTOL);
+                        break;
+                    case PROTOMECH:
+                        decreasePhenotypeBonus(SkillType.S_GUN_PROTO);
+                        break;
+                    case NAVAL:
+                        decreasePhenotypeBonus(SkillType.S_TECH_VESSEL);
+                        decreasePhenotypeBonus(SkillType.S_GUN_SPACE);
+                        decreasePhenotypeBonus(SkillType.S_PILOT_SPACE);
+                        decreasePhenotypeBonus(SkillType.S_NAV);
+                        break;
+                    default:
                         break;
                 }
+
+                switch (newPhenotype) {
+                    case MECHWARRIOR:
+                        increasePhenotypeBonus(SkillType.S_GUN_MECH);
+                        increasePhenotypeBonus(SkillType.S_PILOT_MECH);
+                        break;
+                    case ELEMENTAL:
+                        increasePhenotypeBonus(SkillType.S_GUN_BA);
+                        increasePhenotypeBonus(SkillType.S_ANTI_MECH);
+                        break;
+                    case AEROSPACE:
+                        increasePhenotypeBonus(SkillType.S_GUN_AERO);
+                        increasePhenotypeBonus(SkillType.S_PILOT_AERO);
+                        increasePhenotypeBonus(SkillType.S_GUN_JET);
+                        increasePhenotypeBonus(SkillType.S_PILOT_JET);
+                        break;
+                    case VEHICLE:
+                        increasePhenotypeBonus(SkillType.S_GUN_VEE);
+                        increasePhenotypeBonus(SkillType.S_PILOT_GVEE);
+                        increasePhenotypeBonus(SkillType.S_PILOT_NVEE);
+                        increasePhenotypeBonus(SkillType.S_PILOT_VTOL);
+                        break;
+                    case PROTOMECH:
+                        increasePhenotypeBonus(SkillType.S_GUN_PROTO);
+                        break;
+                    case NAVAL:
+                        increasePhenotypeBonus(SkillType.S_TECH_VESSEL);
+                        increasePhenotypeBonus(SkillType.S_GUN_SPACE);
+                        increasePhenotypeBonus(SkillType.S_PILOT_SPACE);
+                        increasePhenotypeBonus(SkillType.S_NAV);
+                        break;
+                    default:
+                        break;
+                }
+
+                phenotype = newPhenotype;
             }
+
             choicePhenotype.setEnabled(true);
         } else {
             choicePhenotype.setSelectedItem(Phenotype.NONE);
@@ -1326,19 +1374,14 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
     }
 
-    private void clearAllPhenotypeBonuses() {
-        skillBonus.get(SkillType.S_GUN_MECH).setValue(0);
-        skillBonus.get(SkillType.S_PILOT_MECH).setValue(0);
-        skillBonus.get(SkillType.S_GUN_AERO).setValue(0);
-        skillBonus.get(SkillType.S_PILOT_AERO).setValue(0);
-        skillBonus.get(SkillType.S_GUN_JET).setValue(0);
-        skillBonus.get(SkillType.S_PILOT_JET).setValue(0);
-        skillBonus.get(SkillType.S_GUN_PROTO).setValue(0);
-        skillBonus.get(SkillType.S_GUN_BA).setValue(0);
-        skillBonus.get(SkillType.S_GUN_VEE).setValue(0);
-        skillBonus.get(SkillType.S_PILOT_GVEE).setValue(0);
-        skillBonus.get(SkillType.S_PILOT_NVEE).setValue(0);
-        skillBonus.get(SkillType.S_PILOT_VTOL).setValue(0);
+    private void increasePhenotypeBonus(String skillType) {
+        final int value = Math.min((Integer) skillBonus.get(skillType).getValue() + 1, 8);
+        skillBonus.get(skillType).setValue(value);
+    }
+
+    private void decreasePhenotypeBonus(String skillType) {
+        final int value = Math.max((Integer) skillBonus.get(skillType).getValue() - 1, -8);
+        skillBonus.get(skillType).setValue(value);
     }
 
     @Override
