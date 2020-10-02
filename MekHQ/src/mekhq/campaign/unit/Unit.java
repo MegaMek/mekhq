@@ -1812,7 +1812,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             mothballInfo.writeToXml(pw1, indent);
         }
 
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "unit");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "unit");
     }
 
     public static Unit generateInstanceFromXML(Node wn, Version version) {
