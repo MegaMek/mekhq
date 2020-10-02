@@ -23,13 +23,16 @@ package mekhq.gui.model;
 
 import java.awt.Component;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import megamek.common.Entity;
 import mekhq.campaign.mission.Loot;
+import mekhq.campaign.parts.Part;
 
 /**
  * A table model for displaying loot for scenarios and missions
@@ -139,6 +142,12 @@ public class LootTableModel extends AbstractTableModel {
 
     public String getTooltip(int row, int col) {
         switch (col) {
+            case COL_MECHS:
+                return getLootAt(row).getUnits().stream().map(Entity::getDisplayName)
+                        .collect(Collectors.joining(", "));
+            case COL_PARTS:
+                return getLootAt(row).getParts().stream().map(Part::getPartName)
+                        .collect(Collectors.joining(", "));
             default:
                 return null;
         }
@@ -161,8 +170,7 @@ public class LootTableModel extends AbstractTableModel {
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
                                                        int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected,
-            hasFocus, row, column);
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
