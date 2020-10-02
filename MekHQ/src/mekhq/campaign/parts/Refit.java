@@ -1344,10 +1344,16 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             if (null == part) {
                 MekHQ.getLogger().error(this, "old part with id " + pid + " not found for refit of " + getDesc());
                 continue;
-            } else if ((part instanceof MekLocation) && ((MekLocation) part).getLoc() == Mech.LOC_CT) {
-                part.setUnit(null);
-                oldUnit.getCampaign().removePart(part);
-                continue;
+            } else if (part instanceof MekLocation) {
+                int loc = ((MekLocation) part).getLoc();
+                // Don't add center locations or limbs with a bad hip or shoulder to warehouse
+                if ((loc == Mech.LOC_CT) ||
+                        (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc) > 0) ||
+                        (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0)) {
+                    part.setUnit(null);
+                    oldUnit.getCampaign().removePart(part);
+                    continue;
+                }
             // SI Should never be "kept" for the Warehouse
             // We also don't want to generate new BA suits that have been replaced
             // or allow legacy InfantryAttack BA parts to show up in the warehouse.
