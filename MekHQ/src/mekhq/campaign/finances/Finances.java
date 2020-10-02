@@ -511,7 +511,7 @@ public class Finances implements Serializable {
 
             csvPrinter.flush();
 
-            report = transactions.size() + " " + resourceMap.getString("FinanceExport.text");
+            report = transactions.size() + resourceMap.getString("FinanceExport.text");
         } catch (IOException ioe) {
             MekHQ.getLogger().info(this, "Error exporting finances to " + format);
             report = "Error exporting finances. See log for details.";
