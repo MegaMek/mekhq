@@ -601,16 +601,20 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             .append(unitTonnage)
             .append("</unitTonnage>")
             .append(NL);
-        builder.append(level1)
-            .append("<hits>")
-            .append(hits)
-            .append("</hits>")
-            .append(NL);
-        builder.append(level1)
-            .append("<timeSpent>")
-            .append(timeSpent)
-            .append("</timeSpent>")
-            .append(NL);
+        if (hits > 0) {
+            builder.append(level1)
+                .append("<hits>")
+                .append(hits)
+                .append("</hits>")
+                .append(NL);
+        }
+        if (timeSpent > 0) {
+            builder.append(level1)
+                .append("<timeSpent>")
+                .append(timeSpent)
+                .append("</timeSpent>")
+                .append(NL);
+        }
         builder.append(level1)
             .append("<mode>")
             .append(mode)
@@ -635,46 +639,60 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 .append("</unitId>")
                 .append(NL);
         }
-        builder.append(level1)
-            .append("<workingOvertime>")
-            .append(workingOvertime)
-            .append("</workingOvertime>")
-            .append(NL);
-        builder.append(level1)
-            .append("<shorthandedMod>")
-            .append(shorthandedMod)
-            .append("</shorthandedMod>")
-            .append(NL);
-        builder.append(level1)
-            .append("<refitId>")
-            .append(refitId)
-            .append("</refitId>")
-            .append(NL);
-        builder.append(level1)
-            .append("<daysToArrival>")
-            .append(daysToArrival)
-            .append("</daysToArrival>")
-            .append(NL);
-        builder.append(level1)
-            .append("<brandNew>")
-            .append(brandNew)
-            .append("</brandNew>")
-            .append(NL);
+        if (workingOvertime) {
+            builder.append(level1)
+                .append("<workingOvertime>")
+                .append(workingOvertime)
+                .append("</workingOvertime>")
+                .append(NL);
+        }
+        if (shorthandedMod != 0) {
+            builder.append(level1)
+                .append("<shorthandedMod>")
+                .append(shorthandedMod)
+                .append("</shorthandedMod>")
+                .append(NL);
+        }
+        if (refitId != null) {
+            builder.append(level1)
+                .append("<refitId>")
+                .append(refitId)
+                .append("</refitId>")
+                .append(NL);
+        }
+        if (daysToArrival > 0) {
+            builder.append(level1)
+                .append("<daysToArrival>")
+                .append(daysToArrival)
+                .append("</daysToArrival>")
+                .append(NL);
+        }
+        if (brandNew) {
+            builder.append(level1)
+                .append("<brandNew>")
+                .append(brandNew)
+                .append("</brandNew>")
+                .append(NL);
+        }
         builder.append(level1)
             .append("<quantity>")
             .append(quantity)
             .append("</quantity>")
             .append(NL);
-        builder.append(level1)
-            .append("<daysToWait>")
-            .append(daysToWait)
-            .append("</daysToWait>")
-            .append(NL);
-        builder.append(level1)
-            .append("<replacementId>")
-            .append(replacementId)
-            .append("</replacementId>")
-            .append(NL);
+        if (daysToWait > 0) {
+            builder.append(level1)
+                .append("<daysToWait>")
+                .append(daysToWait)
+                .append("</daysToWait>")
+                .append(NL);
+        }
+        if (replacementId > 0) {
+            builder.append(level1)
+                .append("<replacementId>")
+                .append(replacementId)
+                .append("</replacementId>")
+                .append(NL);
+        }
         if (reserveId != null) {
             builder.append(level1)
                 .append("<reserveId>")
@@ -687,11 +705,13 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             .append(quality)
             .append("</quality>")
             .append(NL);
-        builder.append(level1)
-            .append("<isTeamSalvaging>")
-            .append(isTeamSalvaging)
-            .append("</isTeamSalvaging>")
-            .append(NL);
+        if (isTeamSalvaging) {
+            builder.append(level1)
+                .append("<isTeamSalvaging>")
+                .append(isTeamSalvaging)
+                .append("</isTeamSalvaging>")
+                .append(NL);
+        }
         if (parentPart != null) {
             builder.append(level1)
                 .append("<parentPartId>")
