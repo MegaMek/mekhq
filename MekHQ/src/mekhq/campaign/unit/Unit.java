@@ -1833,8 +1833,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
                 if (wn2.getNodeName().equalsIgnoreCase("site")) {
                     retVal.site = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
-                    retVal.pilotId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToArrival")) {
                     retVal.daysToArrival = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysActivelyMaintained")) {
