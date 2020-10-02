@@ -1766,7 +1766,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         if (parentPart instanceof PartRef) {
             int id = parentPart.getId();
             parentPart = knownParts.get(id);
-            if (parentPart == null) {
+            if ((parentPart == null) && (id > 0)) {
                 MekHQ.getLogger().error(PartRef.class,
                     String.format("Part %d ('%s') references missing parent part %d",
                         getId(), getName(), id));
@@ -1779,10 +1779,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 Part realPart = knownParts.get(childPart.getId());
                 if (realPart != null) {
                     childParts.set(ii, realPart);
-                } else {
+                } else if (childPart.getId() > 0) {
                     MekHQ.getLogger().error(PartRef.class,
                         String.format("Part %d ('%s') references missing child part %d",
-                            getId(), getName(), id));
+                            getId(), getName(), childPart.getId()));
                     childParts.remove(ii);
                 }
             }
