@@ -21,6 +21,9 @@ package mekhq.gui.dialog;
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.client.ui.swing.tileset.CamoManager;
+import megamek.client.ui.swing.tileset.EntityImage;
+import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -161,7 +164,29 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
     @Override
     protected Entity refreshUnitView() {
-        return super.refreshUnitView();
+        Entity selectedEntity = super.refreshUnitView();
+        if (selectedEntity != null) {
+            Image base = campaign.getApp().getIconPackage().getMechTiles().imageFor(selectedEntity,
+                    labelImage, -1);
+
+            Image camo;
+            if ((selectedEntity.getCamoCategory() != null)
+                    && !selectedEntity.getCamoCategory().equals(IPlayer.NO_CAMO)) {
+                camo = CamoManager.getEntityCamoImage(selectedEntity);
+            } else {
+                camo = CamoManager.getCamoImage(campaign.getCamoCategory(), campaign.getCamoFileName());
+            }
+
+            // This seems unnecessary as the CamoManager will return an image for a playercolor
+            int tint = PlayerColors.getColorRGB(campaign.getColorIndex());
+
+            labelImage.setIcon(new ImageIcon(new EntityImage(base, tint, camo, labelImage, selectedEntity)
+                    .loadPreviewImage()));
+        } else {
+            labelImage.setIcon(null);
+        }
+
+        return selectedEntity;
     }
 
     @Override
