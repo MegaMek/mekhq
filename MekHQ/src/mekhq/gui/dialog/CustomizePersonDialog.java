@@ -64,14 +64,15 @@ import mekhq.preferences.PreferencesNode;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class CustomizePersonDialog extends JDialog implements DialogOptionListener {
+    //region Variable declarations
     private static final long serialVersionUID = -6265589976779860566L;
 
     private Person person;
-    private ArrayList<DialogOptionComponent> optionComps = new ArrayList<>();
-    private Hashtable<String, JSpinner> skillLvls = new Hashtable<>();
-    private Hashtable<String, JSpinner> skillBonus = new Hashtable<>();
-    private Hashtable<String, JLabel> skillValues = new Hashtable<>();
-    private Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
+    private List<DialogOptionComponent> optionComps = new ArrayList<>();
+    private Map<String, JSpinner> skillLvls = new Hashtable<>();
+    private Map<String, JSpinner> skillBonus = new Hashtable<>();
+    private Map<String, JLabel> skillValues = new Hashtable<>();
+    private Map<String, JCheckBox> skillChks = new Hashtable<>();
     private PilotOptions options;
     private LocalDate birthdate;
     private LocalDate recruitment;
@@ -84,15 +85,15 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JButton btnRankDate;
     private JButton btnRetirementDate;
     private JComboBox<Gender> choiceGender;
-    private javax.swing.JLabel lblAge;
-    private javax.swing.JPanel panSkills;
-    private javax.swing.JPanel panOptions;
-    private javax.swing.JTextField textToughness;
-    private javax.swing.JTextField textGivenName;
-    private javax.swing.JTextField textSurname;
-    private javax.swing.JTextField textHonorific;
-    private javax.swing.JTextField textNickname;
-    private javax.swing.JTextField textBloodname;
+    private JLabel lblAge;
+    private JPanel panSkills;
+    private JPanel panOptions;
+    private JTextField textToughness;
+    private JTextField textGivenName;
+    private JTextField textSurname;
+    private JTextField textHonorific;
+    private JTextField textNickname;
+    private JTextField textBloodname;
     private MarkdownEditorPanel txtBio;
     private JComboBox<Faction> choiceFaction;
     private JComboBox<PlanetarySystem> choiceSystem;
@@ -112,6 +113,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog",
             new EncodeControl());
+    //endregion Variable declarations
 
     /** Creates new form CustomizePilotDialog */
     public CustomizePersonDialog(JFrame parent, boolean modal, Person person, Campaign campaign) {
@@ -174,15 +176,15 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        setTitle(resourceMap.getString("Form.title")); // NOI18N
+        setTitle(resourceMap.getString("Form.title"));
 
-        setName("Form"); // NOI18N
+        setName("Form");
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         int y = 1;
 
-        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
-        lblName.setName("lblName"); // NOI18N
+        lblName.setText(resourceMap.getString("lblName.text"));
+        lblName.setName("lblName");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -1090,7 +1092,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         for (final Object newVar : optionComps) {
             DialogOptionComponent comp = (DialogOptionComponent) newVar;
             option = comp.getOption();
-            if ((comp.getValue().equals("None"))) { // NON-NLS-$1
+            if ((comp.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
             } else {
                 person.getOptions().getOption(option.getName()).setValue(comp.getValue());
@@ -1161,7 +1163,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 }
             }
             optionComp.setSelected(option.stringValue());
-        } else if (OptionsConstants.GUNNERY_SANDBLASTER.equals(option.getName())) { //$NON-NLS-1$
+        } else if (OptionsConstants.GUNNERY_SANDBLASTER.equals(option.getName())) {
             optionComp.addValue(Crew.SPECIAL_NONE);
             //holy crap, do we really need to add every weapon?
             for (Enumeration<EquipmentType> i = EquipmentType.getAllTypes(); i.hasMoreElements();) {
@@ -1171,19 +1173,19 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 }
             }
             optionComp.setSelected(option.stringValue());
-        } else if (OptionsConstants.GUNNERY_SPECIALIST.equals(option.getName())) { //$NON-NLS-1$
+        } else if (OptionsConstants.GUNNERY_SPECIALIST.equals(option.getName())) {
             optionComp.addValue(Crew.SPECIAL_NONE);
             optionComp.addValue(Crew.SPECIAL_ENERGY);
             optionComp.addValue(Crew.SPECIAL_BALLISTIC);
             optionComp.addValue(Crew.SPECIAL_MISSILE);
             optionComp.setSelected(option.stringValue());
-        } else if (OptionsConstants.GUNNERY_RANGE_MASTER.equals(option.getName())) { //$NON-NLS-1$
+        } else if (OptionsConstants.GUNNERY_RANGE_MASTER.equals(option.getName())) {
             optionComp.addValue(Crew.RANGEMASTER_NONE);
             optionComp.addValue(Crew.RANGEMASTER_MEDIUM);
             optionComp.addValue(Crew.RANGEMASTER_LONG);
             optionComp.addValue(Crew.RANGEMASTER_EXTREME);
             optionComp.setSelected(option.stringValue());
-        } else if (OptionsConstants.MISC_HUMAN_TRO.equals(option.getName())) { //$NON-NLS-1$
+        } else if (OptionsConstants.MISC_HUMAN_TRO.equals(option.getName())) {
             optionComp.addValue(Crew.HUMANTRO_NONE);
             optionComp.addValue(Crew.HUMANTRO_MECH);
             optionComp.addValue(Crew.HUMANTRO_AERO);
@@ -1210,8 +1212,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         for (final Object newVar : optionComps) {
             DialogOptionComponent comp = (DialogOptionComponent) newVar;
             option = comp.getOption();
-            if ((comp.getValue().equals("None"))) { // NON-NLS-$1
-                person.getOptions().getOption(option.getName()).setValue("None"); // NON-NLS-$1
+            if ((comp.getValue().equals("None"))) {
+                person.getOptions().getOption(option.getName()).setValue("None");
             } else {
                 person.getOptions().getOption(option.getName())
                 .setValue(comp.getValue());
@@ -1225,8 +1227,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             return;
         }
         SkillType stype = SkillType.getType(type);
-        int lvl = (Integer)skillLvls.get(type).getModel().getValue();
-        int b = (Integer)skillBonus.get(type).getModel().getValue();
+        int lvl = (Integer) skillLvls.get(type).getModel().getValue();
+        int b = (Integer) skillBonus.get(type).getModel().getValue();
         int target = stype.getTarget() - lvl - b;
         if (stype.countUp()) {
             target = stype.getTarget() + lvl + b;
@@ -1254,7 +1256,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private void btnServiceDateActionPerformed(ActionEvent evt) {
         // show the date chooser
-
         DateChooser dc = new DateChooser(frame, recruitment);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
