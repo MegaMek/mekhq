@@ -147,10 +147,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     //a made-up person to handle repairs on Large Craft
     private Person engineer;
 
-    //for backwards compatibility with 0.1.8, but otherwise is no longer used
-    @SuppressWarnings("unused")
-    private int pilotId = -1;
-
     private String history;
 
     //for delivery
@@ -4716,10 +4712,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public String getName() {
-        if (getFluffName() != null && !getFluffName().equals("")) {
+        if (!getFluffName().equals("")) {
             return entity.getShortName() + " - " + getFluffName();
+        } else {
+            return entity.getShortName();
         }
-        return entity.getShortName();
     }
 
     public String getHyperlinkedName() {
@@ -5028,14 +5025,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @return the name
      */
     public String getFluffName() {
-        return this.fluffName;
+        return fluffName;
     }
 
     /**
-     * @param name the name to set
+     * @param fluffName the name to set
      */
-    public void setFluffName(String name) {
-        this.fluffName = name;
+    public void setFluffName(String fluffName) {
+        this.fluffName = fluffName;
     }
 
     /**
