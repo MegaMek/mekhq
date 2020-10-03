@@ -89,7 +89,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.IPartWork;
 
 /**
  * This object tracks the refit of a given unit into a new unit.
@@ -101,7 +100,7 @@ import mekhq.campaign.work.IPartWork;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Refit extends Part implements IPartWork, IAcquisitionWork {
+public class Refit extends Part implements IAcquisitionWork {
     private static final long serialVersionUID = -1765098410743713570L;
     public static final int NO_CHANGE = 0;
     public static final int CLASS_OMNI = 1;
@@ -1036,13 +1035,36 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
         }
 
+        // If we need ammunition, put it into two buckets:
+        // 1. Shots to buy
+        // 2. Shots from the warehouse
         for (AmmoType atype : shotsNeeded.keySet()) {
-            int shots = Math.max(0, shotsNeeded.get(atype) - AmmoBin.getAmountAvailable(campaign, atype));
-            if (shots > 0) {
-                int tons = (int) Math.ceil((double) shots / atype.getShots());
+            int needed = shotsNeeded.get(atype);
+            int available = AmmoBin.getAmountAvailable(campaign, atype);
+
+            // Add to our shopping list however many shots we need to purchase
+            int shotsToBuy = Math.max(0, shotsNeeded.get(atype) - available);
+            if (shotsToBuy > 0) {
+                int tons = (int) Math.ceil((double) shotsToBuy / atype.getShots());
                 AmmoStorage ammo = new AmmoStorage(0, atype, atype.getShots() * tons, campaign);
                 newUnitParts.add(ammo);
                 shoppingList.add(ammo);
+
+                // Reduce the amount we need by the amount we bought
+                needed -= shotsToBuy;
+            }
+
+            // Now we can go through our available inventory and snag them
+            if (needed > 0) {
+                // pull from our stock...
+                AmmoBin.changeAmountAvailable(campaign, -needed, atype);
+
+                // ...and add that to our list of new unit parts
+                int tons = (int) Math.ceil((double) needed / atype.getShots());
+                AmmoStorage ammo = new AmmoStorage(tons, atype, atype.getShots() * tons, campaign);
+                ammo.setRefitId(oldUnit.getId());
+                campaign.addPart(ammo, 0);
+                newUnitParts.add(ammo);
             }
         }
 
@@ -1153,6 +1175,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             checkForArmorSupplies();
             return kitFound && !partsInTransit() && (null == newArmorSupplies || (armorNeeded - newArmorSupplies.getAmount()) <= 0);
         }
+
         ArrayList<Part> newShoppingList = new ArrayList<>();
         for (Part part : shoppingList) {
             if (part instanceof IAcquisitionWork) {
@@ -1179,21 +1202,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
         }
 
-        // Cycle through newUnitParts, find any ammo bins and see if we have the ammo to load them
-        boolean missingAmmo = false;
-        for (Part part : newUnitParts) {
-            if (part instanceof AmmoBin) {
-                AmmoBin bin = (AmmoBin) part;
-                Part foundAmmo = getCampaign().findSparePart(campaignPart -> AmmoStorage.IsRightAmmo(campaignPart, (AmmoType) bin.getType()));
-
-                if ((foundAmmo == null) || (((AmmoStorage) foundAmmo).getShots() < bin.getShotsNeeded())) {
-                    missingAmmo = true;
-                    // if we've found even one ammo bin that we can't load, we're not ready to refit, so bug out early
-                    break;
-                }
-            }
-        }
-
         checkForArmorSupplies();
         shoppingList = newShoppingList;
 
@@ -1202,7 +1210,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             return false;
         }
 
-        return shoppingList.size() == 0 && !missingAmmo && (null == newArmorSupplies || (armorNeeded - newArmorSupplies.getAmount()) <= 0);
+        return shoppingList.size() == 0
+            && (null == newArmorSupplies || (armorNeeded - newArmorSupplies.getAmount()) <= 0);
     }
 
     public void checkForArmorSupplies() {
@@ -1252,8 +1261,20 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
     public void cancel() {
         oldUnit.setRefit(null);
+
+        // Return our reserved ammo back to the campaign
+        for (Part part : newUnitParts) {
+            if (part instanceof AmmoStorage) {
+                // merge back into the campaign
+                AmmoStorage ammoStorage = (AmmoStorage)part;
+                AmmoBin.changeAmountAvailable(campaign, ammoStorage.getShots(), (AmmoType)ammoStorage.getType());
+                oldUnit.getCampaign().removePart(part);
+            }
+        }
+
         for (Part part : newUnitParts) {
             part.setRefitId(null);
+
             // If the part was not part of the old unit we need to consolidate it with others of its type
             // in the warehouse. Ammo Bins just get unloaded and removed; no reason to keep them around.
             if (part.getUnitId() == null) {
@@ -1423,6 +1444,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     oldUnit.getCampaign().removePart(part);
                     continue;
                 }
+            } else if (part instanceof AmmoStorage) {
+                // merge back into the campaign before completing the refit
+                AmmoStorage ammoStorage = (AmmoStorage)part;
+                AmmoBin.changeAmountAvailable(campaign, ammoStorage.getShots(), (AmmoType)ammoStorage.getType());
+                oldUnit.getCampaign().removePart(part);
+                continue;
             }
             part.setUnit(oldUnit);
             part.setRefitId(null);
