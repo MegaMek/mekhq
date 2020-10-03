@@ -50,6 +50,7 @@ VERSION HISTORY:
 + Issue #1525: Swapping to Minimum Crew instead of Maximum Crew
 + Issue #1875: Phenotype Bonus is properly added and reduced when editing your phenotype
 + PR #2101: Reduce the size of a Part's XML by ~30%
++ PR #2102: Reduce the size of a Unit's XML
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
