@@ -243,13 +243,12 @@ public class Bloodname implements Serializable {
      */
     public static @Nullable Bloodname randomBloodname(Clan faction, Phenotype phenotype, int year) {
         if (faction == null) {
-            MekHQ.getLogger().error(Bloodname.class,
-                    "Random Bloodname attempted for a clan that does not exist."
+            MekHQ.getLogger().error("Random Bloodname attempted for a clan that does not exist."
                     + System.lineSeparator()
                     + "Please ensure that your clan exists in both the clans.xml and bloodnames.xml files as appropriate.");
             return null;
         } else if (phenotype == null) {
-            MekHQ.getLogger().error(Bloodname.class, "Random Bloodname attempted for an unknown phenotype. Please open a bug report so this issue may be fixed.");
+            MekHQ.getLogger().error("Random Bloodname attempted for an unknown phenotype. Please open a bug report so this issue may be fixed.");
             return null;
         }
 
