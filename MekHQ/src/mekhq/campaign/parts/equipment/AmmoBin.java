@@ -617,6 +617,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public boolean isCompatibleAmmo(AmmoType a1, AmmoType a2) {
+        return isCompatibleAmmo(campaign, a1, a2);
+    }
+
+    public static boolean isCompatibleAmmo(Campaign campaign, AmmoType a1, AmmoType a2) {
 
         // If the option isn't on, we don't use this!
         if (!(campaign.getCampaignOptions().useAmmoByType())) {
@@ -684,38 +688,41 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        final AmmoType thisType = (AmmoType)getType();
+        return getAmountAvailable(campaign, (AmmoType)getType());
+    }
+
+    public static int getAmountAvailable(Campaign campaign, AmmoType ammoType) {
         if (campaign.getCampaignOptions().useAmmoByType()) {
             Predicate<Part> predicate;
-            if (AmmoBin.ALLOWED_BY_TYPE.contains(thisType.getAmmoType())) {
+            if (AmmoBin.ALLOWED_BY_TYPE.contains(ammoType.getAmmoType())) {
                 predicate = part -> {
                     return part instanceof AmmoStorage
-                            && thisType.equalsAmmoTypeOnly(((AmmoStorage) part).getType())
-                            && thisType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
+                            && ammoType.equalsAmmoTypeOnly(((AmmoStorage) part).getType())
+                            && ammoType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
                 };
             } else {
                 predicate = part -> {
                     return part instanceof AmmoStorage
-                            && thisType.equals(((AmmoStorage) part).getType())
-                            && thisType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
+                            && ammoType.equals(((AmmoStorage) part).getType())
+                            && ammoType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
                 };
             }
             AmmoStorage a = (AmmoStorage) campaign.findSparePart(predicate);
             return a != null ? a.getShots() : 0;
         } else {
             return campaign.streamSpareParts()
-                            .filter(part -> part instanceof AmmoStorage && part.isPresent())
-                            .mapToInt(part -> {
-                                AmmoStorage a = (AmmoStorage)part;
-                                AmmoType aType = (AmmoType)a.getType();
-                                if (aType.equals(getType()) && thisType.getMunitionType() == aType.getMunitionType()) {
-                                    return a.getShots();
-                                } else if (isCompatibleAmmo(aType, thisType) && thisType.getRackSize() != 0) {
-                                    return (a.getShots() * aType.getRackSize()) / thisType.getRackSize();
-                                }
-                                return 0;
-                            })
-                            .sum();
+                           .filter(part -> part instanceof AmmoStorage && part.isPresent())
+                           .mapToInt(part -> {
+                               AmmoStorage a = (AmmoStorage)part;
+                               AmmoType aType = (AmmoType)a.getType();
+                               if (aType.equals(ammoType) && ammoType.getMunitionType() == aType.getMunitionType()) {
+                                   return a.getShots();
+                               } else if (isCompatibleAmmo(campaign, aType, ammoType) && ammoType.getRackSize() != 0) {
+                                   return (a.getShots() * aType.getRackSize()) / ammoType.getRackSize();
+                               }
+                               return 0;
+                           })
+                           .sum();
         }
     }
 

@@ -842,7 +842,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         //TODO: use ammo removed from the old unit in the case of changing between full ton and half
         //ton MG or OS/regular.
         for (AmmoType type : ammoNeeded.keySet()) {
-            int shotsNeeded = Math.max(ammoNeeded.get(type) - getAmmoAvailable(type), 0);
+            int shotsNeeded = Math.max(ammoNeeded.get(type) - AmmoBin.getAmountAvailable(campaign, type), 0);
             int shotsPerTon = type.getShots();
             if ((shotsNeeded > 0) && (shotsPerTon > 0)) {
                 cost = cost.plus(Money.of(type.getCost(newEntity, false, -1) * ((double) shotsNeeded / shotsPerTon)));
@@ -1031,18 +1031,21 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 newUnitParts.add(part);
                 AmmoBin bin = (AmmoBin) part;
                 bin.setShotsNeeded(bin.getFullShots());
-                bin.loadBin();
-                if (bin.getShotsNeeded() > 0) {
-                    shotsNeeded.merge((AmmoType) bin.getType(), bin.getShotsNeeded(), Integer::sum);
-                }
+                shotsNeeded.merge((AmmoType) bin.getType(), bin.getShotsNeeded(), Integer::sum);
                 iter.remove();
             }
         }
+
         for (AmmoType atype : shotsNeeded.keySet()) {
-            int tons = (int) Math.ceil((double) shotsNeeded.get(atype) / atype.getShots());
-            AmmoStorage ammo = new AmmoStorage(0, atype, atype.getShots() * tons, campaign);
-            shoppingList.add(ammo);
+            int shots = Math.max(0, shotsNeeded.get(atype) - AmmoBin.getAmountAvailable(campaign, atype));
+            if (shots > 0) {
+                int tons = (int) Math.ceil((double) shots / atype.getShots());
+                AmmoStorage ammo = new AmmoStorage(0, atype, atype.getShots() * tons, campaign);
+                newUnitParts.add(ammo);
+                shoppingList.add(ammo);
+            }
         }
+
         reserveNewParts();
         if (customJob) {
             //add the stuff on the shopping list to the master shopping list
@@ -1058,17 +1061,16 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     //newUnitParts.add(part.getId());
                 }
                 else if (part instanceof AmmoBin) {
+                    // TODO: custom job ammo...
+
                     //ammo bins are free - bleh
                     AmmoBin bin = (AmmoBin) part;
                     bin.setShotsNeeded(bin.getFullShots());
                     part.setRefitId(oldUnit.getId());
                     oldUnit.getCampaign().addPart(part, 0);
                     newUnitParts.add(part);
-                    bin.loadBin();
                     if (bin.needsFixing()) {
                         oldUnit.getCampaign().getShoppingList().addShoppingItem(bin, 1, oldUnit.getCampaign());
-                        //need to call it a second time to use up if found
-                        bin.loadBin();
                     }
                 }
                 else if (part instanceof IAcquisitionWork) {
@@ -1242,18 +1244,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         return existingArmorSupplies;
     }
 
-    public int getAmmoAvailable(AmmoType type) {
-        for (Part part : oldUnit.getCampaign().getSpareParts()) {
-            if (part instanceof AmmoStorage) {
-                AmmoStorage a = (AmmoStorage) part;
-                if (a.getType().equals(type)) {
-                    return a.getShots();
-                }
-            }
-        }
-        return 0;
-    }
-
     private void updateRefitClass(int rClass) {
         if (rClass > refitClass) {
             refitClass = rClass;
@@ -1279,14 +1269,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 }
             }
         }
-        /*
+
         if (null != newArmorSupplies) {
             newArmorSupplies.setRefitId(null);
             newArmorSupplies.setUnit(oldUnit);
             oldUnit.getCampaign().removePart(newArmorSupplies);
             newArmorSupplies.changeAmountAvailable(newArmorSupplies.getAmount());
         }
-        */
 
         // Remove refit parts from the procurement list. Those which have already been purchased and
         // are in transit are left as is.
