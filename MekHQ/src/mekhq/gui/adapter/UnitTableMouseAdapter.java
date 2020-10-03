@@ -455,8 +455,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             String fluffName = (String) JOptionPane.showInputDialog(
                     gui.getFrame(), "Name for this unit?", "Unit Name",
                     JOptionPane.QUESTION_MESSAGE, null, null,
-                    selectedUnit.getFluffName() == null ? "" : selectedUnit.getFluffName());
-            selectedUnit.setFluffName(fluffName);
+                    selectedUnit.getFluffName());
+            selectedUnit.setFluffName((fluffName != null) ? fluffName : "");
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equals(COMMAND_SHOW_BV_CALC)) {
             IUnitAction showUnitBvAction = new ShowUnitBvAction();
