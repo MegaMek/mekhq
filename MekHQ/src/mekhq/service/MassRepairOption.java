@@ -135,14 +135,12 @@ public class MassRepairOption {
             try {
                 MassRepairOption mro = parseFromXML(mroNode);
                 if ((mro.getType() == -1) || (mro.getType() >= VALID_REPAIR_TYPES.length)) {
-                    MekHQ.getLogger().error(MassRepairOption.class,
-                            "Attempted to load MassRepairOption with illegal type id of " + mro.getType());
+                    MekHQ.getLogger().error("Attempted to load MassRepairOption with illegal type id of " + mro.getType());
                 } else {
                     massRepairOptions.add(mro);
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(MassRepairOption.class, "Failed to parse MassRepairOption from XML");
-                MekHQ.getLogger().error(MassRepairOption.class, e);
+                MekHQ.getLogger().error("Failed to parse MassRepairOption from XML", e);
             }
         }
 
@@ -174,9 +172,8 @@ public class MassRepairOption {
                 mro.setBthMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
             }
 
-            MekHQ.getLogger().info(MassRepairOption.class,
-                    String.format("massRepairOption %d.%s\n\t%s",
-                            mro.getType(), mroItemNode.getNodeName(), mroItemNode.getTextContent()));
+            MekHQ.getLogger().info(String.format("massRepairOption %d.%s\n\t%s",
+                    mro.getType(), mroItemNode.getNodeName(), mroItemNode.getTextContent()));
         }
 
         return mro;
