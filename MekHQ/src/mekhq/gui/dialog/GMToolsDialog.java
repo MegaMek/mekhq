@@ -20,10 +20,9 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -48,7 +47,10 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -60,8 +62,10 @@ import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
 public class GMToolsDialog extends JDialog {
+    //region Variable Declarations
     private static final long serialVersionUID = 7724064095803583812L;
 
+    //region GUI Variables
     private JSpinner numDice;
     private JSpinner sizeDice;
     private JLabel totalDiceResult;
@@ -84,28 +88,58 @@ public class GMToolsDialog extends JDialog {
     private JLabel currentCallsign;
     private JLabel callsignGenerated;
 
-    private CampaignGUI gui;
-    private Person person;
+    private JComboBox<String> originClanPicker;
+    private JComboBox<Integer> bloodnameEraPicker;
+    private JComboBox<Phenotype> phenotypePicker;
+    private JLabel currentBloodname;
+    private JLabel bloodnameGenerated;
+    private JLabel originClanGenerated;
+    private JLabel phenotypeGenerated;
+    private JLabel bloodnameWarningLabel;
+    //endregion GUI Variables
 
+    //region Previously Generated Information
     /**
      * The last unit rolled, used when clicking 'Add Random Unit' after Roll for RAT is clicked
      */
     private MechSummary lastRolledUnit;
 
     /**
-     * The last name rolled, used when clocking 'Set Generated Name' after Generate Name is clicked
+     * The last name rolled, used when clicking 'Set Generated Name' after Generate Name is clicked
      */
     private String[] lastGeneratedName;
 
     /**
-     * The last callsign rolled, used when clocking 'Set Generated Callsign' after Generate Callsign is clicked
+     * The last callsign rolled, used when clicking 'Set Generated Callsign' after Generate Callsign is clicked
      */
     private String lastGeneratedCallsign;
 
+    /**
+     * The last bloodname rolled, used when clicking 'Set Generated Bloodname' after Generate Bloodname is clicked
+     */
+    private String lastGeneratedBloodname;
+    //endregion Previously Generated Information
+
+    //region Data Sources
+    private CampaignGUI gui;
+    private Person person;
+    private List<Clan> clans = new ArrayList<>();
+    //endregion Data Sources
+
+    //region Bloodname Information
+    private int originClan;
+    private Phenotype selectedPhenotype;
+    private int bloodnameYear;
+    //endregion Bloodname Information
+
+    //region Constants
     private static final String[] QUALITY_NAMES = {"F", "D", "C", "B", "A", "A*"};
     private static final String[] WEIGHT_NAMES = {"Light", "Medium", "Heavy", "Assault"};
+    private static final Integer[] ERAS = {2807, 2825, 2850, 2900, 2950, 3000, 3050, 3060, 3075, 3085, 3100};
+    //endregion Constants
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GMToolsDialog", new EncodeControl());
+    //endregion Variable Declarations
 
     //region Constructors
     /**
@@ -133,6 +167,7 @@ public class GMToolsDialog extends JDialog {
         setLocationRelativeTo(parent);
         setUserPreferences();
         setValuesFromPerson();
+        validateBloodnameInput();
     }
     //endregion Constructors
 
@@ -142,6 +177,7 @@ public class GMToolsDialog extends JDialog {
         getContentPane().add(getRATRoller(), newGridBagConstraints(0,1));
         getContentPane().add(getNameGenerator(), newGridBagConstraints(0, 2));
         getContentPane().add(getCallsignGenerator(), newGridBagConstraints(0, 3));
+        getContentPane().add(getBloodnameGenerator(), newGridBagConstraints(0, 4));
     }
 
     //region Dice Panel Initialization
@@ -216,8 +252,8 @@ public class GMToolsDialog extends JDialog {
         factionLabel.setName("factionLabel");
         ratPanel.add(factionLabel, newGridBagConstraints(1, 0, 2, 1));
 
-        List<FactionChoice> factionChoices = getFactionChoices((person == null)
-                ? getGUI().getCampaign().getGameYear() : person.getBirthday().getYear());
+        List<FactionChoice> factionChoices = getFactionChoices((getPerson() == null)
+                ? getGUI().getCampaign().getGameYear() : getPerson().getBirthday().getYear());
         DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>(factionChoices.toArray(new FactionChoice[]{}));
         factionPicker = new JComboBox<>(factionModel);
         factionPicker.setName("factionPicker");
@@ -300,8 +336,8 @@ public class GMToolsDialog extends JDialog {
         originFactionLabel.setName("originFactionLabel");
         namePanel.add(originFactionLabel, newGridBagConstraints(gridx, 0));
 
-        List<FactionChoice> factionChoices = getFactionChoices((person == null)
-                ? getGUI().getCampaign().getGameYear() : person.getBirthday().getYear());
+        List<FactionChoice> factionChoices = getFactionChoices((getPerson() == null)
+                ? getGUI().getCampaign().getGameYear() : getPerson().getBirthday().getYear());
         DefaultComboBoxModel<FactionChoice> factionModel = new DefaultComboBoxModel<>(factionChoices.toArray(new FactionChoice[]{}));
         nameGeneratorFactionPicker = new JComboBox<>(factionModel);
         nameGeneratorFactionPicker.setName("nameGeneratorFactionPicker");
@@ -335,7 +371,7 @@ public class GMToolsDialog extends JDialog {
         gridxMax = gridx - 1;
         gridx = 0;
 
-        if (person != null) {
+        if (getPerson() != null) {
             JLabel currentNameLabel = new JLabel(resources.getString("currentNameLabel.text"));
             currentNameLabel.setName("currentNameLabel");
             namePanel.add(currentNameLabel, newGridBagConstraints(gridx++, 3));
@@ -353,7 +389,7 @@ public class GMToolsDialog extends JDialog {
         nameGenerated.setName("nameGenerated");
         namePanel.add(nameGenerated, newGridBagConstraints(gridx++, 3));
 
-        if (person != null) {
+        if (getPerson() != null) {
             JButton assignNameButton = new JButton(resources.getString("assignNameButton.text"));
             assignNameButton.setName("assignNameButton");
             assignNameButton.addActionListener(evt -> assignName());
@@ -377,7 +413,7 @@ public class GMToolsDialog extends JDialog {
 
         int gridx = 0, gridy = 0;
 
-        if (person != null) {
+        if (getPerson() != null) {
             JLabel currentCallsignLabel = new JLabel(resources.getString("currentCallsignLabel.text"));
             currentCallsignLabel.setName("currentCallsignLabel");
             callsignPanel.add(currentCallsignLabel, newGridBagConstraints(gridx++, gridy));
@@ -397,7 +433,7 @@ public class GMToolsDialog extends JDialog {
 
         gridy++;
 
-        if (person != null) {
+        if (getPerson() != null) {
             JButton assignCallsignButton = new JButton(resources.getString("assignCallsignButton.text"));
             assignCallsignButton.setName("assignCallsignButton");
             assignCallsignButton.addActionListener(evt -> assignCallsign());
@@ -412,6 +448,129 @@ public class GMToolsDialog extends JDialog {
         return callsignPanel;
     }
     //endregion Callsign Generator Panel Initialization
+
+    //region Bloodname Generator Panel Initialization
+    private JPanel getBloodnameGenerator() {
+        JPanel namePanel = new JPanel(new GridBagLayout());
+        namePanel.setName("bloodnamePanel");
+        namePanel.setBorder(BorderFactory.createTitledBorder(resources.getString("bloodnamePanel.text")));
+
+        int gridx = 0, gridy = 0, gridxMax;
+
+        JLabel originClanLabel = new JLabel(resources.getString("originClanLabel.text"));
+        originClanLabel.setName("originClanLabel");
+        namePanel.add(originClanLabel, newGridBagConstraints(gridx, gridy));
+
+        clans.addAll(Clan.getClans());
+        clans.sort(Comparator.comparing(o -> o.getFullName(bloodnameYear)));
+        DefaultComboBoxModel<String> originClanModel = new DefaultComboBoxModel<>();
+        for (Clan clan : clans) {
+            originClanModel.addElement(clan.getFullName(bloodnameYear));
+        }
+        originClanPicker = new JComboBox<>(originClanModel);
+        originClanPicker.setName("originClanPicker");
+        originClanPicker.setSelectedIndex(0);
+        originClanPicker.addActionListener(evt -> validateBloodnameInput());
+        namePanel.add(originClanPicker, newGridBagConstraints(gridx++, gridy + 1));
+
+        JLabel bloodnameEraLabel = new JLabel(resources.getString("bloodnameEraLabel.text"));
+        bloodnameEraLabel.setName("bloodnameEraLabel");
+        namePanel.add(bloodnameEraLabel, newGridBagConstraints(gridx, gridy));
+
+        bloodnameEraPicker = new JComboBox<>(ERAS);
+        bloodnameEraPicker.setName("bloodnameEraPicker");
+        bloodnameEraPicker.setSelectedIndex(0);
+        bloodnameEraPicker.addActionListener(evt -> validateBloodnameInput());
+        namePanel.add(bloodnameEraPicker, newGridBagConstraints(gridx++, gridy + 1));
+
+        JLabel phenotypeLabel = new JLabel(resources.getString("phenotypeLabel.text"));
+        phenotypeLabel.setName("phenotypeLabel");
+        namePanel.add(phenotypeLabel, newGridBagConstraints(gridx, gridy));
+
+        DefaultComboBoxModel<Phenotype> phenotypeModel = new DefaultComboBoxModel<>();
+        phenotypeModel.addElement(Phenotype.GENERAL);
+        for (Phenotype phenotype : Phenotype.getExternalPhenotypes()) {
+            phenotypeModel.addElement(phenotype);
+        }
+        phenotypePicker = new JComboBox<>(phenotypeModel);
+        phenotypePicker.setName("phenotypePicker");
+        phenotypePicker.setSelectedItem(Phenotype.GENERAL);
+        phenotypePicker.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                setText((value == null) ? ""
+                        : (value instanceof Phenotype ? ((Phenotype) value).getGroupingName() : "ERROR"));
+
+                return this;
+            }
+        });
+        phenotypePicker.addActionListener(evt -> validateBloodnameInput());
+        namePanel.add(phenotypePicker, newGridBagConstraints(gridx++, gridy + 1));
+
+        gridx = 0;
+        gridy = 2;
+
+        if (getPerson() != null) {
+            JLabel currentBloodnameLabel = new JLabel(resources.getString("currentBloodnameLabel.text"));
+            currentBloodnameLabel.setName("currentBloodnameLabel");
+            namePanel.add(currentBloodnameLabel, newGridBagConstraints(gridx++, gridy));
+
+            currentBloodname = new JLabel("-");
+            currentBloodname.setName("currentBloodname");
+            namePanel.add(currentBloodname, newGridBagConstraints(gridx++, gridy));
+        }
+
+        JLabel bloodnameGeneratedLabel = new JLabel(resources.getString("bloodnameGeneratedLabel.text"));
+        bloodnameGeneratedLabel.setName("nameGeneratedLabel");
+        namePanel.add(bloodnameGeneratedLabel, newGridBagConstraints(gridx++, gridy));
+
+        bloodnameGenerated = new JLabel("-");
+        bloodnameGenerated.setName("bloodnameGenerated");
+        namePanel.add(bloodnameGenerated, newGridBagConstraints(gridx++, gridy++));
+
+        gridx = 0;
+
+        JLabel originClanGeneratedLabel = new JLabel(resources.getString("originClanGeneratedLabel.text"));
+        originClanGeneratedLabel.setName("originClanGeneratedLabel");
+        namePanel.add(originClanGeneratedLabel, newGridBagConstraints(gridx++, gridy));
+
+        originClanGenerated = new JLabel("-");
+        originClanGenerated.setName("originClanGenerated");
+        namePanel.add(originClanGenerated, newGridBagConstraints(gridx++, gridy));
+
+        JLabel phenotypeGeneratedLabel = new JLabel(resources.getString("phenotypeGeneratedLabel.text"));
+        phenotypeGeneratedLabel.setName("phenotypeGeneratedLabel");
+        namePanel.add(phenotypeGeneratedLabel, newGridBagConstraints(gridx++, gridy));
+
+        phenotypeGenerated = new JLabel("-");
+        phenotypeGenerated.setName("phenotypeGenerated");
+        namePanel.add(phenotypeGenerated, newGridBagConstraints(gridx++, gridy++));
+
+        gridxMax = gridx - 1;
+        gridx = 0;
+
+        bloodnameWarningLabel = new JLabel("");
+        GridBagConstraints gridBagConstraints = newGridBagConstraints(gridx++, gridy, 1, 1);
+        gridBagConstraints.gridwidth = 2;
+        namePanel.add(bloodnameWarningLabel, gridBagConstraints);
+
+        if (getPerson() != null) {
+            JButton assignBloodnameButton = new JButton(resources.getString("assignBloodnameButton.text"));
+            assignBloodnameButton.setName("assignBloodnameButton");
+            assignBloodnameButton.addActionListener(evt -> assignBloodname());
+            namePanel.add(assignBloodnameButton, newGridBagConstraints(gridxMax--, gridy));
+        }
+
+        JButton generateBloodnameButton = new JButton(resources.getString("generateBloodnameButton.text"));
+        generateBloodnameButton.setName("generateNameButton");
+        generateBloodnameButton.addActionListener(evt -> generateBloodname());
+        namePanel.add(generateBloodnameButton, newGridBagConstraints(gridxMax--, gridy));
+
+        return namePanel;
+    }
+    //endregion Bloodname Generator Panel Initialization
 
     //region GridBagConstraint Simplification Methods
     private GridBagConstraints newGridBagConstraints(int x, int y) {
@@ -493,7 +652,24 @@ public class GMToolsDialog extends JDialog {
                 break;
             }
         }
-        //endregion RAT Roller
+
+        if (!StringUtil.isNullOrEmpty(getPerson().getBloodname())) {
+            currentBloodname.setText(getPerson().getBloodname());
+        }
+
+        int year = gui.getCampaign().getGameYear();
+        for (int i = ERAS.length - 1; i >= 0; i--) {
+            if (ERAS[i] <= year) {
+                bloodnameEraPicker.setSelectedIndex(i);
+                year = ERAS[i];
+                break;
+            }
+        }
+
+        originClanPicker.setSelectedItem((gui.getCampaign().getFaction().isClan()
+                ? gui.getCampaign().getFaction() : getPerson().getOriginFaction()).getFullName(year));
+
+        phenotypePicker.setSelectedItem(getPerson().getPhenotype());
     }
 
     /**
@@ -520,7 +696,6 @@ public class GMToolsDialog extends JDialog {
 
         return 0;
     }
-
 
     /**
      * Determine if a person's primary role supports operating a
@@ -598,6 +773,14 @@ public class GMToolsDialog extends JDialog {
     public void setLastGeneratedCallsign(String lastGeneratedCallsign) {
         this.lastGeneratedCallsign = lastGeneratedCallsign;
     }
+
+    public String getLastGeneratedBloodname() {
+        return lastGeneratedBloodname;
+    }
+
+    public void setLastGeneratedBloodname(String lastGeneratedBloodname) {
+        this.lastGeneratedBloodname = lastGeneratedBloodname;
+    }
     //endregion Getters and Setters
 
     //region ActionEvent Handlers
@@ -667,7 +850,7 @@ public class GMToolsDialog extends JDialog {
                 }
                 setLastRolledUnit(null);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(this, "Failed to load entity "
+                MekHQ.getLogger().error("Failed to load entity "
                         + getLastRolledUnit().getName() + " from " + getLastRolledUnit().getSourceFile().toString(), ex);
                 unitPicked.setText(String.format(Messages.getString("entityLoadFailure.error"), getLastRolledUnit().getName()));
             }
@@ -718,6 +901,86 @@ public class GMToolsDialog extends JDialog {
         getPerson().setCallsign(getLastGeneratedCallsign());
 
         MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
+    }
+
+    private void generateBloodname() {
+        Bloodname bloodname = Bloodname.randomBloodname(clans.get(originClan),
+                selectedPhenotype, bloodnameYear);
+        if (bloodname != null) {
+            bloodnameGenerated.setText(bloodname.getName() + " (" + bloodname.getFounder() + ")");
+            originClanGenerated.setText(Clan.getClan(bloodname.getOrigClan()).getFullName(bloodnameYear));
+            phenotypeGenerated.setText(bloodname.getPhenotype().getGroupingName());
+            setLastGeneratedBloodname(bloodname.getName());
+        }
+    }
+
+    private void assignBloodname() {
+        if (getLastGeneratedBloodname() == null) {
+            generateBloodname();
+        }
+
+        currentBloodname.setText(getLastGeneratedBloodname());
+        getPerson().setBloodname(getLastGeneratedBloodname());
+
+        MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
+    }
+
+
+    private void validateBloodnameInput() {
+        originClan = originClanPicker.getSelectedIndex();
+        bloodnameYear = ERAS[bloodnameEraPicker.getSelectedIndex()];
+        selectedPhenotype = (Phenotype) phenotypePicker.getSelectedItem();
+
+        if ((originClan < 0) || (selectedPhenotype == Phenotype.NONE) || (selectedPhenotype == null)) {
+            return;
+        }
+
+        Clan selectedClan = clans.get(originClan);
+        String txt = "<html>";
+
+        if (bloodnameYear < selectedClan.getStartDate()) {
+            for (int era : ERAS) {
+                if (era >= selectedClan.getStartDate()) {
+                    bloodnameYear = era;
+                    txt += "<div>" + selectedClan.getFullName(bloodnameYear) + " formed in "
+                            + selectedClan.getStartDate() + ". Using " + bloodnameYear + ".</div>";
+                    break;
+                }
+            }
+
+            if (bloodnameYear < selectedClan.getStartDate()) {
+                bloodnameYear = selectedClan.getStartDate();
+            }
+        } else if (bloodnameYear > selectedClan.getEndDate()) {
+            for (int i = ERAS.length - 1; i >= 0; i--) {
+                if (ERAS[i] <= selectedClan.getEndDate()) {
+                    bloodnameYear = ERAS[i];
+                    txt += "<div>" + selectedClan.getFullName(bloodnameYear) + " ceased to existed in "
+                            + selectedClan.getEndDate() + ". Using " + bloodnameYear + ".</div>";
+                    break;
+                }
+            }
+
+            if (bloodnameYear > selectedClan.getEndDate()) {
+                bloodnameYear = selectedClan.getEndDate();
+            }
+        }
+
+        if ((selectedPhenotype == Phenotype.PROTOMECH) && (bloodnameYear < 3060)) {
+            txt += "<div>ProtoMechs did not exist in " + bloodnameYear + ". Using Aerospace.</div>";
+            selectedPhenotype = Phenotype.AEROSPACE;
+        } else if ((selectedPhenotype == Phenotype.NAVAL) && (!"CSR".equals(selectedClan.getGenerationCode()))) {
+            txt += "<div>The Naval phenotype is unique to Clan Snow Raven. Using General.</div>";
+            selectedPhenotype = Phenotype.GENERAL;
+        } else if ((selectedPhenotype == Phenotype.VEHICLE) && (!"CHH".equals(selectedClan.getGenerationCode()))) {
+            txt += "<div>The vehicle phenotype is unique to Clan Hell's Horses. Using General.</div>";
+            selectedPhenotype = Phenotype.GENERAL;
+        } else if ((selectedPhenotype == Phenotype.VEHICLE) && (bloodnameYear < 3100)) {
+            txt += "<div>The vehicle phenotype began development in the 32nd century. Using 3100.</div>";
+            bloodnameYear = 3100;
+        }
+        txt += "</html>";
+        bloodnameWarningLabel.setText(txt);
     }
     //endregion ActionEvent Handlers
 

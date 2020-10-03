@@ -233,14 +233,6 @@ public class CampaignGUI extends JPanel {
         batchXPDialog.setVisible(true);
     }
 
-    public void showBloodnameDialog() {
-        final int year = getCampaign().getGameYear();
-        BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame(),
-                getCampaign().getFaction().getFullName(year), year);
-
-        bloodnameDialog.setVisible(true);
-    }
-
     private void initComponents() {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()); //$NON-NLS-1$
 
@@ -869,30 +861,30 @@ public class CampaignGUI extends JPanel {
         //region Reports Menu
         // The Reports menu uses the following Mnemonic keys as of 19-March-2020:
         // C, H, P, T, U
-        JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text")); // NOI18N
+        JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text"));
         menuReports.setMnemonic(KeyEvent.VK_E);
 
-        JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text")); // NOI18N
+        JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text"));
         miDragoonsRating.setMnemonic(KeyEvent.VK_U);
         miDragoonsRating.addActionListener(evt -> showReport(new RatingReport(getCampaign())));
         menuReports.add(miDragoonsRating);
 
-        JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text")); // NOI18N
+        JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text"));
         miPersonnelReport.setMnemonic(KeyEvent.VK_P);
         miPersonnelReport.addActionListener(evt -> showReport(new PersonnelReport(getCampaign())));
         menuReports.add(miPersonnelReport);
 
-        JMenuItem miHangarBreakdown = new JMenuItem(resourceMap.getString("miHangarBreakdown.text")); // NOI18N
+        JMenuItem miHangarBreakdown = new JMenuItem(resourceMap.getString("miHangarBreakdown.text"));
         miHangarBreakdown.setMnemonic(KeyEvent.VK_H);
         miHangarBreakdown.addActionListener(evt -> showReport(new HangarReport(getCampaign())));
         menuReports.add(miHangarBreakdown);
 
-        JMenuItem miTransportReport = new JMenuItem(resourceMap.getString("miTransportReport.text")); // NOI18N
+        JMenuItem miTransportReport = new JMenuItem(resourceMap.getString("miTransportReport.text"));
         miTransportReport.setMnemonic(KeyEvent.VK_T);
         miTransportReport.addActionListener(evt -> showReport(new TransportReport(getCampaign())));
         menuReports.add(miTransportReport);
 
-        JMenuItem miCargoReport = new JMenuItem(resourceMap.getString("miCargoReport.text")); // NOI18N
+        JMenuItem miCargoReport = new JMenuItem(resourceMap.getString("miCargoReport.text"));
         miCargoReport.setMnemonic(KeyEvent.VK_C);
         miCargoReport.addActionListener(evt -> showReport(new CargoReport(getCampaign())));
         menuReports.add(miCargoReport);
@@ -903,10 +895,10 @@ public class CampaignGUI extends JPanel {
         //region Community Menu
         // The Community menu uses the following Mnemonic keys as of 19-March-2020:
         // C
-        JMenu menuCommunity = new JMenu(resourceMap.getString("menuCommunity.text")); // NOI18N
+        JMenu menuCommunity = new JMenu(resourceMap.getString("menuCommunity.text"));
         //menuCommunity.setMnemonic(KeyEvent.VK_?); // This will need to be replaced with a unique mnemonic key if this menu is ever added
 
-        JMenuItem miChat = new JMenuItem(resourceMap.getString("miChat.text")); // NOI18N
+        JMenuItem miChat = new JMenuItem(resourceMap.getString("miChat.text"));
         miChat.setMnemonic(KeyEvent.VK_C);
         miChat.addActionListener(this::miChatActionPerformed);
         menuCommunity.add(miChat);
@@ -916,19 +908,14 @@ public class CampaignGUI extends JPanel {
 
         //region View Menu
         // The View menu uses the following Mnemonic keys as of 02-June-2020:
-        // B, H, R
-        JMenu menuView = new JMenu(resourceMap.getString("menuView.text")); // NOI18N
+        // H, R
+        JMenu menuView = new JMenu(resourceMap.getString("menuView.text"));
         menuView.setMnemonic(KeyEvent.VK_V);
 
-        JMenuItem miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text")); // NOI18N
+        JMenuItem miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text"));
         miHistoricalDailyReportDialog.setMnemonic(KeyEvent.VK_H);
         miHistoricalDailyReportDialog.addActionListener(evt -> showHistoricalDailyReportDialog());
         menuView.add(miHistoricalDailyReportDialog);
-
-        JMenuItem miBloodnameDialog = new JMenuItem(resourceMap.getString("miBloodnameDialog.text"));
-        miBloodnameDialog.setMnemonic(KeyEvent.VK_B);
-        miBloodnameDialog.addActionListener(evt -> showBloodnameDialog());
-        menuView.add(miBloodnameDialog);
 
         miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
         miRetirementDefectionDialog.setMnemonic(KeyEvent.VK_R);
