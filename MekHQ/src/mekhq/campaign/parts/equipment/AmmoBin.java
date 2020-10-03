@@ -592,7 +592,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     public static void changeAmountAvailable(Campaign campaign, int amount, final AmmoType curType) {
         AmmoStorage a = (AmmoStorage)campaign.findSparePart(part -> {
-            if (!(part instanceof AmmoStorage) || !part.isPresent()) {
+            if (!(part instanceof AmmoStorage) || !part.isPresent() || part.isReservedForRefit()) {
                 return false;
             }
             AmmoType ammoType = (AmmoType)((AmmoStorage)part).getType();
