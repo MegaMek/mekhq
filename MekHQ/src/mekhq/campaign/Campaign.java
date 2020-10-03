@@ -1746,7 +1746,8 @@ public class Campaign implements Serializable, ITechManager {
         // go ahead and check for existing parts because some version weren't
         // properly collecting parts
         Part mergedWith = null;
-        if (!(p instanceof MissingPart) && null == p.getUnitId()) {
+        if (!(p instanceof MissingPart) && (null == p.getUnitId())
+            && !p.isReservedForRefit() && !p.isReservedForReplacement()) {
             Part spare = checkForExistingSparePart(p);
             if (null != spare) {
                 if (p instanceof Armor) {
@@ -1773,40 +1774,19 @@ public class Campaign implements Serializable, ITechManager {
             parts.put(p.getId(), p);
             MekHQ.triggerEvent(new PartNewEvent(p));
         } else {
-            // Go through each unit and its refits to see if the new armor ID should be updated
+            // Go through each unit and its refits to see if the new armorshould be updated
             // CAW: I believe all other parts on a refit have a unit assigned to them.
             for (Unit u : getUnits()) {
                 Refit r = u.getRefit();
-                // If there is a refit and this part matches the new armor, update the ID
+                // If there is a refit and this part matches the new armor, update the armor entry
                 if (null != r) {
                     if (mergedWith instanceof Armor
-                        && r.getNewArmorSuppliesId() == p.getId()) {
-                        MekHQ.getLogger().info(Campaign.class, "addPartWithoutId",
+                        && r.getNewArmorSupplies() == p) {
+                        MekHQ.getLogger().info(Campaign.class,
                             String.format("%s (%d) was merged with %s (%d) used in a refit for %s", p.getName(),
                                 p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
                         Armor mergedArmor = (Armor)mergedWith;
                         r.setNewArmorSupplies(mergedArmor);
-                    } else {
-                        List<Integer> ids = r.getOldUnitPartIds();
-                        for (int ii = 0; ii < ids.size(); ++ii) {
-                            int oid = ids.get(ii);
-                            if (p.getId() == oid) {
-                                MekHQ.getLogger().info(Campaign.class, "addPartWithoutId",
-                                String.format("%s (%d) was merged with %s (%d) used in the old unit in a refit for %s", p.getName(),
-                                    p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
-                                ids.set(ii, mergedWith.getId());
-                            }
-                        }
-                        ids = r.getNewUnitPartIds();
-                        for (int ii = 0; ii < ids.size(); ++ii) {
-                            int nid = ids.get(ii);
-                            if (p.getId() == nid) {
-                                MekHQ.getLogger().info(Campaign.class, "addPartWithoutId",
-                                String.format("%s (%d) was merged with %s (%d) used in the new unit in a refit for %s", p.getName(),
-                                    p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
-                                ids.set(ii, mergedWith.getId());
-                            }
-                        }
                     }
                 }
             }
