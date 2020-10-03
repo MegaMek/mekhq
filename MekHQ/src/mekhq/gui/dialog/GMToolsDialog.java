@@ -129,9 +129,9 @@ public class GMToolsDialog extends JDialog {
     //endregion Data Sources
 
     //region Bloodname Information
-    int originClan;
-    Phenotype selectedPhenotype;
-    int bloodnameYear;
+    private int originClan;
+    private Phenotype selectedPhenotype;
+    private int bloodnameYear;
     //endregion Bloodname Information
 
     //region Constants
