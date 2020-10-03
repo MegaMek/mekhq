@@ -154,10 +154,10 @@ public class CurrentLocation implements Serializable {
     }
 
     /**
-     * Gets a value indicating whether or not the jumpship
+     * Gets a value indicating whether or not the JumpShip
      * is currently recharging.
-     * @param campaign The campaign object which owns the jumpship.
-     * @return True if the jumpship has to spend time recharging,
+     * @param campaign The campaign object which owns the JumpShip.
+     * @return True if the JumpShip has to spend time recharging,
      *         otherwise false.
      */
     public boolean isRecharging(Campaign campaign) {
@@ -165,9 +165,9 @@ public class CurrentLocation implements Serializable {
     }
 
     /**
-     * Marks the jumpship at the current location to be
+     * Marks the JumpShip at the current location to be
      * fully charged.
-     * @param campaign The campaign object which owns the jumpship.
+     * @param campaign The campaign object which owns the JumpShip.
      */
     public void setRecharged(Campaign campaign) {
         rechargeTime = currentSystem.getRechargeTime(campaign.getLocalDate());
@@ -211,7 +211,7 @@ public class CurrentLocation implements Serializable {
                     if (!campaign.getFinances().debit(campaign.calculateCostPerJump(
                             true, campaign.getCampaignOptions().useEquipmentContractBase()),
                             Transaction.C_TRANSPORT,
-                            "jump from " + currentSystem.getName(campaign.getLocalDate())
+                            "Jump from " + currentSystem.getName(campaign.getLocalDate())
                                     + " to " + jumpPath.get(1).getName(campaign.getLocalDate()),
                             campaign.getLocalDate())) {
                         campaign.addReport("<font color='red'><b>You cannot afford to make the jump!</b></font>");

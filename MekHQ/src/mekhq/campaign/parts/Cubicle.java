@@ -59,9 +59,8 @@ public class Cubicle extends Part {
 
     @Override
     public String getName() {
-        Part parent = campaign.getPart(parentPartId);
-        if (null != parent) {
-            return parent.getName() + " Cubicle";
+        if (null != parentPart) {
+            return parentPart.getName() + " Cubicle";
         }
         return super.getName();
     }
@@ -84,8 +83,7 @@ public class Cubicle extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        Part bayPart = campaign.getPart(parentPartId);
-        if (null != bayPart) {
+        if (null != parentPart) {
             Part spare = campaign.checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.removePart(this);
@@ -97,9 +95,9 @@ public class Cubicle extends Part {
             Part missing = getMissingPart();
             unit.addPart(missing);
             campaign.addPart(missing, 0);
-            bayPart.removeChildPart(id);
-            bayPart.addChildPart(missing);
-            bayPart.updateConditionFromPart();
+            parentPart.removeChildPart(this);
+            parentPart.addChildPart(missing);
+            parentPart.updateConditionFromPart();
         }
         setUnit(null);
     }

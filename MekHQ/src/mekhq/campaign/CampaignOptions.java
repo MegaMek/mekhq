@@ -27,6 +27,7 @@ import java.util.List;
 
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.service.MassRepairOption;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -185,9 +186,6 @@ public class CampaignOptions implements Serializable {
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
-    private boolean capturePrisoners; // TODO : Merge me with the AtB option useAtBCapture
-    private PrisonerStatus defaultPrisonerStatus;
-    private boolean prisonerBabyStatus;
     private boolean altQualityAveraging;
     private boolean useAdvancedMedical; // Unofficial
     private boolean useDylansRandomXp; // Unofficial
@@ -243,6 +241,13 @@ public class CampaignOptions implements Serializable {
     private double salaryAntiMekMultiplier;
     private double[] salaryXpMultiplier;
     private Money[] salaryTypeBase;
+
+    //Prisoners
+    private PrisonerCaptureStyle prisonerCaptureStyle;
+    private PrisonerStatus defaultPrisonerStatus;
+    private boolean prisonerBabyStatus;
+    private boolean useAtBPrisonerDefection;
+    private boolean useAtBPrisonerRansom;
     //endregion Personnel Tab
 
     //region Finance tab
@@ -391,7 +396,6 @@ public class CampaignOptions implements Serializable {
     private boolean useWeatherConditions;
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
-    private boolean useAtBCapture; // TODO : merge me with the Personnel Option capturePrisoners
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -514,9 +518,6 @@ public class CampaignOptions implements Serializable {
         useEdge = false;
         useSupportEdge = false;
         useImplants = false;
-        capturePrisoners = true;
-        defaultPrisonerStatus = PrisonerStatus.PRISONER;
-        prisonerBabyStatus = true;
         altQualityAveraging = false;
         useAdvancedMedical = false;
         useDylansRandomXp = false;
@@ -615,6 +616,13 @@ public class CampaignOptions implements Serializable {
         salaryTypeBase[Person.T_PROTO_PILOT] = Money.of(960);
         salaryTypeBase[Person.T_LAM_PILOT] = Money.of(1500);
         salaryTypeBase[Person.T_VEHICLE_CREW] = Money.of(900);
+
+        //Prisoner
+        prisonerCaptureStyle = PrisonerCaptureStyle.TAHARQA;
+        defaultPrisonerStatus = PrisonerStatus.PRISONER;
+        prisonerBabyStatus = true;
+        useAtBPrisonerDefection = false;
+        useAtBPrisonerRansom = false;
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -783,7 +791,6 @@ public class CampaignOptions implements Serializable {
         useWeatherConditions = true;
         useLightConditions = true;
         usePlanetaryConditions = false;
-        useAtBCapture = false;
         //endregion Against the Bot Tab
     }
     //endregion Constructors
@@ -941,30 +948,6 @@ public class CampaignOptions implements Serializable {
 
     public void setImplants(boolean b) {
         this.useImplants = b;
-    }
-
-    public boolean capturePrisoners() {
-        return capturePrisoners;
-    }
-
-    public void setCapturePrisoners(boolean b) {
-        capturePrisoners = b;
-    }
-
-    public PrisonerStatus getDefaultPrisonerStatus() {
-        return defaultPrisonerStatus;
-    }
-
-    public void setDefaultPrisonerStatus(PrisonerStatus d) {
-        defaultPrisonerStatus = d;
-    }
-
-    public boolean getPrisonerBabyStatus() {
-        return prisonerBabyStatus;
-    }
-
-    public void setPrisonerBabyStatus(boolean prisonerBabyStatus) {
-        this.prisonerBabyStatus = prisonerBabyStatus;
     }
 
     public boolean useAltQualityAveraging() {
@@ -1619,6 +1602,48 @@ public class CampaignOptions implements Serializable {
         this.salaryTypeBase[type] = Money.of(base);
     }
     //endregion salary
+
+    //region Prisoners
+    public PrisonerCaptureStyle getPrisonerCaptureStyle() {
+        return prisonerCaptureStyle;
+    }
+
+    public void setPrisonerCaptureStyle(PrisonerCaptureStyle prisonerCaptureStyle) {
+        this.prisonerCaptureStyle = prisonerCaptureStyle;
+    }
+
+    public PrisonerStatus getDefaultPrisonerStatus() {
+        return defaultPrisonerStatus;
+    }
+
+    public void setDefaultPrisonerStatus(PrisonerStatus d) {
+        defaultPrisonerStatus = d;
+    }
+
+    public boolean getPrisonerBabyStatus() {
+        return prisonerBabyStatus;
+    }
+
+    public void setPrisonerBabyStatus(boolean prisonerBabyStatus) {
+        this.prisonerBabyStatus = prisonerBabyStatus;
+    }
+
+    public boolean useAtBPrisonerDefection() {
+        return useAtBPrisonerDefection;
+    }
+
+    public void setUseAtBPrisonerDefection(boolean useAtBPrisonerDefection) {
+        this.useAtBPrisonerDefection = useAtBPrisonerDefection;
+    }
+
+    public boolean useAtBPrisonerRansom() {
+        return useAtBPrisonerRansom;
+    }
+
+    public void setUseAtBPrisonerRansom(boolean useAtBPrisonerRansom) {
+        this.useAtBPrisonerRansom = useAtBPrisonerRansom;
+    }
+    //endregion Prisoners
     //endregion Personnel Tab
 
     //region Finances Tab
@@ -2894,14 +2919,6 @@ public class CampaignOptions implements Serializable {
         limitLanceNumUnits = limit;
     }
 
-    public boolean getUseAtBCapture() {
-        return useAtBCapture;
-    }
-
-    public void setUseAtBCapture(boolean set) {
-        useAtBCapture = set;
-    }
-
     public boolean getContractMarketReportRefresh() {
         return contractMarketReportRefresh;
     }
@@ -3170,6 +3187,14 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomDeaths", useRandomDeaths);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "keepMarriedNameUponSpouseDeath", keepMarriedNameUponSpouseDeath);
         //endregion family
+
+        //region Prisoners
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerCaptureStyle", prisonerCaptureStyle.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerBabyStatus", prisonerBabyStatus);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBPrisonerDefection", useAtBPrisonerDefection);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBPrisonerRansom", useAtBPrisonerRansom);
+        //endregion Prisoners
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -3209,9 +3234,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "timeInRankDisplayFormat", timeInRankDisplayFormat.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRetirementDateTracking", useRetirementDateTracking);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackTotalEarnings", trackTotalEarnings);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerBabyStatus", prisonerBabyStatus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketName", personnelMarketName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
                                        personnelMarketRandomEliteRemoval);
@@ -3279,7 +3301,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "restrictPartsByMission", restrictPartsByMission);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitLanceWeight", limitLanceWeight);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitLanceNumUnits", limitLanceNumUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBCapture", useAtBCapture);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
@@ -3642,6 +3663,27 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
                 retVal.keepMarriedNameUponSpouseDeath = Boolean.parseBoolean(wn2.getTextContent().trim());
             //endregion Family
+
+            //region Prisoners
+            } else if (wn2.getNodeName().equalsIgnoreCase("prisonerCaptureStyle")) {
+                retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.valueOf(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
+                String prisonerStatus = wn2.getTextContent().trim();
+
+                try {
+                    prisonerStatus = String.valueOf(Integer.parseInt(prisonerStatus) + 1);
+                } catch (Exception ignored) {
+
+                }
+
+                retVal.setDefaultPrisonerStatus(PrisonerStatus.parseFromString(prisonerStatus));
+            } else if (wn2.getNodeName().equalsIgnoreCase("prisonerBabyStatus")) {
+                retVal.setPrisonerBabyStatus(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBPrisonerDefection")) {
+                retVal.setUseAtBPrisonerDefection(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBPrisonerRansom")) {
+                retVal.setUseAtBPrisonerRansom(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            //endregion Prisoners
             //endregion Personnel Tab
 
             //region Finances Tab
@@ -3682,7 +3724,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
                 retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
-                    retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
+                retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
                 retVal.usedPartsValue[0] = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) {
@@ -3715,20 +3757,9 @@ public class CampaignOptions implements Serializable {
                 retVal.useRetirementDateTracking = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
                 retVal.trackTotalEarnings = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
-                retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
-                String prisonerStatus = wn2.getTextContent().trim();
-
-                try {
-                    prisonerStatus = String.valueOf(Integer.parseInt(prisonerStatus) + 1);
-                } catch (Exception ignored) {
-
-                }
-
-                retVal.setDefaultPrisonerStatus(PrisonerStatus.parseFromString(prisonerStatus));
-            } else if (wn2.getNodeName().equalsIgnoreCase("prisonerBabyStatus")) {
-                retVal.prisonerBabyStatus = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) { // Legacy
+                retVal.setPrisonerCaptureStyle(Boolean.parseBoolean(wn2.getTextContent().trim())
+                        ? PrisonerCaptureStyle.TAHARQA : PrisonerCaptureStyle.NONE);
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
                 retVal.useRandomHitsForVees = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
@@ -3882,8 +3913,12 @@ public class CampaignOptions implements Serializable {
                 retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceNumUnits")) {
                 retVal.limitLanceNumUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) {
-                retVal.useAtBCapture = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
+                if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
+                    retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.ATB);
+                    retVal.setUseAtBPrisonerDefection(true);
+                    retVal.setUseAtBPrisonerRansom(true);
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
                 retVal.contractMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {

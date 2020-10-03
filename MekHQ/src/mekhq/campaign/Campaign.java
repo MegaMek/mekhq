@@ -1321,7 +1321,7 @@ public class Campaign implements Serializable, ITechManager {
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
         if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && prisonerStatus.isFree()) {
             if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
-                    "recruitment of " + p.getFullName(), getLocalDate())) {
+                    "Recruitment of " + p.getFullName(), getLocalDate())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
                         + p.getFullName() + "</b></font>");
                 return false;
@@ -1634,7 +1634,7 @@ public class Campaign implements Serializable, ITechManager {
             p.setId(-1);
             return;
         }
-        if (null == p.getUnit()) {
+        if ((null == p.getUnit()) && !p.hasParentPart()) {
             Part spare = checkForExistingSparePart(p);
             if (null != spare) {
                 if (p instanceof Armor) {
@@ -1713,14 +1713,23 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+
+
     /**
-     * Imports a {@link Part} into the campaign.
+     * Imports a collection of parts into the campaign.
      *
-     * @param p The {@link Part} to import into the campaign.
+     * @param newParts The collection of {@link Part} instances
+     *                 to import into the campaign.
      */
-    public void importPart(Part p) {
-        p.setCampaign(this);
-        addPartWithoutId(p);
+    public void importParts(Collection<Part> newParts) {
+        for (Part p : newParts) {
+            p.setCampaign(this);
+            addPartWithoutId(p);
+        }
+
+        for (Part p : newParts) {
+            p.fixupPartReferences(parts);
+        }
     }
 
     public void addPartWithoutId(Part p) {
@@ -2735,7 +2744,7 @@ public class Campaign implements Serializable, ITechManager {
 
         String report = tech.getHyperlinkedFullTitle() + " spent " + minutes + " minutes mothballing " + u.getHyperlinkedName();
         if (!u.isMothballing()) {
-            completeMothball(u);
+            u.completeMothball();
             report += ". Mothballing complete.";
         } else {
             report += ". " + u.getMothballTime() + " minutes remaining.";
@@ -2748,15 +2757,6 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         addReport(report);
-    }
-
-    /**
-     * Completes the mothballing of a unit.
-     * @param u The unit which should now be mothballed.
-     */
-    public void completeMothball(Unit u) {
-        u.setMothballTime(0);
-        u.setMothballed(true);
     }
 
     /**
@@ -2790,28 +2790,20 @@ public class Campaign implements Serializable, ITechManager {
         u.setMothballTime(u.getMothballTime() - minutes);
 
         String report = tech.getHyperlinkedFullTitle() + " spent " + minutes + " minutes activating " + u.getHyperlinkedName();
-        if (!u.isMothballing()) {
-            completeActivation(u);
-            report += ". Activation complete.";
-        } else {
-            report += ". " + u.getMothballTime() + " minutes remaining.";
-        }
 
         tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
         if (!u.isSelfCrewed()) {
             astechPoolMinutes -= 6 * minutes;
         }
 
-        addReport(report);
-    }
+        if (!u.isMothballing()) {
+            u.completeActivation();
+            report += ". Activation complete.";
+        } else {
+            report += ". " + u.getMothballTime() + " minutes remaining.";
+        }
 
-    /**
-     * Completes the activation of a unit.
-     * @param u The unit which should now be activated.
-     */
-    public void completeActivation(Unit u) {
-        u.setMothballTime(0);
-        u.setMothballed(false);
+        addReport(report);
     }
 
     public void refit(Refit r) {
@@ -3923,11 +3915,8 @@ public class Campaign implements Serializable, ITechManager {
         }
         parts.remove(part.getId());
         //remove child parts as well
-        for (int childId : part.getChildPartIds()) {
-            Part childPart = getPart(childId);
-            if (null != childPart) {
-                removePart(childPart);
-            }
+        for (Part childPart : part.getChildParts()) {
+            removePart(childPart);
         }
         MekHQ.triggerEvent(new PartRemovedEvent(part));
     }
@@ -6219,6 +6208,17 @@ public class Campaign implements Serializable, ITechManager {
         return getCampaignOptions().getUnitRatingMethod()
                 .equals(mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV) ? rating.getUnitRatingAsInteger()
                         : rating.getModifier();
+    }
+
+    /**
+     * This is a better method for pairing AtB with IOpts with regards to Prisoner Capture
+     */
+    public int getUnitRatingAsInteger() {
+        if (getCampaignOptions().useDragoonRating()) {
+            return getUnitRating().getUnitRatingAsInteger();
+        } else {
+            return IUnitRating.DRAGOON_C;
+        }
     }
 
     public RandomSkillPreferences getRandomSkillPreferences() {
