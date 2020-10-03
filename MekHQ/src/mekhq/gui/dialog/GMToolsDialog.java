@@ -29,7 +29,6 @@ import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generators.RandomCallsignGenerator;
@@ -61,7 +60,6 @@ import mekhq.gui.preferences.JIntNumberSpinnerPreference;
 import mekhq.gui.preferences.JTextFieldPreference;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
-import sun.swing.DefaultLookup;
 
 public class GMToolsDialog extends JDialog {
     //region Variable Declarations
@@ -501,31 +499,9 @@ public class GMToolsDialog extends JDialog {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                                                           boolean isSelected, boolean cellHasFocus) {
-                setOpaque(list.isOpaque());
-                if (isSelected) {
-                    setBackground(list.getSelectionBackground());
-                    setForeground(list.getSelectionForeground());
-                } else {
-                    setBackground(list.getBackground());
-                    setForeground(list.getForeground());
-                }
-                setFont(list.getFont());
-
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 setText((value == null) ? ""
                         : (value instanceof Phenotype ? ((Phenotype) value).getGroupingName() : "ERROR"));
-
-                setEnabled(list.isEnabled());
-
-                if (cellHasFocus) {
-                    Border border = null;
-                    if (isSelected) {
-                        border = DefaultLookup.getBorder(this, ui, "List.focusSelectedCellHighlightBorder");
-                    }
-                    if (border == null) {
-                        border = DefaultLookup.getBorder(this, ui, "List.focusCellHighlightBorder");
-                    }
-                    setBorder(border);
-                }
 
                 return this;
             }
@@ -874,7 +850,7 @@ public class GMToolsDialog extends JDialog {
                 }
                 setLastRolledUnit(null);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(this, "Failed to load entity "
+                MekHQ.getLogger().error("Failed to load entity "
                         + getLastRolledUnit().getName() + " from " + getLastRolledUnit().getSourceFile().toString(), ex);
                 unitPicked.setText(String.format(Messages.getString("entityLoadFailure.error"), getLastRolledUnit().getName()));
             }
