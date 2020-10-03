@@ -41,7 +41,6 @@ import javax.swing.table.TableRowSorter;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -49,6 +48,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
+import mekhq.service.MassRepairConfiguredOptions;
 import mekhq.service.MassRepairMassSalvageMode;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.UnitTableModel;
@@ -58,6 +58,7 @@ import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.preferences.PreferencesNode;
+import mekhq.service.MassRepairOption;
 import mekhq.service.MassRepairService;
 import mekhq.service.MassRepairService.MassRepairPartSet;
 
@@ -160,6 +161,10 @@ public class MassRepairSalvageDialog extends JDialog {
     public MassRepairMassSalvageMode getMode() {
         return mode;
     }
+
+    public Map<Integer, MassRepairOptionControl> getMassRepairOptionControlMap() {
+        return massRepairOptionControlMap;
+    }
     //endregion Getters and Setters
 
     private void filterUnits() {
@@ -228,7 +233,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
             MassRepairOptionControl mroc = massRepairOptionControlMap.get(type);
 
-            if ((mroc == null) || !mroc.activeBox.isSelected()) {
+            if ((mroc == null) || !mroc.getActiveBox().isSelected()) {
                 continue;
             }
 
@@ -602,28 +607,28 @@ public class MassRepairSalvageDialog extends JDialog {
         int columnIdx = 0;
 
         MassRepairOptionControl mroc = new MassRepairOptionControl();
-        mroc.activeBox = createMassRepairOptionItemBox(text, tooltipText, activeBoxName, mro.isActive(),
-                pnlItems, rowIdx, columnIdx++);
-        mroc.minSkillCBox = createMassRepairSkillCBox(mro.getSkillMin(), mro.isActive(), pnlItems,
-                rowIdx, columnIdx++);
-        mroc.maxSkillCBox = createMassRepairSkillCBox(mro.getSkillMax(), mro.isActive(), pnlItems,
-                rowIdx, columnIdx++);
-        mroc.minBTHSpn = createMassRepairSkillBTHSpinner(mro.getBthMin(), mro.isActive(), pnlItems,
-                rowIdx, columnIdx++);
-        mroc.maxBTHSpn = createMassRepairSkillBTHSpinner(mro.getBthMax(), mro.isActive(), pnlItems,
-                rowIdx, columnIdx++);
+        mroc.setActiveBox(createMassRepairOptionItemBox(text, tooltipText, activeBoxName, mro.isActive(),
+                pnlItems, rowIdx, columnIdx++));
+        mroc.setMinSkillCBox(createMassRepairSkillCBox(mro.getSkillMin(), mro.isActive(), pnlItems,
+                rowIdx, columnIdx++));
+        mroc.setMaxSkillCBox(createMassRepairSkillCBox(mro.getSkillMax(), mro.isActive(), pnlItems,
+                rowIdx, columnIdx++));
+        mroc.setMinBTHSpn(createMassRepairSkillBTHSpinner(mro.getBthMin(), mro.isActive(), pnlItems,
+                rowIdx, columnIdx++));
+        mroc.setMaxBTHSpn(createMassRepairSkillBTHSpinner(mro.getBthMax(), mro.isActive(), pnlItems,
+                rowIdx, columnIdx++));
 
-        mroc.activeBox.addActionListener(evt -> {
-            if (mroc.activeBox.isSelected()) {
-                mroc.minSkillCBox.setEnabled(true);
-                mroc.maxSkillCBox.setEnabled(true);
-                mroc.minBTHSpn.setEnabled(true);
-                mroc.maxBTHSpn.setEnabled(true);
+        mroc.getActiveBox().addActionListener(evt -> {
+            if (mroc.getActiveBox().isSelected()) {
+                mroc.getMinSkillCBox().setEnabled(true);
+                mroc.getMaxSkillCBox().setEnabled(true);
+                mroc.getMinBTHSpn().setEnabled(true);
+                mroc.getMaxBTHSpn().setEnabled(true);
             } else {
-                mroc.minSkillCBox.setEnabled(false);
-                mroc.maxSkillCBox.setEnabled(false);
-                mroc.minBTHSpn.setEnabled(false);
-                mroc.maxBTHSpn.setEnabled(false);
+                mroc.getMinSkillCBox().setEnabled(false);
+                mroc.getMaxSkillCBox().setEnabled(false);
+                mroc.getMinBTHSpn().setEnabled(false);
+                mroc.getMaxBTHSpn().setEnabled(false);
             }
         });
 
@@ -861,7 +866,7 @@ public class MassRepairSalvageDialog extends JDialog {
                 : "btnStart.MR.text"));
         btnStart.setName("btnStart");
         btnStart.addActionListener(this::btnStartMassRepairActionPerformed);
-        pnlButtons.add(btnStart, gridBagConstraints);;
+        pnlButtons.add(btnStart, gridBagConstraints);
 
         JButton btnSaveAsDefault = new JButton(resources.getString("btnSaveAsDefault.text"));
         btnSaveAsDefault.setName("btnSaveAsDefault");
@@ -879,36 +884,6 @@ public class MassRepairSalvageDialog extends JDialog {
     }
 
     private void btnStartMassRepairActionPerformed(ActionEvent evt) {
-        List<MassRepairOption> activeMROs = new ArrayList<>();
-
-        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-            int type = MassRepairOption.VALID_REPAIR_TYPES[i];
-
-            MassRepairOptionControl mroc = massRepairOptionControlMap.get(type);
-
-            if ((mroc == null) || !mroc.activeBox.isSelected()) {
-                continue;
-            }
-
-            MassRepairOption mro = new MassRepairOption();
-            mro.setType(type);
-            mro.setActive(mroc.activeBox.isSelected());
-            mro.setSkillMin(mroc.minSkillCBox.getSelectedIndex());
-            mro.setSkillMax(mroc.maxSkillCBox.getSelectedIndex());
-            mro.setBthMin((Integer) mroc.minBTHSpn.getValue());
-            mro.setBthMax((Integer) mroc.maxBTHSpn.getValue());
-
-            activeMROs.add(mro);
-        }
-
-        if (activeMROs.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    resources.getString("NoEnabledRepairOptions.error"),
-                    resources.getString("NoEnabledRepairOptions.errorTitle"),
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         if (getMode().isUnits()) {
             int[] selectedRows = unitTable.getSelectedRows();
 
@@ -939,10 +914,17 @@ public class MassRepairSalvageDialog extends JDialog {
                 return;
             }
 
-            MassRepairService.MassRepairConfiguredOptions configuredOptions = new MassRepairService.MassRepairConfiguredOptions();
-            configuredOptions.setup(this);
+            MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions(this);
 
-            MassRepairService.massRepairSalvageUnits(campaignGUI.getCampaign(), units, activeMROs);
+            if (!configuredOptions.hasActiveMassRepairOption()) {
+                JOptionPane.showMessageDialog(this,
+                        resources.getString("NoEnabledRepairOptions.error"),
+                        resources.getString("NoEnabledRepairOptions.errorTitle"),
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            MassRepairService.massRepairSalvageUnits(campaignGUI.getCampaign(), units, configuredOptions);
 
             filterUnits();
         } else if (getMode().isWarehouse()) {
@@ -975,11 +957,10 @@ public class MassRepairSalvageDialog extends JDialog {
                 return;
             }
 
-            MassRepairService.MassRepairConfiguredOptions configuredOptions = new MassRepairService.MassRepairConfiguredOptions();
-            configuredOptions.setup(this);
+            MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions(this);
             configuredOptions.setScrapImpossible(false);
 
-            MassRepairPartSet partSet = MassRepairService.performWarehouseMassRepair(parts, activeMROs,
+            MassRepairPartSet partSet = MassRepairService.performWarehouseMassRepair(parts,
                     configuredOptions, campaignGUI.getCampaign());
 
             String msg = resources.getString("Completed.text");
@@ -1028,13 +1009,9 @@ public class MassRepairSalvageDialog extends JDialog {
                 continue;
             }
 
-            MassRepairOption mro = new MassRepairOption();
-            mro.setType(type);
-            mro.setActive(mroc.activeBox.isSelected());
-            mro.setSkillMin(mroc.minSkillCBox.getSelectedIndex());
-            mro.setSkillMax(mroc.maxSkillCBox.getSelectedIndex());
-            mro.setBthMin((Integer) mroc.minBTHSpn.getValue());
-            mro.setBthMax((Integer) mroc.maxBTHSpn.getValue());
+            MassRepairOption mro = new MassRepairOption(type, mroc.getActiveBox().isSelected(),
+                    mroc.getMinSkillCBox().getSelectedIndex(), mroc.getMaxSkillCBox().getSelectedIndex(),
+                    (Integer) mroc.getMinBTHSpn().getValue(), (Integer) mroc.getMaxBTHSpn().getValue());
 
             campaignOptions.addMassRepairOption(mro);
         }
@@ -1045,14 +1022,6 @@ public class MassRepairSalvageDialog extends JDialog {
                 resources.getString("DefaultOptionsSaved.text"),
                 resources.getString("DefaultOptionsSaved.title"),
                 JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private static class MassRepairOptionControl {
-        protected JCheckBox activeBox = null;
-        protected JComboBox<String> minSkillCBox = null;
-        protected JComboBox<String> maxSkillCBox = null;
-        protected JSpinner minBTHSpn = null;
-        protected JSpinner maxBTHSpn = null;
     }
 
     private void setUserPreferences() {
@@ -1088,5 +1057,53 @@ public class MassRepairSalvageDialog extends JDialog {
 
     public JCheckBox getReplacePodPartsBox() {
         return replacePodPartsBox;
+    }
+
+    public static class MassRepairOptionControl {
+        private JCheckBox activeBox = null;
+        private JComboBox<String> minSkillCBox = null;
+        private JComboBox<String> maxSkillCBox = null;
+        private JSpinner minBTHSpn = null;
+        private JSpinner maxBTHSpn = null;
+
+        public JCheckBox getActiveBox() {
+            return activeBox;
+        }
+
+        public void setActiveBox(JCheckBox activeBox) {
+            this.activeBox = activeBox;
+        }
+
+        public JComboBox<String> getMinSkillCBox() {
+            return minSkillCBox;
+        }
+
+        public void setMinSkillCBox(JComboBox<String> minSkillCBox) {
+            this.minSkillCBox = minSkillCBox;
+        }
+
+        public JComboBox<String> getMaxSkillCBox() {
+            return maxSkillCBox;
+        }
+
+        public void setMaxSkillCBox(JComboBox<String> maxSkillCBox) {
+            this.maxSkillCBox = maxSkillCBox;
+        }
+
+        public JSpinner getMinBTHSpn() {
+            return minBTHSpn;
+        }
+
+        public void setMinBTHSpn(JSpinner minBTHSpn) {
+            this.minBTHSpn = minBTHSpn;
+        }
+
+        public JSpinner getMaxBTHSpn() {
+            return maxBTHSpn;
+        }
+
+        public void setMaxBTHSpn(JSpinner maxBTHSpn) {
+            this.maxBTHSpn = maxBTHSpn;
+        }
     }
 }
