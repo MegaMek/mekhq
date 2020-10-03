@@ -650,12 +650,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             case CMD_FREE: {
                 // TODO: Warn in particular for "freeing" in deep space, leading to Geneva Conventions violation (#1400 adding Crime to MekHQ)
                 // TODO: Record the people into some NPC pool, if still alive
-                if (0 == JOptionPane.showConfirmDialog(
-                        null,
-                        String.format(resourceMap.getString("confirmFree.format"), selectedPerson.getFullTitle()),
+                String title = (people.length == 1) ? people[0].getFullTitle()
+                        : String.format(resourceMap.getString("numPrisoners.text"), people.length);
+                if (0 == JOptionPane.showConfirmDialog(null,
+                        String.format(resourceMap.getString("confirmFree.format"), title),
                         resourceMap.getString("freeQ.text"),
                         JOptionPane.YES_NO_OPTION)) {
-                    gui.getCampaign().removePerson(selectedPerson.getId());
+                    for (Person person : people) {
+                        gui.getCampaign().removePerson(person.getId());
+                    }
                 }
                 break;
             }
@@ -701,10 +704,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_REMOVE: {
-                String title = String.format(resourceMap.getString("numPersonnel.text"), people.length);
-                if (people.length == 1) {
-                    title = people[0].getFullTitle();
-                }
+                String title = (people.length == 1) ? people[0].getFullTitle()
+                        : String.format(resourceMap.getString("numPersonnel.text"), people.length);
                 if (0 == JOptionPane.showConfirmDialog(null,
                         String.format(resourceMap.getString("confirmRemove.format"), title),
                         resourceMap.getString("removeQ.text"),
@@ -1291,23 +1292,17 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
 
             if (StaticChecks.areAnyFree(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON));
-            }
-
-            if (oneSelected && !person.getPrisonerStatus().isFree()) {
+            } else {
+                // If none are free, then we can put the Free option
                 popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE));
             }
 
-            if (gui.getCampaign().getCampaignOptions().getUseAtB()
-                    && (gui.getCampaign().getCampaignOptions().getUseAtBCapture()
-                    || gui.getCampaign().getCampaignOptions().capturePrisoners())
+            if (gui.getCampaign().getCampaignOptions().useAtBPrisonerRansom()
                     && StaticChecks.areAllPrisoners(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("ransom.text"), CMD_RANSOM));
             }
 
-            if (gui.getCampaign().getCampaignOptions().getUseAtB()
-                    && (gui.getCampaign().getCampaignOptions().getUseAtBCapture()
-                    || gui.getCampaign().getCampaignOptions().capturePrisoners())
-                    && StaticChecks.areAnyWillingToDefect(selected)) {
+            if (StaticChecks.areAnyWillingToDefect(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT));
             }
 
@@ -1738,11 +1733,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 JMenuHelpers.addMenuIfNonEmpty(menu, techMenu, MAX_POPUP_ITEMS);
 
                 // and we always include the None checkbox
-                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("none.text")); //$NON-NLS-1$
-                cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1")); //$NON-NLS-1$
+                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("none.text"));
+                cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1"));
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
-                popup.add(menu);
+
+                if ((menu.getItemCount() > 1) || (gui.getCampaign().getUnit(person.getUnitId()) != null)
+                        || (person.getTechUnitIDs().size() > 0)) {
+                    JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+                }
             }
 
             if (oneSelected && person.getStatus().isActive()) {
@@ -1796,9 +1795,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         JMenuHelpers.addMenuIfNonEmpty(menu, femaleMenu, MAX_POPUP_ITEMS);
                     }
 
-                    if (menu.getItemCount() > 0) {
-                        popup.add(menu);
-                    }
+                    JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
                 }
 
                 if (person.getGenealogy().hasSpouse()) {

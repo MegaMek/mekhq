@@ -33,6 +33,11 @@ public final class MekHqConstants {
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
     //endregion Command Center
+
+    //region Personnel Tab Display Options
+    public static final String PERSONNEL_INDIVIDUAL_ROLE_FILTERS = "personnelIndividualRoleFilters";
+    public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
+    //endregion Personnel Tab Display Options
     //endregion Display
 
     //region Autosave
@@ -56,6 +61,7 @@ public final class MekHqConstants {
     public static final String XML_SAVES_NODE = "mekhq/prefs/xmlsaves";
     public static final String PREFER_GZIPPED_CAMPAIGN_FILE = "preferGzippedCampaignFile";
     public static final String WRITE_CUSTOMS_TO_XML = "writeCustomsToXML";
+    public static final String SAVE_MOTHBALL_STATE = "saveMothballState";
     //endregion Campaign XML Save Options
 
     //region Miscellaneous Options

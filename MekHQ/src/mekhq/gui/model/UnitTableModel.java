@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2013-2020 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.model;
 
 import java.awt.Component;
@@ -11,7 +29,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.common.Entity;
-import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.TechConstants;
@@ -31,7 +48,7 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
  * @author Jay lawson
  */
 public class UnitTableModel extends DataTableModel {
-
+    //region Variable Declarations
     private static final long serialVersionUID = -5207167419079014157L;
 
     public final static int COL_NAME    =    0;
@@ -58,6 +75,7 @@ public class UnitTableModel extends DataTableModel {
     private Campaign campaign;
 
     private final MekHqColors colors = new MekHqColors();
+    //endregion Variable Declarations
 
     public UnitTableModel(Campaign c) {
         data = new ArrayList<Unit>();
@@ -299,11 +317,10 @@ public class UnitTableModel extends DataTableModel {
 
         private static final long serialVersionUID = 9054581142945717303L;
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus,
-                int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected,
-                    hasFocus, row, column);
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                       boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
@@ -331,8 +348,9 @@ public class UnitTableModel extends DataTableModel {
                     applyColors(colors.getNonFunctional());
                 } else if (u.hasPartsNeedingFixing()) {
                     applyColors(colors.getNeedsPartsFixed());
-                } else if (u.getEntity() instanceof Infantry
-                        && u.getActiveCrew().size() < u.getFullCrewSize()) {
+                } else if (u.isUnmaintained()) {
+                    applyColors(colors.getUnmaintained());
+                } else if (u.getActiveCrew().size() < u.getFullCrewSize()) {
                     applyColors(colors.getUncrewed());
                 } else {
                     setBackground(UIManager.getColor("Table.background"));

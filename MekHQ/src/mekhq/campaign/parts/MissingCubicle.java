@@ -57,9 +57,8 @@ public class MissingCubicle extends MissingPart {
 
     @Override
     public String getName() {
-        Part parent = campaign.getPart(parentPartId);
-        if (null != parent) {
-            return parent.getName() + " Cubicle";
+        if (null != parentPart) {
+            return parentPart.getName() + " Cubicle";
         }
         return super.getName();
     }
@@ -99,10 +98,9 @@ public class MissingCubicle extends MissingPart {
             campaign.addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             remove(false);
-            Part bayPart = campaign.getPart(parentPartId);
-            if (null != bayPart) {
-                bayPart.addChildPart(actualReplacement);
-                bayPart.updateConditionFromPart();
+            if (null != parentPart) {
+                parentPart.addChildPart(actualReplacement);
+                parentPart.updateConditionFromPart();
             }
         }
     }

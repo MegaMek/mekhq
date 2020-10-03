@@ -43,6 +43,11 @@ public class MekHqOptionsDialog extends BaseDialog {
     private JCheckBox optionCommandCenterUseUnitMarket;
     private JCheckBox optionCommandCenterMRMS;
     //endregion Command Center Display
+
+    //region Personnel Tab Display Options
+    private JCheckBox optionPersonnelIndividualRoleFilters;
+    private JCheckBox optionPersonnelFilterOnPrimaryRole;
+    //endregion Personnel Tab Display Options
     //endregion Display
 
     //region Autosave
@@ -62,6 +67,7 @@ public class MekHqOptionsDialog extends BaseDialog {
     //region Campaign XML Save
     private JCheckBox optionPreferGzippedOutput;
     private JCheckBox optionWriteCustomsToXML;
+    private JCheckBox optionSaveMothballState;
     //endregion Campaign XML Save
 
     //region Miscellaneous
@@ -78,7 +84,7 @@ public class MekHqOptionsDialog extends BaseDialog {
 
     /**
      * This dialog uses the following Mnemonics:
-     * C, D, M, M, S, W, Y
+     * C, D, M, M, S, U, W, Y
      */
     @Override
     protected Container createCustomUI() {
@@ -114,6 +120,14 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionCommandCenterMRMS = new JCheckBox(resources.getString("optionCommandCenterMRMS.text"));
         optionCommandCenterMRMS.setToolTipText(resources.getString("optionCommandCenterMRMS.toolTipText"));
         //endregion Command Center Display
+
+        //region Personnel Tab Display Options
+        JLabel labelPersonnelDisplay = new JLabel(resources.getString("labelPersonnelDisplay.text"));
+
+        optionPersonnelIndividualRoleFilters = new JCheckBox(resources.getString("optionPersonnelIndividualRoleFilters.text"));
+
+        optionPersonnelFilterOnPrimaryRole = new JCheckBox(resources.getString("optionPersonnelFilterOnPrimaryRole.text"));
+        //endregion Personnel Tab Display Options
         //endregion Display
 
         //region Autosave
@@ -163,6 +177,10 @@ public class MekHqOptionsDialog extends BaseDialog {
 
         optionWriteCustomsToXML = new JCheckBox(resources.getString("optionWriteCustomsToXML.text"));
         optionWriteCustomsToXML.setMnemonic(KeyEvent.VK_C);
+
+        optionSaveMothballState = new JCheckBox(resources.getString("optionSaveMothballState.text"));
+        optionSaveMothballState.setToolTipText(resources.getString("optionSaveMothballState.toolTipText"));
+        optionSaveMothballState.setMnemonic(KeyEvent.VK_U);
         //endregion Campaign XML Save
 
         //region Miscellaneous Options
@@ -199,6 +217,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(labelCommandCenterDisplay)
                     .addComponent(optionCommandCenterUseUnitMarket)
                     .addComponent(optionCommandCenterMRMS)
+                    .addComponent(labelPersonnelDisplay)
+                    .addComponent(optionPersonnelIndividualRoleFilters)
+                    .addComponent(optionPersonnelFilterOnPrimaryRole)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -214,6 +235,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(labelXMLSave)
                     .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
+                    .addComponent(optionSaveMothballState)
                     .addComponent(labelMiscellaneous)
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(labelStartGameDelay)
@@ -235,6 +257,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(labelCommandCenterDisplay)
                     .addComponent(optionCommandCenterUseUnitMarket)
                     .addComponent(optionCommandCenterMRMS)
+                    .addComponent(labelPersonnelDisplay)
+                    .addComponent(optionPersonnelIndividualRoleFilters)
+                    .addComponent(optionPersonnelFilterOnPrimaryRole)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
                     .addComponent(optionSaveDaily)
@@ -250,6 +275,7 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(labelXMLSave)
                     .addComponent(optionPreferGzippedOutput)
                     .addComponent(optionWriteCustomsToXML)
+                    .addComponent(optionSaveMothballState)
                     .addComponent(labelMiscellaneous)
                     .addGroup(layout.createSequentialGroup()
                             .addComponent(labelStartGameDelay)
@@ -270,6 +296,8 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
         MekHQ.getMekHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
         MekHQ.getMekHQOptions().setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
+        MekHQ.getMekHQOptions().setPersonnelIndividualRoleFilters(optionPersonnelIndividualRoleFilters.isSelected());
+        MekHQ.getMekHQOptions().setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
 
         MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
         MekHQ.getMekHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
@@ -283,6 +311,7 @@ public class MekHqOptionsDialog extends BaseDialog {
 
         MekHQ.getMekHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
         MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
+        MekHQ.getMekHQOptions().setSaveMothballState(optionSaveMothballState.isSelected());
 
         MekHQ.getMekHQOptions().setStartGameDelay((Integer) optionStartGameDelay.getValue());
 
@@ -295,6 +324,8 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionHistoricalDailyLog.setSelected(MekHQ.getMekHQOptions().getHistoricalDailyLog());
         optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket());
         optionCommandCenterMRMS.setSelected(MekHQ.getMekHQOptions().getCommandCenterMRMS());
+        optionPersonnelIndividualRoleFilters.setSelected(MekHQ.getMekHQOptions().getPersonnelIndividualRoleFilters());
+        optionPersonnelFilterOnPrimaryRole.setSelected(MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole());
 
         optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
         optionSaveDaily.setSelected(MekHQ.getMekHQOptions().getAutosaveDailyValue());
@@ -308,6 +339,7 @@ public class MekHqOptionsDialog extends BaseDialog {
 
         optionPreferGzippedOutput.setSelected(MekHQ.getMekHQOptions().getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
+        optionSaveMothballState.setSelected(MekHQ.getMekHQOptions().getSaveMothballState());
 
         optionStartGameDelay.setValue(MekHQ.getMekHQOptions().getStartGameDelay());
     }

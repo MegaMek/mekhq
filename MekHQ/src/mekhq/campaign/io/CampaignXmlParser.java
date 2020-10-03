@@ -1483,6 +1483,7 @@ public class CampaignXmlParser {
         NodeList wList = wn.getChildNodes();
 
         // Okay, lets iterate through the children, eh?
+        List<Part> parts = new ArrayList<>();
         for (int x = 0; x < wList.getLength(); x++) {
             Node wn2 = wList.item(x);
 
@@ -1577,9 +1578,11 @@ public class CampaignXmlParser {
             }
 
             if (p != null) {
-                retVal.importPart(p);
+                parts.add(p);
             }
         }
+
+        retVal.importParts(parts);
 
         MekHQ.getLogger().info(CampaignXmlParser.class, "Load Part Nodes Complete!");
     }

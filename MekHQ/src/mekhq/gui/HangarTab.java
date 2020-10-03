@@ -93,6 +93,8 @@ public final class HangarTab extends CampaignGuiTab {
     private UnitTableModel unitModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
+
     HangarTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
@@ -111,8 +113,6 @@ public final class HangarTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$ ;
-                new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
@@ -123,14 +123,16 @@ public final class HangarTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        add(new JLabel(resourceMap.getString("lblUnitChoice.text")), //$NON-NLS-1$ ;
-                gridBagConstraints);
+        add(new JLabel(resourceMap.getString("lblUnitChoice.text")), gridBagConstraints);
 
         DefaultComboBoxModel<String> unitGroupModel = new DefaultComboBoxModel<>();
         unitGroupModel.addElement("All Units");
         for (int i = 0; i < UnitType.SIZE; i++) {
             unitGroupModel.addElement(UnitType.getTypeDisplayableName(i));
         }
+        unitGroupModel.addElement(resourceMap.getString("choiceUnit.ActiveUnits.filter"));
+        unitGroupModel.addElement(resourceMap.getString("choiceUnit.MothballedUnits.filter"));
+        unitGroupModel.addElement(resourceMap.getString("choiceUnit.UnmaintainedUnits.filter"));
         choiceUnit = new JComboBox<>(unitGroupModel);
         choiceUnit.setSelectedIndex(0);
         choiceUnit.addActionListener(ev -> filterUnits());
@@ -273,12 +275,26 @@ public final class HangarTab extends CampaignGuiTab {
                 }
                 UnitTableModel unitModel = entry.getModel();
                 Unit unit = unitModel.getUnit(entry.getIdentifier());
-                Entity en = unit.getEntity();
-                int type = -1;
-                if (null != en) {
-                    type = en.getUnitType();
+
+                if (nGroup < UnitType.SIZE) {
+                    Entity en = unit.getEntity();
+                    int type = -1;
+                    if (en != null) {
+                        type = en.getUnitType();
+                    }
+                    return type == nGroup;
+                } else if (resourceMap.getString("choiceUnit.ActiveUnits.filter")
+                        .equals(choiceUnit.getSelectedItem())) {
+                    return !unit.isMothballed();
+                } else if (resourceMap.getString("choiceUnit.MothballedUnits.filter")
+                        .equals(choiceUnit.getSelectedItem())) {
+                    return unit.isMothballed();
+                } else if (resourceMap.getString("choiceUnit.UnmaintainedUnits.filter")
+                        .equals(choiceUnit.getSelectedItem())) {
+                    return unit.isUnmaintained();
+                } else {
+                    return false;
                 }
-                return type == nGroup;
             }
         };
         unitSorter.setRowFilter(unitTypeFilter);
