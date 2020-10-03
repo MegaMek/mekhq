@@ -172,7 +172,7 @@ public class MassRepairOption {
                 mro.setBthMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
             }
 
-            MekHQ.getLogger().info(String.format("massRepairOption %d.%s\n\t%s",
+            MekHQ.getLogger().debug(String.format("massRepairOption %d.%s\n\t%s",
                     mro.getType(), mroItemNode.getNodeName(), mroItemNode.getTextContent()));
         }
 

@@ -23,6 +23,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MassRepairConfiguredOptions {
@@ -183,7 +184,7 @@ public class MassRepairConfiguredOptions {
 
     public List<MassRepairOption> getActiveMassRepairOptions() {
         if (!hasActiveMassRepairOption()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         List<MassRepairOption> activeMassRepairOptions = new ArrayList<>();

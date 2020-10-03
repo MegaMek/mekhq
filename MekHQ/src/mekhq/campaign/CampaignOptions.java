@@ -3378,7 +3378,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-        MekHQ.getLogger().info(CampaignOptions.class, "Loading Campaign Options from XML...");
+        MekHQ.getLogger().info("Loading Campaign Options from XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3393,7 +3393,7 @@ public class CampaignOptions implements Serializable {
                 continue;
             }
 
-            MekHQ.getLogger().info(CampaignOptions.class, String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
+            MekHQ.getLogger().debug(String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
 
             //region Repair and Maintenance Tab
             if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
@@ -3632,7 +3632,7 @@ public class CampaignOptions implements Serializable {
                 } else if (values.length == 9) {
                     migrateMarriageSurnameWeights(retVal, values);
                 } else {
-                    MekHQ.getLogger().error(CampaignOptions.class, "Unkown length of randomMarriageSurnameWeights");
+                    MekHQ.getLogger().error("Unknown length of randomMarriageSurnameWeights");
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
@@ -3960,7 +3960,7 @@ public class CampaignOptions implements Serializable {
             }
         }
 
-        MekHQ.getLogger().info(CampaignOptions.class, "Load Campaign Options Complete!");
+        MekHQ.getLogger().debug("Load Campaign Options Complete!");
 
         return retVal;
     }
