@@ -547,7 +547,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return null;
     }
 
-    public void swapAmmoFromCompatible(int needed, AmmoStorage as) {
+    public static void swapAmmoFromCompatible(Campaign campaign, int needed, AmmoStorage as) {
         AmmoStorage a;
         AmmoType aType;
         AmmoType curType = (AmmoType)as.getType();
@@ -562,7 +562,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 if (a.isSamePartType(as)) {
                     continue;
                 }
-                if (!isCompatibleAmmo(aType, curType)) {
+                if (!isCompatibleAmmo(campaign, aType, curType)) {
                     continue;
                 }
                 if (a.getShots() == 0) {
@@ -570,10 +570,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 }
                 // Finally, do the conversion. Run until the other ammo type runs out or we have enough
                 converted = aType.getRackSize();
-                a.changeAmountAvailable(-1, aType);
+                changeAmountAvailable(campaign, -1, aType);
                 while (converted < needed && a.getShots() > 0) {
                     converted += aType.getRackSize();
-                    a.changeAmountAvailable(-1, aType);
+                    changeAmountAvailable(campaign, -1, aType);
                 }
                 needed -= converted;
                 // If we have enough, we're done.
@@ -582,11 +582,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 }
             }
         }
-        converted = Math.round((float)converted/curType.getRackSize());
-        as.changeAmountAvailable(converted, curType);
+        converted = (int)Math.round((double)converted/curType.getRackSize());
+        changeAmountAvailable(campaign, converted, curType);
     }
 
     public void changeAmountAvailable(int amount, final AmmoType curType) {
+        changeAmountAvailable(campaign, amount, curType);
+    }
+
+    public static void changeAmountAvailable(Campaign campaign, int amount, final AmmoType curType) {
         AmmoStorage a = (AmmoStorage)campaign.findSparePart(part -> {
             if (!(part instanceof AmmoStorage) || !part.isPresent()) {
                 return false;
@@ -600,7 +604,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             AmmoType aType = (AmmoType)a.getType();
             if (amount < 0 && campaign.getCampaignOptions().useAmmoByType()
                 && a.getShots() < Math.abs(amount)) {
-                swapAmmoFromCompatible(Math.abs(amount) * aType.getRackSize(), a);
+                swapAmmoFromCompatible(campaign, Math.abs(amount) * aType.getRackSize(), a);
             }
             a.changeShots(amount);
             if (a.getShots() <= 0) {
@@ -612,7 +616,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 && campaign.getCampaignOptions().useAmmoByType()
                 && AmmoBin.ALLOWED_BY_TYPE.contains(curType.getAmmoType())) {
             campaign.addPart(new AmmoStorage(1, curType ,0, campaign), 0);
-            changeAmountAvailable(amount, curType);
+            changeAmountAvailable(campaign, amount, curType);
         }
     }
 
