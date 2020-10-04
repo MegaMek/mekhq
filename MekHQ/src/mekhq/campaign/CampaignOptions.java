@@ -3356,25 +3356,20 @@ public class CampaignOptions implements Serializable {
             }
         }
 
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<usePortraitForType>"
-                    + csv.toString()
-                    + "</usePortraitForType>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePortraitForType", csv.toString());
 
         //region AtB Options
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAtBUnitMarket", useAtBUnitMarket);
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                + "<rats>"
-                + MekHqXmlUtil.escape(StringUtils.join(rats, ','))
-                + "</rats>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBUnitMarket", useAtBUnitMarket);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rats", StringUtils.join(rats, ','));
         if (staticRATs) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<staticRATs/>");
         }
+
         if (ignoreRatEra) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<ignoreRatEra/>");
         }
         //endregion AtB Options
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "campaignOptions");
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
