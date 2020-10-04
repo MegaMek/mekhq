@@ -347,10 +347,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 				+daysToWait
                 +"</daysToWait>");
         if (hasReplacementPart()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<replacementId>"
-                    + getReplacementPart().getId()
-                    +"</replacementId>");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "replacementId", getReplacementPart().getId());
         }
 	}
 
@@ -419,7 +416,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	@Override
 	public void cancelReservation() {
 		Part replacement = findReplacement(false);
-		if (hasReplacementPart() && null != replacement) {
+		if (hasReplacementPart() && (null != replacement)) {
 			setReplacementPart(null);
 			replacement.setReserveId(null);
 			if (replacement.isSpare()) {

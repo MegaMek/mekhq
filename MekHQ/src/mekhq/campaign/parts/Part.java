@@ -1827,7 +1827,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             int id = replacementPart.getId();
             replacementPart = knownParts.get(id);
             if ((replacementPart == null) && (id > 0)) {
-                MekHQ.getLogger().error(PartRef.class,
+                MekHQ.getLogger().error(
                     String.format("Part %d ('%s') references missing replacement part %d",
                         getId(), getName(), id));
             }

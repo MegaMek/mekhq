@@ -1635,7 +1635,7 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
         if ((null == p.getUnit()) && !p.hasParentPart()
-            && !p.isReservedForRefit() && !p.isReservedForReplacement()) {
+                && !p.isReservedForRefit() && !p.isReservedForReplacement()) {
             Part spare = checkForExistingSparePart(p);
             if (null != spare) {
                 if (p instanceof Armor) {
@@ -1748,7 +1748,7 @@ public class Campaign implements Serializable, ITechManager {
         // properly collecting parts
         Part mergedWith = null;
         if (!(p instanceof MissingPart) && (null == p.getUnitId())
-            && !p.isReservedForRefit() && !p.isReservedForReplacement()) {
+                && !p.isReservedForRefit() && !p.isReservedForReplacement()) {
             Part spare = checkForExistingSparePart(p);
             if (null != spare) {
                 if (p instanceof Armor) {
@@ -1775,7 +1775,7 @@ public class Campaign implements Serializable, ITechManager {
             parts.put(p.getId(), p);
             MekHQ.triggerEvent(new PartNewEvent(p));
         } else {
-            // Go through each unit and its refits to see if the new armorshould be updated
+            // Go through each unit and its refits to see if the new armor should be updated
             // CAW: I believe all other parts on a refit have a unit assigned to them.
             if (mergedWith instanceof Armor) {
                 for (Unit u : getUnits()) {
@@ -1786,7 +1786,7 @@ public class Campaign implements Serializable, ITechManager {
                             MekHQ.getLogger().info(
                                 String.format("%s (%d) was merged with %s (%d) used in a refit for %s", p.getName(),
                                     p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
-                            Armor mergedArmor = (Armor)mergedWith;
+                            Armor mergedArmor = (Armor) mergedWith;
                             r.setNewArmorSupplies(mergedArmor);
                         }
                     }
