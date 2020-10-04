@@ -53,6 +53,8 @@ VERSION HISTORY:
 + PR #2102: Reduce the size of a Unit's XML
 + PR #2077: Standardizing MRMS Options
 + PR #2052: Bloodname GM Tools
++ Issue #1079: Carrying out a refit no longer fixes shoulder/hip damage "for free"; 
+	legs with busted hips and center torsos no longer added to inventory after being removed from mech during refit
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
