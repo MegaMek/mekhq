@@ -43,6 +43,7 @@ import megamek.client.generators.RandomCallsignGenerator;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
 import megamek.common.util.EncodeControl;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
@@ -133,23 +134,23 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             try {
                 Faction.generateFactions();
             } catch (Exception e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
             try {
                 CurrencyManager.getInstance().loadCurrencies();
             } catch (Exception e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
             try {
                 Bloodname.loadBloodnameData();
             } catch (Exception e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
             try {
                 //Load values needed for CampaignOptionsDialog
                 RATManager.populateCollectionNames();
             } catch (Exception e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
             while (!Systems.getInstance().isInitialized()) {
                 //Sleep for up to one second.
@@ -168,14 +169,14 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             try {
                 QuirksHandler.initQuirksList();
             } catch (IOException e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
             while (!MechSummaryCache.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    MekHQ.getLogger().error(this, e);
+                    MekHQ.getLogger().error(e);
                 }
             }
             //endregion Progress 1
@@ -183,7 +184,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             //region Progress 2
             setProgress(2);
             //load in directory items and tilesets
-            app.getIconPackage().loadDirectories();
+            MHQStaticDirectoryManager.initialize();
             //endregion Progress 2
 
             //region Progress 3
@@ -197,10 +198,10 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     InjuryTypes.registerAll();
                     campaign.setApp(app);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(this, e);
+                    MekHQ.getLogger().error(e);
                 }
             } else {
-                MekHQ.getLogger().info(this, "Loading campaign file from XML...");
+                MekHQ.getLogger().info("Loading campaign file from XML...");
 
                 // And then load the campaign object from it.
                 FileInputStream fis;
@@ -227,7 +228,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     cancelled = true;
                     cancel(true);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(this, e);
+                    MekHQ.getLogger().error(e);
                     JOptionPane.showMessageDialog(null,
                             "The campaign file could not be loaded. \nPlease check the log file for details.",
                             "Campaign Loading Error",

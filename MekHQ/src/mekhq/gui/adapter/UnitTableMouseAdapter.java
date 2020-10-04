@@ -388,9 +388,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (StringUtil.isNullOrEmpty(category)) {
                 category = Player.ROOT_CAMO;
             }
-            CamoChoiceDialog ccd = new CamoChoiceDialog(gui.getFrame(), true,
-                    category, selectedUnit.getCamoFileName(), gui.getCampaign()
-                            .getColorIndex(), gui.getIconPackage().getCamos());
+            CamoChoiceDialog ccd = new CamoChoiceDialog(gui.getFrame(), true, category,
+                    selectedUnit.getCamoFileName(), gui.getCampaign().getColorIndex());
             ccd.setLocationRelativeTo(gui.getFrame());
             ccd.setVisible(true);
 

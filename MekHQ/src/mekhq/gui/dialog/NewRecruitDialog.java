@@ -29,6 +29,7 @@ import javax.swing.ScrollPaneConstants;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
@@ -233,7 +234,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 
     private void choosePortrait() {
         ImageChoiceDialog pcd = new ImageChoiceDialog(hqView.getFrame(), true, person.getPortraitCategory(),
-                person.getPortraitFileName(), hqView.getIconPackage().getPortraits());
+                person.getPortraitFileName(), MHQStaticDirectoryManager.getPortraits());
         pcd.setVisible(true);
         person.setPortraitCategory(pcd.getCategory());
         person.setPortraitFileName(pcd.getFileName());

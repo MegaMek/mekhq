@@ -214,8 +214,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = personnelTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(personModel.getColumnWidth(i));
-            column.setCellRenderer(personModel.getRenderer(
-                    PersonnelTabView.GRAPHIC.equals(choicePersonView.getSelectedItem()), getIconPackage()));
+            column.setCellRenderer(personModel.getRenderer(PersonnelTabView.GRAPHIC
+                    .equals(choicePersonView.getSelectedItem())));
         }
         personnelTable.setIntercellSpacing(new Dimension(0, 0));
         personnelTable.setShowGrid(false);
@@ -316,8 +316,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
             column.setCellRenderer(personModel.getRenderer(
-                    PersonnelTabView.GRAPHIC == choicePersonView.getSelectedItem(),
-                    getIconPackage()));
+                    PersonnelTabView.GRAPHIC == choicePersonView.getSelectedItem()));
             if (i == PersonnelTableModel.COL_RANK) {
                 if (view == PersonnelTabView.GRAPHIC) {
                     column.setPreferredWidth(125);

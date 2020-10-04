@@ -36,6 +36,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
@@ -795,8 +796,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             case CMD_EDIT_PORTRAIT: {
                 ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(),
                         true, selectedPerson.getPortraitCategory(),
-                        selectedPerson.getPortraitFileName(), gui.getIconPackage()
-                        .getPortraits());
+                        selectedPerson.getPortraitFileName(),
+                        MHQStaticDirectoryManager.getPortraits());
                 pcd.setVisible(true);
 
                 final String category = pcd.getCategory();

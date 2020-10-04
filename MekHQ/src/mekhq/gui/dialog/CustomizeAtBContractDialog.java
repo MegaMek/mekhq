@@ -22,7 +22,6 @@ package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -33,24 +32,12 @@ import java.awt.image.BufferedImage;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
-import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -69,10 +56,9 @@ import mekhq.preferences.PreferencesNode;
  */
 public class CustomizeAtBContractDialog extends JDialog {
 	private static final long serialVersionUID = -7018467869340880912L;
-	private Frame frame;
+	private JFrame frame;
 	private AtBContract contract;
 	private Campaign campaign;
-	private DirectoryItems camos;
 	private String allyCamoCategory;
 	private String allyCamoFileName;
 	private int allyColorIndex;
@@ -105,11 +91,10 @@ public class CustomizeAtBContractDialog extends JDialog {
 
 	Set<String> currentFactions;
 
-	public CustomizeAtBContractDialog(Frame parent, boolean modal, AtBContract contract, Campaign c, DirectoryItems camos) {
+	public CustomizeAtBContractDialog(JFrame parent, boolean modal, AtBContract contract, Campaign c) {
 		super(parent, modal);
 		this.frame = parent;
 		this.contract = contract;
-		this.camos = camos;
 		campaign = c;
 		allyCamoCategory = contract.getAllyCamoCategory();
 		allyCamoFileName = contract.getAllyCamoFileName();
@@ -124,9 +109,9 @@ public class CustomizeAtBContractDialog extends JDialog {
 	}
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
         getContentPane().setLayout(new BorderLayout());
@@ -526,9 +511,8 @@ public class CustomizeAtBContractDialog extends JDialog {
 		public void actionPerformed(ActionEvent e) {
 	        CamoChoiceDialog ccd;
 	        if (e.getSource().equals(btnAllyCamo)) {
-	        	ccd = new CamoChoiceDialog(frame, true,
-	        			allyCamoCategory, allyCamoFileName,
-	        			allyColorIndex, camos);
+	        	ccd = new CamoChoiceDialog(frame, true, allyCamoCategory, allyCamoFileName,
+                        allyColorIndex);
 		        ccd.setVisible(true);
 		        allyCamoCategory = ccd.getCategory();
 		        allyCamoFileName = ccd.getFileName();
@@ -538,9 +522,8 @@ public class CustomizeAtBContractDialog extends JDialog {
 		        setCamoIcon(btnAllyCamo, allyCamoCategory,
 	        			allyCamoFileName, allyColorIndex);
 	        } else {
-	        	ccd = new CamoChoiceDialog(frame, true,
-	        			enemyCamoCategory, enemyCamoFileName,
-	        			enemyColorIndex, camos);
+	        	ccd = new CamoChoiceDialog(frame, true, enemyCamoCategory, enemyCamoFileName,
+	        			enemyColorIndex);
 		        ccd.setVisible(true);
 		        enemyCamoCategory = ccd.getCategory();
 		        enemyCamoFileName = ccd.getFileName();
@@ -577,9 +560,9 @@ public class CustomizeAtBContractDialog extends JDialog {
         try {
             // Translate the root camo directory name.
             if (Player.ROOT_CAMO.equals(camoCategory)) {
-                camoCategory = ""; //$NON-NLS-1$
+                camoCategory = "";
             }
-            Image camo = (Image) camos.getItem(camoCategory, camoFileName);
+            Image camo = (Image) MHQStaticDirectoryManager.getCamouflage().getItem(camoCategory, camoFileName);
             btnCamo.setIcon(new ImageIcon(camo));
         } catch (Exception err) {
         	JOptionPane.showMessageDialog(
@@ -597,7 +580,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         }
     }
 
-    private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
+    private void btnOKActionPerformed(ActionEvent evt) {
     	contract.setName(txtName.getText());
     	contract.setEmployerCode(cbEmployer.getSelectedItemKey(), campaign.getGameYear());
     	contract.setEnemyCode(cbEnemy.getSelectedItemKey());

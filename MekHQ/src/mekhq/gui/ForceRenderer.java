@@ -15,6 +15,7 @@ import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
 import mekhq.IconPackage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -168,13 +169,13 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
     protected Icon getIconFrom(Unit unit) {
         Person person = unit.getCommander();
-        if(null == person) {
+        if (null == person) {
             return null;
         }
         String category = person.getPortraitCategory();
         String filename = person.getPortraitFileName();
 
-        if(Crew.ROOT_PORTRAIT.equals(category)) {
+        if (Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
@@ -183,27 +184,28 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             filename = "default.gif";
         }
         // Try to get the unit's portrait file.
-        Image portrait = null;
+        Image portrait;
         try {
-            portrait = (Image) getIconPackage().getPortraits().getItem(category, filename);
-            if(null != portrait) {
+            portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
+            if (null != portrait) {
                 portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
             } else {
-                portrait = (Image) getIconPackage().getPortraits().getItem("", "default.gif");
-                if(null != portrait) {
+                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", "default.gif");
+                if (null != portrait) {
                     portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
                 }
             }
             return new ImageIcon(portrait);
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "getIconFrom", e);
+            MekHQ.getLogger().error(e);
             return null;
         }
     }
 
     protected Icon getIconFrom(Force force) {
-        Image forceImage = IconPackage.buildForceIcon(force.getIconCategory(), force.getIconFileName(), getIconPackage().getForceIcons(), force.getIconMap());
-        if(null != forceImage) {
+        Image forceImage = MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
+                force.getIconFileName(), force.getIconMap());
+        if (null != forceImage) {
             forceImage = forceImage.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
         }
         return new ImageIcon(forceImage);

@@ -21,10 +21,10 @@ package mekhq.gui.dialog;
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
-import megamek.client.ui.swing.tileset.CamoManager;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.*;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.UnitOrder;
@@ -169,15 +169,15 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     protected Entity refreshUnitView() {
         Entity selectedEntity = super.refreshUnitView();
         if (selectedEntity != null) {
-            Image base = campaign.getApp().getIconPackage().getMechTiles().imageFor(selectedEntity,
+            Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(selectedEntity,
                     labelImage, -1);
 
             Image camo;
             if ((selectedEntity.getCamoCategory() != null)
                     && !selectedEntity.getCamoCategory().equals(IPlayer.NO_CAMO)) {
-                camo = CamoManager.getEntityCamoImage(selectedEntity);
+                camo = MHQStaticDirectoryManager.getEntityCamoImage(selectedEntity);
             } else {
-                camo = CamoManager.getCamoImage(campaign.getCamoCategory(), campaign.getCamoFileName());
+                camo = MHQStaticDirectoryManager.getCamoImage(campaign.getCamoCategory(), campaign.getCamoFileName());
             }
 
             // This seems unnecessary as the CamoManager will return an image for a playercolor

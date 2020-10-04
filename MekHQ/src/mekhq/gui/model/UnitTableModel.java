@@ -33,7 +33,6 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
-import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -306,9 +305,9 @@ public class UnitTableModel extends DataTableModel {
         setData(getCampaign().getCopyOfUnits());
     }
 
-    public TableCellRenderer getRenderer(boolean graphic, IconPackage icons) {
-        if(graphic) {
-            return new UnitTableModel.VisualRenderer(icons);
+    public TableCellRenderer getRenderer(boolean graphic) {
+        if (graphic) {
+            return new UnitTableModel.VisualRenderer();
         }
         return new UnitTableModel.Renderer();
     }
@@ -370,16 +369,15 @@ public class UnitTableModel extends DataTableModel {
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-
         private static final long serialVersionUID = -9154596036677641620L;
 
-        public VisualRenderer(IconPackage icons) {
-            super(icons);
+        public VisualRenderer() {
+            super();
         }
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus,
-                int row, int column) {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                       boolean hasFocus, int row, int column) {
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);

@@ -379,7 +379,7 @@ public class RetirementDefectionDialog extends JDialog {
         for (int i = 0; i < UnitAssignmentTableModel.N_COL; i++) {
             column = unitAssignmentTable.getColumnModel().getColumn(unitAssignmentTable.convertColumnIndexToView(i));
             column.setPreferredWidth(model.getColumnWidth(i));
-            column.setCellRenderer(unitModel.getRenderer(i, hqView.getIconPackage()));
+            column.setCellRenderer(unitModel.getRenderer(i));
         }
 
         unitAssignmentTable.setRowHeight(80);
@@ -938,7 +938,7 @@ class RetirementTable extends JTable {
             column = getColumnModel().getColumn(convertColumnIndexToView(i));
             column.setPreferredWidth(model.getColumnWidth(i));
             if ((i != RetirementTableModel.COL_PAY_BONUS) && (i != RetirementTableModel.COL_MISC_MOD)) {
-                column.setCellRenderer(model.getRenderer(i, hqView.getIconPackage()));
+                column.setCellRenderer(model.getRenderer(i));
             }
         }
 
