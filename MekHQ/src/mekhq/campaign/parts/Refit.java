@@ -49,6 +49,7 @@ import megamek.common.Bay;
 import megamek.common.BayType;
 import megamek.common.BipedMech;
 import megamek.common.ConvFighter;
+import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -122,6 +123,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     private boolean customJob;
     private boolean isRefurbishing;
     private boolean kitFound;
+    private boolean replacingLocations;
     private String fixableString;
 
     private List<Integer> oldUnitParts;
@@ -166,6 +168,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         timeSpent = 0;
         fixableString = null;
         kitFound = false;
+        replacingLocations = false;
         campaign = oldUnit.getCampaign();
         calculate();
         if (customJob) {
@@ -293,7 +296,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     && (newEntity.getArmorTechRating() == oldUnit.getEntity().getArmorTechRating());
         }
         int recycledArmorPoints = 0;
-        boolean replacingLocations = false;
         boolean[] locationHasNewStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
         boolean[] locationLostOldStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
         HashMap<AmmoType,Integer> ammoNeeded = new HashMap<>();
@@ -1342,10 +1344,16 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             if (null == part) {
                 MekHQ.getLogger().error(this, "old part with id " + pid + " not found for refit of " + getDesc());
                 continue;
-            } else if ((part instanceof MekLocation) && ((MekLocation) part).getLoc() == Mech.LOC_CT) {
-                part.setUnit(null);
-                oldUnit.getCampaign().removePart(part);
-                continue;
+            } else if (part instanceof MekLocation) {
+                int loc = ((MekLocation) part).getLoc();
+                // Don't add center locations or limbs with a bad hip or shoulder to warehouse
+                if ((loc == Mech.LOC_CT) ||
+                        (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc) > 0) ||
+                        (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0)) {
+                    part.setUnit(null);
+                    oldUnit.getCampaign().removePart(part);
+                    continue;
+                }
             // SI Should never be "kept" for the Warehouse
             // We also don't want to generate new BA suits that have been replaced
             // or allow legacy InfantryAttack BA parts to show up in the warehouse.
@@ -1432,6 +1440,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             if (null == part) {
                 MekHQ.getLogger().error(this, "part with id " + pid + " not found for refit of " + getDesc());
                 continue;
+            }
+            if ((!replacingLocations) && (part instanceof MekLocation)) {
+                // Preserve any hip or shoulder damage
+                int loc = ((MekLocation) part).getLoc();
+                if ((oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc) > 0) ||
+                        (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0)) {
+                    // Apply damage to hip or shoulder at slot 0
+                    newEntity.getCritical(loc, 0).setDestroyed(true);
+                }
             }
             if ((part instanceof HeatSink) && (newEntity instanceof Tank)) {
                 // Unit should not have heat sink parts
