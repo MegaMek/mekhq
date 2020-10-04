@@ -1019,8 +1019,17 @@ public class Refit extends Part implements IAcquisitionWork {
         // Bay space might change, and either way all cargo needs to be unloaded while the refit is in progress
         oldUnit.unloadTransportShip();
         newEntity.setOwner(oldUnit.getEntity().getOwner());
+
         // We don't want to require waiting for a refit kit if all that is missing is ammo or ammo bins.
         Map<AmmoType,Integer> shotsNeeded = new HashMap<>();
+        for (Part part : newUnitParts) {
+            if (part instanceof AmmoBin) {
+                AmmoBin bin = (AmmoBin) part;
+                bin.setShotsNeeded(bin.getFullShots());
+                shotsNeeded.merge((AmmoType) bin.getType(), bin.getShotsNeeded(), Integer::sum);
+            }
+        }
+
         for (Iterator<Part> iter = shoppingList.iterator(); iter.hasNext(); ) {
             final Part part = iter.next();
             if (part instanceof AmmoBin) {
@@ -1047,7 +1056,12 @@ public class Refit extends Part implements IAcquisitionWork {
             if (shotsToBuy > 0) {
                 int tons = (int) Math.ceil((double) shotsToBuy / atype.getShots());
                 AmmoStorage ammo = new AmmoStorage(0, atype, atype.getShots() * tons, campaign);
-                newUnitParts.add(ammo);
+
+                // CAW: custom refits manage their shopping list differently...(but they shouldn't)
+                if (!customJob) {
+                    newUnitParts.add(ammo);
+                }
+
                 shoppingList.add(ammo);
 
                 // Reduce the amount we need by the amount we bought
