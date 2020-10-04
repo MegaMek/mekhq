@@ -1680,9 +1680,9 @@ public class Campaign implements Serializable, ITechManager {
         }
         p.setDaysToArrival(0);
         addReport(p.getArrivalReport());
-        int quantity = p.getQuantity();
-        Part spare = checkForExistingSparePart(p);
+        Part spare = p.isReservedForRefit() ? null : checkForExistingSparePart(p);
         if (null != spare) {
+            int quantity = p.getQuantity();
             if (p instanceof Armor) {
                 if (spare instanceof Armor) {
                     while (quantity > 0) {
@@ -1777,17 +1777,18 @@ public class Campaign implements Serializable, ITechManager {
         } else {
             // Go through each unit and its refits to see if the new armorshould be updated
             // CAW: I believe all other parts on a refit have a unit assigned to them.
-            for (Unit u : getUnits()) {
-                Refit r = u.getRefit();
-                // If there is a refit and this part matches the new armor, update the armor entry
-                if (null != r) {
-                    if (mergedWith instanceof Armor
-                        && r.getNewArmorSupplies() == p) {
-                        MekHQ.getLogger().info(Campaign.class,
-                            String.format("%s (%d) was merged with %s (%d) used in a refit for %s", p.getName(),
-                                p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
-                        Armor mergedArmor = (Armor)mergedWith;
-                        r.setNewArmorSupplies(mergedArmor);
+            if (mergedWith instanceof Armor) {
+                for (Unit u : getUnits()) {
+                    Refit r = u.getRefit();
+                    // If there is a refit and this part matches the new armor, update the armor entry
+                    if (null != r) {
+                        if (r.getNewArmorSupplies() == p) {
+                            MekHQ.getLogger().info(
+                                String.format("%s (%d) was merged with %s (%d) used in a refit for %s", p.getName(),
+                                    p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
+                            Armor mergedArmor = (Armor)mergedWith;
+                            r.setNewArmorSupplies(mergedArmor);
+                        }
                     }
                 }
             }
@@ -2428,6 +2429,11 @@ public class Campaign implements Serializable, ITechManager {
             String personTitle = person.getHyperlinkedFullTitle() + " ";
 
             for (PlanetarySystem system: systems) {
+                if (currentList.isEmpty()) {
+                    // Nothing left to shop for!
+                    break;
+                }
+
                 List<IAcquisitionWork> remainingItems = new ArrayList<>();
 
                 //loop through shopping list. If its time to check, then check as appropriate. Items not
