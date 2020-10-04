@@ -198,7 +198,7 @@ public class RandomSkillPreferences implements Serializable {
     }
 
     public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn) {
-        MekHQ.getLogger().info(RandomSkillPreferences.class, "Loading Random Skill Preferences from XML...");
+        MekHQ.getLogger().debug("Loading Random Skill Preferences from XML...");
 
         wn.normalize();
         RandomSkillPreferences retVal = new RandomSkillPreferences();
@@ -212,10 +212,7 @@ public class RandomSkillPreferences implements Serializable {
             if (wn2.getNodeType() != Node.ELEMENT_NODE)
                 continue;
 
-            MekHQ.getLogger().info(RandomSkillPreferences.class, "---");
-            MekHQ.getLogger().info(RandomSkillPreferences.class, wn2.getNodeName());
-            MekHQ.getLogger().info(RandomSkillPreferences.class, "\t" + wn2.getTextContent());
-
+            MekHQ.getLogger().debug(wn2.getNodeName() + ": " + wn2.getTextContent());
             if (wn2.getNodeName().equalsIgnoreCase("overallRecruitBonus")) {
                 retVal.overallRecruitBonus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("randomizeSkill")) {
@@ -254,7 +251,7 @@ public class RandomSkillPreferences implements Serializable {
             }
         }
 
-        MekHQ.getLogger().info(RandomSkillPreferences.class, "Load Random Skill Preferences Complete!");
+        MekHQ.getLogger().debug("Load Random Skill Preferences Complete!");
 
         return retVal;
     }
