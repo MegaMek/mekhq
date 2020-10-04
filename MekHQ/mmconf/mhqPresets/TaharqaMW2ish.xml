@@ -3,11 +3,12 @@
 	<title>Taharqa&apos;s MW2ish Presets</title>
 	<description>This preset largely affects skill levels and XP costs. Namely, all skills range from level 0 to level 6 and XP costs rise with the level of the skill such that, for example, it costs more XP to advance from Regular to Veteran than from Green to Regular. Special abilities have also been tweaked with these costs in mind.</description>
 	<campaignOptions>
+		<manualUnitRatingModifier>0</manualUnitRatingModifier>
 		<logMaintenance>false</logMaintenance>
 		<useFactionForNames>true</useFactionForNames>
 		<repairSystem>0</repairSystem>
 		<useUnitRating>true</useUnitRating>
-		<unitRatingMethod>Campaign Ops</unitRatingMethod>
+		<unitRatingMethod>CAMPAIGN_OPS</unitRatingMethod>
 		<useEraMods>false</useEraMods>
 		<assignedTechFirst>true</assignedTechFirst>
 		<resetToFirstTech>true</resetToFirstTech>
@@ -96,6 +97,7 @@
 		<minimumMarriageAge>16</minimumMarriageAge>
 		<checkMutualAncestorsDepth>4</checkMutualAncestorsDepth>
 		<logMarriageNameChange>false</logMarriageNameChange>
+		<useManualMarriages>true</useManualMarriages>
 		<useRandomMarriages>false</useRandomMarriages>
 		<chanceRandomMarriages>2.5E-4</chanceRandomMarriages>
 		<marriageAgeRange>10</marriageAgeRange>
@@ -114,6 +116,11 @@
 		<displayFamilyLevel>0</displayFamilyLevel>
 		<useRandomDeaths>false</useRandomDeaths>
 		<keepMarriedNameUponSpouseDeath>false</keepMarriedNameUponSpouseDeath>
+		<prisonerCaptureStyle>NONE</prisonerCaptureStyle>
+		<defaultPrisonerStatus>PRISONER</defaultPrisonerStatus>
+		<prisonerBabyStatus>true</prisonerBabyStatus>
+		<useAtBPrisonerDefection>false</useAtBPrisonerDefection>
+		<useAtBPrisonerRansom>false</useAtBPrisonerRansom>
 		<payForParts>true</payForParts>
 		<payForRepairs>false</payForRepairs>
 		<payForUnits>true</payForUnits>
@@ -146,9 +153,8 @@
 		<timeInServiceDisplayFormat>YEARS</timeInServiceDisplayFormat>
 		<useTimeInRank>false</useTimeInRank>
 		<timeInRankDisplayFormat>MONTHS_YEARS</timeInRankDisplayFormat>
+		<useRetirementDateTracking>false</useRetirementDateTracking>
 		<trackTotalEarnings>false</trackTotalEarnings>
-		<capturePrisoners>false</capturePrisoners>
-		<defaultPrisonerStatus>PRISONER</defaultPrisonerStatus>
 		<personnelMarketName>FM: Mercenaries Revised</personnelMarketName>
 		<personnelMarketRandomEliteRemoval>10</personnelMarketRandomEliteRemoval>
 		<personnelMarketRandomVeteranRemoval>8</personnelMarketRandomVeteranRemoval>
@@ -160,10 +166,7 @@
 		<salaryEnlistedMultiplier>1.0</salaryEnlistedMultiplier>
 		<salaryCommissionMultiplier>1.2</salaryCommissionMultiplier>
 		<salaryAntiMekMultiplier>1.5</salaryAntiMekMultiplier>
-		<probPhenoMW>95</probPhenoMW>
-		<probPhenoAero>95</probPhenoAero>
-		<probPhenoBA>100</probPhenoBA>
-		<probPhenoVee>0</probPhenoVee>
+		<phenotypeProbabilities>95,100,95,0,95,25</phenotypeProbabilities>
 		<tougherHealing>true</tougherHealing>
 		<useAtB>false</useAtB>
 		<useAero>false</useAero>
@@ -190,8 +193,10 @@
 		<mercSizeLimited>false</mercSizeLimited>
 		<trackOriginalUnit>false</trackOriginalUnit>
 		<regionalMechVariations>false</regionalMechVariations>
+		<attachedPlayerCamouflage>true</attachedPlayerCamouflage>
+		<playerControlsAttachedUnits>false</playerControlsAttachedUnits>
 		<searchRadius>800</searchRadius>
-		<intensity>1.0</intensity>
+		<atbBattleChance>40,20,60,10</atbBattleChance>
 		<generateChases>true</generateChases>
 		<variableContractLength>false</variableContractLength>
 		<instantUnitMarketDelivery>false</instantUnitMarketDelivery>
@@ -206,16 +211,13 @@
 		<restrictPartsByMission>true</restrictPartsByMission>
 		<limitLanceWeight>true</limitLanceWeight>
 		<limitLanceNumUnits>true</limitLanceNumUnits>
-		<useAtBCapture>false</useAtBCapture>
 		<contractMarketReportRefresh>true</contractMarketReportRefresh>
 		<unitMarketReportRefresh>true</unitMarketReportRefresh>
-		<startGameDelay>500</startGameDelay>
 		<assignPortraitOnRoleChange>false</assignPortraitOnRoleChange>
 		<allowOpforAeros>false</allowOpforAeros>
 		<allowOpforLocalUnits>false</allowOpforLocalUnits>
 		<opforAeroChance>5</opforAeroChance>
 		<opforLocalUnitChance>5</opforLocalUnitChance>
-		<historicalDailyLog>false</historicalDailyLog>
 		<massRepairUseExtraTime>true</massRepairUseExtraTime>
 		<massRepairUseRushJob>true</massRepairUseRushJob>
 		<massRepairAllowCarryover>true</massRepairAllowCarryover>
@@ -224,86 +226,86 @@
 		<massRepairUseAssignedTechsFirst>false</massRepairUseAssignedTechsFirst>
 		<massRepairReplacePod>true</massRepairReplacePod>
 		<massRepairOptions>
-			<massRepairOption0>
+			<massRepairOption>
 				<type>0</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
 				<btnMin>4</btnMin>
 				<btnMax>4</btnMax>
-			</massRepairOption0>
-			<massRepairOption1>
+			</massRepairOption>
+			<massRepairOption>
 				<type>1</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
 				<btnMin>4</btnMin>
 				<btnMax>4</btnMax>
-			</massRepairOption1>
-			<massRepairOption2>
+			</massRepairOption>
+			<massRepairOption>
 				<type>2</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
 				<btnMin>4</btnMin>
 				<btnMax>4</btnMax>
-			</massRepairOption2>
-			<massRepairOption3>
+			</massRepairOption>
+			<massRepairOption>
 				<type>3</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
 				<btnMin>4</btnMin>
 				<btnMax>4</btnMax>
-			</massRepairOption3>
-			<massRepairOption4>
+			</massRepairOption>
+			<massRepairOption>
 				<type>4</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
 				<btnMin>4</btnMin>
 				<btnMax>4</btnMax>
-			</massRepairOption4>
-			<massRepairOption5>
+			</massRepairOption>
+			<massRepairOption>
 				<type>5</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
 				<btnMin>4</btnMin>
 				<btnMax>4</btnMax>
-			</massRepairOption5>
-			<massRepairOption6>
+			</massRepairOption>
+			<massRepairOption>
 				<type>6</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
 				<btnMin>4</btnMin>
 				<btnMax>4</btnMax>
-			</massRepairOption6>
-			<massRepairOption7>
+			</massRepairOption>
+			<massRepairOption>
 				<type>7</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
 				<btnMin>4</btnMin>
 				<btnMax>4</btnMax>
-			</massRepairOption7>
-			<massRepairOption8>
+			</massRepairOption>
+			<massRepairOption>
 				<type>8</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
 				<btnMin>4</btnMin>
 				<btnMax>4</btnMax>
-			</massRepairOption8>
-			<massRepairOption9>
-				<type>12</type>
+			</massRepairOption>
+			<massRepairOption>
+				<type>9</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
 				<btnMin>4</btnMin>
 				<btnMax>4</btnMax>
-			</massRepairOption9>
+			</massRepairOption>
 		</massRepairOptions>
 		<planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>
 		<planetIndustryAcquisitionBonus>0,0,0,0,0,0</planetIndustryAcquisitionBonus>
@@ -311,6 +313,7 @@
 		<salaryTypeBase>0 CSB,1500 CSB,1500 CSB,900 CSB,900 CSB,900 CSB,900 CSB,960 CSB,750 CSB,960 CSB,900 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB</salaryTypeBase>
 		<salaryXpMultiplier>0.6,0.6,1.0,1.6,3.2</salaryXpMultiplier>
 		<usePortraitForType>false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
+	<useAtBUnitMarket>false</useAtBUnitMarket>
 		<rats>Xotl,Total Warfare</rats>
 	</campaignOptions>
 	<skillTypes>
@@ -684,12 +687,12 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Spacecraft::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -705,12 +708,12 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Spacecraft::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -726,8 +729,8 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel</skill>
-				<skill>Tech/BA</skill>
 				<skill>Tech/Aero</skill>
+				<skill>Tech/BA</skill>
 				<skill>Tech/Mechanic</skill>
 				<skill>Tech/Mech</skill>
 			</skillPrereq>
@@ -763,8 +766,8 @@ Additionally, you gain -1 to PSR checks in Jungle terrain.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Green</skill>
-				<skill>Gunnery/Protomech::Green</skill>
 				<skill>Piloting/Mech::Green</skill>
+				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -796,8 +799,8 @@ Note: This ability is only used for BattleMechs.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Green</skill>
-				<skill>Tech/BA::Green</skill>
 				<skill>Tech/Aero::Green</skill>
+				<skill>Tech/BA::Green</skill>
 				<skill>Tech/Mechanic::Green</skill>
 				<skill>Tech/Mech::Green</skill>
 			</skillPrereq>
@@ -831,12 +834,12 @@ Plasma and Flamer).</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
-				<skill>Gunnery/Spacecraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Spacecraft::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -854,12 +857,12 @@ RL and ATM).</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
-				<skill>Gunnery/Spacecraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Spacecraft::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -874,12 +877,12 @@ RL and ATM).</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Spacecraft::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -896,8 +899,8 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Green</skill>
-				<skill>Gunnery/Protomech::Green</skill>
 				<skill>Piloting/Mech::Green</skill>
+				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -911,12 +914,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Spacecraft::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -932,8 +935,8 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Green</skill>
-				<skill>Tech/BA::Green</skill>
 				<skill>Tech/Aero::Green</skill>
+				<skill>Tech/BA::Green</skill>
 				<skill>Tech/Mechanic::Green</skill>
 				<skill>Tech/Mech::Green</skill>
 			</skillPrereq>
@@ -988,12 +991,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Spacecraft::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -1022,12 +1025,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Spacecraft::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -1043,8 +1046,8 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Green</skill>
 				<skill>Piloting/Mech::Green</skill>
+				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1075,8 +1078,8 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Green</skill>
-				<skill>Tech/BA::Green</skill>
 				<skill>Tech/Aero::Green</skill>
+				<skill>Tech/BA::Green</skill>
 				<skill>Tech/Mechanic::Green</skill>
 				<skill>Tech/Mech::Green</skill>
 			</skillPrereq>
@@ -1130,11 +1133,11 @@ Finally, urban guerrillas can call on local support once per scenario.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -1171,11 +1174,11 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 				<skill>Artillery::Green</skill>
 			</skillPrereq>
@@ -1219,12 +1222,12 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities>cluster_hitter</removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Spacecraft::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
@@ -1242,8 +1245,8 @@ NOTE: The quirk should be used only on bipedal units that have an animal like ap
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Green</skill>
 				<skill>Piloting/Mech::Green</skill>
+				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1331,8 +1334,8 @@ Note: This ability is only used for BattleMechs.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Green</skill>
-				<skill>Tech/BA::Green</skill>
 				<skill>Tech/Aero::Green</skill>
+				<skill>Tech/BA::Green</skill>
 				<skill>Tech/Mechanic::Green</skill>
 				<skill>Tech/Mech::Green</skill>
 			</skillPrereq>
@@ -1350,8 +1353,47 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Green</skill>
-				<skill>Gunnery/Protomech::Green</skill>
 				<skill>Piloting/Mech::Green</skill>
+				<skill>Gunnery/Protomech::Green</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Blind Fighter (Unofficial)</displayName>
+			<lookupName>blind_fighter</lookupName>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to darkness.</desc>
+			<xpCost>4</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Gunnery/Battlesuit::Green</skill>
+				<skill>Gunnery/Aircraft::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Protomech::Green</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>RangeMaster (CamOps)</displayName>
+			<lookupName>range_master</lookupName>
+			<desc>Range modifiers are swapped with short range (Medium, Long, or Extreme).</desc>
+			<xpCost>6</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Gunnery/Aircraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
+				<skill>Gunnery/Aerospace::Green</skill>
+				<skill>Gunnery/Spacecraft::Green</skill>
+				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1369,45 +1411,6 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			</skillPrereq>
 		</ability>
 		<ability>
-			<displayName>RangeMaster (CamOps)</displayName>
-			<lookupName>range_master</lookupName>
-			<desc>Range modifiers are swapped with short range (Medium, Long, or Extreme).</desc>
-			<xpCost>6</xpCost>
-			<weight>3</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-			<choiceValues></choiceValues>
-			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aircraft::Green</skill>
-				<skill>Gunnery/Spacecraft::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
-				<skill>Gunnery/Protomech::Green</skill>
-			</skillPrereq>
-		</ability>
-		<ability>
-			<displayName>Blind Fighter (Unofficial)</displayName>
-			<lookupName>blind_fighter</lookupName>
-			<desc>A pilot with this ability does not suffer the initial -1 to hit due to darkness.</desc>
-			<xpCost>4</xpCost>
-			<weight>2</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-			<choiceValues></choiceValues>
-			<skillPrereq>
-				<skill>Gunnery/Aircraft::Green</skill>
-				<skill>Gunnery/Battlesuit::Green</skill>
-				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
-				<skill>Gunnery/Protomech::Green</skill>
-			</skillPrereq>
-		</ability>
-		<ability>
 			<displayName>Tech Specialist, Weapon (Unofficial)</displayName>
 			<lookupName>tech_weapon_specialist</lookupName>
 			<desc>-1 to repair and maintenance checks when working with weapons</desc>
@@ -1419,8 +1422,8 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Green</skill>
-				<skill>Tech/BA::Green</skill>
 				<skill>Tech/Aero::Green</skill>
+				<skill>Tech/BA::Green</skill>
 				<skill>Tech/Mechanic::Green</skill>
 				<skill>Tech/Mech::Green</skill>
 			</skillPrereq>
@@ -1438,29 +1441,29 @@ Gaussrifles).</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
-				<skill>Gunnery/Spacecraft::Green</skill>
+				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/Vehicle::Green</skill>
+				<skill>Gunnery/Spacecraft::Green</skill>
 				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Vehicle::Green</skill>
 				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
 	</specialAbilities>
-	<randomSkillPreferences>
-		<overallRecruitBonus>0</overallRecruitBonus>
-		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
-		<specialAbilBonus>-10,-10,-2,0,0</specialAbilBonus>
-		<tacticsMod>-10,-10,-7,-4,-1</tacticsMod>
-		<randomizeSkill>true</randomizeSkill>
-		<useClanBonuses>true</useClanBonuses>
-		<antiMekProb>10</antiMekProb>
-		<combatSmallArmsBonus>-3</combatSmallArmsBonus>
-		<supportSmallArmsBonus>-6</supportSmallArmsBonus>
-		<artilleryProb>10</artilleryProb>
-		<artilleryBonus>-2</artilleryBonus>
-		<secondSkillProb>10</secondSkillProb>
-		<secondSkillBonus>-2</secondSkillBonus>
-	</randomSkillPreferences>
+<randomSkillPreferences>
+	<overallRecruitBonus>0</overallRecruitBonus>
+	<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
+	<specialAbilBonus>-10,-10,-2,0,0</specialAbilBonus>
+	<tacticsMod>-10,-10,-7,-4,-1</tacticsMod>
+	<randomizeSkill>true</randomizeSkill>
+	<useClanBonuses>true</useClanBonuses>
+	<antiMekProb>10</antiMekProb>
+	<combatSmallArmsBonus>-3</combatSmallArmsBonus>
+	<supportSmallArmsBonus>-6</supportSmallArmsBonus>
+	<artilleryProb>10</artilleryProb>
+	<artilleryBonus>-2</artilleryBonus>
+	<secondSkillProb>10</secondSkillProb>
+	<secondSkillBonus>-2</secondSkillBonus>
+</randomSkillPreferences>
 </gamePreset>
