@@ -1057,11 +1057,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 int tons = (int) Math.ceil((double) shotsToBuy / atype.getShots());
                 AmmoStorage ammo = new AmmoStorage(0, atype, atype.getShots() * tons, campaign);
 
-                // CAW: custom refits manage their shopping list differently...(but they shouldn't)
-                if (!customJob) {
-                    newUnitParts.add(ammo);
-                }
-
+                newUnitParts.add(ammo);
                 shoppingList.add(ammo);
 
                 // Reduce the amount we need by the amount we bought
@@ -1192,6 +1188,10 @@ public class Refit extends Part implements IAcquisitionWork {
 
         ArrayList<Part> newShoppingList = new ArrayList<>();
         for (Part part : shoppingList) {
+            if (part instanceof AmmoStorage) {
+                continue;
+            }
+
             if (part instanceof IAcquisitionWork) {
                 //check to see if we found a replacement
                 Part replacement = part;
