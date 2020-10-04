@@ -56,6 +56,7 @@ VERSION HISTORY:
 + Issue #1079: Carrying out a refit no longer fixes shoulder/hip damage "for free"; legs with busted hips and center torsos no longer added to inventory after being removed from mech during refit
 + PR #2093: Loot Table: Fixing Money Capitalization and Adding Basic Unit/Part Tooltips
 + News data upgrade
++ PR #2109: News Validation
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
