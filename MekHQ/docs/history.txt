@@ -57,6 +57,7 @@ VERSION HISTORY:
 + PR #2093: Loot Table: Fixing Money Capitalization and Adding Basic Unit/Part Tooltips
 + News data upgrade
 + PR #2109: News Validation
++ PR #2110: Campaign Preset Update
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues
