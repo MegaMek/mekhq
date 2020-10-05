@@ -279,11 +279,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     cancelled = true;
                     cancel(true);
                 } else {
+                    campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
                     campaign.setStartingSystem();
                     campaign.generateNewPersonnelMarket();
                     campaign.reloadNews();
                     campaign.readNews();
-                    campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
                     if (campaign.getCampaignOptions().getUseAtB()) {
                         campaign.initAtB(true);
                     }
