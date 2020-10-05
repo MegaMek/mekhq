@@ -503,13 +503,14 @@ public class Refit extends Part implements IAcquisitionWork {
                 Part replacement = ((MissingPart)nPart).findReplacement(true);
                 //check quantity
                 //TODO: the one weakness here is that we will not pick up damaged parts
-                if (null != replacement && null == partQuantity.get(replacement)) {
+                if ((null != replacement) && (null == partQuantity.get(replacement))) {
                     partQuantity.put(replacement, replacement.getQuantity());
                 }
-                if (null != replacement && partQuantity.get(replacement) > 0) {
+
+                if ((null != replacement) && (partQuantity.get(replacement) > 0)) {
                     newUnitParts.add(replacement);
                     //adjust quantity
-                    partQuantity.put(replacement, partQuantity.get(replacement)-1);
+                    partQuantity.put(replacement, partQuantity.get(replacement) - 1);
                     //If the quantity is now 0 set usedForRefitPlanning flag so findReplacement ignores this item
                     if (partQuantity.get(replacement) == 0) {
                         replacement.setUsedForRefitPlanning(true);
@@ -549,10 +550,11 @@ public class Refit extends Part implements IAcquisitionWork {
                     Part replacement = mab.findReplacement(true);
                     //check quantity
                     //TODO: the one weakness here is that we will not pick up damaged parts
-                    if (null != replacement && null == partQuantity.get(replacement)) {
+                    if ((null != replacement) && (null == partQuantity.get(replacement))) {
                         partQuantity.put(replacement, replacement.getQuantity());
                     }
-                    if (null != replacement && partQuantity.get(replacement) > 0) {
+
+                    if ((null != replacement) && (partQuantity.get(replacement) > 0)) {
                         newUnitParts.add(replacement);
                         //adjust quantity
                         partQuantity.put(replacement, partQuantity.get(replacement)-1);
@@ -1225,7 +1227,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         return shoppingList.size() == 0
-            && (null == newArmorSupplies || (armorNeeded - newArmorSupplies.getAmount()) <= 0);
+            && ((null == newArmorSupplies) || (armorNeeded - newArmorSupplies.getAmount()) <= 0);
     }
 
     public void checkForArmorSupplies() {
@@ -1280,8 +1282,8 @@ public class Refit extends Part implements IAcquisitionWork {
         for (Part part : newUnitParts) {
             if (part instanceof AmmoStorage) {
                 // merge back into the campaign
-                AmmoStorage ammoStorage = (AmmoStorage)part;
-                AmmoBin.changeAmountAvailable(campaign, ammoStorage.getShots(), (AmmoType)ammoStorage.getType());
+                AmmoStorage ammoStorage = (AmmoStorage) part;
+                AmmoBin.changeAmountAvailable(campaign, ammoStorage.getShots(), (AmmoType) ammoStorage.getType());
                 oldUnit.getCampaign().removePart(part);
             }
         }
@@ -1460,8 +1462,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
             } else if (part instanceof AmmoStorage) {
                 // merge back into the campaign before completing the refit
-                AmmoStorage ammoStorage = (AmmoStorage)part;
-                AmmoBin.changeAmountAvailable(campaign, ammoStorage.getShots(), (AmmoType)ammoStorage.getType());
+                AmmoStorage ammoStorage = (AmmoStorage) part;
+                AmmoBin.changeAmountAvailable(campaign, ammoStorage.getShots(), (AmmoType) ammoStorage.getType());
                 oldUnit.getCampaign().removePart(part);
                 continue;
             }
@@ -2587,9 +2589,9 @@ public class Refit extends Part implements IAcquisitionWork {
         if (newArmorSupplies instanceof RefitArmorRef) {
             Part realPart = knownParts.get(newArmorSupplies.getId());
             if (realPart instanceof Armor) {
-                newArmorSupplies = (Armor)realPart;
+                newArmorSupplies = (Armor) realPart;
             } else {
-                MekHQ.getLogger().error(RefitArmorRef.class,
+                MekHQ.getLogger().error(
                     String.format("Refit %s (Unit: %s) references missing armor supplies %d",
                         getRefitId(), getUnitId(), newArmorSupplies.getId()));
                 newArmorSupplies = null;
@@ -2603,7 +2605,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 if (realPart != null) {
                     oldUnitParts.set(ii, realPart);
                 } else if (part.getId() > 0) {
-                    MekHQ.getLogger().error(RefitPartRef.class,
+                    MekHQ.getLogger().error(
                         String.format("Refit %s (Unit: %s) references missing old unit part %d",
                             getRefitId(), getUnitId(), part.getId()));
                     oldUnitParts.remove(ii);
@@ -2618,7 +2620,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 if (realPart != null) {
                     newUnitParts.set(ii, realPart);
                 } else if (part.getId() > 0) {
-                    MekHQ.getLogger().error(RefitPartRef.class,
+                    MekHQ.getLogger().error(
                         String.format("Refit %s (Unit: %s) references missing new unit part %d",
                             getRefitId(), getUnitId(), part.getId()));
                     newUnitParts.remove(ii);
@@ -2636,7 +2638,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 if (realPart != null) {
                     realParts.add(realPart);
                 } else {
-                    MekHQ.getLogger().error(RefitPartRef.class,
+                    MekHQ.getLogger().error(
                         String.format("Refit %s (Unit: %s) references missing large craft ammo bin %d",
                             getRefitId(), getUnitId(), part.getId()));
                 }

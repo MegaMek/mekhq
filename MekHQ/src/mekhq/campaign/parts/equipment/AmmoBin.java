@@ -582,7 +582,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 }
             }
         }
-        converted = (int)Math.round((double)converted/curType.getRackSize());
+        converted = (int) Math.round((double) converted / curType.getRackSize());
         changeAmountAvailable(campaign, converted, curType);
     }
 
@@ -692,7 +692,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        return getAmountAvailable(campaign, (AmmoType)getType());
+        return getAmountAvailable(campaign, (AmmoType) getType());
     }
 
     public static int getAmountAvailable(Campaign campaign, AmmoType ammoType) {
@@ -719,9 +719,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                            .mapToInt(part -> {
                                AmmoStorage a = (AmmoStorage)part;
                                AmmoType aType = (AmmoType)a.getType();
-                               if (aType.equals(ammoType) && ammoType.getMunitionType() == aType.getMunitionType()) {
+                               if (aType.equals(ammoType) && (ammoType.getMunitionType() == aType.getMunitionType())) {
                                    return a.getShots();
-                               } else if (isCompatibleAmmo(campaign, aType, ammoType) && ammoType.getRackSize() != 0) {
+                               } else if (isCompatibleAmmo(campaign, aType, ammoType) && (ammoType.getRackSize() != 0)) {
                                    return (a.getShots() * aType.getRackSize()) / ammoType.getRackSize();
                                }
                                return 0;
