@@ -1,6 +1,10 @@
 VERSION HISTORY:
 ----------------
-0.47.11-SNAPSHOT
+0.47.12-SNAPSHOT 
++ Issue #1970: Workaround for single hex ecm causing smallcraft to be overweight
++ Issue #1079: Add refit time for moving a part between locations
+
+0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo
 + Issue #2032: Fixing Campaign Options Save following Preset Load
 + PR #2023: Moving StartGameDelay to MekHQOptions
