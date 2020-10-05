@@ -29,7 +29,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
@@ -6917,9 +6916,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Money getTotalEquipmentValue() {
-        return Money.zero()
-                .plus(getUnits().stream().map(Unit::getSellValue).collect(Collectors.toList()))
-                .plus(streamSpareParts().map(Part::getActualValue).collect(Collectors.toList()));
+        Money unitsSellValue = getHangar().getUnitCosts(Unit::getSellValue);
+        return streamSpareParts().map(Part::getActualValue)
+            .reduce(unitsSellValue, Money::plus);
     }
 
     /**
@@ -7174,117 +7173,88 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public int getTotalMechBays() {
-        double bays = 0;
-        for (Unit u : getUnits()) {
-            bays += u.getMechCapacity();
-        }
-        return (int)Math.round(bays);
+        return (int)Math.round(getHangar().getUnitsStream()
+            .mapToDouble(Unit::getMechCapacity)
+            .sum());
     }
 
     public int getTotalASFBays() {
-        double bays = 0;
-        for (Unit u : getUnits()) {
-            bays += u.getASFCapacity();
-        }
-        return (int)Math.round(bays);
+        return (int)Math.round(getHangar().getUnitsStream()
+            .mapToDouble(Unit::getASFCapacity)
+            .sum());
     }
 
     public int getTotalSmallCraftBays() {
-        double bays = 0;
-        for (Unit u : getUnits()) {
-            bays += u.getSmallCraftCapacity();
-        }
-        return (int)Math.round(bays);
+        return (int)Math.round(getHangar().getUnitsStream()
+            .mapToDouble(Unit::getSmallCraftCapacity)
+            .sum());
     }
 
     public int getTotalBattleArmorBays() {
-        double bays = 0;
-        for (Unit u : getUnits()) {
-            bays += u.getBattleArmorCapacity();
-        }
-        return (int)Math.round(bays);
+        return (int)Math.round(getHangar().getUnitsStream()
+            .mapToDouble(Unit::getBattleArmorCapacity)
+            .sum());
     }
 
     public int getTotalInfantryBays() {
-        double bays = 0;
-        for (Unit u : getUnits()) {
-            bays += u.getInfantryCapacity();
-        }
-        return (int)Math.round(bays);
+        return (int)Math.round(getHangar().getUnitsStream()
+            .mapToDouble(Unit::getInfantryCapacity)
+            .sum());
     }
 
     public int getTotalHeavyVehicleBays() {
-        double bays = 0;
-        for (Unit u : getUnits()) {
-            bays += u.getHeavyVehicleCapacity();
-        }
-        return (int)Math.round(bays);
+        return (int)Math.round(getHangar().getUnitsStream()
+            .mapToDouble(Unit::getHeavyVehicleCapacity)
+            .sum());
     }
 
     public int getTotalLightVehicleBays() {
-        double bays = 0;
-        for (Unit u : getUnits()) {
-            bays += u.getLightVehicleCapacity();
-        }
-        return (int)Math.round(bays);
+        return (int)Math.round(getHangar().getUnitsStream()
+            .mapToDouble(Unit::getLightVehicleCapacity)
+            .sum());
     }
 
     public int getTotalProtomechBays() {
-        double bays = 0;
-        for (Unit u : getUnits()) {
-            bays += u.getProtomechCapacity();
-        }
-        return (int)Math.round(bays);
+        return (int)Math.round(getHangar().getUnitsStream()
+            .mapToDouble(Unit::getProtomechCapacity)
+            .sum());
     }
 
     public int getTotalDockingCollars() {
-        double collars = 0;
-        for (Unit u : getUnits()) {
-            if (u.getEntity() instanceof Jumpship) {
-                collars += u.getDocks();
-            }
-        }
-        return (int)Math.round(collars);
+        return getHangar().getUnitsStream()
+            .filter(u -> u.getEntity() instanceof Jumpship)
+            .mapToInt(Unit::getDocks)
+            .sum();
     }
 
     public double getTotalInsulatedCargoCapacity() {
-        double capacity = 0;
-        for (Unit u : getUnits()) {
-            capacity += u.getInsulatedCargoCapacity();
-        }
-        return capacity;
+        return getHangar().getUnitsStream()
+            .mapToDouble(Unit::getInsulatedCargoCapacity)
+            .sum();
     }
 
     public double getTotalRefrigeratedCargoCapacity() {
-        double capacity = 0;
-        for (Unit u : getUnits()) {
-            capacity += u.getRefrigeratedCargoCapacity();
-        }
-        return capacity;
+        return getHangar().getUnitsStream()
+            .mapToDouble(Unit::getRefrigeratedCargoCapacity)
+            .sum();
     }
 
     public double getTotalLivestockCargoCapacity() {
-        double capacity = 0;
-        for (Unit u : getUnits()) {
-            capacity += u.getLivestockCargoCapacity();
-        }
-        return capacity;
+        return getHangar().getUnitsStream()
+            .mapToDouble(Unit::getLivestockCargoCapacity)
+            .sum();
     }
 
     public double getTotalLiquidCargoCapacity() {
-        double capacity = 0;
-        for (Unit u : getUnits()) {
-            capacity += u.getLiquidCargoCapacity();
-        }
-        return capacity;
+        return getHangar().getUnitsStream()
+            .mapToDouble(Unit::getLiquidCargoCapacity)
+            .sum();
     }
 
     public double getTotalCargoCapacity() {
-        double capacity = 0;
-        for (Unit u : getUnits()) {
-            capacity += u.getCargoCapacity();
-        }
-        return capacity;
+        return getHangar().getUnitsStream()
+            .mapToDouble(Unit::getCargoCapacity)
+            .sum();
     }
 
     // Liquid not included
@@ -8271,39 +8241,15 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Money getMonthlySpareParts() {
-        Money partsCost = Money.zero();
-
-        for (Unit u : getUnits()) {
-            if (u.isMothballed()) {
-                continue;
-            }
-            partsCost = partsCost.plus(u.getSparePartsCost());
-        }
-        return partsCost;
+        return getHangar().getUnitCosts(u -> !u.isMothballed(), Unit::getSparePartsCost);
     }
 
     public Money getMonthlyFuel() {
-        Money fuelCost = Money.zero();
-
-        for (Unit u : getUnits()) {
-            if (u.isMothballed()) {
-                continue;
-            }
-            fuelCost = fuelCost.plus(u.getFuelCost());
-        }
-        return fuelCost;
+        return getHangar().getUnitCosts(u -> !u.isMothballed(), Unit::getFuelCost);
     }
 
     public Money getMonthlyAmmo() {
-        Money ammoCost = Money.zero();
-
-        for (Unit u : getUnits()) {
-            if (u.isMothballed()) {
-                continue;
-            }
-            ammoCost = ammoCost.plus(u.getAmmoCost());
-        }
-        return ammoCost;
+        return getHangar().getUnitCosts(u -> !u.isMothballed(), Unit::getAmmoCost);
     }
 
     @Override

@@ -1166,7 +1166,7 @@ public class CampaignGUI extends JPanel {
         }
         Vector<Unit> notMaintained = new Vector<>();
         int totalAstechMinutesNeeded = 0;
-        for (Unit u : getCampaign().getUnits()) {
+        for (Unit u : getCampaign().getHangar().getUnits()) {
             if (u.isUnmaintained()) {
                 notMaintained.add(u);
             } else if (u.isPresent() && (u.getEngineer() == null)) {

@@ -678,9 +678,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             }
         });
         choiceOriginalUnit.addItem(null);
-        for (Unit unit : campaign.getUnits()) {
-            choiceOriginalUnit.addItem(unit);
-        }
+        campaign.getHangar().forEachUnit(choiceOriginalUnit::addItem);
         if (null == person.getOriginalUnitId() || null == campaign.getUnit(person.getOriginalUnitId())) {
             choiceOriginalUnit.setSelectedItem(null);
         } else {

@@ -28,10 +28,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import mekhq.MekHqXmlUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -86,6 +88,26 @@ public class Hangar {
      */
     public Stream<Unit> getUnitsStream() {
         return units.values().stream();
+    }
+
+    /**
+     * Calculates the total costs for the units in the hangar.
+     * @param getCosts A function which returns a cost for a unit.
+     * @return The total costs for the units.
+     */
+    public Money getUnitCosts(Function<Unit, Money> getCosts) {
+        return getUnitsStream().map(getCosts).reduce(Money.zero(), Money::plus);
+    }
+
+    /**
+     * Calculates the total costs for the units matching a predicate
+     * in the hangar.
+     * @param predicate A function to use to select a unit.
+     * @param getCosts A function which returns a cost for a selected unit.
+     * @return The total costs for the units selected by the predicate.
+     */
+    public Money getUnitCosts(Predicate<Unit> predicate, Function<Unit, Money> getCosts) {
+        return getUnitsStream().filter(predicate).map(getCosts).reduce(Money.zero(), Money::plus);
     }
 
     /**

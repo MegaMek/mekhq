@@ -36,7 +36,7 @@ public final class UnitTestUtilities {
 
     public static Unit addAndGetUnit(Campaign campaign, Entity entity) {
         campaign.addNewUnit(entity, false, 0);
-        for (Unit unit : campaign.getUnits()) {
+        for (Unit unit : campaign.getHangar().getUnits()) {
             return unit;
         }
 
