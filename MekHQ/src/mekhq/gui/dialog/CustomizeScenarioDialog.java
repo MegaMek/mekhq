@@ -385,7 +385,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 } else {
-                    LocalDate nextMonday = campaign.getLocalDate().with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+                    LocalDate nextMonday = campaign.getLocalDate().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
 
                     if (!dc.getDate().isBefore(nextMonday)) {
                         JOptionPane.showMessageDialog(frame,
