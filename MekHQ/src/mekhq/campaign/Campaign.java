@@ -173,7 +173,7 @@ public class Campaign implements Serializable, ITechManager {
     // all three
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
     // and more still - we're tracking DropShips and WarShips in a separate set so that we can assign units to transports
-    private Map<UUID, Unit> units = new LinkedHashMap<>();
+    private Hangar units = new Hangar();
     private Set<UUID> transportShips = new HashSet<>();
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
     private TreeMap<Integer, Part> parts = new TreeMap<>();
@@ -699,7 +699,7 @@ public class Campaign implements Serializable, ITechManager {
                         p.setOriginalUnitTech(getPerson(pid).getOriginalUnitTech());
                         p.setOriginalUnitId(getPerson(pid).getOriginalUnitId());
                         if (unitAssignments.containsKey(pid)) {
-                            getPersonnelMarket().addPerson(p, getUnit(unitAssignments.get(pid)).getEntity());
+                            getPersonnelMarket().addPerson(p, getHangar().getUnit(unitAssignments.get(pid)).getEntity());
                         } else {
                             getPersonnelMarket().addPerson(p);
                         }
@@ -972,7 +972,9 @@ public class Campaign implements Serializable, ITechManager {
 
     private void addUnit(Unit u) {
         MekHQ.getLogger().info(this, "Adding unit: (" + u.getId() + "):" + u);
-        units.put(u.getId(), u);
+
+        getHangar().addUnit(u);
+
         checkDuplicateNamesDuringAdd(u.getEntity());
 
         //If this is a ship, add it to the list of potential transports
@@ -1020,16 +1022,12 @@ public class Campaign implements Serializable, ITechManager {
         // new
         // unit.
         Unit unit = new Unit(tu.getEntity(), this);
+        getHangar().addUnit(unit);
 
         // we decided we like the test unit so much we are going to keep it
         unit.getEntity().setOwner(player);
         unit.getEntity().setGame(game);
-
-        UUID id = UUID.randomUUID();
-
-        unit.getEntity().setExternalIdAsString(id.toString());
-        unit.setId(id);
-        units.put(id, unit);
+        unit.getEntity().setExternalIdAsString(unit.getId().toString());
 
         // now lets grab the parts from the test unit and set them up with this unit
         for (Part p : tu.getParts()) {
@@ -1060,15 +1058,14 @@ public class Campaign implements Serializable, ITechManager {
      * @param en An <code>Entity</code> object that the new unit will be wrapped around
      */
     public Unit addUnit(Entity en, boolean allowNewPilots, int days) {
+        Unit unit = new Unit(en, this);
+        getHangar().addUnit(unit);
+
         // reset the game object
         en.setOwner(player);
         en.setGame(game);
+        en.setExternalIdAsString(unit.getId().toString());
 
-        UUID id = UUID.randomUUID();
-        en.setExternalIdAsString(id.toString());
-        Unit unit = new Unit(en, this);
-        unit.setId(id);
-        units.put(id, unit);
         unit.initializeBaySpace();
         removeUnitFromForce(unit); // Added to avoid the 'default force bug'
         // when calculating cargo
@@ -1106,8 +1103,15 @@ public class Campaign implements Serializable, ITechManager {
         return unit;
     }
 
+    /**
+     * Gets the current hangar containing the player's units.
+     */
+    public Hangar getHangar() {
+        return units;
+    }
+
     public Collection<Unit> getUnits() {
-        return units.values();
+        return getHangar().getUnits();
     }
 
     public List<Unit> getUnits(boolean weightSorted) {
@@ -1157,7 +1161,7 @@ public class Campaign implements Serializable, ITechManager {
 
     // Since getUnits doesn't return a defensive copy and I don't know what I might break if I made it do so...
     public ArrayList<Unit> getCopyOfUnits() {
-        return new ArrayList<>(units.values());
+        return new ArrayList<>(getHangar().getUnits());
     }
 
     public ArrayList<Entity> getEntities() {
@@ -1169,10 +1173,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Unit getUnit(UUID id) {
-        if (null == id) {
-            return null;
-        }
-        return units.get(id);
+        return getHangar().getUnit(id);
     }
 
     //region Personnel
@@ -2099,16 +2100,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public boolean isWorkingOnRefit(Person p) {
-        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
-            Unit u = mu.getValue();
-            if (u.isRefitting()) {
-                if (null != u.getRefit().getTeamId()
-                        && u.getRefit().getTeamId().equals(p.getId())) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        Unit unit = getHangar().findUnit(u ->
+            u.isRefitting() && Objects.equals(p.getId(), u.getRefit().getTeamId()));
+        return unit != null;
     }
 
     public List<Person> getDoctors() {
@@ -2155,7 +2149,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         if (roll >= target.getValue()) {
             report = report + medWork.succeed();
-            Unit u = getUnit(medWork.getUnitId());
+            Unit u = getHangar().getUnit(medWork.getUnitId());
             if (null != u) {
                 u.resetPilotAndEntity();
             }
@@ -3203,7 +3197,7 @@ public class Campaign implements Serializable, ITechManager {
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
                         for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
-                            Unit u = getUnit(uid);
+                            Unit u = getHangar().getUnit(uid);
                             if ((u != null) && u.isUnderRepair()) {
                                 forceUnderRepair = true;
                                 break;
@@ -3214,7 +3208,7 @@ public class Campaign implements Serializable, ITechManager {
                             forceIds.get(forceId).setScenarioId(s.getId());
                             s.addForces(forceId);
                             for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
-                                Unit u = getUnit(uid);
+                                Unit u = getHangar().getUnit(uid);
                                 if (null != u) {
                                     u.setScenarioId(s.getId());
                                 }
@@ -3374,7 +3368,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 } else if (p.checkNaturalHealing(15)) {
                     addReport(p.getHyperlinkedFullTitle() + " heals naturally!");
-                    Unit u = getUnit(p.getUnitId());
+                    Unit u = getHangar().getUnit(p.getUnitId());
                     if (u != null) {
                         u.resetPilotAndEntity();
                     }
@@ -3383,7 +3377,7 @@ public class Campaign implements Serializable, ITechManager {
             // TODO Advanced Medical needs to go away from here later on
             if (getCampaignOptions().useAdvancedMedical()) {
                 InjuryUtil.resolveDailyHealing(this, p);
-                Unit u = getUnit(p.getUnitId());
+                Unit u = getHangar().getUnit(p.getUnitId());
                 if (u != null) {
                     u.resetPilotAndEntity();
                 }
@@ -3676,24 +3670,19 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Money getMaintenanceCosts() {
-        Money costs = Money.zero();
         if (campaignOptions.payForMaintain()) {
-            for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
-                Unit u = mu.getValue();
-                if (u.requiresMaintenance() && null != u.getTech()) {
-                    costs = costs.plus(u.getMaintenanceCost());
-                }
-            }
+            return getHangar().getUnitsStream()
+                .filter(u -> u.requiresMaintenance() && null != u.getTech())
+                .map(Unit::getMaintenanceCost)
+                .reduce(Money.zero(), (a, b) -> a.plus(b));
         }
-        return costs;
+        return Money.zero();
     }
 
     public Money getWeeklyMaintenanceCosts() {
-        Money costs = Money.zero();
-        for (Map.Entry<UUID, Unit> u : units.entrySet()) {
-            costs = costs.plus(u.getValue().getWeeklyMaintenanceCost());
-        }
-        return costs;
+        return getHangar().getUnitsStream()
+            .map(Unit::getWeeklyMaintenanceCost)
+            .reduce(Money.zero(), (a, b) -> a.plus(b));
     }
 
     public Money getOverheadExpenses() {
@@ -3705,7 +3694,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void removeUnit(UUID id) {
-        Unit unit = getUnit(id);
+        Unit unit = getHangar().getUnit(id);
 
         // remove all parts for this unit as well
         for (Part p : unit.getParts()) {
@@ -3729,7 +3718,8 @@ public class Campaign implements Serializable, ITechManager {
         removeTransportShip(id);
 
         // finally remove the unit
-        units.remove(unit.getId());
+        getHangar().removeUnit(unit.getId());
+
         checkDuplicateNamesDuringDelete(unit.getEntity());
         addReport(unit.getName() + " has been removed from the unit roster.");
         MekHQ.triggerEvent(new UnitRemovedEvent(unit));
@@ -3748,7 +3738,7 @@ public class Campaign implements Serializable, ITechManager {
 
         person.getGenealogy().clearGenealogy(this);
 
-        Unit u = getUnit(person.getUnitId());
+        Unit u = getHangar().getUnit(person.getUnitId());
         if (null != u) {
             u.remove(person, true);
         }
@@ -3786,14 +3776,14 @@ public class Campaign implements Serializable, ITechManager {
      */
     private void awardTrainingXPByMaximumRole(Lance l) {
         for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits(true)) {
-            Unit trainerUnit = getUnit(trainerId);
+            Unit trainerUnit = getHangar().getUnit(trainerId);
 
             // not sure how this occurs, but it probably shouldn't halt processing of a new day.
             if (trainerUnit == null) {
                 continue;
             }
 
-            Person commander = getUnit(trainerId).getCommander();
+            Person commander = trainerUnit.getCommander();
             // AtB 2.31: Training lance – needs a officer with Veteran skill levels
             //           and adds 1xp point to every Green skilled unit.
             if (commander != null && commander.getRank().isOfficer()) {
@@ -3805,7 +3795,7 @@ public class Campaign implements Serializable, ITechManager {
                     // ...and if the commander is better than a veteran, find all of
                     // the personnel under their command...
                     for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits(true)) {
-                        Unit traineeUnit = getUnit(traineeId);
+                        Unit traineeUnit = getHangar().getUnit(traineeId);
 
                         if (traineeUnit == null) {
                             continue;
@@ -3847,15 +3837,14 @@ public class Campaign implements Serializable, ITechManager {
         if (tech == null || tech.getId() == null) {
             return;
         }
-        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
-            Unit u = mu.getValue();
+        getHangar().forEachUnit(u -> {
             if (tech.getId().equals(u.getTechId())) {
                 u.removeTech();
             }
             if (u.getRefit() != null && tech.getId().equals(u.getRefit().getTeamId())) {
                 u.getRefit().setTeamId(null);
             }
-        }
+        });
         for (Part p : getParts()) {
             if (tech.getId().equals(p.getTeamId())) {
                 p.setTeamId(null);
@@ -3923,7 +3912,7 @@ public class Campaign implements Serializable, ITechManager {
         forceIds.remove(fid);
         // clear forceIds of all personnel with this force
         for (UUID uid : force.getUnits()) {
-            Unit u = getUnit(uid);
+            Unit u = getHangar().getUnit(uid);
             if (null == u) {
                 continue;
             }
@@ -3996,7 +3985,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Force getForceFor(Person p) {
-        Unit u = getUnit(p.getUnitId());
+        Unit u = getHangar().getUnit(p.getUnitId());
         if (u != null) {
             return getForceFor(u);
         } else if (p.isTech()) {
@@ -4055,7 +4044,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         for (UUID uid : unitsToCheck) {
-            Unit u = getUnit(uid);
+            Unit u = getHangar().getUnit(uid);
             if (null != u) {
                 u.initializeParts(true);
                 u.runDiagnostic(false);
@@ -4104,7 +4093,7 @@ public class Campaign implements Serializable, ITechManager {
             List<UUID> orphanForceUnitIDs = new ArrayList<>();
 
             for (UUID unitID : force.getUnits()) {
-                if (getUnit(unitID) == null) {
+                if (getHangar().getUnit(unitID) == null) {
                     orphanForceUnitIDs.add(unitID);
                 }
             }
@@ -4330,7 +4319,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void sellUnit(UUID id) {
-        Unit unit = getUnit(id);
+        Unit unit = getHangar().getUnit(id);
         Money sellValue = unit.getSellValue();
         finances.credit(sellValue, Transaction.C_UNIT_SALE,
                 "Sale of " + unit.getName(), getLocalDate());
@@ -4548,7 +4537,7 @@ public class Campaign implements Serializable, ITechManager {
         //endregion Campaign Options
 
         // Lists of objects:
-        writeMapToXml(pw1, indent, "units", units); // Units
+        units.writeToXml(pw1, indent, "units"); // Units
         writeMapToXml(pw1, indent, "personnel", personnel); // Personnel
         writeMapToXml(pw1, indent, "missions", missions); // Missions
         // the forces structure is hierarchical, but that should be handled
@@ -4875,7 +4864,7 @@ public class Campaign implements Serializable, ITechManager {
         if (null == uid) {
             return new ArrayList<>();
         }
-        Unit u = getUnit(uid);
+        Unit u = getHangar().getUnit(uid);
         if (u != null) {
             if (u.isSalvage() || !u.isRepairable()) {
                 return u.getSalvageableParts(onlyNotBeingWorkedOn);
@@ -4890,7 +4879,7 @@ public class Campaign implements Serializable, ITechManager {
         if (null == uid) {
             return new ArrayList<>();
         }
-        Unit u = getUnit(uid);
+        Unit u = getHangar().getUnit(uid);
         if (u != null) {
             return u.getPartsNeeded();
         }
@@ -5316,7 +5305,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void personUpdated(Person p) {
-        Unit u = getUnit(p.getUnitId());
+        Unit u = getHangar().getUnit(p.getUnitId());
         if (null != u) {
             u.resetPilotAndEntity();
         }
@@ -6076,7 +6065,7 @@ public class Campaign implements Serializable, ITechManager {
      *             by a GM and should bypass any costs associated.
      */
     public void hirePersonnelFor(UUID uid, boolean isGM) {
-        Unit unit = getUnit(uid);
+        Unit unit = getHangar().getUnit(uid);
         if (null == unit) {
             return;
         }
@@ -6757,12 +6746,12 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void reloadGameEntities() {
         game.reset();
-        for (Map.Entry<UUID, Unit> u : units.entrySet()) {
-            Entity en = u.getValue().getEntity();
+        getHangar().forEachUnit(u -> {
+            Entity en = u.getEntity();
             if (null != en) {
                 game.addEntity(en.getId(), en);
             }
-        }
+        });
     }
 
     public void completeMission(int id, int status) {
@@ -7003,7 +6992,7 @@ public class Campaign implements Serializable, ITechManager {
     public Money getForceValue(boolean noInfantry) {
         Money value = Money.zero();
         for (UUID uuid : forces.getAllUnits(false)) {
-            Unit u = getUnit(uuid);
+            Unit u = getHangar().getUnit(uuid);
             if (null == u) {
                 continue;
             }
@@ -8194,8 +8183,8 @@ public class Campaign implements Serializable, ITechManager {
                                     // TODO : Fix this so we aren't using a hack that just assumes IS2
                                     p.setOriginalUnitTech(Person.TECH_IS2);
                                 }
-                                if (null != p.getUnitId() && null != units.get(p.getUnitId())
-                                        && ms.getName().equals(units.get(p.getUnitId()).getEntity().getShortNameRaw())) {
+                                if (null != p.getUnitId() && null != getHangar().getUnit(p.getUnitId())
+                                        && ms.getName().equals(getHangar().getUnit(p.getUnitId()).getEntity().getShortNameRaw())) {
                                     p.setOriginalUnitId(p.getUnitId());
                                 }
                             }
