@@ -37,6 +37,7 @@ import megamek.common.MechBay;
 import megamek.common.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
@@ -52,6 +53,7 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
@@ -71,6 +73,7 @@ public class CampaignOpsReputationTest {
 
     private Campaign mockCampaign;
     private CampaignOptions mockCampaignOptions;
+    private Hangar mockHangar;
     private List<Unit> unitList;
     private List<Person> personnelList;
     private List<Person> activePersonnelList;
@@ -208,6 +211,8 @@ public class CampaignOpsReputationTest {
         Faction mockFaction = mock(Faction.class);
         when(mockFaction.is(any())).thenReturn(true);
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        mockHangar = mock(Hangar.class);
+        when(mockCampaign.getHangar()).thenReturn(mockHangar);
 
         mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.getManualUnitRatingModifier()).thenReturn(0);
@@ -282,7 +287,7 @@ public class CampaignOpsReputationTest {
         mockFinances = mock(Finances.class);
         when(mockFinances.isInDebt()).thenReturn(false);
 
-        doReturn(unitList).when(mockCampaign).getCopyOfUnits();
+        when(mockHangar.getUnits()).thenReturn(unitList);
         doReturn(personnelList).when(mockCampaign).getPersonnel();
         doReturn(activePersonnelList).when(mockCampaign).getActivePersonnel();
         doReturn(astechs).when(mockCampaign).getAstechPool();
@@ -363,7 +368,7 @@ public class CampaignOpsReputationTest {
     }
 
     private void buildFreshCampaign() {
-        doReturn(new ArrayList<Unit>(0)).when(mockCampaign).getCopyOfUnits();
+        when(mockHangar.getUnits()).thenReturn(Collections.emptyList());
         doReturn(new ArrayList<Person>(0)).when(mockCampaign).getPersonnel();
         doReturn(new ArrayList<Person>(0)).when(mockCampaign).getActivePersonnel();
         doReturn(new ArrayList<Person>(0)).when(mockCampaign).getAdmins();

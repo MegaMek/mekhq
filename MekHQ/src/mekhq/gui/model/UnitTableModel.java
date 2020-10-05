@@ -303,7 +303,7 @@ public class UnitTableModel extends DataTableModel {
     }
 
     public void refreshData() {
-        setData(getCampaign().getCopyOfUnits());
+        setData(new ArrayList<>(getCampaign().getHangar().getUnits()));
     }
 
     public TableCellRenderer getRenderer(boolean graphic, IconPackage icons) {

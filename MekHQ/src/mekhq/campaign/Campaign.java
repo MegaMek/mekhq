@@ -1113,11 +1113,6 @@ public class Campaign implements Serializable, ITechManager {
         return getHangar().getUnits();
     }
 
-    // Since getUnits doesn't return a defensive copy and I don't know what I might break if I made it do so...
-    public ArrayList<Unit> getCopyOfUnits() {
-        return new ArrayList<>(getHangar().getUnits());
-    }
-
     public ArrayList<Entity> getEntities() {
         ArrayList<Entity> entities = new ArrayList<>();
         for (Unit unit : getUnits()) {
