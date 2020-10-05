@@ -628,7 +628,8 @@ public class GMToolsDialog extends JDialog {
         currentName.setText(getPerson().getFullName());
 
         // Gender is set based on the person's gender
-        genderPicker.setSelectedItem(getPerson().getGender().getExternalVariant());
+        genderPicker.setSelectedItem(person.getGender().isExternal() ? person.getGender()
+                : getPerson().getGender().getExternalVariant());
 
         // Current Callsign is set if applicable
         if (!StringUtil.isNullOrEmpty(getPerson().getCallsign())) {
