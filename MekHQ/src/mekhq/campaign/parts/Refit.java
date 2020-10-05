@@ -464,12 +464,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     updateRefitClass(CLASS_C);
                 }
                 if (movedPart instanceof EquipmentPart) {
-                    //TODO: set this as salvaging
-                    //boolean isSalvaging = movedPart.isSalvaging();
-                    //movedPart.setSalvaging(true);
-                    //movedPart.updateConditionFromEntity(false);
-                    time += movedPart.getBaseTime();
-                    //movedPart.setSalvaging(isSalvaging);
+                    // Use equivalent MissingEquipmentPart install time
+                    time += movedPart.getMissingPart().getBaseTime();
                 }
             } else {
                 //its a new part
