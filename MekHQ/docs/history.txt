@@ -1,6 +1,10 @@
 VERSION HISTORY:
 ----------------
-0.47.11-SNAPSHOT
+0.47.12-SNAPSHOT 
++ Issue #1970: Workaround for single hex ecm causing smallcraft to be overweight
++ Issue #1079: Add refit time for moving a part between locations
+
+0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo
 + Issue #2032: Fixing Campaign Options Save following Preset Load
 + PR #2023: Moving StartGameDelay to MekHQOptions
@@ -56,6 +60,8 @@ VERSION HISTORY:
 + Issue #1079: Carrying out a refit no longer fixes shoulder/hip damage "for free"; legs with busted hips and center torsos no longer added to inventory after being removed from mech during refit
 + PR #2093: Loot Table: Fixing Money Capitalization and Adding Basic Unit/Part Tooltips
 + News data upgrade
++ PR #2109: News Validation
++ PR #2110: Campaign Preset Update
 
 0.47.10 (2020-09-20 2100 UTC)
 + PR #1896: Campaign writeToXml: Fixing Output Spacing Issues

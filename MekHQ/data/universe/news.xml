@@ -1217,7 +1217,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 		<location>Kathil</location>
 	</newsItem>
 	<newsItem>
-		<headline>Rumors stirring of new <em>Phoenix Hawks</em> in Federated Commonwealth</headline><!-- Source: MUL Online -->
+		<headline><![CDATA[Rumors stirring of new <em>Phoenix Hawks</em> in Federated Commonwealth]]></headline><!-- Source: MUL Online -->
 		<date>3043</date>
 		<desc><![CDATA[<p>Several sources on contested planets near the Federated Commonwealth border have indicated that a new model of <em>Phoenix Hawk</em> have been sighted. An ancient design, unmistakable BattleMech has rumored to be packing more of a punch than usual while staying out of range of its opponents. The AFFC media liason has not returned any requests for verification of this information so we can only speculate on what this means.</p>]]></desc>
 		<service>FBC</service>

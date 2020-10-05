@@ -60,6 +60,7 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
+import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
@@ -162,6 +163,13 @@ public class Refit extends Part implements IAcquisitionWork {
         newEntity = newEn;
         newEntity.setOwner(oldUnit.getEntity().getOwner());
         newEntity.setGame(oldUnit.getEntity().getGame());
+        if (newEntity.getClass() == SmallCraft.class) { // SmallCraft but not subclasses
+            // Entity.setGame() will add a Single Hex ECM part to SmallCraft that otherwise has no ECM
+            // This is required for MegaMek, but causes SmallCraft to be overweight when refitting in MekHQ
+            // Work-around is to remove the ECM part early during a refit
+            // Ref: https://github.com/MegaMek/mekhq/issues/1970
+            newEntity.removeMisc(BattleArmor.SINGLE_HEX_ECM);
+        }
         failedCheck = false;
         timeSpent = 0;
         fixableString = null;
@@ -451,12 +459,8 @@ public class Refit extends Part implements IAcquisitionWork {
                     updateRefitClass(CLASS_C);
                 }
                 if (movedPart instanceof EquipmentPart) {
-                    //TODO: set this as salvaging
-                    //boolean isSalvaging = movedPart.isSalvaging();
-                    //movedPart.setSalvaging(true);
-                    //movedPart.updateConditionFromEntity(false);
-                    time += movedPart.getBaseTime();
-                    //movedPart.setSalvaging(isSalvaging);
+                    // Use equivalent MissingEquipmentPart install time
+                    time += movedPart.getMissingPart().getBaseTime();
                 }
             } else {
                 //its a new part

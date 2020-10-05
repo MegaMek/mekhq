@@ -31,6 +31,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.common.util.StringUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -59,9 +60,9 @@ public class News {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             unmarshaller = context.createUnmarshaller();
             // For debugging only!
-            unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
+            //unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(News.class, e);
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -93,7 +94,7 @@ public class News {
             archive = new HashMap<>();
             news = new HashMap<>();
             int id = 0;
-            MekHQ.getLogger().info(this, "Starting load of news data for " + year + " from XML...");
+            MekHQ.getLogger().debug("Starting load of news data for " + year + " from XML...");
 
             // Initialize variables.
             Document xmlDoc;
@@ -105,7 +106,7 @@ public class News {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(this, ex);
+                MekHQ.getLogger().error(ex);
                 return;
             }
 
@@ -120,8 +121,9 @@ public class News {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn = nl.item(x);
 
-                if (wn.getParentNode() != newsEle)
+                if (!wn.getParentNode().equals(newsEle)) {
                     continue;
+                }
 
                 int xc = wn.getNodeType();
 
@@ -137,13 +139,19 @@ public class News {
                         try {
                             newsItem = (NewsItem) unmarshaller.unmarshal(wn);
                         } catch (JAXBException e) {
-                            MekHQ.getLogger().error(this, e);
+                            MekHQ.getLogger().error(e);
                             continue;
                         }
-                        if (null == newsItem.getDate()) {
-                            MekHQ.getLogger().error(this, "The date is null for news Item " + newsItem.getHeadline());
-                        }
-                        if (!newsItem.isInYear(year)) {
+                        if (StringUtil.isNullOrEmpty(newsItem.getHeadline())) {
+                            MekHQ.getLogger().error("Null or empty headline for a news item");
+                            continue;
+                        } else if (null == newsItem.getDate()) {
+                            MekHQ.getLogger().error("The date is null for news Item " + newsItem.getHeadline());
+                            continue;
+                        } else if (StringUtil.isNullOrEmpty(newsItem.getDescription())) {
+                            MekHQ.getLogger().error("Null or empty headline for a news item");
+                            continue;
+                        } else if (!newsItem.isInYear(year)) {
                             continue;
                         }
                         List<NewsItem> items;
@@ -160,7 +168,7 @@ public class News {
                     }
                 }
             }
-            MekHQ.getLogger().info(this, "loaded " + archive.size() + " days of news items for " + year);
+            MekHQ.getLogger().debug("Loaded " + archive.size() + " days of news items for " + year);
         }
     }
 }
