@@ -53,7 +53,6 @@ import mekhq.service.IAutosaveService;
 
 import megamek.common.*;
 import megamek.common.enums.Gender;
-import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.generator.RandomGenderGenerator;
