@@ -1933,7 +1933,7 @@ public class CampaignGUI extends JPanel {
 
             // Add the units from the file.
             for (Entity entity : parser.getEntities()) {
-                getCampaign().addUnit(entity, allowNewPilots, 0);
+                getCampaign().addNewUnit(entity, allowNewPilots, 0);
             }
 
             // TODO : re-add any ejected pilots

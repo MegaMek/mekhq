@@ -365,7 +365,7 @@ public class PersonnelMarketDialog extends JDialog {
 				campaign.getLocalDate())) {
 			return;
 		}
-		campaign.addUnit(en, false, 0);
+		campaign.addNewUnit(en, false, 0);
 		Unit unit = null;
 		for (Unit u : campaign.getUnits()) {
 			if (u.getEntity() == en) {

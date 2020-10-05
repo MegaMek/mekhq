@@ -666,7 +666,7 @@ public class Campaign implements Serializable, ITechManager {
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(cost, Transaction.C_UNIT, "Purchased " + en.getShortName(), getLocalDate());
-        addUnit(en, true, transitDays);
+        addNewUnit(en, true, transitDays);
         if (!getCampaignOptions().getInstantUnitMarketDelivery()) {
             addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
         }
@@ -967,11 +967,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param u A {@link Unit} to import into the campaign.
      */
     public void importUnit(Unit u) {
-        addUnit(u);
-    }
-
-    private void addUnit(Unit u) {
-        MekHQ.getLogger().info(this, "Adding unit: (" + u.getId() + "):" + u);
+        MekHQ.getLogger().debug("Importing unit: (" + u.getId() + "): " + u.getName());
 
         getHangar().addUnit(u);
 
@@ -980,7 +976,7 @@ public class Campaign implements Serializable, ITechManager {
         //If this is a ship, add it to the list of potential transports
         //Jumpships and space stations are intentionally ignored at present, because this functionality is being
         //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
-        if (u.getEntity() != null && (u.getEntity() instanceof Dropship || u.getEntity() instanceof Warship)) {
+        if ((u.getEntity() instanceof Dropship) || (u.getEntity() instanceof Warship)) {
             addTransportShip(u.getId());
         }
 
@@ -988,6 +984,7 @@ public class Campaign implements Serializable, ITechManager {
         if (Entity.NONE == u.getEntity().getId()) {
             u.getEntity().setId(game.getNextEntityId());
         }
+
         game.addEntity(u.getEntity().getId(), u.getEntity());
     }
 
@@ -997,7 +994,8 @@ public class Campaign implements Serializable, ITechManager {
      * @param id - The unique ID of the ship we want to add to this Set
      */
     public void addTransportShip(UUID id) {
-        MekHQ.getLogger().info(this, "Adding DropShip/WarShip: " + id);
+        MekHQ.getLogger().debug("Adding DropShip/WarShip: " + id);
+
         transportShips.add(id);
     }
 
@@ -1007,7 +1005,8 @@ public class Campaign implements Serializable, ITechManager {
      * @param id - The unique ID of the ship we want to remove from this Set
      */
     public void removeTransportShip(UUID id) {
-        MekHQ.getLogger().info(this, "Removing DropShip/WarShip: " + id);
+        MekHQ.getLogger().debug("Removing DropShip/WarShip: " + id);
+
         transportShips.remove(id);
     }
 
@@ -1053,11 +1052,11 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * Add a unit to the campaign. This is only for new units
+     * Add a new unit to the campaign.
      *
      * @param en An <code>Entity</code> object that the new unit will be wrapped around
      */
-    public Unit addUnit(Entity en, boolean allowNewPilots, int days) {
+    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days) {
         Unit unit = new Unit(en, this);
         getHangar().addUnit(unit);
 
@@ -1073,7 +1072,7 @@ public class Campaign implements Serializable, ITechManager {
         //If this is a ship, add it to the list of potential transports
         //Jumpships and space stations are intentionally ignored at present, because this functionality is being
         //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
-        if (unit.getEntity() != null && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Warship)) {
+        if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Warship)) {
             addTransportShip(id);
         }
 
@@ -4307,13 +4306,13 @@ public class Campaign implements Serializable, ITechManager {
         if (campaignOptions.payForUnits()) {
             if (finances.debit(cost, Transaction.C_UNIT,
                     "Purchased " + en.getShortName(), getLocalDate())) {
-                addUnit(en, false, days);
+                addNewUnit(en, false, days);
                 return true;
             } else {
                 return false;
             }
         } else {
-            addUnit(en, false, days);
+            addNewUnit(en, false, days);
             return true;
         }
     }
