@@ -43,71 +43,71 @@ import mekhq.campaign.work.WorkTime;
  */
 public abstract class MissingPart extends Part implements Serializable, MekHqXmlSerializable, IPartWork, IAcquisitionWork {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 300672661487966982L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 300672661487966982L;
 
-	public MissingPart(int tonnage, Campaign c) {
-	    super(tonnage, false, c);
-	}
+    public MissingPart(int tonnage, Campaign c) {
+        super(tonnage, false, c);
+    }
 
-	public MissingPart(int tonnage, boolean isOmniPodded, Campaign c) {
-		super(tonnage, isOmniPodded, c);
-	}
+    public MissingPart(int tonnage, boolean isOmniPodded, Campaign c) {
+        super(tonnage, isOmniPodded, c);
+    }
 
-	public MissingPart clone() {
-		//should never be called
-		return null;
-	}
+    public MissingPart clone() {
+        //should never be called
+        return null;
+    }
 
-	@Override
-	public Money getStickerPrice() {
-		//missing parts aren't worth a thing
-		return Money.zero();
-	}
+    @Override
+    public Money getStickerPrice() {
+        //missing parts aren't worth a thing
+        return Money.zero();
+    }
 
-	@Override
-	public Money getBuyCost() {
-	    return getNewPart().getStickerPrice();
-	}
+    @Override
+    public Money getBuyCost() {
+        return getNewPart().getStickerPrice();
+    }
 
-	@Override
-	public boolean isSalvaging() {
-		return false;
-	}
+    @Override
+    public boolean isSalvaging() {
+        return false;
+    }
 
-	@Override
-	public String getStatus() {
-		return "Destroyed";
-	}
+    @Override
+    public String getStatus() {
+        return "Destroyed";
+    }
 
-	@Override
-	public boolean isSamePartType(Part part) {
-		//missing parts should always return false
-		return false;
-	}
+    @Override
+    public boolean isSamePartType(Part part) {
+        //missing parts should always return false
+        return false;
+    }
 
-	public String getDesc() {
-		String bonus = getAllMods(null).getValueAsString();
-		if (getAllMods(null).getValue() > -1) {
-			bonus = "+" + bonus;
-		}
-		bonus = "(" + bonus + ")";
-		String toReturn = "<html><font size='2'";
-		String scheduled = "";
-		if (getTeamId() != null) {
-			scheduled = " (scheduled) ";
-		}
+    public String getDesc() {
+        String bonus = getAllMods(null).getValueAsString();
+        if (getAllMods(null).getValue() > -1) {
+            bonus = "+" + bonus;
+        }
+        bonus = "(" + bonus + ")";
+        String toReturn = "<html><font size='2'";
+        String scheduled = "";
+        if (getTeamId() != null) {
+            scheduled = " (scheduled) ";
+        }
 
-		//if (this instanceof ReplacementItem
-		//		&& !((ReplacementItem) this).hasPart()) {
-		//	toReturn += " color='white'";
-		//}
-		toReturn += ">";
-		toReturn += "<b>Replace " + getName() + "</b><br/>";
-		toReturn += getDetails() + "<br/>";
-		if(getSkillMin() > SkillType.EXP_ELITE) {
+        //if (this instanceof ReplacementItem
+        //		&& !((ReplacementItem) this).hasPart()) {
+        //	toReturn += " color='white'";
+        //}
+        toReturn += ">";
+        toReturn += "<b>Replace " + getName() + "</b><br/>";
+        toReturn += getDetails() + "<br/>";
+        if(getSkillMin() > SkillType.EXP_ELITE) {
             toReturn += "<font color='red'>Impossible</font>";
         } else {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
@@ -119,134 +119,134 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
                 toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
             }
         }
-		toReturn += "</font></html>";
-		return toReturn;
-	}
+        toReturn += "</font></html>";
+        return toReturn;
+    }
 
-	@Override
-	public String succeed() {
-		fix();
-		return " <font color='green'><b> replaced.</b></font>";
-	}
+    @Override
+    public String succeed() {
+        fix();
+        return " <font color='green'><b> replaced.</b></font>";
+    }
 
-	@Override
-	public void fix() {
-		Part replacement = findReplacement(false);
-		if(null != replacement) {
-			Part actualReplacement = replacement.clone();
-			unit.addPart(actualReplacement);
-			campaign.addPart(actualReplacement, 0);
-			replacement.decrementQuantity();
-			remove(false);
-			//assign the replacement part to the unit
-			actualReplacement.updateConditionFromPart();
-		}
-	}
+    @Override
+    public void fix() {
+        Part replacement = findReplacement(false);
+        if(null != replacement) {
+            Part actualReplacement = replacement.clone();
+            unit.addPart(actualReplacement);
+            campaign.addPart(actualReplacement, 0);
+            replacement.decrementQuantity();
+            remove(false);
+            //assign the replacement part to the unit
+            actualReplacement.updateConditionFromPart();
+        }
+    }
 
-	@Override
-	public void remove(boolean salvage) {
-		campaign.removePart(this);
-		if(null != unit) {
-			unit.removePart(this);
-		}
-		setUnit(null);
-		if (null != parentPart) {
-		    parentPart.removeChildPart(this);
-		}
-	}
+    @Override
+    public void remove(boolean salvage) {
+        campaign.removePart(this);
+        if(null != unit) {
+            unit.removePart(this);
+        }
+        setUnit(null);
+        if (null != parentPart) {
+            parentPart.removeChildPart(this);
+        }
+    }
 
-	public abstract boolean isAcceptableReplacement(Part part, boolean refit);
+    public abstract boolean isAcceptableReplacement(Part part, boolean refit);
 
-	public Part findReplacement(boolean refit) {
-		Part bestPart = null;
+    public Part findReplacement(boolean refit) {
+        Part bestPart = null;
 
-		//check to see if we already have a replacement assigned
-		if (hasReplacementPart()) {
-			return getReplacementPart();
+        //check to see if we already have a replacement assigned
+        if (hasReplacementPart()) {
+            return getReplacementPart();
         }
 
-		// don't just return with the first part if it is damaged
-		for(Part part : campaign.getSpareParts()) {
-			if (part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent() || part.hasParentPart() || part.isUsedForRefitPlanning()) {
-				continue;
-			}
+        // don't just return with the first part if it is damaged
+        for(Part part : campaign.getSpareParts()) {
+            if (part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent() || part.hasParentPart() || part.isUsedForRefitPlanning()) {
+                continue;
+            }
 
-			if(isAcceptableReplacement(part, refit)) {
-				if(null == bestPart) {
-					bestPart = part;
-				} else if(bestPart.needsFixing() && !part.needsFixing()) {
-					bestPart = part;
-				} else if (bestPart.getQuality() < part.getQuality()) {
-				    bestPart = part;
+            if(isAcceptableReplacement(part, refit)) {
+                if(null == bestPart) {
+                    bestPart = part;
+                } else if(bestPart.needsFixing() && !part.needsFixing()) {
+                    bestPart = part;
+                } else if (bestPart.getQuality() < part.getQuality()) {
+                    bestPart = part;
                 }
-			}
-		}
-		return bestPart;
-	}
+            }
+        }
+        return bestPart;
+    }
 
-	public boolean isReplacementAvailable() {
-		return null != findReplacement(false);
-	}
+    public boolean isReplacementAvailable() {
+        return null != findReplacement(false);
+    }
 
-	@Override
+    @Override
     public String getDetails() {
         return getDetails(true);
     }
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-		if(isReplacementAvailable()) {
-			return "Replacement part available";
-		} else {
-			PartInventory inventories = campaign.getPartInventory(getNewPart());
-			return "<font color='red'>No replacement (" + inventories.getTransitOrderedDetails() + ")</font>";
-		}
+        if(isReplacementAvailable()) {
+            return "Replacement part available";
+        } else {
+            PartInventory inventories = campaign.getPartInventory(getNewPart());
+            return "<font color='red'>No replacement (" + inventories.getTransitOrderedDetails() + ")</font>";
+        }
     }
 
-	@Override
-	public boolean needsFixing() {
-		//missing parts always need fixing
-		if(null != unit) {
-			return (!unit.isSalvage() || null != getTeamId()) && unit.isRepairable();
-		}
-		return false;
-	}
+    @Override
+    public boolean needsFixing() {
+        //missing parts always need fixing
+        if(null != unit) {
+            return (!unit.isSalvage() || null != getTeamId()) && unit.isRepairable();
+        }
+        return false;
+    }
 
-	@Override
-	public MissingPart getMissingPart() {
-		//do nothing - this should never be accessed
-		return null;
-	}
+    @Override
+    public MissingPart getMissingPart() {
+        //do nothing - this should never be accessed
+        return null;
+    }
 
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		//do nothing
-	}
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        //do nothing
+    }
 
-	@Override
-	public String fail(int rating) {
-		skillMin = ++rating;
-		timeSpent = 0;
-		shorthandedMod = 0;
-		if(skillMin > SkillType.EXP_ELITE) {
-			Part part = findReplacement(false);
-			if(null != part) {
-				part.decrementQuantity();
-				skillMin = SkillType.EXP_GREEN;
-			}
-			return " <font color='red'><b> failed and part destroyed.</b></font>";
-		} else {
-			return " <font color='red'><b> failed.</b></font>";
-		}
-	}
+    @Override
+    public String fail(int rating) {
+        skillMin = ++rating;
+        timeSpent = 0;
+        shorthandedMod = 0;
+        if(skillMin > SkillType.EXP_ELITE) {
+            Part part = findReplacement(false);
+            if(null != part) {
+                part.decrementQuantity();
+                skillMin = SkillType.EXP_GREEN;
+            }
+            return " <font color='red'><b> failed and part destroyed.</b></font>";
+        } else {
+            return " <font color='red'><b> failed.</b></font>";
+        }
+    }
 
-	@Override
-	public boolean canChangeWorkMode() {
-	    return !isOmniPodded();
-	}
+    @Override
+    public boolean canChangeWorkMode() {
+        return !isOmniPodded();
+    }
 
-	@Override
-	public TargetRoll getAllAcquisitionMods() {
+    @Override
+    public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
         if(getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
@@ -268,169 +268,169 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         return target;
     }
 
-	@Override
-	public String getAcquisitionDesc() {
-		String toReturn = "<html><font size='2'";
+    @Override
+    public String getAcquisitionDesc() {
+        String toReturn = "<html><font size='2'";
 
-		toReturn += ">";
-		toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
-		PartInventory inventories = campaign.getPartInventory(getNewPart());
-		toReturn += inventories.getTransitOrderedDetails();
-		if (!isOmniPodded()) {
-		    Part newPart = getAcquisitionPart();
-		    newPart.setOmniPodded(true);
-		    inventories = campaign.getPartInventory(newPart);
-		    if (inventories.getSupply() > 0) {
-		        toReturn += ", " + inventories.supplyAsString() + " OmniPod";
-		    }
-		}
-		toReturn += "<br/>";
-		toReturn += getBuyCost().toAmountAndSymbolString() + "<br/>";
-		toReturn += "</font></html>";
-		return toReturn;
-	}
+        toReturn += ">";
+        toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
+        PartInventory inventories = campaign.getPartInventory(getNewPart());
+        toReturn += inventories.getTransitOrderedDetails();
+        if (!isOmniPodded()) {
+            Part newPart = getAcquisitionPart();
+            newPart.setOmniPodded(true);
+            inventories = campaign.getPartInventory(newPart);
+            if (inventories.getSupply() > 0) {
+                toReturn += ", " + inventories.supplyAsString() + " OmniPod";
+            }
+        }
+        toReturn += "<br/>";
+        toReturn += getBuyCost().toAmountAndSymbolString() + "<br/>";
+        toReturn += "</font></html>";
+        return toReturn;
+    }
 
     @Override
     public String getAcquisitionDisplayName() {
-    	return getAcquisitionName();
+        return getAcquisitionName();
     }
 
-	@Override
-	public String getAcquisitionExtraDesc() {
-		return "";
-	}
+    @Override
+    public String getAcquisitionExtraDesc() {
+        return "";
+    }
 
-	@Override
+    @Override
     public String getAcquisitionBonus() {
-		String bonus = getAllAcquisitionMods().getValueAsString();
-		if(getAllAcquisitionMods().getValue() > -1) {
-			bonus = "+" + bonus;
-		}
+        String bonus = getAllAcquisitionMods().getValueAsString();
+        if(getAllAcquisitionMods().getValue() > -1) {
+            bonus = "+" + bonus;
+        }
 
-		return "(" + bonus + ")";
+        return "(" + bonus + ")";
     }
 
-	@Override
-	public Part getAcquisitionPart() {
-		return getNewPart();
-	}
+    @Override
+    public Part getAcquisitionPart() {
+        return getNewPart();
+    }
 
-	@Override
-	public String find(int transitDays) {
-		Part newPart = getNewPart();
-		newPart.setBrandNew(true);
-		newPart.setDaysToArrival(transitDays);
-		if(campaign.buyPart(newPart, transitDays)) {
-		    return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
-		} else {
-		    return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
-		}
-	}
+    @Override
+    public String find(int transitDays) {
+        Part newPart = getNewPart();
+        newPart.setBrandNew(true);
+        newPart.setDaysToArrival(transitDays);
+        if(campaign.buyPart(newPart, transitDays)) {
+            return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
+        } else {
+            return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+        }
+    }
 
-	@Override
-	public Object getNewEquipment() {
-	    return getNewPart();
-	}
+    @Override
+    public Object getNewEquipment() {
+        return getNewPart();
+    }
 
-	public abstract Part getNewPart();
+    public abstract Part getNewPart();
 
-	@Override
-	public String failToFind() {
-		return "<font color='red'><b> part not found</b>.</font>";
-	}
+    @Override
+    public String failToFind() {
+        return "<font color='red'><b> part not found</b>.</font>";
+    }
 
-	@Override
-	public void writeToXmlBegin(PrintWriter pw1, int indent) {
-		super.writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<daysToWait>"
-				+daysToWait
+    @Override
+    public void writeToXmlBegin(PrintWriter pw1, int indent) {
+        super.writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<daysToWait>"
+                +daysToWait
                 +"</daysToWait>");
         if (hasReplacementPart()) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "replacementId", getReplacementPart().getId());
         }
-	}
+    }
 
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		writeToXmlEnd(pw1, indent);
-	}
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	public String checkScrappable() {
-		if(!isReplacementAvailable()) {
-			return "Nothing to scrap";
-		}
-		return null;
-	}
+    @Override
+    public String checkScrappable() {
+        if(!isReplacementAvailable()) {
+            return "Nothing to scrap";
+        }
+        return null;
+    }
 
-	@Override
-	public String scrap() {
+    @Override
+    public String scrap() {
         Part replace = findReplacement(false);
-		if(null != replace) {
-			replace.decrementQuantity();
+        if(null != replace) {
+            replace.decrementQuantity();
             return replace.getName() + " scrapped.";
         }
 
-		skillMin = SkillType.EXP_GREEN;
+        skillMin = SkillType.EXP_GREEN;
 
         return getName() + " scrapped.";
-	}
+    }
 
-	@Override
-	public String getAcquisitionName() {
-	    String details = getNewPart().getDetails();
-	    details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
-		return getPartName() + " " + details;
-	}
+    @Override
+    public String getAcquisitionName() {
+        String details = getNewPart().getDetails();
+        details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
+        return getPartName() + " " + details;
+    }
 
-	@Override
-	public int getTechLevel() {
-		return getNewPart().getTechLevel();
-	}
+    @Override
+    public int getTechLevel() {
+        return getNewPart().getTechLevel();
+    }
 
-	@Override
-	public void reservePart() {
-		//this is being set as an overnight repair, so
-		//we also need to reserve the replacement. If the
-		//quantity of the replacement is more than one, we will
-		//also need to split off a separate one
-		//shouldn't be null, but it never hurts to check
-		Part replacement = findReplacement(false);
-		UUID teamId = getTeamId();
-		if ((null != replacement) &&(null != teamId)) {
-			if (replacement.getQuantity() > 1) {
-				Part actualReplacement = replacement.clone();
-				actualReplacement.setReserveId(teamId);
+    @Override
+    public void reservePart() {
+        //this is being set as an overnight repair, so
+        //we also need to reserve the replacement. If the
+        //quantity of the replacement is more than one, we will
+        //also need to split off a separate one
+        //shouldn't be null, but it never hurts to check
+        Part replacement = findReplacement(false);
+        UUID teamId = getTeamId();
+        if ((null != replacement) &&(null != teamId)) {
+            if (replacement.getQuantity() > 1) {
+                Part actualReplacement = replacement.clone();
+                actualReplacement.setReserveId(teamId);
                 campaign.addPart(actualReplacement, 0);
                 setReplacementPart(actualReplacement);
-				replacement.decrementQuantity();
-			} else {
+                replacement.decrementQuantity();
+            } else {
                 replacement.setReserveId(teamId);
                 setReplacementPart(replacement);
-			}
-		}
-	}
+            }
+        }
+    }
 
-	@Override
-	public void cancelReservation() {
-		Part replacement = findReplacement(false);
-		if (hasReplacementPart() && (null != replacement)) {
-			setReplacementPart(null);
-			replacement.setReserveId(null);
-			if (replacement.isSpare()) {
-				Part spare = campaign.checkForExistingSparePart(replacement);
-				if (null != spare) {
-					spare.incrementQuantity();
-					campaign.removePart(replacement);
-				}
-			}
-		}
-	}
+    @Override
+    public void cancelReservation() {
+        Part replacement = findReplacement(false);
+        if (hasReplacementPart() && (null != replacement)) {
+            setReplacementPart(null);
+            replacement.setReserveId(null);
+            if (replacement.isSpare()) {
+                Part spare = campaign.checkForExistingSparePart(replacement);
+                if (null != spare) {
+                    spare.incrementQuantity();
+                    campaign.removePart(replacement);
+                }
+            }
+        }
+    }
 
-	@Override
-	public boolean needsMaintenance() {
+    @Override
+    public boolean needsMaintenance() {
         return false;
     }
 
