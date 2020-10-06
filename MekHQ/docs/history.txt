@@ -7,6 +7,7 @@ VERSION HISTORY:
 + PR #2105: Avoid part ID references in Refits and elsewhere
 + Issue #2115: Fixing GM Tool Gender load
 + PR #2122: Fixing Scenario Date Compare
++ Issue #1265: Option to Subtract Salvage Overages from Final Contract Payment
 
 0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo
