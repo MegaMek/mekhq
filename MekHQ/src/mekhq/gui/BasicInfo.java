@@ -135,7 +135,7 @@ public class BasicInfo extends JPanel {
         if (null == MHQStaticDirectoryManager.getMechTileset()) {
             return null;
         }
-        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity(), -1);
+        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
         if (null == base) {
             return null;
         }
