@@ -3587,58 +3587,6 @@ public class Campaign implements Serializable, ITechManager {
         return null;
     }
 
-    public Money getPayRoll() {
-        return getPayRoll(false);
-    }
-
-    public Money getPayRoll(boolean noInfantry) {
-        if (getCampaignOptions().payForSalaries()) {
-            return getTheoreticalPayroll(noInfantry);
-        } else {
-            return Money.zero();
-        }
-    }
-
-    private Money getTheoreticalPayroll(boolean noInfantry) {
-        Money salaries = Money.zero();
-        for (Person p : getActivePersonnel()) {
-            // Optionized infantry (Unofficial)
-            if (!(noInfantry && (p.getPrimaryRole() == Person.T_INFANTRY))) {
-                salaries = salaries.plus(p.getSalary());
-            }
-        }
-        // add in astechs from the astech pool
-        // we will assume Mech Tech * able-bodied * enlisted (changed from vee mechanic)
-        // 800 * 0.5 * 0.6 = 240
-        salaries = salaries.plus(240.0 * astechPool);
-        salaries = salaries.plus(320.0 * medicPool);
-        return salaries;
-    }
-
-    public Money getMaintenanceCosts() {
-        if (campaignOptions.payForMaintain()) {
-            return getHangar().getUnitsStream()
-                .filter(u -> u.requiresMaintenance() && (null != u.getTech()))
-                .map(Unit::getMaintenanceCost)
-                .reduce(Money.zero(), (a, b) -> a.plus(b));
-        }
-        return Money.zero();
-    }
-
-    public Money getWeeklyMaintenanceCosts() {
-        return getHangar().getUnitsStream()
-            .map(Unit::getWeeklyMaintenanceCost)
-            .reduce(Money.zero(), (a, b) -> a.plus(b));
-    }
-
-    public Money getOverheadExpenses() {
-        if (getCampaignOptions().payForOverhead()) {
-            return getTheoreticalPayroll(false).multipliedBy(0.05);
-        } else {
-            return Money.zero();
-        }
-    }
-
     public void removeUnit(UUID id) {
         Unit unit = getHangar().getUnit(id);
 
@@ -6908,96 +6856,6 @@ public class Campaign implements Serializable, ITechManager {
         return inventory;
     }
 
-    public Money getTotalEquipmentValue() {
-        Money unitsSellValue = getHangar().getUnitCosts(Unit::getSellValue);
-        return streamSpareParts().map(Part::getActualValue)
-            .reduce(unitsSellValue, Money::plus);
-    }
-
-    /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
-     * Beta.
-     *
-     * @return
-     */
-    public Money getForceValue() {
-        return getForceValue(false);
-    }
-
-    /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
-     * Beta.
-     *
-     * @return
-     */
-    public Money getForceValue(boolean noInfantry) {
-        Money value = Money.zero();
-        for (UUID uuid : forces.getAllUnits(false)) {
-            Unit u = getHangar().getUnit(uuid);
-            if (null == u) {
-                continue;
-            }
-            if (noInfantry && ((u.getEntity().getEntityType() & Entity.ETYPE_INFANTRY) == Entity.ETYPE_INFANTRY)
-                    && !((u.getEntity().getEntityType() & Entity.ETYPE_BATTLEARMOR) == Entity.ETYPE_BATTLEARMOR)) {
-                continue;
-            }
-            if (u.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
-                if (getCampaignOptions().getDropshipContractPercent() == 0) {
-                    continue;
-                }
-                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue()));
-            } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
-                if (getCampaignOptions().getWarshipContractPercent() == 0) {
-                    continue;
-                }
-                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue()));
-            } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) || u.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
-                if (getCampaignOptions().getJumpshipContractPercent() == 0) {
-                    continue;
-                }
-                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue()));
-            } else {
-                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue()));
-            }
-        }
-        return value;
-    }
-
-    public Money getEquipmentContractValue(Unit u, boolean useSaleValue) {
-        Money value;
-        Money percentValue;
-
-        if (useSaleValue) {
-            value = u.getSellValue();
-        } else {
-            value = u.getBuyCost();
-        }
-
-        if (u.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
-            percentValue = value.multipliedBy(getCampaignOptions().getDropshipContractPercent()).dividedBy(100);
-        } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
-            percentValue = value.multipliedBy(getCampaignOptions().getWarshipContractPercent()).dividedBy(100);
-        } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) || u.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
-            percentValue = value.multipliedBy(getCampaignOptions().getJumpshipContractPercent()).dividedBy(100);
-        } else {
-            percentValue = value.multipliedBy(getCampaignOptions().getEquipmentContractPercent()).dividedBy(100);
-        }
-
-        return percentValue;
-    }
-
-    public Money getContractBase() {
-        if (getCampaignOptions().usePeacetimeCost()) {
-            return getPeacetimeCost()
-                    .multipliedBy(0.75)
-                    .plus(getForceValue(getCampaignOptions().useInfantryDontCount()));
-        } else if (getCampaignOptions().useEquipmentContractBase()) {
-            return getForceValue(getCampaignOptions().useInfantryDontCount());
-        } else {
-            return getTheoreticalPayroll(getCampaignOptions().useInfantryDontCount());
-        }
-    }
-
     public void addLoan(Loan loan) {
         addReport("You have taken out loan " + loan.getDescription()
                 + ". Your account has been credited "
@@ -7755,47 +7613,6 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         return unitRating;
-    }
-
-    /**
-     * Gets peacetime costs including salaries.
-     * @return The peacetime costs of the campaign including salaries.
-     */
-    public Money getPeacetimeCost() {
-        return getPeacetimeCost(true);
-    }
-
-    /**
-     * Gets peacetime costs, optionally including salaries.
-     *
-     * This can be used to ensure salaries are not double counted.
-     *
-     * @param includeSalaries A value indicating whether or not salaries
-     *                        should be included in peacetime cost calculations.
-     * @return The peacetime costs of the campaign, optionally including salaries.
-     */
-    public Money getPeacetimeCost(boolean includeSalaries) {
-        Money peaceTimeCosts = Money.zero()
-                                .plus(getMonthlySpareParts())
-                                .plus(getMonthlyFuel())
-                                .plus(getMonthlyAmmo());
-        if (includeSalaries) {
-            peaceTimeCosts = peaceTimeCosts.plus(getPayRoll(getCampaignOptions().useInfantryDontCount()));
-        }
-
-        return peaceTimeCosts;
-    }
-
-    public Money getMonthlySpareParts() {
-        return getHangar().getUnitCosts(u -> !u.isMothballed(), Unit::getSparePartsCost);
-    }
-
-    public Money getMonthlyFuel() {
-        return getHangar().getUnitCosts(u -> !u.isMothballed(), Unit::getFuelCost);
-    }
-
-    public Money getMonthlyAmmo() {
-        return getHangar().getUnitCosts(u -> !u.isMothballed(), Unit::getAmmoCost);
     }
 
     @Override

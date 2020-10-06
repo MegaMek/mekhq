@@ -225,6 +225,7 @@ public class Finances implements Serializable {
 
     public void newDay(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Accountant accountant = new Accountant(campaign);
 
         // check for a new fiscal year
         if (campaign.getCampaignOptions().getFinancialYearDuration().isEndOfFinancialYear(campaign.getLocalDate())) {
@@ -271,7 +272,7 @@ public class Finances implements Serializable {
             if (campaignOptions.usePeacetimeCost()) {
                 if (!campaignOptions.showPeacetimeCost()) {
                     // Do not include salaries as that will be tracked below
-                    Money peacetimeCost = campaign.getPeacetimeCost(false);
+                    Money peacetimeCost = accountant.getPeacetimeCost(false);
 
                     if (debit(peacetimeCost, Transaction.C_MAINTAIN,
                             resourceMap.getString("PeacetimeCosts.title"), campaign.getLocalDate())) {
@@ -283,9 +284,9 @@ public class Finances implements Serializable {
                                 String.format(resourceMap.getString("NotImplemented.text"), "for operating costs"));
                     }
                 } else {
-                    Money sparePartsCost = campaign.getMonthlySpareParts();
-                    Money ammoCost = campaign.getMonthlyAmmo();
-                    Money fuelCost = campaign.getMonthlyFuel();
+                    Money sparePartsCost = accountant.getMonthlySpareParts();
+                    Money ammoCost = accountant.getMonthlyAmmo();
+                    Money fuelCost = accountant.getMonthlyFuel();
 
                     if (debit(sparePartsCost, Transaction.C_MAINTAIN,
                             resourceMap.getString("PeacetimeCostsParts.title"), campaign.getLocalDate())) {
@@ -317,7 +318,7 @@ public class Finances implements Serializable {
             }
 
             if (campaignOptions.payForSalaries()) {
-                Money payRollCost = campaign.getPayRoll();
+                Money payRollCost = accountant.getPayRoll();
 
                 if (debit(payRollCost, Transaction.C_SALARY, resourceMap.getString("Salaries.title"),
                         campaign.getLocalDate())) {
@@ -338,7 +339,7 @@ public class Finances implements Serializable {
 
             // Handle overhead expenses
             if (campaignOptions.payForOverhead()) {
-                Money overheadCost = campaign.getOverheadExpenses();
+                Money overheadCost = accountant.getOverheadExpenses();
 
                 if (debit(overheadCost, Transaction.C_OVERHEAD,
                         resourceMap.getString("Overhead.title"), campaign.getLocalDate())) {
@@ -486,7 +487,7 @@ public class Finances implements Serializable {
     }
 
     public Money getMaxCollateral(Campaign c) {
-        return c.getTotalEquipmentValue()
+        return new Accountant(c).getTotalEquipmentValue()
                 .plus(getTotalAssetValue())
                 .minus(getTotalLoanCollateral());
     }

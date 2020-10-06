@@ -22,6 +22,7 @@ package mekhq.gui.view;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.mission.Contract;
 
 import javax.swing.*;
@@ -373,12 +374,12 @@ public class ContractPaymentBreakdown {
 
     private void setLblOverheadExp2() {
         lblOverheadExp2.setText(generateMonthlyHeader(contract.getLengthPlusTravel(campaign))
-                + "-" + campaign.getOverheadExpenses().toAmountAndSymbolString());
+                + "-" + new Accountant(campaign).getOverheadExpenses().toAmountAndSymbolString());
     }
 
     private void setLblMaintenanceExp2() {
         lblMaintenanceExp2.setText(generateMonthlyHeader(contract.getLengthPlusTravel(campaign))
-                + "-" + campaign.getMaintenanceCosts().toAmountAndSymbolString());
+                + "-" + new Accountant(campaign).getMaintenanceCosts().toAmountAndSymbolString());
     }
 
     private void setLblPayrollExp2() {
