@@ -41,7 +41,7 @@ public class Money implements Comparable<Money> {
         this.wrapped = money;
     }
 
-    public BigMoney getWrapped() {
+    private BigMoney getWrapped() {
         return wrapped;
     }
 
