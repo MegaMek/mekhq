@@ -283,6 +283,7 @@ public class CampaignOptions implements Serializable {
     private double jumpshipContractPercent;
     private double warshipContractPercent;
     private boolean blcSaleValue;
+    private boolean overageRepaymentInFinalPayment;
     //endregion Mercenary Tab
 
     //region Experience Tab
@@ -664,6 +665,7 @@ public class CampaignOptions implements Serializable {
         jumpshipContractPercent = 0.0;
         warshipContractPercent = 0.0;
         blcSaleValue = false;
+        overageRepaymentInFinalPayment = false;
         //endregion Mercenary Tab
 
         //region Experience Tab
@@ -2431,6 +2433,14 @@ public class CampaignOptions implements Serializable {
         this.blcSaleValue = b;
     }
 
+    public boolean getOverageRepaymentInFinalPayment() {
+        return overageRepaymentInFinalPayment;
+    }
+
+    public void setOverageRepaymentInFinalPayment(boolean overageRepaymentInFinalPayment) {
+        this.overageRepaymentInFinalPayment = overageRepaymentInFinalPayment;
+    }
+
     public int getClanAcquisitionPenalty() {
         return clanAcquisitionPenalty;
     }
@@ -3141,6 +3151,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractBase", equipmentContractBase);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractSaleValue", equipmentContractSaleValue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "blcSaleValue", blcSaleValue);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "overageRepaymentInFinalPayment", overageRepaymentInFinalPayment);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanAcquisitionPenalty", clanAcquisitionPenalty);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "isAcquisitionPenalty", isAcquisitionPenalty);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "healWaitingPeriod", healWaitingPeriod);
@@ -3550,6 +3561,8 @@ public class CampaignOptions implements Serializable {
                 retVal.equipmentContractSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("blcSaleValue")) {
                 retVal.blcSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("overageRepaymentInFinalPayment")) {
+                retVal.setOverageRepaymentInFinalPayment(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
                 retVal.acquisitionSupportStaffOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {

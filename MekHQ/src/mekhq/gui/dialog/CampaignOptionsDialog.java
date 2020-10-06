@@ -324,6 +324,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkEquipContractSaleValue;
     private JRadioButton btnContractPersonnel;
     private JCheckBox chkBLCSaleValue;
+    private JCheckBox chkOverageRepaymentInFinalPayment;
     //endregion Mercenary Tab
 
     //region Experience Tab
@@ -423,6 +424,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JPanel panAtB;
     private JCheckBox chkUseAtB;
     private JComboBox<String> cbSkillLevel;
+
     //unit administration
     private JCheckBox chkUseShareSystem;
     private JCheckBox chkSharesExcludeLargeCraft;
@@ -2316,122 +2318,120 @@ public class CampaignOptionsDialog extends JDialog {
 
         //region Mercenary Tab
         panMercenary.setName("panMercenary");
-        panMercenary.setLayout(new java.awt.GridBagLayout());
+        panMercenary.setLayout(new GridBagLayout());
 
         btnContractEquipment = new JRadioButton(resourceMap.getString("panMercenary.IntOpsPayment.title"));
         btnContractEquipment.setToolTipText(resourceMap.getString("panMercenary.IntOpsPayment.tooltip"));
-        btnContractPersonnel = new JRadioButton(resourceMap.getString("panMercenary.FMMRPayment.title"));
-        btnContractPersonnel.setToolTipText(resourceMap.getString("panMercenary.FMMRPayment.tooltip"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(btnContractEquipment, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("Combat Percent:"), gridBagConstraints);
 
         spnEquipPercent = new JSpinner(new SpinnerNumberModel(0.1, 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1));
         spnEquipPercent.setEditor(new JSpinner.NumberEditor(spnEquipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnEquipPercent.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnEquipPercent, gridBagConstraints);
+
+        chkEquipContractSaleValue = new JCheckBox("Base on equipment sale value");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(chkEquipContractSaleValue, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("DropShip Percent:"), gridBagConstraints);
 
         spnDropshipPercent = new JSpinner(new SpinnerNumberModel(0.1, 0.0, CampaignOptions.MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT, 0.1));
         spnDropshipPercent.setEditor(new JSpinner.NumberEditor(spnDropshipPercent, "0.0"));
         ((JSpinner.NumberEditor) spnDropshipPercent.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnDropshipPercent, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("JumpShip Percent:"), gridBagConstraints);
 
         spnJumpshipPercent = new JSpinner(new SpinnerNumberModel(0.1, 0.0, CampaignOptions.MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT, 0.1));
         spnJumpshipPercent.setEditor(new JSpinner.NumberEditor(spnJumpshipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnJumpshipPercent.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnJumpshipPercent, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("WarShip Percent:"), gridBagConstraints);
 
         spnWarshipPercent = new JSpinner(new SpinnerNumberModel(0.1, 0.0, CampaignOptions.MAXIMUM_WARSHIP_EQUIPMENT_PERCENT, 0.1));
         spnWarshipPercent.setEditor(new JSpinner.NumberEditor(spnWarshipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnWarshipPercent.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnWarshipPercent, gridBagConstraints);
+
+        btnContractPersonnel = new JRadioButton(resourceMap.getString("panMercenary.FMMRPayment.title"));
+        btnContractPersonnel.setToolTipText(resourceMap.getString("panMercenary.FMMRPayment.tooltip"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(btnContractPersonnel, gridBagConstraints);
+
+        chkBLCSaleValue = new JCheckBox("Base battle loss compensation on equipment sale value");
+        gridBagConstraints.gridy = 6;
+        panMercenary.add(chkBLCSaleValue, gridBagConstraints);
+
+        chkOverageRepaymentInFinalPayment = new JCheckBox(resourceMap.getString("chkOverageRepaymentInFinalPayment.text"));
+        chkOverageRepaymentInFinalPayment.setToolTipText(resourceMap.getString("chkOverageRepaymentInFinalPayment.toolTipText"));
+        gridBagConstraints.gridy = 7;
+        panMercenary.add(chkOverageRepaymentInFinalPayment, gridBagConstraints);
 
         ButtonGroup groupContract = new ButtonGroup();
         groupContract.add(btnContractEquipment);
         groupContract.add(btnContractPersonnel);
-
-        chkEquipContractSaleValue = new JCheckBox("Base on equipment sale value");
-
-        chkBLCSaleValue = new JCheckBox("Base battle loss compensation on equipment sale value");
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(btnContractEquipment, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("Combat Percent:"), gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        //gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(spnEquipPercent, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        //gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(chkEquipContractSaleValue, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("Dropship Percent:"), gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        //gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(spnDropshipPercent, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("Jumpship Percent:"), gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        //gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(spnJumpshipPercent, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("Warship Percent:"), gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        //gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(spnWarshipPercent, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 3;
-        //gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(btnContractPersonnel, gridBagConstraints);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 3;
-        //gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(chkBLCSaleValue, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panMercenary.TabConstraints.tabTitle"), panMercenary);
         //endregion Mercenary Tab
@@ -3587,8 +3587,6 @@ public class CampaignOptionsDialog extends JDialog {
 
         cbSkillLevel = new JComboBox<>();
         chkUseShareSystem = new JCheckBox();
-        chkSharesExcludeLargeCraft = new JCheckBox();
-        chkSharesForAll = new JCheckBox();
         chkRetirementRolls = new JCheckBox();
         chkTrackUnitFatigue = new JCheckBox();
         chkCustomRetirementMods = new JCheckBox();
@@ -3719,12 +3717,12 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubAtBAdmin.add(chkUseShareSystem, gridBagConstraints);
 
-        chkSharesExcludeLargeCraft.setText(resourceMap.getString("chkSharesExcludeLargeCraft.text"));
+        chkSharesExcludeLargeCraft = new JCheckBox(resourceMap.getString("chkSharesExcludeLargeCraft.text"));
         chkSharesExcludeLargeCraft.setToolTipText(resourceMap.getString("chkSharesExcludeLargeCraft.toolTipText"));
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkSharesExcludeLargeCraft, gridBagConstraints);
 
-        chkSharesForAll.setText(resourceMap.getString("chkSharesForAll.text"));
+        chkSharesForAll = new JCheckBox(resourceMap.getString("chkSharesForAll.text"));
         chkSharesForAll.setToolTipText(resourceMap.getString("chkSharesForAll.toolTipText"));
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkSharesForAll, gridBagConstraints);
@@ -4564,6 +4562,7 @@ public class CampaignOptionsDialog extends JDialog {
         spnWarshipPercent.setValue(options.getWarshipContractPercent());
         chkEquipContractSaleValue.setSelected(options.useEquipmentContractSaleValue());
         chkBLCSaleValue.setSelected(options.useBLCSaleValue());
+        chkOverageRepaymentInFinalPayment.setSelected(options.getOverageRepaymentInFinalPayment());
         //endregion Mercenary Tab
 
         //region Experience Tab
@@ -4804,7 +4803,6 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void btnSaveActionPerformed() {
-        final String METHOD_NAME = "btnSaveActionPerformed()";
         if (txtName.getText().length() == 0) {
             return;
         }
@@ -4843,20 +4841,10 @@ public class CampaignOptionsDialog extends JDialog {
                 SkillType.lookupHash, SpecialAbility.getAllSpecialAbilities());
 
         // Then save it out to that file.
-        FileOutputStream fos;
-        PrintWriter pw;
-
-        try {
-            fos = new FileOutputStream(file);
-            pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
+        try (FileOutputStream fos = new FileOutputStream(file);
+             PrintWriter pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
             preset.writeToXml(pw, 0);
             pw.flush();
-            pw.close();
-            fos.close();
-            // delete the backup file because we didn't need it
-            if (backupFile.exists()) {
-                backupFile.delete();
-            }
             MekHQ.getLogger().info(this, "Campaign options saved to " + file);
         } catch (Exception ex) {
             MekHQ.getLogger().error(this, ex);
@@ -4866,9 +4854,12 @@ public class CampaignOptionsDialog extends JDialog {
             file.delete();
             if (backupFile.exists()) {
                 Utilities.copyfile(backupFile, file);
-                backupFile.delete();
             }
         }
+        if (backupFile.exists()) {
+            backupFile.delete();
+        }
+
         this.setVisible(false);
     }
 
@@ -4959,6 +4950,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setWarshipContractPercent((Double) spnWarshipPercent.getModel().getValue());
         options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());
         options.setBLCSaleValue(chkBLCSaleValue.isSelected());
+        options.setOverageRepaymentInFinalPayment(chkOverageRepaymentInFinalPayment.isSelected());
 
         options.setWaitingPeriod((Integer) spnAcquireWaitingPeriod.getModel().getValue());
         options.setAcquisitionSkill((String) choiceAcquireSkill.getSelectedItem());

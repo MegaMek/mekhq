@@ -6773,19 +6773,43 @@ public class Campaign implements Serializable, ITechManager {
         mission.setStatus(status);
         if (mission instanceof Contract) {
             Contract contract = (Contract) mission;
+            Money remainingMoney = Money.zero();
             // check for money in escrow
             // According to FMM(r) pg 179, both failure and breach lead to no
             // further payment even though this seems stupid
             if ((contract.getStatus() == Mission.S_SUCCESS)
                     && contract.getMonthsLeft(getLocalDate()) > 0) {
-                Money remainingMoney = contract.getMonthlyPayOut()
+                remainingMoney = contract.getMonthlyPayOut()
                         .multipliedBy(contract.getMonthsLeft(getLocalDate()));
+            }
+
+            // If overage repayment is enabled, we first need to check if the salvage percent is
+            // under 100. 100 means you cannot have a overage.
+            // Then, we check if the salvage percent is less than the percent salvaged by the
+            // unit in question. If it is, then they owe the assigner some cash
+            if (getCampaignOptions().getOverageRepaymentInFinalPayment()
+                    && (contract.getSalvagePct() < 100)) {
+                Money totalSalvaged = contract.getSalvagedByEmployer().plus(contract.getSalvagedByUnit());
+                double percentSalvaged = contract.getSalvagedByUnit().getAmount().doubleValue() / totalSalvaged.getAmount().doubleValue();
+                double salvagePercent = contract.getSalvagePct() / 100.0;
+
+                if (salvagePercent < percentSalvaged) {
+                    Money amountToRepay = totalSalvaged.multipliedBy(percentSalvaged - salvagePercent);
+                    remainingMoney = remainingMoney.minus(amountToRepay);
+                    contract.subtractSalvageByUnit(amountToRepay);
+                }
+            }
+
+            if (remainingMoney.isPositive()) {
                 finances.credit(remainingMoney, Transaction.C_CONTRACT,
                         "Remaining payment for " + contract.getName(), getLocalDate());
-                addReport("Your account has been credited for "
-                        + remainingMoney.toAmountAndSymbolString()
-                        + " for the remaining payout from contract "
-                        + contract.getName());
+                addReport("Your account has been credited for " + remainingMoney.toAmountAndSymbolString()
+                        + " for the remaining payout from contract " + contract.getName());
+            } else if (remainingMoney.isNegative()) {
+                finances.debit(remainingMoney, Transaction.C_CONTRACT,
+                        "Repaying payment overages for " + contract.getName(), getLocalDate());
+                addReport("Your account has been debited for " + remainingMoney.toAmountAndSymbolString()
+                        + " to replay payment overages occurred during the contract " + contract.getName());
             }
 
             // This relies on the mission being a Contract, and AtB to be on
