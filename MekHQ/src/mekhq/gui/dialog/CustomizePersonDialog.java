@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generators.RandomCallsignGenerator;
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.enums.Gender;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
