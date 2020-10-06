@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -55,13 +54,13 @@ public class TechTableModel extends DataTableModel {
         return tab.getCampaign();
     }
 
-    public TechTableModel.Renderer getRenderer(IconPackage icons) {
-        return new TechTableModel.Renderer(icons);
+    public TechTableModel.Renderer getRenderer() {
+        return new TechTableModel.Renderer();
     }
 
     public class Renderer extends BasicInfo implements TableCellRenderer {
-        public Renderer(IconPackage icons) {
-            super(icons);
+        public Renderer() {
+            super();
         }
 
         private static final long serialVersionUID = -4951696376098422679L;

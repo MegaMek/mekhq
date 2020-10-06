@@ -17,7 +17,6 @@ import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
-import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -32,9 +31,6 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class RetirementTableModel extends AbstractTableModel {
-    /**
-     *
-     */
     private static final long serialVersionUID = 7461821036790309952L;
 
     public final static int COL_PERSON = 0;
@@ -375,10 +371,12 @@ public class RetirementTableModel extends AbstractTableModel {
         editPayout = edit;
     }
 
-    public TableCellRenderer getRenderer(int col, IconPackage icons) {
+    public TableCellRenderer getRenderer(int col) {
         if (col < COL_TARGET) {
-            return new VisualRenderer(icons);
-        } else return new TextRenderer();
+            return new VisualRenderer();
+        } else {
+            return new TextRenderer();
+        }
     }
 
     public class TextRenderer extends MekHqTableCellRenderer {
@@ -410,8 +408,8 @@ public class RetirementTableModel extends AbstractTableModel {
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
         private static final long serialVersionUID = 7261885081786958754L;
 
-        public VisualRenderer(IconPackage icons) {
-            super(icons);
+        public VisualRenderer() {
+            super();
         }
 
         @Override

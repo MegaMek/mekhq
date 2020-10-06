@@ -33,6 +33,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.TreePath;
 
 import megamek.common.util.StringUtil;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.gui.utilities.JMenuHelpers;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -349,7 +350,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             if (null != singleForce) {
                 ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(), true,
                         singleForce.getIconCategory(), singleForce.getIconFileName(),
-                        singleForce.getIconMap(), gui.getIconPackage().getForceIcons(), true);
+                        singleForce.getIconMap(), MHQStaticDirectoryManager.getForceIcons(), true);
                 pcd.setVisible(true);
                 if (pcd.isChanged()) {
                     singleForce.setIconCategory(pcd.getCategory());
@@ -1526,7 +1527,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         }
 
         return new CamoChoiceDialog(gui.getFrame(), true, category, fileName,
-            gui.getCampaign().getColorIndex(), gui.getIconPackage().getCamos());
+            gui.getCampaign().getColorIndex());
     }
 
     /**

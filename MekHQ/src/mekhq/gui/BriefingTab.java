@@ -41,6 +41,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.com.util.UnitPrintManager;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.GMModeEvent;
@@ -345,9 +346,9 @@ public final class BriefingTab extends CampaignGuiTab {
     private void editMission() {
         Mission mission = getCampaign().getMission(selectedMission);
         if (null != mission) {
-            if (getCampaign().getCampaignOptions().getUseAtB() && mission instanceof AtBContract) {
-                CustomizeAtBContractDialog cmd = new CustomizeAtBContractDialog(getFrame(), true, (AtBContract) mission,
-                        getCampaign(), getIconPackage().getCamos());
+            if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {
+                CustomizeAtBContractDialog cmd = new CustomizeAtBContractDialog(getFrame(), true,
+                        (AtBContract) mission, getCampaign());
                 cmd.setVisible(true);
                 if (cmd.getMissionId() != -1) {
                     selectedMission = cmd.getMissionId();

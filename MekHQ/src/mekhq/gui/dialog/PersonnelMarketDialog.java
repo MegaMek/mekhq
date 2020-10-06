@@ -32,7 +32,6 @@ import javax.swing.table.TableRowSorter;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
@@ -68,8 +67,6 @@ public class PersonnelMarketDialog extends JDialog {
 	private CampaignGUI hqView;
     private PersonnelMarket personnelMarket;
     Person selectedPerson = null;
-    @SuppressWarnings("unused")
-    private DirectoryItems portraits;
     private Money unitCost = Money.zero();
 
     private JComboBox<PersonnelFilter> comboPersonType;
@@ -93,11 +90,10 @@ public class PersonnelMarketDialog extends JDialog {
     //endregion Variable Declarations
 
     /** Creates new form PersonnelMarketDialog */
-    public PersonnelMarketDialog(Frame frame, CampaignGUI view, Campaign c, DirectoryItems portraits) {
+    public PersonnelMarketDialog(Frame frame, CampaignGUI view, Campaign c) {
         super(frame, true);
         hqView = view;
         campaign = c;
-        this.portraits = portraits;
         personnelMarket = c.getPersonnelMarket();
         personnelModel = new PersonnelTableModel(campaign);
         personnelModel.setData(personnelMarket.getPersonnel());
@@ -222,7 +218,7 @@ public class PersonnelMarketDialog extends JDialog {
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = ((XTableColumnModel) tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(personnelModel.getColumnWidth(i));
-            column.setCellRenderer(personnelModel.getRenderer(false, null));
+            column.setCellRenderer(personnelModel.getRenderer(false));
 
             if (i != PersonnelTableModel.COL_GIVEN_NAME
                     && ((!campaign.getFaction().isClan() && i != PersonnelTableModel.COL_SURNAME)

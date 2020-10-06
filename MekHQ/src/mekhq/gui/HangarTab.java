@@ -207,8 +207,8 @@ public final class HangarTab extends CampaignGuiTab {
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = unitTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(unitModel.getColumnWidth(i));
-            column.setCellRenderer(
-                    unitModel.getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC, getIconPackage()));
+            column.setCellRenderer(unitModel
+                    .getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC));
         }
         unitTable.setIntercellSpacing(new Dimension(0, 0));
         unitTable.setShowGrid(false);
@@ -326,8 +326,8 @@ public final class HangarTab extends CampaignGuiTab {
         TableColumn column;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(
-                    unitModel.getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC, getIconPackage()));
+            column.setCellRenderer(unitModel
+                    .getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC));
             if (i == UnitTableModel.COL_WCLASS) {
                 if (view == UV_GRAPHIC) {
                     column.setPreferredWidth(125);
@@ -453,8 +453,7 @@ public final class HangarTab extends CampaignGuiTab {
             return;
         }
         Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
-        scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign(), getIconPackage().getCamos(),
-                getIconPackage().getMechTiles()));
+        scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign()));
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later

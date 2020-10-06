@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,8 +22,8 @@ import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.MechSummaryCache;
 import megamek.common.event.Subscribe;
-import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.*;
@@ -49,7 +49,6 @@ import java.util.ResourceBundle;
  * Collates important information about the campaign and displays it, along with some actionable buttons
  */
 public final class CommandCenterTab extends CampaignGuiTab {
-
     private JPanel panCommand;
 
     // basic info panel
@@ -83,7 +82,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
     //icon panel
     private JPanel panIcon;
     private JLabel lblIcon;
-    private DirectoryItems icons;
 
     private ResourceBundle resourceMap;
 
@@ -443,10 +441,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * set the icon for the unit if it exits in the icon panel
      */
     public void setIcon() {
-        if (null == icons) {
-            icons = getCampaignGui().getIconPackage().getForceIcons();
-        }
-
         lblIcon.setIcon(null);
 
         String category = getCampaign().getIconCategory();
@@ -461,7 +455,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             // Try to get the icon file.
             Image icon;
             try {
-                icon = (Image) icons.getItem(category, filename);
+                icon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem(category, filename);
                 if (null != icon) {
                     icon = icon.getScaledInstance(150, -1, Image.SCALE_DEFAULT);
                 } else {
@@ -469,7 +463,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                 }
                 lblIcon.setIcon(new ImageIcon(icon));
             } catch (Exception e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
         }
     }

@@ -20,7 +20,6 @@
  */
 package mekhq.campaign;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -67,7 +66,6 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.BuildingBlock;
-import megamek.common.util.fileUtils.DirectoryItems;
 import mekhq.campaign.event.AcquisitionEvent;
 import mekhq.campaign.event.AstechPoolChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
@@ -153,7 +151,6 @@ import mekhq.campaign.universe.RangedPlanetSelector;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.gui.utilities.PortraitFileFactory;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.MassRepairService;
 
@@ -6235,13 +6232,14 @@ public class Campaign implements Serializable, ITechManager {
         p.addLogEntry(entry);
     }
 
-    private List<String> getPossibleRandomPortraits (DirectoryItems portraits, List<String> existingPortraits, String subDir ) {
+    //region Portraits
+    private List<String> getPossibleRandomPortraits (List<String> existingPortraits, String subDir ) {
         List<String> possiblePortraits = new ArrayList<>();
-        Iterator<String> categories = portraits.getCategoryNames();
+        Iterator<String> categories = MHQStaticDirectoryManager.getPortraits().getCategoryNames();
         while (categories.hasNext()) {
             String category = categories.next();
             if (category.endsWith(subDir)) {
-                Iterator<String> names = portraits.getItemNames(category);
+                Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
                 while (names.hasNext()) {
                     String name = names.next();
                     String location = category + ":" + name;
@@ -6263,17 +6261,7 @@ public class Campaign implements Serializable, ITechManager {
             existingPortraits.add(existingPerson.getPortraitCategory() + ":"
                     + existingPerson.getPortraitFileName());
         }
-        // TODO: it would be nice to pull the portraits directory from MekHQ
-        // TODO: itself
-        DirectoryItems portraits;
-        try {
-            portraits = new DirectoryItems(
-                    new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    PortraitFileFactory.getInstance());
-        } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "assignRandomPortraitFor", e);
-            return;
-        }
+
         List<String> possiblePortraits;
 
         // Will search for portraits in the /gender/primaryrole folder first,
@@ -6317,16 +6305,16 @@ public class Campaign implements Serializable, ITechManager {
             searchCat_CombatSupport = "Combat/";
         }
 
-        possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_Role);
+        possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchCat_Gender + searchCat_Role);
 
         if (possiblePortraits.isEmpty() && !searchCat_RoleGroup.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_RoleGroup);
+            possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchCat_Gender + searchCat_RoleGroup);
         }
         if (possiblePortraits.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_CombatSupport);
+            possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchCat_Gender + searchCat_CombatSupport);
         }
         if (possiblePortraits.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender);
+            possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchCat_Gender);
         }
         if (!possiblePortraits.isEmpty()) {
             String chosenPortrait = possiblePortraits.get(Compute.randomInt(possiblePortraits.size()));
@@ -6338,6 +6326,7 @@ public class Campaign implements Serializable, ITechManager {
             p.setPortraitFileName(temp[1]);
         }
     }
+    //endregion Portraits
 
     /**
      * Assigns a random origin to a {@link Person}.

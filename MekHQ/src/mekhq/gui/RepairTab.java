@@ -227,7 +227,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = ((XTableColumnModel) servicedUnitTable.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(servicedUnitModel.getColumnWidth(i));
-            column.setCellRenderer(servicedUnitModel.getRenderer(false, getIconPackage()));
+            column.setCellRenderer(servicedUnitModel.getRenderer(false));
             if ((i != UnitTableModel.COL_NAME) && (i != UnitTableModel.COL_STATUS)
                     && (i != UnitTableModel.COL_REPAIR) && (i != UnitTableModel.COL_SITE)
                     && (i != UnitTableModel.COL_TYPE)) {
@@ -267,7 +267,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
         techTable.setRowHeight(60);
-        techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer(getIconPackage()));
+        techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
         techTable.getSelectionModel().addListSelectionListener(this::techTableValueChanged);
         techSorter = new TableRowSorter<>(techsModel);
         techSorter.setComparator(0, new TechSorter());

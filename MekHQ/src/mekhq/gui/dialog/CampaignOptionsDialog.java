@@ -69,9 +69,9 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
-import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -123,10 +123,8 @@ public class CampaignOptionsDialog extends JDialog {
     private String camoCategory;
     private String camoFileName;
     private int colorIndex;
-    private DirectoryItems camos;
     private String iconCategory;
     private String iconFileName;
-    private DirectoryItems forceIcons;
     private Hashtable<String, JSpinner> hashSkillTargets;
     private Hashtable<String, JSpinner> hashGreenSkill;
     private Hashtable<String, JSpinner> hashRegSkill;
@@ -504,10 +502,8 @@ public class CampaignOptionsDialog extends JDialog {
         this.camoCategory = campaign.getCamoCategory();
         this.camoFileName = campaign.getCamoFileName();
         this.colorIndex = campaign.getColorIndex();
-        this.camos = icons.getCamos();
         this.iconCategory = campaign.getIconCategory();
         this.iconFileName = campaign.getIconFileName();
-        this.forceIcons = icons.getForceIcons();
         hashSkillTargets = new Hashtable<>();
         hashGreenSkill = new Hashtable<>();
         hashRegSkill = new Hashtable<>();
@@ -5274,7 +5270,8 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void btnIconActionPerformed(ActionEvent evt) {
-        ImageChoiceDialog pcd = new ImageChoiceDialog(frame, true, iconCategory, iconFileName, forceIcons);
+        ImageChoiceDialog pcd = new ImageChoiceDialog(frame, true, iconCategory, iconFileName,
+                MHQStaticDirectoryManager.getForceIcons());
         pcd.setVisible(true);
         if (pcd.isChanged()) {
             iconCategory = pcd.getCategory();
@@ -5284,7 +5281,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void btnCamoActionPerformed(ActionEvent evt) {
-        CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex, camos);
+        CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex);
         ccd.setVisible(true);
         camoCategory = ccd.getCategory();
         camoFileName = ccd.getFileName();
@@ -5403,9 +5400,9 @@ public class CampaignOptionsDialog extends JDialog {
         try {
             // Translate the root camo directory name.
             if (Player.ROOT_CAMO.equals(camoCategory)) {
-                camoCategory = ""; //$NON-NLS-1$
+                camoCategory = "";
             }
-            Image camo = (Image) camos.getItem(camoCategory, camoFileName);
+            Image camo = (Image) MHQStaticDirectoryManager.getCamouflage().getItem(camoCategory, camoFileName);
             btnCamo.setIcon(new ImageIcon(camo));
         } catch (Exception err) {
             JOptionPane.showMessageDialog(
@@ -5440,7 +5437,7 @@ public class CampaignOptionsDialog extends JDialog {
             if (Campaign.ROOT_ICON.equals(iconCategory)) {
                 iconCategory = ""; //$NON-NLS-1$
             }
-            Image icon = (Image) forceIcons.getItem(iconCategory, iconFileName);
+            Image icon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem(iconCategory, iconFileName);
             icon = icon.getScaledInstance(75, -1, Image.SCALE_DEFAULT);
             btnIcon.setIcon(new ImageIcon(icon));
         } catch (Exception err) {
