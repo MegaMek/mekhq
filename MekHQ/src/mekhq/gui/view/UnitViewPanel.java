@@ -324,7 +324,7 @@ public class UnitViewPanel extends ScrollablePanel {
         if (null == MHQStaticDirectoryManager.getMechTileset()) {
             return null;
         }
-        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity(), c, -1);
+        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
         int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c, u.getEntity());
         return entityImage.loadPreviewImage();
