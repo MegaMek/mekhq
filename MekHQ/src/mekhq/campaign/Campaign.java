@@ -125,7 +125,9 @@ import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
+import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
@@ -4961,43 +4963,46 @@ public class Campaign implements Serializable, ITechManager {
      */
     @SuppressWarnings("unused") // FIXME: Waiting for Dylan to finish re-writing
     public Money calculateCostPerJump(boolean excludeOwnTransports, boolean campaignOpsCosts) {
+        HangarStatistics stats = new HangarStatistics(getHangar());
+        CargoStatistics cargoStats = new CargoStatistics(this);
+
         Money collarCost = Money.of(campaignOpsCosts ? 100000 : 50000);
 
         // first we need to get the total number of units by type
-        int nMech = getNumberOfUnitsByType(Entity.ETYPE_MECH);
-        int nLVee = getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true);
-        int nHVee = getNumberOfUnitsByType(Entity.ETYPE_TANK);
-        int nAero = getNumberOfUnitsByType(Entity.ETYPE_AERO);
-        int nSC = getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
-        int nCF = getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
-        int nBA = getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
+        int nMech = stats.getNumberOfUnitsByType(Entity.ETYPE_MECH);
+        int nLVee = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true);
+        int nHVee = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
+        int nAero = stats.getNumberOfUnitsByType(Entity.ETYPE_AERO);
+        int nSC = stats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
+        int nCF = stats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
+        int nBA = stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
         int nMechInf = 0;
         int nMotorInf = 0;
         int nFootInf = 0;
-        int nProto = getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
-        int nDropship = getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
-        int nCollars = getTotalDockingCollars();
-        double nCargo = getTotalCargoCapacity(); // ignoring refrigerated/insulated/etc.
+        int nProto = stats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
+        int nDropship = stats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
+        int nCollars = stats.getTotalDockingCollars();
+        double nCargo = cargoStats.getTotalCargoCapacity(); // ignoring refrigerated/insulated/etc.
 
         // get cargo tonnage including parts in transit, then get mothballed unit
         // tonnage
-        double carriedCargo = getCargoTonnage(true, false) + getCargoTonnage(false, true);
+        double carriedCargo = cargoStats.getCargoTonnage(true, false) + cargoStats.getCargoTonnage(false, true);
 
         // calculate the number of units left untransported
-        int noMech = Math.max(nMech - getOccupiedBays(Entity.ETYPE_MECH), 0);
-        int noDS = Math.max(nDropship - getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
-        int noSC = Math.max(nSC - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        int noCF = Math.max(nCF - getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(nAero - getOccupiedBays(Entity.ETYPE_AERO), 0);
-        int nolv = Math.max(nLVee - getOccupiedBays(Entity.ETYPE_TANK, true), 0);
-        int nohv = Math.max(nHVee - getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int noinf = Math.max(getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int noBA = Math.max(nBA - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int noProto = Math.max(nProto - getOccupiedBays(Entity.ETYPE_PROTOMECH), 0);
-        int freehv = Math.max(getTotalHeavyVehicleBays() - getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int freeinf = Math.max(getTotalInfantryBays() - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int freeba = Math.max(getTotalBattleArmorBays() - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int freeSC = Math.max(getTotalSmallCraftBays() - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int noMech = Math.max(nMech - stats.getOccupiedBays(Entity.ETYPE_MECH), 0);
+        int noDS = Math.max(nDropship - stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
+        int noSC = Math.max(nSC - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int noCF = Math.max(nCF - stats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
+        int noASF = Math.max(nAero - stats.getOccupiedBays(Entity.ETYPE_AERO), 0);
+        int nolv = Math.max(nLVee - stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
+        int nohv = Math.max(nHVee - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int noinf = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int noBA = Math.max(nBA - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        int noProto = Math.max(nProto - stats.getOccupiedBays(Entity.ETYPE_PROTOMECH), 0);
+        int freehv = Math.max(stats.getTotalHeavyVehicleBays() - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int freeinf = Math.max(stats.getTotalInfantryBays() - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int freeba = Math.max(stats.getTotalBattleArmorBays() - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        int freeSC = Math.max(stats.getTotalSmallCraftBays() - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         int noCargo = (int) Math.ceil(Math.max(carriedCargo - nCargo, 0));
 
         int newNoASF = Math.max(noASF - freeSC, 0);
@@ -7158,453 +7163,6 @@ public class Campaign implements Serializable, ITechManager {
      */
     public Set<UUID> getTransportShips() {
         return transportShips;
-    }
-
-    public int getTotalMechBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getMechCapacity)
-            .sum());
-    }
-
-    public int getTotalASFBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getASFCapacity)
-            .sum());
-    }
-
-    public int getTotalSmallCraftBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getSmallCraftCapacity)
-            .sum());
-    }
-
-    public int getTotalBattleArmorBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getBattleArmorCapacity)
-            .sum());
-    }
-
-    public int getTotalInfantryBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getInfantryCapacity)
-            .sum());
-    }
-
-    public int getTotalHeavyVehicleBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getHeavyVehicleCapacity)
-            .sum());
-    }
-
-    public int getTotalLightVehicleBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getLightVehicleCapacity)
-            .sum());
-    }
-
-    public int getTotalProtomechBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getProtomechCapacity)
-            .sum());
-    }
-
-    public int getTotalDockingCollars() {
-        return getHangar().getUnitsStream()
-            .filter(u -> u.getEntity() instanceof Jumpship)
-            .mapToInt(Unit::getDocks)
-            .sum();
-    }
-
-    public double getTotalInsulatedCargoCapacity() {
-        return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getInsulatedCargoCapacity)
-            .sum();
-    }
-
-    public double getTotalRefrigeratedCargoCapacity() {
-        return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getRefrigeratedCargoCapacity)
-            .sum();
-    }
-
-    public double getTotalLivestockCargoCapacity() {
-        return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getLivestockCargoCapacity)
-            .sum();
-    }
-
-    public double getTotalLiquidCargoCapacity() {
-        return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getLiquidCargoCapacity)
-            .sum();
-    }
-
-    public double getTotalCargoCapacity() {
-        return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getCargoCapacity)
-            .sum();
-    }
-
-    // Liquid not included
-    public double getTotalCombinedCargoCapacity() {
-        return getTotalCargoCapacity() + getTotalLivestockCargoCapacity()
-                + getTotalInsulatedCargoCapacity() + getTotalRefrigeratedCargoCapacity();
-    }
-
-    public int getNumberOfUnitsByType(long type) {
-        return getNumberOfUnitsByType(type, false, false);
-    }
-
-    public int getNumberOfUnitsByType(long type, boolean inTransit) {
-        return getNumberOfUnitsByType(type, inTransit, false);
-    }
-
-    public int getNumberOfUnitsByType(long type, boolean inTransit, boolean lv) {
-        int num = 0;
-        for (Unit unit : getUnits()) {
-            if (!inTransit && !unit.isPresent()) {
-                continue;
-            }
-            if (unit.isMothballed()) {
-                if (type == Unit.ETYPE_MOTHBALLED) {
-                    num++;
-                }
-                continue;
-            }
-            Entity en = unit.getEntity();
-            if (en instanceof GunEmplacement || en instanceof FighterSquadron || en instanceof Jumpship) {
-                continue;
-            }
-            if (type == Entity.ETYPE_MECH && en instanceof Mech) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_DROPSHIP && en instanceof Dropship) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_SMALL_CRAFT && en instanceof SmallCraft
-                    && !(en instanceof Dropship)) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_CONV_FIGHTER && en instanceof ConvFighter) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_AERO && en instanceof Aero
-                    && !(en instanceof SmallCraft || en instanceof ConvFighter)) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_INFANTRY && en instanceof Infantry && !(en instanceof BattleArmor)) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_BATTLEARMOR && en instanceof BattleArmor) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_TANK && en instanceof Tank) {
-                if ((en.getWeight() <= 50 && lv) || (en.getWeight() > 50 && !lv)) {
-                    num++;
-                }
-                continue;
-            }
-            if (type == Entity.ETYPE_PROTOMECH && en instanceof Protomech) {
-                num++;
-            }
-        }
-
-        return num;
-    }
-
-    public double getCargoTonnage(boolean inTransit) {
-        return getCargoTonnage(inTransit, false);
-    }
-
-    @SuppressWarnings("unused") // FIXME: This whole method needs re-worked once Dropship Assignments are in
-    public double getCargoTonnage(final boolean inTransit, final boolean mothballed) {
-        double cargoTonnage = 0;
-        double mothballedTonnage = 0;
-        int mechs = getNumberOfUnitsByType(Entity.ETYPE_MECH);
-        int ds = getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
-        int sc = getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
-        int cf = getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
-        int asf = getNumberOfUnitsByType(Entity.ETYPE_AERO);
-        int inf = getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
-        int ba = getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
-        int lv = getNumberOfUnitsByType(Entity.ETYPE_TANK, true);
-        int hv = getNumberOfUnitsByType(Entity.ETYPE_TANK, false);
-        int protos = getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
-
-        cargoTonnage += streamSpareParts().filter(p -> inTransit || p.isPresent())
-                            .mapToDouble(p -> p.getQuantity() * p.getTonnage())
-                            .sum();
-
-        // place units in bays
-        // FIXME: This has been temporarily disabled. It really needs DropShip assignments done to fix it correctly.
-        // Remaining units go into cargo
-        for (Unit unit : getUnits()) {
-            if (!inTransit && !unit.isPresent()) {
-                continue;
-            }
-            Entity en = unit.getEntity();
-            if (unit.isMothballed()) {
-                mothballedTonnage += en.getWeight();
-                continue;
-            }
-            if (en instanceof GunEmplacement || en instanceof FighterSquadron || en instanceof Jumpship) {
-                continue;
-            }
-            // cargoTonnage += en.getWeight();
-        }
-        if (mothballed) {
-            return mothballedTonnage;
-        }
-        return cargoTonnage;
-    }
-
-    public String getCargoDetails() {
-        StringBuffer sb = new StringBuffer("Cargo\n\n");
-        double ccc = this.getTotalCombinedCargoCapacity();
-        double gcc = this.getTotalCargoCapacity();
-        double icc = this.getTotalInsulatedCargoCapacity();
-        double lcc = this.getTotalLiquidCargoCapacity();
-        double scc = this.getTotalLivestockCargoCapacity();
-        double rcc = this.getTotalRefrigeratedCargoCapacity();
-        double tonnage = this.getCargoTonnage(false);
-        double mothballedTonnage = this.getCargoTonnage(false, true);
-        double mothballedUnits = Math.max(getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
-        double combined = (tonnage + mothballedTonnage);
-        double transported = Math.min(combined, ccc);
-        double overage = combined - transported;
-
-        sb.append(String.format("%-35s      %6.3f\n", "Total Capacity:", ccc));
-        sb.append(String.format("%-35s      %6.3f\n", "General Capacity:", gcc));
-        sb.append(String.format("%-35s      %6.3f\n", "Insulated Capacity:", icc));
-        sb.append(String.format("%-35s      %6.3f\n", "Liquid Capacity:", lcc));
-        sb.append(String.format("%-35s      %6.3f\n", "Livestock Capacity:", scc));
-        sb.append(String.format("%-35s      %6.3f\n", "Refrigerated Capacity:", rcc));
-        sb.append(String.format("%-35s      %6.3f\n", "Cargo Transported:", tonnage));
-        sb.append(String.format("%-35s      %4s (%1.0f)\n", "Mothballed Units as Cargo (Tons):", mothballedUnits, mothballedTonnage));
-        sb.append(String.format("%-35s      %6.3f/%1.3f\n", "Transported/Capacity:", transported, ccc));
-        sb.append(String.format("%-35s      %6.3f\n", "Overage Not Transported:", overage));
-
-        return new String(sb);
-    }
-
-    public int getOccupiedBays(long type) {
-        return getOccupiedBays(type, false);
-    }
-
-    public int getOccupiedBays(long type, boolean lv) {
-        int num = 0;
-        for (Unit unit : getUnits()) {
-            if (unit.isMothballed()) {
-                continue;
-            }
-            Entity en = unit.getEntity();
-            if (en instanceof GunEmplacement || en instanceof Jumpship) {
-                continue;
-            }
-            if (type == Entity.ETYPE_MECH && en instanceof Mech) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_DROPSHIP && en instanceof Dropship) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_SMALL_CRAFT && en instanceof SmallCraft && !(en instanceof Dropship)) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_CONV_FIGHTER && en instanceof ConvFighter) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_AERO && en instanceof Aero
-                    && !(en instanceof SmallCraft || en instanceof ConvFighter)) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_INFANTRY && en instanceof Infantry && !(en instanceof BattleArmor)) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_BATTLEARMOR && en instanceof BattleArmor) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_TANK && en instanceof Tank) {
-                if ((en.getWeight() <= 50 && lv) || (en.getWeight() > 50 && !lv)) {
-                    num++;
-                }
-                continue;
-            }
-            if (type == Entity.ETYPE_PROTOMECH && en instanceof Protomech) {
-                num++;
-            }
-        }
-
-        if (type == Entity.ETYPE_MECH) {
-            return Math.min(getTotalMechBays(), num);
-        }
-
-        if (type == Entity.ETYPE_AERO) {
-            return Math.min(getTotalASFBays(), num);
-        }
-
-        if (type == Entity.ETYPE_INFANTRY) {
-            return Math.min(getTotalInfantryBays(), num);
-        }
-
-        if (type == Entity.ETYPE_BATTLEARMOR) {
-            return Math.min(getTotalBattleArmorBays(), num);
-        }
-
-        if (type == Entity.ETYPE_TANK) {
-            if (lv) {
-                return Math.min(getTotalLightVehicleBays(), num);
-            }
-            return Math.min(getTotalHeavyVehicleBays(), num);
-        }
-
-        if (type == Entity.ETYPE_SMALL_CRAFT) {
-            return Math.min(getTotalSmallCraftBays(), num);
-        }
-
-        if (type == Entity.ETYPE_PROTOMECH) {
-            return Math.min(getTotalProtomechBays(), num);
-        }
-
-        if (type == Entity.ETYPE_DROPSHIP) {
-            return Math.min(getTotalDockingCollars(), num);
-        }
-
-        return -1; // default, this is an error condition
-    }
-
-    public String getTransportDetails() {
-        int noMech = Math.max(getNumberOfUnitsByType(Entity.ETYPE_MECH) - getOccupiedBays(Entity.ETYPE_MECH), 0);
-        int noDS = Math.max(getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP) - getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
-        int noSC = Math.max(getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
-        int noCF = Math
-                .max(getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(getNumberOfUnitsByType(Entity.ETYPE_AERO) - getOccupiedBays(Entity.ETYPE_AERO), 0);
-        int nolv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) - getOccupiedBays(Entity.ETYPE_TANK, true), 0);
-        int nohv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK) - getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int noinf = Math.max(getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int noBA = Math.max(getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        @SuppressWarnings("unused") // FIXME: This should be used somewhere...
-        int noProto = Math.max(getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - getOccupiedBays(Entity.ETYPE_PROTOMECH),
-                0);
-        int freehv = Math.max(getTotalHeavyVehicleBays() - getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int freeinf = Math.max(getTotalInfantryBays() - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int freeba = Math.max(getTotalBattleArmorBays() - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int freeSC = Math.max(getTotalSmallCraftBays() - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        int mothballedAsCargo = Math.max(getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
-
-        String asfAppend = "";
-        int newNoASF = Math.max(noASF - freeSC, 0);
-        int placedASF = Math.max(noASF - newNoASF, 0);
-        if (noASF > 0 && freeSC > 0) {
-            asfAppend = " [" + placedASF + " ASF will be placed in Small Craft bays]";
-            freeSC -= placedASF;
-        }
-
-        String lvAppend = "";
-        int newNolv = Math.max(nolv - freehv, 0);
-        int placedlv = Math.max(nolv - newNolv, 0);
-        if (nolv > 0 && freehv > 0) {
-            lvAppend = " [" + placedlv + " Light Vehicles will be placed in Heavy Vehicle bays]";
-            freehv -= placedlv;
-        }
-
-        if (noBA > 0 && freeinf > 0) {
-
-        }
-
-        if (noinf > 0 && freeba > 0) {
-
-        }
-
-        StringBuffer sb = new StringBuffer("Transports\n\n");
-
-        // Lets do Mechs first.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Mech Bays (Occupied):",
-                getTotalMechBays(), getOccupiedBays(Entity.ETYPE_MECH), "Mechs Not Transported:", noMech));
-
-        // Lets do ASF next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d%s\n", "ASF Bays (Occupied):",
-                getTotalASFBays(), getOccupiedBays(Entity.ETYPE_AERO), "ASF Not Transported:", noASF, asfAppend));
-
-        // Lets do Light Vehicles next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d%s\n", "Light Vehicle Bays (Occupied):",
-                getTotalLightVehicleBays(), getOccupiedBays(Entity.ETYPE_TANK, true), "Light Vehicles Not Transported:",
-                nolv, lvAppend));
-
-        // Lets do Heavy Vehicles next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Heavy Vehicle Bays (Occupied):",
-                getTotalHeavyVehicleBays(), getOccupiedBays(Entity.ETYPE_TANK), "Heavy Vehicles Not Transported:",
-                nohv));
-
-        if (noASF > 0 && freeSC > 0) {
-            // Lets do ASF in Free Small Craft Bays next.
-            sb.append(String.format("%-35s   %4d (%4d)      %-35s     %4d\n", "   Light Vehicles in Heavy Vehicle Bays (Occupied):",
-                    getTotalHeavyVehicleBays(), getOccupiedBays(Entity.ETYPE_TANK) + placedlv,
-                    "Light Vehicles Not Transported:", newNolv));
-        }
-
-        if (nolv > 0 && freehv > 0) {
-
-        }
-
-        // Lets do Infantry next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Infantry Bays (Occupied):",
-                getTotalInfantryBays(), getOccupiedBays(Entity.ETYPE_INFANTRY), "Infantry Not Transported:", noinf));
-
-        if (noBA > 0 && freeinf > 0) {
-
-        }
-
-        // Lets do Battle Armor next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Battle Armor Bays (Occupied):",
-                getTotalBattleArmorBays(), getOccupiedBays(Entity.ETYPE_BATTLEARMOR), "Battle Armor Not Transported:",
-                noBA));
-
-        if (noinf > 0 && freeba > 0) {
-
-        }
-
-        // Lets do Small Craft next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Small Craft Bays (Occupied):",
-                getTotalSmallCraftBays(), getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), "Small Craft Not Transported:",
-                noSC));
-
-        if (noASF > 0 && freeSC > 0) {
-            // Lets do ASF in Free Small Craft Bays next.
-            sb.append(String.format("%-35s   %4d (%4d)      %-35s     %4d\n", "   ASF in Small Craft Bays (Occupied):",
-                    getTotalSmallCraftBays(), getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) + placedASF,
-                    "ASF Not Transported:", newNoASF));
-        }
-
-        // Lets do Protomechs next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Protomech Bays (Occupied):",
-                getTotalProtomechBays(), getOccupiedBays(Entity.ETYPE_PROTOMECH), "Protomechs Not Transported:", noSC));
-
-        sb.append("\n\n");
-
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Docking Collars (Occupied):",
-                getTotalDockingCollars(), getOccupiedBays(Entity.ETYPE_DROPSHIP), "Dropships Not Transported:", noDS));
-
-        sb.append("\n\n");
-
-        sb.append(String.format("%-35s      %4d\n", "Mothballed Units (see Cargo report)", mothballedAsCargo));
-
-        return new String(sb);
     }
 
     public String getCombatPersonnelDetails() {
