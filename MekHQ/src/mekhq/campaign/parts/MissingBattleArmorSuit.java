@@ -309,11 +309,8 @@ public class MissingBattleArmorSuit extends MissingPart {
         Part bestPart = null;
 
         //check to see if we already have a replacement assigned
-        if(replacementId > -1) {
-            bestPart = campaign.getPart(replacementId);
-            if(null != bestPart) {
-                return bestPart;
-            }
+        if (hasReplacementPart()) {
+            return getReplacementPart();
         }
         // don't just return with the first part if it is damaged
         for(Part part : campaign.getSpareParts()) {

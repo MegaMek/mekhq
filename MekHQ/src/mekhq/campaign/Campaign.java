@@ -1634,7 +1634,8 @@ public class Campaign implements Serializable, ITechManager {
             p.setId(-1);
             return;
         }
-        if ((null == p.getUnit()) && !p.hasParentPart()) {
+        if ((null == p.getUnit()) && !p.hasParentPart()
+                && !p.isReservedForRefit() && !p.isReservedForReplacement()) {
             Part spare = checkForExistingSparePart(p);
             if (null != spare) {
                 if (p instanceof Armor) {
@@ -1679,9 +1680,9 @@ public class Campaign implements Serializable, ITechManager {
         }
         p.setDaysToArrival(0);
         addReport(p.getArrivalReport());
-        int quantity = p.getQuantity();
-        Part spare = checkForExistingSparePart(p);
+        Part spare = p.isReservedForRefit() ? null : checkForExistingSparePart(p);
         if (null != spare) {
+            int quantity = p.getQuantity();
             if (p instanceof Armor) {
                 if (spare instanceof Armor) {
                     while (quantity > 0) {
@@ -1746,7 +1747,8 @@ public class Campaign implements Serializable, ITechManager {
         // go ahead and check for existing parts because some version weren't
         // properly collecting parts
         Part mergedWith = null;
-        if (!(p instanceof MissingPart) && null == p.getUnitId()) {
+        if (!(p instanceof MissingPart) && (null == p.getUnitId())
+                && !p.isReservedForRefit() && !p.isReservedForReplacement()) {
             Part spare = checkForExistingSparePart(p);
             if (null != spare) {
                 if (p instanceof Armor) {
@@ -1773,39 +1775,19 @@ public class Campaign implements Serializable, ITechManager {
             parts.put(p.getId(), p);
             MekHQ.triggerEvent(new PartNewEvent(p));
         } else {
-            // Go through each unit and its refits to see if the new armor ID should be updated
+            // Go through each unit and its refits to see if the new armor should be updated
             // CAW: I believe all other parts on a refit have a unit assigned to them.
-            for (Unit u : getUnits()) {
-                Refit r = u.getRefit();
-                // If there is a refit and this part matches the new armor, update the ID
-                if (null != r) {
-                    if (mergedWith instanceof Armor
-                        && r.getNewArmorSuppliesId() == p.getId()) {
-                        MekHQ.getLogger().info(Campaign.class, "addPartWithoutId",
-                            String.format("%s (%d) was merged with %s (%d) used in a refit for %s", p.getName(),
-                                p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
-                        Armor mergedArmor = (Armor)mergedWith;
-                        r.setNewArmorSupplies(mergedArmor);
-                    } else {
-                        List<Integer> ids = r.getOldUnitPartIds();
-                        for (int ii = 0; ii < ids.size(); ++ii) {
-                            int oid = ids.get(ii);
-                            if (p.getId() == oid) {
-                                MekHQ.getLogger().info(Campaign.class, "addPartWithoutId",
-                                String.format("%s (%d) was merged with %s (%d) used in the old unit in a refit for %s", p.getName(),
+            if (mergedWith instanceof Armor) {
+                for (Unit u : getUnits()) {
+                    Refit r = u.getRefit();
+                    // If there is a refit and this part matches the new armor, update the armor entry
+                    if (null != r) {
+                        if (r.getNewArmorSupplies() == p) {
+                            MekHQ.getLogger().info(
+                                String.format("%s (%d) was merged with %s (%d) used in a refit for %s", p.getName(),
                                     p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
-                                ids.set(ii, mergedWith.getId());
-                            }
-                        }
-                        ids = r.getNewUnitPartIds();
-                        for (int ii = 0; ii < ids.size(); ++ii) {
-                            int nid = ids.get(ii);
-                            if (p.getId() == nid) {
-                                MekHQ.getLogger().info(Campaign.class, "addPartWithoutId",
-                                String.format("%s (%d) was merged with %s (%d) used in the new unit in a refit for %s", p.getName(),
-                                    p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
-                                ids.set(ii, mergedWith.getId());
-                            }
+                            Armor mergedArmor = (Armor) mergedWith;
+                            r.setNewArmorSupplies(mergedArmor);
                         }
                     }
                 }
@@ -2447,6 +2429,11 @@ public class Campaign implements Serializable, ITechManager {
             String personTitle = person.getHyperlinkedFullTitle() + " ";
 
             for (PlanetarySystem system: systems) {
+                if (currentList.isEmpty()) {
+                    // Nothing left to shop for!
+                    break;
+                }
+
                 List<IAcquisitionWork> remainingItems = new ArrayList<>();
 
                 //loop through shopping list. If its time to check, then check as appropriate. Items not
@@ -7882,7 +7869,7 @@ public class Campaign implements Serializable, ITechManager {
             // don't do actual damage until we clear the for loop to avoid
             // concurrent mod problems
             // put it into a hash - 4 points of damage will mean destruction
-            HashMap<Integer, Integer> partsToDamage = new HashMap<>();
+            Map<Part, Integer> partsToDamage = new HashMap<>();
             StringBuilder maintenanceReport = new StringBuilder("<emph>" + techName + " performing maintenance</emph><br><br>");
             for (Part p : u.getParts()) {
                 String partReport = "<b>" + p.getName() + "</b> (Quality " + p.getQualityName() + ")";
@@ -7908,16 +7895,16 @@ public class Campaign implements Serializable, ITechManager {
                         }
                         if (!campaignOptions.useUnofficialMaintenance()) {
                             if (margin < -6) {
-                                partsToDamage.put(p.getId(), 4);
+                                partsToDamage.put(p, 4);
                             } else if (margin < -4) {
-                                partsToDamage.put(p.getId(), 3);
+                                partsToDamage.put(p, 3);
                             } else if (margin == -4) {
-                                partsToDamage.put(p.getId(), 2);
+                                partsToDamage.put(p, 2);
                             } else if (margin < -1) {
-                                partsToDamage.put(p.getId(), 1);
+                                partsToDamage.put(p, 1);
                             }
                         } else if (margin < -6) {
-                            partsToDamage.put(p.getId(), 1);
+                            partsToDamage.put(p, 1);
                         }
                         break;
                     }
@@ -7929,9 +7916,9 @@ public class Campaign implements Serializable, ITechManager {
                         }
                         if (!campaignOptions.useUnofficialMaintenance()) {
                             if (margin < -6) {
-                                partsToDamage.put(p.getId(), 2);
+                                partsToDamage.put(p, 2);
                             } else if (margin < -2) {
-                                partsToDamage.put(p.getId(), 1);
+                                partsToDamage.put(p, 1);
                             }
                         }
                         break;
@@ -7944,9 +7931,9 @@ public class Campaign implements Serializable, ITechManager {
                         }
                         if (!campaignOptions.useUnofficialMaintenance()) {
                             if (margin < -6) {
-                                partsToDamage.put(p.getId(), 2);
+                                partsToDamage.put(p, 2);
                             } else if (margin < -3) {
-                                partsToDamage.put(p.getId(), 1);
+                                partsToDamage.put(p, 1);
                             }
                         }
                         break;
@@ -7955,7 +7942,7 @@ public class Campaign implements Serializable, ITechManager {
                         if (margin < -3) {
                             p.decreaseQuality();
                             if ((margin < -4) && !campaignOptions.useUnofficialMaintenance()) {
-                                partsToDamage.put(p.getId(), 1);
+                                partsToDamage.put(p, 1);
                             }
                         } else if (margin >= 5) {
                             p.improveQuality();
@@ -7966,7 +7953,7 @@ public class Campaign implements Serializable, ITechManager {
                         if (margin < -2) {
                             p.decreaseQuality();
                             if ((margin < -5) && !campaignOptions.useUnofficialMaintenance()) {
-                                partsToDamage.put(p.getId(), 1);
+                                partsToDamage.put(p, 1);
                             }
                         } else if (margin >= 6) {
                             p.improveQuality();
@@ -7977,7 +7964,7 @@ public class Campaign implements Serializable, ITechManager {
                         if (margin < -2) {
                             p.decreaseQuality();
                             if (margin < -6 && !campaignOptions.useUnofficialMaintenance()) {
-                                partsToDamage.put(p.getId(), 1);
+                                partsToDamage.put(p, 1);
                             }
                         }
                         // TODO: award XP point if margin >= 6 (make this optional)
@@ -7993,8 +7980,8 @@ public class Campaign implements Serializable, ITechManager {
                 } else {
                     partReport += ": quality remains " + p.getQualityName();
                 }
-                if (null != partsToDamage.get(p.getId())) {
-                    if (partsToDamage.get(p.getId()) > 3) {
+                if (null != partsToDamage.get(p)) {
+                    if (partsToDamage.get(p) > 3) {
                         partReport += ", <font color='red'><b>part destroyed</b></font>";
                     } else {
                         partReport += ", <font color='red'><b>part damaged</b></font>";
@@ -8002,19 +7989,17 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 maintenanceReport.append(partReport).append("<br>");
             }
+
             int nDamage = 0;
             int nDestroy = 0;
-            for (int key : partsToDamage.keySet()) {
-                Part p = getPart(key);
-                if (null != p) {
-                    int damage = partsToDamage.get(key);
-                    if (damage > 3) {
-                        nDestroy++;
-                        p.remove(false);
-                    } else {
-                        p.doMaintenanceDamage(damage);
-                        nDamage++;
-                    }
+            for (Map.Entry<Part, Integer> p : partsToDamage.entrySet()) {
+                int damage = p.getValue();
+                if (damage > 3) {
+                    nDestroy++;
+                    p.getKey().remove(false);
+                } else {
+                    p.getKey().doMaintenanceDamage(damage);
+                    nDamage++;
                 }
             }
 

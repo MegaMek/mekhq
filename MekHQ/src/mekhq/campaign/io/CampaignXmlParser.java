@@ -379,9 +379,11 @@ public class CampaignXmlParser {
         timestamp = System.currentTimeMillis();
 
         // Process parts...
-        List<Part> spareParts = new ArrayList<>();
+        Map<Integer,Part> knownParts = new HashMap<>();
         List<Part> removeParts = new ArrayList<>();
         for (Part prt : retVal.getParts()) {
+            knownParts.put(prt.getId(), prt);
+
             Unit u = retVal.getUnit(prt.getUnitId());
             prt.setUnit(u);
             if (null != u) {
@@ -440,20 +442,6 @@ public class CampaignXmlParser {
                     }
                 }
 
-            } else if (version.getMajorVersion() == 0
-                    && version.getMinorVersion() < 2 && version.getSnapshot() < 16) {
-                boolean found = false;
-                for (Part spare : spareParts) {
-                    if (spare.isSamePartTypeAndStatus(prt)) {
-                        spare.incrementQuantity();
-                        removeParts.add(prt);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    spareParts.add(prt);
-                }
             }
             if (prt instanceof MissingPart) {
                 // Missing Parts should only exist on units, but there have
@@ -506,10 +494,10 @@ public class CampaignXmlParser {
                     }
                 }
             }
-
         }
         for (Part prt : removeParts) {
             retVal.removePart(prt);
+            knownParts.remove(prt.getId());
         }
 
         MekHQ.getLogger().info(CampaignXmlParser.class, String.format("[Campaign Load] Parts processed in %dms",
@@ -534,22 +522,9 @@ public class CampaignXmlParser {
             unit.resetPilotAndEntity();
 
             if (null != unit.getRefit()) {
+                unit.getRefit().fixupPartReferences(knownParts);
+
                 unit.getRefit().reCalc();
-                if (null == unit.getRefit().getNewArmorSupplies()
-                        && unit.getRefit().getNewArmorSuppliesId() > 0) {
-                    Part armorPart = retVal.getPart(unit.getRefit().getNewArmorSuppliesId());
-                    if (armorPart instanceof Armor) {
-                        Armor armorSupplies = (Armor) armorPart;
-                        unit.getRefit().setNewArmorSupplies(armorSupplies);
-                        if (null == armorSupplies.getUnit()) {
-                            armorSupplies.setUnit(unit);
-                        }
-                    } else {
-                        MekHQ.getLogger().error(CampaignXmlParser.class,
-                                String.format("[Campain Load] Refit for unit %s (%s) references armor supplies that are incorrect; ignoring.",
-                                        unit.getName(), unit.getId().toString()));
-                    }
-                }
                 if (!unit.getRefit().isCustomJob()
                         && !unit.getRefit().kitFound()) {
                     retVal.getShoppingList().addShoppingItemWithoutChecking(unit
