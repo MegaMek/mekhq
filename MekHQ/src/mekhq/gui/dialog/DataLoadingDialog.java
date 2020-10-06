@@ -39,7 +39,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generators.RandomCallsignGenerator;
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
 import megamek.common.util.EncodeControl;

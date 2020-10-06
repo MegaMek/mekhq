@@ -31,7 +31,7 @@ import java.util.function.Predicate;
 import javax.swing.*;
 
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generators.RandomCallsignGenerator;
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
