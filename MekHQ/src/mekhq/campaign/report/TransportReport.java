@@ -53,7 +53,7 @@ public class TransportReport extends Report {
     }
 
     public String getTransportDetails() {
-        HangarStatistics stats = new HangarStatistics(getHangar());
+        HangarStatistics stats = getCampaign().getHangarStatistics();
 
         int noMech = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_MECH) - stats.getOccupiedBays(Entity.ETYPE_MECH), 0);
         int noDS = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP) - stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);

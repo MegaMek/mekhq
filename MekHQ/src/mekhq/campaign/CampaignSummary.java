@@ -148,14 +148,14 @@ public class CampaignSummary {
                 countMissionByStatus[Mission.S_BREACH];
 
         //cargo capacity
-        CargoStatistics cargoStats = new CargoStatistics(campaign);
+        CargoStatistics cargoStats = campaign.getCargoStatistics();
         cargoCapacity = cargoStats.getTotalCombinedCargoCapacity();
         cargoTons = cargoStats.getCargoTonnage(false);
         double mothballedTonnage = cargoStats.getCargoTonnage(false, true);
         cargoTons = (cargoTons + mothballedTonnage);
 
         //transport capacity
-        HangarStatistics hangarStats = new HangarStatistics(campaign.getHangar());
+        HangarStatistics hangarStats = campaign.getHangarStatistics();
         int noMech = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MECH) - hangarStats.getOccupiedBays(Entity.ETYPE_MECH), 0);
         int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
@@ -257,7 +257,7 @@ public class CampaignSummary {
             percentTransported = 100 - (int) Math.round(100 * unitsOver / (double) (unitsOver + unitsTransported));
         }
         String dropshipAppend = "";
-        int dockingCollars = new HangarStatistics(campaign.getHangar()).getTotalDockingCollars();
+        int dockingCollars = campaign.getHangarStatistics().getTotalDockingCollars();
         if (nDS > 0) {
             dropshipAppend = ", " + Integer.toString(nDS) + " dropships/" + Integer.toString(dockingCollars) + " docking collars";
         }

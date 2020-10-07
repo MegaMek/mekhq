@@ -343,7 +343,7 @@ public class PersonnelMarket {
     }
 
     public static long getUnitMainForceTypes(Campaign c) {
-        HangarStatistics hangarStats = new HangarStatistics(c.getHangar());
+        HangarStatistics hangarStats = c.getHangarStatistics();
         int mechs = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MECH);
         int ds = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int sc = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);

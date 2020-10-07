@@ -85,7 +85,7 @@ public class CargoStatistics {
 
     @SuppressWarnings("unused") // FIXME: This whole method needs re-worked once Dropship Assignments are in
     public double getCargoTonnage(final boolean inTransit, final boolean mothballed) {
-        HangarStatistics stats = new HangarStatistics(getHangar());
+        HangarStatistics stats = getCampaign().getHangarStatistics();
 
         double cargoTonnage = 0;
         double mothballedTonnage = 0;

@@ -1106,6 +1106,20 @@ public class Campaign implements Serializable, ITechManager {
         return units;
     }
 
+    /**
+     * Gets statistics related to units in the hangar.
+     */
+    public HangarStatistics getHangarStatistics() {
+        return new HangarStatistics(getHangar());
+    }
+
+    /**
+     * Gets statistics related to cargo in the hangar.
+     */
+    public CargoStatistics getCargoStatistics() {
+        return new CargoStatistics(this);
+    }
+
     public Collection<Unit> getUnits() {
         return getHangar().getUnits();
     }
@@ -4858,8 +4872,8 @@ public class Campaign implements Serializable, ITechManager {
      */
     @SuppressWarnings("unused") // FIXME: Waiting for Dylan to finish re-writing
     public Money calculateCostPerJump(boolean excludeOwnTransports, boolean campaignOpsCosts) {
-        HangarStatistics stats = new HangarStatistics(getHangar());
-        CargoStatistics cargoStats = new CargoStatistics(this);
+        HangarStatistics stats = getHangarStatistics();
+        CargoStatistics cargoStats = getCargoStatistics();
 
         Money collarCost = Money.of(campaignOpsCosts ? 100000 : 50000);
 

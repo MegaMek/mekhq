@@ -55,8 +55,8 @@ public class CargoReport extends Report {
     }
 
     public String getCargoDetails() {
-        CargoStatistics cargoStats = new CargoStatistics(getCampaign());
-        HangarStatistics hangarStats = new HangarStatistics(getHangar());
+        CargoStatistics cargoStats = getCampaign().getCargoStatistics();
+        HangarStatistics hangarStats = getCampaign().getHangarStatistics();
 
         StringBuffer sb = new StringBuffer("Cargo\n\n");
         double ccc = cargoStats.getTotalCombinedCargoCapacity();
