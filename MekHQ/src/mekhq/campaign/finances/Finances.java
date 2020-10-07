@@ -225,7 +225,7 @@ public class Finances implements Serializable {
 
     public void newDay(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Accountant accountant = new Accountant(campaign);
+        Accountant accountant = campaign.getAccountant();
 
         // check for a new fiscal year
         if (campaign.getCampaignOptions().getFinancialYearDuration().isEndOfFinancialYear(campaign.getLocalDate())) {
@@ -487,7 +487,7 @@ public class Finances implements Serializable {
     }
 
     public Money getMaxCollateral(Campaign c) {
-        return new Accountant(c).getTotalEquipmentValue()
+        return c.getAccountant().getTotalEquipmentValue()
                 .plus(getTotalAssetValue())
                 .minus(getTotalLoanCollateral());
     }

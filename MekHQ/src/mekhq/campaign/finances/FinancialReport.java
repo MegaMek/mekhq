@@ -179,7 +179,7 @@ public class FinancialReport {
                 .collect(Collectors.toList()));
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Accountant accountant = new Accountant(campaign);
+        Accountant accountant = campaign.getAccountant();
 
         if (campaignOptions.payForMaintain()) {
             r.maintenance = accountant.getWeeklyMaintenanceCosts().multipliedBy(4);

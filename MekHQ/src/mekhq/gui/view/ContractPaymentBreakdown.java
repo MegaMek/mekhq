@@ -374,12 +374,12 @@ public class ContractPaymentBreakdown {
 
     private void setLblOverheadExp2() {
         lblOverheadExp2.setText(generateMonthlyHeader(contract.getLengthPlusTravel(campaign))
-                + "-" + new Accountant(campaign).getOverheadExpenses().toAmountAndSymbolString());
+                + "-" + campaign.getAccountant().getOverheadExpenses().toAmountAndSymbolString());
     }
 
     private void setLblMaintenanceExp2() {
         lblMaintenanceExp2.setText(generateMonthlyHeader(contract.getLengthPlusTravel(campaign))
-                + "-" + new Accountant(campaign).getMaintenanceCosts().toAmountAndSymbolString());
+                + "-" + campaign.getAccountant().getMaintenanceCosts().toAmountAndSymbolString());
     }
 
     private void setLblPayrollExp2() {

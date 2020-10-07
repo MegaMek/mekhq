@@ -4693,6 +4693,10 @@ public class Campaign implements Serializable, ITechManager {
         return finances;
     }
 
+    public Accountant getAccountant() {
+        return new Accountant(this);
+    }
+
     public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid) {
         return getPartsNeedingServiceFor(uid, false);
     }

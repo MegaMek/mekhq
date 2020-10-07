@@ -489,7 +489,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @return the cumulative sum of estimated overhead expenses for the duration of travel + deployment
      */
     public Money getTotalEstimatedOverheadExpenses(Campaign c) {
-        return new Accountant(c).getOverheadExpenses().multipliedBy(getLengthPlusTravel(c));
+        return c.getAccountant().getOverheadExpenses().multipliedBy(getLengthPlusTravel(c));
     }
 
     /**
@@ -497,7 +497,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @return the cumulative sum of estimated maintenance expenses for the duration of travel + deployment
      */
     public Money getTotalEstimatedMaintenanceExpenses(Campaign c) {
-        return new Accountant(c).getMaintenanceCosts().multipliedBy(getLengthPlusTravel(c));
+        return c.getAccountant().getMaintenanceCosts().multipliedBy(getLengthPlusTravel(c));
     }
 
     /**
@@ -505,7 +505,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @return the estimated payroll expenses for one month
      */
     public Money getEstimatedPayrollExpenses(Campaign c) {
-        Accountant accountant = new Accountant(c);
+        Accountant accountant = c.getAccountant();
         if (c.getCampaignOptions().usePeacetimeCost()) {
             return accountant.getPeacetimeCost();
         } else {
@@ -574,7 +574,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @param c current campaign
      */
     public void calculateContract(Campaign c) {
-        Accountant accountant = new Accountant(c);
+        Accountant accountant = c.getAccountant();
 
         //calculate base amount
         baseAmount = accountant.getContractBase()
