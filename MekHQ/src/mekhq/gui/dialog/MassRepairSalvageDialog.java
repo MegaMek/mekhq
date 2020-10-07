@@ -243,12 +243,12 @@ public class MassRepairSalvageDialog extends JDialog {
         if (refreshCompleteList) {
             completePartsList = new ArrayList<>();
 
-            for (Part part : campaignGUI.getCampaign().getSpareParts()) {
+            campaignGUI.getCampaign().forEachSparePart(part -> {
                 if (!part.isBeingWorkedOn() && part.needsFixing() && !(part instanceof AmmoBin)
                         && (part.getSkillMin() <= SkillType.EXP_ELITE)) {
                     completePartsList.add(part);
                 }
-            }
+            });
         }
 
         filteredPartsList = new ArrayList<>();

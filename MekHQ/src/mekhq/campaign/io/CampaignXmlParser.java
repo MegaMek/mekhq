@@ -649,11 +649,11 @@ public class CampaignXmlParser {
 
         //unload any ammo bins in the warehouse
         List<AmmoBin> binsToUnload = new ArrayList<>();
-        for (Part prt : retVal.getSpareParts()) {
+        retVal.forEachSparePart(prt -> {
             if (prt instanceof AmmoBin && !prt.isReservedForRefit() && ((AmmoBin) prt).getShotsNeeded() == 0) {
                 binsToUnload.add((AmmoBin) prt);
             }
-        }
+        });
         for (AmmoBin bin : binsToUnload) {
             bin.unload();
         }

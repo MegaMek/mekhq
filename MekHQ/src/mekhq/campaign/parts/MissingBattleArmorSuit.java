@@ -306,49 +306,45 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     @Override
     public Part findReplacement(boolean refit) {
-        Part bestPart = null;
-
         //check to see if we already have a replacement assigned
         if (hasReplacementPart()) {
             return getReplacementPart();
         }
         // don't just return with the first part if it is damaged
-        for(Part part : campaign.getSpareParts()) {
-            if(part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent() || part.hasParentPart()) {
-                continue;
-            }
-
-            if(isAcceptableReplacement(part, refit)) {
-                if(null == bestPart) {
-                    bestPart = part;
-                } else {
-                    int bestPartArmor = 0;
-                    int currentPartArmor = 0;
-                    int bestPartQuantity = 0;
-                    int currentPartQuantity = 0;
-                    for (Part p : bestPart.getChildParts()) {
-                        if (p instanceof BaArmor) {
-                            bestPartArmor = ((BaArmor)p).getAmount();
-                        } else {
-                            bestPartQuantity++;
+        return campaign.streamSpareParts()
+            .filter(MissingPart::isAvailableAsReplacement)
+            .reduce(null, (bestPart, part) -> {
+                if (isAcceptableReplacement(part, refit)) {
+                    if (bestPart == null) {
+                        return part;
+                    } else {
+                        int bestPartArmor = 0;
+                        int currentPartArmor = 0;
+                        int bestPartQuantity = 0;
+                        int currentPartQuantity = 0;
+                        for (Part p : bestPart.getChildParts()) {
+                            if (p instanceof BaArmor) {
+                                bestPartArmor = ((BaArmor)p).getAmount();
+                            } else {
+                                bestPartQuantity++;
+                            }
                         }
-                    }
-                    for (Part p : part.getChildParts()) {
-                        if (p instanceof BaArmor) {
-                            currentPartArmor = ((BaArmor)p).getAmount();
-                        } else {
-                            currentPartQuantity++;
+                        for (Part p : part.getChildParts()) {
+                            if (p instanceof BaArmor) {
+                                currentPartArmor = ((BaArmor)p).getAmount();
+                            } else {
+                                currentPartQuantity++;
+                            }
                         }
-                    }
-                    if(currentPartQuantity > bestPartQuantity) {
-                        bestPart = part;
-                    } else if(currentPartArmor > bestPartArmor) {
-                        bestPart = part;
+                        if (currentPartQuantity > bestPartQuantity) {
+                            return part;
+                        } else if (currentPartArmor > bestPartArmor) {
+                            return part;
+                        }
                     }
                 }
-            }
-        }
-        return bestPart;
+                return bestPart;
+            });
     }
 
     @Override
