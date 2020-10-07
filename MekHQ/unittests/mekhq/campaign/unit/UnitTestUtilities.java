@@ -35,8 +35,8 @@ import java.io.InputStream;
 public final class UnitTestUtilities {
 
     public static Unit addAndGetUnit(Campaign campaign, Entity entity) {
-        campaign.addUnit(entity, false, 0);        
-        for (Unit unit : campaign.getUnits()) {
+        campaign.addNewUnit(entity, false, 0);
+        for (Unit unit : campaign.getHangar().getUnits()) {
             return unit;
         }
 

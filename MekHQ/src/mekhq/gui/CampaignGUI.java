@@ -1166,7 +1166,7 @@ public class CampaignGUI extends JPanel {
         }
         Vector<Unit> notMaintained = new Vector<>();
         int totalAstechMinutesNeeded = 0;
-        for (Unit u : getCampaign().getUnits()) {
+        for (Unit u : getCampaign().getHangar().getUnits()) {
             if (u.isUnmaintained()) {
                 notMaintained.add(u);
             } else if (u.isPresent() && (u.getEngineer() == null)) {
@@ -1932,7 +1932,7 @@ public class CampaignGUI extends JPanel {
 
             // Add the units from the file.
             for (Entity entity : parser.getEntities()) {
-                getCampaign().addUnit(entity, allowNewPilots, 0);
+                getCampaign().addNewUnit(entity, allowNewPilots, 0);
             }
 
             // TODO : re-add any ejected pilots

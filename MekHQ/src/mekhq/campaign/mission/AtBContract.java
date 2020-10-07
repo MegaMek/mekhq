@@ -706,7 +706,7 @@ public class AtBContract extends Contract implements Serializable {
             }
 
             if (null != en) {
-                c.addUnit(en, false, 0);
+                c.addNewUnit(en, false, 0);
             } else {
                 c.addReport("<html><font color='red'>Could not load unit</font></html>");
             }

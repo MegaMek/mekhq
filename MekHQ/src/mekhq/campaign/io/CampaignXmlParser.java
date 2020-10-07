@@ -374,8 +374,8 @@ public class CampaignXmlParser {
             }
         }
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, String.format("[Campaign Load] Force IDs set in %dms",
-                System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().info(String.format("[Campaign Load] Force IDs set in %dms",
+            System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         // Process parts...
@@ -500,8 +500,8 @@ public class CampaignXmlParser {
             knownParts.remove(prt.getId());
         }
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, String.format("[Campaign Load] Parts processed in %dms",
-                System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().info(String.format("[Campaign Load] Parts processed in %dms",
+            System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         for (Person psn : retVal.getPersonnel()) {
@@ -509,12 +509,12 @@ public class CampaignXmlParser {
             psn.resetSkillTypes();
         }
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, String.format("[Campaign Load] Rank references fixed in %dms",
-                System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().info(String.format("[Campaign Load] Rank references fixed in %dms",
+            System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         // Okay, Units, need their pilot references fixed.
-        for (Unit unit : retVal.getUnits()) {
+        retVal.getHangar().forEachUnit(unit -> {
             // Also, the unit should have its campaign set.
             unit.setCampaign(retVal);
 
@@ -572,30 +572,30 @@ public class CampaignXmlParser {
                     }
                 }
             }
-        }
+        });
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, String.format("[Campaign Load] Pilot references fixed in %dms",
-                System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().info(String.format("[Campaign Load] Pilot references fixed in %dms",
+            System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
-        for (Unit unit : retVal.getUnits()) {
+        retVal.getHangar().forEachUnit(unit -> {
             // Some units have been incorrectly assigned a null C3UUID as a string. This should correct that by setting a new C3UUID
             if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i() || unit.getEntity().hasNavalC3())
                     && (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
                 unit.getEntity().setC3UUID();
                 unit.getEntity().setC3NetIdSelf();
             }
-        }
+        });
         retVal.refreshNetworks();
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, String.format("[Campaign Load] C3 networks refreshed in %dms",
-                System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().info(String.format("[Campaign Load] C3 networks refreshed in %dms",
+            System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         // ok, once we are sure that campaign has been set for all units, we can
         // now go through and initializeParts and run diagnostics
         List<Unit> removeUnits = new ArrayList<>();
-        for (Unit unit : retVal.getUnits()) {
+        retVal.getHangar().forEachUnit(unit -> {
             // just in case parts are missing (i.e. because they weren't tracked
             // in previous versions)
             unit.initializeParts(true);
@@ -609,18 +609,18 @@ public class CampaignXmlParser {
                     unit.setSalvage(true);
                 }
             }
-        }
+        });
         for (Unit unit : removeUnits) {
             retVal.removeUnit(unit.getId());
         }
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, String.format("[Campaign Load] Units initialized in %dms",
+        MekHQ.getLogger().info(String.format("[Campaign Load] Units initialized in %dms",
                 System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         retVal.reloadNews();
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, String.format("[Campaign Load] News loaded in %dms",
+        MekHQ.getLogger().info(String.format("[Campaign Load] News loaded in %dms",
                 System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
@@ -658,7 +658,7 @@ public class CampaignXmlParser {
             bin.unload();
         }
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, String.format("[Campaign Load] Ammo bins cleared in %dms",
+        MekHQ.getLogger().info(String.format("[Campaign Load] Ammo bins cleared in %dms",
                 System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
@@ -674,7 +674,7 @@ public class CampaignXmlParser {
             }
         }
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, String.format("[Campaign Load] Reserved refit parts fixed in %dms",
+        MekHQ.getLogger().info(String.format("[Campaign Load] Reserved refit parts fixed in %dms",
                 System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
@@ -716,12 +716,12 @@ public class CampaignXmlParser {
             retVal.removePart(toRemove);
         }
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, String.format("[Campaign Load] Warehouse cleaned up in %dms",
+        MekHQ.getLogger().info(String.format("[Campaign Load] Warehouse cleaned up in %dms",
                 System.currentTimeMillis() - timestamp));
 
         retVal.setUnitRating(null);
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, "Load of campaign file complete!");
+        MekHQ.getLogger().info("Load of campaign file complete!");
 
         return retVal;
     }
@@ -984,24 +984,27 @@ public class CampaignXmlParser {
     private static void fixIdReferences(Campaign retVal) {
         // set up translation hashes
         Map<Integer, UUID> uHash = new HashMap<>();
+        retVal.getHangar().forEachUnit(u -> uHash.put(u.getOldId(), u.getId()));
+
         Map<Integer, UUID> pHash = new HashMap<>();
-        for (Unit u : retVal.getUnits()) {
-            uHash.put(u.getOldId(), u.getId());
-        }
         for (Person p : retVal.getPersonnel()) {
             pHash.put(p.getOldId(), p.getId());
         }
+
         // ok now go through and fix
-        for (Unit u : retVal.getUnits()) {
-            u.fixIdReferences(uHash, pHash);
-        }
+        retVal.getHangar().forEachUnit(u -> u.fixIdReferences(uHash, pHash));
+
         for (Person p : retVal.getPersonnel()) {
             p.fixIdReferences(uHash, pHash);
         }
+
         retVal.getForces().fixIdReferences(uHash);
+
         for (Part p : retVal.getParts()) {
             p.fixIdReferences(uHash, pHash);
         }
+
+        // check for kills with missing person references
         List<Kill> ghostKills = new ArrayList<>();
         for (Kill k : retVal.getKills()) {
             k.fixIdReferences(pHash);
@@ -1009,7 +1012,7 @@ public class CampaignXmlParser {
                 ghostKills.add(k);
             }
         }
-        // check for kills with missing person references
+
         for (Kill k : ghostKills) {
             if (null == k.getPilotId()) {
                 retVal.removeKill(k);
@@ -1018,7 +1021,7 @@ public class CampaignXmlParser {
     }
 
     private static void fixIdReferencesB(Campaign retVal) {
-        for (Unit u : retVal.getUnits()) {
+        retVal.getHangar().forEachUnit(u -> {
             Entity en = u.getEntity();
             en.setExternalIdAsString(u.getId().toString());
 
@@ -1027,7 +1030,7 @@ public class CampaignXmlParser {
                 en.setC3UUID();
                 en.setC3NetIdSelf();
             }
-        }
+        });
     }
 
     private static void processFinances(Campaign retVal, Node wn) {

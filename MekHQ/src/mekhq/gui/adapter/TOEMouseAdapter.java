@@ -54,6 +54,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CamoChoiceDialog;
@@ -828,41 +829,42 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     // Or Gun Emplacements!
                     // TODO: Or Robotic Systems!
                     JMenu unsorted = new JMenu("Unsorted");
-                    for (Unit u : gui.getCampaign().getUnits(true)) {
+
+                    HangarSorter.weightSorted().forEachUnit(gui.getCampaign().getHangar(), u -> {
                         String type = UnitType.getTypeName(u.getEntity().getUnitType());
                         String className = u.getEntity().getWeightClassName();
                         if (null != u.getCommander()) {
                             Person p = u.getCommander();
                             if (p.getStatus().isActive() && (u.getForceId() < 1) && u.isPresent()) {
-                                menuItem = new JMenuItem(p.getFullTitle() + ", " + u.getName());
-                                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
-                                menuItem.addActionListener(this);
-                                menuItem.setEnabled(u.isAvailable());
+                                JMenuItem menuItem0 = new JMenuItem(p.getFullTitle() + ", " + u.getName());
+                                menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
+                                menuItem0.addActionListener(this);
+                                menuItem0.setEnabled(u.isAvailable());
                                 if (null != weightClassForUnitType.get(type + "_" + className)) {
-                                    weightClassForUnitType.get(type + "_" + className).add(menuItem);
+                                    weightClassForUnitType.get(type + "_" + className).add(menuItem0);
                                     weightClassForUnitType.get(type + "_" + className).setEnabled(true);
                                 } else {
-                                    unsorted.add(menuItem);
+                                    unsorted.add(menuItem0);
                                 }
                                 unitTypeMenus.get(type).setEnabled(true);
                             }
                         }
                         if (u.getEntity() instanceof GunEmplacement) {
                             if (u.getForceId() < 1 && u.isPresent()) {
-                                menuItem = new JMenuItem("AutoTurret, " + u.getName());
-                                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
-                                menuItem.addActionListener(this);
-                                menuItem.setEnabled(u.isAvailable());
+                                JMenuItem menuItem0 = new JMenuItem("AutoTurret, " + u.getName());
+                                menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
+                                menuItem0.addActionListener(this);
+                                menuItem0.setEnabled(u.isAvailable());
                                 if (null != weightClassForUnitType.get(type + "_" + className)) {
-                                    weightClassForUnitType.get(type + "_" + className).add(menuItem);
+                                    weightClassForUnitType.get(type + "_" + className).add(menuItem0);
                                     weightClassForUnitType.get(type + "_" + className).setEnabled(true);
                                 } else {
-                                    unsorted.add(menuItem);
+                                    unsorted.add(menuItem0);
                                 }
                                 unitTypeMenus.get(type).setEnabled(true);
                             }
                         }
-                    }
+                    });
 
                     for (int i = 0; i < UnitType.SIZE; i++)
                     {

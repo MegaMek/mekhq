@@ -49,6 +49,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
+import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.*;
@@ -1404,7 +1405,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 int weightClass = -1;
 
                 if (oneSelected && person.getStatus().isActive() && person.getPrisonerStatus().isFree()) {
-                    for (Unit unit : gui.getCampaign().getUnits(true, true, true)) {
+                    for (Unit unit : HangarSorter.defaultSorting().getUnits(gui.getCampaign().getHangar())) {
                         if (!unit.isAvailable()) {
                             continue;
                         } else if (unit.getEntity().getUnitType() != unitType) {
@@ -1560,7 +1561,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         }
                     }
                 } else if (StaticChecks.areAllActive(selected) && StaticChecks.areAllEligible(selected)) {
-                    for (Unit unit : gui.getCampaign().getUnits( true, true, true)) {
+                    for (Unit unit : HangarSorter.defaultSorting().getUnits(gui.getCampaign().getHangar())) {
                         if (!unit.isAvailable()) {
                             continue;
                         } else if (unit.getEntity().getUnitType() != unitType) {

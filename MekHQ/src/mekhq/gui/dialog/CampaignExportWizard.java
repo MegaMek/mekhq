@@ -293,9 +293,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupUnitList() {
         unitList = new JList<>();
         DefaultListModel<Unit> unitListModel = new DefaultListModel<>();
-        for (Unit unit : sourceCampaign.getUnits()) {
-            unitListModel.addElement(unit);
-        }
+        sourceCampaign.getHangar().forEachUnit(unitListModel::addElement);
         unitList.setModel(unitListModel);
         unitList.addListSelectionListener(e -> {
             lblStatus.setText(getUnitSelectionStatus());
@@ -556,9 +554,7 @@ public class CampaignExportWizard extends JDialog {
             }
         }
 
-        for (Unit unit : destinationCampaign.getUnits()) {
-            unit.resetEngineer();
-        }
+        destinationCampaign.getHangar().forEachUnit(Unit::resetEngineer);
 
         // there's just no way to overwrite parts
         // so we simply add them to the destination

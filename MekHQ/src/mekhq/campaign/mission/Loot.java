@@ -142,7 +142,7 @@ public class Loot implements MekHqXmlSerializable {
                     "Reward for " + getName() + " during " + s.getName(), campaign.getLocalDate());
         }
         for(Entity e : units) {
-            campaign.addUnit(e, false, 0);
+            campaign.addNewUnit(e, false, 0);
         }
         for(Part p : parts) {
             campaign.addPart(p, 0);

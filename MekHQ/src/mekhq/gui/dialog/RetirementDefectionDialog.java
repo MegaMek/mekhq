@@ -505,9 +505,9 @@ public class RetirementDefectionDialog extends JDialog {
         List<UUID> unassignedMechs = new ArrayList<>();
         List<UUID> unassignedASF = new ArrayList<>();
         ArrayList<UUID> availableUnits = new ArrayList<>();
-        for (Unit u : hqView.getCampaign().getUnits()) {
+        hqView.getCampaign().getHangar().forEachUnit(u -> {
             if (!u.isAvailable() && !u.isMothballing() && !u.isMothballed()) {
-                continue;
+                return;
             }
             availableUnits.add(u.getId());
             if (UnitType.MEK == u.getEntity().getUnitType()) {
@@ -520,7 +520,8 @@ public class RetirementDefectionDialog extends JDialog {
                     unassignedASF.add(u.getId());
                 }
             }
-        }
+        });
+
         /* Defectors who steal a unit will take either the one they were
          * piloting or one of the unassigned units (50/50, unless there
          * is only one choice)

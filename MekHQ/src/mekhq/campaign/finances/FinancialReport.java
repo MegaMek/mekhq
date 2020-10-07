@@ -153,7 +153,7 @@ public class FinancialReport {
         r.loans = campaign.getFinances().getLoanBalance();
         r.assets = campaign.getFinances().getTotalAssetValue();
 
-        for (Unit u : campaign.getUnits()) {
+        campaign.getHangar().forEachUnit(u -> {
             Money value = u.getSellValue();
             if (u.getEntity() instanceof Mech) {
                 r.mech = r.mech.plus(value);
@@ -171,7 +171,7 @@ public class FinancialReport {
             } else if (u.getEntity() instanceof Protomech) {
                 r.proto = r.proto.plus(value);
             }
-        }
+        });
 
         r.spareParts = r.spareParts.plus(
             campaign.streamSpareParts()

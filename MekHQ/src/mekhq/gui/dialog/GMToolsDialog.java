@@ -843,7 +843,7 @@ public class GMToolsDialog extends JDialog {
             try {
                 e = new MechFileParser(getLastRolledUnit().getSourceFile(),
                         getLastRolledUnit().getEntryName()).getEntity();
-                Unit u = getGUI().getCampaign().addUnit(e, false, 0);
+                Unit u = getGUI().getCampaign().addNewUnit(e, false, 0);
                 if ((getPerson() != null) && (getPerson().getUnitId() == null)) {
                     u.addPilotOrSoldier(getPerson());
                     getPerson().setOriginalUnit(u);
