@@ -6882,113 +6882,6 @@ public class Campaign implements Serializable, ITechManager {
 
     }
 
-    public FinancialReport getFinancialReport() {
-        return FinancialReport.calculate(this);
-    }
-
-    public String getFormattedFinancialReport() {
-        StringBuilder sb = new StringBuilder();
-
-        FinancialReport r = getFinancialReport();
-
-        Money liabilities = r.getTotalLiabilities();
-        Money assets = r.getTotalAssets();
-        Money netWorth = r.getNetWorth();
-
-        int longest = Math.max(
-                liabilities.toAmountAndSymbolString().length(),
-                assets.toAmountAndSymbolString().length());
-        longest = Math.max(
-                netWorth.toAmountAndSymbolString().length(),
-                longest);
-        String formatted = "%1$" + longest + "s";
-        sb.append("Net Worth................ ")
-                .append(String.format(formatted, netWorth.toAmountAndSymbolString())).append("\n\n");
-        sb.append("    Assets............... ")
-                .append(String.format(formatted, assets.toAmountAndSymbolString())).append("\n");
-        sb.append("       Cash.............. ")
-                .append(String.format(formatted, r.getCash().toAmountAndSymbolString())).append("\n");
-        if (r.getMechValue().isPositive()) {
-            sb.append("       Mechs............. ")
-                    .append(String.format(formatted, r.getMechValue().toAmountAndSymbolString())).append("\n");
-        }
-        if (r.getVeeValue().isPositive()) {
-            sb.append("       Vehicles.......... ")
-                    .append(String.format(formatted, r.getVeeValue().toAmountAndSymbolString())).append("\n");
-        }
-        if (r.getBattleArmorValue().isPositive()) {
-            sb.append("       BattleArmor....... ")
-                    .append(String.format(formatted, r.getBattleArmorValue().toAmountAndSymbolString())).append("\n");
-        }
-        if (r.getInfantryValue().isPositive()) {
-            sb.append("       Infantry.......... ")
-                    .append(String.format(formatted, r.getInfantryValue().toAmountAndSymbolString())).append("\n");
-        }
-        if (r.getProtomechValue().isPositive()) {
-            sb.append("       Protomechs........ ")
-                    .append(String.format(formatted, r.getProtomechValue().toAmountAndSymbolString())).append("\n");
-        }
-        if (r.getSmallCraftValue().isPositive()) {
-            sb.append("       Small Craft....... ")
-                    .append(String.format(formatted, r.getSmallCraftValue().toAmountAndSymbolString())).append("\n");
-        }
-        if (r.getLargeCraftValue().isPositive()) {
-            sb.append("       Large Craft....... ")
-                    .append(String.format(formatted, r.getLargeCraftValue().toAmountAndSymbolString())).append("\n");
-        }
-        sb.append("       Spare Parts....... ")
-                .append(String.format(formatted, r.getSparePartsValue().toAmountAndSymbolString())).append("\n");
-
-        if (getFinances().getAllAssets().size() > 0) {
-            for (Asset asset : getFinances().getAllAssets()) {
-                String assetName = asset.getName();
-                if (assetName.length() > 18) {
-                    assetName = assetName.substring(0, 17);
-                } else {
-                    int numPeriods = 18 - assetName.length();
-                    for (int i = 0; i < numPeriods; i++) {
-                        assetName += ".";
-                    }
-                }
-                assetName += " ";
-                sb.append("       ").append(assetName)
-                        .append(String.format(formatted, asset.getValue().toAmountAndSymbolString()))
-                        .append("\n");
-            }
-        }
-        sb.append("\n");
-        sb.append("    Liabilities.......... ")
-                .append(String.format(formatted, liabilities.toAmountAndSymbolString())).append("\n");
-        sb.append("       Loans............. ")
-                .append(String.format(formatted, r.getLoans().toAmountAndSymbolString())).append("\n\n\n");
-
-        sb.append("Monthly Profit........... ")
-                .append(String.format(formatted, r.getMonthlyIncome().minus(r.getMonthlyExpenses()).toAmountAndSymbolString()))
-                .append("\n\n");
-        sb.append("Monthly Income........... ")
-                .append(String.format(formatted, r.getMonthlyIncome().toAmountAndSymbolString())).append("\n");
-        sb.append("    Contract Payments.... ")
-                .append(String.format(formatted, r.getContracts().toAmountAndSymbolString())).append("\n\n");
-        sb.append("Monthly Expenses......... ")
-                .append(String.format(formatted, r.getMonthlyExpenses().toAmountAndSymbolString())).append("\n");
-        sb.append("    Salaries............. ")
-                .append(String.format(formatted, r.getSalaries().toAmountAndSymbolString())).append("\n");
-        sb.append("    Maintenance.......... ")
-                .append(String.format(formatted, r.getMaintenance().toAmountAndSymbolString())).append("\n");
-        sb.append("    Overhead............. ")
-                .append(String.format(formatted, r.getOverheadCosts().toAmountAndSymbolString())).append("\n");
-        if (campaignOptions.usePeacetimeCost()) {
-            sb.append("    Spare Parts.......... ")
-                    .append(String.format(formatted, r.getMonthlySparePartCosts().toAmountAndSymbolString())).append("\n");
-            sb.append("    Training Munitions... ")
-                    .append(String.format(formatted, r.getMonthlyAmmoCosts().toAmountAndSymbolString())).append("\n");
-            sb.append("    Fuel................. ")
-                    .append(String.format(formatted, r.getMonthlyFuelCosts().toAmountAndSymbolString())).append("\n");
-        }
-
-        return sb.toString();
-    }
-
     public void setHealingTimeOptions(int newHeal, int newNaturalHeal) {
         // we need to check the current values and then if necessary change the
         // times for all
@@ -7015,6 +6908,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
     }
+
     /**
      * Returns our list of potential transport ships
      * @return
