@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2020 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2018, 2020 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.module;
 
@@ -26,9 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.module.api.MekHQModule;
 
@@ -38,10 +36,8 @@ import mekhq.module.api.MekHQModule;
  * use by the various specific module managers.
  *
  * @author Neoancient
- *
  */
 public class ScriptPluginManager {
-
     private static ScriptPluginManager instance;
 
     private final List<MekHQModule> modules;
@@ -76,12 +72,9 @@ public class ScriptPluginManager {
     }
 
     private void addModule(File script, String extension) {
-        final String METHOD_NAME = "addModule(File)"; //$NON-NLS-1$
-
         ScriptEngine engine = scriptEngineManager.getEngineByExtension(extension);
         if (null == engine) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING,
-                    "Could not find script engine for extension " + extension);
+            MekHQ.getLogger().warning(this, "Could not find script engine for extension " + extension);
             return;
         }
         try (Reader fileReader = new FileReader(script)) {
@@ -92,10 +85,8 @@ public class ScriptPluginManager {
                     modules.add((MekHQModule) p);
                 }
             }
-        } catch (IOException | ScriptException e) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "While parsing script " + script.getName());
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(this, "While parsing script " + script.getName(), e);
         }
     }
 
@@ -103,14 +94,10 @@ public class ScriptPluginManager {
     private static void listEngines() {
         ScriptEngineManager mgr = new ScriptEngineManager(PluginManager.getInstance().getClassLoader());
         for (ScriptEngineFactory engine : mgr.getEngineFactories()) {
-            MekHQ.getLogger().info(ScriptPluginManager.class, "listEngines",
-                    "Engine: " + engine.getEngineName());
-            MekHQ.getLogger().info(ScriptPluginManager.class, "listEngines",
-                    "\tVersion: " + engine.getEngineVersion());
-            MekHQ.getLogger().info(ScriptPluginManager.class, "listEngines",
-                    "\tAlias: " + engine.getNames());
-            MekHQ.getLogger().info(ScriptPluginManager.class, "listEngines",
-                    "\tLanguage name: " + engine.getLanguageName() + "\n");
+            MekHQ.getLogger().info(ScriptPluginManager.class, "Engine: " + engine.getEngineName());
+            MekHQ.getLogger().info(ScriptPluginManager.class, "\tVersion: " + engine.getEngineVersion());
+            MekHQ.getLogger().info(ScriptPluginManager.class, "\tAlias: " + engine.getNames());
+            MekHQ.getLogger().info(ScriptPluginManager.class, "\tLanguage name: " + engine.getLanguageName() + "\n");
         }
     }
 }

@@ -146,7 +146,6 @@ public class PersonAwardController {
                 } else {
                     awards.remove(award);
                 }
-                // TODO : LocalDate : Replace me with direct LocalDate usage
                 AwardLogger.removedAward(person, currentDate, award);
                 MekHQ.triggerEvent(new PersonChangedEvent(person));
                 return;
@@ -159,7 +158,6 @@ public class PersonAwardController {
      * @param award that was given.
      */
     public void logAward(Award award, LocalDate date) {
-        // TODO : LocalDate : Replace me with direct LocalDate usage
         AwardLogger.award(person, date, award);
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }

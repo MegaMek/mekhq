@@ -30,7 +30,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
@@ -116,7 +115,7 @@ public class CustomOption {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn = nl.item(x);
 
-            if (wn.getParentNode() != spaEle)
+            if (!wn.getParentNode().equals(spaEle))
                 continue;
 
             int xc = wn.getNodeType();
@@ -139,12 +138,9 @@ public class CustomOption {
     }
 
     public static CustomOption generateInstanceFromXML(Node wn) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
-
         String key = wn.getAttributes().getNamedItem("name").getTextContent();
         if (null == key) {
-            MekHQ.getLogger().log(CustomOption.class, METHOD_NAME, LogLevel.ERROR,
-                    "Custom ability does not have a 'name' attribute.");
+            MekHQ.getLogger().error(CustomOption.class, "Custom ability does not have a 'name' attribute.");
             return null;
         }
 
@@ -178,8 +174,8 @@ public class CustomOption {
                     break;
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().log(CustomOption.class, METHOD_NAME, LogLevel.ERROR,
-                    "Error parsing custom ability " + retVal.name);
+            MekHQ.getLogger().error(CustomOption.class, "Error parsing custom ability " + retVal.name);
+            MekHQ.getLogger().error(CustomOption.class, ex);
         }
 
         return retVal;

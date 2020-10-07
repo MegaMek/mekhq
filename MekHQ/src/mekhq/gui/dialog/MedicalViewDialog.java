@@ -63,7 +63,6 @@ import mekhq.campaign.log.LogEntryType;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.view.Paperdoll;
 import mekhq.preferences.PreferencesNode;
-import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -104,20 +103,19 @@ public class MedicalViewDialog extends JDialog {
     private transient Color labelColor;
     private transient ImageIcon healImageIcon;
 
-    public MedicalViewDialog(Window parent, Campaign c, Person p, IconPackage ip) {
+    public MedicalViewDialog(Window parent, Campaign c, Person p) {
         super();
         this.campaign = Objects.requireNonNull(c);
         this.person = Objects.requireNonNull(p);
-        //this.iconPackage = Objects.requireNonNull(ip);
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl());
 
         // Preload default paperdolls
-        try (InputStream fis = new FileInputStream(ip.getGuiElement("default_male_paperdoll"))) { //$NON-NLS-1$
+        try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_male_paperdoll"))) {
             defaultMaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "<init>(Window,Campaign,Person,IconPackage)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "<init>(Window,Campaign,Person,IconPackage)", e);
         }
-        try (InputStream fis = new FileInputStream(ip.getGuiElement("default_female_paperdoll"))) { //$NON-NLS-1$
+        try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_female_paperdoll"))) {
             defaultFemaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
             MekHQ.getLogger().error(getClass(), "<init>(Window,Campaign,Person,IconPackage)", e); //$NON-NLS-1$

@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -34,20 +33,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.ResourceBundle;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -61,7 +47,6 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -81,25 +66,20 @@ import mekhq.preferences.PreferencesNode;
  * Code copied heavily from PersonnelMarketDialog
  *
  * @author Neoancient
- *
  */
 public class UnitMarketDialog extends JDialog {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -7668601227249317220L;
+    private static final long serialVersionUID = -7668601227249317220L;
 
-	private static boolean showMeks = true;
-	private static boolean showVees = true;
-	private static boolean showAero = false;
-	private static boolean pctThreshold = false;
-	private static int threshold = 120;
+    private static boolean showMeks = true;
+    private static boolean showVees = true;
+    private static boolean showAero = false;
+    private static boolean pctThreshold = false;
+    private static int threshold = 120;
 
-	private UnitMarketTableModel marketModel;
-	private Campaign campaign;
+    private UnitMarketTableModel marketModel;
+    private Campaign campaign;
     private UnitMarket unitMarket;
-    boolean addToCampaign;
-    Entity selectedEntity = null;
+    private Entity selectedEntity = null;
 
     private JButton btnAdd;
     private JButton btnPurchase;
@@ -119,11 +99,10 @@ public class UnitMarketDialog extends JDialog {
     private JScrollPane scrollTableUnits;
     private JScrollPane scrollUnitView;
     private TableRowSorter<UnitMarketTableModel> sorter;
-    ArrayList <RowSorter.SortKey> sortKeys;
     private JSplitPane splitMain;
 
-    /** Creates new form UnitSelectorDialog */
-    public UnitMarketDialog(Frame frame, Campaign c) {
+    /** Creates new form UnitMarketDialog */
+    public UnitMarketDialog(JFrame frame, Campaign c) {
         super(frame, true);
         campaign = c;
         unitMarket = c.getUnitMarket();
@@ -135,8 +114,7 @@ public class UnitMarketDialog extends JDialog {
         setUserPreferences();
     }
 
-    @SuppressWarnings("serial")
-	private void initComponents() {
+    private void initComponents() {
         GridBagConstraints gbc = new GridBagConstraints();
 
         scrollTableUnits = new JScrollPane();
@@ -156,23 +134,20 @@ public class UnitMarketDialog extends JDialog {
         btnPurchase = new JButton();
         btnClose = new JButton();
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitMarketDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitMarketDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle(resourceMap.getString("Form.title")); // NOI18N
+        setTitle(resourceMap.getString("Form.title"));
         getContentPane().setLayout(new BorderLayout());
 
         panelFilterBtns.setLayout(new GridBagLayout());
 
-        ItemListener checkboxListener = new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent arg0) {
-				showMeks = chkShowMeks.isSelected();
-				showAero = chkShowAero.isSelected();
-				showVees = chkShowVees.isSelected();
-				pctThreshold = chkPctThreshold.isSelected();
-				spnThreshold.setEnabled(chkPctThreshold.isSelected());
-				filterOffers();
-			}
+        ItemListener checkboxListener = arg0 -> {
+            showMeks = chkShowMeks.isSelected();
+            showAero = chkShowAero.isSelected();
+            showVees = chkShowVees.isSelected();
+            pctThreshold = chkPctThreshold.isSelected();
+            spnThreshold.setEnabled(chkPctThreshold.isSelected());
+            filterOffers();
         };
 
         chkShowMeks.setText(resourceMap.getString("chkShowMeks.text"));
@@ -228,7 +203,7 @@ public class UnitMarketDialog extends JDialog {
         panelFilterBtns.add(panel, gbc);
 
         scrollTableUnits.setMinimumSize(new java.awt.Dimension(500, 400));
-        scrollTableUnits.setName("srcTablePersonnel"); // NOI18N
+        scrollTableUnits.setName("srcTablePersonnel");
         scrollTableUnits.setPreferredSize(new java.awt.Dimension(500, 400));
 
         gbc = new GridBagConstraints();
@@ -248,23 +223,19 @@ public class UnitMarketDialog extends JDialog {
         sorter.setComparator(UnitMarketTableModel.COL_PERCENT, numComparator);
         tableUnits.setRowSorter(sorter);
         tableUnits.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tableUnits.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                offerChanged(evt);
-            }
-        });
-        TableColumn column = null;
+        tableUnits.getSelectionModel().addListSelectionListener(this::offerChanged);
+        TableColumn column;
         for (int i = 0; i < UnitMarketTableModel.COL_NUM; i++) {
             column = ((XTableColumnModel)tableUnits.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(marketModel.getColumnWidth(i));
             column.setCellRenderer(new DefaultTableCellRenderer() {
-                public Component getTableCellRendererComponent(JTable table,
-                        Object value, boolean isSelected, boolean hasFocus,
-                        int row, int column) {
-                    super.getTableCellRendererComponent(table, value, isSelected,
-                            hasFocus, row, column);
-                    setHorizontalAlignment(((UnitMarketTableModel)table.getModel()).
-                    		getAlignment(table.convertColumnIndexToModel(column)));
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value,
+                                                               boolean isSelected, boolean hasFocus,
+                                                               int row, int column) {
+                    super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    setHorizontalAlignment(((UnitMarketTableModel) table.getModel())
+                            .getAlignment(table.convertColumnIndexToModel(column)));
                     return this;
                 }
             });
@@ -277,7 +248,7 @@ public class UnitMarketDialog extends JDialog {
         lblBlackMarketWarning.setText(resourceMap.getString("lblBlackMarketWarning.text"));
 
         scrollTableUnits.setMinimumSize(new java.awt.Dimension(500, 400));
-        scrollTableUnits.setName("scrollTableUnits"); // NOI18N
+        scrollTableUnits.setName("scrollTableUnits");
         scrollTableUnits.setPreferredSize(new java.awt.Dimension(500, 400));
         panelMain.setLayout(new BorderLayout());
         panelMain.add(panelFilterBtns, BorderLayout.PAGE_START);
@@ -297,8 +268,8 @@ public class UnitMarketDialog extends JDialog {
         panelOKBtns.setLayout(new java.awt.GridBagLayout());
 
         btnPurchase.setText(resourceMap.getString("btnPurchase.text"));
-        btnPurchase.setName("btnPurchase"); // NOI18N
-        btnPurchase.addActionListener(evt -> purchaseUnit(evt));
+        btnPurchase.setName("btnPurchase");
+        btnPurchase.addActionListener(this::purchaseUnit);
         panelOKBtns.add(btnPurchase, new java.awt.GridBagConstraints());
         btnPurchase.setEnabled(null != selectedEntity);
 
@@ -307,9 +278,9 @@ public class UnitMarketDialog extends JDialog {
         btnAdd.setEnabled(null !=  selectedEntity);
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
-        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
+        btnClose.setText(resourceMap.getString("btnClose.text"));
+        btnClose.setName("btnClose");
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
         getContentPane().add(panelOKBtns, BorderLayout.PAGE_END);
@@ -343,125 +314,116 @@ public class UnitMarketDialog extends JDialog {
     }
 
     public Entity getUnit() {
-	    return selectedEntity;
-	}
+        return selectedEntity;
+    }
 
-	private void purchaseUnit(ActionEvent evt) {
-	    if(null != selectedEntity) {
-	    	int transitDays = campaign.getCampaignOptions().getInstantUnitMarketDelivery()?0:
-	    		campaign.calculatePartTransitTime(Compute.d6(2) - 2);
-			UnitMarket.MarketOffer offer = marketModel.getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
-			Money cost = Money.of(offer.unit.getCost() * offer.pct / 100.0);
-			if (campaign.getFunds().isLessThan(cost)) {
-				 campaign.addReport("<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
-				 return;
-			}
+    private void purchaseUnit(ActionEvent evt) {
+        if (null != selectedEntity) {
+            int transitDays = campaign.getCampaignOptions().getInstantUnitMarketDelivery() ? 0
+                    : campaign.calculatePartTransitTime(Compute.d6(2) - 2);
+            UnitMarket.MarketOffer offer = marketModel.getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
+            Money cost = Money.of(offer.unit.getCost() * offer.pct / 100.0);
+            if (campaign.getFunds().isLessThan(cost)) {
+                 campaign.addReport("<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
+                 return;
+            }
 
-			int roll = Compute.d6();
-			if (offer.market == UnitMarket.MARKET_BLACK && roll <= 2) {
-				campaign.getFinances().debit(cost.dividedBy(roll), Transaction.C_UNIT,
-						"Purchased " + selectedEntity.getShortName() + " (lost on black market)",
-						campaign.getLocalDate());
-				campaign.addReport("<font color='red'>Swindled! money was paid, but no unit delivered.</font>");
-			} else {
-				campaign.getFinances().debit(cost, Transaction.C_UNIT,
-						"Purchased " + selectedEntity.getShortName(),
-						campaign.getLocalDate());
-				campaign.addUnit(selectedEntity, false, transitDays);
-				if (!campaign.getCampaignOptions().getInstantUnitMarketDelivery()) {
-					campaign.addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
-				}
-			}
-			UnitMarket.MarketOffer selected = ((UnitMarketTableModel)tableUnits.getModel()).getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
-			unitMarket.removeOffer(selected);
-			((UnitMarketTableModel)tableUnits.getModel()).setData(unitMarket.getOffers());
-	    	refreshOfferView();
-	    }
-	}
+            int roll = Compute.d6();
+            if ((offer.market == UnitMarket.MARKET_BLACK) && (roll <= 2)) {
+                campaign.getFinances().debit(cost.dividedBy(roll), Transaction.C_UNIT,
+                        "Purchased " + selectedEntity.getShortName() + " (lost on black market)",
+                        campaign.getLocalDate());
+                campaign.addReport("<font color='red'>Swindled! money was paid, but no unit delivered.</font>");
+            } else {
+                campaign.getFinances().debit(cost, Transaction.C_UNIT,
+                        "Purchased " + selectedEntity.getShortName(),
+                        campaign.getLocalDate());
+                campaign.addUnit(selectedEntity, false, transitDays);
+                if (!campaign.getCampaignOptions().getInstantUnitMarketDelivery()) {
+                    campaign.addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
+                }
+            }
+            UnitMarket.MarketOffer selected = ((UnitMarketTableModel) tableUnits.getModel())
+                    .getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
+            unitMarket.removeOffer(selected);
+            ((UnitMarketTableModel) tableUnits.getModel()).setData(unitMarket.getOffers());
+            refreshOfferView();
+        }
+    }
 
-	private void addUnit() {
-		if (null != selectedEntity) {
-			campaign.addUnit(selectedEntity, false, 0);
-        	UnitMarket.MarketOffer selected = ((UnitMarketTableModel) tableUnits.getModel()).getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
-	    	unitMarket.removeOffer(selected);
-	    	((UnitMarketTableModel) tableUnits.getModel()).setData(unitMarket.getOffers());
-			refreshOfferView();
-		}
-	}
+    private void addUnit() {
+        if (null != selectedEntity) {
+            campaign.addUnit(selectedEntity, false, 0);
+            UnitMarket.MarketOffer selected = ((UnitMarketTableModel) tableUnits.getModel())
+                    .getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
+            unitMarket.removeOffer(selected);
+            ((UnitMarketTableModel) tableUnits.getModel()).setData(unitMarket.getOffers());
+            refreshOfferView();
+        }
+    }
 
-	private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
-	    selectedEntity = null;
-	    setVisible(false);
-	}
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
+        selectedEntity = null;
+        setVisible(false);
+    }
 
     private void filterOffers() {
-    	RowFilter<UnitMarketTableModel, Integer> unitTypeFilter;
-    	unitTypeFilter = new RowFilter<UnitMarketTableModel,Integer>() {
-    		@Override
-    		public boolean include(Entry<? extends UnitMarketTableModel, ? extends Integer> entry) {
-    			UnitMarket.MarketOffer offer = marketModel.getOffer(entry.getIdentifier());
-    			boolean underThreshold = !chkPctThreshold.isSelected() ||
-    					offer.pct <= (Integer) spnThreshold.getValue();
-    			if (offer.unitType == UnitType.MEK) {
-    				return underThreshold && chkShowMeks.isSelected();
-    			}
-    			if (offer.unitType == UnitType.TANK) {
-    				return underThreshold && chkShowVees.isSelected();
-    			}
-    			if (offer.unitType == UnitType.AERO) {
-    				return underThreshold && chkShowAero.isSelected();
-    			}
-    			return false;
-    		}
-    	};
-        sorter.setRowFilter(unitTypeFilter);
-   	}
+        sorter.setRowFilter(new RowFilter<UnitMarketTableModel,Integer>() {
+            @Override
+            public boolean include(Entry<? extends UnitMarketTableModel, ? extends Integer> entry) {
+                UnitMarket.MarketOffer offer = marketModel.getOffer(entry.getIdentifier());
+                boolean underThreshold = !chkPctThreshold.isSelected()
+                        || (offer.pct <= (Integer) spnThreshold.getValue());
+                if (offer.unitType == UnitType.MEK) {
+                    return underThreshold && chkShowMeks.isSelected();
+                } else if (offer.unitType == UnitType.TANK) {
+                    return underThreshold && chkShowVees.isSelected();
+                } else if (offer.unitType == UnitType.AERO) {
+                    return underThreshold && chkShowAero.isSelected();
+                } else {
+                    return false;
+                }
+            }
+        });
+    }
 
     private void offerChanged(ListSelectionEvent evt) {
-        final String METHOD_NAME = "offerChanged(ListSelectionEvent)"; //$NON-NLS-1$
-
         int view = tableUnits.getSelectedRow();
-        if(view < 0) {
+        if (view < 0) {
             //selection got filtered away
             selectedEntity= null;
             refreshOfferView();
             return;
         }
-		MechSummary ms = marketModel.getOffer(tableUnits.convertRowIndexToModel(view)).unit;
-		try {
-			selectedEntity = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
-		} catch (EntityLoadingException e) {
+        MechSummary ms = marketModel.getOffer(tableUnits.convertRowIndexToModel(view)).unit;
+        try {
+            selectedEntity = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
+        } catch (EntityLoadingException e) {
             selectedEntity = null;
             btnPurchase.setEnabled(false);
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Unable to load mech: " + ms.getSourceFile() + ": " //$NON-NLS-1$
-                    + ms.getEntryName() + ": " + e.getMessage()); //$NON-NLS-1$
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+            MekHQ.getLogger().error(this, "Unable to load mech: " + ms.getSourceFile()
+                    + ": " + ms.getEntryName() + ": " + e.getMessage(), e);
             refreshOfferView();
             return;
-		}
+        }
         refreshOfferView();
     }
 
      void refreshOfferView() {
-    	 int row = tableUnits.getSelectedRow();
-         if(row < 0 || selectedEntity == null) {
+         int row = tableUnits.getSelectedRow();
+         if ((row < 0) || (selectedEntity == null)) {
              mechViewPanel.reset();
          } else {
-	    	 mechViewPanel.setMech(selectedEntity, true);
-	 		//This odd code is to make sure that the scrollbar stays at the top
-	 		//I cant just call it here, because it ends up getting reset somewhere later
-	 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	 			public void run() {
-	 				scrollUnitView.getVerticalScrollBar().setValue(0);
-	 			}
-	 		});
+             mechViewPanel.setMech(selectedEntity, true);
+            //This odd code is to make sure that the scrollbar stays at the top
+            //I can't just call it here, because it ends up getting reset somewhere later
+            javax.swing.SwingUtilities.invokeLater(() -> scrollUnitView.getVerticalScrollBar().setValue(0));
          }
          btnPurchase.setEnabled(null != selectedEntity);
-         btnAdd.setEnabled(null != selectedEntity && campaign.isGM());
+         btnAdd.setEnabled((selectedEntity != null) && campaign.isGM());
     }
 
-	@Override
+    @Override
     public void setVisible(boolean visible) {
         filterOffers();
          super.setVisible(visible);

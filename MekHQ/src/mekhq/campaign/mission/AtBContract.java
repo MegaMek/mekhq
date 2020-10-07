@@ -43,7 +43,6 @@ import megamek.common.MechSummary;
 import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -362,48 +361,48 @@ public class AtBContract extends Contract implements Serializable {
             && campaign.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
             multiplier *= (unitRatingMod * 0.2) + 0.5;
         } else {
-            if (unitRatingMod >= IUnitRating.DRAGOON_A){
+            if (unitRatingMod >= IUnitRating.DRAGOON_A) {
                 multiplier *= 2.0;
             }
-            if (unitRatingMod == IUnitRating.DRAGOON_B){
+            if (unitRatingMod == IUnitRating.DRAGOON_B) {
                 multiplier *= 1.5;
             }
-            if (unitRatingMod == IUnitRating.DRAGOON_D){
+            if (unitRatingMod == IUnitRating.DRAGOON_D) {
                 multiplier *= 0.8;
             }
-            if (unitRatingMod == IUnitRating.DRAGOON_F){
+            if (unitRatingMod == IUnitRating.DRAGOON_F) {
                 multiplier *= 0.5;
             }
         }
 
         switch (missionType) {
-        case MT_CADREDUTY:
-            multiplier *= 0.8;
-            break;
-        case MT_SECURITYDUTY:
-            multiplier *= 1.2;
-            break;
-        case MT_DIVERSIONARYRAID:
-            multiplier *= 1.8;
-            break;
-        case MT_EXTRACTIONRAID:
-            multiplier *= 1.6;
-            break;
-        case MT_GUERRILLAWARFARE:
-            multiplier *= 2.1;
-            break;
-        case MT_OBJECTIVERAID:
-            multiplier *= 1.6;
-            break;
-        case MT_PLANETARYASSAULT:
-            multiplier *= 1.5;
-            break;
-        case MT_RECONRAID:
-            multiplier *= 1.6;
-            break;
-        case MT_RELIEFDUTY:
-            multiplier *= 1.4;
-            break;
+            case MT_CADREDUTY:
+                multiplier *= 0.8;
+                break;
+            case MT_SECURITYDUTY:
+                multiplier *= 1.2;
+                break;
+            case MT_DIVERSIONARYRAID:
+                multiplier *= 1.8;
+                break;
+            case MT_EXTRACTIONRAID:
+                multiplier *= 1.6;
+                break;
+            case MT_GUERRILLAWARFARE:
+                multiplier *= 2.1;
+                break;
+            case MT_OBJECTIVERAID:
+                multiplier *= 1.6;
+                break;
+            case MT_PLANETARYASSAULT:
+                multiplier *= 1.5;
+                break;
+            case MT_RECONRAID:
+                multiplier *= 1.6;
+                break;
+            case MT_RELIEFDUTY:
+                multiplier *= 1.4;
+                break;
         }
 
         Faction employer = Faction.getFaction(employerCode);
@@ -417,8 +416,7 @@ public class AtBContract extends Contract implements Serializable {
         } else {
             multiplier *= 1.1;
         }
-        if (enemyCode.equals("REB") ||
-                enemyCode.equals("PIR")) {
+        if (enemyCode.equals("REB") || enemyCode.equals("PIR")) {
             multiplier *= 1.1;
         }
 
@@ -702,17 +700,15 @@ public class AtBContract extends Contract implements Serializable {
             Entity en = null;
             RandomUnitGenerator.getInstance().setChosenRAT(rat);
             ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
-            if (msl.size() > 0 && null != msl.get(0)) {
+            if ((msl.size() > 0) && (msl.get(0) != null)) {
                 try {
                     en = new MechFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
                 } catch (EntityLoadingException ex) {
-                    en = null;
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                            "Unable to load entity: " + msl.get(0).getSourceFile() + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                    MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+                    MekHQ.getLogger().error(this, "Unable to load entity: " + msl.get(0).getSourceFile()
+                            + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage(), ex);
                 }
-
             }
+
             if (null != en) {
                 c.addUnit(en, false, 0);
             } else {
@@ -757,171 +753,171 @@ public class AtBContract extends Contract implements Serializable {
             int roll = Compute.randomInt(20) + 1;
 
             switch (missionType) {
-            case MT_DIVERSIONARYRAID:
-            case MT_OBJECTIVERAID:
-            case MT_RECONRAID:
-            case MT_EXTRACTIONRAID:
-                if (roll < 10) event = EVT_BONUSROLL;
-                else if (roll < 14) event = EVT_SPECIALMISSION;
-                else if (roll < 16) event = EVT_BETRAYAL;
-                else if (roll < 17) event = EVT_TREACHERY;
-                else if (roll < 18) event = EVT_LOGISTICSFAILURE;
-                else if (roll < 19) event = EVT_REINFORCEMENTS;
-                else if (roll < 20) event = EVT_SPECIALEVENTS;
-                else event = EVT_BIGBATTLE;
-                break;
-            case MT_GARRISONDUTY:
-                if (roll < 8) event = EVT_BONUSROLL;
-                else if (roll < 12) event = EVT_SPECIALMISSION;
-                else if (roll < 13) event = EVT_CIVILDISTURBANCE;
-                else if (roll < 14) event = EVT_SPORADICUPRISINGS;
-                else if (roll < 15) event = EVT_REBELLION;
-                else if (roll < 16) event = EVT_BETRAYAL;
-                else if (roll < 17) event = EVT_TREACHERY;
-                else if (roll < 18) event = EVT_LOGISTICSFAILURE;
-                else if (roll < 19) event = EVT_REINFORCEMENTS;
-                else if (roll < 20) event = EVT_SPECIALEVENTS;
-                else event = EVT_BIGBATTLE;
-                break;
-            case MT_RIOTDUTY:
-                if (roll < 8) event = EVT_BONUSROLL;
-                else if (roll < 11) event = EVT_SPECIALMISSION;
-                else if (roll < 12) event = EVT_CIVILDISTURBANCE;
-                else if (roll < 13) event = EVT_SPORADICUPRISINGS;
-                else if (roll < 15) event = EVT_REBELLION;
-                else if (roll < 16) event = EVT_BETRAYAL;
-                else if (roll < 17) event = EVT_TREACHERY;
-                else if (roll < 18) event = EVT_LOGISTICSFAILURE;
-                else if (roll < 19) event = EVT_REINFORCEMENTS;
-                else if (roll < 20) event = EVT_SPECIALEVENTS;
-                else event = EVT_BIGBATTLE;
-                break;
-            case MT_PIRATEHUNTING:
-                if (roll < 10) event = EVT_BONUSROLL;
-                else if (roll < 14) event = EVT_SPECIALMISSION;
-                else if (roll < 15) event = EVT_CIVILDISTURBANCE;
-                else if (roll < 16) event = EVT_BETRAYAL;
-                else if (roll < 17) event = EVT_TREACHERY;
-                else if (roll < 18) event = EVT_LOGISTICSFAILURE;
-                else if (roll < 19) event = EVT_REINFORCEMENTS;
-                else if (roll < 20) event = EVT_SPECIALEVENTS;
-                else event = EVT_BIGBATTLE;
-                break;
-            default:
-                if (roll < 10) event = EVT_BONUSROLL;
-                else if (roll < 15) event = EVT_SPECIALMISSION;
-                else if (roll < 16) event = EVT_BETRAYAL;
-                else if (roll < 17) event = EVT_TREACHERY;
-                else if (roll < 18) event = EVT_LOGISTICSFAILURE;
-                else if (roll < 19) event = EVT_REINFORCEMENTS;
-                else if (roll < 20) event = EVT_SPECIALEVENTS;
-                else event = EVT_BIGBATTLE;
+                case MT_DIVERSIONARYRAID:
+                case MT_OBJECTIVERAID:
+                case MT_RECONRAID:
+                case MT_EXTRACTIONRAID:
+                    if (roll < 10) event = EVT_BONUSROLL;
+                    else if (roll < 14) event = EVT_SPECIALMISSION;
+                    else if (roll < 16) event = EVT_BETRAYAL;
+                    else if (roll < 17) event = EVT_TREACHERY;
+                    else if (roll < 18) event = EVT_LOGISTICSFAILURE;
+                    else if (roll < 19) event = EVT_REINFORCEMENTS;
+                    else if (roll < 20) event = EVT_SPECIALEVENTS;
+                    else event = EVT_BIGBATTLE;
+                    break;
+                case MT_GARRISONDUTY:
+                    if (roll < 8) event = EVT_BONUSROLL;
+                    else if (roll < 12) event = EVT_SPECIALMISSION;
+                    else if (roll < 13) event = EVT_CIVILDISTURBANCE;
+                    else if (roll < 14) event = EVT_SPORADICUPRISINGS;
+                    else if (roll < 15) event = EVT_REBELLION;
+                    else if (roll < 16) event = EVT_BETRAYAL;
+                    else if (roll < 17) event = EVT_TREACHERY;
+                    else if (roll < 18) event = EVT_LOGISTICSFAILURE;
+                    else if (roll < 19) event = EVT_REINFORCEMENTS;
+                    else if (roll < 20) event = EVT_SPECIALEVENTS;
+                    else event = EVT_BIGBATTLE;
+                    break;
+                case MT_RIOTDUTY:
+                    if (roll < 8) event = EVT_BONUSROLL;
+                    else if (roll < 11) event = EVT_SPECIALMISSION;
+                    else if (roll < 12) event = EVT_CIVILDISTURBANCE;
+                    else if (roll < 13) event = EVT_SPORADICUPRISINGS;
+                    else if (roll < 15) event = EVT_REBELLION;
+                    else if (roll < 16) event = EVT_BETRAYAL;
+                    else if (roll < 17) event = EVT_TREACHERY;
+                    else if (roll < 18) event = EVT_LOGISTICSFAILURE;
+                    else if (roll < 19) event = EVT_REINFORCEMENTS;
+                    else if (roll < 20) event = EVT_SPECIALEVENTS;
+                    else event = EVT_BIGBATTLE;
+                    break;
+                case MT_PIRATEHUNTING:
+                    if (roll < 10) event = EVT_BONUSROLL;
+                    else if (roll < 14) event = EVT_SPECIALMISSION;
+                    else if (roll < 15) event = EVT_CIVILDISTURBANCE;
+                    else if (roll < 16) event = EVT_BETRAYAL;
+                    else if (roll < 17) event = EVT_TREACHERY;
+                    else if (roll < 18) event = EVT_LOGISTICSFAILURE;
+                    else if (roll < 19) event = EVT_REINFORCEMENTS;
+                    else if (roll < 20) event = EVT_SPECIALEVENTS;
+                    else event = EVT_BIGBATTLE;
+                    break;
+                default:
+                    if (roll < 10) event = EVT_BONUSROLL;
+                    else if (roll < 15) event = EVT_SPECIALMISSION;
+                    else if (roll < 16) event = EVT_BETRAYAL;
+                    else if (roll < 17) event = EVT_TREACHERY;
+                    else if (roll < 18) event = EVT_LOGISTICSFAILURE;
+                    else if (roll < 19) event = EVT_REINFORCEMENTS;
+                    else if (roll < 20) event = EVT_SPECIALEVENTS;
+                    else event = EVT_BIGBATTLE;
             }
             switch (event) {
-            case EVT_BONUSROLL:
-                c.addReport("<b>Special Event:</b> ");
-                doBonusRoll(c);
-                break;
-            case EVT_SPECIALMISSION:
-                c.addReport("<b>Special Event:</b> Special mission this month");
-                specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
-                specialEventScenarioType = findSpecialMissionType();
-                break;
-            case EVT_CIVILDISTURBANCE:
-                c.addReport("<b>Special Event:</b> Civil disturbance<br />Next enemy morale roll gets +1 modifier");
-                moraleMod++;
-                break;
-            case EVT_SPORADICUPRISINGS:
-                c.addReport("<b>Special Event:</b> Sporadic uprisings<br />+2 to next enemy morale roll");
-                moraleMod += 2;
-                break;
-            case EVT_REBELLION:
-                c.addReport("<b>Special Event:</b> Rebellion<br />+2 to next enemy morale roll");
-                specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
-                specialEventScenarioType = AtBScenario.CIVILIANRIOT;
-                break;
-            case EVT_BETRAYAL:
-                String text = "<b>Special Event:</b> Betrayal (employer minor breach)<br />";
-                switch (Compute.d6()) {
-                    case 1:
-                        text += "Major logistics problem: parts availability level for the rest of the contract becomes one level lower.";
-                        partsAvailabilityLevel--;
-                        break;
-                    case 2:
-                        text += "Transport: Player is abandoned in the field by employer transports; if he loses a Base Attack battle he loses all Meks on repair.";
-                        break;
-                    case 3:
-                        text += "Diversion: All Battle Type rolls for the rest of the contract get a -5 modifier.";
-                        battleTypeMod -= 5;
-                        break;
-                    case 4:
-                        text += "False Intelligence: Next week Battle Type rolls get a -10 modifier.";
-                        nextWeekBattleTypeMod -= 10;
-                        break;
-                    case 5:
-                        text += "The Company Store: All equipment/supply prices are increased by 100% until the end of the contract.";
-                        break;
-                    case 6:
-                        text += "False Alarm: No betrayal, but the employer still gets a minor breach.";
-                        break;
-                }
-                employerMinorBreaches++;
-                c.addReport(text);
-                break;
-            case EVT_TREACHERY:
-                c.addReport("<b>Special Event:</b> Treachery<br />Bad information from employer. Next Enemy Morale roll gets +1. Employer minor breach.");
-                moraleMod++;
-                employerMinorBreaches++;
-                break;
-            case EVT_LOGISTICSFAILURE:
-                c.addReport("<b>Special Event:</b> Logistics Failure<br />Parts availability for the next month are one level lower.");
-                partsAvailabilityLevel--;
-                priorLogisticsFailure = true;
-                break;
-            case EVT_REINFORCEMENTS:
-                c.addReport("<b>Special Event:</b> Reinforcements<br />The next Enemy Morale roll gets a -1.");
-                moraleMod--;
-                break;
-            case EVT_SPECIALEVENTS:
-                text = "<b>Special Event:</b> ";
-                switch (Compute.d6()) {
-                    case 1:
-                        text += "Change of Alliance: Next Enemy Morale roll gets a +1 modifier.";
-                        moraleMod++;
-                        break;
-                    case 2:
-                        text += "Internal Dissension";
-                        specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
-                        specialEventScenarioType = AtBScenario.AMBUSH;
-                        break;
-                    case 3:
-                        text += "ComStar Interdict: Base availability level decreases one level for the rest of the contract.";
-                        partsAvailabilityLevel--;
-                        break;
-                    case 4:
-                        text += "Defectors: Next Enemy Morale roll gets a -1 modifier.";
-                        moraleMod--;
-                        break;
-                    case 5:
-                        text += "Free Trader: Base availability level increases one level for the rest of the contract.";
-                        partsAvailabilityLevel++;
-                        break;
-                    case 6:
-                        String unit = c.getUnitMarket().addSingleUnit(c, UnitMarket.MARKET_EMPLOYER,
-                            UnitType.MEK, getEmployerCode(),
-                            IUnitRating.DRAGOON_F, 50);
-                        if (unit != null) {
-                            text += String.format("Surplus Sale: %s offered by employer on the <a href='UNIT_MARKET'>unit market</a>", unit);
-                        }
-                        break;
-                }
-                c.addReport(text);
-                break;
-            case EVT_BIGBATTLE:
-                c.addReport("<b>Special Event:</b> Big battle this month");
-                specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
-                specialEventScenarioType = findBigBattleType();
-                break;
+                case EVT_BONUSROLL:
+                    c.addReport("<b>Special Event:</b> ");
+                    doBonusRoll(c);
+                    break;
+                case EVT_SPECIALMISSION:
+                    c.addReport("<b>Special Event:</b> Special mission this month");
+                    specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
+                    specialEventScenarioType = findSpecialMissionType();
+                    break;
+                case EVT_CIVILDISTURBANCE:
+                    c.addReport("<b>Special Event:</b> Civil disturbance<br />Next enemy morale roll gets +1 modifier");
+                    moraleMod++;
+                    break;
+                case EVT_SPORADICUPRISINGS:
+                    c.addReport("<b>Special Event:</b> Sporadic uprisings<br />+2 to next enemy morale roll");
+                    moraleMod += 2;
+                    break;
+                case EVT_REBELLION:
+                    c.addReport("<b>Special Event:</b> Rebellion<br />+2 to next enemy morale roll");
+                    specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
+                    specialEventScenarioType = AtBScenario.CIVILIANRIOT;
+                    break;
+                case EVT_BETRAYAL:
+                    String text = "<b>Special Event:</b> Betrayal (employer minor breach)<br />";
+                    switch (Compute.d6()) {
+                        case 1:
+                            text += "Major logistics problem: parts availability level for the rest of the contract becomes one level lower.";
+                            partsAvailabilityLevel--;
+                            break;
+                        case 2:
+                            text += "Transport: Player is abandoned in the field by employer transports; if he loses a Base Attack battle he loses all Meks on repair.";
+                            break;
+                        case 3:
+                            text += "Diversion: All Battle Type rolls for the rest of the contract get a -5 modifier.";
+                            battleTypeMod -= 5;
+                            break;
+                        case 4:
+                            text += "False Intelligence: Next week Battle Type rolls get a -10 modifier.";
+                            nextWeekBattleTypeMod -= 10;
+                            break;
+                        case 5:
+                            text += "The Company Store: All equipment/supply prices are increased by 100% until the end of the contract.";
+                            break;
+                        case 6:
+                            text += "False Alarm: No betrayal, but the employer still gets a minor breach.";
+                            break;
+                    }
+                    employerMinorBreaches++;
+                    c.addReport(text);
+                    break;
+                case EVT_TREACHERY:
+                    c.addReport("<b>Special Event:</b> Treachery<br />Bad information from employer. Next Enemy Morale roll gets +1. Employer minor breach.");
+                    moraleMod++;
+                    employerMinorBreaches++;
+                    break;
+                case EVT_LOGISTICSFAILURE:
+                    c.addReport("<b>Special Event:</b> Logistics Failure<br />Parts availability for the next month are one level lower.");
+                    partsAvailabilityLevel--;
+                    priorLogisticsFailure = true;
+                    break;
+                case EVT_REINFORCEMENTS:
+                    c.addReport("<b>Special Event:</b> Reinforcements<br />The next Enemy Morale roll gets a -1.");
+                    moraleMod--;
+                    break;
+                case EVT_SPECIALEVENTS:
+                    text = "<b>Special Event:</b> ";
+                    switch (Compute.d6()) {
+                        case 1:
+                            text += "Change of Alliance: Next Enemy Morale roll gets a +1 modifier.";
+                            moraleMod++;
+                            break;
+                        case 2:
+                            text += "Internal Dissension";
+                            specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
+                            specialEventScenarioType = AtBScenario.AMBUSH;
+                            break;
+                        case 3:
+                            text += "ComStar Interdict: Base availability level decreases one level for the rest of the contract.";
+                            partsAvailabilityLevel--;
+                            break;
+                        case 4:
+                            text += "Defectors: Next Enemy Morale roll gets a -1 modifier.";
+                            moraleMod--;
+                            break;
+                        case 5:
+                            text += "Free Trader: Base availability level increases one level for the rest of the contract.";
+                            partsAvailabilityLevel++;
+                            break;
+                        case 6:
+                            String unit = c.getUnitMarket().addSingleUnit(c, UnitMarket.MARKET_EMPLOYER,
+                                UnitType.MEK, getEmployerCode(),
+                                IUnitRating.DRAGOON_F, 50);
+                            if (unit != null) {
+                                text += String.format("Surplus Sale: %s offered by employer on the <a href='UNIT_MARKET'>unit market</a>", unit);
+                            }
+                            break;
+                    }
+                    c.addReport(text);
+                    break;
+                case EVT_BIGBATTLE:
+                    c.addReport("<b>Special Event:</b> Big battle this month");
+                    specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
+                    specialEventScenarioType = findBigBattleType();
+                    break;
             }
         }
         /* If the campaign somehow gets past the scheduled date (such as by
@@ -1218,6 +1214,7 @@ public class AtBContract extends Contract implements Serializable {
         }
     }
 
+    @Override
     public void loadFieldsFromXmlNode(Node wn) throws ParseException {
         super.loadFieldsFromXmlNode(wn);
         NodeList nl = wn.getChildNodes();

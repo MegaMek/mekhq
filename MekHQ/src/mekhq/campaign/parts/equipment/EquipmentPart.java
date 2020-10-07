@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts.equipment;
 
@@ -34,7 +34,6 @@ import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.TechAdvancement;
 import megamek.common.WeaponType;
-import megamek.common.logging.LogLevel;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -569,8 +568,7 @@ public class EquipmentPart extends Part {
         }
         if (varCost.isZero()) {
             // if we don't know what it is...
-            MekHQ.getLogger().log(EquipmentPart.class, "resolveVariableCost", LogLevel.WARNING,
-                    "I don't know how much " + name + " costs.");
+            MekHQ.getLogger().debug(EquipmentPart.class, "I don't know how much " + name + " costs.");
         }
         return varCost;
     }

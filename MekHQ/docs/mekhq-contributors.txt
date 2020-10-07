@@ -1,79 +1,80 @@
-  Current maintainer:
-     MegaMek GitHub Organization <https://github.com/MegaMek>
+Current maintainer:
+MegaMek GitHub Organization <https://github.com/MegaMek>
 
-  Original maintainer:
-     Jay Lawson <jaylawson39@yahoo.com>
+	Original maintainer:
+		Jay Lawson <jaylawson39@yahoo.com>
 
-  Lead Developers:
-	 Carl Spain
-	 Christopher Watford
-	 NickAragua
-		 
-  Emeritus Developers:
-     Dylan Myers <https://github.com/Dylan-M>
-     Nicholas Walczak <arlith@users.sourceforge.net>
-     Sebastian Brocks <beerockxs@users.sourceforge.net>
+	Lead Developers:
+		Carl Spain
+		Christopher Watford
+		NickAragua
+		Justin "Windchild" Bowen
 
-  Developers:
-  	 Frederic Morel <natitf@users.sourceforge.net>
-  	 Deric Page
-  	 Robin Toll <fastsammy@users.sourceforge.net>
+	Emeritus Developers:
+		Dylan Myers <https://github.com/Dylan-M>
+		Nicholas Walczak <arlith@users.sourceforge.net>
+		Sebastian Brocks <beerockxs@users.sourceforge.net>
+		Frederic Morel <natitf@users.sourceforge.net>
+		Deric Page
+		Robin Toll <fastsammy@users.sourceforge.net>
 
-  More Code:
-     Daniel Vystrcil
-     Longinus00
-     Josh Street
-     Neyah Peterson
- 	 Justin "Windchild" Bowen
+	More Code:
+		Daniel Vystrcil
+		Longinus00
+		Josh Street
+		Neyah Peterson
 
-  Data
-      Unit Updates:
-         DarkISI
-         Dave Nawton <hammer-gs@users.sourceforge.net>
+Data
+	Unit Updates:
+		DarkISI
+		Dave Nawton <hammer-gs@users.sourceforge.net>
 
-      Splash Screen Images:
-		 Florian "SpOoKy777" Mellies (https://www.deviantart.com/spooky777)
-      	 
-	  Original Screen Images:
-	     Anthony Scroggins (http://shimmering-sword.deviantart.com)
-		 
-      Starterbook Campaign Files:
-         Dave Nawton <hammer-gs@users.sourceforge.net>
+	Splash Screen Images:
+		Florian "SpOoKy777" Mellies (https://www.deviantart.com/spooky777)
 
-      Inner Sphere Map Data
-        Alex Yokel
-      	The data for the maps used here come from the Pryde Rock Stellar Cartography datafiles
-      	produced by Medron Pryde (http://www.pryderockindustries.com/dl_game_aids.php#ISM)
-      	These files are in turn based on Mike Flynn's Inner Sphere Cartography Society data
-      	at http://iscs.teamspam.net/
+	Original Screen Images:
+		Anthony Scroggins (http://shimmering-sword.deviantart.com)
 
-      Force Images
-        Dylan Myers <https://github.com/Dylan-M>
-        Peter Farland <pfarland@live.com>
-        Chris Thompson <http://bg.battletech.com/forums/index.php?action=profile;u=757>
-        CarnageINC
-        krazzyharry
-		
-	 Against the Bot Guide
+	Starterbook Campaign Files:
+		Dave Nawton <hammer-gs@users.sourceforge.net>
+
+	Inner Sphere Map Data
+		Alex Yokel
+		The data for the maps used here come from the Pryde Rock Stellar Cartography datafiles
+		produced by Medron Pryde (http://www.pryderockindustries.com/dl_game_aids.php#ISM)
+		These files are in turn based on Mike Flynn's Inner Sphere Cartography Society data
+		at http://iscs.teamspam.net/
+
+	Force Images
+		Dylan Myers <https://github.com/Dylan-M>
+		Peter Farland <pfarland@live.com>
+		Chris Thompson <http://bg.battletech.com/forums/index.php?action=profile;u=757>
+		CarnageINC
+		krazzyharry
+
+	Against the Bot Guide
 		CampaignAnon 
-		
-	
-    Icons for MarkdownEditorPanel
-     Bold, italic, ordered list, unordered list, horizontal rule, and question mark icons provided
-     by Google in Google Material Design Icons and distributed under the Creative Commons ShareAlike 4.0 
-      International License (https://creativecommons.org/licenses/by-sa/4.0/).
-    
-     Header icons provided by Font Awesome by Dave Gandy - http://fontawesome.io
-    
-    Star Images
-        Bloodwolf
-  
 
-  And Of Course...
-     FASA, WizKids, FanPro and Catalyst Game Labs for creating and publishing the original game of
-     BattleTech, a source of fun and inspiration to us all.
+	News
+		Jason Schmetzer
+		jwest
 
 
-  If I've missed anyone or details have changed, please accept apologies and
-  contact the current maintainer (above.)
+	Icons for MarkdownEditorPanel
+		Bold, italic, ordered list, unordered list, horizontal rule, and question mark icons provided
+		by Google in Google Material Design Icons and distributed under the Creative Commons ShareAlike 4.0 
+		International License (https://creativecommons.org/licenses/by-sa/4.0/).
 
+		Header icons provided by Font Awesome by Dave Gandy - http://fontawesome.io
+
+	Star Images
+		Bloodwolf
+
+
+And Of Course...
+FASA, WizKids, FanPro and Catalyst Game Labs for creating and publishing the original game of
+BattleTech, a source of fun and inspiration to us all.
+
+
+If I've missed anyone or details have changed, please accept our apologies and
+contact the current maintainer (above.)

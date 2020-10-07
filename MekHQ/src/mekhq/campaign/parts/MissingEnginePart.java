@@ -211,14 +211,7 @@ public class MissingEnginePart extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		boolean useHover = null != unit && unit.getEntity().getMovementMode() == EntityMovementMode.HOVER && unit.getEntity() instanceof Tank;
-		int flags = 0;
-		if(engine.hasFlag(Engine.CLAN_ENGINE)) {
-			flags = Engine.CLAN_ENGINE;
-		}
-		if(null != unit && unit.getEntity() instanceof Tank) {
-			flags |= Engine.TANK_ENGINE;
-		}
-		return new EnginePart(getUnitTonnage(), new Engine(engine.getRating(), engine.getEngineType(), flags), campaign, useHover);
+		return new EnginePart(getUnitTonnage(), new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, useHover);
 	}
 
 	@Override

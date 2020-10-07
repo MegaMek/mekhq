@@ -1,7 +1,7 @@
 /*
  * BaseDialog.java
  *
- * Copyright (c) 2019 MekHQ Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,16 +12,14 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import megamek.common.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
@@ -140,8 +138,8 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
         this.getContentPane().add(bottom, BorderLayout.PAGE_END);
     }
 
-    private final void setPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(this.getClass());
+    private void setPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(BaseDialog.class);
 
         preferences.manage(new JWindowPreference(this));
         this.setCustomPreferences(preferences);
@@ -160,7 +158,7 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
         try {
             this.cancelAction();
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "cancelButtonActionPerformed", e);
+            MekHQ.getLogger().error(e);
         }
         finally {
             this.result = DialogResult.CANCEL;
@@ -176,7 +174,7 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
         try {
             this.cancelAction();
         } catch (Exception ex) {
-            MekHQ.getLogger().error(getClass(), "windowClosing", ex);
+            MekHQ.getLogger().error(ex);
         }
         finally {
             this.result = DialogResult.CANCEL;

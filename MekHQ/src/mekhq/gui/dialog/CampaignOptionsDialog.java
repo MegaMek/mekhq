@@ -21,7 +21,6 @@ package mekhq.gui.dialog;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -70,9 +69,9 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
-import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -91,6 +90,7 @@ import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.Marriage;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
@@ -123,10 +123,8 @@ public class CampaignOptionsDialog extends JDialog {
     private String camoCategory;
     private String camoFileName;
     private int colorIndex;
-    private DirectoryItems camos;
     private String iconCategory;
     private String iconFileName;
-    private DirectoryItems forceIcons;
     private Hashtable<String, JSpinner> hashSkillTargets;
     private Hashtable<String, JSpinner> hashGreenSkill;
     private Hashtable<String, JSpinner> hashRegSkill;
@@ -149,7 +147,8 @@ public class CampaignOptionsDialog extends JDialog {
     private JComboBox<String> comboFaction;
     SortedComboBoxModel<String> factionModel;
     private JCheckBox useUnitRatingCheckBox;
-    private JComboBox<String> unitRatingMethodCombo;
+    private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
+    private JSpinner manualUnitRatingModifier;
     private JButton btnDate;
     private JButton btnCamo;
     private JButton btnIcon;
@@ -230,9 +229,6 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox useEdgeBox;
     private JCheckBox useSupportEdgeBox;
     private JCheckBox useImplantsBox;
-    private JCheckBox chkCapturePrisoners;
-    private JComboBox<PrisonerStatus> comboPrisonerStatus;
-    private JCheckBox chkPrisonerBabyStatus;
     private JCheckBox altQualityAveragingCheckBox;
     private JCheckBox useAdvancedMedicalBox;
     private JCheckBox useDylansRandomXpBox;
@@ -281,6 +277,12 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner spnSalaryAntiMek;
     private JSpinner[] spnSalaryXp;
     private JSpinner[] spnSalaryBase;
+    //Prisoners
+    private JComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
+    private JComboBox<PrisonerStatus> comboPrisonerStatus;
+    private JCheckBox chkPrisonerBabyStatus;
+    private JCheckBox chkAtBPrisonerDefection;
+    private JCheckBox chkAtBPrisonerRansom;
     //endregion Personnel Tab
 
     //region Finances Tab
@@ -320,6 +322,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkEquipContractSaleValue;
     private JRadioButton btnContractPersonnel;
     private JCheckBox chkBLCSaleValue;
+    private JCheckBox chkOverageRepaymentInFinalPayment;
     //endregion Mercenary Tab
 
     //region Experience Tab
@@ -419,6 +422,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JPanel panAtB;
     private JCheckBox chkUseAtB;
     private JComboBox<String> cbSkillLevel;
+
     //unit administration
     private JCheckBox chkUseShareSystem;
     private JCheckBox chkSharesExcludeLargeCraft;
@@ -486,14 +490,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
-    private JCheckBox chkUseAtBCapture;
-    private JSpinner spnStartGameDelay;
     //endregion Against the Bot Tab
-
-    //region Miscellaneous Tab
-    private JPanel panMisc;
-    private JCheckBox chkHistoricalDailyLog;
-    //endregion Miscellaneous Tab
     //endregion Variable Declarations
 
     public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c, IconPackage icons) {
@@ -505,10 +502,8 @@ public class CampaignOptionsDialog extends JDialog {
         this.camoCategory = campaign.getCamoCategory();
         this.camoFileName = campaign.getCamoFileName();
         this.colorIndex = campaign.getColorIndex();
-        this.camos = icons.getCamos();
         this.iconCategory = campaign.getIconCategory();
         this.iconFileName = campaign.getIconFileName();
-        this.forceIcons = icons.getForceIcons();
         hashSkillTargets = new Hashtable<>();
         hashGreenSkill = new Hashtable<>();
         hashRegSkill = new Hashtable<>();
@@ -532,15 +527,9 @@ public class CampaignOptionsDialog extends JDialog {
     private void initComponents() {
         //region Variable Declaration and Initialisation
         tabOptions = new JTabbedPane();
-        panGeneral = new JPanel();
-        txtName = new JTextField();
-        btnDate = new JButton();
-        comboFaction = new JComboBox<>();
-        comboFactionNames = new JComboBox<>();
         comboRanks = new JComboBox<>();
+        comboFactionNames = new JComboBox<>();
         sldGender = new JSlider(SwingConstants.HORIZONTAL);
-        btnCamo = new JButton();
-        btnIcon = new JButton();
         panRepair = new JPanel();
         panSupplies = new JPanel();
         panPersonnel = new JPanel();
@@ -556,8 +545,6 @@ public class CampaignOptionsDialog extends JDialog {
         useEraModsCheckBox = new JCheckBox();
         assignedTechFirstCheckBox = new JCheckBox();
         resetToFirstTechCheckBox = new JCheckBox();
-        useUnitRatingCheckBox = new JCheckBox();
-        unitRatingMethodCombo = new JComboBox<>(UnitRatingMethod.getUnitRatingMethodNames());
         JLabel clanPriceModifierLabel = new JLabel();
         JLabel usedPartsValueLabel = new JLabel();
         JLabel damagedPartsValueLabel = new JLabel();
@@ -569,7 +556,6 @@ public class CampaignOptionsDialog extends JDialog {
         useEdgeBox = new JCheckBox();
         useSupportEdgeBox = new JCheckBox();
         useImplantsBox = new JCheckBox();
-        chkCapturePrisoners = new JCheckBox();
         useAdvancedMedicalBox = new JCheckBox();
         useDylansRandomXpBox = new JCheckBox();
         payForPartsBox = new JCheckBox();
@@ -616,11 +602,9 @@ public class CampaignOptionsDialog extends JDialog {
 
         chkSupportStaffOnly = new JCheckBox();
 
-        panMisc = new JPanel();
-        chkHistoricalDailyLog = new JCheckBox();
-
         GridBagConstraints gridBagConstraints;
         int gridy = 0;
+        int gridx = 0;
         //endregion Variable Declaration and Initialisation
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
@@ -632,53 +616,29 @@ public class CampaignOptionsDialog extends JDialog {
         tabOptions.setName("tabOptions");
 
         //region General Tab
+        panGeneral = new JPanel(new GridBagLayout());
         panGeneral.setName("panGeneral");
-        panGeneral.setLayout(new GridBagLayout());
-
-        txtName.setText(campaign.getName());
-        txtName.setMinimumSize(new Dimension(500, 30));
-        txtName.setName("txtName");
-        txtName.setPreferredSize(new java.awt.Dimension(500, 30));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panGeneral.add(txtName, gridBagConstraints);
 
         JLabel lblName = new JLabel(resourceMap.getString("lblName.text"));
         lblName.setName("lblName");
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(lblName, gridBagConstraints);
 
+        txtName = new JTextField(campaign.getName());
+        txtName.setName("txtName");
+        txtName.setMinimumSize(new Dimension(500, 30));
+        txtName.setPreferredSize(new Dimension(500, 30));
+        gridBagConstraints.gridx = gridx--;
+        panGeneral.add(txtName, gridBagConstraints);
+
         JLabel lblFaction = new JLabel(resourceMap.getString("lblFaction.text"));
         lblFaction.setName("lblFaction");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridy = gridy++;
         panGeneral.add(lblFaction, gridBagConstraints);
-
-        JLabel lblDate = new JLabel(resourceMap.getString("lblDate.text"));
-        lblDate.setName("lblDate");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panGeneral.add(lblDate, gridBagConstraints);
-
-        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
-        btnDate.setMinimumSize(new Dimension(400, 30));
-        btnDate.setName("btnDate");
-        btnDate.setPreferredSize(new Dimension(400, 30));
-        btnDate.addActionListener(this::btnDateActionPerformed);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panGeneral.add(btnDate, gridBagConstraints);
 
         factionModel = new SortedComboBoxModel<>();
         for (String sName : Faction.getChoosableFactionCodes()) {
@@ -688,80 +648,103 @@ public class CampaignOptionsDialog extends JDialog {
             }
         }
         factionModel.setSelectedItem(campaign.getFaction().getFullName(date.getYear()));
+        comboFaction = new JComboBox<>();
+        comboFaction.setName("comboFaction");
         comboFaction.setModel(factionModel);
         comboFaction.setMinimumSize(new Dimension(400, 30));
-        comboFaction.setName("comboFaction");
         comboFaction.setPreferredSize(new Dimension(400, 30));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.gridx = gridx--;
         panGeneral.add(comboFaction, gridBagConstraints);
 
-        JPanel unitRatingPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
+        JPanel unitRatingPanel = new JPanel(new GridBagLayout());
 
-        useUnitRatingCheckBox.setText(resourceMap.getString("useUnitRatingCheckBox.text"));
+        useUnitRatingCheckBox = new JCheckBox(resourceMap.getString("useUnitRatingCheckBox.text"));
         useUnitRatingCheckBox.setName("useUnitRatingCheckBox");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         unitRatingPanel.add(useUnitRatingCheckBox);
 
-        unitRatingPanel.add(Box.createHorizontalStrut(10));
-
-        JLabel unitRatingMethodLabel = new JLabel("Unit Rating Method:");
+        JLabel unitRatingMethodLabel = new JLabel(resourceMap.getString("unitRatingMethodLabel.text"));
         unitRatingMethodLabel.setName("unitRatingMethodLabel");
-        unitRatingPanel.add(unitRatingMethodLabel);
+        gridBagConstraints.gridx = 1;
+        unitRatingPanel.add(unitRatingMethodLabel, gridBagConstraints);
 
+        unitRatingMethodCombo = new JComboBox<>(UnitRatingMethod.values());
         unitRatingMethodCombo.setName("unitRatingMethodCombo");
-        unitRatingPanel.add(unitRatingMethodCombo);
+        gridBagConstraints.gridx = 2;
+        unitRatingPanel.add(unitRatingMethodCombo, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        JLabel manualUnitRatingModifierLabel = new JLabel(resourceMap.getString("manualUnitRatingModifierLabel.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
+        unitRatingPanel.add(manualUnitRatingModifierLabel, gridBagConstraints);
+
+        manualUnitRatingModifier = new JSpinner(new SpinnerNumberModel(0, -100, 100, 1));
+        gridBagConstraints.gridx = 1;
+        unitRatingPanel.add(manualUnitRatingModifier, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = gridx;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panGeneral.add(unitRatingPanel, gridBagConstraints);
 
-        btnCamo.setMaximumSize(new java.awt.Dimension(84, 72));
-        btnCamo.setMinimumSize(new java.awt.Dimension(84, 72));
-        btnCamo.setName("btnCamo"); // NOI18N
-        btnCamo.setPreferredSize(new java.awt.Dimension(84, 72));
-        btnCamo.addActionListener(this::btnCamoActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panGeneral.add(btnCamo, gridBagConstraints);
+        JLabel lblDate = new JLabel(resourceMap.getString("lblDate.text"));
+        lblDate.setName("lblDate");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridy = gridy++;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panGeneral.add(lblDate, gridBagConstraints);
+
+        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+        btnDate.setName("btnDate");
+        btnDate.setMinimumSize(new Dimension(400, 30));
+        btnDate.setPreferredSize(new Dimension(400, 30));
+        btnDate.addActionListener(this::btnDateActionPerformed);
+        gridBagConstraints.gridx = gridx--;
+        panGeneral.add(btnDate, gridBagConstraints);
 
         JLabel lblCamo = new JLabel(resourceMap.getString("lblCamo.text"));
         lblCamo.setName("lblCamo");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridy = gridy++;
         panGeneral.add(lblCamo, gridBagConstraints);
 
-        btnIcon.setMaximumSize(new java.awt.Dimension(84, 72));
-        btnIcon.setMinimumSize(new java.awt.Dimension(84, 72));
-        btnIcon.setPreferredSize(new java.awt.Dimension(84, 72));
-        btnIcon.addActionListener(this::btnIconActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        btnCamo = new JButton();
+        btnCamo.setName("btnCamo");
+        btnCamo.setMinimumSize(new Dimension(84, 72));
+        btnCamo.setPreferredSize(new Dimension(84, 72));
+        btnCamo.setMaximumSize(new Dimension(84, 72));
+        btnCamo.addActionListener(this::btnCamoActionPerformed);
+        gridBagConstraints.gridx = gridx--;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panGeneral.add(btnIcon, gridBagConstraints);
+        panGeneral.add(btnCamo, gridBagConstraints);
 
         JLabel lblIcon = new JLabel(resourceMap.getString("lblIcon.text"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridy = gridy++;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(lblIcon, gridBagConstraints);
+
+        btnIcon = new JButton();
+        btnIcon.addActionListener(this::btnIconActionPerformed);
+        btnIcon.setMinimumSize(new Dimension(84, 72));
+        btnIcon.setPreferredSize(new Dimension(84, 72));
+        btnIcon.setMaximumSize(new Dimension(84, 72));
+        gridBagConstraints.gridx = gridx--;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panGeneral.add(btnIcon, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panGeneral.TabConstraints.tabTitle"), panGeneral);
         //endregion General Tab
 
         //region Repair and Maintenance Tab
-        panRepair.setName("panRules");
+        panRepair.setName("panRepair");
         panRepair.setLayout(new java.awt.GridBagLayout());
 
         JPanel panSubRepair = new JPanel(new GridBagLayout());
@@ -770,29 +753,20 @@ public class CampaignOptionsDialog extends JDialog {
         panSubRepair.setBorder(BorderFactory.createTitledBorder("Repair"));
         panSubMaintenance.setBorder(BorderFactory.createTitledBorder("Maintenance"));
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = .5;
+        gridBagConstraints.weightx = 0.5;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         panRepair.add(panSubRepair, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         panRepair.add(panSubMaintenance, gridBagConstraints);
-
-        //We want the new mass repair panel to span two cells
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.weighty = 1;
-        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-
 
         useEraModsCheckBox.setText(resourceMap.getString("useEraModsCheckBox.text")); // NOI18N
         useEraModsCheckBox.setToolTipText(resourceMap.getString("useEraModsCheckBox.toolTipText")); // NOI18N
@@ -1508,12 +1482,12 @@ public class CampaignOptionsDialog extends JDialog {
         useTacticsBox.setText(resourceMap.getString("useTacticsBox.text"));
         useTacticsBox.setToolTipText(resourceMap.getString("useTacticsBox.toolTipText"));
         useTacticsBox.setName("useTacticsBox");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panPersonnel.add(useTacticsBox, gridBagConstraints);
 
         useInitBonusBox.setText(resourceMap.getString("useInitBonusBox.text"));
@@ -1557,26 +1531,6 @@ public class CampaignOptionsDialog extends JDialog {
         useImplantsBox.setName("useImplantsBox");
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(useImplantsBox, gridBagConstraints);
-
-        chkCapturePrisoners.setText(resourceMap.getString("chkCapturePrisoners.text"));
-        chkCapturePrisoners.setToolTipText(resourceMap.getString("chkCapturePrisoners.toolTipText"));
-        gridBagConstraints.gridy = ++gridy;
-        panPersonnel.add(chkCapturePrisoners, gridBagConstraints);
-
-        DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
-        prisonerStatusModel.removeElement(PrisonerStatus.FREE); // we don't want this as a standard use case for prisoners
-        comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
-        JPanel pnlPrisonerStatus = new JPanel();
-        pnlPrisonerStatus.add(comboPrisonerStatus);
-        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisonerStatus.text")));
-        gridBagConstraints.gridy = ++gridy;
-        panPersonnel.add(pnlPrisonerStatus, gridBagConstraints);
-
-        chkPrisonerBabyStatus = new JCheckBox(resourceMap.getString("prisonerBabyStatus.text"));
-        chkPrisonerBabyStatus.setToolTipText(resourceMap.getString("prisonerBabyStatus.toolTipText"));
-        chkPrisonerBabyStatus.setName("chkPrisonerBabyStatus");
-        gridBagConstraints.gridy = ++gridy;
-        panPersonnel.add(chkPrisonerBabyStatus, gridBagConstraints);
 
         altQualityAveragingCheckBox = new JCheckBox(resourceMap.getString("altQualityAveragingCheckBox.text"));
         altQualityAveragingCheckBox.setToolTipText(resourceMap.getString("altQualityAveragingCheckBox.toolTipText"));
@@ -1689,7 +1643,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(panOriginSearchRadius, gridBagConstraints);
 
-        //Family
+        //region Family
         JPanel panFamily = new JPanel(new GridBagLayout());
         panFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("FamilyTab.text")));
         int panFamilyGridY = ++gridy;
@@ -1871,8 +1825,9 @@ public class CampaignOptionsDialog extends JDialog {
 
         gridBagConstraints.gridy = panFamilyGridY;
         panPersonnel.add(panFamily, gridBagConstraints);
+        //endregion Family
 
-        //Salary
+        //region Salary
         JPanel panSalary = new JPanel(new GridBagLayout());
         panSalary.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("SalaryTab.text")));
 
@@ -1980,6 +1935,87 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(panSalary, gridBagConstraints);
+        //endregion Salary
+
+        //region Prisoners
+        comboPrisonerCaptureStyle = new JComboBox<>(PrisonerCaptureStyle.values());
+        comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
+            private static final long serialVersionUID = -543354619818226314L;
+
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (isSelected && (index > -1) && (list.getSelectedValue() instanceof PrisonerCaptureStyle)) {
+                    list.setToolTipText(((PrisonerCaptureStyle) list.getSelectedValue()).getToolTip());
+                }
+
+                return this;
+            }
+        });
+
+        JLabel prisonerCaptureStyleLabel = new JLabel(resourceMap.getString("prisonerCaptureStyle.text"));
+
+        DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
+        prisonerStatusModel.removeElement(PrisonerStatus.FREE); // we don't want this as a standard use case for prisoners
+        comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
+
+        JLabel prisonerStatusLabel = new JLabel(resourceMap.getString("prisonerStatus.text"));
+
+        chkPrisonerBabyStatus = new JCheckBox(resourceMap.getString("prisonerBabyStatus.text"));
+        chkPrisonerBabyStatus.setToolTipText(resourceMap.getString("prisonerBabyStatus.toolTipText"));
+        chkPrisonerBabyStatus.setName("chkPrisonerBabyStatus");
+
+        chkAtBPrisonerDefection = new JCheckBox(resourceMap.getString("chkAtBPrisonerDefection.text"));
+        chkAtBPrisonerDefection.setToolTipText(resourceMap.getString("chkAtBPrisonerDefection.toolTipText"));
+        chkAtBPrisonerDefection.setName("chkAtBPrisonerDefection");
+
+        chkAtBPrisonerRansom = new JCheckBox(resourceMap.getString("chkAtBPrisonerRansom.text"));
+        chkAtBPrisonerRansom.setName("chkAtBPrisonerRansom");
+
+        // Layout the Panel
+        JPanel panPrisoners = new JPanel();
+        panPrisoners.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panPrisoners.text")));
+        GroupLayout layout = new GroupLayout(panPrisoners);
+        panPrisoners.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(prisonerCaptureStyleLabel)
+                                .addComponent(comboPrisonerCaptureStyle, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(prisonerStatusLabel)
+                                .addComponent(comboPrisonerStatus, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkPrisonerBabyStatus)
+                        .addComponent(chkAtBPrisonerDefection)
+                        .addComponent(chkAtBPrisonerRansom)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(prisonerCaptureStyleLabel)
+                                .addComponent(comboPrisonerCaptureStyle))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(prisonerStatusLabel)
+                                .addComponent(comboPrisonerStatus))
+                        .addComponent(chkPrisonerBabyStatus)
+                        .addComponent(chkAtBPrisonerDefection)
+                        .addComponent(chkAtBPrisonerRansom)
+        );
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 23;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panPersonnel.add(panPrisoners, gridBagConstraints);
+        //endregion Prisoners
 
         JScrollPane scrollPersonnel = new JScrollPane(panPersonnel);
         scrollPersonnel.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -2278,122 +2314,120 @@ public class CampaignOptionsDialog extends JDialog {
 
         //region Mercenary Tab
         panMercenary.setName("panMercenary");
-        panMercenary.setLayout(new java.awt.GridBagLayout());
+        panMercenary.setLayout(new GridBagLayout());
 
         btnContractEquipment = new JRadioButton(resourceMap.getString("panMercenary.IntOpsPayment.title"));
         btnContractEquipment.setToolTipText(resourceMap.getString("panMercenary.IntOpsPayment.tooltip"));
-        btnContractPersonnel = new JRadioButton(resourceMap.getString("panMercenary.FMMRPayment.title"));
-        btnContractPersonnel.setToolTipText(resourceMap.getString("panMercenary.FMMRPayment.tooltip"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(btnContractEquipment, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("Combat Percent:"), gridBagConstraints);
 
         spnEquipPercent = new JSpinner(new SpinnerNumberModel(0.1, 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1));
         spnEquipPercent.setEditor(new JSpinner.NumberEditor(spnEquipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnEquipPercent.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnEquipPercent, gridBagConstraints);
+
+        chkEquipContractSaleValue = new JCheckBox("Base on equipment sale value");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(chkEquipContractSaleValue, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("DropShip Percent:"), gridBagConstraints);
 
         spnDropshipPercent = new JSpinner(new SpinnerNumberModel(0.1, 0.0, CampaignOptions.MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT, 0.1));
         spnDropshipPercent.setEditor(new JSpinner.NumberEditor(spnDropshipPercent, "0.0"));
         ((JSpinner.NumberEditor) spnDropshipPercent.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnDropshipPercent, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("JumpShip Percent:"), gridBagConstraints);
 
         spnJumpshipPercent = new JSpinner(new SpinnerNumberModel(0.1, 0.0, CampaignOptions.MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT, 0.1));
         spnJumpshipPercent.setEditor(new JSpinner.NumberEditor(spnJumpshipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnJumpshipPercent.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnJumpshipPercent, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("WarShip Percent:"), gridBagConstraints);
 
         spnWarshipPercent = new JSpinner(new SpinnerNumberModel(0.1, 0.0, CampaignOptions.MAXIMUM_WARSHIP_EQUIPMENT_PERCENT, 0.1));
         spnWarshipPercent.setEditor(new JSpinner.NumberEditor(spnWarshipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnWarshipPercent.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnWarshipPercent, gridBagConstraints);
+
+        btnContractPersonnel = new JRadioButton(resourceMap.getString("panMercenary.FMMRPayment.title"));
+        btnContractPersonnel.setToolTipText(resourceMap.getString("panMercenary.FMMRPayment.tooltip"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panMercenary.add(btnContractPersonnel, gridBagConstraints);
+
+        chkBLCSaleValue = new JCheckBox("Base battle loss compensation on equipment sale value");
+        gridBagConstraints.gridy = 6;
+        panMercenary.add(chkBLCSaleValue, gridBagConstraints);
+
+        chkOverageRepaymentInFinalPayment = new JCheckBox(resourceMap.getString("chkOverageRepaymentInFinalPayment.text"));
+        chkOverageRepaymentInFinalPayment.setToolTipText(resourceMap.getString("chkOverageRepaymentInFinalPayment.toolTipText"));
+        gridBagConstraints.gridy = 7;
+        panMercenary.add(chkOverageRepaymentInFinalPayment, gridBagConstraints);
 
         ButtonGroup groupContract = new ButtonGroup();
         groupContract.add(btnContractEquipment);
         groupContract.add(btnContractPersonnel);
-
-        chkEquipContractSaleValue = new JCheckBox("Base on equipment sale value");
-
-        chkBLCSaleValue = new JCheckBox("Base battle loss compensation on equipment sale value");
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(btnContractEquipment, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("Combat Percent:"), gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        //gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(spnEquipPercent, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        //gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(chkEquipContractSaleValue, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("Dropship Percent:"), gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        //gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(spnDropshipPercent, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("Jumpship Percent:"), gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        //gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(spnJumpshipPercent, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("Warship Percent:"), gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        //gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(spnWarshipPercent, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 3;
-        //gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(btnContractPersonnel, gridBagConstraints);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 3;
-        //gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(chkBLCSaleValue, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panMercenary.TabConstraints.tabTitle"), panMercenary);
         //endregion Mercenary Tab
@@ -3549,8 +3583,6 @@ public class CampaignOptionsDialog extends JDialog {
 
         cbSkillLevel = new JComboBox<>();
         chkUseShareSystem = new JCheckBox();
-        chkSharesExcludeLargeCraft = new JCheckBox();
-        chkSharesForAll = new JCheckBox();
         chkRetirementRolls = new JCheckBox();
         chkTrackUnitFatigue = new JCheckBox();
         chkCustomRetirementMods = new JCheckBox();
@@ -3591,8 +3623,6 @@ public class CampaignOptionsDialog extends JDialog {
         chkRestrictPartsByMission = new JCheckBox();
         chkUseLightConditions = new JCheckBox();
         chkUsePlanetaryConditions = new JCheckBox();
-        chkUseAtBCapture = new JCheckBox();
-        spnStartGameDelay = new JSpinner();
 
         chkAeroRecruitsHaveUnits = new JCheckBox();
         chkInstantUnitMarketDelivery = new JCheckBox();
@@ -3683,12 +3713,12 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubAtBAdmin.add(chkUseShareSystem, gridBagConstraints);
 
-        chkSharesExcludeLargeCraft.setText(resourceMap.getString("chkSharesExcludeLargeCraft.text"));
+        chkSharesExcludeLargeCraft = new JCheckBox(resourceMap.getString("chkSharesExcludeLargeCraft.text"));
         chkSharesExcludeLargeCraft.setToolTipText(resourceMap.getString("chkSharesExcludeLargeCraft.toolTipText"));
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkSharesExcludeLargeCraft, gridBagConstraints);
 
-        chkSharesForAll.setText(resourceMap.getString("chkSharesForAll.text"));
+        chkSharesForAll = new JCheckBox(resourceMap.getString("chkSharesForAll.text"));
         chkSharesForAll.setToolTipText(resourceMap.getString("chkSharesForAll.toolTipText"));
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkSharesForAll, gridBagConstraints);
@@ -4139,7 +4169,7 @@ public class CampaignOptionsDialog extends JDialog {
         JPanel panOpforLocal = new JPanel();
         chkOpforUsesLocalForces.setText(resourceMap.getString("chkOpforUsesLocalForces.text"));
         chkOpforUsesLocalForces.setToolTipText(resourceMap.getString("chkOpforUsesLocalForces.toolTipText"));
-        JLabel lblOpforLocalForceChance = new JLabel(resourceMap.getString("lblOpforAeroLikelihood.text"));
+        JLabel lblOpforLocalForceChance = new JLabel(resourceMap.getString("lblOpforLocalForceLikelihood.text"));
         lblOpforLocalForceChance.setToolTipText(resourceMap.getString("lblOpforLocalForceLikelihood.toolTipText"));
         spnOpforLocalForceChance.setModel(new SpinnerNumberModel(0, 0, 6, 1));
         panOpforLocal.add(chkOpforUsesLocalForces);
@@ -4207,50 +4237,6 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUsePlanetaryConditions, gridBagConstraints);
 
-        chkUseAtBCapture.setText(resourceMap.getString("chkUseAtBCapture.text"));
-        chkUseAtBCapture.setToolTipText(resourceMap.getString("chkUseAtBCapture.toolTipText"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = yTablePosition++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(chkUseAtBCapture, gridBagConstraints);
-
-        JTextArea txtStartGameDelay = new JTextArea();
-        txtStartGameDelay.setText(resourceMap.getString("txtStartGameDelay.text"));
-        txtStartGameDelay.setName("txtStartGameDelay");
-        txtStartGameDelay.setEditable(false);
-        txtStartGameDelay.setLineWrap(true);
-        txtStartGameDelay.setWrapStyleWord(true);
-        txtStartGameDelay.setOpaque(false);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = yTablePosition++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(txtStartGameDelay, gridBagConstraints);
-
-        JLabel lblStartGameDelay = new JLabel(resourceMap.getString("spnStartGameDelay.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = yTablePosition;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(lblStartGameDelay, gridBagConstraints);
-
-        spnStartGameDelay.setModel(new SpinnerNumberModel(0, 0, 1500, 25));
-        spnStartGameDelay.setToolTipText(resourceMap.getString("spnStartGameDelay.toolTipText"));
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = yTablePosition;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(spnStartGameDelay, gridBagConstraints);
-
         JScrollPane scrAtB = new JScrollPane(panAtB);
         scrAtB.setPreferredSize(new java.awt.Dimension(500, 400));
 
@@ -4264,28 +4250,12 @@ public class CampaignOptionsDialog extends JDialog {
         });
         //endregion Against the Bot Tab
 
-        //region Miscellaneous Tab
-        JScrollPane scrMisc = new JScrollPane(panMisc);
-        scrMisc.setPreferredSize(new java.awt.Dimension(500, 400));
-
-        chkHistoricalDailyLog.setText(resourceMap.getString("chkShowHistoricalDailyReport.text"));
-        chkHistoricalDailyLog.setToolTipText(resourceMap.getString("chkShowHistoricalDailyReport.toolTipText"));
-        chkHistoricalDailyLog.setName("chkHistoricalDailyLog");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMisc.add(chkHistoricalDailyLog, gridBagConstraints);
-
-        tabOptions.addTab(resourceMap.getString("misc.TabConstraints.tabTitle"), scrMisc);
-        //endregion Miscellaneous Tab
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(tabOptions, gridBagConstraints);
@@ -4401,7 +4371,8 @@ public class CampaignOptionsDialog extends JDialog {
 
         //region General Tab
         useUnitRatingCheckBox.setSelected(options.useDragoonRating());
-        unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod().getDescription());
+        unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod());
+        manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
         //endregion General Tab
 
         //region Repair and Maintenance Tab
@@ -4410,13 +4381,13 @@ public class CampaignOptionsDialog extends JDialog {
         resetToFirstTechCheckBox.setSelected(options.useResetToFirstTech());
         useQuirksBox.setSelected(options.useQuirks());
         useAeroSystemHitsBox.setSelected(options.useAeroSystemHits());
-        if (options.isDestroyByMargin()) {
+        if (useDamageMargin.isSelected() != options.isDestroyByMargin()) {
             useDamageMargin.doClick();
         }
         spnDamageMargin.setValue(options.getDestroyMargin());
         spnDestroyPartTarget.setValue(options.getDestroyPartTarget());
 
-        if (options.checkMaintenance()) {
+        if (checkMaintenance.isSelected() != options.checkMaintenance()) {
             checkMaintenance.doClick();
         }
         spnMaintenanceDays.setValue(options.getMaintenanceCycleDays());
@@ -4458,7 +4429,7 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Supplies and Acquisitions Tab
 
         //region Tech Limits Tab
-        if (options.limitByYear()) {
+        if (limitByYearBox.isSelected() != options.limitByYear()) {
             limitByYearBox.doClick();
         }
         disallowExtinctStuffBox.setSelected(options.disallowExtinctStuff());
@@ -4481,9 +4452,6 @@ public class CampaignOptionsDialog extends JDialog {
         useEdgeBox.setSelected(options.useEdge());
         useSupportEdgeBox.setSelected(options.useSupportEdge());
         useImplantsBox.setSelected(options.useImplants());
-        chkCapturePrisoners.setSelected(options.capturePrisoners());
-        comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
-        chkPrisonerBabyStatus.setSelected(options.getPrisonerBabyStatus());
         altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
         useAdvancedMedicalBox.setSelected(options.useAdvancedMedical());
         useDylansRandomXpBox.setSelected(options.useDylansRandomXp());
@@ -4504,6 +4472,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
         spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
 
+        //Family
         spnMinimumMarriageAge.setValue(options.getMinimumMarriageAge());
         spnCheckMutualAncestorsDepth.setValue(options.checkMutualAncestorsDepth());
         chkLogMarriageNameChange.setSelected(options.logMarriageNameChange());
@@ -4529,6 +4498,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseRandomDeaths.setSelected(options.useRandomDeaths());
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
 
+        //Salary
         spnSalaryCommission.setValue(options.getSalaryCommissionMultiplier());
         spnSalaryEnlisted.setValue(options.getSalaryEnlistedMultiplier());
         spnSalaryAntiMek.setValue(options.getSalaryAntiMekMultiplier());
@@ -4538,6 +4508,13 @@ public class CampaignOptionsDialog extends JDialog {
         for (int i = 1; i < spnSalaryBase.length; i++) {
             spnSalaryBase[i].setValue(options.getBaseSalary(i));
         }
+
+        //Prisoners
+        comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
+        comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
+        chkPrisonerBabyStatus.setSelected(options.getPrisonerBabyStatus());
+        chkAtBPrisonerDefection.setSelected(options.useAtBPrisonerDefection());
+        chkAtBPrisonerRansom.setSelected(options.useAtBPrisonerRansom());
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -4581,6 +4558,7 @@ public class CampaignOptionsDialog extends JDialog {
         spnWarshipPercent.setValue(options.getWarshipContractPercent());
         chkEquipContractSaleValue.setSelected(options.useEquipmentContractSaleValue());
         chkBLCSaleValue.setSelected(options.useBLCSaleValue());
+        chkOverageRepaymentInFinalPayment.setSelected(options.getOverageRepaymentInFinalPayment());
         //endregion Mercenary Tab
 
         //region Experience Tab
@@ -4637,7 +4615,7 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Rank System Tab
 
         //region Name and Portrait Generation Tab
-        if (options.useOriginFactionForNames()) {
+        if (chkUseOriginFactionForNames.isSelected() != options.useOriginFactionForNames()) {
             chkUseOriginFactionForNames.doClick();
         }
 
@@ -4652,9 +4630,9 @@ public class CampaignOptionsDialog extends JDialog {
                 allSelected = false;
             }
         }
-        if (allSelected) {
+        if (allSelected && !allPortraitsBox.isSelected()) {
             allPortraitsBox.doClick();
-        } else if (noneSelected) {
+        } else if (noneSelected && !noPortraitsBox.isSelected()) {
             noPortraitsBox.doClick();
         }
 
@@ -4673,7 +4651,7 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Personnel Market Tab
 
         //region Against the Bot Tab
-        if (options.getUseAtB()) {
+        if (chkUseAtB.isSelected() != options.getUseAtB()) {
             chkUseAtB.doClick();
         }
         cbSkillLevel.setSelectedIndex(options.getSkillLevel());
@@ -4752,13 +4730,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseWeatherConditions.setSelected(options.getUseWeatherConditions());
         chkUseLightConditions.setSelected(options.getUseLightConditions());
         chkUsePlanetaryConditions.setSelected(options.getUsePlanetaryConditions());
-        chkUseAtBCapture.setSelected(options.getUseAtBCapture());
-        spnStartGameDelay.setValue(options.getStartGameDelay());
         //endregion Against the Bot Tab
-
-        //region Miscellaneous Tab
-        chkHistoricalDailyLog.setSelected(options.historicalDailyLog());
-        //endregion Miscellaneous Tab
     }
 
     public static String[][] getSkillCostsArray(Hashtable<String, SkillType> skillHash) {
@@ -4827,7 +4799,6 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void btnSaveActionPerformed() {
-        final String METHOD_NAME = "btnSaveActionPerformed()";
         if (txtName.getText().length() == 0) {
             return;
         }
@@ -4866,20 +4837,10 @@ public class CampaignOptionsDialog extends JDialog {
                 SkillType.lookupHash, SpecialAbility.getAllSpecialAbilities());
 
         // Then save it out to that file.
-        FileOutputStream fos;
-        PrintWriter pw;
-
-        try {
-            fos = new FileOutputStream(file);
-            pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
+        try (FileOutputStream fos = new FileOutputStream(file);
+             PrintWriter pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
             preset.writeToXml(pw, 0);
             pw.flush();
-            pw.close();
-            fos.close();
-            // delete the backup file because we didn't need it
-            if (backupFile.exists()) {
-                backupFile.delete();
-            }
             MekHQ.getLogger().info(this, "Campaign options saved to " + file);
         } catch (Exception ex) {
             MekHQ.getLogger().error(this, ex);
@@ -4889,9 +4850,12 @@ public class CampaignOptionsDialog extends JDialog {
             file.delete();
             if (backupFile.exists()) {
                 Utilities.copyfile(backupFile, file);
-                backupFile.delete();
             }
         }
+        if (backupFile.exists()) {
+            backupFile.delete();
+        }
+
         this.setVisible(false);
     }
 
@@ -4939,7 +4903,8 @@ public class CampaignOptionsDialog extends JDialog {
         options.setDamagedPartsValue((Double) spnDamagedPartsValue.getModel().getValue());
         options.setCanceledOrderReimbursement((Double) spnOrderRefund.getModel().getValue());
         options.setDragoonRating(useUnitRatingCheckBox.isSelected());
-        options.setUnitRatingMethod(UnitRatingMethod.getUnitRatingMethod((String) unitRatingMethodCombo.getSelectedItem()));
+        options.setUnitRatingMethod((UnitRatingMethod) unitRatingMethodCombo.getSelectedItem());
+        options.setManualUnitRatingModifier((Integer) manualUnitRatingModifier.getValue());
         options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
         options.setUseTactics(useTacticsBox.isSelected());
         campaign.getGameOptions().getOption("command_init").setValue(useTacticsBox.isSelected());
@@ -4981,6 +4946,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setWarshipContractPercent((Double) spnWarshipPercent.getModel().getValue());
         options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());
         options.setBLCSaleValue(chkBLCSaleValue.isSelected());
+        options.setOverageRepaymentInFinalPayment(chkOverageRepaymentInFinalPayment.isSelected());
 
         options.setWaitingPeriod((Integer) spnAcquireWaitingPeriod.getModel().getValue());
         options.setAcquisitionSkill((String) choiceAcquireSkill.getSelectedItem());
@@ -5080,9 +5046,6 @@ public class CampaignOptionsDialog extends JDialog {
         options.setSupportEdge(useSupportEdgeBox.isSelected());
         options.setImplants(useImplantsBox.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
-        options.setCapturePrisoners(chkCapturePrisoners.isSelected());
-        options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
-        options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
         options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
         options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
@@ -5142,6 +5105,12 @@ public class CampaignOptionsDialog extends JDialog {
                 options.setBaseSalary(i, (double) spnSalaryBase[i].getValue());
             } catch (Exception ignored) { }
         }
+        //Prisoners
+        options.setPrisonerCaptureStyle((PrisonerCaptureStyle) comboPrisonerCaptureStyle.getSelectedItem());
+        options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
+        options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
+        options.setUseAtBPrisonerDefection(chkAtBPrisonerDefection.isSelected());
+        options.setUseAtBPrisonerRansom(chkAtBPrisonerRansom.isSelected());
         //endregion Personnel Tab
 
         //start SPA
@@ -5162,6 +5131,7 @@ public class CampaignOptionsDialog extends JDialog {
         // Start Against the Bot
         options.setUseAtB(chkUseAtB.isSelected());
         options.setSkillLevel(cbSkillLevel.getSelectedIndex());
+        options.setUseAtBUnitMarket(chkUseAtB.isSelected()); // TODO : add fully modular capabilities
         options.setUseShareSystem(chkUseShareSystem.isSelected());
         options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
         options.setSharesForAll(chkSharesForAll.isSelected());
@@ -5217,19 +5187,14 @@ public class CampaignOptionsDialog extends JDialog {
         options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
-        options.setUseAtBCapture(chkUseAtBCapture.isSelected());
-        options.setStartGameDelay((Integer) spnStartGameDelay.getValue());
 
         options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
         options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
         options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
-        options.setContractMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
-
+        options.setUnitMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
         // End Against the Bot
 
-        //region Miscellaneous Tab
-        options.setHistoricalDailyLog(chkHistoricalDailyLog.isSelected());
-        //endregion Miscellaneous Tab
+        campaign.setCampaignOptions(options);
 
         MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
     }
@@ -5305,7 +5270,8 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void btnIconActionPerformed(ActionEvent evt) {
-        ImageChoiceDialog pcd = new ImageChoiceDialog(frame, true, iconCategory, iconFileName, forceIcons);
+        ImageChoiceDialog pcd = new ImageChoiceDialog(frame, true, iconCategory, iconFileName,
+                MHQStaticDirectoryManager.getForceIcons());
         pcd.setVisible(true);
         if (pcd.isChanged()) {
             iconCategory = pcd.getCategory();
@@ -5315,7 +5281,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void btnCamoActionPerformed(ActionEvent evt) {
-        CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex, camos);
+        CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex);
         ccd.setVisible(true);
         camoCategory = ccd.getCategory();
         camoFileName = ccd.getFileName();
@@ -5434,9 +5400,9 @@ public class CampaignOptionsDialog extends JDialog {
         try {
             // Translate the root camo directory name.
             if (Player.ROOT_CAMO.equals(camoCategory)) {
-                camoCategory = ""; //$NON-NLS-1$
+                camoCategory = "";
             }
-            Image camo = (Image) camos.getItem(camoCategory, camoFileName);
+            Image camo = (Image) MHQStaticDirectoryManager.getCamouflage().getItem(camoCategory, camoFileName);
             btnCamo.setIcon(new ImageIcon(camo));
         } catch (Exception err) {
             JOptionPane.showMessageDialog(
@@ -5471,7 +5437,7 @@ public class CampaignOptionsDialog extends JDialog {
             if (Campaign.ROOT_ICON.equals(iconCategory)) {
                 iconCategory = ""; //$NON-NLS-1$
             }
-            Image icon = (Image) forceIcons.getItem(iconCategory, iconFileName);
+            Image icon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem(iconCategory, iconFileName);
             icon = icon.getScaledInstance(75, -1, Image.SCALE_DEFAULT);
             btnIcon.setIcon(new ImageIcon(icon));
         } catch (Exception err) {

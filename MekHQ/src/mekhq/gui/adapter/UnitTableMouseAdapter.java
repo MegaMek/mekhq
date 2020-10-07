@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2020 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2014, 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.adapter;
 
@@ -59,15 +59,15 @@ import mekhq.campaign.parts.MissingThrusters;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.InfantryAmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.actions.StripUnitAction;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.CancelMothballUnitAction;
 import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
+import mekhq.campaign.unit.actions.ShowUnitBvAction;
+import mekhq.campaign.unit.actions.StripUnitAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.MekLabTab;
@@ -127,6 +127,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     public static final String COMMAND_REFURBISH = "REFURBISH";
     public static final String COMMAND_REFIT_KIT = "REFIT_KIT";
     public static final String COMMAND_FLUFF_NAME = "FLUFF_NAME";
+    public static final String COMMAND_SHOW_BV_CALC = "SHOW_BV_CALC";
     //endregion Standard Commands
 
     //region GM Commands
@@ -387,9 +388,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (StringUtil.isNullOrEmpty(category)) {
                 category = Player.ROOT_CAMO;
             }
-            CamoChoiceDialog ccd = new CamoChoiceDialog(gui.getFrame(), true,
-                    category, selectedUnit.getCamoFileName(), gui.getCampaign()
-                            .getColorIndex(), gui.getIconPackage().getCamos());
+            CamoChoiceDialog ccd = new CamoChoiceDialog(gui.getFrame(), true, category,
+                    selectedUnit.getCamoFileName(), gui.getCampaign().getColorIndex());
             ccd.setLocationRelativeTo(gui.getFrame());
             ccd.setVisible(true);
 
@@ -454,9 +454,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             String fluffName = (String) JOptionPane.showInputDialog(
                     gui.getFrame(), "Name for this unit?", "Unit Name",
                     JOptionPane.QUESTION_MESSAGE, null, null,
-                    selectedUnit.getFluffName() == null ? "" : selectedUnit.getFluffName());
-            selectedUnit.setFluffName(fluffName);
+                    selectedUnit.getFluffName());
+            selectedUnit.setFluffName((fluffName != null) ? fluffName : "");
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+        } else if (command.equals(COMMAND_SHOW_BV_CALC)) {
+            IUnitAction showUnitBvAction = new ShowUnitBvAction();
+            showUnitBvAction.Execute(gui.getCampaign(), selectedUnit);
         } else if (command.equals(COMMAND_RESTORE_UNIT)) {
             for (Unit unit : units) {
                 unit.setSalvage(false);
@@ -974,7 +977,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
 
                 // fill with personnel
                 if (oneAvailableUnitBelowMaxCrew) {
-                    menuItem = new JMenuItem("Hire full complement");
+                    menuItem = new JMenuItem(resourceMap.getString("hireMinimumComplement.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
@@ -1033,6 +1036,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     popup.add(menuItem);
                 }
 
+                if (oneSelected) {
+                    menuItem = new JMenuItem("Show BV Calculation");
+                    menuItem.setActionCommand(COMMAND_SHOW_BV_CALC);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
+
                 // sell unit
                 if (!allDeployed && gui.getCampaign().getCampaignOptions().canSellUnits()) {
                     popup.addSeparator();
@@ -1055,13 +1065,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
                     if (oneActive) {
-                        menuItem = new JMenuItem(oneSelected ? "Mothball Units" : "Mass Mothball Unit");
+                        menuItem = new JMenuItem(oneSelected ? "Mothball Unit" : "Mass Mothball Units");
                         menuItem.setActionCommand(COMMAND_GM_MOTHBALL);
                         menuItem.addActionListener(this);
                         menu.add(menuItem);
                     }
                     if (oneMothballed) {
-                        menuItem = new JMenuItem(oneSelected ? "Activate Units" : "Mass Activate Unit");
+                        menuItem = new JMenuItem(oneSelected ? "Activate Unit" : "Mass Activate Units");
                         menuItem.setActionCommand(COMMAND_GM_ACTIVATE);
                         menuItem.addActionListener(this);
                         menu.add(menuItem);
@@ -1073,7 +1083,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         menu.add(menuItem);
                     }
                     if (oneAvailableUnitBelowMaxCrew) {
-                        menuItem = new JMenuItem("Add full complement");
+                        menuItem = new JMenuItem(resourceMap.getString("addMinimumComplement.text"));
                         menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
                         menuItem.addActionListener(this);
                         menu.add(menuItem);

@@ -40,6 +40,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
 import megamek.common.options.IOption;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -48,9 +49,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 
 import megamek.common.Crew;
 import megamek.common.options.PilotOptions;
-import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
-import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.Campaign;
@@ -85,20 +84,13 @@ public class PersonViewPanel extends ScrollablePanel {
     private final Person person;
     private final Campaign campaign;
 
-    private final DirectoryItems portraits;
-    private final DirectoryItems awardIcons;
-    private final IconPackage ip;
-
     ResourceBundle resourceMap;
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
         this.person = p;
         this.campaign = c;
         this.gui = gui;
-        this.ip = gui.getIconPackage();
-        this.portraits = this.ip.getPortraits();
-        this.awardIcons = this.ip.getAwardIcons();
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl());
         initComponents();
     }
 
@@ -320,7 +312,8 @@ public class PersonViewPanel extends ScrollablePanel {
             try {
                 int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
                 String ribbonFileName = award.getRibbonFileName(numberOfAwards);
-                ribbon = (Image) awardIcons.getItem(award.getSet() + "/ribbons/", ribbonFileName);
+                ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons()
+                        .getItem(award.getSet() + "/ribbons/", ribbonFileName);
                 if (ribbon == null)
                     continue;
                 ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
@@ -328,7 +321,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "drawRibbons", e);
+                MekHQ.getLogger().error(e);
             }
 
             i++;
@@ -364,7 +357,8 @@ public class PersonViewPanel extends ScrollablePanel {
             try {
                 int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
                 String medalFileName = award.getMedalFileName(numberOfAwards);
-                medal = (Image) awardIcons.getItem(award.getSet() + "/medals/", medalFileName);
+                medal = (Image) MHQStaticDirectoryManager.getAwardIcons()
+                        .getItem(award.getSet() + "/medals/", medalFileName);
                 if (medal == null)
                     continue;
                 medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
@@ -372,7 +366,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "drawMedals", e);
+                MekHQ.getLogger().error(e);
             }
         }
 
@@ -394,7 +388,8 @@ public class PersonViewPanel extends ScrollablePanel {
             try {
                 int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
                 String miscFileName = award.getMiscFileName(numberOfAwards);
-                Image miscAwardBufferedImage = (Image) awardIcons.getItem(award.getSet() + "/misc/", miscFileName);
+                Image miscAwardBufferedImage = (Image) MHQStaticDirectoryManager.getAwardIcons()
+                        .getItem(award.getSet() + "/misc/", miscFileName);
                 if (miscAwardBufferedImage == null)
                     continue;
                 miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
@@ -403,7 +398,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "drawMiscAwards", e);
+                MekHQ.getLogger().error(e);
             }
         }
         return pnlMiscAwards;
@@ -442,18 +437,18 @@ public class PersonViewPanel extends ScrollablePanel {
         // Try to get the player's portrait file.
         Image portrait;
         try {
-            portrait = (Image) portraits.getItem(category, filename);
+            portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
             if (null != portrait) {
                 portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
             } else {
-                portrait = (Image) portraits.getItem("", "default.gif");
+                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", "default.gif");
                 if (null != portrait) {
                     portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
                 }
             }
             lblPortrait.setIcon(new ImageIcon(portrait));
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "setPortrait", e);
+            MekHQ.getLogger().error(e);
         }
 
         GridBagConstraints gbc_lblPortrait = new GridBagConstraints();
@@ -1424,7 +1419,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         JButton medicalButton = new JButton(new ImageIcon("data/images/misc/medical.png"));
         medicalButton.addActionListener(event -> {
-            MedicalViewDialog medDialog = new MedicalViewDialog(SwingUtilities.getWindowAncestor(this), campaign, person, ip);
+            MedicalViewDialog medDialog = new MedicalViewDialog(SwingUtilities.getWindowAncestor(this), campaign, person);
             medDialog.setModalityType(ModalityType.APPLICATION_MODAL);
             medDialog.setVisible(true);
             removeAll();

@@ -93,6 +93,8 @@ public final class HangarTab extends CampaignGuiTab {
     private UnitTableModel unitModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
+
     HangarTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
@@ -111,8 +113,6 @@ public final class HangarTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$ ;
-                new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
@@ -123,14 +123,16 @@ public final class HangarTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        add(new JLabel(resourceMap.getString("lblUnitChoice.text")), //$NON-NLS-1$ ;
-                gridBagConstraints);
+        add(new JLabel(resourceMap.getString("lblUnitChoice.text")), gridBagConstraints);
 
         DefaultComboBoxModel<String> unitGroupModel = new DefaultComboBoxModel<>();
         unitGroupModel.addElement("All Units");
         for (int i = 0; i < UnitType.SIZE; i++) {
             unitGroupModel.addElement(UnitType.getTypeDisplayableName(i));
         }
+        unitGroupModel.addElement(resourceMap.getString("choiceUnit.ActiveUnits.filter"));
+        unitGroupModel.addElement(resourceMap.getString("choiceUnit.MothballedUnits.filter"));
+        unitGroupModel.addElement(resourceMap.getString("choiceUnit.UnmaintainedUnits.filter"));
         choiceUnit = new JComboBox<>(unitGroupModel);
         choiceUnit.setSelectedIndex(0);
         choiceUnit.addActionListener(ev -> filterUnits());
@@ -205,8 +207,8 @@ public final class HangarTab extends CampaignGuiTab {
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = unitTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(unitModel.getColumnWidth(i));
-            column.setCellRenderer(
-                    unitModel.getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC, getIconPackage()));
+            column.setCellRenderer(unitModel
+                    .getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC));
         }
         unitTable.setIntercellSpacing(new Dimension(0, 0));
         unitTable.setShowGrid(false);
@@ -273,12 +275,26 @@ public final class HangarTab extends CampaignGuiTab {
                 }
                 UnitTableModel unitModel = entry.getModel();
                 Unit unit = unitModel.getUnit(entry.getIdentifier());
-                Entity en = unit.getEntity();
-                int type = -1;
-                if (null != en) {
-                    type = en.getUnitType();
+
+                if (nGroup < UnitType.SIZE) {
+                    Entity en = unit.getEntity();
+                    int type = -1;
+                    if (en != null) {
+                        type = en.getUnitType();
+                    }
+                    return type == nGroup;
+                } else if (resourceMap.getString("choiceUnit.ActiveUnits.filter")
+                        .equals(choiceUnit.getSelectedItem())) {
+                    return !unit.isMothballed();
+                } else if (resourceMap.getString("choiceUnit.MothballedUnits.filter")
+                        .equals(choiceUnit.getSelectedItem())) {
+                    return unit.isMothballed();
+                } else if (resourceMap.getString("choiceUnit.UnmaintainedUnits.filter")
+                        .equals(choiceUnit.getSelectedItem())) {
+                    return unit.isUnmaintained();
+                } else {
+                    return false;
                 }
-                return type == nGroup;
             }
         };
         unitSorter.setRowFilter(unitTypeFilter);
@@ -310,8 +326,8 @@ public final class HangarTab extends CampaignGuiTab {
         TableColumn column;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(
-                    unitModel.getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC, getIconPackage()));
+            column.setCellRenderer(unitModel
+                    .getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC));
             if (i == UnitTableModel.COL_WCLASS) {
                 if (view == UV_GRAPHIC) {
                     column.setPreferredWidth(125);
@@ -437,8 +453,7 @@ public final class HangarTab extends CampaignGuiTab {
             return;
         }
         Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
-        scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign(), getIconPackage().getCamos(),
-                getIconPackage().getMechTiles()));
+        scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign()));
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later

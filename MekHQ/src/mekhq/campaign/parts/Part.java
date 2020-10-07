@@ -42,6 +42,7 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.WeaponType;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -180,9 +181,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     protected boolean workingOvertime;
     protected int shorthandedMod;
 
-    //this tracks whether the part is reserved for a refit
-    protected UUID refitId;
-    protected UUID reserveId;
+    /** This tracks the unit which resorved the part for a refit */
+    private UUID refitId;
+    /** The unique identifier of the tech who is reserving this part for overnight work */
+    private UUID reserveId;
     //temporarily mark the part used by current refit planning
     protected transient boolean usedForRefitPlanning;
 
@@ -198,8 +200,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
      * not show up independently. Currently (8/8/2015), we are only using this for BA suits
      * We need a parent part id and a vector of children parts to represent this.
      */
-    protected int parentPartId;
-    protected ArrayList<Integer> childPartIds;
+    protected Part parentPart;
+    protected ArrayList<Part> childParts;
 
     /**
      * The number of parts in exactly the same condition,
@@ -214,7 +216,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     //only relevant for parts that can be acquired
     protected int daysToWait;
-    protected int replacementId;
+
+    /** The part which will be used as a replacement */
+    private Part replacementPart;
 
     public Part() {
         this(0, false, null);
@@ -241,10 +245,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         this.campaign = c;
         this.brandNew = true;
         this.quantity = 1;
-        this.replacementId = -1;
         this.quality = QUALITY_D;
-        this.parentPartId = -1;
-        this.childPartIds = new ArrayList<>();
+        this.childParts = new ArrayList<>();
         this.isTeamSalvaging = false;
     }
 
@@ -365,6 +367,29 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public void setBrandNew(boolean b) {
         this.brandNew = b;
+    }
+
+    /**
+     * Gets a value indicating if there is a replacement
+     * part assigned to this part.
+     */
+    public boolean hasReplacementPart() {
+        return replacementPart != null;
+    }
+
+    /**
+     * Gets the replacement for this part.
+     */
+    @Nullable
+    public Part getReplacementPart() {
+        return replacementPart;
+    }
+
+    /**
+     * Sets the replacement part for this part.
+     */
+    public void setReplacementPart(@Nullable Part part) {
+        replacementPart = part;
     }
 
     public int getUnitTonnage() {
@@ -601,16 +626,20 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             .append(unitTonnage)
             .append("</unitTonnage>")
             .append(NL);
-        builder.append(level1)
-            .append("<hits>")
-            .append(hits)
-            .append("</hits>")
-            .append(NL);
-        builder.append(level1)
-            .append("<timeSpent>")
-            .append(timeSpent)
-            .append("</timeSpent>")
-            .append(NL);
+        if (hits > 0) {
+            builder.append(level1)
+                .append("<hits>")
+                .append(hits)
+                .append("</hits>")
+                .append(NL);
+        }
+        if (timeSpent > 0) {
+            builder.append(level1)
+                .append("<timeSpent>")
+                .append(timeSpent)
+                .append("</timeSpent>")
+                .append(NL);
+        }
         builder.append(level1)
             .append("<mode>")
             .append(mode)
@@ -635,65 +664,90 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 .append("</unitId>")
                 .append(NL);
         }
-        builder.append(level1)
-            .append("<workingOvertime>")
-            .append(workingOvertime)
-            .append("</workingOvertime>")
-            .append(NL);
-        builder.append(level1)
-            .append("<shorthandedMod>")
-            .append(shorthandedMod)
-            .append("</shorthandedMod>")
-            .append(NL);
-        builder.append(level1)
-            .append("<refitId>")
-            .append(refitId)
-            .append("</refitId>")
-            .append(NL);
-        builder.append(level1)
-            .append("<daysToArrival>")
-            .append(daysToArrival)
-            .append("</daysToArrival>")
-            .append(NL);
-        builder.append(level1)
-            .append("<brandNew>")
-            .append(brandNew)
-            .append("</brandNew>")
-            .append(NL);
+        if (workingOvertime) {
+            builder.append(level1)
+                .append("<workingOvertime>")
+                .append(workingOvertime)
+                .append("</workingOvertime>")
+                .append(NL);
+        }
+        if (shorthandedMod != 0) {
+            builder.append(level1)
+                .append("<shorthandedMod>")
+                .append(shorthandedMod)
+                .append("</shorthandedMod>")
+                .append(NL);
+        }
+        if (refitId != null) {
+            builder.append(level1)
+                .append("<refitId>")
+                .append(refitId)
+                .append("</refitId>")
+                .append(NL);
+        }
+        if (daysToArrival > 0) {
+            builder.append(level1)
+                .append("<daysToArrival>")
+                .append(daysToArrival)
+                .append("</daysToArrival>")
+                .append(NL);
+        }
+        if (brandNew) {
+            builder.append(level1)
+                .append("<brandNew>")
+                .append(brandNew)
+                .append("</brandNew>")
+                .append(NL);
+        }
         builder.append(level1)
             .append("<quantity>")
             .append(quantity)
             .append("</quantity>")
             .append(NL);
-        builder.append(level1)
-            .append("<daysToWait>")
-            .append(daysToWait)
-            .append("</daysToWait>")
-            .append(NL);
-        builder.append(level1)
-            .append("<replacementId>")
-            .append(replacementId)
-            .append("</replacementId>")
-            .append(NL);
+        if (daysToWait > 0) {
+            builder.append(level1)
+                .append("<daysToWait>")
+                .append(daysToWait)
+                .append("</daysToWait>")
+                .append(NL);
+        }
+        if (replacementPart != null) {
+            builder.append(level1)
+                .append("<replacementId>")
+                .append(replacementPart.getId())
+                .append("</replacementId>")
+                .append(NL);
+        }
+        if (reserveId != null) {
+            builder.append(level1)
+                .append("<reserveId>")
+                .append(reserveId)
+                .append("</reserveId>")
+                .append(NL);
+        }
         builder.append(level1)
             .append("<quality>")
             .append(quality)
             .append("</quality>")
             .append(NL);
-        builder.append(level1)
-            .append("<isTeamSalvaging>")
-            .append(isTeamSalvaging)
-            .append("</isTeamSalvaging>")
-            .append(NL);
-        builder.append(level1)
-            .append("<parentPartId>")
-            .append(parentPartId)
-            .append("</parentPartId>")
-            .append(NL);
-        for (int childId : childPartIds) {
+        if (isTeamSalvaging) {
+            builder.append(level1)
+                .append("<isTeamSalvaging>")
+                .append(isTeamSalvaging)
+                .append("</isTeamSalvaging>")
+                .append(NL);
+        }
+        if (parentPart != null) {
+            builder.append(level1)
+                .append("<parentPartId>")
+                .append(parentPart.getId())
+                .append("</parentPartId>")
+                .append(NL);
+        }
+        for (Part childPart : childParts) {
             builder.append(level1)
                 .append("<childPartId>")
-                .append(childId)
+                .append(childPart.getId())
                 .append("</childPartId>")
                 .append(NL);
         }
@@ -802,13 +856,18 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                      retVal.brandNew = wn2.getTextContent().equalsIgnoreCase("true");
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
-                    retVal.replacementId = Integer.parseInt(wn2.getTextContent());
+                    retVal.replacementPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
                     retVal.quality = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("parentPartId")) {
-                    retVal.parentPartId = Integer.parseInt(wn2.getTextContent());
+                    retVal.parentPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("childPartId")) {
-                    retVal.childPartIds.add(Integer.parseInt(wn2.getTextContent()));
+                    int childPartId = Integer.parseInt(wn2.getTextContent());
+                    if (childPartId > 0) {
+                        retVal.childParts.add(new PartRef(childPartId));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("reserveId")) {
+                    retVal.reserveId = UUID.fromString(wn2.getTextContent());
                 }
             }
 
@@ -1044,8 +1103,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return null != getTeamId() && isTeamSalvaging;
     }
 
-    public void setReserveId(UUID i) {
-        this.reserveId = i;
+    /**
+     * Sets the unique identifier of the team member
+     * who has reserved this part for work they are
+     * performing overnight.
+     * @param teamId The unique identifier of the team member.
+     */
+    public void setReserveId(UUID teamId) {
+        this.reserveId = teamId;
     }
 
     @Override
@@ -1212,10 +1277,19 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         this.quality = part.quality;
     }
 
-    public void setRefitId(UUID rid) {
-        refitId = rid;
+    /**
+     * Sets the unit which has reserved this part for a refit.
+     * @param unitId The unique identifier of the unit.
+     */
+    public void setRefitId(UUID unitId) {
+        refitId = unitId;
     }
 
+    /**
+     * Gets the unique identifier of the unit which reserved
+     * this part for a refit.
+     * @return The unique identifier of the unit reserving this part.
+     */
     public UUID getRefitId() {
         return refitId;
     }
@@ -1302,11 +1376,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public void decrementQuantity() {
         quantity--;
         if (quantity <= 0) {
-            for (int childId : childPartIds) {
-                Part p = campaign.getPart(childId);
-                if (null != p) {
-                    campaign.removePart(p);
-                }
+            for (Part childPart : childParts) {
+                campaign.removePart(childPart);
             }
             campaign.removePart(this);
         }
@@ -1319,18 +1390,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public void setQuantity(int number) {
         quantity = number;
         if (quantity <= 0) {
-            for (int childId : childPartIds) {
-                Part p = campaign.getPart(childId);
-                if (null != p) {
-                    campaign.removePart(p);
-                }
+            for (Part childPart : childParts) {
+                campaign.removePart(childPart);
             }
             campaign.removePart(this);
         }
     }
 
     public boolean isSpare() {
-        return null == unitId && parentPartId == -1;
+        return unitId == null && parentPart == null;
     }
 
     public boolean isRightTechType(String skillType) {
@@ -1414,50 +1482,37 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public abstract String getLocationName();
 
-    public void setParentPartId(int id) {
-        parentPartId = id;
+    public void setParentPart(Part part) {
+        parentPart = part;
     }
 
-    public int getParentPartId() {
-        return parentPartId;
+    public Part getParentPart() {
+        return parentPart;
     }
 
     public boolean hasParentPart() {
-        return parentPartId != -1;
+        return parentPart != null;
     }
 
-    public ArrayList<Integer> getChildPartIds() {
-        return childPartIds;
+    public ArrayList<Part> getChildParts() {
+        return childParts;
     }
 
     public void addChildPart(Part child) {
-        childPartIds.add(child.getId());
-        child.setParentPartId(id);
+        childParts.add(child);
+        child.setParentPart(this);
     }
 
-    public void removeChildPart(int childId) {
-        ArrayList<Integer> tempArray = new ArrayList<>();
-        for (int cid : childPartIds) {
-            if (cid == childId) {
-                Part part = campaign.getPart(childId);
-                if (null != part) {
-                    part.setParentPartId(-1);
-                }
-            } else {
-                tempArray.add(cid);
-            }
-        }
-        childPartIds = tempArray;
+    public void removeChildPart(Part childPart) {
+        childPart.setParentPart(null);
+        childParts.remove(childPart);
     }
 
     public void removeAllChildParts() {
-        for (int childId : childPartIds) {
-            Part part = campaign.getPart(childId);
-            if (null != part) {
-                part.setParentPartId(-1);
-            }
+        for (Part childPart : childParts) {
+            childPart.setParentPart(null);
         }
-        childPartIds = new ArrayList<>();
+        childParts = new ArrayList<>();
     }
 
     /**
@@ -1765,5 +1820,130 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                     SimpleTechLevel.STANDARD);
         }
         return getTechAdvancement().getStaticTechLevel();
+    }
+
+    public void fixupPartReferences(Map<Integer, Part> knownParts) {
+        if (replacementPart instanceof PartRef) {
+            int id = replacementPart.getId();
+            replacementPart = knownParts.get(id);
+            if ((replacementPart == null) && (id > 0)) {
+                MekHQ.getLogger().error(
+                    String.format("Part %d ('%s') references missing replacement part %d",
+                        getId(), getName(), id));
+            }
+        }
+
+        if (parentPart instanceof PartRef) {
+            int id = parentPart.getId();
+            parentPart = knownParts.get(id);
+            if ((parentPart == null) && (id > 0)) {
+                MekHQ.getLogger().error(PartRef.class,
+                    String.format("Part %d ('%s') references missing parent part %d",
+                        getId(), getName(), id));
+            }
+        }
+
+        for (int ii = childParts.size() - 1; ii >= 0; --ii) {
+            Part childPart = childParts.get(ii);
+            if (childPart instanceof PartRef) {
+                Part realPart = knownParts.get(childPart.getId());
+                if (realPart != null) {
+                    childParts.set(ii, realPart);
+                } else if (childPart.getId() > 0) {
+                    MekHQ.getLogger().error(PartRef.class,
+                        String.format("Part %d ('%s') references missing child part %d",
+                            getId(), getName(), childPart.getId()));
+                    childParts.remove(ii);
+                }
+            }
+        }
+    }
+
+    public static class PartRef extends Part {
+        private static final long serialVersionUID = 1L;
+
+        public PartRef(int id) {
+            this.id = id;
+        }
+
+        @Override
+        public int getBaseTime() {
+            return 0;
+        }
+
+        @Override
+        public void updateConditionFromEntity(boolean checkForDestruction) {
+        }
+
+        @Override
+        public void updateConditionFromPart() {
+        }
+
+        @Override
+        public void remove(boolean salvage) {
+        }
+
+        @Override
+        public MissingPart getMissingPart() {
+            return null;
+        }
+
+        @Override
+        public int getLocation() {
+            return 0;
+        }
+
+        @Override
+        public String checkFixable() {
+            return null;
+        }
+
+        @Override
+        public boolean needsFixing() {
+            return false;
+        }
+
+        @Override
+        public int getDifficulty() {
+            return 0;
+        }
+
+        @Override
+        public Money getStickerPrice() {
+            return null;
+        }
+
+        @Override
+        public double getTonnage() {
+            return 0;
+        }
+
+        @Override
+        public boolean isSamePartType(Part part) {
+            return false;
+        }
+
+        @Override
+        public void writeToXml(PrintWriter pw1, int indent) {
+        }
+
+        @Override
+        protected void loadFieldsFromXmlNode(Node wn) {
+        }
+
+        @Override
+        public Part clone() {
+            return null;
+        }
+
+        @Override
+        public String getLocationName() {
+            return null;
+        }
+
+        @Override
+        public ITechnology getTechAdvancement() {
+            return null;
+        }
     }
 }

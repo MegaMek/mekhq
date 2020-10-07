@@ -36,7 +36,6 @@ import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
@@ -231,8 +230,6 @@ public class PersonnelMarket {
     }
 
     public static PersonnelMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
-
         PersonnelMarket retVal = null;
 
         try {
@@ -265,11 +262,9 @@ public class PersonnelMarket {
                     try {
                         en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
                     } catch (EntityLoadingException ex) {
-                        en = null;
-                        MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, LogLevel.ERROR,
-                                "Unable to load entity: " + ms.getSourceFile() + ": " //$NON-NLS-1$
-                                        + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                        MekHQ.getLogger().error(PersonnelMarket.class, METHOD_NAME, ex);
+                        MekHQ.getLogger().error(PersonnelMarket.class,
+                                "Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
+                        MekHQ.getLogger().error(PersonnelMarket.class, ex);
                     }
                     if (null != en) {
                         retVal.attachedEntities.put(id, en);
@@ -283,12 +278,8 @@ public class PersonnelMarket {
                 } else  {
                     // Error condition of sorts!
                     // Errr, what should we do here?
-                    MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, LogLevel.ERROR,
-                            "Unknown node type not loaded in Personnel nodes: " //$NON-NLS-1$
-                            + wn2.getNodeName());
-
+                    MekHQ.getLogger().error(PersonnelMarket.class, "Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
                 }
-
             }
 
             // All personnel need the rank reference fixed
@@ -302,7 +293,7 @@ public class PersonnelMarket {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(PersonnelMarket.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(PersonnelMarket.class, ex);
         }
 
         return retVal;

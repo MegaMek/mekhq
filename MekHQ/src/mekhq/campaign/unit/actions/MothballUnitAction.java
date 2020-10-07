@@ -1,7 +1,7 @@
 /*
  * MothballUnitAction.java
  *
- * Copyright (c) 2019 Megamek Team. All rights reserved.
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit.actions;
 
 import java.util.UUID;
@@ -31,7 +30,6 @@ import mekhq.campaign.unit.Unit;
  * Mothballs a unit.
  */
 public class MothballUnitAction implements IUnitAction {
-
     private final UUID techId;
     private final boolean isGM;
 
@@ -51,9 +49,8 @@ public class MothballUnitAction implements IUnitAction {
     public void Execute(Campaign campaign, Unit unit) {
         if (isGM) {
             unit.startMothballing(null, true);
-        }
-        else {
-            if (!unit.isSelfCrewed() && null == techId) {
+        } else {
+            if (!unit.isSelfCrewed() && (null == techId)) {
                 return;
             }
 

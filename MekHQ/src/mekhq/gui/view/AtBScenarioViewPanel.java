@@ -64,6 +64,7 @@ import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -320,16 +321,15 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
             if (null != scenario.getLance(campaign)) {
                 lblForceDesc.setText(campaign.getForce(scenario.getLanceForceId()).getFullName());
-            } else if(scenario instanceof AtBDynamicScenario){
-
+            } else if (scenario instanceof AtBDynamicScenario) {
                 StringBuilder forceBuilder = new StringBuilder();
                 forceBuilder.append("<html>");
                 boolean chop = false;
-                for(int forceID : scenario.getForceIDs()) {
+                for (int forceID : scenario.getForceIDs()) {
                     forceBuilder.append(campaign.getForce(forceID).getFullName());
                     forceBuilder.append("<br/>");
                     ScenarioForceTemplate template = ((AtBDynamicScenario) scenario).getPlayerForceTemplates().get(forceID);
-                    if(template != null && template.getActualDeploymentZone() >= 0) {
+                    if (template != null && template.getActualDeploymentZone() >= 0) {
                         forceBuilder.append("Deploy: ");
                         forceBuilder.append(IStartingPositions.START_LOCATION_NAMES[template.getActualDeploymentZone()]);
                         forceBuilder.append("<br/>");
@@ -337,7 +337,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                     chop = true;
                 }
 
-                if(chop) {
+                if (chop) {
                     forceBuilder.delete(forceBuilder.length() - 5, forceBuilder.length());
                 }
                 forceBuilder.append("</html>");
@@ -908,10 +908,9 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         }
 
         protected Icon getIcon(Object node) {
-
-            if(node instanceof UnitStub) {
+            if (node instanceof UnitStub) {
                 return getIconFrom((UnitStub)node);
-            } else if(node instanceof ForceStub) {
+            } else if (node instanceof ForceStub) {
                 return getIconFrom((ForceStub)node);
             } else {
                 return null;
@@ -922,7 +921,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             String category = unit.getPortraitCategory();
             String filename = unit.getPortraitFileName();
 
-            if(Crew.ROOT_PORTRAIT.equals(category)) {
+            if (Crew.ROOT_PORTRAIT.equals(category)) {
                 category = "";
             }
 
@@ -933,18 +932,18 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             // Try to get the player's portrait file.
             Image portrait = null;
             try {
-                portrait = (Image) icons.getPortraits().getItem(category, filename);
+                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
                 if(null != portrait) {
                     portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
                 } else {
-                    portrait = (Image) icons.getPortraits().getItem("", "default.gif");
+                    portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", "default.gif");
                     if(null != portrait) {
                         portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
                     }
                 }
                 return new ImageIcon(portrait);
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "getIconFrom", e);
+                MekHQ.getLogger().error(e);
                 return null;
             }
         }
@@ -954,39 +953,39 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             String filename = force.getIconFileName();
             LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
 
-            if(Crew.ROOT_PORTRAIT.equals(category)) {
+            if (Crew.ROOT_PORTRAIT.equals(category)) {
                 category = "";
             }
 
             // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == filename) || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
+            if ((null == category) || (null == filename)
+                    || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
                 filename = "empty.png";
             }
 
             // Try to get the player's portrait file.
-            Image portrait = null;
+            Image portrait;
             try {
-                portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
-               if(null != portrait) {
-                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-            } else {
-                portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
-                if(null != portrait) {
+                portrait = MHQStaticDirectoryManager.buildForceIcon(category, filename, iconMap);
+                if (null != portrait) {
                     portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-                }
+                } else {
+                    portrait = (Image) MHQStaticDirectoryManager.getForceIcons().getItem("", "empty.png");
+                    if (null != portrait) {
+                        portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
+                    }
                 }
                 return new ImageIcon(portrait);
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "getIconFrom", e);
+                MekHQ.getLogger().error(e);
                 return null;
             }
        }
     }
 
-    protected class EntityListModel implements TreeModel {
-
+    protected static class EntityListModel implements TreeModel {
         private ArrayList<String> root;
-        private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
+        private Vector<TreeModelListener> listeners = new Vector<>();
         private String name;
 
         public EntityListModel(ArrayList<String> root, String name) {
@@ -1000,24 +999,24 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
         @Override
         public Object getChild(Object parent, int index) {
-            if(parent instanceof ArrayList<?>) {
-                return ((ArrayList<?>)parent).get(index);
+            if (parent instanceof ArrayList<?>) {
+                return ((ArrayList<?>) parent).get(index);
             }
             return null;
         }
 
         @Override
         public int getChildCount(Object parent) {
-            if(parent instanceof ArrayList<?>) {
-                return ((ArrayList<?>)parent).size();
+            if (parent instanceof ArrayList<?>) {
+                return ((ArrayList<?>) parent).size();
             }
             return 0;
         }
 
         @Override
         public int getIndexOfChild(Object parent, Object child) {
-            if(parent instanceof ArrayList<?>) {
-                return ((ArrayList<?>)parent).indexOf(child);
+            if (parent instanceof ArrayList<?>) {
+                return ((ArrayList<?>) parent).indexOf(child);
             }
             return 0;
         }

@@ -76,6 +76,7 @@ public class BattleArmorSuit extends Part {
     private Money alternateCost = Money.zero();
     private double alternateTon;
     private int introYear;
+    private boolean isReplacement;
 
     public BattleArmorSuit() {
         super(0, null);
@@ -139,7 +140,7 @@ public class BattleArmorSuit extends Part {
     public double getTonnage() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
-        if(null == unit && getChildPartIds().size()==0) {
+        if ((null == unit) && getChildParts().isEmpty()) {
             return alternateTon;
         }
         double tons = 0;
@@ -218,12 +219,11 @@ public class BattleArmorSuit extends Part {
         }
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded extra costs
-        if(null == unit && getChildPartIds().size()==0) {
+        if ((null == unit) && getChildParts().isEmpty()) {
             tons += alternateTon;
         }
-        for(int childId : getChildPartIds()) {
-            Part p = campaign.getPart(childId);
-            if(null != p && !(p instanceof BattleArmorSuit)) {
+        for (Part p : getChildParts()) {
+            if (!(p instanceof BattleArmorSuit)) {
                 tons += p.getTonnage();
             }
         }
@@ -234,7 +234,7 @@ public class BattleArmorSuit extends Part {
     public Money getStickerPrice() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
-        if(null == unit && getChildPartIds().size()==0) {
+        if ((null == unit) && getChildParts().isEmpty()) {
             return alternateCost;
         }
         Money cost = Money.zero();
@@ -267,14 +267,11 @@ public class BattleArmorSuit extends Part {
             cost = cost.plus(50000 * (jumpMP + 1));
         }
         cost = cost.plus(25000 * (groundMP-1));
-        for(int childId : getChildPartIds()) {
-            Part p = campaign.getPart(childId);
-            if(null != p) {
-                if(p instanceof BaArmor) {
-                    cost = cost.plus(p.getCurrentValue());
-                } else if (!(p instanceof BattleArmorSuit)) {
-                    cost = cost.plus(p.getStickerPrice());
-                }
+        for (Part p : getChildParts()) {
+            if (p instanceof BaArmor) {
+                cost = cost.plus(p.getCurrentValue());
+            } else if (!(p instanceof BattleArmorSuit)) {
+                cost = cost.plus(p.getStickerPrice());
             }
         }
 
@@ -445,7 +442,7 @@ public class BattleArmorSuit extends Part {
                 if(part instanceof BaArmor && ((BaArmor)part).getLocation() == trooper) {
                     BaArmor armorClone = (BaArmor)part.clone();
                     armorClone.setAmount(((BaArmor)part).getAmount());
-                    armorClone.setParentPartId(getId());
+                    armorClone.setParentPart(this);
                     campaign.addPart(armorClone, 0);
                     addChildPart(armorClone);
                 }
@@ -529,15 +526,12 @@ public class BattleArmorSuit extends Part {
         } else {
             int nEquip = 0;
             int armor = 0;
-            if(getChildPartIds().size() > 0) {
-                for(int childId : getChildPartIds()) {
-                    Part p = campaign.getPart(childId);
-                    if(null != p) {
-                        if(p instanceof BaArmor) {
-                            armor = ((BaArmor)p).getAmount();
-                        } else {
-                            nEquip++;
-                        }
+            if (!getChildParts().isEmpty()) {
+                for (Part p : getChildParts()) {
+                    if (p instanceof BaArmor) {
+                        armor = ((BaArmor)p).getAmount();
+                    } else {
+                        nEquip++;
                     }
                 }
                 return nEquip + " pieces of equipment; " + armor + " armor points";
@@ -629,14 +623,14 @@ public class BattleArmorSuit extends Part {
             for(Part part : newUnit.getParts()) {
                 if(part instanceof BattleArmorEquipmentPart && ((BattleArmorEquipmentPart)part).getTrooper() == BattleArmor.LOC_TROOPER_1) {
                     Part newEquip = part.clone();
-                    newEquip.setParentPartId(getId());
+                    newEquip.setParentPart(this);
                     campaign.addPart(newEquip, 0);
                     addChildPart(newEquip);
                 }
                 else if(part instanceof BaArmor && ((BaArmor)part).getLocation() == BattleArmor.LOC_TROOPER_1) {
                     BaArmor armorClone = (BaArmor)part.clone();
                     armorClone.setAmount(newUnit.getEntity().getOArmor(BattleArmor.LOC_TROOPER_1));
-                    armorClone.setParentPartId(getId());
+                    armorClone.setParentPart(this);
                     campaign.addPart(armorClone, 0);
                     addChildPart(armorClone);
                 }
@@ -644,9 +638,17 @@ public class BattleArmorSuit extends Part {
         }
     }
 
+    /**
+     * Sets a value indicating whether or not this part
+     * is being used as a replacement.
+     */
+    public void isReplacement(boolean value) {
+        isReplacement = value;
+    }
+
     @Override
     public void postProcessCampaignAddition() {
-        if(getChildPartIds().isEmpty()) {
+        if (!isReplacement && getChildParts().isEmpty()) {
             addSubParts();
         }
     }

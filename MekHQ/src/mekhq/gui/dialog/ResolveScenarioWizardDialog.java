@@ -514,9 +514,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
             // if the person is dead, set the checkbox and skip all this captured stuff
             if ((status.getHits() > 5) || status.isDead()) {
                 kiaCheck.setSelected(true);
-            } else if (status.isCaptured() &&
-                    tracker.getCampaign().getCampaignOptions().getUseAtB() &&
-                    tracker.getCampaign().getCampaignOptions().getUseAtBCapture()) {
+            } else if (status.isCaptured()
+                    && tracker.getCampaign().getCampaignOptions().getPrisonerCaptureStyle().isAtB()) {
                 boolean wasCaptured = false;
                 if (status.wasPickedUp()) {
                     wasCaptured = true;

@@ -139,7 +139,10 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                             "Unit is currently deployed and can not be repaired.",
                             "Unit is deployed", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    MassRepairService.performSingleUnitMassRepairOrSalvage(gui, unit);
+                    String message = MassRepairService.performSingleUnitMassRepairOrSalvage(gui.getCampaign(), unit);
+
+                    JOptionPane.showMessageDialog(gui.getFrame(), message, "Complete",
+                            JOptionPane.INFORMATION_MESSAGE);
                     MekHQ.triggerEvent(new UnitChangedEvent(unit));
                 }
             }

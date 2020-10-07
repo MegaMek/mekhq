@@ -1,18 +1,18 @@
 /*
  * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,7 +26,6 @@ import org.w3c.dom.NodeList;
 import megamek.common.BayType;
 import megamek.common.Entity;
 import megamek.common.ITechnology;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -36,18 +35,18 @@ import mekhq.campaign.Campaign;
  *
  */
 public class MissingCubicle extends MissingPart {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -5418633125937755683L;
-    
+
     private BayType bayType;
-    
+
     public MissingCubicle() {
         this(0, null, null);
     }
-    
+
     public MissingCubicle(int tonnage, BayType bayType, Campaign c) {
         super(tonnage, false, c);
         this.bayType = bayType;
@@ -58,9 +57,8 @@ public class MissingCubicle extends MissingPart {
 
     @Override
     public String getName() {
-        Part parent = campaign.getPart(parentPartId);
-        if (null != parent) {
-            return parent.getName() + " Cubicle";
+        if (null != parentPart) {
+            return parentPart.getName() + " Cubicle";
         }
         return super.getName();
     }
@@ -100,10 +98,9 @@ public class MissingCubicle extends MissingPart {
             campaign.addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             remove(false);
-            Part bayPart = campaign.getPart(parentPartId);
-            if (null != bayPart) {
-                bayPart.addChildPart(actualReplacement);
-                bayPart.updateConditionFromPart();
+            if (null != parentPart) {
+                parentPart.addChildPart(actualReplacement);
+                parentPart.updateConditionFromPart();
             }
         }
     }
@@ -127,21 +124,20 @@ public class MissingCubicle extends MissingPart {
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
-        
-        for (int x=0; x<nl.getLength(); x++) {
-            Node wn2 = nl.item(x);      
+
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("bayType")) {
                 bayType = BayType.parse(wn2.getTextContent());
                 if (null == bayType) {
-                    MekHQ.getLogger().log(MissingCubicle.class, "loadFieldsFromXmlNode(Node)",
-                            LogLevel.ERROR, "Could not parse bay type " + wn2.getTextContent());
+                    MekHQ.getLogger().error(MissingCubicle.class, "Could not parse bay type " + wn2.getTextContent());
                     bayType = BayType.MECH;
                 }
                 name = bayType.getDisplayName() + " Cubicle";
-            } 
+            }
         }
     }
-    
+
     @Override
     public void writeToXmlBegin(PrintWriter pw1, int indent) {
         super.writeToXmlBegin(pw1, indent);

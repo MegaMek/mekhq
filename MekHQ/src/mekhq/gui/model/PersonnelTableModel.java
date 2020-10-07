@@ -40,7 +40,6 @@ import megamek.common.UnitType;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
-import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
@@ -706,11 +705,12 @@ public class PersonnelTableModel extends DataTableModel {
         }
     }
 
-    public TableCellRenderer getRenderer(boolean graphic, IconPackage icons) {
+    public TableCellRenderer getRenderer(boolean graphic) {
         if (graphic) {
-            return new PersonnelTableModel.VisualRenderer(icons);
+            return new PersonnelTableModel.VisualRenderer();
+        } else {
+            return new PersonnelTableModel.Renderer();
         }
-        return new PersonnelTableModel.Renderer();
     }
 
     public class Renderer extends DefaultTableCellRenderer {
@@ -750,11 +750,10 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-
         private static final long serialVersionUID = -9154596036677641620L;
 
-        public VisualRenderer(IconPackage icons) {
-            super(icons);
+        public VisualRenderer() {
+            super();
         }
 
         @Override

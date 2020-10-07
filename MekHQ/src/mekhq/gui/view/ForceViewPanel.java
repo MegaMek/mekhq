@@ -38,6 +38,7 @@ import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -160,18 +161,19 @@ public class ForceViewPanel extends ScrollablePanel {
         }
 
         // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename) || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
+        if ((null == category) || (null == filename)
+                || (Crew.PORTRAIT_NONE.equals(filename)&& !Force.ROOT_LAYERED.equals(category))) {
         	filename = "empty.png";
         }
 
         // Try to get the player's portrait file.
         Image portrait;
         try {
-            portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
+            portrait = MHQStaticDirectoryManager.buildForceIcon(category, filename, iconMap);
             if (null != portrait) {
         		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);
             } else {
-            	portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
+            	portrait = (Image) MHQStaticDirectoryManager.getForceIcons().getItem("", "empty.png");
             }
         	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);
             ImageIcon icon = new ImageIcon(portrait);
@@ -500,11 +502,11 @@ public class ForceViewPanel extends ScrollablePanel {
         // Try to get the player's portrait file.
         Image portrait;
         try {
-            portrait = (Image) icons.getPortraits().getItem(category, filename);
+            portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
             if (null != portrait) {
                 portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);
             } else {
-            	portrait = (Image) icons.getPortraits().getItem("", "default.gif");
+            	portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", "default.gif");
             	if (null != portrait) {
                     portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);
             	}
@@ -516,10 +518,7 @@ public class ForceViewPanel extends ScrollablePanel {
     }
 
     private Image getImageFor(Unit u, Component c) {
-		if (null == icons.getMechTiles()) {
-			return null;
-		}
-        Image base = icons.getMechTiles().imageFor(u.getEntity(), c, -1);
+        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
         int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c, u.getEntity());
         return entityImage.loadPreviewImage();
@@ -529,9 +528,10 @@ public class ForceViewPanel extends ScrollablePanel {
         // Try to get the player's camo file.
         Image camo = null;
         try {
-            camo = (Image) icons.getCamos().getItem(unit.getCamoCategory(), unit.getCamoFileName());
+            camo = (Image) MHQStaticDirectoryManager.getCamouflage().
+                    getItem(unit.getCamoCategory(), unit.getCamoFileName());
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "getCamo", e);
+            MekHQ.getLogger().error(e);
         }
         return camo;
     }

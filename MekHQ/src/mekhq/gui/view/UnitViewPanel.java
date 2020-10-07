@@ -28,15 +28,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import megamek.client.ui.swing.tileset.EntityImage;
-import megamek.client.ui.swing.tileset.MechTileset;
 import megamek.client.ui.swing.util.FluffImageHelper;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Entity;
 import megamek.common.MechView;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
-import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
@@ -54,11 +53,7 @@ public class UnitViewPanel extends ScrollablePanel {
 	private Entity entity;
 	private Campaign campaign;
 
-	private MechTileset mt;
-    private DirectoryItems camos;
-
 	private JLabel lblImage;
-	//private javax.swing.JPanel pnlStats;
 	private javax.swing.JTextPane txtReadout;
 	private javax.swing.JTextPane txtFluff;
 	private javax.swing.JPanel pnlStats;
@@ -75,14 +70,11 @@ public class UnitViewPanel extends ScrollablePanel {
 	private javax.swing.JLabel lblQuirk;
 	private javax.swing.JLabel txtQuirk;
 
-	public UnitViewPanel(Unit u, Campaign c, DirectoryItems camos, MechTileset mt) {
+	public UnitViewPanel(Unit u, Campaign c) {
 		unit = u;
 		entity = u.getEntity();
 		campaign = c;
-		this.camos = camos;
-		this.mt = mt;
 		initComponents();
-		//setMinimumSize(new Dimension(400, 200));
 	}
 
 	private void initComponents() {
@@ -98,7 +90,7 @@ public class UnitViewPanel extends ScrollablePanel {
 
         int compWidth = 1;
         Image image = FluffImageHelper.getFluffImage(entity);
-        if(null != image) {
+        if (null != image) {
             //fluff image exists so use custom ImgLabel to get full mech porn
             lblImage = new  ImgLabel(image);
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -115,7 +107,7 @@ public class UnitViewPanel extends ScrollablePanel {
             compWidth=2;
             lblImage = new JLabel();
             image = getImageFor(unit, lblImage);
-            if(null != image) {
+            if (null != image) {
                 ImageIcon icon = new ImageIcon(image);
                 lblImage.setIcon(icon);
                 gridBagConstraints = new java.awt.GridBagConstraints();
@@ -157,7 +149,7 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.gridwidth = compWidth;
-		if(unit.getHistory().length() == 0) {
+		if (unit.getHistory().length() == 0) {
 			gridBagConstraints.weighty = 1.0;
 		}
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -165,7 +157,7 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(txtReadout, gridBagConstraints);
 
-		if(unit.getHistory().length() > 0) {
+		if (unit.getHistory().length() > 0) {
 			txtFluff.setName("txtFluff");
 			txtFluff.setEditable(false);
 			txtFluff.setContentType("text/html");
@@ -278,7 +270,7 @@ public class UnitViewPanel extends ScrollablePanel {
 
 
 		double weight = 1.0;
-		if(campaign.getCampaignOptions().useQuirks() && entity.countQuirks() > 0) {
+		if (campaign.getCampaignOptions().useQuirks() && entity.countQuirks() > 0) {
 			weight = 0.0;
 		}
 
@@ -303,7 +295,7 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtCost, gridBagConstraints);
 
-		if(campaign.getCampaignOptions().useQuirks() && entity.countQuirks() > 0) {
+		if (campaign.getCampaignOptions().useQuirks() && entity.countQuirks() > 0) {
 			lblQuirk.setName("lblQuirk1"); // NOI18N
 			lblQuirk.setText(resourceMap.getString("lblQuirk1.text"));
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -329,10 +321,10 @@ public class UnitViewPanel extends ScrollablePanel {
 	}
 
 	private Image getImageFor(Unit u, Component c) {
-		if (null == mt) {
-			return null;
-		}
-        Image base = mt.imageFor(u.getEntity(), c, -1);
+        if (null == MHQStaticDirectoryManager.getMechTileset()) {
+            return null;
+        }
+        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
         int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c, u.getEntity());
         return entityImage.loadPreviewImage();
@@ -342,9 +334,10 @@ public class UnitViewPanel extends ScrollablePanel {
         // Try to get the player's camo file.
         Image camo = null;
         try {
-            camo = (Image) camos.getItem(unit.getCamoCategory(), unit.getCamoFileName());
+            camo = (Image) MHQStaticDirectoryManager.getCamouflage()
+                    .getItem(unit.getCamoCategory(), unit.getCamoFileName());
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "getCamo", e);
+            MekHQ.getLogger().error(e);
         }
         return camo;
     }

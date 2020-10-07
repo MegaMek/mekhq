@@ -42,11 +42,10 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
-import mekhq.IconPackage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.gui.enums.LayeredForceIcon;
@@ -89,7 +88,8 @@ public class ImageChoiceDialog extends JDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    public ImageChoiceDialog(Frame parent, boolean modal, String category, String filename, DirectoryItems items) {
+    public ImageChoiceDialog(Frame parent, boolean modal, String category, String filename,
+                             DirectoryItems items) {
         this(parent, modal, category, filename, null, items, false);
     }
 
@@ -414,7 +414,7 @@ public class ImageChoiceDialog extends JDialog {
         filename = Force.ICON_NONE;
 
         // Build the layered image
-        Image forceImage = IconPackage.buildForceIcon(category, filename, imageItems, iconMap);
+        Image forceImage = MHQStaticDirectoryManager.buildForceIcon(category, filename, iconMap);
         ImageIcon imageIcon = new ImageIcon(forceImage);
 
         // Disable selection of a static icon
@@ -614,7 +614,7 @@ public class ImageChoiceDialog extends JDialog {
                     lblImage.setIcon(new ImageIcon(image));
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "setImage", e);
+                MekHQ.getLogger().error(e);
             }
         }
     }

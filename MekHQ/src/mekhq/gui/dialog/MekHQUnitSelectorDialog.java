@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,18 +10,21 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.client.ui.swing.tileset.EntityImage;
+import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.*;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.UnitOrder;
@@ -51,7 +54,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         updateOptionValues();
         initialize();
         run();
-        setVisible(true);
     }
 
     @Override
@@ -78,8 +80,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
         if (addToCampaign) {
             // This is used for the buy command in MekHQ, named buttonSelect because of how it is used elsewhere
-            buttonSelect = new JButton(Messages.getString("MechSelectorDialog.Buy",
-                    new Object[]{TARGET_UNKNOWN}));
+            buttonSelect = new JButton(Messages.getString("MechSelectorDialog.Buy", TARGET_UNKNOWN));
             buttonSelect.setName("buttonBuy");
             buttonSelect.addActionListener(this);
             panelButtons.add(buttonSelect, new GridBagConstraints());
@@ -145,26 +146,49 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         Entity entity = super.getSelectedEntity();
         if (entity == null) {
             selectedUnit = null;
-            buttonSelect.setEnabled(false);
-            buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy",
-                    new Object[]{TARGET_UNKNOWN}));
-            buttonSelect.setToolTipText(null);
-        } else {
+            if (addToCampaign) {
+                buttonSelect.setEnabled(false);
+                buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy", TARGET_UNKNOWN));
+                buttonSelect.setToolTipText(null);
+            }
+        } else if (addToCampaign) {
             selectedUnit = new UnitOrder(entity, campaign);
             buttonSelect.setEnabled(true);
             Person logisticsPerson = campaign.getLogisticsPerson();
             buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy",
-                    new Object[]{campaign.getTargetForAcquisition(selectedUnit, logisticsPerson,
-                            false).getValueAsString()}));
+                    campaign.getTargetForAcquisition(selectedUnit, logisticsPerson, false)
+                            .getValueAsString()));
             buttonSelect.setToolTipText(campaign.getTargetForAcquisition(selectedUnit,
                     logisticsPerson, false).getDesc());
         }
+
         return entity;
     }
 
     @Override
     protected Entity refreshUnitView() {
-        return super.refreshUnitView();
+        Entity selectedEntity = super.refreshUnitView();
+        if (selectedEntity != null) {
+            Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(selectedEntity);
+
+            Image camo;
+            if ((selectedEntity.getCamoCategory() != null)
+                    && !selectedEntity.getCamoCategory().equals(IPlayer.NO_CAMO)) {
+                camo = MHQStaticDirectoryManager.getEntityCamoImage(selectedEntity);
+            } else {
+                camo = MHQStaticDirectoryManager.getCamoImage(campaign.getCamoCategory(), campaign.getCamoFileName());
+            }
+
+            // This seems unnecessary as the CamoManager will return an image for a playercolor
+            int tint = PlayerColors.getColorRGB(campaign.getColorIndex());
+
+            labelImage.setIcon(new ImageIcon(new EntityImage(base, tint, camo, labelImage, selectedEntity)
+                    .loadPreviewImage()));
+        } else {
+            labelImage.setIcon(null);
+        }
+
+        return selectedEntity;
     }
 
     @Override
