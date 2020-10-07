@@ -4139,7 +4139,6 @@ public class Campaign implements Serializable, ITechManager {
         this.iconFileName = s;
     }
 
-
     public ArrayList<Part> getSpareParts() {
         ArrayList<Part> spares = new ArrayList<>();
         for (Part part : getParts()) {
@@ -4564,62 +4563,6 @@ public class Campaign implements Serializable, ITechManager {
             pw1.println("\t\t</gameoption>"); //$NON-NLS-1$
         }
         pw1.println("\t</gameOptions>");
-    }
-
-    /**
-     * A helper function to encapsulate writing the array/hash pairs out to XML. Each of the types requires a different XML
-     * structure, but is in an identical holding structure. Thus, genericized function and interface to cleanly wrap it up.
-     * God, I love 3rd-generation programming languages.
-     *
-     * @param <arrType> The object type in the list. Must implement MekHqXmlSerializable.
-     * @param pw1       The PrintWriter to output XML to.
-     * @param indent    The indentation level to use for writing XML (purely for neatness).
-     * @param tag       The name of the tag to use to encapsulate it.
-     * @param array     The list of objects to write out.
-     * @param hashtab   The lookup hashtable for the associated array.
-     */
-    private <arrType> void writeArrayAndHashToXml(PrintWriter pw1, int indent,
-            String tag, ArrayList<arrType> array, Hashtable<Integer, arrType> hashtab) {
-        // Hooray for implicitly-type-detected genericized functions!
-        // However, I still ended up making an interface to handle this.
-        // That way, I can cast it and call "writeToXml" to make it cleaner.
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<" + tag + ">");
-
-        // Enumeration<Integer> = hashtab.keys
-        for (Integer x : hashtab.keySet()) {
-            ((MekHqXmlSerializable) (hashtab.get(x))).writeToXml(pw1,
-                    indent + 1);
-        }
-
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
-    }
-
-    /**
-     * A helper function to encapsulate writing the array/hash pairs out to XML. Each of the types requires a different XML
-     * structure, but is in an identical holding structure. Thus, genericized function and interface to cleanly wrap it up.
-     * God, I love 3rd-generation programming languages.
-     *
-     * @param <arrType> The object type in the list. Must implement MekHqXmlSerializable.
-     * @param pw1       The PrintWriter to output XML to.
-     * @param indent    The indentation level to use for writing XML (purely for neatness).
-     * @param tag       The name of the tag to use to encapsulate it.
-     * @param array     The list of objects to write out.
-     * @param hashtab   The lookup hashtable for the associated array.
-     */
-    private <arrType> void writeArrayAndHashToXmlforUUID(PrintWriter pw1,
-            int indent, String tag, ArrayList<arrType> array, Hashtable<UUID, arrType> hashtab) {
-        // Hooray for implicitly-type-detected genericized functions!
-        // However, I still ended up making an interface to handle this.
-        // That way, I can cast it and call "writeToXml" to make it cleaner.
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<" + tag + ">");
-
-        // Enumeration<Integer> = hashtab.keys
-        for (UUID x : hashtab.keySet()) {
-            ((MekHqXmlSerializable) (hashtab.get(x))).writeToXml(pw1,
-                    indent + 1);
-        }
-
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
     }
 
     /**
