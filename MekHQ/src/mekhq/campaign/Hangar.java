@@ -55,13 +55,11 @@ public class Hangar {
             return;
         }
 
-        UUID id = unit.getId();
-        if (id == null) {
-            id = UUID.randomUUID();
-            unit.setId(id);
+        if (unit.getId() == null) {
+            unit.setId(UUID.randomUUID());
         }
 
-        units.put(id, unit);
+        units.put(unit.getId(), unit);
     }
 
     /**
@@ -155,12 +153,12 @@ public class Hangar {
     }
 
 	public void writeToXml(PrintWriter pw1, int indent, String tag) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<" + tag + ">");
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, tag);
 
         forEachUnit(unit -> {
             unit.writeToXml(pw1, indent + 1);
         });
 
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, tag);
 	}
 }

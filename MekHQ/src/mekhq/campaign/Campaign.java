@@ -3619,7 +3619,7 @@ public class Campaign implements Serializable, ITechManager {
     public Money getMaintenanceCosts() {
         if (campaignOptions.payForMaintain()) {
             return getHangar().getUnitsStream()
-                .filter(u -> u.requiresMaintenance() && null != u.getTech())
+                .filter(u -> u.requiresMaintenance() && (null != u.getTech()))
                 .map(Unit::getMaintenanceCost)
                 .reduce(Money.zero(), (a, b) -> a.plus(b));
         }
@@ -7172,49 +7172,49 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public int getTotalMechBays() {
-        return (int)Math.round(getHangar().getUnitsStream()
+        return (int) Math.round(getHangar().getUnitsStream()
             .mapToDouble(Unit::getMechCapacity)
             .sum());
     }
 
     public int getTotalASFBays() {
-        return (int)Math.round(getHangar().getUnitsStream()
+        return (int) Math.round(getHangar().getUnitsStream()
             .mapToDouble(Unit::getASFCapacity)
             .sum());
     }
 
     public int getTotalSmallCraftBays() {
-        return (int)Math.round(getHangar().getUnitsStream()
+        return (int) Math.round(getHangar().getUnitsStream()
             .mapToDouble(Unit::getSmallCraftCapacity)
             .sum());
     }
 
     public int getTotalBattleArmorBays() {
-        return (int)Math.round(getHangar().getUnitsStream()
+        return (int) Math.round(getHangar().getUnitsStream()
             .mapToDouble(Unit::getBattleArmorCapacity)
             .sum());
     }
 
     public int getTotalInfantryBays() {
-        return (int)Math.round(getHangar().getUnitsStream()
+        return (int) Math.round(getHangar().getUnitsStream()
             .mapToDouble(Unit::getInfantryCapacity)
             .sum());
     }
 
     public int getTotalHeavyVehicleBays() {
-        return (int)Math.round(getHangar().getUnitsStream()
+        return (int) Math.round(getHangar().getUnitsStream()
             .mapToDouble(Unit::getHeavyVehicleCapacity)
             .sum());
     }
 
     public int getTotalLightVehicleBays() {
-        return (int)Math.round(getHangar().getUnitsStream()
+        return (int) Math.round(getHangar().getUnitsStream()
             .mapToDouble(Unit::getLightVehicleCapacity)
             .sum());
     }
 
     public int getTotalProtomechBays() {
-        return (int)Math.round(getHangar().getUnitsStream()
+        return (int) Math.round(getHangar().getUnitsStream()
             .mapToDouble(Unit::getProtomechCapacity)
             .sum());
     }
@@ -8101,7 +8101,7 @@ public class Campaign implements Serializable, ITechManager {
                                     // TODO : Fix this so we aren't using a hack that just assumes IS2
                                     p.setOriginalUnitTech(Person.TECH_IS2);
                                 }
-                                if (null != p.getUnitId() && null != getHangar().getUnit(p.getUnitId())
+                                if ((null != p.getUnitId()) && (null != getHangar().getUnit(p.getUnitId()))
                                         && ms.getName().equals(getHangar().getUnit(p.getUnitId()).getEntity().getShortNameRaw())) {
                                     p.setOriginalUnitId(p.getUnitId());
                                 }

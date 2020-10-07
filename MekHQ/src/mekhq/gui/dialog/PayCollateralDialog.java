@@ -137,7 +137,7 @@ public class PayCollateralDialog extends JDialog {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            if(j == units.size()) {
+            if (j == units.size()) {
                 gridBagConstraints.weighty = 1.0;
             }
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
