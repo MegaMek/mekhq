@@ -571,7 +571,7 @@ public class PlanetarySystemMapPanel extends JPanel {
      */
     private BufferedImage getEntityImage(Unit u) {
         Image img;
-        img = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity(), this, -1);
+        img = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
         if (img == null) {
             return null;
         }

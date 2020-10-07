@@ -518,7 +518,7 @@ public class ForceViewPanel extends ScrollablePanel {
     }
 
     private Image getImageFor(Unit u, Component c) {
-        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity(), c, -1);
+        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
         int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c, u.getEntity());
         return entityImage.loadPreviewImage();

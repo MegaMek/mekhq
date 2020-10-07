@@ -169,8 +169,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     protected Entity refreshUnitView() {
         Entity selectedEntity = super.refreshUnitView();
         if (selectedEntity != null) {
-            Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(selectedEntity,
-                    labelImage, -1);
+            Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(selectedEntity);
 
             Image camo;
             if ((selectedEntity.getCamoCategory() != null)
