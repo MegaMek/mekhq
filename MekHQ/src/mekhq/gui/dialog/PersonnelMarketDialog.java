@@ -63,9 +63,9 @@ public class PersonnelMarketDialog extends JDialog {
     //region Variable Declarations
     private static final long serialVersionUID = 707579637170575313L;
 
-	private PersonnelTableModel personnelModel;
-	private Campaign campaign;
-	private CampaignGUI hqView;
+    private PersonnelTableModel personnelModel;
+    private Campaign campaign;
+    private CampaignGUI hqView;
     private PersonnelMarket personnelMarket;
     Person selectedPerson = null;
     @SuppressWarnings("unused")
@@ -313,38 +313,38 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     public Person getPerson() {
-	    return selectedPerson;
-	}
+        return selectedPerson;
+    }
 
-	private void hirePerson(ActionEvent evt) {
-	    if (null != selectedPerson) {
-	    	if (campaign.getFunds().isLessThan((campaign.getCampaignOptions().payForRecruitment()
+    private void hirePerson(ActionEvent evt) {
+        if (null != selectedPerson) {
+            if (campaign.getFunds().isLessThan((campaign.getCampaignOptions().payForRecruitment()
                             ? selectedPerson.getSalary().multipliedBy(2)
                             : Money.zero()).plus(unitCost))) {
-				 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
-	    	} else {
-	    		/* Adding person to campaign changes pid; grab the old one to
-	    		 * use as a key to any attached entity
-	    		 */
-	    		UUID pid = selectedPerson.getId();
-	    		if (campaign.recruitPerson(selectedPerson)) {
-	    			Entity en = personnelMarket.getAttachedEntity(pid);
-	    			if (null != en) {
-	    				addUnit(en, true);
-	    				personnelMarket.removeAttachedEntity(pid);
-	    			}
-	    			personnelMarket.removePerson(selectedPerson);
-	    			personnelModel.setData(personnelMarket.getPersonnel());
-	    		}
-	    	}
-	    	refreshPersonView();
-	    }
-	}
+                 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
+            } else {
+                /* Adding person to campaign changes pid; grab the old one to
+                 * use as a key to any attached entity
+                 */
+                UUID pid = selectedPerson.getId();
+                if (campaign.recruitPerson(selectedPerson)) {
+                    Entity en = personnelMarket.getAttachedEntity(pid);
+                    if (null != en) {
+                        addUnit(en, true);
+                        personnelMarket.removeAttachedEntity(pid);
+                    }
+                    personnelMarket.removePerson(selectedPerson);
+                    personnelModel.setData(personnelMarket.getPersonnel());
+                }
+            }
+            refreshPersonView();
+        }
+    }
 
-	private void addPerson() {
-		if (selectedPerson != null) {
-			Entity en = personnelMarket.getAttachedEntity(selectedPerson);
-			UUID pid = selectedPerson.getId();
+    private void addPerson() {
+        if (selectedPerson != null) {
+            Entity en = personnelMarket.getAttachedEntity(selectedPerson);
+            UUID pid = selectedPerson.getId();
 
             if (campaign.recruitPerson(selectedPerson, true)) {
                 addUnit(en, false);
@@ -353,50 +353,50 @@ public class PersonnelMarketDialog extends JDialog {
                 personnelMarket.removeAttachedEntity(pid);
             }
             refreshPersonView();
-		}
-	}
+        }
+    }
 
-	private void addUnit(Entity en, boolean pay) {
-		if (null == en) {
-			return;
-		}
-		if (pay && !campaign.getFinances().debit(unitCost, Transaction.C_UNIT,
-				"Purchased " + en.getShortName(),
-				campaign.getLocalDate())) {
-			return;
-		}
-		Unit unit = campaign.addNewUnit(en, false, 0);
+    private void addUnit(Entity en, boolean pay) {
+        if (null == en) {
+            return;
+        }
+        if (pay && !campaign.getFinances().debit(unitCost, Transaction.C_UNIT,
+                "Purchased " + en.getShortName(),
+                campaign.getLocalDate())) {
+            return;
+        }
+        Unit unit = campaign.addNewUnit(en, false, 0);
         if (unit == null) {
             // No such unit matching the entity.
             return;
         }
 
-		if (unit.usesSoloPilot()) {
-			unit.addPilotOrSoldier(selectedPerson);
-			selectedPerson.setOriginalUnit(unit);
-		} else if (unit.usesSoldiers()) {
-			unit.addPilotOrSoldier(selectedPerson);
-		} else if (selectedPerson.canDrive(en)) {
-			unit.addDriver(selectedPerson);
-		} else if (selectedPerson.canGun(en)) {
-			unit.addGunner(selectedPerson);
-		} else if (selectedPerson.getPrimaryRole() == Person.T_NAVIGATOR) {
-			unit.setNavigator(selectedPerson);
-		} else {
-			unit.addVesselCrew(selectedPerson);
-		}
+        if (unit.usesSoloPilot()) {
+            unit.addPilotOrSoldier(selectedPerson);
+            selectedPerson.setOriginalUnit(unit);
+        } else if (unit.usesSoldiers()) {
+            unit.addPilotOrSoldier(selectedPerson);
+        } else if (selectedPerson.canDrive(en)) {
+            unit.addDriver(selectedPerson);
+        } else if (selectedPerson.canGun(en)) {
+            unit.addGunner(selectedPerson);
+        } else if (selectedPerson.getPrimaryRole() == Person.T_NAVIGATOR) {
+            unit.setNavigator(selectedPerson);
+        } else {
+            unit.addVesselCrew(selectedPerson);
+        }
 
-		campaign.hirePersonnelFor(unit.getId(), !pay);
-	}
+        campaign.hirePersonnelFor(unit.getId(), !pay);
+    }
 
-	private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
-	    selectedPerson = null;
-    	personnelMarket.setPaidRecruitment(radioPaidRecruitment.isSelected());
-    	if (radioPaidRecruitment.isSelected()) {
-    		personnelMarket.setPaidRecruitType(comboRecruitType.getSelectedIndex() + 1);
-    	}
-	    setVisible(false);
-	}
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
+        selectedPerson = null;
+        personnelMarket.setPaidRecruitment(radioPaidRecruitment.isSelected());
+        if (radioPaidRecruitment.isSelected()) {
+            personnelMarket.setPaidRecruitType(comboRecruitType.getSelectedIndex() + 1);
+        }
+        setVisible(false);
+    }
 
     private void filterPersonnel() {
         PersonnelFilter nGroup = (comboPersonType.getSelectedItem() != null)
@@ -419,55 +419,55 @@ public class PersonnelMarketDialog extends JDialog {
             return;
         }
         selectedPerson = personnelModel.getPerson(tablePersonnel.convertRowIndexToModel(view));
-    	Entity en =  personnelMarket.getAttachedEntity(selectedPerson);
-    	if (null == en) {
-    		unitCost = Money.zero();
-    	} else {
-    		if (!campaign.getCampaignOptions().getUseShareSystem() &&
-    				(en instanceof megamek.common.Mech ||
-    						en instanceof megamek.common.Tank ||
-    						en instanceof megamek.common.Aero)) {
-    			unitCost = Money.of(en.getCost(false)).dividedBy(2.0);
-    		} else {
-    			unitCost = Money.zero();
-    		}
-    	}
+        Entity en =  personnelMarket.getAttachedEntity(selectedPerson);
+        if (null == en) {
+            unitCost = Money.zero();
+        } else {
+            if (!campaign.getCampaignOptions().getUseShareSystem() &&
+                    (en instanceof megamek.common.Mech ||
+                            en instanceof megamek.common.Tank ||
+                            en instanceof megamek.common.Aero)) {
+                unitCost = Money.of(en.getCost(false)).dividedBy(2.0);
+            } else {
+                unitCost = Money.zero();
+            }
+        }
         refreshPersonView();
     }
 
      void refreshPersonView() {
-    	 lblUnitCost.setText("");
+         lblUnitCost.setText("");
 
-    	 int row = tablePersonnel.getSelectedRow();
+         int row = tablePersonnel.getSelectedRow();
 
-    	 if (row < 0) {
+         if (row < 0) {
              scrollPersonnelView.setViewportView(null);
              return;
          }
 
          Entity en = personnelMarket.getAttachedEntity(selectedPerson);
          String unitText = "";
-    	 if (unitCost.isPositive()) {
-    		 unitText = "Unit cost: " + unitCost.toAmountAndSymbolString();
-    	 }
+         if (unitCost.isPositive()) {
+             unitText = "Unit cost: " + unitCost.toAmountAndSymbolString();
+         }
 
-		 if (null != en) {
-			 if (StringUtil.isNullOrEmpty(unitText)) {
-				 unitText = "Unit: ";
-			 } else {
-				 unitText += " - ";
-			 }
+         if (null != en) {
+             if (StringUtil.isNullOrEmpty(unitText)) {
+                 unitText = "Unit: ";
+             } else {
+                 unitText += " - ";
+             }
 
-			 unitText += en.getDisplayName();
-		 }
+             unitText += en.getDisplayName();
+         }
 
-    	 lblUnitCost.setText(unitText);
+         lblUnitCost.setText(unitText);
 
          if (null != en) {
              JTabbedPane tabUnit = new JTabbedPane();
              String name = "Commander";
              if (Compute.getFullCrewSize(en) == 1) {
-            	 name = "Pilot";
+                 name = "Pilot";
              }
              tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, hqView));
              MechViewPanel mvp = new MechViewPanel();
@@ -475,21 +475,21 @@ public class PersonnelMarketDialog extends JDialog {
              tabUnit.add("Unit", mvp);
              scrollPersonnelView.setViewportView(tabUnit);
          } else {
-        	 scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, hqView));
+             scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, hqView));
          }
- 		//This odd code is to make sure that the scrollbar stays at the top
- 		//I cant just call it here, because it ends up getting reset somewhere later
- 		javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
+         //This odd code is to make sure that the scrollbar stays at the top
+         //I cant just call it here, because it ends up getting reset somewhere later
+         javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
-	@Override
+    @Override
     public void setVisible(boolean visible) {
         filterPersonnel();
         //changePersonnelView();
         super.setVisible(visible);
     }
 
-	public TableCellRenderer getRenderer() {
+    public TableCellRenderer getRenderer() {
         //if(choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
             //return personnelModel.new VisualRenderer(hqView.getCamos(), portraits, hqView.getMechTiles());
        // }

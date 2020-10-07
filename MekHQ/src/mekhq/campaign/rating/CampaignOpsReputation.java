@@ -107,9 +107,6 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         setTotalSkillLevels(BigDecimal.ZERO);
 
         for (Unit u : getCampaign().getHangar().getUnits()) {
-            if (null == u) {
-                continue;
-            }
             if (u.isMothballed()) {
                 continue;
             }
