@@ -1880,50 +1880,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * Finds the active person in a particular role with the highest level in a
-     * given, with an optional secondary skill to break ties.
-     *
-     * @param role
-     *            One of the Person.T_* constants
-     * @param primary
-     *            The skill to use for comparison.
-     * @param secondary
-     *            If not null and there is more than one person tied for the most
-     *            the highest, preference will be given to the one with a higher
-     *            level in the secondary skill.
-     * @return The admin in the designated role with the most experience.
-     */
-    public Person findBestInRole(int role, String primary, String secondary) {
-        int highest = 0;
-        Person retVal = null;
-        for (Person p : getActivePersonnel()) {
-            if ((p.getPrimaryRole() == role || p.getSecondaryRole() == role) && p.getSkill(primary) != null) {
-                if (p.getSkill(primary).getLevel() > highest) {
-                    retVal = p;
-                    highest = p.getSkill(primary).getLevel();
-                } else if (secondary != null && p.getSkill(primary).getLevel() == highest &&
-                /*
-                 * If the skill level of the current person is the same as the previous highest,
-                 * select the current instead under the following conditions:
-                 */
-                        (retVal == null || // None has been selected yet (current has level 0)
-                                retVal.getSkill(secondary) == null || // Previous selection does not have secondary
-                                                                      // skill
-                                (p.getSkill(secondary) != null // Current has secondary skill and it is higher than the
-                                                               // previous.
-                                        && p.getSkill(secondary).getLevel() > retVal.getSkill(secondary).getLevel()))) {
-                    retVal = p;
-                }
-            }
-        }
-        return retVal;
-    }
-
-    public Person findBestInRole(int role, String skill) {
-        return findBestInRole(role, skill, null);
-    }
-
-    /**
      * @return The list of all active {@link Person}s who qualify as technicians ({@link Person#isTech()}));
      */
     public List<Person> getTechs() {
@@ -5661,7 +5617,8 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         /* If contract is still null, the unit is not in a contract. */
-        Person adminLog = findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
+        PersonnelFinder finder = new PersonnelFinder();
+        Person adminLog = finder.findBestInRole(getActivePersonnel(), Person.T_ADMIN_LOG, SkillType.S_ADMIN);
         int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN
                 : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         int adminMod = adminLogExp - SkillType.EXP_REGULAR;

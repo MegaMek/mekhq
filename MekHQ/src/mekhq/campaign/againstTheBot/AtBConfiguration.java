@@ -51,6 +51,7 @@ import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelFinder;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
@@ -352,8 +353,12 @@ public class AtBConfiguration implements Serializable {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Base");
         }
         TargetRoll target = new TargetRoll(shipSearchTargetBase(unitType), "Base");
-        Person adminLog = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
-        int adminLogExp = (adminLog == null)?SkillType.EXP_ULTRA_GREEN:adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+
+        PersonnelFinder finder = new PersonnelFinder();
+        Person adminLog = finder.findBestInRole(campaign.getActivePersonnel(), Person.T_ADMIN_LOG, SkillType.S_ADMIN);
+        int adminLogExp = (adminLog == null)
+                ? SkillType.EXP_ULTRA_GREEN
+                : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         for (Person p : campaign.getAdmins()) {
             if ((p.getPrimaryRole() == Person.T_ADMIN_LOG ||
                     p.getSecondaryRole() == Person.T_ADMIN_LOG) &&

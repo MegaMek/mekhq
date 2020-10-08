@@ -40,6 +40,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelFinder;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
@@ -645,9 +646,10 @@ public class ContractMarket implements Serializable {
 		 * the highest admin skill, or higher negotiation if the admin
 		 * skills are equal.
 		 */
-		Person adminCommand = campaign.findBestInRole(Person.T_ADMIN_COM, SkillType.S_ADMIN, SkillType.S_NEG);
-		Person adminTransport = campaign.findBestInRole(Person.T_ADMIN_TRA, SkillType.S_ADMIN, SkillType.S_NEG);
-		Person adminLogistics = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN, SkillType.S_NEG);
+        PersonnelFinder finder = new PersonnelFinder();
+		Person adminCommand = finder.findBestInRole(campaign.getActivePersonnel(), Person.T_ADMIN_COM, SkillType.S_ADMIN, SkillType.S_NEG);
+		Person adminTransport = finder.findBestInRole(campaign.getActivePersonnel(), Person.T_ADMIN_TRA, SkillType.S_ADMIN, SkillType.S_NEG);
+		Person adminLogistics = finder.findBestInRole(campaign.getActivePersonnel(), Person.T_ADMIN_LOG, SkillType.S_ADMIN, SkillType.S_NEG);
 		int adminCommandExp = (adminCommand == null)?SkillType.EXP_ULTRA_GREEN:adminCommand.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 		int adminTransportExp = (adminTransport == null)?SkillType.EXP_ULTRA_GREEN:adminTransport.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 		int adminLogisticsExp = (adminLogistics == null)?SkillType.EXP_ULTRA_GREEN:adminLogistics.getSkill(SkillType.S_ADMIN).getExperienceLevel();

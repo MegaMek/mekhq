@@ -25,6 +25,7 @@ import java.util.List;
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelFinder;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.module.api.PersonnelMarketMethod;
 
@@ -113,8 +114,11 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                     }
                 }
 
-                Person adminHR = c.findBestInRole(Person.T_ADMIN_HR, SkillType.S_ADMIN);
-                int adminHRExp = (adminHR == null)?SkillType.EXP_ULTRA_GREEN:adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+                PersonnelFinder finder = new PersonnelFinder();
+                Person adminHR = finder.findBestInRole(c.getActivePersonnel(), Person.T_ADMIN_HR, SkillType.S_ADMIN);
+                int adminHRExp = (adminHR == null)
+                        ? SkillType.EXP_ULTRA_GREEN
+                        : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
                 int gunneryMod = 0;
                 int pilotingMod = 0;
                 switch (adminHRExp) {

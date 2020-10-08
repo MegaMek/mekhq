@@ -64,6 +64,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelFinder;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
@@ -402,10 +403,11 @@ public final class BriefingTab extends CampaignGuiTab {
                 } else {
                     if ((getCampaign().getRetirementDefectionTracker().getRetirees((AtBContract) mission) != null)
                             && getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
+                        PersonnelFinder finder = new PersonnelFinder();
                         final int[] admins = {Person.T_ADMIN_COM, Person.T_ADMIN_HR,
                                 Person.T_ADMIN_LOG, Person.T_ADMIN_TRA};
                         for (int role : admins) {
-                            Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
+                            Person admin = finder.findBestInRole(getCampaign().getActivePersonnel(), role, SkillType.S_ADMIN);
                             if (admin != null) {
                                 admin.awardXP(1);
                                 getCampaign().addReport(admin.getHyperlinkedName() + " has gained 1 XP.");

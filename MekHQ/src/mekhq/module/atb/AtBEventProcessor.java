@@ -40,6 +40,7 @@ import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelFinder;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
@@ -104,7 +105,8 @@ public class AtBEventProcessor {
             mod -= 3;
         }
 
-        Person adminHR = campaign.findBestInRole(Person.T_ADMIN_HR, SkillType.S_ADMIN);
+        PersonnelFinder finder = new PersonnelFinder();
+        Person adminHR = finder.findBestInRole(campaign.getActivePersonnel(), Person.T_ADMIN_HR, SkillType.S_ADMIN);
         int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN
                 : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         mod += adminHRExp - 2;

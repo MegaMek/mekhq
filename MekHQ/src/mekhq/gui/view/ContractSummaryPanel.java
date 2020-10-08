@@ -36,6 +36,7 @@ import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelFinder;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.GuiTabType;
@@ -80,13 +81,14 @@ public class ContractSummaryPanel extends JPanel {
         this.campaign = campaign;
         this.allowRerolls = allowRerolls;
         if (allowRerolls) {
-            Person admin = campaign.findBestInRole(Person.T_ADMIN_COM, SkillType.S_NEG, SkillType.S_ADMIN);
+            PersonnelFinder finder = new PersonnelFinder();
+            Person admin = finder.findBestInRole(campaign.getActivePersonnel(), Person.T_ADMIN_COM, SkillType.S_NEG, SkillType.S_ADMIN);
             cmdRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
                     ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
-            admin = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_NEG, SkillType.S_ADMIN);
+            admin = finder.findBestInRole(campaign.getActivePersonnel(), Person.T_ADMIN_LOG, SkillType.S_NEG, SkillType.S_ADMIN);
             logRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
                     ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
-            admin = campaign.findBestInRole(Person.T_ADMIN_TRA, SkillType.S_NEG, SkillType.S_ADMIN);
+            admin = finder.findBestInRole(campaign.getActivePersonnel(), Person.T_ADMIN_TRA, SkillType.S_NEG, SkillType.S_ADMIN);
             tranRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
                     ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
         }

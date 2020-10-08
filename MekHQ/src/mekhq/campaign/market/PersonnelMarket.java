@@ -43,6 +43,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelFinder;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.module.PersonnelMarketServiceManager;
@@ -408,9 +409,12 @@ public class PersonnelMarket {
     }
 
     public TargetRoll getShipSearchTarget(Campaign campaign, boolean jumpship) {
-        TargetRoll target = new TargetRoll(jumpship?12:10, "Base");
-        Person adminLog = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
-        int adminLogExp = (adminLog == null)?SkillType.EXP_ULTRA_GREEN:adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+        TargetRoll target = new TargetRoll(jumpship ? 12 : 10, "Base");
+        PersonnelFinder finder = new PersonnelFinder();
+        Person adminLog = finder.findBestInRole(campaign.getActivePersonnel(), Person.T_ADMIN_LOG, SkillType.S_ADMIN);
+        int adminLogExp = (adminLog == null)
+                ? SkillType.EXP_ULTRA_GREEN
+                : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         for (Person p : campaign.getAdmins()) {
             if ((p.getPrimaryRole() == Person.T_ADMIN_LOG ||
                     p.getSecondaryRole() == Person.T_ADMIN_LOG) &&
