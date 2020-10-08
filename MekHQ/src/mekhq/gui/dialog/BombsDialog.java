@@ -57,7 +57,7 @@ public class BombsDialog extends JDialog implements ActionListener {
     private BombChoicePanel bombPanel;
     private IBomber bomber;
     private Campaign campaign;
-    
+
     private int[] bombChoices;
     private int[] bombCatalog = new int[BombType.B_NUM];
     private int[] availBombs = new int[BombType.B_NUM];
@@ -71,7 +71,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         this.bomber = iBomber;
         this.campaign = campaign;
         bombChoices = bomber.getBombChoices();
-        
+
         initGUI();
         validate();
         pack();
@@ -82,19 +82,20 @@ public class BombsDialog extends JDialog implements ActionListener {
     private void initGUI() {
         //Using bombCatalog to store the part ID's of the bombs so don't have to keep full spare list in memory
         //and for ease of access later
-        List<Part> spareParts = campaign.getSpareParts();
-        for(Part spare : spareParts) {
-            if(spare instanceof AmmoStorage && ((EquipmentPart)spare).getType() instanceof BombType && spare.isPresent()) {
+        campaign.forEachSparePart(spare -> {
+            if ((spare instanceof AmmoStorage)
+                    && (((EquipmentPart)spare).getType() instanceof BombType)
+                    && spare.isPresent()) {
                 int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage)spare).getType().getInternalName()));
                 bombCatalog[bombType] = spare.getId();
                 availBombs[bombType] = ((AmmoStorage)spare).getShots();
             }
-        }
-        
+        });
+
         for (int type = 0; type < BombType.B_NUM; type++) {
             typeMax[type] = availBombs[type] + bombChoices[type];
         }
-        
+
         bombPanel = new BombChoicePanel(bomber, campaign.getGameOptions().booleanOption("at2_nukes"),
                 true, typeMax);
 
@@ -134,7 +135,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         if (okayButton.equals(e.getSource())) {
             bombPanel.applyChoice();
             int[] newLoadout = bombPanel.getChoice();
-            
+
             //Get difference between starting bomb load and new bomb load
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if(bombChoices[type] != newLoadout[type]) {
@@ -143,7 +144,7 @@ public class BombsDialog extends JDialog implements ActionListener {
                     newLoadout[type] = 0;
                 }
             }
-            
+
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if (newLoadout[type] != 0) {
                     //IF there are bombs of this TYPE in the warehouse
@@ -161,7 +162,7 @@ public class BombsDialog extends JDialog implements ActionListener {
                     }
                 }
             }
-            
+
             setVisible(false);
         } else if (cancelButton.equals(e.getSource())) {
             setVisible(false);
