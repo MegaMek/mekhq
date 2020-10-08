@@ -1257,20 +1257,18 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     public Armor getExistingArmorSupplies() {
-        Armor existingArmorSupplies = null;
         if (null == newArmorSupplies) {
             return null;
         }
-        for (Part part : oldUnit.getCampaign().getSpareParts()) {
+        return (Armor) oldUnit.getCampaign().findSparePart(part -> {
             if (part instanceof Armor && ((Armor) part).getType() == newArmorSupplies.getType()
                     && part.isClanTechBase() == newArmorSupplies.isClanTechBase()
                     && !part.isReservedForRefit()
                     && part.isPresent()) {
-                existingArmorSupplies = (Armor) part;
-                break;
+                return true;
             }
-        }
-        return existingArmorSupplies;
+            return false;
+        });
     }
 
     private void updateRefitClass(int rClass) {

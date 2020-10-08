@@ -27,6 +27,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -4198,6 +4199,20 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         return spares;
+    }
+
+    /**
+     * Executes a method for each spare part in the campaign.
+     *
+     * @param consumer The method to apply to each spare part
+     *                 in the campaign.
+     */
+    public void forEachSparePart(Consumer<Part> consumer) {
+        for (Part part : getParts()) {
+            if (part.isSpare()) {
+                consumer.accept(part);
+            }
+        }
     }
 
     /**
