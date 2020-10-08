@@ -324,21 +324,19 @@ public class MissingBattleArmorSuit extends MissingPart {
                         int currentPartQuantity = 0;
                         for (Part p : bestPart.getChildParts()) {
                             if (p instanceof BaArmor) {
-                                bestPartArmor = ((BaArmor)p).getAmount();
+                                bestPartArmor = ((BaArmor) p).getAmount();
                             } else {
                                 bestPartQuantity++;
                             }
                         }
                         for (Part p : part.getChildParts()) {
                             if (p instanceof BaArmor) {
-                                currentPartArmor = ((BaArmor)p).getAmount();
+                                currentPartArmor = ((BaArmor) p).getAmount();
                             } else {
                                 currentPartQuantity++;
                             }
                         }
-                        if (currentPartQuantity > bestPartQuantity) {
-                            return part;
-                        } else if (currentPartArmor > bestPartArmor) {
+                        if ((currentPartQuantity > bestPartQuantity) || (currentPartArmor > bestPartArmor)) {
                             return part;
                         }
                     }
