@@ -19,17 +19,20 @@
 package mekhq.service;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -49,12 +52,15 @@ import mekhq.campaign.work.WorkTime;
 import mekhq.gui.sorter.UnitStatusSorter;
 
 public class MassRepairService {
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair", new EncodeControl());
+
     private MassRepairService() {
 
     }
 
-    public static boolean isValidMRMSUnit(Unit unit) {
-        if (unit.isSelfCrewed()) {
+    public static boolean isValidMRMSUnit(Unit unit, MassRepairConfiguredOptions configuredOptions) {
+        if (unit.isSelfCrewed() || (!unit.isSalvage() && !configuredOptions.useRepair())
+                || (unit.isSalvage() && !configuredOptions.useSalvage())) {
             return false;
         }
 
@@ -65,14 +71,18 @@ public class MassRepairService {
     public static MassRepairPartSet performWarehouseMassRepair(List<IPartWork> selectedParts,
                                                                MassRepairConfiguredOptions configuredOptions,
                                                                Campaign campaign) {
-        campaign.addReport("Beginning mass warehouse repair.");
+        if (!configuredOptions.useRepair()) { // Warehouse only uses repair
+            campaign.addReport(resources.getString("MRMS.CompleteDisabled.report"));
+            return new MassRepairPartSet();
+        }
+        campaign.addReport(resources.getString("MRMS.StartWarehouse.report"));
 
         List<Person> techs = campaign.getTechs(true);
 
         MassRepairPartSet partSet = new MassRepairPartSet();
 
         if (techs.isEmpty()) {
-            campaign.addReport("No available techs to repairs parts.");
+            campaign.addReport(resources.getString("MRMS.NoAvailableTechs.report"));
         } else {
             Map<Integer, MassRepairOption> mroByTypeMap = new HashMap<>();
 
@@ -113,11 +123,23 @@ public class MassRepairService {
 
     public static String performSingleUnitMassRepairOrSalvage(Campaign campaign, Unit unit) {
         MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions(campaign);
+        if (!configuredOptions.isEnabled()) {
+            String msg = resources.getString("MRMS.CompleteDisabled.report");
+            campaign.addReport(msg);
+            return msg;
+        } else if ((!unit.isSalvage() && !configuredOptions.useRepair())
+                || (unit.isSalvage() && !configuredOptions.useSalvage())) {
+            String msg = MessageFormat.format(resources.getString("MRMS.CompleteTypeDisabled.report"),
+                    unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair"));
+            campaign.addReport(msg);
+            return msg;
+        }
+
         List<MassRepairOption> activeMROList = configuredOptions.getActiveMassRepairOptions();
         MassRepairUnitAction unitAction = performUnitMassRepairOrSalvage(campaign, unit,
                 unit.isSalvage(), activeMROList, configuredOptions);
 
-        String actionDescriptor = unit.isSalvage() ? "Salvage" : "Repair";
+        String actionDescriptor = unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair");
         String msg = String.format("<font color='green'>Mass %s complete on %s.</font>", actionDescriptor,
                 unit.getName());
 
@@ -166,11 +188,16 @@ public class MassRepairService {
     }
 
     public static void massRepairSalvageAllUnits(Campaign campaign) {
-        MassRepairConfiguredOptions massRepairConfiguredOptions = new MassRepairConfiguredOptions(campaign);
+        MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions(campaign);
+        if (!configuredOptions.isEnabled()) {
+            campaign.addReport(resources.getString("MRMS.CompleteDisabled.report"));
+            return;
+        }
+
         List<Unit> units = new ArrayList<>();
 
         for (Unit unit : campaign.getServiceableUnits()) {
-            if (!isValidMRMSUnit(unit)) {
+            if (!isValidMRMSUnit(unit, configuredOptions)) {
                 continue;
             }
 
@@ -191,11 +218,16 @@ public class MassRepairService {
             return 1;
         });
 
-        massRepairSalvageUnits(campaign, units, massRepairConfiguredOptions);
+        massRepairSalvageUnits(campaign, units, configuredOptions);
     }
 
     public static void massRepairSalvageUnits(Campaign campaign, List<Unit> units,
                                               MassRepairConfiguredOptions configuredOptions) {
+        // This shouldn't happen but is being added preventatively
+        if (!configuredOptions.isEnabled()) {
+            campaign.addReport(resources.getString("MRMS.CompleteDisabled.report"));
+            return;
+        }
         Map<MassRepairUnitAction.STATUS, List<MassRepairUnitAction>> unitActionsByStatus = new HashMap<>();
         List<MassRepairOption> activeMROs = configuredOptions.getActiveMassRepairOptions();
 
@@ -209,7 +241,7 @@ public class MassRepairService {
         }
 
         if (unitActionsByStatus.isEmpty()) {
-            campaign.addReport("Mass Repair/Salvage complete. There were no units worked on.");
+            campaign.addReport(resources.getString("MRMS.CompleteNoUnits.report"));
         } else {
             int totalCount = 0;
             int actionsPerformed = 0;
@@ -332,7 +364,7 @@ public class MassRepairService {
         campaign.addReport(sbMsg.toString());
     }
 
-    public static MassRepairUnitAction performUnitMassRepairOrSalvage(Campaign campaign, Unit unit,
+    private static MassRepairUnitAction performUnitMassRepairOrSalvage(Campaign campaign, Unit unit,
                                                                       boolean isSalvage,
                                                                       List<MassRepairOption> mroList,
                                                                       MassRepairConfiguredOptions configuredOptions) {
@@ -1179,10 +1211,6 @@ public class MassRepairService {
         private int maxTechSkill;
         private int configuredBTHMin;
 
-        public MassRepairPartAction() {
-
-        }
-
         public MassRepairPartAction(IPartWork partWork) {
             this.partWork = partWork;
         }
@@ -1266,7 +1294,7 @@ public class MassRepairService {
         private Map<MassRepairPartAction.STATUS, List<MassRepairPartAction>> partActionsByStatus = new HashMap<>();
 
         public void addPartAction(MassRepairPartAction partAction) {
-            if (null == partAction) {
+            if (partAction == null) {
                 return;
             }
 
@@ -1309,10 +1337,6 @@ public class MassRepairService {
         private MassRepairPartSet partSet = new MassRepairPartSet();
         private STATUS status;
         private boolean salvaging;
-
-        public MassRepairUnitAction() {
-
-        }
 
         public MassRepairUnitAction(Unit unit, boolean salvaging, STATUS status) {
             this.unit = unit;
