@@ -28,6 +28,8 @@ import java.util.List;
 
 public class MassRepairConfiguredOptions {
     //region Variable Declarations
+    private boolean useRepair;
+    private boolean useSalvage;
     private boolean useExtraTime;
     private boolean useRushJob;
     private boolean allowCarryover;
@@ -51,6 +53,8 @@ public class MassRepairConfiguredOptions {
 
     //region Initialization
     public void setup(CampaignOptions options) {
+        setUseRepair(options.massRepairUseRepair());
+        setUseSalvage(options.massRepairUseSalvage());
         setUseExtraTime(options.massRepairUseExtraTime());
         setUseRushJob(options.massRepairUseRushJob());
         setAllowCarryover(options.massRepairAllowCarryover());
@@ -68,6 +72,8 @@ public class MassRepairConfiguredOptions {
     }
 
     public void setup(MassRepairSalvageDialog dlg) {
+        setUseRepair(dlg.getUseRepairBox().isSelected());
+        setUseSalvage(dlg.getUseSalvageBox().isSelected());
         setUseExtraTime(dlg.getUseExtraTimeBox().isSelected());
         setUseRushJob(dlg.getUseRushJobBox().isSelected());
         setAllowCarryover(dlg.getAllowCarryoverBox().isSelected());
@@ -109,6 +115,26 @@ public class MassRepairConfiguredOptions {
     //endregion Initialization
 
     //region Getters/Setters
+    public boolean isEnabled() {
+        return useRepair() || useSalvage();
+    }
+
+    public boolean useRepair() {
+        return useRepair;
+    }
+
+    public void setUseRepair(boolean useRepair) {
+        this.useRepair = useRepair;
+    }
+
+    public boolean useSalvage() {
+        return useSalvage;
+    }
+
+    public void setUseSalvage(boolean useSalvage) {
+        this.useSalvage = useSalvage;
+    }
+
     public boolean isUseExtraTime() {
         return useExtraTime;
     }
