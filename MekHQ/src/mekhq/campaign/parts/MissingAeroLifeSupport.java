@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -37,14 +36,9 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingAeroLifeSupport extends MissingPart {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 2806921577150714477L;
 
     private boolean fighter;
@@ -135,12 +129,11 @@ public class MissingAeroLifeSupport extends MissingPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("fighter")) {
                 fighter = wn2.getTextContent().trim().equalsIgnoreCase("true");
-            }
-            else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
                 cost = Money.fromXmlString(wn2.getTextContent().trim());
             }
         }
@@ -148,7 +141,7 @@ public class MissingAeroLifeSupport extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Aero) {
+        if (null != unit && unit.getEntity() instanceof Aero) {
             ((Aero)unit.getEntity()).setLifeSupport(false);
         }
 

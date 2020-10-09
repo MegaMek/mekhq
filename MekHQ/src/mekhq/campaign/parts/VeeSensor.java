@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -35,7 +34,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class VeeSensor extends Part {
@@ -75,8 +73,8 @@ public class VeeSensor extends Part {
 	@Override
 	public void fix() {
 		super.fix();
-		if(null != unit && unit.getEntity() instanceof Tank) {
-			((Tank)unit.getEntity()).setSensorHits(0);
+		if (null != unit && unit.getEntity() instanceof Tank) {
+			((Tank) unit.getEntity()).setSensorHits(0);
 		}
 	}
 
@@ -87,12 +85,12 @@ public class VeeSensor extends Part {
 
 	@Override
 	public void remove(boolean salvage) {
-		if(null != unit && unit.getEntity() instanceof Tank) {
-			((Tank)unit.getEntity()).setSensorHits(4);
+		if (null != unit && unit.getEntity() instanceof Tank) {
+			((Tank) unit.getEntity()).setSensorHits(4);
 			Part spare = campaign.checkForExistingSparePart(this);
-			if(!salvage) {
+			if (!salvage) {
 				campaign.removePart(this);
-			} else if(null != spare) {
+			} else if (null != spare) {
 				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
@@ -107,10 +105,10 @@ public class VeeSensor extends Part {
 
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
-		if(null != unit && unit.getEntity() instanceof Tank) {
+		if (null != unit && unit.getEntity() instanceof Tank) {
 			int priorHits = hits;
-			hits = ((Tank)unit.getEntity()).getSensorHits();
-			if(checkForDestruction
+			hits = ((Tank) unit.getEntity()).getSensorHits();
+			if (checkForDestruction
 					&& hits > priorHits
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
@@ -120,7 +118,7 @@ public class VeeSensor extends Part {
 
 	@Override
 	public int getBaseTime() {
-		if(isSalvaging()) {
+		if (isSalvaging()) {
 			return 260;
 		}
 		return 75;
@@ -138,8 +136,8 @@ public class VeeSensor extends Part {
 
 	@Override
 	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Tank) {
-			((Tank)unit.getEntity()).setSensorHits(hits);
+		if (null != unit && unit.getEntity() instanceof Tank) {
+			((Tank) unit.getEntity()).setSensorHits(hits);
 		}
 	}
 

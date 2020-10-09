@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts;
 
@@ -205,9 +205,9 @@ public class SVEnginePart extends Part {
                 ((Aero) unit.getEntity()).setEngineHits(((Aero) unit.getEntity()).getMaxEngineHits());
             }
             Part spare = campaign.checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.removePart(this);
             }
@@ -222,7 +222,7 @@ public class SVEnginePart extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {
+        if (null != unit) {
             int engineHits = 0;
             int engineCrits = 0;
             if (unit.getEntity() instanceof Tank) {
@@ -234,7 +234,7 @@ public class SVEnginePart extends Part {
                 engineHits = unit.getEntity().getEngineHits();
                 engineCrits = 3;
             }
-            if(engineHits >= engineCrits) {
+            if (engineHits >= engineCrits) {
                 remove(false);
             } else {
                 hits = Math.max(engineHits, 0);

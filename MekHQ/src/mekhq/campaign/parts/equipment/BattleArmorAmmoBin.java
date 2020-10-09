@@ -20,7 +20,6 @@
  */
 package mekhq.campaign.parts.equipment;
 
-
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
@@ -156,12 +155,12 @@ public class BattleArmorAmmoBin extends AmmoBin {
                 } else {
                     //loading a new type of ammo
                     unload();
-                    mounted.changeAmmoType((AmmoType)type);
+                    mounted.changeAmmoType((AmmoType) type);
                     mounted.setShotsLeft(shotsPerTrooper);
                 }
             }
         }
-        changeAmountAvailable(-1 * shots, (AmmoType)type);
+        changeAmountAvailable(-1 * shots, (AmmoType) type);
         shotsNeeded -= shots;
     }
 
@@ -200,13 +199,13 @@ public class BattleArmorAmmoBin extends AmmoBin {
 
     @Override
     public Part getNewPart() {
-        int shots = (int) Math.floor(1000/((AmmoType)type).getKgPerShot());
+        int shots = (int) Math.floor(1000 / ((AmmoType) type).getKgPerShot());
         if (shots <= 0) {
             //FIXME: no idea what to do here, these really should be fixed on the MM side
             //because presumably this is happening because KgperShot is -1 or 0
             shots = 20;
         }
-        return new AmmoStorage(1,type,shots,campaign);
+        return new AmmoStorage(1, type, shots, campaign);
     }
 
     @Override
@@ -240,7 +239,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
     }
 
     private int calculateShots() {
-        int shots = (int) Math.floor(1000/((AmmoType)type).getKgPerShot());
+        int shots = (int) Math.floor(1000 / ((AmmoType) type).getKgPerShot());
         if (shots <= 0) {
             //FIXME: no idea what to do here, these really should be fixed on the MM side
             //because presumably this is happening because KgperShot is -1 or 0

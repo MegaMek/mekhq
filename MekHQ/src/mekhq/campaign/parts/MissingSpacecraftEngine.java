@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -37,7 +36,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingSpacecraftEngine extends MissingPart {
@@ -80,12 +78,12 @@ public class MissingSpacecraftEngine extends MissingPart {
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof SpacecraftEngine
                 && getName().equals(part.getName())
-                && getTonnage() == ((SpacecraftEngine)part).getTonnage();
+                && getTonnage() == part.getTonnage();
     }
 
     @Override
     public int getTechLevel() {
-        if(clan) {
+        if (clan) {
             return TechConstants.T_CLAN_TW;
         } else {
             return TechConstants.T_IS_TW_NON_BOX;
@@ -113,17 +111,13 @@ public class MissingSpacecraftEngine extends MissingPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("engineTonnage")) {
                 engineTonnage = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-                if(wn2.getTextContent().equalsIgnoreCase("true")) {
-                    clan = true;
-                } else {
-                    clan = false;
-                }
+                clan = Boolean.parseBoolean(wn2.getTextContent().trim());
             }
         }
     }
@@ -135,9 +129,9 @@ public class MissingSpacecraftEngine extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
-            if(unit.getEntity() instanceof Aero) {
-                ((Aero)unit.getEntity()).setEngineHits(3);
+        if (null != unit) {
+            if (unit.getEntity() instanceof Aero) {
+                ((Aero) unit.getEntity()).setEngineHits(3);
             }
         }
     }

@@ -24,9 +24,11 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.finances.Money;
 
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -181,6 +183,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     /** The part which will be used as a replacement */
     private Part replacementPart;
+
+    protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
+            new EncodeControl());
 
     public Part() {
         this(0, false, null);
@@ -841,7 +846,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(Part.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         return retVal;
@@ -1778,8 +1783,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             int id = parentPart.getId();
             parentPart = knownParts.get(id);
             if ((parentPart == null) && (id > 0)) {
-                MekHQ.getLogger().error(PartRef.class,
-                    String.format("Part %d ('%s') references missing parent part %d",
+                MekHQ.getLogger().error(
+                        String.format("Part %d ('%s') references missing parent part %d",
                         getId(), getName(), id));
             }
         }
@@ -1791,7 +1796,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 if (realPart != null) {
                     childParts.set(ii, realPart);
                 } else if (childPart.getId() > 0) {
-                    MekHQ.getLogger().error(PartRef.class,
+                    MekHQ.getLogger().error(
                         String.format("Part %d ('%s') references missing child part %d",
                             getId(), getName(), childPart.getId()));
                     childParts.remove(ii);

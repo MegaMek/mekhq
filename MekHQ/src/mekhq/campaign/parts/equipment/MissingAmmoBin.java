@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
@@ -37,7 +36,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingAmmoBin extends MissingEquipmentPart {
@@ -50,10 +48,10 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot,
-            boolean omniPodded, Campaign c) {
+                          boolean omniPodded, Campaign c) {
         super(tonnage, et, equipNum, c, 1.0, 1.0, omniPodded);
         this.oneShot = singleShot;
-        if(null != name) {
+        if (null != name) {
             this.name += " Bin";
         }
     }
@@ -86,12 +84,12 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
+        if (null != replacement) {
             Part actualReplacement = getActualReplacement((AmmoBin) replacement);
             unit.addPart(actualReplacement);
             campaign.addPart(actualReplacement, 0);
             replacement.decrementQuantity();
-            ((EquipmentPart)actualReplacement).setEquipmentNum(equipmentNum);
+            ((EquipmentPart) actualReplacement).setEquipmentNum(equipmentNum);
             remove(false);
             //assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
@@ -100,7 +98,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 
     protected Part getActualReplacement(AmmoBin found) {
         //Check to see if munition types are different
-        if (getType() == found.getType()) {
+        if (getType().equals(found.getType())) {
             return found.clone();
         } else {
             return new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(),
@@ -112,9 +110,9 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         if ((part instanceof AmmoBin)
                 && !(part instanceof LargeCraftAmmoBin)) {
-            EquipmentPart eqpart = (EquipmentPart)part;
+            EquipmentPart eqpart = (EquipmentPart) part;
             EquipmentType et = eqpart.getType();
-            return type.equals(et) && ((AmmoBin)part).getFullShots() == getFullShots();
+            return type.equals(et) && ((AmmoBin) part).getFullShots() == getFullShots();
         }
         return false;
     }
@@ -125,7 +123,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 
     protected int getFullShots() {
         int fullShots = ((AmmoType) type).getShots();
-        if(oneShot) {
+        if (oneShot) {
             fullShots = 1;
         }
         return fullShots;
@@ -163,17 +161,16 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         super.loadFieldsFromXmlNode(wn);
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
                 equipmentNum = Integer.parseInt(wn2.getTextContent());
-            }
-            else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
                 typeName = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                 daysToWait = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
-                oneShot = wn2.getTextContent().equalsIgnoreCase("true");
+                oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
             }
         }
         restore();

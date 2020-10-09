@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
@@ -56,7 +55,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
@@ -83,10 +81,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         this.shotsNeeded = shots;
         this.oneShot = singleShot;
         this.checkedToday = false;
-        if(type instanceof AmmoType) {
+        if (type instanceof AmmoType) {
             this.munition = ((AmmoType)type).getMunitionType();
         }
-        if(null != name) {
+        if (null != name) {
             this.name += " Bin";
         }
     }
@@ -129,19 +127,19 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     public int getFullShots() {
         int fullShots = ((AmmoType)type).getShots();
-        if(unit != null) {
+        if (unit != null) {
             Mounted m = unit.getEntity().getEquipment(equipmentNum);
-            if(null != m && m.getOriginalShots() > 0) {
+            if (null != m && m.getOriginalShots() > 0) {
                 fullShots = m.getOriginalShots();
             }
         }
-        if(null != unit && unit.getEntity() instanceof Protomech) {
+        if (null != unit && unit.getEntity() instanceof Protomech) {
             //if protomechs are using alternate munitions then cut in half
-            if(((AmmoType)type).getMunitionType() != AmmoType.M_STANDARD) {
+            if (((AmmoType) type).getMunitionType() != AmmoType.M_STANDARD) {
                 fullShots = fullShots / 2;
             }
         }
-        if(oneShot) {
+        if (oneShot) {
             fullShots = 1;
         }
         return fullShots;
@@ -165,9 +163,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         //if on a unit, then use the ammo type on the existing entity, to avoid getting it wrong due to
         //ammo swaps
         EquipmentType curType = type;
-        if(null != unit && null != unit.getEntity()) {
+        if (null != unit && null != unit.getEntity()) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted && (mounted.getType() instanceof AmmoType)) {
+            if (null != mounted && (mounted.getType() instanceof AmmoType)) {
                 curType = mounted.getType();
             }
         }
@@ -175,12 +173,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     protected int getShotsPerTon() {
-        AmmoType atype = (AmmoType)type;
-        if(atype.getKgPerShot() > 0) {
-            return (int)Math.floor(1000.0/atype.getKgPerShot());
+        AmmoType atype = (AmmoType) type;
+        if (atype.getKgPerShot() > 0) {
+            return (int) Math.floor(1000.0 / atype.getKgPerShot());
         }
         //if not listed by kg per shot, we assume this is a single ton increment
-        return ((AmmoType)type).getShots();
+        return ((AmmoType) type).getShots();
     }
 
     @Override
@@ -205,7 +203,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     public void changeMunition(long m) {
         this.munition = m;
-        for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(),(AmmoType)type, CampaignOptions.TECH_EXPERIMENTAL)) {
+        for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(),(AmmoType) type, CampaignOptions.TECH_EXPERIMENTAL)) {
             if (atype.getMunitionType() == munition) {
                 type = atype;
                 break;
@@ -228,7 +226,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         if (null != unit) {
             Mounted m = unit.getEntity().getEquipment(equipmentNum);
             return (m == null)
-                    || (m.getType() != type);
+                    || (!m.getType().equals(type));
         }
         return false;
     }
@@ -268,21 +266,20 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         super.loadFieldsFromXmlNode(wn);
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
                 equipmentNum = Integer.parseInt(wn2.getTextContent());
-            }
-            else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
                 typeName = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("munition")) {
                 munition = Long.parseLong(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("shotsNeeded")) {
                 shotsNeeded = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
-                checkedToday = wn2.getTextContent().equalsIgnoreCase("true");
+                checkedToday = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
-                oneShot = wn2.getTextContent().equalsIgnoreCase("true");
+                oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
             }
         }
         restore();
@@ -304,12 +301,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String getStatus() {
         String toReturn = "Fully Loaded";
-        if(shotsNeeded >= getFullShots()) {
+        if (shotsNeeded >= getFullShots()) {
             toReturn = "Empty";
         } else if (shotsNeeded > 0) {
             toReturn = "Partially Loaded";
         }
-        if(isReservedForRefit()) {
+        if (isReservedForRefit()) {
             toReturn += " (Reserved for Refit)";
         }
         return toReturn;
@@ -339,9 +336,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
                     changeAmountAvailable(-1 * shots, (AmmoType)type);
                     shotsNeeded -= shots;
-                }
-                else {
-                    MekHQ.getLogger().warning(AmmoBin.class, mType.getName() + " is not valid equipment for " + getName() + " to restock ammo on unit " + unit.getName());
+                } else {
+                    MekHQ.getLogger().warning(mType.getName() + " is not valid equipment for " + getName() + " to restock ammo on unit " + unit.getName());
                 }
             }
         }
@@ -369,16 +365,16 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         //some AmmoStorage instead if we implement customization of these units
         int shots = getFullShots() - shotsNeeded;
         AmmoType curType = (AmmoType)type;
-        if(null != unit) {
+        if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted && mounted.getType() instanceof AmmoType) {
+            if (null != mounted && mounted.getType() instanceof AmmoType) {
                 shots = mounted.getBaseShotsLeft();
                 mounted.setShotsLeft(0);
-                curType = (AmmoType)mounted.getType();
+                curType = (AmmoType) mounted.getType();
             }
         }
         shotsNeeded = getFullShots();
-        if(shots > 0) {
+        if (shots > 0) {
             changeAmountAvailable(shots, curType);
         }
     }
@@ -402,7 +398,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public TargetRoll getAllMods(Person tech) {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return super.getAllMods(tech);
         }
         return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "ammo loading");
@@ -410,15 +406,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {
+        if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
-                if(mounted.isMissing() || mounted.isDestroyed()) {
+            if (null != mounted) {
+                if (mounted.isMissing() || mounted.isDestroyed()) {
                     mounted.setShotsLeft(0);
                     remove(false);
                     return;
                 }
-                if (type == mounted.getType()) {
+                if (type.equals(mounted.getType())) {
                     shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();
                 }
             }
@@ -427,17 +423,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public int getBaseTime() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return isOmniPodded()? 30 : 120;
         }
-        if(null != unit) {
+        if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
+            if (null != mounted) {
                 long currentMuniType = 0;
-                if(mounted.getType() instanceof AmmoType) {
-                    currentMuniType = ((AmmoType)mounted.getType()).getMunitionType();
+                if (mounted.getType() instanceof AmmoType) {
+                    currentMuniType = ((AmmoType) mounted.getType()).getMunitionType();
                 }
-                if(getMunitionType() != currentMuniType) {
+                if (getMunitionType() != currentMuniType) {
                     return 30;
                 }
             }
@@ -448,14 +444,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public int getActualTime() {
         if (isOmniPodded()) {
-            return (int)Math.ceil(getBaseTime() * mode.timeMultiplier * 0.5);
+            return (int) Math.ceil(getBaseTime() * mode.timeMultiplier * 0.5);
         }
         return (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
     }
 
     @Override
     public int getDifficulty() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return -2;
         }
         return 0;
@@ -463,9 +459,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
+        if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
+            if (null != mounted) {
                 mounted.setHit(false);
                 mounted.setDestroyed(false);
                 mounted.setRepairable(true);
@@ -477,10 +473,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return  (part instanceof AmmoBin)
+        return (part instanceof AmmoBin)
                 && !(part instanceof LargeCraftAmmoBin)
-                && getType().equals( ((AmmoBin)part).getType() )
-                && ((AmmoBin)part).getFullShots() == getFullShots();
+                && getType().equals( ((AmmoBin) part).getType() )
+                && ((AmmoBin) part).getFullShots() == getFullShots();
     }
 
     @Override
@@ -488,8 +484,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return (shotsNeeded > 0) || ammoTypeChanged();
     }
 
+    @Override
     public String getDesc() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return super.getDesc();
         }
         String toReturn = "<html><font size='2'";
@@ -513,19 +510,19 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return super.getDetails(includeRepairDetails);
         }
-        if(null != unit) {
+        if (null != unit) {
             String availability;
             int shotsAvailable = getAmountAvailable();
             PartInventory inventories = campaign.getPartInventory(getNewPart());
 
             String orderTransitString = getOrderTransitStringForDetails(inventories);
 
-            if(shotsAvailable == 0) {
+            if (shotsAvailable == 0) {
                 availability = "<br><font color='red'>No ammo " + orderTransitString + "</font>";
-            } else if(shotsAvailable < getShotsNeeded()) {
+            } else if (shotsAvailable < getShotsNeeded()) {
                 availability = "<br><font color='red'>Only " + shotsAvailable + " available" + orderTransitString + "</font>";
             } else {
                 availability = "<br><font color='green'>" + shotsAvailable + " available " + orderTransitString + "</font>";
@@ -539,10 +536,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String checkFixable() {
-        if(!isSalvaging() && getAmountAvailable() == 0) {
+        if (!isSalvaging() && getAmountAvailable() == 0) {
             return "No ammo of this type is available";
         }
-        if(null == unit) {
+        if (null == unit) {
             return "Ammo bins can only be loaded when installed on units";
         }
         return null;
@@ -555,13 +552,13 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         int converted = 0;
 
         // TODO: make this less intensive.
-        for(Part part : campaign.getSpareParts()) {
-            if(!part.isPresent()) {
+        for (Part part : campaign.getSpareParts()) {
+            if (!part.isPresent()) {
                 continue;
             }
-            if(part instanceof AmmoStorage) {
-                a = (AmmoStorage)part;
-                aType = ((AmmoType)a.getType());
+            if (part instanceof AmmoStorage) {
+                a = (AmmoStorage) part;
+                aType = ((AmmoType) a.getType());
                 if (a.isSamePartType(as)) {
                     continue;
                 }
@@ -594,11 +591,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public static void changeAmountAvailable(Campaign campaign, int amount, final AmmoType curType) {
-        AmmoStorage a = (AmmoStorage)campaign.findSparePart(part -> {
+        AmmoStorage a = (AmmoStorage) campaign.findSparePart(part -> {
             if (!(part instanceof AmmoStorage) || !part.isPresent() || part.isReservedForRefit()) {
                 return false;
             }
-            AmmoType ammoType = (AmmoType)((AmmoStorage)part).getType();
+            AmmoType ammoType = (AmmoType) ((AmmoStorage) part).getType();
             return ammoType.equals(curType)
                 && curType.getMunitionType() == ammoType.getMunitionType();
         });
@@ -628,7 +625,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public static boolean isCompatibleAmmo(Campaign campaign, AmmoType a1, AmmoType a2) {
-
         // If the option isn't on, we don't use this!
         if (!(campaign.getCampaignOptions().useAmmoByType())) {
             return false;
@@ -702,17 +698,13 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         if (campaign.getCampaignOptions().useAmmoByType()) {
             Predicate<Part> predicate;
             if (AmmoBin.ALLOWED_BY_TYPE.contains(ammoType.getAmmoType())) {
-                predicate = part -> {
-                    return part instanceof AmmoStorage
-                            && ammoType.equalsAmmoTypeOnly(((AmmoStorage) part).getType())
-                            && ammoType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
-                };
+                predicate = part -> part instanceof AmmoStorage
+                        && ammoType.equalsAmmoTypeOnly(((AmmoStorage) part).getType())
+                        && ammoType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
             } else {
-                predicate = part -> {
-                    return part instanceof AmmoStorage
-                            && ammoType.equals(((AmmoStorage) part).getType())
-                            && ammoType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
-                };
+                predicate = part -> part instanceof AmmoStorage
+                        && ammoType.equals(((AmmoStorage) part).getType())
+                        && ammoType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
             }
             AmmoStorage a = (AmmoStorage) campaign.findSparePart(predicate);
             return a != null ? a.getShots() : 0;
@@ -764,7 +756,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String getAcquisitionBonus() {
         String bonus = getAllAcquisitionMods().getValueAsString();
-        if(getAllAcquisitionMods().getValue() > -1) {
+        if (getAllAcquisitionMods().getValue() > -1) {
             bonus = "+" + bonus;
         }
 
@@ -785,10 +777,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
         // Faction and Tech mod
-        if(isClanTechBase() && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
+        if (isClanTechBase() && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
-        }
-        else if(campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
+        } else if (campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
         //availability mod
@@ -859,5 +850,4 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public boolean isExtinctIn(int year, boolean clan, int techFaction) {
         return isExtinct(year, clan, techFaction);
     }
-
 }

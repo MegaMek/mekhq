@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -31,7 +30,6 @@ import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingMekSensor extends MissingPart {
@@ -43,7 +41,7 @@ public class MissingMekSensor extends MissingPart {
 
 	public MissingMekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Mech Sensors";
+        this.name = resources.getString("MissingMekSensor.title");
     }
 
 	@Override
@@ -69,23 +67,21 @@ public class MissingMekSensor extends MissingPart {
 
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return part instanceof MekSensor && getUnitTonnage() == part.getUnitTonnage();
+		return (part instanceof MekSensor) && (getUnitTonnage() == part.getUnitTonnage());
 	}
 
 	@Override
     public String checkFixable() {
-		if(null == unit) {
+		if (unit == null) {
 			return null;
 		}
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
-        	if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
-            	if(unit.isLocationBreached(i)) {
+        for (int i = 0; i < unit.getEntity().locations(); i++) {
+        	if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
+            	if (unit.isLocationBreached(i)) {
             		return unit.getEntity().getLocationName(i) + " is breached.";
-            	}
-            	if(unit.isLocationDestroyed(i)) {
+            	} else if (unit.isLocationDestroyed(i)) {
             		return unit.getEntity().getLocationName(i) + " is destroyed.";
             	}
-
             }
         }
         return null;
@@ -98,20 +94,19 @@ public class MissingMekSensor extends MissingPart {
 
 	@Override
 	public void updateConditionFromPart() {
-		if(null != unit) {
+		if (unit != null) {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
 		}
 	}
 
 	@Override
 	public String getLocationName() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public int getLocation() {
-		if(null != unit) {
+		if (unit != null) {
 			Entity entity = unit.getEntity();
 			for (int i = 0; i < entity.locations(); i++) {
 				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
@@ -129,16 +124,12 @@ public class MissingMekSensor extends MissingPart {
 
 	@Override
     public boolean isInLocation(String loc) {
-		 if(null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mech)) {
+		 if ((unit == null) || (unit.getEntity() == null) || !(unit.getEntity() instanceof Mech)) {
 			 return false;
-		 }
-		 if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
+		 } else if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
              return true;
-         }
-		 if(((Mech)unit.getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
-     		if(unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
-     			return true;
-     		}
+         } else if (((Mech) unit.getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
+             return unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT;
 		 }
 		 return false;
     }
