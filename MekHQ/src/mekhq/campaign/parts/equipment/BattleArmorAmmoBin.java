@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
 
 
@@ -32,15 +31,12 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
-import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
-
+public class BattleArmorAmmoBin extends AmmoBin {
     /**
      * Battle Armor ammo bins need to look for shots for all the remaining troopers in the
      * squad.
@@ -59,7 +55,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     }
 
     public int getNumTroopers() {
-        if(null != unit && unit.getEntity() instanceof BattleArmor) {
+        if (null != unit && unit.getEntity() instanceof BattleArmor) {
             //we are going to base this on the full squad size, even though this makes understrength
             //squads overpay for their ammo - that way suits can be moved around without having to adjust
             //ammo - Tech: "oh you finally got here. Check in the back corner, we stockpiled some ammo for
@@ -77,33 +73,33 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
 
     /*@Override
     public int getFullShots() {
-    	return super.getFullShots() * getNumTroopers();
+        return super.getFullShots() * getNumTroopers();
     }*/
 
     @Override
     protected int getCurrentShots() {
-    	int shots = getFullShots() * getNumTroopers() - shotsNeeded;
-    	//replace with actual entity values if entity not null because the previous number will not
-    	//be correct for ammo swaps
-    	if(null != unit && null != unit.getEntity()) {
-    		Mounted m = unit.getEntity().getEquipment(equipmentNum);
-    		if(null != m) {
-    			shots = m.getBaseShotsLeft() * getNumTroopers();
-    		}
-    	}
-    	return shots;
+        int shots = getFullShots() * getNumTroopers() - shotsNeeded;
+        //replace with actual entity values if entity not null because the previous number will not
+        //be correct for ammo swaps
+        if (null != unit && null != unit.getEntity()) {
+            Mounted m = unit.getEntity().getEquipment(equipmentNum);
+            if (null != m) {
+                shots = m.getBaseShotsLeft() * getNumTroopers();
+            }
+        }
+        return shots;
     }
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {
+        if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
-            	long currentMuniType = 0;
-				if(mounted.getType() instanceof AmmoType) {
-					currentMuniType = ((AmmoType)mounted.getType()).getMunitionType();
-				}
-				if(currentMuniType == getMunitionType()) {
+            if (null != mounted) {
+                long currentMuniType = 0;
+                if (mounted.getType() instanceof AmmoType) {
+                    currentMuniType = ((AmmoType)mounted.getType()).getMunitionType();
+                }
+                if (currentMuniType == getMunitionType()) {
                     shotsNeeded = (getFullShots() - mounted.getBaseShotsLeft()) * getNumTroopers();
                 } else {
                     //we have a change of munitions
@@ -114,28 +110,28 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     }
 
     @Override
-	public int getBaseTime() {
-		if(null != unit) {
-			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if(null != mounted) {
-				if(!type.equals(mounted.getType())) {
-					return 30;
-				}
-			}
-		}
-		return 15;
-	}
+    public int getBaseTime() {
+        if (null != unit) {
+            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            if (null != mounted) {
+                if (!type.equals(mounted.getType())) {
+                    return 30;
+                }
+            }
+        }
+        return 15;
+    }
 
-	@Override
-	public int getDifficulty() {
-		return 0;
-	}
+    @Override
+    public int getDifficulty() {
+        return 0;
+    }
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
+        if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
+            if (null != mounted) {
                 mounted.setHit(false);
                 mounted.setDestroyed(false);
                 mounted.setRepairable(true);
@@ -150,11 +146,11 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         int shots = Math.min(getAmountAvailable(), shotsNeeded);
         int shotsPerTrooper = shots / getNumTroopers();
         shots = shotsPerTrooper * getNumTroopers();
-        if(null != unit) {
+        if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
-            	if(mounted.getType().equals(type)
-						&& ((AmmoType)mounted.getType()).getMunitionType() == getMunitionType()) {
+            if (null != mounted) {
+                if (mounted.getType().equals(type)
+                        && ((AmmoType)mounted.getType()).getMunitionType() == getMunitionType()) {
                     //just a simple reload
                     mounted.setShotsLeft(mounted.getBaseShotsLeft() + shotsPerTrooper);
                 } else {
@@ -173,27 +169,27 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     public void unload() {
         int shots = 0;
         AmmoType curType = (AmmoType)type;
-        if(null != unit) {
+        if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
+            if (null != mounted) {
                 shots = mounted.getBaseShotsLeft() * getNumTroopers();
                 mounted.setShotsLeft(0);
                 curType = (AmmoType)mounted.getType();
             }
         }
         shotsNeeded = getFullShots() * getNumTroopers();
-        if(shots > 0) {
+        if (shots > 0) {
             changeAmountAvailable(shots, curType);
         }
     }
 
     @Override
     public String checkFixable() {
-    	int amountAvailable = getAmountAvailable();
-    	if(amountAvailable > 0 && amountAvailable < getNumTroopers()) {
-    		return "Cannot do a partial reload of Battle Armor ammo less than the number of troopers";
-    	}
-    	return super.checkFixable();
+        int amountAvailable = getAmountAvailable();
+        if (amountAvailable > 0 && amountAvailable < getNumTroopers()) {
+            return "Cannot do a partial reload of Battle Armor ammo less than the number of troopers";
+        }
+        return super.checkFixable();
 
     }
 
@@ -204,23 +200,23 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
 
     @Override
     public Part getNewPart() {
-    	int shots = (int) Math.floor(1000/((AmmoType)type).getKgPerShot());
-		if(shots <= 0) {
-			//FIXME: no idea what to do here, these really should be fixed on the MM side
-			//because presumably this is happening because KgperShot is -1 or 0
-			shots = 20;
-		}
+        int shots = (int) Math.floor(1000/((AmmoType)type).getKgPerShot());
+        if (shots <= 0) {
+            //FIXME: no idea what to do here, these really should be fixed on the MM side
+            //because presumably this is happening because KgperShot is -1 or 0
+            shots = 20;
+        }
         return new AmmoStorage(1,type,shots,campaign);
     }
 
     @Override
     public IAcquisitionWork getAcquisitionWork() {
-    	int shots = (int) Math.floor(1000/((AmmoType)type).getKgPerShot());
-		if(shots <= 0) {
-			//FIXME: no idea what to do here, these really should be fixed on the MM side
-			//because presumably this is happening because KgperShot is -1 or 0
-			shots = 20;
-		}
+        int shots = (int) Math.floor(1000/((AmmoType)type).getKgPerShot());
+        if (shots <= 0) {
+            //FIXME: no idea what to do here, these really should be fixed on the MM side
+            //because presumably this is happening because KgperShot is -1 or 0
+            shots = 20;
+        }
         return new AmmoStorage(1,type,shots,campaign);
     }
 
@@ -240,39 +236,39 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
 
     @Override
     public String getAcquisitionDisplayName() {
-    	return type.getDesc();
+        return type.getDesc();
     }
 
     private int calculateShots() {
         int shots = (int) Math.floor(1000/((AmmoType)type).getKgPerShot());
-		if(shots <= 0) {
-			//FIXME: no idea what to do here, these really should be fixed on the MM side
-			//because presumably this is happening because KgperShot is -1 or 0
-			shots = 20;
-		}
+        if (shots <= 0) {
+            //FIXME: no idea what to do here, these really should be fixed on the MM side
+            //because presumably this is happening because KgperShot is -1 or 0
+            shots = 20;
+        }
 
-		return shots;
+        return shots;
     }
 
-	@Override
-	public String getAcquisitionExtraDesc() {
-		return calculateShots() + " shots";
-	}
+    @Override
+    public String getAcquisitionExtraDesc() {
+        return calculateShots() + " shots";
+    }
 
-	@Override
+    @Override
     public String getAcquisitionBonus() {
         String bonus = getAllAcquisitionMods().getValueAsString();
-        if(getAllAcquisitionMods().getValue() > -1) {
+        if (getAllAcquisitionMods().getValue() > -1) {
             bonus = "+" + bonus;
         }
 
         return "(" + bonus + ")";
     }
 
-	@Override
-	public Part getAcquisitionPart() {
-		return getNewPart();
-	}
+    @Override
+    public Part getAcquisitionPart() {
+        return getNewPart();
+    }
 
     @Override
     public boolean needsMaintenance() {
@@ -281,8 +277,8 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
 
     @Override
     public boolean canNeverScrap() {
-    	return true;
-	}
+        return true;
+    }
 
     /**
      * Restores the equipment from the name
@@ -290,7 +286,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     @Override
     public void restore() {
         if (typeName == null) {
-        	typeName = type.getName();
+            typeName = type.getName();
         } else {
             type = EquipmentType.get(typeName);
         }
@@ -301,13 +297,13 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         //a check on the XML loading after restore - we also will need to to the same for proto
         //ammo but we can only do this if we have all the correct ammo rack sizes for the
         //generics (e.g. LRM1, LRM2, LRM3, etc)
-        /*if(typeName.contains("BA-")) {
-        	String newTypeName = "IS" + typeName.split("BA-")[1];
-        	EquipmentType newType = EquipmentType.get(newTypeName);
-        	if(null != newType) {
-        		typeName = newTypeName;
-        		type = newType;
-        	}
+        /*if (typeName.contains("BA-")) {
+            String newTypeName = "IS" + typeName.split("BA-")[1];
+            EquipmentType newType = EquipmentType.get(newTypeName);
+            if (null != newType) {
+                typeName = newTypeName;
+                type = newType;
+            }
         }*/
 
 
@@ -316,14 +312,9 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
             return;
         }
         try {
-        	equipTonnage = type.getTonnage(null);
-        } catch(NullPointerException ex) {
-            MekHQ.getLogger().error(BattleArmorAmmoBin.class, "restore", ex);
+            equipTonnage = type.getTonnage(null);
+        } catch(NullPointerException e) {
+            MekHQ.getLogger().error(e);
         }
-    }
-
-    @Override
-    public PartRepairType getMassRepairOptionType() {
-    	return PartRepairType.AMMO;
     }
 }
