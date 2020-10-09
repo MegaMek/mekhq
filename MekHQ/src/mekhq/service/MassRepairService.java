@@ -59,7 +59,7 @@ public class MassRepairService {
     }
 
     public static boolean isValidMRMSUnit(Unit unit, MassRepairConfiguredOptions configuredOptions) {
-        if (unit.isSelfCrewed() || (!unit.isSalvage() && configuredOptions.useRepair())
+        if (unit.isSelfCrewed() || (!unit.isSalvage() && !configuredOptions.useRepair())
                 || (unit.isSalvage() && !configuredOptions.useSalvage())) {
             return false;
         }
@@ -127,7 +127,7 @@ public class MassRepairService {
             String msg = resources.getString("MRMS.CompleteDisabled.report");
             campaign.addReport(msg);
             return msg;
-        } else if ((!unit.isSalvage() && configuredOptions.useRepair())
+        } else if ((!unit.isSalvage() && !configuredOptions.useRepair())
                 || (unit.isSalvage() && !configuredOptions.useSalvage())) {
             String msg = MessageFormat.format(resources.getString("MRMS.CompleteTypeDisabled.report"),
                     unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair"));
@@ -1338,10 +1338,6 @@ public class MassRepairService {
         private MassRepairPartSet partSet = new MassRepairPartSet();
         private STATUS status;
         private boolean salvaging;
-
-        public MassRepairUnitAction() {
-
-        }
 
         public MassRepairUnitAction(Unit unit, boolean salvaging, STATUS status) {
             this.unit = unit;
