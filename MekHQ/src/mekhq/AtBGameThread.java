@@ -60,12 +60,14 @@ public class AtBGameThread extends GameThread {
 
     AtBScenario scenario;
 
-    public AtBGameThread(String name, Client c, MekHQ app, List<Unit> units, AtBScenario scenario) {
-        this(name, c, app, units, scenario, true);
+    public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
+                         AtBScenario scenario) {
+        this(name, password, c, app, units, scenario, true);
     }
 
-    public AtBGameThread(String name, Client c, MekHQ app, List<Unit> units, AtBScenario scenario, boolean started) {
-        super(name, c, app, units, started);
+    public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
+                         AtBScenario scenario, boolean started) {
+        super(name, password, c, app, units, started);
         this.scenario = scenario;
     }
 
@@ -94,7 +96,7 @@ public class AtBGameThread extends GameThread {
         try {
             client.connect();
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, "MegaMek client failed to connect to server", ex);
+            MekHQ.getLogger().error("MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -107,11 +109,11 @@ public class AtBGameThread extends GameThread {
             // phase
             for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error(this, "Thread in unknown stage" );
+                MekHQ.getLogger().error("Thread in unknown stage" );
             }
 
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-                MekHQ.getLogger().info(this, "Thread in lounge" );
+                MekHQ.getLogger().info("Thread in lounge" );
 
                 client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
@@ -119,14 +121,14 @@ public class AtBGameThread extends GameThread {
 
                 if (started) {
                     client.getGame().getOptions().loadOptions();
-                    client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
+                    client.sendGameOptions(password, app.getCampaign().getGameOptionsVector());
                     Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
                 MapSettings mapSettings = MapSettings.getInstance();
 
                 // if the scenario is taking place in space, do space settings instead
-                if ((scenario instanceof AtBScenario) &&
+                if ((scenario != null) &&
                         scenario.getTerrainType() == AtBScenario.TER_SPACE) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                 } else {
@@ -134,10 +136,10 @@ public class AtBGameThread extends GameThread {
                     try (InputStream is = new FileInputStream(mapgenFile)) {
                         mapSettings = MapSettings.getInstance(is);
                     } catch (FileNotFoundException ex) {
-                        MekHQ.getLogger().error(this, "Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
+                        MekHQ.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
                     }
 
-                    if(scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+                    if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
                 }
@@ -306,7 +308,7 @@ public class AtBGameThread extends GameThread {
                     try {
                         botClient.connect();
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(this, "Could not connect with Bot name " + bf.getName(), e);
+                        MekHQ.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
                     }
                     swingGui.getBots().put(name, botClient);
 
@@ -314,8 +316,8 @@ public class AtBGameThread extends GameThread {
 
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
-                    if (scenario instanceof AtBScenario) {
-                        AtBDynamicScenarioFactory.loadTransports((AtBScenario) scenario, botClient);
+                    if (scenario != null) {
+                        AtBDynamicScenarioFactory.loadTransports(scenario, botClient);
                     }
                 }
 
@@ -361,7 +363,7 @@ public class AtBGameThread extends GameThread {
                 Thread.sleep(50);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(this, e);
+            MekHQ.getLogger().error(e);
         }
         finally {
             client.die();
@@ -389,7 +391,7 @@ public class AtBGameThread extends GameThread {
                 sleep(50);
             }
             if (null == botClient.getLocalPlayer()) {
-                MekHQ.getLogger().error(this, "Could not configure bot " + botClient.getName());
+                MekHQ.getLogger().error("Could not configure bot " + botClient.getName());
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
@@ -415,7 +417,7 @@ public class AtBGameThread extends GameThread {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(this, e);
+            MekHQ.getLogger().error(e);
         }
     }
 }
