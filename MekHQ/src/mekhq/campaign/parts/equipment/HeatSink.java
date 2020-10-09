@@ -30,6 +30,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartRepairType;
 
 /**
  *
@@ -112,8 +113,8 @@ public class HeatSink extends EquipmentPart {
 	}
 
 	@Override
-	public int getRepairPartType() {
-    	return Part.REPAIR_PART_TYPE.HEATSINK;
+	public PartRepairType getRepairPartType() {
+    	return PartRepairType.HEAT_SINK;
     }
 
 	@Override

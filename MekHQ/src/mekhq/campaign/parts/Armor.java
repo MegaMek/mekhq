@@ -26,6 +26,7 @@ import java.text.DecimalFormat;
 import java.util.Objects;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -676,8 +677,8 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.ARMOR;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ARMOR;
     }
 
     @Override

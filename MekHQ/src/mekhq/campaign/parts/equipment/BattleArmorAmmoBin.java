@@ -32,6 +32,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
@@ -273,10 +274,12 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
 		return getNewPart();
 	}
 
+    @Override
     public boolean needsMaintenance() {
         return false;
     }
 
+    @Override
     public boolean canNeverScrap() {
     	return true;
 	}
@@ -284,6 +287,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     /**
      * Restores the equipment from the name
      */
+    @Override
     public void restore() {
         if (typeName == null) {
         	typeName = type.getName();
@@ -308,8 +312,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
 
 
         if (type == null) {
-            MekHQ.getLogger().error(BattleArmorAmmoBin.class, "restore",
-                    "Mounted.restore: could not restore equipment type \"" + typeName + "\"");
+            MekHQ.getLogger().error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
             return;
         }
         try {
@@ -320,7 +323,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.AMMO;
+    public PartRepairType getMassRepairOptionType() {
+    	return PartRepairType.AMMO;
     }
 }

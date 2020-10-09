@@ -21,6 +21,7 @@ package mekhq.service;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -31,25 +32,20 @@ import java.util.List;
 
 public class MassRepairOption {
     //region Variable Declarations
-    private int type;
+    private PartRepairType type;
     private boolean active;
     private int skillMin;
     private int skillMax;
     private int bthMin;
     private int bthMax;
-
-    public static final int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO,
-            Part.REPAIR_PART_TYPE.WEAPON, Part.REPAIR_PART_TYPE.GENERAL_LOCATION, Part.REPAIR_PART_TYPE.ENGINE,
-            Part.REPAIR_PART_TYPE.GYRO, Part.REPAIR_PART_TYPE.ACTUATOR, Part.REPAIR_PART_TYPE.ELECTRONICS,
-            Part.REPAIR_PART_TYPE.POD_SPACE, Part.REPAIR_PART_TYPE.GENERAL };
     //endregion Variable Declarations
 
     //region Constructors
-    public MassRepairOption(int type) {
+    public MassRepairOption(PartRepairType type) {
         this (type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, 4, 4);
     }
 
-    public MassRepairOption(int type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
+    public MassRepairOption(PartRepairType type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
         this.type = type;
         this.active = active;
         this.skillMin = skillMin;
@@ -60,11 +56,11 @@ public class MassRepairOption {
     //endregion Constructors
 
     //region Getters/Setters
-    public int getType() {
+    public PartRepairType getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(PartRepairType type) {
         this.type = type;
     }
 
@@ -112,7 +108,7 @@ public class MassRepairOption {
     //region File IO
     public void writeToXML(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "massRepairOption");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "type", getType());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "type", getType().name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "active", isActive() ? 1 : 0);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "skillMin", getSkillMin());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "skillMax", getSkillMax());
@@ -148,7 +144,7 @@ public class MassRepairOption {
     }
 
     public static MassRepairOption parseFromXML(Node mroNode) {
-        MassRepairOption mro = new MassRepairOption(-1);
+        MassRepairOption mro = new MassRepairOption(PartRepairType.);
 
         NodeList mroItemList = mroNode.getChildNodes();
         for (int mroItemIdx = 0; mroItemIdx < mroItemList.getLength(); mroItemIdx++) {

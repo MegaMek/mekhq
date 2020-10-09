@@ -28,6 +28,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -115,7 +116,7 @@ public class InfantryWeaponPart extends EquipmentPart {
 	}
 
     @Override
-    public int getMassRepairOptionType() {
-    	return REPAIR_PART_TYPE.WEAPON;
+    public PartRepairType getMassRepairOptionType() {
+    	return PartRepairType.WEAPON;
     }
 }

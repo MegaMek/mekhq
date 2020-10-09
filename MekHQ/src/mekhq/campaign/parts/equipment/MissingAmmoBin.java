@@ -32,6 +32,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -179,7 +180,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.AMMO;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.AMMO;
     }
 }

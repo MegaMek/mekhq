@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -106,7 +107,7 @@ public class MissingMekCockpit extends MissingPart {
 	public int getType() {
 		return type;
 	}
-	
+
 	public boolean isClan() {
 	    return isClan;
 	}
@@ -159,9 +160,9 @@ public class MissingMekCockpit extends MissingPart {
     public TechAdvancement getTechAdvancement() {
         return Mech.getCockpitTechAdvancement(type);
     }
-	
+
 	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
+	public PartRepairType getMassRepairOptionType() {
+    	return PartRepairType.ELECTRONICS;
     }
 }

@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -289,8 +290,9 @@ public class AeroSensor extends Part {
     public TechAdvancement getTechAdvancement() {
         return TECH_ADVANCEMENT;
     }
+
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.ELECTRONICS;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ELECTRONICS;
     }
 }

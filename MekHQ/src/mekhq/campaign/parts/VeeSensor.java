@@ -1,20 +1,20 @@
 /*
  * VeeSensor.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 
 import megamek.common.Compute;
@@ -43,7 +44,7 @@ public class VeeSensor extends Part {
 	public VeeSensor() {
 		this(0, null);
 	}
-	
+
 	public VeeSensor(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Vehicle Sensors";
@@ -54,7 +55,7 @@ public class VeeSensor extends Part {
         clone.copyBaseData(this);
 		return clone;
 	}
-	
+
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof VeeSensor;
@@ -109,22 +110,22 @@ public class VeeSensor extends Part {
 		if(null != unit && unit.getEntity() instanceof Tank) {
 			int priorHits = hits;
 			hits = ((Tank)unit.getEntity()).getSensorHits();
-			if(checkForDestruction 
-					&& hits > priorHits 
+			if(checkForDestruction
+					&& hits > priorHits
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
 			}
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 260;
 		}
 		return 75;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 0;
@@ -158,7 +159,7 @@ public class VeeSensor extends Part {
 		// TODO Auto-generated method stub
 		return Money.zero();
 	}
-	
+
 	@Override
 	public boolean isRightTechType(String skillType) {
 		return skillType.equals(SkillType.S_TECH_MECHANIC);
@@ -174,14 +175,14 @@ public class VeeSensor extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return TankLocation.TECH_ADVANCEMENT;
     }
-    
+
     @Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
+	public PartRepairType getMassRepairOptionType() {
+    	return PartRepairType.ELECTRONICS;
     }
 }

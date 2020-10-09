@@ -39,6 +39,7 @@ import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -74,7 +75,7 @@ public class MassRepairService {
         if (techs.isEmpty()) {
             campaign.addReport("No available techs to repairs parts.");
         } else {
-            Map<Integer, MassRepairOption> mroByTypeMap = new HashMap<>();
+            Map<PartRepairType, MassRepairOption> mroByTypeMap = new HashMap<>();
 
             for (MassRepairOption massRepairOption : configuredOptions.getMassRepairOptions()) {
                 mroByTypeMap.put(massRepairOption.getType(), massRepairOption);
@@ -354,7 +355,7 @@ public class MassRepairService {
             }
         }
 
-        Map<Integer, MassRepairOption> mroByTypeMap = new HashMap<>();
+        Map<PartRepairType, MassRepairOption> mroByTypeMap = new HashMap<>();
 
         for (MassRepairOption massRepairOption : mroList) {
             mroByTypeMap.put(massRepairOption.getType(), massRepairOption);
@@ -388,7 +389,7 @@ public class MassRepairService {
 
     private static MassRepairUnitAction performUnitMassTechAction(Campaign campaign, Unit unit,
                                                                   List<Person> techs,
-                                                                  Map<Integer, MassRepairOption> mroByTypeMap,
+                                                                  Map<PartRepairType, MassRepairOption> mroByTypeMap,
                                                                   boolean salvaging,
                                                                   MassRepairConfiguredOptions configuredOptions) {
         List<IPartWork> parts = campaign.getPartsNeedingServiceFor(unit.getId(), true);
@@ -489,7 +490,7 @@ public class MassRepairService {
             }
 
             if (!locationMap.isEmpty()) {
-                MassRepairOption mro = mroByTypeMap.get(Part.REPAIR_PART_TYPE.GENERAL_LOCATION);
+                MassRepairOption mro = mroByTypeMap.get(PartRepairType.GENERAL_LOCATION);
 
                 if ((null == mro) || !mro.isActive()) {
                     return new MassRepairUnitAction(unit, salvaging, MassRepairUnitAction.STATUS.UNFIXABLE_LIMB);
@@ -636,7 +637,7 @@ public class MassRepairService {
 
     private static MassRepairPartAction repairPart(Campaign campaign, IPartWork partWork, Unit unit,
                                                    List<Person> techs,
-                                                   Map<Integer, MassRepairOption> mroByTypeMap,
+                                                   Map<PartRepairType, MassRepairOption> mroByTypeMap,
                                                    MassRepairConfiguredOptions configuredOptions,
                                                    boolean warehouseMode) {
         // We were doing this check for every tech, that's unnecessary as it
@@ -845,7 +846,7 @@ public class MassRepairService {
         return MassRepairPartAction.createRepaired(partWork);
     }
 
-    private static List<IPartWork> filterParts(List<IPartWork> parts, Map<Integer, MassRepairOption> mroByTypeMap,
+    private static List<IPartWork> filterParts(List<IPartWork> parts, Map<PartRepairType, MassRepairOption> mroByTypeMap,
                                                List<Person> techs, Campaign campaign) {
         List<IPartWork> newParts = new ArrayList<>();
 
@@ -865,7 +866,7 @@ public class MassRepairService {
             }
 
             if (mroByTypeMap != null) {
-                int repairType = IPartWork.findCorrectMassRepairType(partWork);
+                PartRepairType repairType = IPartWork.findCorrectMassRepairType(partWork);
 
                 MassRepairOption mro = mroByTypeMap.get(repairType);
 
@@ -925,7 +926,7 @@ public class MassRepairService {
     }
 
     private static List<Person> filterTechs(IPartWork partWork, List<Person> techs,
-                                            Map<Integer, MassRepairOption> mroByTypeMap,
+                                            Map<PartRepairType, MassRepairOption> mroByTypeMap,
                                             boolean warehouseMode, Campaign campaign) {
         List<Person> validTechs = new ArrayList<>();
 

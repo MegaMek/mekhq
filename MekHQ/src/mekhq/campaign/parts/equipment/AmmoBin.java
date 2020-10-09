@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.function.Predicate;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -822,8 +823,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.AMMO;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.AMMO;
     }
 
     @Override
