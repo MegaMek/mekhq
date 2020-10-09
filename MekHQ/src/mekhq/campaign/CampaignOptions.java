@@ -22,9 +22,9 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
+import mekhq.Version;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -3052,7 +3052,7 @@ public class CampaignOptions implements Serializable {
             massRepairOptions.remove(foundIdx + 1);
         }
 
-        massRepairOptions.sort(Comparator.comparingInt(MassRepairOption::getType));
+        massRepairOptions.sort((mro1, mro2) -> (((Comparable<Integer>) mro1.getType().ordinal()).compareTo(mro2.getType().ordinal())));
     }
     //endregion Mass Repair/ Mass Salvage
 
@@ -3406,7 +3406,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "campaignOptions");
     }
 
-    public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
+    public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {
         MekHQ.getLogger().info("Loading Campaign Options from XML...");
 
         wn.normalize();
@@ -3991,7 +3991,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
                 retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
-                retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2));
+                retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
             }
         }
 

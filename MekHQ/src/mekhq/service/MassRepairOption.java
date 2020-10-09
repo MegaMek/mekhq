@@ -20,6 +20,7 @@ package mekhq.service;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Version;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import org.w3c.dom.Node;
@@ -116,9 +117,10 @@ public class MassRepairOption {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "massRepairOption");
     }
 
-    public static List<MassRepairOption> parseListFromXML(Node wn2) {
+    public static List<MassRepairOption> parseListFromXML(Node wn2, Version version) {
         List<MassRepairOption> massRepairOptions = new ArrayList<>();
         NodeList mroList = wn2.getChildNodes();
+        List<PartRepairType> partRepairTypes = PartRepairType.getMRMSValidTypes();
 
         for (int mroIdx = 0; mroIdx < mroList.getLength(); mroIdx++) {
             Node mroNode = mroList.item(mroIdx);
@@ -128,8 +130,8 @@ public class MassRepairOption {
             }
 
             try {
-                MassRepairOption mro = parseFromXML(mroNode);
-                if ((mro.getType() == PartRepairType.UNKNOWN_LOCATION) || (mro.getType() >= VALID_REPAIR_TYPES.length)) {
+                MassRepairOption mro = parseFromXML(mroNode, version);
+                if ((mro.getType() == PartRepairType.UNKNOWN_LOCATION) || !partRepairTypes.contains(mro.getType())) {
                     MekHQ.getLogger().error("Attempted to load MassRepairOption with illegal type id of " + mro.getType());
                 } else {
                     massRepairOptions.add(mro);
@@ -142,7 +144,7 @@ public class MassRepairOption {
         return massRepairOptions;
     }
 
-    public static MassRepairOption parseFromXML(Node mroNode) {
+    public static MassRepairOption parseFromXML(Node mroNode, Version version) {
         MassRepairOption mro = new MassRepairOption(PartRepairType.UNKNOWN_LOCATION);
 
         NodeList mroItemList = mroNode.getChildNodes();
@@ -154,7 +156,7 @@ public class MassRepairOption {
             }
 
             if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
-                mro.setType(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                mro.setType(PartRepairType.parseFromString(mroItemNode.getTextContent().trim(), version));
             } else if (mroItemNode.getNodeName().equalsIgnoreCase("active")) {
                 mro.setActive(Integer.parseInt(mroItemNode.getTextContent().trim()) == 1);
             } else if (mroItemNode.getNodeName().equalsIgnoreCase("skillMin")) {

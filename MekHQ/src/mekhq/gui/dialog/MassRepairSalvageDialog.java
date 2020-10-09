@@ -231,16 +231,14 @@ public class MassRepairSalvageDialog extends JDialog {
     private void filterCompletePartsList(boolean refreshCompleteList) {
         Map<PartRepairType, PartRepairType> activeMROMap = new HashMap<>();
 
-        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-            PartRepairType type = MassRepairOption.VALID_REPAIR_TYPES[i];
-
-            MassRepairOptionControl mroc = massRepairOptionControlMap.get(type);
+        for (PartRepairType partRepairType : PartRepairType.getMRMSValidTypes()) {
+            MassRepairOptionControl mroc = massRepairOptionControlMap.get(partRepairType);
 
             if ((mroc == null) || !mroc.getActiveBox().isSelected()) {
                 continue;
             }
 
-            activeMROMap.put(type, type);
+            activeMROMap.put(partRepairType, partRepairType);
         }
 
         if (refreshCompleteList) {
@@ -1031,16 +1029,14 @@ public class MassRepairSalvageDialog extends JDialog {
             campaignOptions.setMassRepairReplacePod(replacePodPartsBox.isSelected());
         }
 
-        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-            PartRepairType type = MassRepairOption.VALID_REPAIR_TYPES[i];
-
-            MassRepairOptionControl mroc = massRepairOptionControlMap.get(type);
+        for (PartRepairType partRepairType : PartRepairType.getMRMSValidTypes()) {
+            MassRepairOptionControl mroc = massRepairOptionControlMap.get(partRepairType);
 
             if (mroc == null) {
                 continue;
             }
 
-            MassRepairOption mro = new MassRepairOption(type, mroc.getActiveBox().isSelected(),
+            MassRepairOption mro = new MassRepairOption(partRepairType, mroc.getActiveBox().isSelected(),
                     mroc.getMinSkillCBox().getSelectedIndex(), mroc.getMaxSkillCBox().getSelectedIndex(),
                     (Integer) mroc.getMinBTHSpn().getValue(), (Integer) mroc.getMaxBTHSpn().getValue());
 

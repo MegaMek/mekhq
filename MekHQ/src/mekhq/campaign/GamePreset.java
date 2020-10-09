@@ -29,6 +29,7 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.Version;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -201,7 +202,7 @@ public class GamePreset implements MekHqXmlSerializable {
                 } else if (xn.equalsIgnoreCase("description")) {
                     preset.description = wn.getTextContent();
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
-                    preset.setOptions(CampaignOptions.generateCampaignOptionsFromXml(wn));
+                    preset.setOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, new Version("")));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     preset.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn));
                 } else if (xn.equalsIgnoreCase("skillTypes")) {

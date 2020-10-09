@@ -2285,7 +2285,7 @@ public class CampaignGUI extends JPanel {
             String xn = wn.getNodeName();
 
             if (xn.equalsIgnoreCase("campaignOptions")) {
-                options = CampaignOptions.generateCampaignOptionsFromXml(wn);
+                options = CampaignOptions.generateCampaignOptionsFromXml(wn, version);
             } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                 rsp = RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn);
             } else if (xn.equalsIgnoreCase("skillTypes")) {

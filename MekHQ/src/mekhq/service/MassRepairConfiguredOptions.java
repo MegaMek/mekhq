@@ -93,16 +93,14 @@ public class MassRepairConfiguredOptions {
         }
 
         setMassRepairOptions(new ArrayList<>());
-        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-            PartRepairType type = MassRepairOption.VALID_REPAIR_TYPES[i];
-
-            MassRepairSalvageDialog.MassRepairOptionControl mroc = dlg.getMassRepairOptionControlMap().get(type);
+        for (PartRepairType partRepairType : PartRepairType.getMRMSValidTypes()) {
+            MassRepairSalvageDialog.MassRepairOptionControl mroc = dlg.getMassRepairOptionControlMap().get(partRepairType);
 
             if (mroc == null) {
                 continue;
             }
 
-            MassRepairOption mro = new MassRepairOption(type, mroc.getActiveBox().isSelected(),
+            MassRepairOption mro = new MassRepairOption(partRepairType, mroc.getActiveBox().isSelected(),
                     mroc.getMinSkillCBox().getSelectedIndex(), mroc.getMaxSkillCBox().getSelectedIndex(),
                     (Integer) mroc.getMinBTHSpn().getValue(), (Integer) mroc.getMaxBTHSpn().getValue());
 
