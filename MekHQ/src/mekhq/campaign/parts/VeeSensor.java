@@ -165,8 +165,8 @@ public class VeeSensor extends Part {
 
 	@Override
 	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
+        // TODO Auto-generated method stub
+        return null;
 	}
 
 	@Override
