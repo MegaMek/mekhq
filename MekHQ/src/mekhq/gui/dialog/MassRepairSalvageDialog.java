@@ -229,10 +229,10 @@ public class MassRepairSalvageDialog extends JDialog {
     }
 
     private void filterCompletePartsList(boolean refreshCompleteList) {
-        Map<Integer, Integer> activeMROMap = new HashMap<>();
+        Map<PartRepairType, PartRepairType> activeMROMap = new HashMap<>();
 
         for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-            int type = MassRepairOption.VALID_REPAIR_TYPES[i];
+            PartRepairType type = MassRepairOption.VALID_REPAIR_TYPES[i];
 
             MassRepairOptionControl mroc = massRepairOptionControlMap.get(type);
 
@@ -258,7 +258,7 @@ public class MassRepairSalvageDialog extends JDialog {
         int quantity = 0;
 
         for (Part part : completePartsList) {
-            int partType = IPartWork.findCorrectMassRepairType(part);
+            PartRepairType partType = IPartWork.findCorrectMassRepairType(part);
 
             if (activeMROMap.containsKey(partType)) {
                 filteredPartsList.add(part);
