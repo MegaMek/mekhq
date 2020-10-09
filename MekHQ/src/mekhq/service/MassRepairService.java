@@ -1331,7 +1331,7 @@ public class MassRepairService {
 
     public static class MassRepairUnitAction {
         public enum STATUS {
-            NO_ACTIONS, ACTIONS_PERFORMED, NO_TECHS, UNFIXABLE_LIMB, NO_PARTS, ALL_PARTS_IN_PROCESS, DISABLED
+            NO_ACTIONS, ACTIONS_PERFORMED, NO_TECHS, UNFIXABLE_LIMB, NO_PARTS, ALL_PARTS_IN_PROCESS
         }
 
         private Unit unit;
