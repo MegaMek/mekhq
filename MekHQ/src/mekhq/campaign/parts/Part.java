@@ -1518,29 +1518,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return sb.toString();
     }
 
-    public static String getRepairTypeShortName(PartRepairType type) {
-        switch (type) {
-            case ARMOR:
-                return "Armor";
-            case AMMO:
-                return "Ammo";
-            case WEAPON:
-                return "Weapons";
-            case GENERAL_LOCATION:
-                return "Locations";
-            case ENGINE:
-                return "Engines";
-            case GYRO:
-                return "Gyros";
-            case ACTUATOR:
-                return "Actuators";
-            case ELECTRONICS:
-                return "Cockpit/Life Support/Sensors";
-            default:
-                return "Other Items";
-        }
-    }
-
     public static String[] findPartImage(IPartWork part) {
         String imgBase = null;
         PartRepairType repairType = IPartWork.findCorrectRepairType(part);
@@ -1568,12 +1545,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 EquipmentType equipmentType = null;
 
                 if (part instanceof EquipmentPart) {
-                    equipmentType = ((EquipmentPart)part).getType();
+                    equipmentType = ((EquipmentPart) part).getType();
                 } else if (part instanceof MissingEquipmentPart) {
-                    equipmentType = ((MissingEquipmentPart)part).getType();
+                    equipmentType = ((MissingEquipmentPart) part).getType();
                 }
 
-                if (null != equipmentType) {
+                if (equipmentType != null) {
                     if (equipmentType.hasFlag(WeaponType.F_LASER)) {
                         imgBase = "laser";
                     } else if (equipmentType.hasFlag(WeaponType.F_MISSILE)) {
@@ -1593,9 +1570,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             case PHYSICAL_WEAPON:
                 imgBase = "melee";
                 break;
+            default:
+                break;
         }
 
-        if (null == imgBase) {
+        if (imgBase == null) {
             imgBase = "equipment";
         }
 
