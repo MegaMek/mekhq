@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.util.StringJoiner;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -819,12 +820,12 @@ public class MekLocation extends Part {
 	}
 
 	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.GENERAL_LOCATION;
+	public PartRepairType getMassRepairOptionType() {
+    	return PartRepairType.GENERAL_LOCATION;
     }
 
 	@Override
-	public int getRepairPartType() {
-    	return Part.REPAIR_PART_TYPE.MEK_LOCATION;
+	public PartRepairType getRepairPartType() {
+    	return PartRepairType.MEK_LOCATION;
     }
 }

@@ -20,7 +20,6 @@ package mekhq.service;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import org.w3c.dom.Node;
@@ -130,7 +129,7 @@ public class MassRepairOption {
 
             try {
                 MassRepairOption mro = parseFromXML(mroNode);
-                if ((mro.getType() == -1) || (mro.getType() >= VALID_REPAIR_TYPES.length)) {
+                if ((mro.getType() == PartRepairType.UNKNOWN_LOCATION) || (mro.getType() >= VALID_REPAIR_TYPES.length)) {
                     MekHQ.getLogger().error("Attempted to load MassRepairOption with illegal type id of " + mro.getType());
                 } else {
                     massRepairOptions.add(mro);
@@ -144,7 +143,7 @@ public class MassRepairOption {
     }
 
     public static MassRepairOption parseFromXML(Node mroNode) {
-        MassRepairOption mro = new MassRepairOption(PartRepairType.);
+        MassRepairOption mro = new MassRepairOption(PartRepairType.UNKNOWN_LOCATION);
 
         NodeList mroItemList = mroNode.getChildNodes();
         for (int mroItemIdx = 0; mroItemIdx < mroItemList.getLength(); mroItemIdx++) {
@@ -168,7 +167,7 @@ public class MassRepairOption {
                 mro.setBthMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
             }
 
-            MekHQ.getLogger().debug(String.format("massRepairOption %d.%s\n\t%s",
+            MekHQ.getLogger().debug(String.format("massRepairOption %s.%s\n\t%s",
                     mro.getType(), mroItemNode.getNodeName(), mroItemNode.getTextContent()));
         }
 

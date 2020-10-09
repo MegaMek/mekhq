@@ -1,20 +1,20 @@
 /*
  * MissingAeroSensor.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -52,7 +53,7 @@ public class MissingAeroLifeSupport extends MissingPart {
     public MissingAeroLifeSupport() {
         this(0, Money.zero(), false, null);
     }
-    
+
      public MissingAeroLifeSupport(int tonnage, Money cost, boolean f, Campaign c) {
          super(tonnage, c);
          this.cost = cost;
@@ -83,7 +84,7 @@ public class MissingAeroLifeSupport extends MissingPart {
              time = 180;
          }
          return time;
-     } 
+     }
 
     @Override
     public int getDifficulty() {
@@ -94,7 +95,7 @@ public class MissingAeroLifeSupport extends MissingPart {
             return -1;
         }
     }
-    
+
     @Override
     public String checkFixable() {
         return null;
@@ -168,14 +169,14 @@ public class MissingAeroLifeSupport extends MissingPart {
         }
         return Entity.LOC_NONE;
     }
-    
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return AeroLifeSupport.TECH_ADVANCEMENT;
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.ELECTRONICS;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ELECTRONICS;
     }
 }

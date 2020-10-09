@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
@@ -136,7 +137,7 @@ public class MissingProtomekSensor extends MissingPart {
     }
 
     @Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
+	public PartRepairType getMassRepairOptionType() {
+    	return PartRepairType.ELECTRONICS;
     }
 }

@@ -20,6 +20,7 @@ package mekhq.service;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
 
 import java.util.ArrayList;
@@ -93,7 +94,7 @@ public class MassRepairConfiguredOptions {
 
         setMassRepairOptions(new ArrayList<>());
         for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-            int type = MassRepairOption.VALID_REPAIR_TYPES[i];
+            PartRepairType type = MassRepairOption.VALID_REPAIR_TYPES[i];
 
             MassRepairSalvageDialog.MassRepairOptionControl mroc = dlg.getMassRepairOptionControlMap().get(type);
 

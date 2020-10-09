@@ -1,26 +1,27 @@
 /*
  * MissingMekLifeSupport.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.parts;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
@@ -39,17 +40,17 @@ public class MissingMekLifeSupport extends MissingPart {
 	public MissingMekLifeSupport() {
 		this(0, null);
 	}
-	
+
 	public MissingMekLifeSupport(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Mech Life Support System";
     }
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		return 180;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return -1;
@@ -70,8 +71,8 @@ public class MissingMekLifeSupport extends MissingPart {
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		return part instanceof MekLifeSupport;
 	}
-	
-	 
+
+
     @Override
     public String checkFixable() {
     	if(null == unit) {
@@ -120,12 +121,12 @@ public class MissingMekLifeSupport extends MissingPart {
 		}
 		return Entity.LOC_NONE;
 	}
-	
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return TA_GENERIC;
     }
-	
+
 	@Override
     public boolean isInLocation(String loc) {
 		 if(null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mech)) {
@@ -139,11 +140,11 @@ public class MissingMekLifeSupport extends MissingPart {
 		 } else if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
              return true;
          }
-		 return false;	
+		 return false;
     }
-	
+
 	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
+	public PartRepairType getMassRepairOptionType() {
+    	return PartRepairType.ELECTRONICS;
     }
 }

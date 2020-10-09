@@ -13,5 +13,6 @@ public enum PartRepairType {
     HEAT_SINK,
     MEK_LOCATION,
     PHYSICAL_WEAPON,
-    POD_SPACE;
+    POD_SPACE,
+    UNKNOWN_LOCATION;
 }

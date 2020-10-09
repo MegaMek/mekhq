@@ -43,6 +43,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -100,7 +101,7 @@ public class MassRepairSalvageDialog extends JDialog {
     private JCheckBox useAssignedTechsFirstBox;
     private JCheckBox replacePodPartsBox;
 
-    private Map<Integer, MassRepairOptionControl> massRepairOptionControlMap = null;
+    private Map<PartRepairType, MassRepairOptionControl> massRepairOptionControlMap = null;
 
     private List<Unit> unitList = null;
     private List<Part> completePartsList = null;
@@ -164,7 +165,7 @@ public class MassRepairSalvageDialog extends JDialog {
         return mode;
     }
 
-    public Map<Integer, MassRepairOptionControl> getMassRepairOptionControlMap() {
+    public Map<PartRepairType, MassRepairOptionControl> getMassRepairOptionControlMap() {
         return massRepairOptionControlMap;
     }
     //endregion Getters and Setters
@@ -547,54 +548,54 @@ public class MassRepairSalvageDialog extends JDialog {
         massRepairOptionControlMap = new HashMap<>();
 
         if (!getMode().isWarehouse()) {
-            massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.ARMOR,
-                    createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ARMOR,
+            massRepairOptionControlMap.put(PartRepairType.ARMOR,
+                    createMassRepairOptionControls(PartRepairType.ARMOR,
                             "massRepairItemArmor.text", "massRepairItemArmor.toolTipText",
                             "massRepairItemArmor", pnlItems, gridRowIdx++));
 
-            massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.AMMO,
-                    createMassRepairOptionControls(Part.REPAIR_PART_TYPE.AMMO,
+            massRepairOptionControlMap.put(PartRepairType.AMMO,
+                    createMassRepairOptionControls(PartRepairType.AMMO,
                             "massRepairItemAmmo.text", "massRepairItemAmmo.toolTipText",
                             "massRepairItemAmmo", pnlItems, gridRowIdx++));
         }
 
-        massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.WEAPON,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.WEAPON,
+        massRepairOptionControlMap.put(PartRepairType.WEAPON,
+                createMassRepairOptionControls(PartRepairType.WEAPON,
                    "massRepairItemWeapons.text", "massRepairItemWeapons.toolTipText",
                         "massRepairItemWeapons", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.GENERAL_LOCATION,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.GENERAL_LOCATION,
+        massRepairOptionControlMap.put(PartRepairType.GENERAL_LOCATION,
+                createMassRepairOptionControls(PartRepairType.GENERAL_LOCATION,
                         "massRepairItemLocations.text", "massRepairItemLocations.toolTipText",
                         "massRepairItemLocations", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.ENGINE,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ENGINE,
+        massRepairOptionControlMap.put(PartRepairType.ENGINE,
+                createMassRepairOptionControls(PartRepairType.ENGINE,
                         "massRepairItemEngines.text", "massRepairItemEngines.toolTipText",
                         "massRepairItemEngines", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.GYRO,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.GYRO,
+        massRepairOptionControlMap.put(PartRepairType.GYRO,
+                createMassRepairOptionControls(PartRepairType.GYRO,
                         "massRepairItemGyros.text", "massRepairItemGyros.toolTipText",
                         "massRepairItemGyros", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.ACTUATOR,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ACTUATOR,
+        massRepairOptionControlMap.put(PartRepairType.ACTUATOR,
+                createMassRepairOptionControls(PartRepairType.ACTUATOR,
                         "massRepairItemActuators.text", "massRepairItemActuators.toolTipText",
                         "massRepairItemActuators", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.ELECTRONICS,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ELECTRONICS,
+        massRepairOptionControlMap.put(PartRepairType.ELECTRONICS,
+                createMassRepairOptionControls(PartRepairType.ELECTRONICS,
                         "massRepairItemHead.text", "massRepairItemHead.toolTipText",
                         "massRepairItemHead", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.GENERAL,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.GENERAL,
+        massRepairOptionControlMap.put(PartRepairType.GENERAL,
+                createMassRepairOptionControls(PartRepairType.GENERAL,
                         "massRepairItemOther.text", "massRepairItemOther.toolTipText",
                         "massRepairItemOther", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.POD_SPACE,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.POD_SPACE,
+        massRepairOptionControlMap.put(PartRepairType.POD_SPACE,
+                createMassRepairOptionControls(PartRepairType.POD_SPACE,
                         "massRepairItemPod.text", "massRepairItemPod.toolTipText",
                         "massRepairItemPod", pnlItems, gridRowIdx++));
 
         return pnlOptions;
     }
 
-    private MassRepairOptionControl createMassRepairOptionControls(int type, String text, String tooltipText,
+    private MassRepairOptionControl createMassRepairOptionControls(PartRepairType type, String text, String tooltipText,
                                                                    String activeBoxName, JPanel pnlItems,
                                                                    int rowIdx) {
         MassRepairOption mro = null;
@@ -1031,7 +1032,7 @@ public class MassRepairSalvageDialog extends JDialog {
         }
 
         for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-            int type = MassRepairOption.VALID_REPAIR_TYPES[i];
+            PartRepairType type = MassRepairOption.VALID_REPAIR_TYPES[i];
 
             MassRepairOptionControl mroc = massRepairOptionControlMap.get(type);
 

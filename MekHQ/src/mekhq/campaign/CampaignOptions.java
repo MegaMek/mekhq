@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.service.MassRepairOption;
@@ -419,8 +420,8 @@ public class CampaignOptions implements Serializable {
         massRepairReplacePod = true;
         massRepairOptions = new ArrayList<>();
 
-        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-            massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
+        for (PartRepairType type : PartRepairType.values()) {
+            massRepairOptions.add(new MassRepairOption(type));
         }
         //endregion Unlisted Variables
 
@@ -3031,7 +3032,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void addMassRepairOption(MassRepairOption mro) {
-        if (mro.getType() == -1) {
+        if (mro.getType() == PartRepairType.UNKNOWN_LOCATION) {
             return;
         }
 

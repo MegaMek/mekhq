@@ -1,20 +1,20 @@
 /*
  * MekLifeSupport.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 
 import megamek.common.Compute;
@@ -44,24 +45,24 @@ public class MekLifeSupport extends Part {
 	public MekLifeSupport() {
 		this(0, null);
 	}
-	
+
 	public MekLifeSupport(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Mech Life Support System";
     }
-	
+
 	public MekLifeSupport clone() {
 		MekLifeSupport clone = new MekLifeSupport(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
 		return clone;
 	}
-	
+
 	@Override
 	public double getTonnage() {
 		//TODO: what should this tonnage be?
 		return 0;
 	}
-	
+
 	@Override
 	public Money getStickerPrice() {
 		return Money.of(50000);
@@ -124,8 +125,8 @@ public class MekLifeSupport extends Part {
 			Entity entity = unit.getEntity();
 			for (int i = 0; i < entity.locations(); i++) {
 				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i) > 0) {
-					if (!unit.isSystemMissing(Mech.SYSTEM_LIFE_SUPPORT, i)) {					
-						hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i);	
+					if (!unit.isSystemMissing(Mech.SYSTEM_LIFE_SUPPORT, i)) {
+						hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i);
 						break;
 					} else {
 						remove(false);
@@ -133,15 +134,15 @@ public class MekLifeSupport extends Part {
 					}
 				}
 			}
-			if(checkForDestruction 
+			if(checkForDestruction
 					&& hits > priorHits && hits >= 2
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
 			}
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 180;
@@ -151,7 +152,7 @@ public class MekLifeSupport extends Part {
 		}
 		return 60;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -167,7 +168,7 @@ public class MekLifeSupport extends Part {
 	public boolean needsFixing() {
 		return hits > 0;
 	}
-	
+
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit) {
@@ -178,7 +179,7 @@ public class MekLifeSupport extends Part {
 			}
 		}
 	}
-	
+
 	@Override
     public String checkFixable() {
 		if(null == unit) {
@@ -199,7 +200,7 @@ public class MekLifeSupport extends Part {
         }
         return null;
     }
-	
+
 	@Override
 	public boolean isMountedOnDestroyedLocation() {
 		if(null == unit) {
@@ -213,12 +214,12 @@ public class MekLifeSupport extends Part {
 		 }
 		return false;
 	}
-	
+
     @Override
     public boolean isPartForEquipmentNum(int index, int loc) {
         return false;
     }
-	
+
 	@Override
 	public boolean isRightTechType(String skillType) {
 		return skillType.equals(SkillType.S_TECH_MECH);
@@ -242,7 +243,7 @@ public class MekLifeSupport extends Part {
 		}
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return TA_GENERIC;
@@ -261,11 +262,11 @@ public class MekLifeSupport extends Part {
 		 } else if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
              return true;
          }
-		 return false;	
+		 return false;
     }
-	
+
 	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
+	public PartRepairType getMassRepairOptionType() {
+    	return PartRepairType.ELECTRONICS;
     }
 }
