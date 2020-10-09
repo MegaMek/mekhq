@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.work;
 
@@ -27,7 +27,6 @@ import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
@@ -86,6 +85,7 @@ public interface IPartWork extends IWork {
      * @return A string containing details regarding the part.
      */
     String getDetails(boolean includeRepairDetails);
+
     int getLocation();
 
     Unit getUnit();
@@ -95,10 +95,13 @@ public interface IPartWork extends IWork {
     String checkFixable();
 
     void reservePart();
+
     void cancelReservation();
+
     boolean isBeingWorkedOn();
 
     PartRepairType getMassRepairOptionType();
+
     PartRepairType getRepairPartType();
 
     static PartRepairType findCorrectMassRepairType(IPartWork part) {
@@ -113,7 +116,7 @@ public interface IPartWork extends IWork {
         if (((part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType))
                 || ((part instanceof MissingEquipmentPart) && (((MissingEquipmentPart) part).getType() instanceof WeaponType))) {
             return PartRepairType.WEAPON;
-        } else if ((part instanceof EquipmentPart) && (((EquipmentPart)part).getType().hasFlag(MiscType.F_CLUB))) {
+        } else if ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType().hasFlag(MiscType.F_CLUB))) {
             return PartRepairType.PHYSICAL_WEAPON;
         } else {
             return part.getRepairPartType();
