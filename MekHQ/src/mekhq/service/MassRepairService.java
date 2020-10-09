@@ -160,7 +160,6 @@ public class MassRepairService {
             case UNFIXABLE_LIMB:
                 msg += " No actions were performed because there is at least one unfixable limb and configured settings do not allow location repairs.";
                 break;
-            case DISABLED:
             case NO_ACTIONS:
             default:
                 break;
