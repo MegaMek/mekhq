@@ -877,7 +877,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                                         + " (" + tech.getMaintenanceTimeUsing() + "m)");
                                 cbMenuItem.setActionCommand(COMMAND_ASSIGN_TECH + ":" + tech.getId());
 
-                                if (tech.getId().equals(unit.getTechId())) {
+                                if (tech == unit.getTech()) {
                                     cbMenuItem.setSelected(true);
                                 } else {
                                     cbMenuItem.addActionListener(this);

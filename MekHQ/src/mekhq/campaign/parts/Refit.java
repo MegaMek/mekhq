@@ -2252,16 +2252,6 @@ public class Refit extends Part implements IAcquisitionWork {
         return Part.T_BOTH;
     }
 
-    public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> pHash) {
-        assignedTechId = pHash.get(oldTechId);
-        if (null != newArmorSupplies) {
-            newArmorSupplies.fixIdReferences(uHash, pHash);
-        }
-        for (Part p : shoppingList) {
-            p.fixIdReferences(uHash, pHash);
-        }
-    }
-
     @Override
     public boolean isRightTechType(String skillType) {
         // TODO Auto-generated method stub

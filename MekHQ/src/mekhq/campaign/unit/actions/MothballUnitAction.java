@@ -54,7 +54,7 @@ public class MothballUnitAction implements IUnitAction {
                 return;
             }
 
-            unit.startMothballing(techId);
+            unit.startMothballing(campaign.getPerson(techId));
         }
     }
 }

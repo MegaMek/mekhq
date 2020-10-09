@@ -1334,21 +1334,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return teamId != null;
     }
 
-    public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> pHash) {
-        unitId = uHash.get(oldUnitId);
-        refitId = uHash.get(oldRefitId);
-        teamId = pHash.get(oldTeamId);
-    }
-
-    /*
-    public void resetRepairStatus() {
-        if (null != unit) {
-            setSalvaging(unit.isSalvage());
-            updateConditionFromEntity(false);
-        }
-    }
-    */
-
     public boolean onBadHipOrShoulder() {
         return false;
     }
@@ -1837,7 +1822,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             int id = parentPart.getId();
             parentPart = knownParts.get(id);
             if ((parentPart == null) && (id > 0)) {
-                MekHQ.getLogger().error(PartRef.class,
+                MekHQ.getLogger().error(
                     String.format("Part %d ('%s') references missing parent part %d",
                         getId(), getName(), id));
             }
@@ -1850,7 +1835,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 if (realPart != null) {
                     childParts.set(ii, realPart);
                 } else if (childPart.getId() > 0) {
-                    MekHQ.getLogger().error(PartRef.class,
+                    MekHQ.getLogger().error(
                         String.format("Part %d ('%s') references missing child part %d",
                             getId(), getName(), childPart.getId()));
                     childParts.remove(ii);

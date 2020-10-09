@@ -3747,7 +3747,7 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
         getHangar().forEachUnit(u -> {
-            if (tech.getId().equals(u.getTechId())) {
+            if (tech == u.getTech()) {
                 u.removeTech();
             }
             if (u.getRefit() != null && tech.getId().equals(u.getRefit().getTeamId())) {

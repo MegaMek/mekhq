@@ -57,7 +57,7 @@ public class ActivateUnitAction implements IUnitAction {
                 return;
             }
 
-            unit.startActivating(techId);
+            unit.startActivating(campaign.getPerson(techId));
         }
     }
 }
