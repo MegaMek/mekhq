@@ -90,6 +90,8 @@ public class MassRepairSalvageDialog extends JDialog {
     private JScrollPane scrollPartsTable;
     private JButton btnSelectAllParts;
 
+    private JCheckBox useRepairBox;
+    private JCheckBox useSalvageBox;
     private JCheckBox useExtraTimeBox;
     private JCheckBox useRushJobBox;
     private JCheckBox allowCarryoverBox;
@@ -122,11 +124,10 @@ public class MassRepairSalvageDialog extends JDialog {
 
         campaignOptions = campaignGUI.getCampaign().getCampaignOptions();
 
-
         initComponents();
 
         if (getMode().isUnits()) {
-            filterUnits();
+            filterUnits(new MassRepairConfiguredOptions(this));
 
             if (selectedUnit != null) {
                 int unitCount = unitTable.getRowCount();
@@ -167,7 +168,7 @@ public class MassRepairSalvageDialog extends JDialog {
     }
     //endregion Getters and Setters
 
-    private void filterUnits() {
+    private void filterUnits(MassRepairConfiguredOptions configuredOptions) {
         // Store selections so after the table is refreshed we can re-select
         // them
         Map<String, Unit> selectedUnitMap = new HashMap<>();
@@ -191,7 +192,7 @@ public class MassRepairSalvageDialog extends JDialog {
         unitList = new ArrayList<>();
 
         for (Unit unit : campaignGUI.getCampaign().getServiceableUnits()) {
-            if (!MassRepairService.isValidMRMSUnit(unit)) {
+            if (!MassRepairService.isValidMRMSUnit(unit, configuredOptions)) {
                 continue;
             }
 
@@ -428,16 +429,31 @@ public class MassRepairSalvageDialog extends JDialog {
 
         GridBagConstraints gridBagConstraints;
 
-        useExtraTimeBox = new JCheckBox(resources.getString("useExtraTimeBox.text"));
-        useExtraTimeBox.setToolTipText(resources.getString("useExtraTimeBox.toolTipText"));
-        useExtraTimeBox.setName("massRepairUseExtraTimeBox");
-        useExtraTimeBox.setSelected(campaignOptions.massRepairUseExtraTime());
+        useRepairBox = new JCheckBox(resources.getString("useRepairBox.text"));
+        useRepairBox.setToolTipText(resources.getString("useRepairBox.toolTipText"));
+        useRepairBox.setName("useRepairBox");
+        useRepairBox.setSelected(campaignOptions.massRepairUseRepair());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridRowIdx++;
         gridBagConstraints.weightx = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlOptions.add(useRepairBox, gridBagConstraints);
+
+        useSalvageBox = new JCheckBox(resources.getString("useSalvageBox.text"));
+        useSalvageBox.setToolTipText(resources.getString("useSalvageBox.toolTipText"));
+        useSalvageBox.setName("useSalvageBox");
+        useSalvageBox.setSelected(campaignOptions.massRepairUseSalvage());
+        gridBagConstraints.gridy = gridRowIdx++;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        pnlOptions.add(useSalvageBox, gridBagConstraints);
+
+        useExtraTimeBox = new JCheckBox(resources.getString("useExtraTimeBox.text"));
+        useExtraTimeBox.setToolTipText(resources.getString("useExtraTimeBox.toolTipText"));
+        useExtraTimeBox.setName("massRepairUseExtraTimeBox");
+        useExtraTimeBox.setSelected(campaignOptions.massRepairUseExtraTime());
+        gridBagConstraints.gridy = gridRowIdx++;
         pnlOptions.add(useExtraTimeBox, gridBagConstraints);
 
         useRushJobBox = new JCheckBox(resources.getString("useRushJobBox.text"));
@@ -445,7 +461,6 @@ public class MassRepairSalvageDialog extends JDialog {
         useRushJobBox.setName("massRepairUseRushJobBox");
         useRushJobBox.setSelected(campaignOptions.massRepairUseRushJob());
         gridBagConstraints.gridy = gridRowIdx++;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
         pnlOptions.add(useRushJobBox, gridBagConstraints);
 
         allowCarryoverBox = new JCheckBox(resources.getString("allowCarryoverBox.text"));
@@ -916,7 +931,12 @@ public class MassRepairSalvageDialog extends JDialog {
 
             MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions(this);
 
-            if (!configuredOptions.hasActiveMassRepairOption()) {
+            if (!configuredOptions.isEnabled()) {
+                JOptionPane.showMessageDialog(this,
+                        resources.getString("MRMSDisabled.error"),
+                        resources.getString("MRMSDisabled.errorTitle"),
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (!configuredOptions.hasActiveMassRepairOption()) {
                 JOptionPane.showMessageDialog(this,
                         resources.getString("NoEnabledRepairOptions.error"),
                         resources.getString("NoEnabledRepairOptions.errorTitle"),
@@ -926,7 +946,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
             MassRepairService.massRepairSalvageUnits(campaignGUI.getCampaign(), units, configuredOptions);
 
-            filterUnits();
+            filterUnits(configuredOptions);
         } else if (getMode().isWarehouse()) {
             int[] selectedRows = partsTable.getSelectedRows();
 
@@ -988,11 +1008,14 @@ public class MassRepairSalvageDialog extends JDialog {
         this.setVisible(false);
     }
 
+    //region Campaign Options
     private void updateOptions() {
-        campaignOptions.setMassRepairUseExtraTime(useExtraTimeBox.isSelected());
-        campaignOptions.setMassRepairUseRushJob(useRushJobBox.isSelected());
-        campaignOptions.setMassRepairAllowCarryover(allowCarryoverBox.isSelected());
-        campaignOptions.setMassRepairOptimizeToCompleteToday(optimizeToCompleteTodayBox.isSelected());
+        campaignOptions.setMassRepairUseRepair(getUseRepairBox().isSelected());
+        campaignOptions.setMassRepairUseSalvage(getUseSalvageBox().isSelected());
+        campaignOptions.setMassRepairUseExtraTime(getUseExtraTimeBox().isSelected());
+        campaignOptions.setMassRepairUseRushJob(getUseRushJobBox().isSelected());
+        campaignOptions.setMassRepairAllowCarryover(getAllowCarryoverBox().isSelected());
+        campaignOptions.setMassRepairOptimizeToCompleteToday(getOptimizeToCompleteTodayBox().isSelected());
 
         if (!getMode().isWarehouse()) {
             campaignOptions.setMassRepairScrapImpossible(scrapImpossibleBox.isSelected());
@@ -1023,12 +1046,21 @@ public class MassRepairSalvageDialog extends JDialog {
                 resources.getString("DefaultOptionsSaved.title"),
                 JOptionPane.INFORMATION_MESSAGE);
     }
+    //endregion Campaign Options
 
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(MassRepairSalvageDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
+    }
+
+    public JCheckBox getUseRepairBox() {
+        return useRepairBox;
+    }
+
+    public JCheckBox getUseSalvageBox() {
+        return useSalvageBox;
     }
 
     public JCheckBox getUseExtraTimeBox() {
