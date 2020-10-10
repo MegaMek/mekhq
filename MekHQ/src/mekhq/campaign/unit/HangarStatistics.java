@@ -59,46 +59,46 @@ public class HangarStatistics {
                 continue;
             }
             Entity en = unit.getEntity();
-            if (en instanceof GunEmplacement || en instanceof FighterSquadron || en instanceof Jumpship) {
+            if ((en instanceof GunEmplacement) || (en instanceof FighterSquadron) || (en instanceof Jumpship)) {
                 continue;
             }
-            if (type == Entity.ETYPE_MECH && en instanceof Mech) {
+            if ((type == Entity.ETYPE_MECH) && (en instanceof Mech)) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_DROPSHIP && en instanceof Dropship) {
+            if ((type == Entity.ETYPE_DROPSHIP) && (en instanceof Dropship)) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_SMALL_CRAFT && en instanceof SmallCraft
+            if ((type == Entity.ETYPE_SMALL_CRAFT) && (en instanceof SmallCraft)
                     && !(en instanceof Dropship)) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_CONV_FIGHTER && en instanceof ConvFighter) {
+            if ((type == Entity.ETYPE_CONV_FIGHTER) && (en instanceof ConvFighter)) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_AERO && en instanceof Aero
-                    && !(en instanceof SmallCraft || en instanceof ConvFighter)) {
+            if ((type == Entity.ETYPE_AERO) && (en instanceof Aero)
+                    && !((en instanceof SmallCraft) || (en instanceof ConvFighter))) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_INFANTRY && en instanceof Infantry && !(en instanceof BattleArmor)) {
+            if ((type == Entity.ETYPE_INFANTRY) && (en instanceof Infantry) && !(en instanceof BattleArmor)) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_BATTLEARMOR && en instanceof BattleArmor) {
+            if ((type == Entity.ETYPE_BATTLEARMOR) && (en instanceof BattleArmor)) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_TANK && en instanceof Tank) {
-                if ((en.getWeight() <= 50 && lv) || (en.getWeight() > 50 && !lv)) {
+            if ((type == Entity.ETYPE_TANK) && (en instanceof Tank)) {
+                if (((en.getWeight() <= 50) && lv) || ((en.getWeight() > 50) && !lv)) {
                     num++;
                 }
                 continue;
             }
-            if (type == Entity.ETYPE_PROTOMECH && en instanceof Protomech) {
+            if ((type == Entity.ETYPE_PROTOMECH) && (en instanceof Protomech)) {
                 num++;
             }
         }
@@ -117,45 +117,45 @@ public class HangarStatistics {
                 continue;
             }
             Entity en = unit.getEntity();
-            if (en instanceof GunEmplacement || en instanceof Jumpship) {
+            if ((en instanceof GunEmplacement) || (en instanceof Jumpship)) {
                 continue;
             }
-            if (type == Entity.ETYPE_MECH && en instanceof Mech) {
+            if ((type == Entity.ETYPE_MECH) && (en instanceof Mech)) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_DROPSHIP && en instanceof Dropship) {
+            if ((type == Entity.ETYPE_DROPSHIP) && (en instanceof Dropship)) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_SMALL_CRAFT && en instanceof SmallCraft && !(en instanceof Dropship)) {
+            if ((type == Entity.ETYPE_SMALL_CRAFT) && (en instanceof SmallCraft) && !(en instanceof Dropship)) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_CONV_FIGHTER && en instanceof ConvFighter) {
+            if ((type == Entity.ETYPE_CONV_FIGHTER) && (en instanceof ConvFighter)) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_AERO && en instanceof Aero
-                    && !(en instanceof SmallCraft || en instanceof ConvFighter)) {
+            if ((type == Entity.ETYPE_AERO) && (en instanceof Aero)
+                    && !((en instanceof SmallCraft) || (en instanceof ConvFighter))) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_INFANTRY && en instanceof Infantry && !(en instanceof BattleArmor)) {
+            if ((type == Entity.ETYPE_INFANTRY) && (en instanceof Infantry) && !(en instanceof BattleArmor)) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_BATTLEARMOR && en instanceof BattleArmor) {
+            if ((type == Entity.ETYPE_BATTLEARMOR) && (en instanceof BattleArmor)) {
                 num++;
                 continue;
             }
-            if (type == Entity.ETYPE_TANK && en instanceof Tank) {
-                if ((en.getWeight() <= 50 && lv) || (en.getWeight() > 50 && !lv)) {
+            if ((type == Entity.ETYPE_TANK) && (en instanceof Tank)) {
+                if (((en.getWeight() <= 50) && lv) || ((en.getWeight() > 50) && !lv)) {
                     num++;
                 }
                 continue;
             }
-            if (type == Entity.ETYPE_PROTOMECH && en instanceof Protomech) {
+            if ((type == Entity.ETYPE_PROTOMECH) && (en instanceof Protomech)) {
                 num++;
             }
         }
