@@ -5134,7 +5134,7 @@ public class Campaign implements Serializable, ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "This unit is not currently available!");
         }
-        if (partWork.getTech() != tech) {
+        if ((partWork.getTech() != null) && (partWork.getTech() != tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "Already being worked on by another team");
         }
