@@ -606,6 +606,14 @@ public class CampaignXmlParser {
                 System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
+        for (Person person : retVal.getPersonnel()) {
+            person.fixReferences(retVal);
+        }
+
+        MekHQ.getLogger().info(String.format("[Campaign Load] Personnel initialized in %dms",
+                System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
+
         retVal.reloadNews();
 
         MekHQ.getLogger().info(String.format("[Campaign Load] News loaded in %dms",
@@ -721,25 +729,20 @@ public class CampaignXmlParser {
     private void fixupUnitTechProblems(Campaign retVal) {
         // Cleanup problems with techs and units
         for (Person tech : retVal.getTechs()) {
-            for (UUID id : new ArrayList<>(tech.getTechUnitIDs())) {
-                Unit u = retVal.getUnit(id);
-
+            for (Unit u : new ArrayList<>(tech.getTechUnits())) {
                 String reason = null;
-                String unitDesc = id.toString();
-                if (null == u) {
-                    reason = "referenced missing unit";
-                    tech.removeTechUnitId(id);
-                } else if (null == u.getTech()) {
+                String unitDesc = u.getId().toString();
+                if (null == u.getTech()) {
                     reason = "was not referenced by unit";
                     u.setTech(tech);
                 } else if (u.isMothballed()) {
                     reason = "referenced mothballed unit";
                     unitDesc = u.getName();
-                    tech.removeTechUnitId(id);
+                    tech.removeTechUnit(u);
                 } else if (u.getTech() != null && !tech.getId().equals(u.getTech().getId())) {
                     reason = String.format("referenced tech %s's maintained unit", u.getTech().getFullName());
                     unitDesc = u.getName();
-                    tech.removeTechUnitId(id);
+                    tech.removeTechUnit(u);
                 }
                 if (null != reason) {
                     MekHQ.getLogger().warning(String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));

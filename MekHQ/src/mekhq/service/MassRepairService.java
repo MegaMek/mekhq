@@ -780,8 +780,8 @@ public class MassRepairService {
                     assigned = force.getTechID().toString().equals(tech.getId().toString());
                 }
 
-                if (!assigned && (tech.getTechUnitIDs() != null) && !tech.getTechUnitIDs().isEmpty()) {
-                    assigned = tech.getTechUnitIDs().contains(unit.getId());
+                if (!assigned && !tech.getTechUnits().isEmpty()) {
+                    assigned = tech.getTechUnits().contains(unit);
                 }
             }
 

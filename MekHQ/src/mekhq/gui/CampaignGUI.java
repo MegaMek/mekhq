@@ -2004,8 +2004,8 @@ public class CampaignGUI extends JPanel {
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have
                     // changed...
-                    p.setUnitId(null);
-                    p.clearTechUnitIDs();
+                    p.setUnit(null);
+                    p.clearTechUnits();
                 }
             }
 

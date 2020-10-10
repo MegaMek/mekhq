@@ -24,7 +24,6 @@ import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.UUID;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -303,13 +302,10 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_NIMP:
                 return p.getAbilityListAsString(PilotOptions.MD_ADVANTAGES);
             case COL_ASSIGN: {
-                if ((p.getTechUnitIDs().size() > 1) && !loadAssignmentFromMarket) {
+                if ((p.getTechUnits().size() > 1) && !loadAssignmentFromMarket) {
                     StringBuilder toReturn = new StringBuilder("<html>");
-                    for (UUID id : p.getTechUnitIDs()) {
-                        Unit u = getCampaign().getUnit(id);
-                        if (u != null) {
-                            toReturn.append(u.getName()).append("<br>");
-                        }
+                    for (Unit u : p.getTechUnits()) {
+                        toReturn.append(u.getName()).append("<br>");
                     }
                     toReturn.append("</html>");
                     return toReturn.toString();
@@ -367,17 +363,10 @@ public class PersonnelTableModel extends DataTableModel {
                 } else {
                     // If we're grouping by unit, determine the number of persons under
                     // their command.
-                    UUID unitId = p.getUnitId();
+                    Unit u = p.getUnit();
 
                     // If the personnel does not have a unit, return their name
-                    if (unitId == null) {
-                        return toReturn;
-                    }
-
-                    // Get the actual unit
-                    Unit u = getCampaign().getUnit(unitId);
                     if (u == null) {
-                        // This should not happen, but if it does, just return their name
                         return toReturn;
                     }
 
@@ -583,7 +572,7 @@ public class PersonnelTableModel extends DataTableModel {
                     Entity en = personnelMarket.getAttachedEntity(p);
                     return ((en != null) ? en.getDisplayName() : "-");
                 } else {
-                    Unit u = getCampaign().getUnit(p.getUnitId());
+                    Unit u = p.getUnit();
                     if (u != null) {
                         String name = u.getName();
                         if (u.getEntity() instanceof Tank) {
@@ -608,14 +597,14 @@ public class PersonnelTableModel extends DataTableModel {
                     }
 
                     //check for tech
-                    if (!p.getTechUnitIDs().isEmpty()) {
-                        if (p.getTechUnitIDs().size() == 1) {
-                            u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
+                    if (!p.getTechUnits().isEmpty()) {
+                        if (p.getTechUnits().size() == 1) {
+                            u = p.getTechUnits().get(0);
                             if (u != null) {
                                 return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
                             }
                         } else {
-                            return "" + p.getTechUnitIDs().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
+                            return "" + p.getTechUnits().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
                         }
                     }
                 }
@@ -624,8 +613,8 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_XP:
                 return Integer.toString(p.getXP());
             case COL_DEPLOY:
-                Unit u = getCampaign().getUnit(p.getUnitId());
-                if ((u != null) && u.isDeployed()) {
+                Unit u = p.getUnit();
+                if ((null != u) && u.isDeployed()) {
                     return getCampaign().getScenario(u.getScenarioId()).getName();
                 }
                 break;
@@ -667,14 +656,10 @@ public class PersonnelTableModel extends DataTableModel {
             Campaign c = getCampaign();
             List<Person> commanders = new ArrayList<>();
             for (Person p : c.getPersonnel()) {
-                if (p.getUnitId() != null) {
-                    UUID unitId = p.getUnitId();
-                    Unit u = c.getUnit(unitId);
-                    if ((u != null) && !p.equals(u.getCommander())) {
-                        // this person is NOT the commander of their unit,
-                        // skip them.
-                        continue;
-                    }
+                if ((p.getUnit() != null) && !p.equals(p.getUnit().getCommander())) {
+                    // this person is NOT the commander of their unit,
+                    // skip them.
+                    continue;
                 }
 
                 // 1. If they don't have a unit, add them.
@@ -756,9 +741,9 @@ public class PersonnelTableModel extends DataTableModel {
                         Entity en = personnelMarket.getAttachedEntity(p);
                         setText((en != null) ? en.getDisplayName() : "-");
                     } else {
-                        Unit u = getCampaign().getUnit(p.getUnitId());
-                        if ((u == null) && !p.getTechUnitIDs().isEmpty()) {
-                            u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
+                        Unit u = p.getUnit();
+                        if ((u == null) && !p.getTechUnits().isEmpty()) {
+                            u = p.getTechUnits().get(0);
                         }
 
                         if (u != null) {

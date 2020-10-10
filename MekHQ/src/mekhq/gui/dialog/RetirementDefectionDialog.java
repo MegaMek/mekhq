@@ -542,9 +542,9 @@ public class RetirementDefectionDialog extends JDialog {
                         && p.equals(hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander())) {
                     continue;
                 }
-                if ((hqView.getCampaign().getPerson(id).getUnitId() != null)
+                if ((p.getUnit() != null)
                         && ((Compute.d6() < 4) || !unassignedAvailable)) {
-                    unitAssignments.put(id, p.getUnitId());
+                    unitAssignments.put(id, p.getUnit().getId());
                 } else if (unassignedAvailable) {
                     if (p.getPrimaryRole() == Person.T_MECHWARRIOR) {
                         int roll = Compute.randomInt(unassignedMechs.size());
@@ -584,9 +584,9 @@ public class RetirementDefectionDialog extends JDialog {
             /* For infantry, the unit commander makes a retirement roll on behalf of the
              * entire unit. Unassigned infantry can retire individually.
              */
-            if ((p.getUnitId() != null)
+            if ((p.getUnit() != null)
                     && ((p.getPrimaryRole() == Person.T_INFANTRY) || (p.getPrimaryRole() == Person.T_BA))) {
-                unitAssignments.put(id, p.getUnitId());
+                unitAssignments.put(id, p.getUnit().getId());
             }
             ((UnitAssignmentTableModel) unitAssignmentTable.getModel()).setData(availableUnits);
         }

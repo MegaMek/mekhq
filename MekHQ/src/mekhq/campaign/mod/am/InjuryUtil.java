@@ -105,7 +105,7 @@ public final class InjuryUtil {
 
     /** Generate combat injuries spread through the whole body */
     public static Collection<Injury> genInjuries(Campaign c, Person p, int hits) {
-        final Unit u = c.getUnit(p.getUnitId());
+        final Unit u = p.getUnit();
         final Entity en = (null != u) ? u.getEntity() : null;
         final boolean mwasf = ((en instanceof Mech) || (en instanceof Aero));
         final int critMod = mwasf ? 0 : 2;
@@ -327,14 +327,14 @@ public final class InjuryUtil {
                             }
                             i.setWorkedOn(true);
                             MedicalLogger.successfullyTreated(doc, p, c.getLocalDate(), i);
-                            Unit u = c.getUnit(p.getUnitId());
+                            Unit u = p.getUnit();
                             if (null != u) {
                                 u.resetPilotAndEntity();
                             }
                         }));
                 }
                 i.setWorkedOn(true);
-                Unit u = c.getUnit(p.getUnitId());
+                Unit u = p.getUnit();
                 if (null != u) {
                     u.resetPilotAndEntity();
                 }

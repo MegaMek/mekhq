@@ -85,7 +85,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         }
 
         for (Person driver : drivers) {
-            if (driver.getStatus().isActive() && (driver.getUnitId() == null)) {
+            if (driver.getStatus().isActive() && driver.getUnit() == null) {
                 unit.addDriver(driver);
             }
         }
@@ -94,22 +94,22 @@ public class MothballInfo implements MekHqXmlSerializable {
             // add the gunner if they exist, aren't dead/retired/etc and aren't already assigned to some
             // other unit. Caveat: single-person units have the same driver and gunner.
             if (gunner.getStatus().isActive() &&
-                    ((gunner.getUnitId() == null) || (gunner.getUnitId() == unit.getId()))) {
+                    ((gunner.getUnit() == null) || (gunner.getUnit() == unit))) {
                 unit.addGunner(gunner);
             }
         }
 
         for (Person crew : vesselCrew) {
-            if (crew.getStatus().isActive() && (crew.getUnitId() == null)) {
+            if (crew.getStatus().isActive() && crew.getUnit() == null) {
                 unit.addVesselCrew(crew);
             }
         }
 
-        if (techOfficer != null && techOfficer.getStatus().isActive() && techOfficer.getUnitId() == null) {
+        if (techOfficer != null && techOfficer.getStatus().isActive() && techOfficer.getUnit() == null) {
             unit.setTechOfficer(techOfficer);
         }
 
-        if (navigator != null && navigator.getStatus().isActive() && navigator.getUnitId() == null) {
+        if (navigator != null && navigator.getStatus().isActive() && navigator.getUnit() == null) {
             unit.setNavigator(navigator);
         }
 
