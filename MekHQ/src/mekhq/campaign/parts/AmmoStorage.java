@@ -238,7 +238,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	public String getDesc() {
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
-		if (getTeamId() != null) {
+		if (getTech() != null) {
 			scheduled = " (scheduled) ";
 		}
 
@@ -287,7 +287,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     /**
-     * Boolean function that determines if the given part is of the correct ammo. 
+     * Boolean function that determines if the given part is of the correct ammo.
      * Useful as a predicate for campaign.findSparePart()
      */
     public static boolean IsRightAmmo(Part part, AmmoType curType) {
@@ -296,7 +296,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                 && ((AmmoType)((AmmoStorage)part).getType()).equals(curType)
                 && curType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
     }
-    
+
     public void changeAmountAvailable(int amount, final AmmoType curType) {
         AmmoStorage a = (AmmoStorage) campaign.findSparePart(part -> {
             return IsRightAmmo(part, curType);

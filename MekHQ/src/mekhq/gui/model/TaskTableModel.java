@@ -119,7 +119,7 @@ public class TaskTableModel extends DataTableModel {
 
             int availableLevel = REPAIR_STATE.AVAILABLE;
 
-            if (null != part.getTeamId()) {
+            if (null != part.getTech()) {
             	availableLevel = REPAIR_STATE.SCHEDULED;
             } else {
             	if (part instanceof MissingPart) {

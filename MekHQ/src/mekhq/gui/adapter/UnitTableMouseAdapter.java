@@ -481,7 +481,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                             part.fix();
                             part.resetTimeSpent();
                             part.resetOvertime();
-                            part.setTeamId(null);
+                            part.setTech(null);
                             part.cancelReservation();
                             part.remove(false);
                             needsCheck = true;
@@ -494,7 +494,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                             }
                             part.resetTimeSpent();
                             part.resetOvertime();
-                            part.setTeamId(null);
+                            part.setTech(null);
                             part.cancelReservation();
                         }
 

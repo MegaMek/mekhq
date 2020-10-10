@@ -48,6 +48,7 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -343,11 +344,16 @@ public class AtBGameThread extends GameThread {
                         // Now, send the load commands
                         if (loadFighters || loadGround) {
                             // List of technicians assigned to transported units. Several units can share a tech.
-                            Set<UUID> cargoTechs = new HashSet<>();
+                            Set<Person> cargoTechs = new HashSet<>();
                             for (UUID cargoId : scenario.getPlayerTransportLinkages().get(id)) {
-                                //Convert the list of Unit UUIDs to MM EntityIds
-                                toLoad.add(campaign.getUnit(cargoId).getEntity().getId());
-                                cargoTechs.add(campaign.getUnit(cargoId).getTech().getId());
+                                Unit unit = campaign.getUnit(cargoId);
+                                if (unit != null) {
+                                    //Convert the list of Unit UUIDs to MM EntityIds
+                                    toLoad.add(unit.getEntity().getId());
+                                    if (unit.getTech() != null) {
+                                        cargoTechs.add(unit.getTech());
+                                    }
+                                }
                             }
                             //Update the transport's passenger count with assigned techs
                             transport.getEntity().setNPassenger(transport.getEntity().getNPassenger() + (cargoTechs.size()));

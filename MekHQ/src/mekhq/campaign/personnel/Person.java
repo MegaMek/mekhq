@@ -959,7 +959,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             // If we're assigned to any repairs or refits, remove that assignment
             for (Part part : campaign.getParts()) {
-                if (getId().equals(part.getTeamId())) {
+                if (this == part.getTech()) {
                     part.cancelAssignment();
                 }
             }

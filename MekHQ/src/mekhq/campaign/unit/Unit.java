@@ -3954,7 +3954,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             //change reference for any scheduled tasks
             for (Part p : getParts()) {
                 if (p.isBeingWorkedOn()) {
-                    p.setTeamId(engineer.getId());
+                    p.setTech(engineer);
                 }
             }
         } else {
@@ -4846,7 +4846,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public boolean isUnderRepair() {
         for (Part p : getParts()) {
-            if (null != p.getTeamId()) {
+            if (null != p.getTech()) {
                 return true;
             }
         }
@@ -5296,10 +5296,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
     }
 
-	public void fixIdReferences(Map<UUID, Person> personnel) {
+	public void fixReferences(Campaign campaign) {
         if (tech instanceof UnitPersonRef) {
             UUID id = tech.getId();
-            tech = personnel.get(id);
+            tech = campaign.getPerson(id);
             if (tech == null) {
                 MekHQ.getLogger().error(
                     String.format("Unit %s ('%s') references missing tech %s",
@@ -5309,7 +5309,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         for (int ii = drivers.size() - 1; ii >= 0; --ii) {
             Person driver = drivers.get(ii);
             if (driver instanceof UnitPersonRef) {
-                drivers.set(ii, personnel.get(driver.getId()));
+                drivers.set(ii, campaign.getPerson(driver.getId()));
                 if (drivers.get(ii) == null) {
                     MekHQ.getLogger().error(
                         String.format("Unit %s ('%s') references missing driver %s",
@@ -5321,7 +5321,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         for (int ii = gunners.size() - 1; ii >= 0; --ii) {
             Person gunner = gunners.get(ii);
             if (gunner instanceof UnitPersonRef) {
-                gunners.set(ii, personnel.get(gunner.getId()));
+                gunners.set(ii, campaign.getPerson(gunner.getId()));
                 if (gunners.get(ii) == null) {
                     MekHQ.getLogger().error(
                         String.format("Unit %s ('%s') references missing gunner %s",
@@ -5333,7 +5333,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         for (int ii = vesselCrew.size() - 1; ii >= 0; --ii) {
             Person crew = vesselCrew.get(ii);
             if (crew instanceof UnitPersonRef) {
-                vesselCrew.set(ii, personnel.get(crew.getId()));
+                vesselCrew.set(ii, campaign.getPerson(crew.getId()));
                 if (vesselCrew.get(ii) == null) {
                     MekHQ.getLogger().error(
                         String.format("Unit %s ('%s') references missing vessel crew %s",
@@ -5344,7 +5344,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         if (engineer instanceof UnitPersonRef) {
             UUID id = engineer.getId();
-            engineer = personnel.get(id);
+            engineer = campaign.getPerson(id);
             if (engineer == null) {
                 MekHQ.getLogger().error(
                     String.format("Unit %s ('%s') references missing engineer %s",
@@ -5353,7 +5353,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         if (navigator instanceof UnitPersonRef) {
             UUID id = navigator.getId();
-            navigator = personnel.get(id);
+            navigator = campaign.getPerson(id);
             if (navigator == null) {
                 MekHQ.getLogger().error(
                     String.format("Unit %s ('%s') references missing navigator %s",
@@ -5361,7 +5361,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         if (mothballInfo != null) {
-            mothballInfo.fixIdReferences(personnel);
+            mothballInfo.fixReferences(campaign);
         }
 	}
 }

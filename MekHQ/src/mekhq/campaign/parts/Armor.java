@@ -124,7 +124,7 @@ public class Armor extends Part implements IAcquisitionWork {
         String toReturn = "<html><font size='2'";
 
         String scheduled = "";
-        if (getTeamId() != null) {
+        if (getTech() != null) {
             scheduled = " (scheduled) ";
         }
 

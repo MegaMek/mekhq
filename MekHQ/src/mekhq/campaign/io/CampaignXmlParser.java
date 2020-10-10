@@ -329,8 +329,8 @@ public class CampaignXmlParser {
                     RankTranslator.translateRankSystem(retVal.getRanks().getOldRankSystem(), retVal.getFactionCode()));
         }
 
-        // Fixup any ID references that may be stale (personnel, units, etc)
-        fixIdReferences(retVal);
+        // Fixup any ghost kills
+        cleanupGhostKills(retVal);
 
         // adjust tech levels for version before 0.1.21
         if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2
@@ -366,11 +366,8 @@ public class CampaignXmlParser {
         timestamp = System.currentTimeMillis();
 
         // Process parts...
-        Map<Integer,Part> knownParts = new HashMap<>();
         List<Part> removeParts = new ArrayList<>();
         for (Part prt : retVal.getParts()) {
-            knownParts.put(prt.getId(), prt);
-
             Unit u = retVal.getUnit(prt.getUnitId());
             prt.setUnit(u);
             if (null != u) {
@@ -484,7 +481,10 @@ public class CampaignXmlParser {
         }
         for (Part prt : removeParts) {
             retVal.removePart(prt);
-            knownParts.remove(prt.getId());
+        }
+
+        for (Part prt : retVal.getParts()) {
+            prt.fixReferences(retVal);
         }
 
         MekHQ.getLogger().info(String.format("[Campaign Load] Parts processed in %dms",
@@ -504,12 +504,13 @@ public class CampaignXmlParser {
         retVal.getHangar().forEachUnit(unit -> {
             // Also, the unit should have its campaign set.
             unit.setCampaign(retVal);
+            unit.fixReferences(retVal);
 
             // reset the pilot and entity, to reflect newly assigned personnel
             unit.resetPilotAndEntity();
 
             if (null != unit.getRefit()) {
-                unit.getRefit().fixupPartReferences(knownParts);
+                unit.getRefit().fixReferences(retVal);
 
                 unit.getRefit().reCalc();
                 if (!unit.getRefit().isCustomJob()
@@ -968,22 +969,7 @@ public class CampaignXmlParser {
         }
     }
 
-    private static void fixIdReferences(Campaign retVal) {
-        // set up translation hashes
-        Map<Integer, UUID> uHash = new HashMap<>();
-        retVal.getHangar().forEachUnit(u -> uHash.put(u.getOldId(), u.getId()));
-
-        Map<UUID, Person> pHash = new HashMap<>();
-        for (Person p : retVal.getPersonnel()) {
-            pHash.put(p.getId(), p);
-        }
-
-        retVal.getHangar().forEachUnit(u -> {
-            u.fixIdReferences(pHash);
-        });
-
-        retVal.getForces().fixIdReferences(uHash);
-
+    private static void cleanupGhostKills(Campaign retVal) {
         // check for kills with missing person references
         List<Kill> ghostKills = new ArrayList<>();
         for (Kill k : retVal.getKills()) {

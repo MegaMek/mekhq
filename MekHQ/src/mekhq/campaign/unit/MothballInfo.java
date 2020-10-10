@@ -205,10 +205,10 @@ public class MothballInfo implements MekHqXmlSerializable {
         }
     }
 
-	public void fixIdReferences(Map<UUID, Person> personnel) {
+	public void fixReferences(Campaign campaign) {
         if (tech instanceof MothballInfoPersonRef) {
             UUID id = tech.getId();
-            tech = personnel.get(id);
+            tech = campaign.getPerson(id);
             if (tech == null) {
                 MekHQ.getLogger().error(
                     String.format("Mothball info references missing tech %s", id));
@@ -217,7 +217,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         for (int ii = drivers.size() - 1; ii >= 0; --ii) {
             Person driver = drivers.get(ii);
             if (driver instanceof MothballInfoPersonRef) {
-                drivers.set(ii, personnel.get(driver.getId()));
+                drivers.set(ii, campaign.getPerson(driver.getId()));
                 if (drivers.get(ii) == null) {
                     MekHQ.getLogger().error(
                         String.format("Mothball info references missing driver %s",
@@ -229,7 +229,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         for (int ii = gunners.size() - 1; ii >= 0; --ii) {
             Person gunner = gunners.get(ii);
             if (gunner instanceof MothballInfoPersonRef) {
-                gunners.set(ii, personnel.get(gunner.getId()));
+                gunners.set(ii, campaign.getPerson(gunner.getId()));
                 if (gunners.get(ii) == null) {
                     MekHQ.getLogger().error(
                         String.format("Mothball info references missing gunner %s",
@@ -241,7 +241,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         for (int ii = vesselCrew.size() - 1; ii >= 0; --ii) {
             Person crew = vesselCrew.get(ii);
             if (crew instanceof MothballInfoPersonRef) {
-                vesselCrew.set(ii, personnel.get(crew.getId()));
+                vesselCrew.set(ii, campaign.getPerson(crew.getId()));
                 if (vesselCrew.get(ii) == null) {
                     MekHQ.getLogger().error(
                         String.format("Mothball info references missing vessel crew %s",
@@ -252,7 +252,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         }
         if (navigator instanceof MothballInfoPersonRef) {
             UUID id = navigator.getId();
-            navigator = personnel.get(id);
+            navigator = campaign.getPerson(id);
             if (navigator == null) {
                 MekHQ.getLogger().error(
                     String.format("Mothball info references missing navigator %s", id));
