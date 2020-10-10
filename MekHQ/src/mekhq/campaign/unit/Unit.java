@@ -4177,9 +4177,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public void removeTech() {
         if (tech != null) {
+            Person originalTech = tech;
             tech.removeTechUnitId(getId());
             tech = null;
-            MekHQ.triggerEvent(new PersonTechAssignmentEvent(null, this));
+            MekHQ.triggerEvent(new PersonTechAssignmentEvent(originalTech, null));
         }
     }
 
