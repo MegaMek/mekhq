@@ -530,7 +530,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         contract.calculatePartsAvailabilityLevel(campaign);
         
-        StratconRulesManager.InitializeCampaignState((AtBContract) contract, campaign);
+        //StratconRulesManager.InitializeCampaignState((AtBContract) contract, campaign);
 
         campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                 "Advance monies for " + contract.getName(), campaign.getLocalDate());

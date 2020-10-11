@@ -161,7 +161,7 @@ public class StratconFacility implements Cloneable {
         return isStrategicObjective;
     }
     
-    public void setStrategicObjectiveRating(boolean isStrategicObjective) {
+    public void setStrategicObjective(boolean isStrategicObjective) {
         this.isStrategicObjective = isStrategicObjective;
     }
     

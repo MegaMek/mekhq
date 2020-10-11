@@ -14,7 +14,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 
 import mekhq.MekHQ;
-import mekhq.campaign.mission.ScenarioTemplate;
 
 /**
  * This class holds data relevant to the various types of contract
@@ -34,17 +33,35 @@ public class StratconContractDefinition {
      */
     public enum StrategicObjectiveType {
         /**
-         * Victory in scenarios - either designated by the "objectiveScenarios" collection or any scenarios.
+         * Victory in any scenario
          */
-        ScenarioVictory,
+        AnyScenarioVictory,
         
         /**
-         * Control of facilities generated at contract start time
+         * Victory in scenarios - designated by the "objectiveScenarios" collection.
+         * These are one-off scenarios that stick around on tracks - when revealed, 
+         * they get a deploy/action/return date as usual, and the player gets one shot to complete them
          */
-        FacilityControl,
+        SpecificScenarioVictory,
+        
+        /**
+         * Control of allied facilities generated at contract start time
+         * Each track will be seeded with some number of allied facilities
+         * They must not be destroyed and the player must have control of them at the end-of-contract date 
+         */
+        AlliedFacilityControl,
+        
+        /**
+         * Control of hostile facilities generated at contract start time
+         * Each track will be seeded with some number of hostile facilities
+         * They must not be destroyed and the player must have control of them at the end-of-contract date
+         */
+        HostileFacilityControl,
         
         /**
          * Destruction of hostile facilities generated at contract start time
+         * Each track will be seeded with some number of hostile facilities
+         * They may either be destroyed or the player must have control of them at the end-of-contract date
          */
         FacilityDestruction
     }
@@ -56,11 +73,16 @@ public class StratconContractDefinition {
         retVal.briefing = "Test Contract Briefing.";
         retVal.alliedFacilityCount = 1;
         retVal.hostileFacilityCount = COUNT_SCALED;
-        retVal.objectiveCount = COUNT_SCALED;
-        retVal.objectiveScenarios = Arrays.asList("TestScenario.xml", "TestScenario.xml");
-        retVal.objectiveOpenFieldModifiers = Arrays.asList("TestMod1.xml", "TestMod2.xml");
-        retVal.objectiveFacilityModifiers = Arrays.asList("TestFacMod1.xml", "TestFacMod2.xml");
-        retVal.objectivesTypes = Arrays.asList(StrategicObjectiveType.ScenarioVictory, StrategicObjectiveType.FacilityControl, StrategicObjectiveType.FacilityDestruction);
+        retVal.objectiveParameters = new ArrayList<>();
+        
+        ObjectiveParameters objective = new ObjectiveParameters();
+        objective.objectiveType = StrategicObjectiveType.SpecificScenarioVictory;
+        objective.objectiveCount = COUNT_SCALED;
+        objective.objectiveScenarios = Arrays.asList("TestScenario.xml", "TestScenario.xml");
+        objective.objectiveScenarioModifiers = Arrays.asList("TestFacMod1.xml", "TestFacMod2.xml");
+        
+        retVal.objectiveParameters.add(objective);
+        
         retVal.allowedScenarios = Arrays.asList("TestAllowScenario.xml", "TestAllowScenario.xml");
         retVal.forbiddenScenarios = Arrays.asList("TestForbidScenario.xml", "TestForbidScenario.xml");
         
@@ -88,34 +110,6 @@ public class StratconContractDefinition {
     private int hostileFacilityCount;
     
     /**
-     * How many strategic objectives will be placed for this contract.
-     * 0 means none. -1 indicates that the number of strategic objectives should be scaled 
-     * to the number of lances required by the contract. 
-     */
-    private int objectiveCount;
-    
-    /**
-     * Specific scenario IDs (file names) which must be completed in order to complete this contract
-     */
-    private List<String> objectiveScenarios;
-    
-    /**
-     * Modifiers which will be applied to any open-field "objective" scenarios
-     */
-    private List<String> objectiveOpenFieldModifiers;
-    
-    /**
-     * Modifiers which will be applied to any "objective" facility scenarios
-     */
-    private List<String> objectiveFacilityModifiers;
-    
-    /**
-     * List of objective types, which determine what counts for 
-     * "strategic objectives"
-     */
-    private List<StrategicObjectiveType> objectivesTypes;
-    
-    /**
      * List of scenario IDs (file names) that are allowed for this contract type
      */
     private List<String> allowedScenarios;
@@ -124,6 +118,11 @@ public class StratconContractDefinition {
      * List of scenario IDs (file names) that are not allowed for this contract type
      */
     private List<String> forbiddenScenarios;
+    
+    /**
+     * Strategic objectives for this contract.
+     */
+    private List<ObjectiveParameters> objectiveParameters;
 
     public String getContractTypeName() {
         return contractTypeName;
@@ -175,78 +174,6 @@ public class StratconContractDefinition {
         this.hostileFacilityCount = hostileFacilityCount;
     }
 
-    /**
-     * @return the objectiveCount
-     */
-    public int getObjectiveCount() {
-        return objectiveCount;
-    }
-
-    /**
-     * @param objectiveCount the objectiveCount to set
-     */
-    public void setObjectiveCount(int objectiveCount) {
-        this.objectiveCount = objectiveCount;
-    }
-
-    /**
-     * @return the objectiveScenarios
-     */
-    @XmlElementWrapper(name="objectiveScenarios")
-    @XmlElement(name="objectiveScenario")
-    public List<String> getObjectiveScenarios() {
-        return objectiveScenarios;
-    }
-
-    /**
-     * @param objectiveScenarios the objectiveScenarios to set
-     */
-    public void setObjectiveScenarios(List<String> objectiveScenarios) {
-        this.objectiveScenarios = objectiveScenarios;
-    }
-
-    /**
-     * @return the objectiveOpenFieldModifiers
-     */
-    @XmlElementWrapper(name="objectiveOpenFieldModifiers")
-    @XmlElement(name="objectiveOpenFieldModifier")
-    public List<String> getObjectiveOpenFieldModifiers() {
-        return objectiveOpenFieldModifiers;
-    }
-
-    /**
-     * @param objectiveOpenFieldModifiers the objectiveOpenFieldModifiers to set
-     */
-    public void setObjectiveOpenFieldModifiers(List<String> objectiveOpenFieldModifiers) {
-        this.objectiveOpenFieldModifiers = objectiveOpenFieldModifiers;
-    }
-
-    /**
-     * @return the objectiveFacilityModifiers
-     */
-    @XmlElementWrapper(name="objectiveFacilityModifiers")
-    @XmlElement(name="objectiveFacilityModifier")
-    public List<String> getObjectiveFacilityModifiers() {
-        return objectiveFacilityModifiers;
-    }
-
-    /**
-     * @param objectiveFacilityModifiers the objectiveFacilityModifiers to set
-     */
-    public void setObjectiveFacilityModifiers(List<String> objectiveFacilityModifiers) {
-        this.objectiveFacilityModifiers = objectiveFacilityModifiers;
-    }
-
-    @XmlElementWrapper(name="objectivesTypes")
-    @XmlElement(name="objectivesType")
-    public List<StrategicObjectiveType> getObjectivesTypes() {
-        return objectivesTypes;
-    }
-
-    public void setObjectivesTypes(List<StrategicObjectiveType> objectivesTypes) {
-        this.objectivesTypes = objectivesTypes;
-    }
-
     @XmlElementWrapper(name="allowedScenarios")
     @XmlElement(name="allowedScenario")
     public List<String> getAllowedScenarios() {
@@ -265,6 +192,46 @@ public class StratconContractDefinition {
 
     public void setForbiddenScenarios(List<String> forbiddenScenarios) {
         this.forbiddenScenarios = forbiddenScenarios;
+    }
+    
+    @XmlElementWrapper(name="objectiveParameters")
+    @XmlElement(name="objectiveParameter")
+    public List<ObjectiveParameters> getObjectiveParameters() {
+        return objectiveParameters;
+    }
+
+    public void setObjectiveParameters(List<ObjectiveParameters> objectiveParameters) {
+        this.objectiveParameters = objectiveParameters;
+    }
+
+    public static class ObjectiveParameters {
+        /**
+         * The type of objective this is; 
+         */
+        StrategicObjectiveType objectiveType;
+        
+        /**
+         * How many strategic objectives will be placed for this contract.
+         * 0 means none. -1 indicates that the number of strategic objectives should be scaled 
+         * to the number of lances required by the contract. 
+         */
+        int objectiveCount;
+        
+        /**
+         * List of IDs (file names) of specific scenarios to use for this objective.
+         * Ignored for AnyScenarioVictory or AlliedFacilityControl objective types
+         */
+        @XmlElementWrapper(name="objectiveScenarios")
+        @XmlElement(name="objectiveScenario")
+        List<String> objectiveScenarios;
+        
+        /**
+         * If a particular scenario being generated is a strategic objective, it will have
+         * these modifiers applied to it
+         */
+        @XmlElementWrapper(name="objectiveScenarioModifiers")
+        @XmlElement(name="objectiveScenarioModifier")
+        List<String> objectiveScenarioModifiers;
     }
     
     // Garrison Duty: Defend X facilities

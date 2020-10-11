@@ -44,10 +44,7 @@ public class StratconRulesManager {
         SupportPoint,
         FightLance
     }
-    
-    public static final int NUM_LANCES_PER_TRACK = 3;
-    
-    public static void InitializeCampaignState(AtBContract contract, Campaign campaign) {
+    /*public static void InitializeCampaignState(AtBContract contract, Campaign campaign) {
         StratconCampaignState campaignState = new StratconCampaignState(contract);
         
         for(int x = 0; x < contract.getRequiredLances() / NUM_LANCES_PER_TRACK; x++) {
@@ -66,9 +63,9 @@ public class StratconRulesManager {
         }
         
         contract.setStratconCampaignState(campaignState);
-    }
+    }*/
     
-    public static StratconTrackState InitializeTrackState(StratconCampaignState campaignState, int numLances) {
+    /*public static StratconTrackState InitializeTrackState(StratconCampaignState campaignState, int numLances) {
         // to initialize a track, 
         // 1. we set the # of required lances
         // 2. set the track size to a total of numlances * 28 hexes, a rectangle that is wider than it is taller
@@ -108,7 +105,7 @@ public class StratconRulesManager {
         }
         
         return retVal;
-    }
+    }*/
 
     /**
      * This function potentially generates non-player-initiated scenarios for the given track.
@@ -452,7 +449,7 @@ public class StratconRulesManager {
      * Worker function that generates stratcon scenario at the given coords, for the given force, on the given track,
      * using the given template. Also registers it with the track and campaign.
      */
-    private static StratconScenario generateScenario(Campaign campaign, AtBContract contract, StratconTrackState track, 
+    static StratconScenario generateScenario(Campaign campaign, AtBContract contract, StratconTrackState track, 
             int forceID, StratconCoords coords, ScenarioTemplate template) {
         StratconScenario scenario = new StratconScenario();
         scenario.setBackingScenario(AtBDynamicScenarioFactory.initializeScenarioFromTemplate(template, contract, campaign));
@@ -474,7 +471,9 @@ public class StratconRulesManager {
         setScenarioDates(track, campaign, scenario);
         
         // register the scenario with the campaign and the track it's generated on
-        scenario.addPrimaryForce(forceID);
+        if(forceID > Force.FORCE_NONE) {
+            scenario.addPrimaryForce(forceID);
+        }
         
         return scenario;
     }

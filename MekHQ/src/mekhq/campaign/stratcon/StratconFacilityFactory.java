@@ -15,7 +15,9 @@
 package mekhq.campaign.stratcon;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import megamek.common.Compute;
 import mekhq.MekHQ;
@@ -28,8 +30,17 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
  */
 public class StratconFacilityFactory {
     // loaded facility definitions
+    
+    // map of filename -> facility definition, for specific facility retrieval
+    private static Map<String, StratconFacility> stratconFacilityMap = new HashMap<>();
+    
+    // list of all loaded facility definitions
     private static List<StratconFacility> stratconFacilityList = new ArrayList<>();
+    
+    // list of all hostile facility defs for convenience
     private static List<StratconFacility> hostileFacilities = new ArrayList<>();
+    
+    // list of all allied facility defs for convenience
     private static List<StratconFacility> alliedFacilities = new ArrayList<>();
     
     static {
@@ -38,6 +49,9 @@ public class StratconFacilityFactory {
     
     public static void reloadFacilities() {
         stratconFacilityList.clear();
+        hostileFacilities.clear();
+        alliedFacilities.clear();
+        stratconFacilityMap.clear();
         
         // load dynamic scenarios
         StratconFacilityManifest facilityManifest = StratconFacilityManifest.Deserialize("./data/stratconfacilities/facilitymanifest.xml");
@@ -71,6 +85,7 @@ public class StratconFacilityFactory {
                 
                 if(facility != null) {
                     stratconFacilityList.add(facility);
+                    stratconFacilityMap.put(fileName.trim(), facility);
                     
                     if(facility.getOwner() == ForceAlignment.Allied) {
                         alliedFacilities.add(facility);
@@ -83,6 +98,13 @@ public class StratconFacilityFactory {
                         String.format("Error loading file: %s", filePath), e);
             }
         }
+    }
+    
+    /**
+     * Gets a specific facility given an "ID" (the file name)
+     */
+    public static StratconFacility getFacilityByName(String name) {
+        return stratconFacilityMap.get(name);
     }
     
     /**

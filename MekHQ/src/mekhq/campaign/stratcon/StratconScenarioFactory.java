@@ -120,6 +120,13 @@ public class StratconScenarioFactory {
     }
     
     /**
+     * Retrieves a specific scenario given the key (file name)
+     */
+    public static ScenarioTemplate getSpecificScenario(String name) {
+        return dynamicScenarioNameMap.get(name);
+    }
+    
+    /**
      * Retrieves a random scenario template appropriate for the given unit type.
      * @param location The desired unit type.
      * @return Random scenario template.
