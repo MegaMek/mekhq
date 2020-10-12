@@ -21,8 +21,6 @@
 
 package mekhq.campaign.parts;
 
-import java.util.Objects;
-
 import megamek.common.EquipmentType;
 import megamek.common.Protomech;
 import megamek.common.TechAdvancement;
@@ -90,7 +88,7 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
         return part instanceof ProtomekArmor
                 && getType() == ((ProtomekArmor) part).getType()
                 && isClanTechBase() == part.isClanTechBase()
-                && Objects.equals(getRefitId(), part.getRefitId());
+                && (getRefitUnit() == part.getRefitUnit());
     }
 
     @Override

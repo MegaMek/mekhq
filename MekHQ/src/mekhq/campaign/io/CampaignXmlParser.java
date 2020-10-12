@@ -368,8 +368,9 @@ public class CampaignXmlParser {
         // Process parts...
         List<Part> removeParts = new ArrayList<>();
         for (Part prt : retVal.getParts()) {
-            Unit u = retVal.getUnit(prt.getUnitId());
-            prt.setUnit(u);
+            prt.fixReferences(retVal);
+
+            Unit u = prt.getUnit();
             if (null != u) {
                 // get rid of any equipmentparts without locations or mounteds
                 if (prt instanceof EquipmentPart) {
@@ -481,10 +482,6 @@ public class CampaignXmlParser {
         }
         for (Part prt : removeParts) {
             retVal.removePart(prt);
-        }
-
-        for (Part prt : retVal.getParts()) {
-            prt.fixReferences(retVal);
         }
 
         MekHQ.getLogger().info(String.format("[Campaign Load] Parts processed in %dms",
@@ -663,9 +660,9 @@ public class CampaignXmlParser {
         //is not refitting or is gone then unreserve
         for (Part part : retVal.getParts()) {
             if (part.isReservedForRefit()) {
-                Unit u = retVal.getUnit(part.getRefitId());
-                if (null == u || !u.isRefitting()) {
-                    part.setRefitId(null);
+                Unit u = part.getRefitUnit();
+                if ((null == u) || !u.isRefitting()) {
+                    part.setRefitUnit(null);
                 }
             }
         }
@@ -1479,12 +1476,12 @@ public class CampaignXmlParser {
                 p = null;
             }
 
-            if ((null != p) && (p.getUnitId() != null)
+            if ((null != p) && (p.getUnit() != null)
                     && ((version.getMinorVersion() < 43)
                             || ((version.getMinorVersion() == 43) && (version.getSnapshot() < 5)))
                     && ((p instanceof AmmoBin) || (p instanceof MissingAmmoBin))) {
-                Unit u = retVal.getUnit(p.getUnitId());
-                if ((null != u) && (u.getEntity().usesWeaponBays())) {
+                Unit u = p.getUnit();
+                if (u.getEntity().usesWeaponBays()) {
                     Mounted ammo;
                     if (p instanceof EquipmentPart) {
                         ammo = u.getEntity().getEquipment(((EquipmentPart) p).getEquipmentNum());
@@ -1517,7 +1514,7 @@ public class CampaignXmlParser {
 
         retVal.importParts(parts);
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, "Load Part Nodes Complete!");
+        MekHQ.getLogger().info("Load Part Nodes Complete!");
     }
 
     /**

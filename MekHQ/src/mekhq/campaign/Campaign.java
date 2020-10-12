@@ -1591,8 +1591,7 @@ public class Campaign implements Serializable, ITechManager {
         //be careful in using this next line
         p.postProcessCampaignAddition();
         // don't add missing parts if they don't have units or units with not id
-        if (p instanceof MissingPart
-                && (null == p.getUnit() || null == p.getUnitId())) {
+        if ((p instanceof MissingPart) && (null == p.getUnit())) {
             p.setId(-1);
             return;
         }
@@ -1692,7 +1691,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void addPartWithoutId(Part p) {
-        if ((p instanceof MissingPart) && (null == p.getUnitId())) {
+        if ((p instanceof MissingPart) && (null == p.getUnit())) {
             // we shouldn't have spare missing parts. I think their existence is
             // a relic.
             return;
@@ -1720,7 +1719,7 @@ public class Campaign implements Serializable, ITechManager {
         if (p instanceof AmmoStorage) {
             return ((AmmoStorage) p).getShots();
         }
-        return ((p.getUnit() != null) || (p.getUnitId() != null)) ? 1 : p.getQuantity();
+        return (p.getUnit() != null) ? 1 : p.getQuantity();
     }
 
     private PartInUse getPartInUse(Part p) {
@@ -1744,7 +1743,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private void updatePartInUseData(PartInUse piu, Part p) {
-        if ((p.getUnit() != null) || (p.getUnitId() != null) || (p instanceof MissingPart)) {
+        if ((p.getUnit() != null) || (p instanceof MissingPart)) {
             piu.setUseCount(piu.getUseCount() + getQuantity(p));
         } else {
             if (p.isPresent()) {
@@ -3855,8 +3854,8 @@ public class Campaign implements Serializable, ITechManager {
     public void restore() {
         // if we fail to restore equipment parts then remove them
         // and possibly re-initialize and diagnose unit
-        ArrayList<Part> partsToRemove = new ArrayList<>();
-        ArrayList<UUID> unitsToCheck = new ArrayList<>();
+        List<Part> partsToRemove = new ArrayList<>();
+        Set<Unit> unitsToCheck = new HashSet<>();
 
         for (Part part : getParts()) {
             if (part instanceof EquipmentPart) {
@@ -3874,8 +3873,8 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         for (Part remove : partsToRemove) {
-            if (null != remove.getUnitId() && !unitsToCheck.contains(remove.getUnitId())) {
-                unitsToCheck.add(remove.getUnitId());
+            if (remove.getUnit() != null) {
+                unitsToCheck.add(remove.getUnit());
             }
             removePart(remove);
         }
@@ -3889,19 +3888,16 @@ public class Campaign implements Serializable, ITechManager {
                 // Aerospace parts have changed after 0.45.4. Reinitialize parts for Small Craft and up
                 if (unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)
                         || unit.getEntity().hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)) {
-                    unitsToCheck.add(unit.getId());
+                    unitsToCheck.add(unit);
                 }
             }
 
             unit.resetEngineer();
         }
 
-        for (UUID uid : unitsToCheck) {
-            Unit u = getHangar().getUnit(uid);
-            if (null != u) {
-                u.initializeParts(true);
-                u.runDiagnostic(false);
-            }
+        for (Unit u : unitsToCheck) {
+            u.initializeParts(true);
+            u.runDiagnostic(false);
         }
 
         shoppingList.restore();
