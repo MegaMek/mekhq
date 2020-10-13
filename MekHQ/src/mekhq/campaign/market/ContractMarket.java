@@ -42,6 +42,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.universe.Faction;
@@ -400,7 +401,7 @@ public class ContractMarket implements Serializable {
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
 
-        //StratconContractInitializer.InitializeCampaignState(contract, campaign);
+        StratconContractInitializer.InitializeCampaignState(contract, campaign, StratconContractDefinition.createTestContract());
 
 		return contract;
 	}

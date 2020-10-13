@@ -1,5 +1,7 @@
 package mekhq.campaign.stratcon;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,35 +19,26 @@ import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType
 
 public class StratconContractInitializer {
     public static final int NUM_LANCES_PER_TRACK = 3;
-    
+
+    /**
+     * Initializes the campaign state given a contract, campaign and contract definition
+     */
     public static void InitializeCampaignState(AtBContract contract, Campaign campaign, StratconContractDefinition contractDefinition) {
         StratconCampaignState campaignState = new StratconCampaignState(contract);
         
-        // go through each objective in the contract definition.
-        // make counts of allied/hostile objective facilities and objective scenarios
-        Map<StrategicObjectiveType, Integer> objectiveCounts;
+        // First, initialize the proper number of tracks. Then:
+        // for each objective: 
+        //  step 1: calculate objective count
+        //          if scaled, multiply # required lances by factor, round up, otherwise just fixed #
+        //  step 2: evenly distribute objectives through tracks
+        //          if uneven number remaining, distribute randomly 
+        //          when objective is specific scenario victory, place specially flagged scenarios
+        //          when objective is allied/hostile facility, place those facilities
+
+        int numTracks = contract.getRequiredLances() / NUM_LANCES_PER_TRACK;
         
-        /*for(ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
-            if(objectiveParams.objectiveCount == StratconContractDefinition.COUNT_SCALED) {
-                objectiveCounts.compute(objectiveParams.objectiveType, 
-                        (k, v) -> v == null ? contract.getRequiredLances() : v + contract.getRequiredLances());
-            } else {
-                objectiveCounts.compute(objectiveParams.objectiveType, 
-                        (k, v) -> v == null ? objectiveParams.objectiveCount : v + objectiveParams.objectiveCount);
-            }
-        }*/
-        
-        /*int numTracks = contract.getRequiredLances() / NUM_LANCES_PER_TRACK;
-        //int objectives
-        
-        
-        for(int x = 0; x < contract.getRequiredLances() / NUM_LANCES_PER_TRACK; x++) {
-            int splitNumObjectives = (int) Math.ceil(contractDefinition.getObjectiveCount() / 3);
-            
-            
-            StratconTrackState track = InitializeTrackState(campaign, campaignState, 
-                    NUM_LANCES_PER_TRACK, contractDefinition.getAlliedFacilityCount(), contractDefinition.getHostileFacilityCount(),
-                    contractDefinition.getO);
+        for(int x = 0; x < numTracks; x++) {
+            StratconTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK);
             track.setDisplayableName(String.format("Track %d", x));
             campaignState.addTrack(track);
         }
@@ -54,25 +47,83 @@ public class StratconContractInitializer {
         // X = # required lances / 3, rounded up. The last track will have fewer required lances.
         int oddLanceCount = contract.getRequiredLances() % NUM_LANCES_PER_TRACK;
         if(oddLanceCount > 0) {
-            StratconTrackState track = InitializeTrackState(campaignState, oddLanceCount);
+            StratconTrackState track = initializeTrackState(oddLanceCount);
             track.setDisplayableName(String.format("Track %d", campaignState.getTracks().size()));
             campaignState.addTrack(track);
-        }*/
+        }
         
+        // now seed the tracks with objectives and facilities
+        for(ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
+            // kind of pointless, but...
+            if (objectiveParams.objectiveCount == 0) {
+                continue;
+            }
+            
+            int objectiveCount = objectiveParams.objectiveCount > 0 ?
+                    (int) objectiveParams.objectiveCount :
+                    (int) (-objectiveParams.objectiveCount * contract.getRequiredLances());
+                    
+            List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTracks().size()); 
+                   
+            for(int x = 0; x < trackObjects.size(); x++) {
+                int numObjects = trackObjects.get(x);
+                
+                switch(objectiveParams.objectiveType) {
+                case SpecificScenarioVictory:
+                    initializeObjectiveScenarios(campaign, contract, campaignState.getTrack(x), numObjects,
+                            objectiveParams.objectiveScenarios, objectiveParams.objectiveScenarioModifiers);
+                    break;
+                case AlliedFacilityControl:
+                    initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Allied, null, true);
+                    break;
+                case HostileFacilityControl:
+                case FacilityDestruction:
+                    initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, null, true);
+                    break;
+                // leave it alone in any other case
+                }
+            }
+        }
+        
+        // non-objective allied facilities
+        int facilityCount = contractDefinition.getAlliedFacilityCount() > 0 ?
+                (int) contractDefinition.getAlliedFacilityCount() :
+                (int) (-contractDefinition.getAlliedFacilityCount() * contract.getRequiredLances());
+                
+        List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTracks().size()); 
+               
+        for(int x = 0; x < trackObjects.size(); x++) {
+            int numObjects = trackObjects.get(x);
+            
+            initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Allied, null, false);
+        }
+        
+        // non-objective hostile facilities
+        facilityCount = contractDefinition.getHostileFacilityCount() > 0 ?
+                (int) contractDefinition.getHostileFacilityCount() :
+                (int) (-contractDefinition.getHostileFacilityCount() * contract.getRequiredLances());
+                
+        trackObjects = trackObjectDistribution(facilityCount, campaignState.getTracks().size()); 
+               
+        for(int x = 0; x < trackObjects.size(); x++) {
+            int numObjects = trackObjects.get(x);
+            
+            initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, null, false);
+        }
+        
+        // now we're done
         contract.setStratconCampaignState(campaignState);
     }
     
-    public static StratconTrackState initializeTrackState(Campaign campaign, StratconCampaignState campaignState, 
-            int numLances, int numAlliedFacilities, int numHostileFacilities, int numObjectiveScenarios, 
-            int numAlliedObjectiveFacilities, int numHostileObjectiveFacilities, 
-            List<String> objectiveScenarios, List<String> objectiveModifiers) {
+    /**
+     * Set up initial state of a track, dimensions are based on number of assigned lances.
+     */
+    public static StratconTrackState initializeTrackState(int numLances) {
         // to initialize a track, 
         // 1. we set the # of required lances
         // 2. set the track size to a total of numlances * 28 hexes, a rectangle that is wider than it is taller
         //      the idea being to create a roughly rectangular playing field that,
         //      if one deploys a scout lance each week to a different spot, can be more or less fully covered
-        // 3. set up numlances facilities (?) in random spots on the track
-        // 4. set up scenarios
         
         StratconTrackState retVal = new StratconTrackState();
         retVal.setRequiredLanceCount(numLances);
@@ -84,18 +135,32 @@ public class StratconContractInitializer {
         retVal.setWidth(width);
         retVal.setHeight(height);
         
-        // plop down objective scenarios first
-        initializeObjectiveScenarios(campaign, campaignState.getContract(), retVal, 
-                numObjectiveScenarios, objectiveScenarios, objectiveModifiers);
+        // todo: place terrain
         
-        // plop down objective facilities second
-        initializeTrackFacilities(retVal, numAlliedObjectiveFacilities, ForceAlignment.Allied, null, true);
-        initializeTrackFacilities(retVal, numHostileObjectiveFacilities, ForceAlignment.Allied, null, true);
+        return retVal;
+    }
+    
+    /**
+     * Generates an array list representing the number of objects to place in a given number of tracks.
+     */
+    private static List<Integer> trackObjectDistribution(int numObjects, int numTracks) {
+        List<Integer> retVal = new ArrayList<>();
+        int leftOver = numObjects % numTracks;
         
-        // plop down non-objective facilities last
-        initializeTrackFacilities(retVal, numAlliedFacilities, ForceAlignment.Allied, null, false);
-        initializeTrackFacilities(retVal, numHostileFacilities, ForceAlignment.Opposing, null, false);
+        for(int track = 0; track < numTracks; track++) {
+            int trackObjects = numObjects / numTracks;
+            
+            // if we are unevenly distributed, add an extra one
+            if(leftOver > 0) {
+                trackObjects++;
+                leftOver--;
+            }
+            
+            retVal.add(trackObjects);
+        }
         
+        // don't always front-load extra objects
+        Collections.shuffle(retVal);        
         return retVal;
     }
     

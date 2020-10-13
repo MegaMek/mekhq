@@ -44,69 +44,7 @@ public class StratconRulesManager {
         SupportPoint,
         FightLance
     }
-    /*public static void InitializeCampaignState(AtBContract contract, Campaign campaign) {
-        StratconCampaignState campaignState = new StratconCampaignState(contract);
-        
-        for(int x = 0; x < contract.getRequiredLances() / NUM_LANCES_PER_TRACK; x++) {
-            StratconTrackState track = InitializeTrackState(campaignState, NUM_LANCES_PER_TRACK);
-            track.setDisplayableName(String.format("Track %d", x));
-            campaignState.addTrack(track);
-        }
-        
-        // a campaign will have X tracks going at a time, where
-        // X = # required lances / 3, rounded up. The last track will have fewer required lances.
-        int oddLanceCount = contract.getRequiredLances() % NUM_LANCES_PER_TRACK;
-        if(oddLanceCount > 0) {
-            StratconTrackState track = InitializeTrackState(campaignState, oddLanceCount);
-            track.setDisplayableName(String.format("Track %d", campaignState.getTracks().size()));
-            campaignState.addTrack(track);
-        }
-        
-        contract.setStratconCampaignState(campaignState);
-    }*/
     
-    /*public static StratconTrackState InitializeTrackState(StratconCampaignState campaignState, int numLances) {
-        // to initialize a track, 
-        // 1. we set the # of required lances
-        // 2. set the track size to a total of numlances * 28 hexes, a rectangle that is wider than it is taller
-        //      the idea being to create a roughly rectangular playing field that,
-        //      if one deploys a scout lance each week to a different spot, can be more or less fully covered
-        // 3. set up numlances facilities (?) in random spots on the track
-        // 4. set up scenarios
-        
-        StratconTrackState retVal = new StratconTrackState();
-        retVal.setRequiredLanceCount(numLances);
-        
-        // set width and height
-        int numHexes = numLances * 28;
-        int height = (int) Math.floor(Math.sqrt(numHexes));
-        int width = numHexes / height;
-        retVal.setWidth(width);
-        retVal.setHeight(height);
-        
-        // generate the facilities
-        for(int fCount = 0; fCount < numLances; fCount++) {
-            StratconFacility sf = StratconFacilityFactory.getRandomFacility();
-            
-            int x = Compute.randomInt(width);
-            int y = Compute.randomInt(height);
-            StratconCoords coords = new StratconCoords(x, y);
-            
-            while(retVal.getFacility(coords) != null) {
-                x = Compute.randomInt(width);
-                y = Compute.randomInt(height);
-                coords = new StratconCoords(x, y);
-            }
-            
-            retVal.addFacility(coords, sf);
-            if(sf.getOwner() == ForceAlignment.Allied) {
-                retVal.getRevealedCoords().add(coords);
-            }
-        }
-        
-        return retVal;
-    }*/
-
     /**
      * This function potentially generates non-player-initiated scenarios for the given track.
      * @param campaign

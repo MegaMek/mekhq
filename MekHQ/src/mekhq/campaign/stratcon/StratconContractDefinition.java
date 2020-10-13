@@ -96,10 +96,10 @@ public class StratconContractDefinition {
     /**
      * How many allied facilities to generate for the contract, 
      * in addition to any facilities placed by objectives.
-     * -1 indicates that the number of facilities should be scaled to the number of 
+     * < 0 indicates that the number of facilities should be scaled to the number of 
      * lances required by the contract. 0 indicates no additional allied facilities.
      */
-    private int alliedFacilityCount;
+    private double alliedFacilityCount;
     
     /**
      * How many hostile facilities to generate for the contract, 
@@ -107,7 +107,7 @@ public class StratconContractDefinition {
      * -1 indicates that the number of facilities should be scaled to the number of 
      * lances required by the contract. 0 indicates no additional hostile facilities.
      */
-    private int hostileFacilityCount;
+    private double hostileFacilityCount;
     
     /**
      * List of scenario IDs (file names) that are allowed for this contract type
@@ -149,28 +149,28 @@ public class StratconContractDefinition {
     /**
      * @return the alliedFacilityCount
      */
-    public int getAlliedFacilityCount() {
+    public double getAlliedFacilityCount() {
         return alliedFacilityCount;
     }
 
     /**
      * @param alliedFacilityCount the alliedFacilityCount to set
      */
-    public void setAlliedFacilityCount(int alliedFacilityCount) {
+    public void setAlliedFacilityCount(double alliedFacilityCount) {
         this.alliedFacilityCount = alliedFacilityCount;
     }
 
     /**
      * @return the hostileFacilityCount
      */
-    public int getHostileFacilityCount() {
+    public double getHostileFacilityCount() {
         return hostileFacilityCount;
     }
 
     /**
      * @param hostileFacilityCount the hostileFacilityCount to set
      */
-    public void setHostileFacilityCount(int hostileFacilityCount) {
+    public void setHostileFacilityCount(double hostileFacilityCount) {
         this.hostileFacilityCount = hostileFacilityCount;
     }
 
@@ -212,10 +212,10 @@ public class StratconContractDefinition {
         
         /**
          * How many strategic objectives will be placed for this contract.
-         * 0 means none. -1 indicates that the number of strategic objectives should be scaled 
-         * to the number of lances required by the contract. 
+         * 0 means none. A number less than zero indicates that the number of strategic objectives 
+         * should be scaled to the number of lances required by the contract, and multiplied by that factor. 
          */
-        int objectiveCount;
+        double objectiveCount;
         
         /**
          * List of IDs (file names) of specific scenarios to use for this objective.
