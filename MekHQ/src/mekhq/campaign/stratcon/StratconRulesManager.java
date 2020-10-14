@@ -302,6 +302,20 @@ public class StratconRulesManager {
         campaign.addScenario(scenario.getBackingScenario(), contract);
         scenario.setBackingScenarioID(scenario.getBackingScenario().getId());
         trackState.addScenario(scenario);
+        
+        // set up dates for the scenario if doesn't have them already
+        if(scenario.getDeploymentDate() == null) {
+            scenario.setDeploymentDate(campaign.getLocalDate());
+        }
+        
+        if(scenario.getActionDate() == null) {
+            scenario.setActionDate(campaign.getLocalDate());
+        }
+        
+        if(scenario.getReturnDate() == null) {
+            scenario.setReturnDate(campaign.getLocalDate().plusDays(trackState.getDeploymentTime()));
+        }
+        
         scenario.commitPrimaryForces(campaign, contract);
     }
     

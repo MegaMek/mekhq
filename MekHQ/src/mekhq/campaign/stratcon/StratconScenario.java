@@ -145,17 +145,23 @@ public class StratconScenario implements IStratconDisplayable {
         }
         stateBuilder.append("<br/>");
 
-        stateBuilder.append("Deployment Date: ");
-        stateBuilder.append(deploymentDate.toString());
-        stateBuilder.append("<br/>");
+        if (deploymentDate != null) {
+            stateBuilder.append("Deployment Date: ");
+            stateBuilder.append(deploymentDate.toString());
+            stateBuilder.append("<br/>");
+        }
         
-        stateBuilder.append("Battle Date: ");
-        stateBuilder.append(deploymentDate.toString());
-        stateBuilder.append("<br/>");
+        if (actionDate != null) {
+            stateBuilder.append("Battle Date: ");
+            stateBuilder.append(actionDate.toString());
+            stateBuilder.append("<br/>");
+        }
         
-        stateBuilder.append("Return Date: ");
-        stateBuilder.append(deploymentDate.toString());
-        stateBuilder.append("<br/>");
+        if (returnDate != null) {
+            stateBuilder.append("Return Date: ");
+            stateBuilder.append(returnDate.toString());
+            stateBuilder.append("<br/>");
+        }
         
         /*if(includeForces) {
             List<UUID> unitIDs = backingScenario.getForces(currentCampaign).getAllUnits();

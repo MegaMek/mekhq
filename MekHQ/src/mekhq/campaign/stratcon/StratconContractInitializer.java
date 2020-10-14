@@ -25,6 +25,7 @@ public class StratconContractInitializer {
      */
     public static void InitializeCampaignState(AtBContract contract, Campaign campaign, StratconContractDefinition contractDefinition) {
         StratconCampaignState campaignState = new StratconCampaignState(contract);
+        campaignState.setBriefingText(contractDefinition.getBriefing() + "<br/>" + generateCommandLevelText(contract));
         
         // First, initialize the proper number of tracks. Then:
         // for each objective: 
@@ -62,6 +63,8 @@ public class StratconContractInitializer {
             int objectiveCount = objectiveParams.objectiveCount > 0 ?
                     (int) objectiveParams.objectiveCount :
                     (int) (-objectiveParams.objectiveCount * contract.getRequiredLances());
+                    
+            campaignState.incrementPendingStrategicObjectiveCount(objectiveCount);
                     
             List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTracks().size()); 
                    
@@ -178,6 +181,10 @@ public class StratconContractInitializer {
             sf.setOwner(owner);
             sf.setStrategicObjective(strategicObjective);
             
+            if(sf.getFacilityType() == null) {
+                int alpha = 1;
+            }
+            
             int x = Compute.randomInt(trackState.getWidth());
             int y = Compute.randomInt(trackState.getHeight());
             StratconCoords coords = new StratconCoords(x, y);
@@ -193,6 +200,10 @@ public class StratconContractInitializer {
             trackState.addFacility(coords, sf);
             if (sf.getOwner() == ForceAlignment.Allied) {
                 trackState.getRevealedCoords().add(coords);
+                sf.setVisible(true);
+            } else {
+                // todo: remove, debugging purposes
+                //sf.setVisible(false);
             }
         }
     }
@@ -241,6 +252,7 @@ public class StratconContractInitializer {
             scenario.setDeploymentDate(null);
             scenario.setActionDate(null);
             scenario.setReturnDate(null);
+            scenario.setStrategicObjective(true);
             
             // apply objective mods
             for(String modifier : objectiveModifiers) {
@@ -251,9 +263,19 @@ public class StratconContractInitializer {
         }
     }
     
-    public static int calculateNumFacilities(StratconContractDefinition contractDefinition, StratconCampaignState campaignState) {
-        return 0;
+    private static String generateCommandLevelText(AtBContract contract) {
+        switch(contract.getCommandRights()) {
+        case AtBContract.COM_INTEGRATED:
+            return "Lance assignments will be made by the employer."
+                    + "Complete required scenarios to fulfill contract conditions."; 
+        case AtBContract.COM_HOUSE:
+            return "Complete required scenarios to fulfill contract conditions.";
+        case AtBContract.COM_LIAISON:
+            return "Complete required scenarios and strategic objectives to fulfill contract conditions.";
+        case AtBContract.COM_INDEP:
+            return "Complete strategic objectives to fulfill contract conditions.";
+        default:
+            return "";
+        }
     }
-    
-    
 }

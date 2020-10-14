@@ -196,6 +196,11 @@ public class AtBScenarioModifier implements Cloneable {
      * @return The scenario modifier, if any.
      */
     public static AtBScenarioModifier getScenarioModifier(String key) {
+        if(!scenarioModifiers.containsKey(key)) {
+            MekHQ.getLogger().error("Scenario modifier " + key + " does not exist.");
+            return null;
+        }
+        
         // clone it to avoid calling code changing the modifier
         return (AtBScenarioModifier) scenarioModifiers.get(key).clone();
     }
@@ -361,8 +366,7 @@ public class AtBScenarioModifier implements Cloneable {
 				}
             }
             catch(Exception e) {
-                MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", 
-                        String.format("Error Loading Scenario %s", filePath), e);
+                MekHQ.getLogger().error(String.format("Error Loading Scenario %s", filePath), e);
             }
         }
         
@@ -387,7 +391,7 @@ public class AtBScenarioModifier implements Cloneable {
             Unmarshaller um = context.createUnmarshaller();
             File xmlFile = new File(fileName);
             if(!xmlFile.exists()) {
-                MekHQ.getLogger().warning(AtBScenarioModifier.class, "Deserialize", String.format("Specified file %s does not exist", fileName));
+                MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
                 return null;
             }
 
@@ -397,7 +401,7 @@ public class AtBScenarioModifier implements Cloneable {
                 resultingModifier = modifierElement.getValue();
             }
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier: " + fileName, e);
+            MekHQ.getLogger().error("Error Deserializing Scenario Modifier: " + fileName, e);
         }
 
         return resultingModifier;
@@ -416,7 +420,7 @@ public class AtBScenarioModifier implements Cloneable {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
         } catch(Exception e) {
-            MekHQ.getLogger().error(AtBScenarioModifier.class, "Serialize", e.getMessage());
+            MekHQ.getLogger().error(e);
         }
     }
     
@@ -619,7 +623,7 @@ class ScenarioModifierManifest {
             Unmarshaller um = context.createUnmarshaller();
             File xmlFile = new File(fileName);
             if(!xmlFile.exists()) {
-                MekHQ.getLogger().warning(ScenarioModifierManifest.class, "Deserialize", String.format("Specified file %s does not exist", fileName));
+                MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
                 return null;
             }
 
@@ -629,7 +633,7 @@ class ScenarioModifierManifest {
                 resultingList = templateElement.getValue();
             }
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier List", e);
+            MekHQ.getLogger().error("Error Deserializing Scenario Modifier List", e);
         }
 
         return resultingList;

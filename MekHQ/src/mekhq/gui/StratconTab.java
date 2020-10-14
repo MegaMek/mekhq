@@ -13,6 +13,8 @@ import javax.swing.JScrollPane;
 
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.campaign.event.MissionCompletedEvent;
+import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -188,6 +190,18 @@ public class StratconTab extends CampaignGuiTab {
     
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
+        repopulateTrackList();
+        updateCampaignState();
+    }
+    
+    @Subscribe
+    public void handle(MissionRemovedEvent ev) {
+        repopulateTrackList();
+        updateCampaignState();
+    }
+
+    @Subscribe
+    public void handle(MissionCompletedEvent ev) {
         repopulateTrackList();
         updateCampaignState();
     }

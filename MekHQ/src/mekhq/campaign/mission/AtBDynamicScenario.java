@@ -302,6 +302,10 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     public void addScenarioModifier(AtBScenarioModifier modifier) {
+        if (modifier == null) {
+            return;
+        }
+        
         scenarioModifiers.add(modifier);
         
         for(String modifierKey : modifier.getLinkedModifiers().keySet()) {

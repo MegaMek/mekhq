@@ -254,6 +254,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 if(currentTrack.getScenario(new StratconCoords(x, y)) != null) {
                     g2D.setColor(Color.RED);
                     g2D.drawPolygon(scenarioMarker);
+                    drawTextEffect(g2D, scenarioMarker, "Hostile Force Detected");
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -280,8 +281,9 @@ public class StratconPanel extends JPanel implements ActionListener {
                 StratconFacility facility = currentTrack.getFacility(new StratconCoords(x, y));
                 
                 if((facility != null) && facility.isVisible()) {
-                    g2D.setColor(Color.GREEN);
+                    g2D.setColor(facility.getOwner() == ForceAlignment.Allied ? Color.GREEN : Color.RED);
                     g2D.drawPolygon(facilityMarker);
+                    drawTextEffect(g2D, facilityMarker, facility.getDisplayableName());
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -291,6 +293,18 @@ public class StratconPanel extends JPanel implements ActionListener {
             int[] translationVector = getRightAndUPVector(x % 2 == 0);
             facilityMarker.translate(translationVector[0], translationVector[1]);
         }
+    }
+    
+    private void drawTextEffect(Graphics2D g2D, Polygon marker, String text) {
+        double startX = marker.getBounds().getMaxX();
+        double startY = marker.getBounds().getMinY();
+        double midPointX = startX + HEX_X_RADIUS / 4;
+        double midPointY = startY - HEX_Y_RADIUS / 4;
+        double endPointX = midPointX + HEX_X_RADIUS / 2;
+        
+        g2D.drawLine((int) startX, (int) startY, (int) midPointX, (int) midPointY);
+        g2D.drawLine((int) midPointX, (int) midPointY, (int) endPointX, (int) midPointY);
+        g2D.drawString(text, (int) endPointX, (int) midPointY);
     }
 
     /**
@@ -393,9 +407,10 @@ public class StratconPanel extends JPanel implements ActionListener {
             infoBuilder.append("<span color='green'>Recon complete</span>");
             
             StratconFacility facility = currentTrack.getFacility(boardState.getSelectedCoords());
-            if(facility != null) {
+            if((facility != null) && (facility.getFacilityType() != null)) {
                 infoBuilder.append((facility.getOwner() == ForceAlignment.Allied) ? "<span color='green'>" : "<span color='red'>");
-                infoBuilder.append(String.format("<br/>Active Facility : %s", facility.getFacilityType().toString()));
+                infoBuilder.append("<br/>");
+                infoBuilder.append(facility.getDisplayableName());
                 infoBuilder.append("<span>");
             }
             

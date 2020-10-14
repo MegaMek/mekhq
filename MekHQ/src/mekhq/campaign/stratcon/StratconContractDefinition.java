@@ -78,14 +78,15 @@ public class StratconContractDefinition {
         ObjectiveParameters objective = new ObjectiveParameters();
         objective.objectiveType = StrategicObjectiveType.SpecificScenarioVictory;
         objective.objectiveCount = COUNT_SCALED;
-        objective.objectiveScenarios = Arrays.asList("TestScenario.xml", "TestScenario.xml");
-        objective.objectiveScenarioModifiers = Arrays.asList("TestFacMod1.xml", "TestFacMod2.xml");
+        objective.objectiveScenarios = Arrays.asList("Capture.xml", "Assassinate.xml");
+        objective.objectiveScenarioModifiers = Arrays.asList("AlliedTankGarrison.xml", "HostileAirGarrison.xml");
         
         retVal.objectiveParameters.add(objective);
         
         retVal.allowedScenarios = Arrays.asList("TestAllowScenario.xml", "TestAllowScenario.xml");
         retVal.forbiddenScenarios = Arrays.asList("TestForbidScenario.xml", "TestForbidScenario.xml");
         
+        retVal.Serialize(new File("d:\\projects\\mekhq\\mekhq\\data\\stratconcontractdefinitions\\testcontract.xml"));
         
         return retVal;
     }

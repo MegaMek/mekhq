@@ -100,7 +100,8 @@ public class StratconFacility implements Cloneable {
     }
     
     public String getDisplayableName() {
-        return String.format("%s: %s", displayableName, facilityType.toString());
+        return String.format("%s %s", getOwner() == ForceAlignment.Allied ? "Allied" : "Hostile", 
+                displayableName);
     }
     
     public void setDisplayableName(String displayableName) {

@@ -1,6 +1,5 @@
 package mekhq.campaign.stratcon;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +37,7 @@ public class StratconCampaignState {
     private int victoryPoints;
     private int pendingStrategicObjectiveCount;
     private int completedStrategicObjectiveCount;
+    private String briefingText; 
     
     @XmlElementWrapper(name="campaignTracks")
     @XmlElement(name="campaignTrack")
@@ -105,12 +105,24 @@ public class StratconCampaignState {
         victoryPoints += increment;
     }
 
+    public String getBriefingText() {
+        return briefingText;
+    }
+
+    public void setBriefingText(String briefingText) {
+        this.briefingText = briefingText;
+    }
+
     public int getPendingStrategicObjectiveCount() {
         return pendingStrategicObjectiveCount;
     }
 
     public void setPendingStrategicObjectiveCount(int pendingStrategicObjectiveCount) {
         this.pendingStrategicObjectiveCount = pendingStrategicObjectiveCount;
+    }
+    
+    public void incrementPendingStrategicObjectiveCount(int increment) {
+        this.pendingStrategicObjectiveCount += increment;
     }
     
     public void incrementPendingStrategicObjectiveCount() {
