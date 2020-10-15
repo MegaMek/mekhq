@@ -11,6 +11,7 @@ VERSION HISTORY:
 + PR #2128: Improve performance of searching for spare parts in large campaigns
 + Issue #442: Enable/Disable MRMS Repair and Salvage Portions
 + Issue #2118: Fixing MekHQ's use of MM password
++ Issue #2138: Fixing GM Mothballing
 
 0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo
