@@ -596,18 +596,9 @@ public class MassRepairSalvageDialog extends JDialog {
     private MassRepairOptionControl createMassRepairOptionControls(PartRepairType type, String text, String tooltipText,
                                                                    String activeBoxName, JPanel pnlItems,
                                                                    int rowIdx) {
-        MassRepairOption mro = null;
-
-        for (MassRepairOption massRepairOption : campaignOptions.getMassRepairOptions()) {
-            if (massRepairOption.getType() == type) {
-                mro = massRepairOption;
-                break;
-            }
-        }
-
-        if (mro == null) {
-            mro = new MassRepairOption(type);
-        }
+        MassRepairOption mro = campaignOptions.getMassRepairOptions().stream()
+                .filter(massRepairOption -> massRepairOption.getType() == type)
+                .findFirst().orElse(new MassRepairOption(type));
 
         int columnIdx = 0;
 

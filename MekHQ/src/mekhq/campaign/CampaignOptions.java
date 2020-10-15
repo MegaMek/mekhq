@@ -24,7 +24,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import mekhq.Version;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -3036,23 +3035,8 @@ public class CampaignOptions implements Serializable {
             return;
         }
 
-        int foundIdx = -1;
-
-        for (int i = 0; i < massRepairOptions.size(); i++) {
-            if (massRepairOptions.get(i).getType() == mro.getType()) {
-                foundIdx = i;
-                break;
-            }
-        }
-
-        if (foundIdx == -1) {
-            massRepairOptions.add(mro);
-        } else {
-            massRepairOptions.add(foundIdx, mro);
-            massRepairOptions.remove(foundIdx + 1);
-        }
-
-        massRepairOptions.sort((mro1, mro2) -> (((Comparable<Integer>) mro1.getType().ordinal()).compareTo(mro2.getType().ordinal())));
+        getMassRepairOptions().removeIf(massRepairOption -> massRepairOption.getType() == mro.getType());
+        getMassRepairOptions().add(mro);
     }
     //endregion Mass Repair/ Mass Salvage
 
@@ -3406,7 +3390,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "campaignOptions");
     }
 
-    public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {
+    public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
         MekHQ.getLogger().info("Loading Campaign Options from XML...");
 
         wn.normalize();
@@ -3991,7 +3975,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
                 retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
-                retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
+                retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2));
             }
         }
 

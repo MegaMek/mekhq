@@ -134,7 +134,7 @@ public class CampaignXmlParser {
      * @throws NullEntityException Thrown when an entity is referenced but cannot be loaded or found
      */
     public Campaign parse() throws CampaignXmlParseException, NullEntityException {
-        MekHQ.getLogger().info(CampaignXmlParser.class, "Starting load of campaign file from XML...");
+        MekHQ.getLogger().info("Starting load of campaign file from XML...");
         // Initialize variables.
         Campaign retVal = new Campaign();
         retVal.setApp(app);
@@ -148,7 +148,7 @@ public class CampaignXmlParser {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(CampaignXmlParser.class, ex);
+            MekHQ.getLogger().error(ex);
 
             throw new CampaignXmlParseException(ex);
         }
@@ -251,7 +251,7 @@ public class CampaignXmlParser {
                 String xn = wn.getNodeName();
 
                 if (xn.equalsIgnoreCase("campaignOptions")) {
-                    retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
+                    retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     retVal.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn));
                 } /* We don't need this since info is processed above in the first iteration...

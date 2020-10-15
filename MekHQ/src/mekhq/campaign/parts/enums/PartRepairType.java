@@ -20,7 +20,6 @@ package mekhq.campaign.parts.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.Version;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +74,7 @@ public enum PartRepairType {
         return partRepairTypes;
     }
 
-    public static PartRepairType parseFromString(String text, Version version) {
+    public static PartRepairType parseFromString(String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
@@ -83,9 +82,7 @@ public enum PartRepairType {
         }
 
         try {
-            int i = Integer.parseInt(text);
-
-            switch (i) {
+            switch (Integer.parseInt(text)) {
                 case 0:
                     return ARMOR;
                 case 1:
@@ -103,7 +100,7 @@ public enum PartRepairType {
                 case 7:
                     return ELECTRONICS;
                 case 8:
-                    return (version.isLowerThan("0.47.10")) ? GENERAL : POD_SPACE;
+                    return GENERAL;
                 case 9:
                     return HEAT_SINK;
                 case 10:

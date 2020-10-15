@@ -29,7 +29,6 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import mekhq.Version;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -165,8 +164,6 @@ public class GamePreset implements MekHqXmlSerializable {
     }
 
     public static GamePreset createGamePresetFromXMLFileInputStream(FileInputStream fis) throws DOMException {
-        final String METHOD_NAME = "createGamePresetFromXMLFileInputStream(FileInputStream)";
-
         GamePreset preset = new GamePreset();
 
         Document xmlDoc;
@@ -177,7 +174,7 @@ public class GamePreset implements MekHqXmlSerializable {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(GamePreset.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
             return preset;
         }
 
@@ -202,7 +199,7 @@ public class GamePreset implements MekHqXmlSerializable {
                 } else if (xn.equalsIgnoreCase("description")) {
                     preset.description = wn.getTextContent();
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
-                    preset.setOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, new Version("")));
+                    preset.setOptions(CampaignOptions.generateCampaignOptionsFromXml(wn));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     preset.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn));
                 } else if (xn.equalsIgnoreCase("skillTypes")) {
@@ -217,8 +214,7 @@ public class GamePreset implements MekHqXmlSerializable {
                         } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.getLogger().error(GamePreset.class, METHOD_NAME,
-                                    "Unknown node type not loaded in Skill Type nodes: " + wn2.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in Skill Type nodes: " + wn2.getNodeName());
 
                             continue;
                         }
@@ -235,8 +231,7 @@ public class GamePreset implements MekHqXmlSerializable {
                             continue;
                         }
                         if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
-                            MekHQ.getLogger().error(GamePreset.class, METHOD_NAME,
-                                    "Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
                             continue;
                         }
 
@@ -267,7 +262,7 @@ public class GamePreset implements MekHqXmlSerializable {
                     presets.add(preset);
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(GamePreset.class, "getGamePresetsIn", e);
+                MekHQ.getLogger().error(e);
             }
         }
         return presets;
