@@ -4491,6 +4491,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             setMothballTime(getMothballOrActivationTime());
             getCampaign().mothball(this);
         } else {
+            completeMothball();
             getCampaign().addReport(getHyperlinkedName() + " has been mothballed (GM)");
         }
     }
