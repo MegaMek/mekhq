@@ -126,7 +126,9 @@ import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
+import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
@@ -1103,6 +1105,20 @@ public class Campaign implements Serializable, ITechManager {
      */
     public Hangar getHangar() {
         return units;
+    }
+
+    /**
+     * Gets statistics related to units in the hangar.
+     */
+    public HangarStatistics getHangarStatistics() {
+        return new HangarStatistics(getHangar());
+    }
+
+    /**
+     * Gets statistics related to cargo in the hangar.
+     */
+    public CargoStatistics getCargoStatistics() {
+        return new CargoStatistics(this);
     }
 
     public Collection<Unit> getUnits() {
@@ -3586,58 +3602,6 @@ public class Campaign implements Serializable, ITechManager {
         return null;
     }
 
-    public Money getPayRoll() {
-        return getPayRoll(false);
-    }
-
-    public Money getPayRoll(boolean noInfantry) {
-        if (getCampaignOptions().payForSalaries()) {
-            return getTheoreticalPayroll(noInfantry);
-        } else {
-            return Money.zero();
-        }
-    }
-
-    private Money getTheoreticalPayroll(boolean noInfantry) {
-        Money salaries = Money.zero();
-        for (Person p : getActivePersonnel()) {
-            // Optionized infantry (Unofficial)
-            if (!(noInfantry && (p.getPrimaryRole() == Person.T_INFANTRY))) {
-                salaries = salaries.plus(p.getSalary());
-            }
-        }
-        // add in astechs from the astech pool
-        // we will assume Mech Tech * able-bodied * enlisted (changed from vee mechanic)
-        // 800 * 0.5 * 0.6 = 240
-        salaries = salaries.plus(240.0 * astechPool);
-        salaries = salaries.plus(320.0 * medicPool);
-        return salaries;
-    }
-
-    public Money getMaintenanceCosts() {
-        if (campaignOptions.payForMaintain()) {
-            return getHangar().getUnitsStream()
-                .filter(u -> u.requiresMaintenance() && (null != u.getTech()))
-                .map(Unit::getMaintenanceCost)
-                .reduce(Money.zero(), (a, b) -> a.plus(b));
-        }
-        return Money.zero();
-    }
-
-    public Money getWeeklyMaintenanceCosts() {
-        return getHangar().getUnitsStream()
-            .map(Unit::getWeeklyMaintenanceCost)
-            .reduce(Money.zero(), (a, b) -> a.plus(b));
-    }
-
-    public Money getOverheadExpenses() {
-        if (getCampaignOptions().payForOverhead()) {
-            return getTheoreticalPayroll(false).multipliedBy(0.05);
-        } else {
-            return Money.zero();
-        }
-    }
-
     public void removeUnit(UUID id) {
         Unit unit = getHangar().getUnit(id);
 
@@ -4190,7 +4154,6 @@ public class Campaign implements Serializable, ITechManager {
         this.iconFileName = s;
     }
 
-
     public ArrayList<Part> getSpareParts() {
         ArrayList<Part> spares = new ArrayList<>();
         for (Part part : getParts()) {
@@ -4632,62 +4595,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * A helper function to encapsulate writing the array/hash pairs out to XML. Each of the types requires a different XML
-     * structure, but is in an identical holding structure. Thus, genericized function and interface to cleanly wrap it up.
-     * God, I love 3rd-generation programming languages.
-     *
-     * @param <arrType> The object type in the list. Must implement MekHqXmlSerializable.
-     * @param pw1       The PrintWriter to output XML to.
-     * @param indent    The indentation level to use for writing XML (purely for neatness).
-     * @param tag       The name of the tag to use to encapsulate it.
-     * @param array     The list of objects to write out.
-     * @param hashtab   The lookup hashtable for the associated array.
-     */
-    private <arrType> void writeArrayAndHashToXml(PrintWriter pw1, int indent,
-            String tag, ArrayList<arrType> array, Hashtable<Integer, arrType> hashtab) {
-        // Hooray for implicitly-type-detected genericized functions!
-        // However, I still ended up making an interface to handle this.
-        // That way, I can cast it and call "writeToXml" to make it cleaner.
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<" + tag + ">");
-
-        // Enumeration<Integer> = hashtab.keys
-        for (Integer x : hashtab.keySet()) {
-            ((MekHqXmlSerializable) (hashtab.get(x))).writeToXml(pw1,
-                    indent + 1);
-        }
-
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
-    }
-
-    /**
-     * A helper function to encapsulate writing the array/hash pairs out to XML. Each of the types requires a different XML
-     * structure, but is in an identical holding structure. Thus, genericized function and interface to cleanly wrap it up.
-     * God, I love 3rd-generation programming languages.
-     *
-     * @param <arrType> The object type in the list. Must implement MekHqXmlSerializable.
-     * @param pw1       The PrintWriter to output XML to.
-     * @param indent    The indentation level to use for writing XML (purely for neatness).
-     * @param tag       The name of the tag to use to encapsulate it.
-     * @param array     The list of objects to write out.
-     * @param hashtab   The lookup hashtable for the associated array.
-     */
-    private <arrType> void writeArrayAndHashToXmlforUUID(PrintWriter pw1,
-            int indent, String tag, ArrayList<arrType> array, Hashtable<UUID, arrType> hashtab) {
-        // Hooray for implicitly-type-detected genericized functions!
-        // However, I still ended up making an interface to handle this.
-        // That way, I can cast it and call "writeToXml" to make it cleaner.
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<" + tag + ">");
-
-        // Enumeration<Integer> = hashtab.keys
-        for (UUID x : hashtab.keySet()) {
-            ((MekHqXmlSerializable) (hashtab.get(x))).writeToXml(pw1,
-                    indent + 1);
-        }
-
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
-    }
-
-    /**
      * A helper function to encapsulate writing the map entries out to XML.
      *
      * @param <keyType> The key type of the map.
@@ -4813,6 +4720,10 @@ public class Campaign implements Serializable, ITechManager {
 
     public Finances getFinances() {
         return finances;
+    }
+
+    public Accountant getAccountant() {
+        return new Accountant(this);
     }
 
     public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid) {
@@ -4976,43 +4887,46 @@ public class Campaign implements Serializable, ITechManager {
      */
     @SuppressWarnings("unused") // FIXME: Waiting for Dylan to finish re-writing
     public Money calculateCostPerJump(boolean excludeOwnTransports, boolean campaignOpsCosts) {
+        HangarStatistics stats = getHangarStatistics();
+        CargoStatistics cargoStats = getCargoStatistics();
+
         Money collarCost = Money.of(campaignOpsCosts ? 100000 : 50000);
 
         // first we need to get the total number of units by type
-        int nMech = getNumberOfUnitsByType(Entity.ETYPE_MECH);
-        int nLVee = getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true);
-        int nHVee = getNumberOfUnitsByType(Entity.ETYPE_TANK);
-        int nAero = getNumberOfUnitsByType(Entity.ETYPE_AERO);
-        int nSC = getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
-        int nCF = getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
-        int nBA = getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
+        int nMech = stats.getNumberOfUnitsByType(Entity.ETYPE_MECH);
+        int nLVee = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true);
+        int nHVee = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
+        int nAero = stats.getNumberOfUnitsByType(Entity.ETYPE_AERO);
+        int nSC = stats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
+        int nCF = stats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
+        int nBA = stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
         int nMechInf = 0;
         int nMotorInf = 0;
         int nFootInf = 0;
-        int nProto = getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
-        int nDropship = getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
-        int nCollars = getTotalDockingCollars();
-        double nCargo = getTotalCargoCapacity(); // ignoring refrigerated/insulated/etc.
+        int nProto = stats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
+        int nDropship = stats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
+        int nCollars = stats.getTotalDockingCollars();
+        double nCargo = cargoStats.getTotalCargoCapacity(); // ignoring refrigerated/insulated/etc.
 
         // get cargo tonnage including parts in transit, then get mothballed unit
         // tonnage
-        double carriedCargo = getCargoTonnage(true, false) + getCargoTonnage(false, true);
+        double carriedCargo = cargoStats.getCargoTonnage(true, false) + cargoStats.getCargoTonnage(false, true);
 
         // calculate the number of units left untransported
-        int noMech = Math.max(nMech - getOccupiedBays(Entity.ETYPE_MECH), 0);
-        int noDS = Math.max(nDropship - getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
-        int noSC = Math.max(nSC - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        int noCF = Math.max(nCF - getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(nAero - getOccupiedBays(Entity.ETYPE_AERO), 0);
-        int nolv = Math.max(nLVee - getOccupiedBays(Entity.ETYPE_TANK, true), 0);
-        int nohv = Math.max(nHVee - getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int noinf = Math.max(getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int noBA = Math.max(nBA - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int noProto = Math.max(nProto - getOccupiedBays(Entity.ETYPE_PROTOMECH), 0);
-        int freehv = Math.max(getTotalHeavyVehicleBays() - getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int freeinf = Math.max(getTotalInfantryBays() - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int freeba = Math.max(getTotalBattleArmorBays() - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int freeSC = Math.max(getTotalSmallCraftBays() - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int noMech = Math.max(nMech - stats.getOccupiedBays(Entity.ETYPE_MECH), 0);
+        int noDS = Math.max(nDropship - stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
+        int noSC = Math.max(nSC - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int noCF = Math.max(nCF - stats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
+        int noASF = Math.max(nAero - stats.getOccupiedBays(Entity.ETYPE_AERO), 0);
+        int nolv = Math.max(nLVee - stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
+        int nohv = Math.max(nHVee - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int noinf = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int noBA = Math.max(nBA - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        int noProto = Math.max(nProto - stats.getOccupiedBays(Entity.ETYPE_PROTOMECH), 0);
+        int freehv = Math.max(stats.getTotalHeavyVehicleBays() - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int freeinf = Math.max(stats.getTotalInfantryBays() - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int freeba = Math.max(stats.getTotalBattleArmorBays() - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        int freeSC = Math.max(stats.getTotalSmallCraftBays() - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         int noCargo = (int) Math.ceil(Math.max(carriedCargo - nCargo, 0));
 
         int newNoASF = Math.max(noASF - freeSC, 0);
@@ -6918,96 +6832,6 @@ public class Campaign implements Serializable, ITechManager {
         return inventory;
     }
 
-    public Money getTotalEquipmentValue() {
-        Money unitsSellValue = getHangar().getUnitCosts(Unit::getSellValue);
-        return streamSpareParts().map(Part::getActualValue)
-            .reduce(unitsSellValue, Money::plus);
-    }
-
-    /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
-     * Beta.
-     *
-     * @return
-     */
-    public Money getForceValue() {
-        return getForceValue(false);
-    }
-
-    /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
-     * Beta.
-     *
-     * @return
-     */
-    public Money getForceValue(boolean noInfantry) {
-        Money value = Money.zero();
-        for (UUID uuid : forces.getAllUnits(false)) {
-            Unit u = getHangar().getUnit(uuid);
-            if (null == u) {
-                continue;
-            }
-            if (noInfantry && ((u.getEntity().getEntityType() & Entity.ETYPE_INFANTRY) == Entity.ETYPE_INFANTRY)
-                    && !((u.getEntity().getEntityType() & Entity.ETYPE_BATTLEARMOR) == Entity.ETYPE_BATTLEARMOR)) {
-                continue;
-            }
-            if (u.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
-                if (getCampaignOptions().getDropshipContractPercent() == 0) {
-                    continue;
-                }
-                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue()));
-            } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
-                if (getCampaignOptions().getWarshipContractPercent() == 0) {
-                    continue;
-                }
-                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue()));
-            } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) || u.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
-                if (getCampaignOptions().getJumpshipContractPercent() == 0) {
-                    continue;
-                }
-                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue()));
-            } else {
-                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue()));
-            }
-        }
-        return value;
-    }
-
-    public Money getEquipmentContractValue(Unit u, boolean useSaleValue) {
-        Money value;
-        Money percentValue;
-
-        if (useSaleValue) {
-            value = u.getSellValue();
-        } else {
-            value = u.getBuyCost();
-        }
-
-        if (u.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
-            percentValue = value.multipliedBy(getCampaignOptions().getDropshipContractPercent()).dividedBy(100);
-        } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
-            percentValue = value.multipliedBy(getCampaignOptions().getWarshipContractPercent()).dividedBy(100);
-        } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) || u.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
-            percentValue = value.multipliedBy(getCampaignOptions().getJumpshipContractPercent()).dividedBy(100);
-        } else {
-            percentValue = value.multipliedBy(getCampaignOptions().getEquipmentContractPercent()).dividedBy(100);
-        }
-
-        return percentValue;
-    }
-
-    public Money getContractBase() {
-        if (getCampaignOptions().usePeacetimeCost()) {
-            return getPeacetimeCost()
-                    .multipliedBy(0.75)
-                    .plus(getForceValue(getCampaignOptions().useInfantryDontCount()));
-        } else if (getCampaignOptions().useEquipmentContractBase()) {
-            return getForceValue(getCampaignOptions().useInfantryDontCount());
-        } else {
-            return getTheoreticalPayroll(getCampaignOptions().useInfantryDontCount());
-        }
-    }
-
     public void addLoan(Loan loan) {
         addReport("You have taken out loan " + loan.getDescription()
                 + ". Your account has been credited "
@@ -7032,113 +6856,6 @@ public class Campaign implements Serializable, ITechManager {
                     + loan.getDescription() + "</font>");
         }
 
-    }
-
-    public FinancialReport getFinancialReport() {
-        return FinancialReport.calculate(this);
-    }
-
-    public String getFormattedFinancialReport() {
-        StringBuilder sb = new StringBuilder();
-
-        FinancialReport r = getFinancialReport();
-
-        Money liabilities = r.getTotalLiabilities();
-        Money assets = r.getTotalAssets();
-        Money netWorth = r.getNetWorth();
-
-        int longest = Math.max(
-                liabilities.toAmountAndSymbolString().length(),
-                assets.toAmountAndSymbolString().length());
-        longest = Math.max(
-                netWorth.toAmountAndSymbolString().length(),
-                longest);
-        String formatted = "%1$" + longest + "s";
-        sb.append("Net Worth................ ")
-                .append(String.format(formatted, netWorth.toAmountAndSymbolString())).append("\n\n");
-        sb.append("    Assets............... ")
-                .append(String.format(formatted, assets.toAmountAndSymbolString())).append("\n");
-        sb.append("       Cash.............. ")
-                .append(String.format(formatted, r.getCash().toAmountAndSymbolString())).append("\n");
-        if (r.getMechValue().isPositive()) {
-            sb.append("       Mechs............. ")
-                    .append(String.format(formatted, r.getMechValue().toAmountAndSymbolString())).append("\n");
-        }
-        if (r.getVeeValue().isPositive()) {
-            sb.append("       Vehicles.......... ")
-                    .append(String.format(formatted, r.getVeeValue().toAmountAndSymbolString())).append("\n");
-        }
-        if (r.getBattleArmorValue().isPositive()) {
-            sb.append("       BattleArmor....... ")
-                    .append(String.format(formatted, r.getBattleArmorValue().toAmountAndSymbolString())).append("\n");
-        }
-        if (r.getInfantryValue().isPositive()) {
-            sb.append("       Infantry.......... ")
-                    .append(String.format(formatted, r.getInfantryValue().toAmountAndSymbolString())).append("\n");
-        }
-        if (r.getProtomechValue().isPositive()) {
-            sb.append("       Protomechs........ ")
-                    .append(String.format(formatted, r.getProtomechValue().toAmountAndSymbolString())).append("\n");
-        }
-        if (r.getSmallCraftValue().isPositive()) {
-            sb.append("       Small Craft....... ")
-                    .append(String.format(formatted, r.getSmallCraftValue().toAmountAndSymbolString())).append("\n");
-        }
-        if (r.getLargeCraftValue().isPositive()) {
-            sb.append("       Large Craft....... ")
-                    .append(String.format(formatted, r.getLargeCraftValue().toAmountAndSymbolString())).append("\n");
-        }
-        sb.append("       Spare Parts....... ")
-                .append(String.format(formatted, r.getSparePartsValue().toAmountAndSymbolString())).append("\n");
-
-        if (getFinances().getAllAssets().size() > 0) {
-            for (Asset asset : getFinances().getAllAssets()) {
-                String assetName = asset.getName();
-                if (assetName.length() > 18) {
-                    assetName = assetName.substring(0, 17);
-                } else {
-                    int numPeriods = 18 - assetName.length();
-                    for (int i = 0; i < numPeriods; i++) {
-                        assetName += ".";
-                    }
-                }
-                assetName += " ";
-                sb.append("       ").append(assetName)
-                        .append(String.format(formatted, asset.getValue().toAmountAndSymbolString()))
-                        .append("\n");
-            }
-        }
-        sb.append("\n");
-        sb.append("    Liabilities.......... ")
-                .append(String.format(formatted, liabilities.toAmountAndSymbolString())).append("\n");
-        sb.append("       Loans............. ")
-                .append(String.format(formatted, r.getLoans().toAmountAndSymbolString())).append("\n\n\n");
-
-        sb.append("Monthly Profit........... ")
-                .append(String.format(formatted, r.getMonthlyIncome().minus(r.getMonthlyExpenses()).toAmountAndSymbolString()))
-                .append("\n\n");
-        sb.append("Monthly Income........... ")
-                .append(String.format(formatted, r.getMonthlyIncome().toAmountAndSymbolString())).append("\n");
-        sb.append("    Contract Payments.... ")
-                .append(String.format(formatted, r.getContracts().toAmountAndSymbolString())).append("\n\n");
-        sb.append("Monthly Expenses......... ")
-                .append(String.format(formatted, r.getMonthlyExpenses().toAmountAndSymbolString())).append("\n");
-        sb.append("    Salaries............. ")
-                .append(String.format(formatted, r.getSalaries().toAmountAndSymbolString())).append("\n");
-        sb.append("    Maintenance.......... ")
-                .append(String.format(formatted, r.getMaintenance().toAmountAndSymbolString())).append("\n");
-        sb.append("    Overhead............. ")
-                .append(String.format(formatted, r.getOverheadCosts().toAmountAndSymbolString())).append("\n");
-        if (campaignOptions.usePeacetimeCost()) {
-            sb.append("    Spare Parts.......... ")
-                    .append(String.format(formatted, r.getMonthlySparePartCosts().toAmountAndSymbolString())).append("\n");
-            sb.append("    Training Munitions... ")
-                    .append(String.format(formatted, r.getMonthlyAmmoCosts().toAmountAndSymbolString())).append("\n");
-            sb.append("    Fuel................. ")
-                    .append(String.format(formatted, r.getMonthlyFuelCosts().toAmountAndSymbolString())).append("\n");
-        }
-
-        return sb.toString();
     }
 
     public void setHealingTimeOptions(int newHeal, int newNaturalHeal) {
@@ -7167,593 +6884,13 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
     }
+
     /**
      * Returns our list of potential transport ships
      * @return
      */
     public Set<UUID> getTransportShips() {
         return transportShips;
-    }
-
-    public int getTotalMechBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getMechCapacity)
-            .sum());
-    }
-
-    public int getTotalASFBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getASFCapacity)
-            .sum());
-    }
-
-    public int getTotalSmallCraftBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getSmallCraftCapacity)
-            .sum());
-    }
-
-    public int getTotalBattleArmorBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getBattleArmorCapacity)
-            .sum());
-    }
-
-    public int getTotalInfantryBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getInfantryCapacity)
-            .sum());
-    }
-
-    public int getTotalHeavyVehicleBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getHeavyVehicleCapacity)
-            .sum());
-    }
-
-    public int getTotalLightVehicleBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getLightVehicleCapacity)
-            .sum());
-    }
-
-    public int getTotalProtomechBays() {
-        return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getProtomechCapacity)
-            .sum());
-    }
-
-    public int getTotalDockingCollars() {
-        return getHangar().getUnitsStream()
-            .filter(u -> u.getEntity() instanceof Jumpship)
-            .mapToInt(Unit::getDocks)
-            .sum();
-    }
-
-    public double getTotalInsulatedCargoCapacity() {
-        return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getInsulatedCargoCapacity)
-            .sum();
-    }
-
-    public double getTotalRefrigeratedCargoCapacity() {
-        return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getRefrigeratedCargoCapacity)
-            .sum();
-    }
-
-    public double getTotalLivestockCargoCapacity() {
-        return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getLivestockCargoCapacity)
-            .sum();
-    }
-
-    public double getTotalLiquidCargoCapacity() {
-        return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getLiquidCargoCapacity)
-            .sum();
-    }
-
-    public double getTotalCargoCapacity() {
-        return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getCargoCapacity)
-            .sum();
-    }
-
-    // Liquid not included
-    public double getTotalCombinedCargoCapacity() {
-        return getTotalCargoCapacity() + getTotalLivestockCargoCapacity()
-                + getTotalInsulatedCargoCapacity() + getTotalRefrigeratedCargoCapacity();
-    }
-
-    public int getNumberOfUnitsByType(long type) {
-        return getNumberOfUnitsByType(type, false, false);
-    }
-
-    public int getNumberOfUnitsByType(long type, boolean inTransit) {
-        return getNumberOfUnitsByType(type, inTransit, false);
-    }
-
-    public int getNumberOfUnitsByType(long type, boolean inTransit, boolean lv) {
-        int num = 0;
-        for (Unit unit : getUnits()) {
-            if (!inTransit && !unit.isPresent()) {
-                continue;
-            }
-            if (unit.isMothballed()) {
-                if (type == Unit.ETYPE_MOTHBALLED) {
-                    num++;
-                }
-                continue;
-            }
-            Entity en = unit.getEntity();
-            if (en instanceof GunEmplacement || en instanceof FighterSquadron || en instanceof Jumpship) {
-                continue;
-            }
-            if (type == Entity.ETYPE_MECH && en instanceof Mech) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_DROPSHIP && en instanceof Dropship) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_SMALL_CRAFT && en instanceof SmallCraft
-                    && !(en instanceof Dropship)) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_CONV_FIGHTER && en instanceof ConvFighter) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_AERO && en instanceof Aero
-                    && !(en instanceof SmallCraft || en instanceof ConvFighter)) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_INFANTRY && en instanceof Infantry && !(en instanceof BattleArmor)) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_BATTLEARMOR && en instanceof BattleArmor) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_TANK && en instanceof Tank) {
-                if ((en.getWeight() <= 50 && lv) || (en.getWeight() > 50 && !lv)) {
-                    num++;
-                }
-                continue;
-            }
-            if (type == Entity.ETYPE_PROTOMECH && en instanceof Protomech) {
-                num++;
-            }
-        }
-
-        return num;
-    }
-
-    public double getCargoTonnage(boolean inTransit) {
-        return getCargoTonnage(inTransit, false);
-    }
-
-    @SuppressWarnings("unused") // FIXME: This whole method needs re-worked once Dropship Assignments are in
-    public double getCargoTonnage(final boolean inTransit, final boolean mothballed) {
-        double cargoTonnage = 0;
-        double mothballedTonnage = 0;
-        int mechs = getNumberOfUnitsByType(Entity.ETYPE_MECH);
-        int ds = getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
-        int sc = getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
-        int cf = getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
-        int asf = getNumberOfUnitsByType(Entity.ETYPE_AERO);
-        int inf = getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
-        int ba = getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
-        int lv = getNumberOfUnitsByType(Entity.ETYPE_TANK, true);
-        int hv = getNumberOfUnitsByType(Entity.ETYPE_TANK, false);
-        int protos = getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
-
-        cargoTonnage += streamSpareParts().filter(p -> inTransit || p.isPresent())
-                            .mapToDouble(p -> p.getQuantity() * p.getTonnage())
-                            .sum();
-
-        // place units in bays
-        // FIXME: This has been temporarily disabled. It really needs DropShip assignments done to fix it correctly.
-        // Remaining units go into cargo
-        for (Unit unit : getUnits()) {
-            if (!inTransit && !unit.isPresent()) {
-                continue;
-            }
-            Entity en = unit.getEntity();
-            if (unit.isMothballed()) {
-                mothballedTonnage += en.getWeight();
-                continue;
-            }
-            if (en instanceof GunEmplacement || en instanceof FighterSquadron || en instanceof Jumpship) {
-                continue;
-            }
-            // cargoTonnage += en.getWeight();
-        }
-        if (mothballed) {
-            return mothballedTonnage;
-        }
-        return cargoTonnage;
-    }
-
-    public String getCargoDetails() {
-        StringBuffer sb = new StringBuffer("Cargo\n\n");
-        double ccc = this.getTotalCombinedCargoCapacity();
-        double gcc = this.getTotalCargoCapacity();
-        double icc = this.getTotalInsulatedCargoCapacity();
-        double lcc = this.getTotalLiquidCargoCapacity();
-        double scc = this.getTotalLivestockCargoCapacity();
-        double rcc = this.getTotalRefrigeratedCargoCapacity();
-        double tonnage = this.getCargoTonnage(false);
-        double mothballedTonnage = this.getCargoTonnage(false, true);
-        double mothballedUnits = Math.max(getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
-        double combined = (tonnage + mothballedTonnage);
-        double transported = Math.min(combined, ccc);
-        double overage = combined - transported;
-
-        sb.append(String.format("%-35s      %6.3f\n", "Total Capacity:", ccc));
-        sb.append(String.format("%-35s      %6.3f\n", "General Capacity:", gcc));
-        sb.append(String.format("%-35s      %6.3f\n", "Insulated Capacity:", icc));
-        sb.append(String.format("%-35s      %6.3f\n", "Liquid Capacity:", lcc));
-        sb.append(String.format("%-35s      %6.3f\n", "Livestock Capacity:", scc));
-        sb.append(String.format("%-35s      %6.3f\n", "Refrigerated Capacity:", rcc));
-        sb.append(String.format("%-35s      %6.3f\n", "Cargo Transported:", tonnage));
-        sb.append(String.format("%-35s      %4s (%1.0f)\n", "Mothballed Units as Cargo (Tons):", mothballedUnits, mothballedTonnage));
-        sb.append(String.format("%-35s      %6.3f/%1.3f\n", "Transported/Capacity:", transported, ccc));
-        sb.append(String.format("%-35s      %6.3f\n", "Overage Not Transported:", overage));
-
-        return new String(sb);
-    }
-
-    public int getOccupiedBays(long type) {
-        return getOccupiedBays(type, false);
-    }
-
-    public int getOccupiedBays(long type, boolean lv) {
-        int num = 0;
-        for (Unit unit : getUnits()) {
-            if (unit.isMothballed()) {
-                continue;
-            }
-            Entity en = unit.getEntity();
-            if (en instanceof GunEmplacement || en instanceof Jumpship) {
-                continue;
-            }
-            if (type == Entity.ETYPE_MECH && en instanceof Mech) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_DROPSHIP && en instanceof Dropship) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_SMALL_CRAFT && en instanceof SmallCraft && !(en instanceof Dropship)) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_CONV_FIGHTER && en instanceof ConvFighter) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_AERO && en instanceof Aero
-                    && !(en instanceof SmallCraft || en instanceof ConvFighter)) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_INFANTRY && en instanceof Infantry && !(en instanceof BattleArmor)) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_BATTLEARMOR && en instanceof BattleArmor) {
-                num++;
-                continue;
-            }
-            if (type == Entity.ETYPE_TANK && en instanceof Tank) {
-                if ((en.getWeight() <= 50 && lv) || (en.getWeight() > 50 && !lv)) {
-                    num++;
-                }
-                continue;
-            }
-            if (type == Entity.ETYPE_PROTOMECH && en instanceof Protomech) {
-                num++;
-            }
-        }
-
-        if (type == Entity.ETYPE_MECH) {
-            return Math.min(getTotalMechBays(), num);
-        }
-
-        if (type == Entity.ETYPE_AERO) {
-            return Math.min(getTotalASFBays(), num);
-        }
-
-        if (type == Entity.ETYPE_INFANTRY) {
-            return Math.min(getTotalInfantryBays(), num);
-        }
-
-        if (type == Entity.ETYPE_BATTLEARMOR) {
-            return Math.min(getTotalBattleArmorBays(), num);
-        }
-
-        if (type == Entity.ETYPE_TANK) {
-            if (lv) {
-                return Math.min(getTotalLightVehicleBays(), num);
-            }
-            return Math.min(getTotalHeavyVehicleBays(), num);
-        }
-
-        if (type == Entity.ETYPE_SMALL_CRAFT) {
-            return Math.min(getTotalSmallCraftBays(), num);
-        }
-
-        if (type == Entity.ETYPE_PROTOMECH) {
-            return Math.min(getTotalProtomechBays(), num);
-        }
-
-        if (type == Entity.ETYPE_DROPSHIP) {
-            return Math.min(getTotalDockingCollars(), num);
-        }
-
-        return -1; // default, this is an error condition
-    }
-
-    public String getTransportDetails() {
-        int noMech = Math.max(getNumberOfUnitsByType(Entity.ETYPE_MECH) - getOccupiedBays(Entity.ETYPE_MECH), 0);
-        int noDS = Math.max(getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP) - getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
-        int noSC = Math.max(getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
-        int noCF = Math
-                .max(getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(getNumberOfUnitsByType(Entity.ETYPE_AERO) - getOccupiedBays(Entity.ETYPE_AERO), 0);
-        int nolv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) - getOccupiedBays(Entity.ETYPE_TANK, true), 0);
-        int nohv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK) - getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int noinf = Math.max(getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int noBA = Math.max(getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        @SuppressWarnings("unused") // FIXME: This should be used somewhere...
-        int noProto = Math.max(getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - getOccupiedBays(Entity.ETYPE_PROTOMECH),
-                0);
-        int freehv = Math.max(getTotalHeavyVehicleBays() - getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int freeinf = Math.max(getTotalInfantryBays() - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int freeba = Math.max(getTotalBattleArmorBays() - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int freeSC = Math.max(getTotalSmallCraftBays() - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        int mothballedAsCargo = Math.max(getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
-
-        String asfAppend = "";
-        int newNoASF = Math.max(noASF - freeSC, 0);
-        int placedASF = Math.max(noASF - newNoASF, 0);
-        if (noASF > 0 && freeSC > 0) {
-            asfAppend = " [" + placedASF + " ASF will be placed in Small Craft bays]";
-            freeSC -= placedASF;
-        }
-
-        String lvAppend = "";
-        int newNolv = Math.max(nolv - freehv, 0);
-        int placedlv = Math.max(nolv - newNolv, 0);
-        if (nolv > 0 && freehv > 0) {
-            lvAppend = " [" + placedlv + " Light Vehicles will be placed in Heavy Vehicle bays]";
-            freehv -= placedlv;
-        }
-
-        if (noBA > 0 && freeinf > 0) {
-
-        }
-
-        if (noinf > 0 && freeba > 0) {
-
-        }
-
-        StringBuffer sb = new StringBuffer("Transports\n\n");
-
-        // Lets do Mechs first.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Mech Bays (Occupied):",
-                getTotalMechBays(), getOccupiedBays(Entity.ETYPE_MECH), "Mechs Not Transported:", noMech));
-
-        // Lets do ASF next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d%s\n", "ASF Bays (Occupied):",
-                getTotalASFBays(), getOccupiedBays(Entity.ETYPE_AERO), "ASF Not Transported:", noASF, asfAppend));
-
-        // Lets do Light Vehicles next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d%s\n", "Light Vehicle Bays (Occupied):",
-                getTotalLightVehicleBays(), getOccupiedBays(Entity.ETYPE_TANK, true), "Light Vehicles Not Transported:",
-                nolv, lvAppend));
-
-        // Lets do Heavy Vehicles next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Heavy Vehicle Bays (Occupied):",
-                getTotalHeavyVehicleBays(), getOccupiedBays(Entity.ETYPE_TANK), "Heavy Vehicles Not Transported:",
-                nohv));
-
-        if (noASF > 0 && freeSC > 0) {
-            // Lets do ASF in Free Small Craft Bays next.
-            sb.append(String.format("%-35s   %4d (%4d)      %-35s     %4d\n", "   Light Vehicles in Heavy Vehicle Bays (Occupied):",
-                    getTotalHeavyVehicleBays(), getOccupiedBays(Entity.ETYPE_TANK) + placedlv,
-                    "Light Vehicles Not Transported:", newNolv));
-        }
-
-        if (nolv > 0 && freehv > 0) {
-
-        }
-
-        // Lets do Infantry next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Infantry Bays (Occupied):",
-                getTotalInfantryBays(), getOccupiedBays(Entity.ETYPE_INFANTRY), "Infantry Not Transported:", noinf));
-
-        if (noBA > 0 && freeinf > 0) {
-
-        }
-
-        // Lets do Battle Armor next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Battle Armor Bays (Occupied):",
-                getTotalBattleArmorBays(), getOccupiedBays(Entity.ETYPE_BATTLEARMOR), "Battle Armor Not Transported:",
-                noBA));
-
-        if (noinf > 0 && freeba > 0) {
-
-        }
-
-        // Lets do Small Craft next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Small Craft Bays (Occupied):",
-                getTotalSmallCraftBays(), getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), "Small Craft Not Transported:",
-                noSC));
-
-        if (noASF > 0 && freeSC > 0) {
-            // Lets do ASF in Free Small Craft Bays next.
-            sb.append(String.format("%-35s   %4d (%4d)      %-35s     %4d\n", "   ASF in Small Craft Bays (Occupied):",
-                    getTotalSmallCraftBays(), getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) + placedASF,
-                    "ASF Not Transported:", newNoASF));
-        }
-
-        // Lets do Protomechs next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Protomech Bays (Occupied):",
-                getTotalProtomechBays(), getOccupiedBays(Entity.ETYPE_PROTOMECH), "Protomechs Not Transported:", noSC));
-
-        sb.append("\n\n");
-
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Docking Collars (Occupied):",
-                getTotalDockingCollars(), getOccupiedBays(Entity.ETYPE_DROPSHIP), "Dropships Not Transported:", noDS));
-
-        sb.append("\n\n");
-
-        sb.append(String.format("%-35s      %4d\n", "Mothballed Units (see Cargo report)", mothballedAsCargo));
-
-        return new String(sb);
-    }
-
-    public String getCombatPersonnelDetails() {
-        int[] countPersonByType = new int[Person.T_NUM];
-        int countTotal = 0;
-        int countInjured = 0;
-        int countMIA = 0;
-        int countKIA = 0;
-        int countDead = 0;
-        int countRetired = 0;
-        Money salary = Money.zero();
-
-        for (Person p : getPersonnel()) {
-            if (!p.hasPrimaryCombatRole() || !p.getPrisonerStatus().isFree()) {
-                continue;
-            }
-
-            // Add them to the total count
-            if (p.getStatus().isActive()) {
-                countPersonByType[p.getPrimaryRole()]++;
-                countTotal++;
-                if (getCampaignOptions().useAdvancedMedical() && p.getInjuries().size() > 0) {
-                    countInjured++;
-                } else if (p.getHits() > 0) {
-                    countInjured++;
-                }
-                salary = salary.plus(p.getSalary());
-            } else if (p.getStatus().isRetired()) {
-                countRetired++;
-            } else if (p.getStatus().isMIA()) {
-                countMIA++;
-            } else if (p.getStatus().isKIA()) {
-                countKIA++;
-                countDead++;
-            } else if (p.getStatus().isDead()) {
-                countDead++;
-            }
-        }
-
-        StringBuilder sb = new StringBuilder("Combat Personnel\n\n");
-
-        sb.append(String.format("%-30s        %4s\n", "Total Combat Personnel", countTotal));
-
-        for (int i = 0; i < Person.T_NUM; i++) {
-            if (Person.isCombatRole(i)) {
-                sb.append(String.format("    %-30s    %4s\n",
-                        Person.getRoleDesc(i, getFaction().isClan()), countPersonByType[i]));
-            }
-        }
-
-        sb.append("\n")
-                .append(String.format("%-30s        %4s\n", "Injured Combat Personnel", countInjured))
-                .append(String.format("%-30s        %4s\n", "MIA Combat Personnel", countMIA))
-                .append(String.format("%-30s        %4s\n", "KIA Combat Personnel", countKIA))
-                .append(String.format("%-30s        %4s\n", "Retired Combat Personnel", countRetired))
-                .append(String.format("%-30s        %4s\n", "Dead Combat Personnel", countDead))
-                .append("\nMonthly Salary For Combat Personnel: ").append(salary.toAmountAndSymbolString());
-
-        return sb.toString();
-    }
-
-    public String getSupportPersonnelDetails() {
-        int[] countPersonByType = new int[Person.T_NUM];
-        int countTotal = 0;
-        int countInjured = 0;
-        int countMIA = 0;
-        int countKIA = 0;
-        int countDead = 0;
-        int countRetired = 0;
-        Money salary = Money.zero();
-        int prisoners = 0;
-        int bondsmen = 0;
-        int dependents = 0;
-
-        for (Person p : getPersonnel()) {
-            // Add them to the total count
-            boolean primarySupport = p.hasPrimarySupportRole(false);
-
-            if (primarySupport && p.getPrisonerStatus().isFree() && p.getStatus().isActive()) {
-                countPersonByType[p.getPrimaryRole()]++;
-                countTotal++;
-                if (p.getInjuries().size() > 0 || p.getHits() > 0) {
-                    countInjured++;
-                }
-                salary = salary.plus(p.getSalary());
-            } else if (p.getPrisonerStatus().isPrisoner() && p.getStatus().isActive()) {
-                prisoners++;
-                if (p.getInjuries().size() > 0 || p.getHits() > 0) {
-                    countInjured++;
-                }
-            } else if (p.getPrisonerStatus().isBondsman() && p.getStatus().isActive()) {
-                bondsmen++;
-                if (p.getInjuries().size() > 0 || p.getHits() > 0) {
-                    countInjured++;
-                }
-            } else if (primarySupport && p.getStatus().isRetired()) {
-                countRetired++;
-            } else if (primarySupport && p.getStatus().isMIA()) {
-                countMIA++;
-            } else if (primarySupport && p.getStatus().isKIA()) {
-                countKIA++;
-                countDead++;
-            } else if (primarySupport && p.getStatus().isDead()) {
-                countDead++;
-            }
-
-            if (p.isDependent() && p.getStatus().isActive() && p.getPrisonerStatus().isFree()) {
-                dependents++;
-            }
-        }
-
-        StringBuilder sb = new StringBuilder("Support Personnel\n\n");
-
-        sb.append(String.format("%-30s        %4s\n", "Total Support Personnel", countTotal));
-
-        for (int i = 0; i < Person.T_NUM; i++) {
-            if (Person.isSupportRole(i)) {
-                sb.append(String.format("    %-30s    %4s\n",
-                        Person.getRoleDesc(i, getFaction().isClan()), countPersonByType[i]));
-            }
-        }
-
-        sb.append("\n")
-                .append(String.format("%-30s        %4s\n", "Injured Support Personnel", countInjured))
-                .append(String.format("%-30s        %4s\n", "MIA Support Personnel", countMIA))
-                .append(String.format("%-30s        %4s\n", "KIA Support Personnel", countKIA))
-                .append(String.format("%-30s        %4s\n", "Retired Support Personnel", countRetired))
-                .append(String.format("%-30s        %4s\n", "Dead Support Personnel", countDead))
-                .append("\nMonthly Salary For Support Personnel: ").append(salary.toAmountAndSymbolString())
-                .append(String.format("\nYou have " + dependents + " %s", (dependents == 1) ? "dependent" : "dependents"))
-                .append(String.format("\nYou have " + prisoners + " prisoner%s", (prisoners == 1) ? "" : "s"))
-                .append(String.format("\nYou have " + bondsmen + " %s", (bondsmen == 1) ? "bondsman" : "bondsmen"));
-
-        return sb.toString();
     }
 
     public void doMaintenance(Unit u) {
@@ -8212,47 +7349,6 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         return unitRating;
-    }
-
-    /**
-     * Gets peacetime costs including salaries.
-     * @return The peacetime costs of the campaign including salaries.
-     */
-    public Money getPeacetimeCost() {
-        return getPeacetimeCost(true);
-    }
-
-    /**
-     * Gets peacetime costs, optionally including salaries.
-     *
-     * This can be used to ensure salaries are not double counted.
-     *
-     * @param includeSalaries A value indicating whether or not salaries
-     *                        should be included in peacetime cost calculations.
-     * @return The peacetime costs of the campaign, optionally including salaries.
-     */
-    public Money getPeacetimeCost(boolean includeSalaries) {
-        Money peaceTimeCosts = Money.zero()
-                                .plus(getMonthlySpareParts())
-                                .plus(getMonthlyFuel())
-                                .plus(getMonthlyAmmo());
-        if (includeSalaries) {
-            peaceTimeCosts = peaceTimeCosts.plus(getPayRoll(getCampaignOptions().useInfantryDontCount()));
-        }
-
-        return peaceTimeCosts;
-    }
-
-    public Money getMonthlySpareParts() {
-        return getHangar().getUnitCosts(u -> !u.isMothballed(), Unit::getSparePartsCost);
-    }
-
-    public Money getMonthlyFuel() {
-        return getHangar().getUnitCosts(u -> !u.isMothballed(), Unit::getFuelCost);
-    }
-
-    public Money getMonthlyAmmo() {
-        return getHangar().getUnitCosts(u -> !u.isMothballed(), Unit::getAmmoCost);
     }
 
     @Override

@@ -23,13 +23,11 @@ package mekhq.campaign.report;
 import javax.swing.JTextPane;
 
 import mekhq.campaign.Campaign;
-
+import mekhq.campaign.Hangar;
 
 
 /**
  * @author Jay Lawson
- * @version %I% %G%
- * @since 3/12/2012
  */
 public abstract class Report {
 
@@ -38,15 +36,19 @@ public abstract class Report {
     public Report(Campaign c) {
         this.campaign = c;
     }
-    
+
     protected Campaign getCampaign() {
         return campaign;
     }
-    
-    //using JTextPane here allows for more flexibility in terms of 
+
+    protected Hangar getHangar() {
+        return getCampaign().getHangar();
+    }
+
+    //using JTextPane here allows for more flexibility in terms of
     //what these reports look like
     public abstract JTextPane getReport();
-        
+
     public abstract String getTitle();
-    
+
 }
