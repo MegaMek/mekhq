@@ -287,10 +287,7 @@ public class UnitTableModel extends DataTableModel {
             setToolTipText(getTooltip(actualRow, actualCol));
             Unit u = getUnit(actualRow);
 
-            if (isSelected) {
-                setBackground(UIManager.getColor("Table.selectionBackground"));
-                setForeground(UIManager.getColor("Table.selectionForeground"));
-            } else {
+            if (!isSelected) {
                 if (u.isDeployed()) {
                     applyColors(colors.getDeployed());
                 } else if(!u.isPresent()) {
@@ -311,9 +308,6 @@ public class UnitTableModel extends DataTableModel {
                     applyColors(colors.getUnmaintained());
                 } else if (u.getActiveCrew().size() < u.getFullCrewSize()) {
                     applyColors(colors.getUncrewed());
-                } else {
-                    setBackground(UIManager.getColor("Table.background"));
-                    setForeground(UIManager.getColor("Table.foreground"));
                 }
             }
             return this;
@@ -357,6 +351,7 @@ public class UnitTableModel extends DataTableModel {
                     } else {
                         clearImage();
                     }
+                    break;
                 }
                 case COL_PILOT: {
                     Person p = u.getCommander();
@@ -366,6 +361,7 @@ public class UnitTableModel extends DataTableModel {
                     } else {
                         clearImage();
                     }
+                    break;
                 }
                 case COL_TECH_CRW: {
                     Person p = u.getTech();
@@ -375,6 +371,7 @@ public class UnitTableModel extends DataTableModel {
                     } else {
                         clearImage();
                     }
+                    break;
                 }
             }
 
