@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,7 +28,6 @@ import java.util.UUID;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
@@ -717,8 +716,8 @@ public class PersonnelTableModel extends DataTableModel {
         private static final long serialVersionUID = 9054581142945717303L;
 
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-                                                       int row, int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                       boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             int actualCol = table.convertColumnIndexToModel(column);
@@ -726,22 +725,17 @@ public class PersonnelTableModel extends DataTableModel {
             setHorizontalAlignment(getAlignment(actualCol));
             setToolTipText(getTooltip(actualRow, actualCol));
 
-            setForeground(UIManager.getColor("Table.foreground"));
-            if (isSelected) {
-                setBackground(UIManager.getColor("Table.selectionBackground"));
-                setForeground(UIManager.getColor("Table.selectionForeground"));
-            } else {
+            if (!isSelected) {
                 if (isDeployed(actualRow)) {
                     colors.getDeployed().getColor().ifPresent(this::setBackground);
                     colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
-                } else if ((Integer.parseInt((String) getValueAt(actualRow,COL_HITS)) > 0) || getPerson(actualRow).hasInjuries(true)) {
+                } else if ((Integer.parseInt((String) getValueAt(actualRow,COL_HITS)) > 0)
+                        || getPerson(actualRow).hasInjuries(true)) {
                     colors.getInjured().getColor().ifPresent(this::setBackground);
                     colors.getInjured().getAlternateColor().ifPresent(this::setForeground);
                 } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
                     colors.getHealedInjuries().getColor().ifPresent(this::setBackground);
                     colors.getHealedInjuries().getAlternateColor().ifPresent(this::setForeground);
-                } else {
-                    setBackground(UIManager.getColor("Table.background"));
                 }
             }
             return this;
@@ -757,9 +751,8 @@ public class PersonnelTableModel extends DataTableModel {
         }
 
         @Override
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus,
-                int row, int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                       boolean hasFocus, int row, int column) {
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
@@ -767,7 +760,7 @@ public class PersonnelTableModel extends DataTableModel {
 
             setText(getValueAt(actualRow, actualCol).toString());
 
-            switch(actualCol) {
+            switch (actualCol) {
                 case COL_RANK:
                     setPortrait(p);
                     setText(p.getFullDesc());
@@ -775,12 +768,13 @@ public class PersonnelTableModel extends DataTableModel {
                 case COL_ASSIGN:
                     if (loadAssignmentFromMarket) {
                         Entity en = personnelMarket.getAttachedEntity(p);
-                        setText(en != null ? en.getDisplayName() : "-");
+                        setText((en != null) ? en.getDisplayName() : "-");
                     } else {
                         Unit u = getCampaign().getUnit(p.getUnitId());
                         if ((u == null) && !p.getTechUnitIDs().isEmpty()) {
                             u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
                         }
+
                         if (u != null) {
                             String desc = "<b>" + u.getName() + "</b><br>";
                             desc += u.getEntity().getWeightClassName();
@@ -802,7 +796,7 @@ public class PersonnelTableModel extends DataTableModel {
                     break;
                 case COL_FORCE:
                     Force force = getCampaign().getForceFor(p);
-                    if (null != force) {
+                    if (force != null) {
                         StringBuilder desc = new StringBuilder("<html><b>").append(force.getName())
                                 .append("</b>");
                         Force parent = force.getParentForce();
@@ -816,7 +810,7 @@ public class PersonnelTableModel extends DataTableModel {
                         desc.append("</html>");
                         setHtmlText(desc.toString());
                         Image forceImage = getImageFor(force);
-                        if (null != forceImage) {
+                        if (forceImage != null) {
                             setImage(forceImage);
                         } else {
                             clearImage();
@@ -827,7 +821,7 @@ public class PersonnelTableModel extends DataTableModel {
                     break;
                 case COL_HITS:
                     Image hitImage = getHitsImage(p.getHits());
-                    if (null != hitImage) {
+                    if (hitImage != null) {
                         setImage(hitImage);
                     } else {
                         clearImage();
@@ -841,21 +835,22 @@ public class PersonnelTableModel extends DataTableModel {
         }
 
         private Image getHitsImage(int hits) {
-            switch(hits) {
-            case 1:
-                return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/onehit.png");
-            case 2:
-                return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/twohits.png");
-            case 3:
-                return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/threehits.png");
-            case 4:
-                return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fourhits.png");
-            case 5:
-                return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fivehits.png");
-            case 6:
-                return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/sixhits.png");
+            switch (hits) {
+                case 1:
+                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/onehit.png");
+                case 2:
+                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/twohits.png");
+                case 3:
+                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/threehits.png");
+                case 4:
+                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fourhits.png");
+                case 5:
+                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fivehits.png");
+                case 6:
+                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/sixhits.png");
+                default:
+                    return null;
             }
-            return null;
         }
     }
 
