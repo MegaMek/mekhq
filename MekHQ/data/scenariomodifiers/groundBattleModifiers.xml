@@ -11,6 +11,9 @@
 			EnemyReinforcements.xml
 		</modifier>
 		<modifier>
+			OverwhelmingEnemyGroundReinforcements.xml
+		</modifier>
+		<modifier>
 			EnemyTankReinforcements.xml
 		</modifier>
 		<modifier>

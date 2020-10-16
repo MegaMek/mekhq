@@ -2,20 +2,16 @@ package mekhq.campaign.stratcon;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.stratcon.StratconContractDefinition.ObjectiveParameters;
-import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 
 public class StratconContractInitializer {
     public static final int NUM_LANCES_PER_TRACK = 3;
@@ -26,6 +22,10 @@ public class StratconContractInitializer {
     public static void InitializeCampaignState(AtBContract contract, Campaign campaign, StratconContractDefinition contractDefinition) {
         StratconCampaignState campaignState = new StratconCampaignState(contract);
         campaignState.setBriefingText(contractDefinition.getBriefing() + "<br/>" + generateCommandLevelText(contract));
+        campaignState.setStrategicObjectivesBehaveAsVPs(contractDefinition.objectivesBehaveAsVPs());
+        
+        // dependency: this is required here in order for scenario initialization to work properly
+        contract.setStratconCampaignState(campaignState);
         
         // First, initialize the proper number of tracks. Then:
         // for each objective: 
@@ -39,7 +39,10 @@ public class StratconContractInitializer {
         int numTracks = contract.getRequiredLances() / NUM_LANCES_PER_TRACK;
         
         for(int x = 0; x < numTracks; x++) {
-            StratconTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK);
+            int scenarioOdds = contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size() - 1));
+            int deploymentTime = contractDefinition.getDeploymentTimes().get(Compute.randomInt(contractDefinition.getDeploymentTimes().size() - 1));
+            
+            StratconTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK, scenarioOdds, deploymentTime);
             track.setDisplayableName(String.format("Track %d", x));
             campaignState.addTrack(track);
         }
@@ -48,7 +51,10 @@ public class StratconContractInitializer {
         // X = # required lances / 3, rounded up. The last track will have fewer required lances.
         int oddLanceCount = contract.getRequiredLances() % NUM_LANCES_PER_TRACK;
         if(oddLanceCount > 0) {
-            StratconTrackState track = initializeTrackState(oddLanceCount);
+            int scenarioOdds = contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size() - 1));
+            int deploymentTime = contractDefinition.getDeploymentTimes().get(Compute.randomInt(contractDefinition.getDeploymentTimes().size() - 1));
+            
+            StratconTrackState track = initializeTrackState(oddLanceCount, scenarioOdds, deploymentTime);
             track.setDisplayableName(String.format("Track %d", campaignState.getTracks().size()));
             campaignState.addTrack(track);
         }
@@ -83,7 +89,9 @@ public class StratconContractInitializer {
                 case FacilityDestruction:
                     initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, null, true);
                     break;
-                // leave it alone in any other case
+                case AnyScenarioVictory:
+                    campaignState.getGlobalScenarioModifiers().addAll(objectiveParams.objectiveScenarioModifiers);
+                    break;
                 }
             }
         }
@@ -115,13 +123,12 @@ public class StratconContractInitializer {
         }
         
         // now we're done
-        contract.setStratconCampaignState(campaignState);
     }
     
     /**
      * Set up initial state of a track, dimensions are based on number of assigned lances.
      */
-    public static StratconTrackState initializeTrackState(int numLances) {
+    public static StratconTrackState initializeTrackState(int numLances, int scenarioOdds, int deploymentTime) {
         // to initialize a track, 
         // 1. we set the # of required lances
         // 2. set the track size to a total of numlances * 28 hexes, a rectangle that is wider than it is taller
@@ -137,6 +144,9 @@ public class StratconContractInitializer {
         int width = numHexes / height;
         retVal.setWidth(width);
         retVal.setHeight(height);
+        
+        retVal.setScenarioOdds(scenarioOdds);
+        retVal.setDeploymentTime(deploymentTime);
         
         // todo: place terrain
         
@@ -177,13 +187,9 @@ public class StratconContractInitializer {
             StratconFacility sf =
                     facilitySubset == null ? 
                     StratconFacilityFactory.getRandomFacility() :
-                    StratconFacilityFactory.getFacilityByName(facilitySubset.get(Compute.randomInt(facilitySubset.size())));
+                    StratconFacilityFactory.getFacilityByName(facilitySubset.get(Compute.randomInt(facilitySubset.size() - 1)));
             sf.setOwner(owner);
             sf.setStrategicObjective(strategicObjective);
-            
-            if(sf.getFacilityType() == null) {
-                int alpha = 1;
-            }
             
             int x = Compute.randomInt(trackState.getWidth());
             int y = Compute.randomInt(trackState.getHeight());
@@ -223,7 +229,7 @@ public class StratconContractInitializer {
         for (int sCount = 0; sCount < numScenarios; sCount++) {
             // pick
             ScenarioTemplate template = StratconScenarioFactory.getSpecificScenario(
-                    objectiveScenarios.get(Compute.randomInt(objectiveScenarios.size())));
+                    objectiveScenarios.get(Compute.randomInt(objectiveScenarios.size() - 1)));
             
             // plonk
             int x = Compute.randomInt(trackState.getWidth());
@@ -255,16 +261,21 @@ public class StratconContractInitializer {
             scenario.setStrategicObjective(true);
             
             // apply objective mods
-            for(String modifier : objectiveModifiers) {
-                scenario.getBackingScenario().addScenarioModifier(AtBScenarioModifier.getScenarioModifier(modifier));
+            if(objectiveModifiers != null) {
+                for(String modifier : objectiveModifiers) {
+                    scenario.getBackingScenario().addScenarioModifier(AtBScenarioModifier.getScenarioModifier(modifier));
+                }
             }
             
             trackState.addScenario(scenario);
         }
     }
     
+    /**
+     * Generates additional instructional text based on the contract command rights
+     */
     private static String generateCommandLevelText(AtBContract contract) {
-        switch(contract.getCommandRights()) {
+        switch (contract.getCommandRights()) {
         case AtBContract.COM_INTEGRATED:
             return "Lance assignments will be made by the employer."
                     + "Complete required scenarios to fulfill contract conditions."; 

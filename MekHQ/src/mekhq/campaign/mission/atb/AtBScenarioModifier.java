@@ -548,6 +548,8 @@ public class AtBScenarioModifier implements Cloneable {
         this.unitRemovalCount = unitRemovalCount;
     }
 
+    @XmlElementWrapper(name="allowedMapLocations")
+    @XmlElement(name="allowedMapLocation")
     public List<MapLocation> getAllowedMapLocations() {
         return allowedMapLocations;
     }

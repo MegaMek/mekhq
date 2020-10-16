@@ -251,10 +251,14 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         for(int x = 0; x < currentTrack.getWidth(); x++) {            
             for(int y = 0; y < currentTrack.getHeight(); y++) {
-                if(currentTrack.getScenario(new StratconCoords(x, y)) != null) {
+                StratconCoords currentCoords = new StratconCoords(x, y);
+                
+                if(currentTrack.getScenario(currentCoords) != null) {
                     g2D.setColor(Color.RED);
                     g2D.drawPolygon(scenarioMarker);
-                    drawTextEffect(g2D, scenarioMarker, "Hostile Force Detected");
+                    if(currentTrack.getFacility(currentCoords) == null) {
+                        drawTextEffect(g2D, scenarioMarker, "Hostile Force Detected");
+                    }
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -407,7 +411,12 @@ public class StratconPanel extends JPanel implements ActionListener {
             infoBuilder.append("<span color='green'>Recon complete</span>");
             
             StratconFacility facility = currentTrack.getFacility(boardState.getSelectedCoords());
+            
             if((facility != null) && (facility.getFacilityType() != null)) {
+                if (facility.isStrategicObjective()) {
+                    infoBuilder.append(String.format("<br/><span color='%s'>Contract objective located</span>", 
+                            facility.getOwner() == ForceAlignment.Allied ? "green" : "red"));
+                }
                 infoBuilder.append((facility.getOwner() == ForceAlignment.Allied) ? "<span color='green'>" : "<span color='red'>");
                 infoBuilder.append("<br/>");
                 infoBuilder.append(facility.getDisplayableName());
@@ -421,7 +430,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         
         
         StratconScenario selectedScenario = getSelectedScenario();
-        if(selectedScenario != null) {
+        if (selectedScenario != null) {
             infoBuilder.append(selectedScenario.getInfo());
         }
         

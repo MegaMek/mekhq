@@ -49,7 +49,7 @@ public class AtBScenarioManifest {
         AtBScenarioManifest resultingManifest = null;
         File inputFile = new File(fileName);
         if(!inputFile.exists()) {
-            MekHQ.getLogger().warning(ScenarioModifierManifest.class, "Deserialize", String.format("Specified file %s does not exist", fileName));
+            MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
             return null;
         }
 
@@ -62,7 +62,7 @@ public class AtBScenarioManifest {
                 resultingManifest = manifestElement.getValue();
             }
         } catch(Exception e) {
-            MekHQ.getLogger().error(AtBScenarioManifest.class, "Deserialize", "Error Deserializing Scenario Manifest", e);
+            MekHQ.getLogger().error("Error Deserializing Scenario Manifest", e);
         }
 
         return resultingManifest;

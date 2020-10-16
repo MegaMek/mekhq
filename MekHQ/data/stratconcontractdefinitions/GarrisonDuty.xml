@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ScenarioTemplate>
+    <alliedFacilityCount>0</alliedFacilityCount>
+    <briefing>Defend designated facilities.</briefing>
+    <contractTypeName>Garrison Duty</contractTypeName>
+    <hostileFacilityCount>0</hostileFacilityCount>
+	<scenarioOdds>
+		<scenarioOdds>10</scenarioOdds>
+		<scenarioOdds>20</scenarioOdds>
+		<scenarioOdds>20</scenarioOdds>
+		<scenarioOdds>20</scenarioOdds>
+	</scenarioOdds>
+	<deploymentTimes>
+		<deploymentTimes>0</deploymentTimes>
+		<deploymentTimes>1</deploymentTimes>
+		<deploymentTimes>2</deploymentTimes>
+		<deploymentTimes>3</deploymentTimes>
+	</deploymentTimes>
+    <objectiveParameters>
+        <objectiveParameter>
+		<objectiveType>AlliedFacilityControl</objectiveType>
+		<objectiveCount>-1</objectiveCount>
+        </objectiveParameter>
+    </objectiveParameters>
+</ScenarioTemplate>

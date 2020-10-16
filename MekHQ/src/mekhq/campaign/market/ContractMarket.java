@@ -360,7 +360,7 @@ public class ContractMarket implements Serializable {
 			contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
 		}
         if (contract.getSystem() == null) {
-		    MekHQ.getLogger().warning(this, "Could not find contract location for "
+		    MekHQ.getLogger().warning("Could not find contract location for "
 		                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode());
 			if (retries > 0) {
 				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
@@ -401,7 +401,8 @@ public class ContractMarket implements Serializable {
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
 
-        StratconContractInitializer.InitializeCampaignState(contract, campaign, StratconContractDefinition.createTestContract());
+        StratconContractInitializer.InitializeCampaignState(contract, campaign, 
+                StratconContractDefinition.getContractDefinition(contract.getMissionType()));
 
 		return contract;
 	}

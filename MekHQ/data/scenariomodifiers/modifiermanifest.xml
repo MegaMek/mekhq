@@ -8,7 +8,13 @@
 			EnemyAirSupportBombers.xml
 		</modifier>
 		<modifier>
+			OverwhelmingEnemyAirReinforcements.xml
+		</modifier>
+		<modifier>
 			EnemyReinforcements.xml
+		</modifier>
+		<modifier>
+			OverwhelmingEnemyGroundReinforcements.xml
 		</modifier>
 		<modifier>
 			EnemyTankReinforcements.xml

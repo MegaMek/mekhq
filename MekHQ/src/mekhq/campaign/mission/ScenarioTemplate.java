@@ -160,7 +160,7 @@ public class ScenarioTemplate implements Cloneable {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
+            MekHQ.getLogger().error(e);
         }
     }
     
@@ -178,7 +178,7 @@ public class ScenarioTemplate implements Cloneable {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, pw);
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
+            MekHQ.getLogger().error(e);
         }
     }
     
@@ -190,7 +190,7 @@ public class ScenarioTemplate implements Cloneable {
     public static ScenarioTemplate Deserialize(String filePath) {
         File inputFile = new File(filePath);
         if(!inputFile.exists()) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", String.format("Cannot deserialize file %s, does not exist", filePath));
+            MekHQ.getLogger().error(String.format("Cannot deserialize file %s, does not exist", filePath));
             return null;
         }
         
@@ -214,7 +214,7 @@ public class ScenarioTemplate implements Cloneable {
                 resultingTemplate = templateElement.getValue();
             }
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", "Error Deserializing Scenario Template", e);
+            MekHQ.getLogger().error("Error Deserializing Scenario Template", e);
         }
 
         return resultingTemplate;
@@ -234,7 +234,7 @@ public class ScenarioTemplate implements Cloneable {
             JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(xmlNode, ScenarioTemplate.class);
             resultingTemplate = templateElement.getValue();
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", "Error Deserializing Scenario Template", e);
+            MekHQ.getLogger().error("Error Deserializing Scenario Template", e);
         }
         
         return resultingTemplate;

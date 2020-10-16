@@ -38,6 +38,10 @@ public class StratconCampaignState {
     private int pendingStrategicObjectiveCount;
     private int completedStrategicObjectiveCount;
     private String briefingText; 
+    private boolean strategicObjectivesBehaveAsVPs;
+    
+    // these are applied to any scenario generated in the campaign; use sparingly
+    private List<String> globalScenarioModifiers = new ArrayList<>(); 
     
     @XmlElementWrapper(name="campaignTracks")
     @XmlElement(name="campaignTrack")
@@ -111,6 +115,22 @@ public class StratconCampaignState {
 
     public void setBriefingText(String briefingText) {
         this.briefingText = briefingText;
+    }
+
+    public boolean strategicObjectivesBehaveAsVPs() {
+        return strategicObjectivesBehaveAsVPs;
+    }
+
+    public void setStrategicObjectivesBehaveAsVPs(boolean strategicObjectivesBehaveAsVPs) {
+        this.strategicObjectivesBehaveAsVPs = strategicObjectivesBehaveAsVPs;
+    }
+
+    public List<String> getGlobalScenarioModifiers() {
+        return globalScenarioModifiers;
+    }
+
+    public void setGlobalScenarioModifiers(List<String> globalScenarioModifiers) {
+        this.globalScenarioModifiers = globalScenarioModifiers;
     }
 
     public int getPendingStrategicObjectiveCount() {

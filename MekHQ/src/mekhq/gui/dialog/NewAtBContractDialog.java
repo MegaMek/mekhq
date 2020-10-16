@@ -532,7 +532,8 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         contract.calculatePartsAvailabilityLevel(campaign);
         
-        StratconContractInitializer.InitializeCampaignState((AtBContract) contract, campaign, StratconContractDefinition.createTestContract());
+        StratconContractInitializer.InitializeCampaignState(contract, campaign, 
+                StratconContractDefinition.getContractDefinition(contract.getMissionType()));
 
         campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                 "Advance monies for " + contract.getName(), campaign.getLocalDate());

@@ -143,6 +143,8 @@ public class StratconTab extends CampaignGuiTab {
         sb.append("<html>");
         
         sb.append(currentContract.getMissionTypeName()).append(": ").append(currentContract.getName());
+        sb.append("<br/>");
+        sb.append(campaignState.getBriefingText());
         sb.append("<br/>Strategic Objectives: ").append(campaignState.getStrategicObjectiveCompletedCount())
             .append("/").append(campaignState.getPendingStrategicObjectiveCount());
         
