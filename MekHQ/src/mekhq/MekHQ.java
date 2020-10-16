@@ -355,7 +355,7 @@ public class MekHQ implements GameListener {
         msg.append("\n\tTotal memory available to MegaMek: ")
                 .append(NumberFormat.getInstance().format(Runtime.getRuntime().maxMemory() / 1024))
                 .append(" kB");
-        getLogger().info(this, msg.toString());
+        getLogger().info(msg.toString());
     }
 
     /**
@@ -430,7 +430,7 @@ public class MekHQ implements GameListener {
         try {
             client = new Client(playerName, serverAddress, port);
         } catch (Exception e) {
-            getLogger().error(this, "Failed to connect to server properly", e);
+            getLogger().error("Failed to connect to server properly", e);
             return;
         }
 
@@ -482,7 +482,7 @@ public class MekHQ implements GameListener {
             stopHost();
             return;
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, "Failed to start up server", ex);
+            MekHQ.getLogger().error("Failed to start up server", ex);
             stopHost();
             return;
         }
@@ -494,9 +494,9 @@ public class MekHQ implements GameListener {
 
         // Start the game thread
         if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
-            gameThread = new AtBGameThread(playerName, client, this, meks, (AtBScenario) scenario);
+            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario);
         } else {
-            gameThread = new GameThread(playerName, client, this, meks);
+            gameThread = new GameThread(playerName, password, client, this, meks);
         }
         gameThread.start();
     }
@@ -597,7 +597,7 @@ public class MekHQ implements GameListener {
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
 
         } catch (Exception e) {
-            getLogger().error(this, e);
+            getLogger().error(e);
         }
     }
 
@@ -684,7 +684,6 @@ public class MekHQ implements GameListener {
 	}
 
     private static void setLookAndFeel(String themeName) {
-        final String METHOD_NAME = "setLookAndFeel";
         Runnable runnable = () -> {
             try {
                 UIManager.setLookAndFeel(themeName);
@@ -706,7 +705,7 @@ public class MekHQ implements GameListener {
                     InstantiationException |
                     IllegalAccessException |
                     UnsupportedLookAndFeelException e) {
-                MekHQ.getLogger().error(MekHQ.class, METHOD_NAME, e);
+                MekHQ.getLogger().error(e);
             }
         };
         SwingUtilities.invokeLater(runnable);

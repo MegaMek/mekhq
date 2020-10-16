@@ -34,6 +34,7 @@ import megamek.common.Tank;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -55,6 +56,7 @@ import static org.junit.Assert.*;
  */
 public class FieldManualMercRevDragoonsRatingTest {
     private Campaign mockCampaign;
+    private Hangar mockHangar;
 
     private List<Person> mockPersonnelList;
     private List<Person> mockActivePersonnelList;
@@ -72,6 +74,8 @@ public class FieldManualMercRevDragoonsRatingTest {
     @Before
     public void setUp() {
         mockCampaign = mock(Campaign.class);
+        mockHangar = mock(Hangar.class);
+        when(mockCampaign.getHangar()).thenReturn(mockHangar);
 
         mockPersonnelList = new ArrayList<>();
         mockActivePersonnelList = new ArrayList<>();
@@ -307,7 +311,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         unitList.add(mockLightning2);
         unitList.add(mockUnion);
         unitList.add(mockInvader);
-        doReturn(unitList).when(mockCampaign).getCopyOfUnits();
+        when(mockHangar.getUnits()).thenReturn(unitList);
 
         spyRating.initValues();
     }

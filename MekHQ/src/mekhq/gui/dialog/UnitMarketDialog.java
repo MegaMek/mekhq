@@ -338,7 +338,7 @@ public class UnitMarketDialog extends JDialog {
                 campaign.getFinances().debit(cost, Transaction.C_UNIT,
                         "Purchased " + selectedEntity.getShortName(),
                         campaign.getLocalDate());
-                campaign.addUnit(selectedEntity, false, transitDays);
+                campaign.addNewUnit(selectedEntity, false, transitDays);
                 if (!campaign.getCampaignOptions().getInstantUnitMarketDelivery()) {
                     campaign.addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
                 }
@@ -353,7 +353,7 @@ public class UnitMarketDialog extends JDialog {
 
     private void addUnit() {
         if (null != selectedEntity) {
-            campaign.addUnit(selectedEntity, false, 0);
+            campaign.addNewUnit(selectedEntity, false, 0);
             UnitMarket.MarketOffer selected = ((UnitMarketTableModel) tableUnits.getModel())
                     .getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
             unitMarket.removeOffer(selected);

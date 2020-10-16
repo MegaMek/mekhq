@@ -45,6 +45,7 @@ import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.unit.HangarStatistics;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 
@@ -342,15 +343,16 @@ public class PersonnelMarket {
     }
 
     public static long getUnitMainForceTypes(Campaign c) {
-        int mechs = c.getNumberOfUnitsByType(Entity.ETYPE_MECH);
-        int ds = c.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
-        int sc = c.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
-        int cf = c.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
-        int asf = c.getNumberOfUnitsByType(Entity.ETYPE_AERO);
-        int vee = c.getNumberOfUnitsByType(Entity.ETYPE_TANK, true) + c.getNumberOfUnitsByType(Entity.ETYPE_TANK);
-        int inf = c.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
-        int ba = c.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
-        int proto = c.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
+        HangarStatistics hangarStats = c.getHangarStatistics();
+        int mechs = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MECH);
+        int ds = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
+        int sc = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
+        int cf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
+        int asf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AERO);
+        int vee = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true) + hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
+        int inf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
+        int ba = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
+        int proto = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
         int most = mechs;
         if (ds > most) {
             most = ds;

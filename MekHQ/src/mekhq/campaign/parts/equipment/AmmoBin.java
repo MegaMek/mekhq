@@ -552,6 +552,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         AmmoType aType;
         AmmoType curType = (AmmoType)as.getType();
         int converted = 0;
+
+        // TODO: make this less intensive.
         for(Part part : campaign.getSpareParts()) {
             if(!part.isPresent()) {
                 continue;

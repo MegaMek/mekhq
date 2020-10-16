@@ -96,6 +96,8 @@ public class CampaignOptions implements Serializable {
     public static final String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"}; // FIXME: This needs to be localized
 
     //Mass Repair/Salvage Options
+    private boolean massRepairUseRepair;
+    private boolean massRepairUseSalvage;
     private boolean massRepairUseExtraTime;
     private boolean massRepairUseRushJob;
     private boolean massRepairAllowCarryover;
@@ -406,6 +408,8 @@ public class CampaignOptions implements Serializable {
         repairSystem = REPAIR_SYSTEM_STRATOPS;
 
         //Mass Repair/Salvage Options
+        massRepairUseRepair = true;
+        massRepairUseSalvage = true;
         massRepairUseExtraTime = true;
         massRepairUseRushJob = true;
         massRepairAllowCarryover = true;
@@ -2946,6 +2950,22 @@ public class CampaignOptions implements Serializable {
     }
 
     //region Mass Repair/ Mass Salvage
+    public boolean massRepairUseRepair() {
+        return massRepairUseRepair;
+    }
+
+    public void setMassRepairUseRepair(boolean massRepairUseRepair) {
+        this.massRepairUseRepair = massRepairUseRepair;
+    }
+
+    public boolean massRepairUseSalvage() {
+        return massRepairUseSalvage;
+    }
+
+    public void setMassRepairUseSalvage(boolean massRepairUseSalvage) {
+        this.massRepairUseSalvage = massRepairUseSalvage;
+    }
+
     public boolean massRepairUseExtraTime() {
         return massRepairUseExtraTime;
     }
@@ -3321,38 +3341,40 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
 
         //Mass Repair/Salvage Options
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseExtraTime", massRepairUseExtraTime);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseRushJob", massRepairUseRushJob);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairAllowCarryover", massRepairAllowCarryover);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairOptimizeToCompleteToday", massRepairOptimizeToCompleteToday);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairScrapImpossible", massRepairScrapImpossible);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseAssignedTechsFirst", massRepairUseAssignedTechsFirst);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairReplacePod", massRepairReplacePod);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, ++indent, "massRepairUseRepair", massRepairUseRepair());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairUseSalvage", massRepairUseSalvage());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairUseExtraTime", massRepairUseExtraTime);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairUseRushJob", massRepairUseRushJob);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairAllowCarryover", massRepairAllowCarryover);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairOptimizeToCompleteToday", massRepairOptimizeToCompleteToday);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairScrapImpossible", massRepairScrapImpossible);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairUseAssignedTechsFirst", massRepairUseAssignedTechsFirst);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairReplacePod", massRepairReplacePod);
 
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "massRepairOptions");
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "massRepairOptions");
         for (MassRepairOption massRepairOption : massRepairOptions) {
-            massRepairOption.writeToXML(pw1, indent + 2);
+            massRepairOption.writeToXML(pw1, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "massRepairOptions");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "massRepairOptions");
 
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+        pw1.println(MekHqXmlUtil.indentStr(indent)
                 + "<planetTechAcquisitionBonus>"
                 + StringUtils.join(planetTechAcquisitionBonus, ',')
                 + "</planetTechAcquisitionBonus>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+        pw1.println(MekHqXmlUtil.indentStr(indent)
                 + "<planetIndustryAcquisitionBonus>"
                 + StringUtils.join(planetIndustryAcquisitionBonus, ',')
                 + "</planetIndustryAcquisitionBonus>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+        pw1.println(MekHqXmlUtil.indentStr(indent)
                 + "<planetOutputAcquisitionBonus>"
                 + StringUtils.join(planetOutputAcquisitionBonus, ',')
                 + "</planetOutputAcquisitionBonus>");
 
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+        pw1.println(MekHqXmlUtil.indentStr(indent)
                     + "<salaryTypeBase>"
                     + Utilities.printMoneyArray(salaryTypeBase)
                     + "</salaryTypeBase>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+        pw1.println(MekHqXmlUtil.indentStr(indent)
                     + "<salaryXpMultiplier>"
                     + StringUtils.join(salaryXpMultiplier, ',')
                     + "</salaryXpMultiplier>");
@@ -3367,20 +3389,20 @@ public class CampaignOptions implements Serializable {
             }
         }
 
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePortraitForType", csv.toString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePortraitForType", csv.toString());
 
         //region AtB Options
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBUnitMarket", useAtBUnitMarket);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rats", StringUtils.join(rats, ','));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAtBUnitMarket", useAtBUnitMarket);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "rats", StringUtils.join(rats, ','));
         if (staticRATs) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<staticRATs/>");
+            pw1.println(MekHqXmlUtil.indentStr(indent) + "<staticRATs/>");
         }
 
         if (ignoreRatEra) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<ignoreRatEra/>");
+            pw1.println(MekHqXmlUtil.indentStr(indent) + "<ignoreRatEra/>");
         }
         //endregion AtB Options
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "campaignOptions");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "campaignOptions");
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
@@ -3949,6 +3971,10 @@ public class CampaignOptions implements Serializable {
                 retVal.staticRATs = true;
             } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) {
                 retVal.ignoreRatEra = true;
+            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) {
+                retVal.setMassRepairUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseSalvage")) {
+                retVal.setMassRepairUseSalvage(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseExtraTime")) {
                 retVal.massRepairUseExtraTime = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRushJob")) {

@@ -667,7 +667,7 @@ public class PlanetarySystemMapPanel extends JPanel {
     private Unit getBestDropship() {
         Unit bestUnit = null;
         double bestWeight = 0.0;
-        for (Unit u : campaign.getUnits()) {
+        for (Unit u : campaign.getHangar().getUnits()) {
             if (u.getEntity() instanceof Dropship && u.getEntity().getWeight() > bestWeight) {
                 bestUnit = u;
                 bestWeight = u.getEntity().getWeight();
@@ -684,7 +684,7 @@ public class PlanetarySystemMapPanel extends JPanel {
     private Unit getBestJumpship() {
         Unit bestUnit = null;
         double bestWeight = 0.0;
-        for (Unit u : campaign.getUnits()) {
+        for (Unit u : campaign.getHangar().getUnits()) {
             if (u.getEntity() instanceof Jumpship && u.getEntity().getWeight() > bestWeight) {
                 bestUnit = u;
                 bestWeight = u.getEntity().getWeight();

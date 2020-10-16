@@ -1592,16 +1592,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void unloadTransportShip() {
         clearTransportedUnits();
         initializeBaySpace();
+
         // And now reset the Transported values for all the units we just booted
-        for (Unit u : campaign.getUnits()) {
-            if (u.hasTransportShipId()) {
-                for (UUID id : u.getTransportShipId().keySet()) {
-                    if (id.equals(getId())) {
-                        u.getTransportShipId().clear();
-                    }
-                }
+        UUID id = getId();
+        campaign.getHangar().forEachUnit(u -> {
+            if (u.hasTransportShipId() && u.getTransportShipId().containsKey(id)) {
+                u.getTransportShipId().clear();
             }
-        }
+        });
     }
 
     public double getUnitCostMultiplier() {
@@ -4493,6 +4491,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             setMothballTime(getMothballOrActivationTime());
             getCampaign().mothball(this);
         } else {
+            completeMothball();
             getCampaign().addReport(getHyperlinkedName() + " has been mothballed (GM)");
         }
     }

@@ -86,7 +86,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             return Money.zero();
         }
 
-        FinancialReport r = campaign.getFinancialReport();
+        FinancialReport r = FinancialReport.calculate(campaign);
 
         Money netWorth = r.getNetWorth();
         if (campaign.getCampaignOptions().getSharesExcludeLargeCraft()) {

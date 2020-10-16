@@ -89,24 +89,25 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         setCountClan(0);
         setCountIS2(0);
 
-        for (Unit u : getCampaign().getCopyOfUnits()) {
-            if ((null == u) || !u.isPresent()) {
+        for (Unit u : getCampaign().getHangar().getUnits()) {
+            if (!u.isPresent()) {
                 continue;
             }
-            MekHQ.getLogger().debug(this, "Processing unit " + u.getName());
+
+            MekHQ.getLogger().debug("Processing unit " + u.getName());
             if (u.isMothballed()) {
-                MekHQ.getLogger().debug(this, "Unit " + u.getName() + " is mothballed. Skipping.");
+                MekHQ.getLogger().debug("Unit " + u.getName() + " is mothballed. Skipping.");
                 continue;
             }
 
             updateUnitCounts(u);
             BigDecimal value = getUnitValue(u);
-            MekHQ.getLogger().debug(this, "Unit " + u.getName() + " -- Value = " + value.toPlainString());
+            MekHQ.getLogger().debug("Unit " + u.getName() + " -- Value = " + value.toPlainString());
             setNumberUnits(getNumberUnits().add(value));
 
             Person p = u.getCommander();
             if (null != p) {
-                MekHQ.getLogger().debug(this, "Unit " + u.getName()
+                MekHQ.getLogger().debug("Unit " + u.getName()
                         + " -- Adding commander (" + p.getFullTitle() + "" + ") to commander list.");
                 getCommanderList().add(p);
             }

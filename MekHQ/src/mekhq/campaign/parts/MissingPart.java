@@ -158,30 +158,35 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
     public abstract boolean isAcceptableReplacement(Part part, boolean refit);
 
     public Part findReplacement(boolean refit) {
-        Part bestPart = null;
-
         //check to see if we already have a replacement assigned
         if (hasReplacementPart()) {
             return getReplacementPart();
         }
 
         // don't just return with the first part if it is damaged
-        for(Part part : campaign.getSpareParts()) {
-            if (part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent() || part.hasParentPart() || part.isUsedForRefitPlanning()) {
-                continue;
-            }
-
-            if(isAcceptableReplacement(part, refit)) {
-                if(null == bestPart) {
-                    bestPart = part;
-                } else if(bestPart.needsFixing() && !part.needsFixing()) {
-                    bestPart = part;
-                } else if (bestPart.getQuality() < part.getQuality()) {
-                    bestPart = part;
+        return campaign.streamSpareParts()
+            .filter(MissingPart::isAvailableAsReplacement)
+            .reduce(null, (bestPart, part) -> {
+                if (isAcceptableReplacement(part, refit)) {
+                    if (bestPart == null) {
+                        return part;
+                    } else if (bestPart.needsFixing() && !part.needsFixing()) {
+                        return part;
+                    } else if (bestPart.getQuality() < part.getQuality()) {
+                        return part;
+                    }
                 }
-            }
-        }
-        return bestPart;
+                return bestPart;
+            });
+    }
+
+    /**
+     * Gets a value indicating whether or not a part is available
+     * as a replacement.
+     * @param part The part being considered as a replacement.
+     */
+    public static boolean isAvailableAsReplacement(Part part) {
+        return !(part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent() || part.hasParentPart());
     }
 
     public boolean isReplacementAvailable() {

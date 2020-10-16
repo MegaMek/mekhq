@@ -153,7 +153,7 @@ public class FinancialReport {
         r.loans = campaign.getFinances().getLoanBalance();
         r.assets = campaign.getFinances().getTotalAssetValue();
 
-        for (Unit u : campaign.getUnits()) {
+        campaign.getHangar().forEachUnit(u -> {
             Money value = u.getSellValue();
             if (u.getEntity() instanceof Mech) {
                 r.mech = r.mech.plus(value);
@@ -171,7 +171,7 @@ public class FinancialReport {
             } else if (u.getEntity() instanceof Protomech) {
                 r.proto = r.proto.plus(value);
             }
-        }
+        });
 
         r.spareParts = r.spareParts.plus(
             campaign.streamSpareParts()
@@ -179,19 +179,21 @@ public class FinancialReport {
                 .collect(Collectors.toList()));
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Accountant accountant = campaign.getAccountant();
+
         if (campaignOptions.payForMaintain()) {
-            r.maintenance = campaign.getWeeklyMaintenanceCosts().multipliedBy(4);
+            r.maintenance = accountant.getWeeklyMaintenanceCosts().multipliedBy(4);
         }
         if (campaignOptions.payForSalaries()) {
-            r.salaries = campaign.getPayRoll();
+            r.salaries = accountant.getPayRoll();
         }
         if (campaignOptions.payForOverhead()) {
-            r.overhead = campaign.getOverheadExpenses();
+            r.overhead = accountant.getOverheadExpenses();
         }
         if (campaignOptions.usePeacetimeCost()) {
-            r.coSpareParts = campaign.getMonthlySpareParts();
-            r.coAmmo = campaign.getMonthlyAmmo();
-            r.coFuel = campaign.getMonthlyFuel();
+            r.coSpareParts = accountant.getMonthlySpareParts();
+            r.coAmmo = accountant.getMonthlyAmmo();
+            r.coFuel = accountant.getMonthlyFuel();
         }
 
         r.contracts = r.contracts.plus(

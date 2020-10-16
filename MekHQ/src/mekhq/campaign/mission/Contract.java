@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
+import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import org.apache.commons.text.CharacterPredicate;
 import org.apache.commons.text.RandomStringGenerator;
@@ -488,7 +489,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @return the cumulative sum of estimated overhead expenses for the duration of travel + deployment
      */
     public Money getTotalEstimatedOverheadExpenses(Campaign c) {
-        return c.getOverheadExpenses().multipliedBy(getLengthPlusTravel(c));
+        return c.getAccountant().getOverheadExpenses().multipliedBy(getLengthPlusTravel(c));
     }
 
     /**
@@ -496,7 +497,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @return the cumulative sum of estimated maintenance expenses for the duration of travel + deployment
      */
     public Money getTotalEstimatedMaintenanceExpenses(Campaign c) {
-        return c.getMaintenanceCosts().multipliedBy(getLengthPlusTravel(c));
+        return c.getAccountant().getMaintenanceCosts().multipliedBy(getLengthPlusTravel(c));
     }
 
     /**
@@ -504,10 +505,11 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @return the estimated payroll expenses for one month
      */
     public Money getEstimatedPayrollExpenses(Campaign c) {
+        Accountant accountant = c.getAccountant();
         if (c.getCampaignOptions().usePeacetimeCost()) {
-            return c.getPeacetimeCost();
+            return accountant.getPeacetimeCost();
         } else {
-            return c.getPayRoll();
+            return accountant.getPayRoll();
         }
     }
 
@@ -572,20 +574,22 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @param c current campaign
      */
     public void calculateContract(Campaign c) {
+        Accountant accountant = c.getAccountant();
+
         //calculate base amount
-        baseAmount = c.getContractBase()
+        baseAmount = accountant.getContractBase()
                 .multipliedBy(getLength())
                 .multipliedBy(paymentMultiplier);
 
         //calculate overhead
         switch(overheadComp) {
         case OH_HALF:
-            overheadAmount = c.getOverheadExpenses()
+            overheadAmount = accountant.getOverheadExpenses()
                     .multipliedBy(getLength())
                     .multipliedBy(0.5);
             break;
         case OH_FULL:
-            overheadAmount = c.getOverheadExpenses().multipliedBy(getLength());
+            overheadAmount = accountant.getOverheadExpenses().multipliedBy(getLength());
             break;
         default:
             overheadAmount = Money.zero();
@@ -594,18 +598,14 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         //calculate support amount
         if (c.getCampaignOptions().usePeacetimeCost()
                 && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
-            supportAmount = c.getPeacetimeCost()
+            supportAmount = accountant.getPeacetimeCost()
                                 .multipliedBy(getLength())
                                 .multipliedBy(straightSupport)
                                 .dividedBy(100);
         } else {
-            Money maintCosts = Money.zero();
-            for (Unit u : c.getUnits()) {
-                if (u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
-                    continue;
-                }
-                maintCosts = maintCosts.plus(u.getWeeklyMaintenanceCost());
-            }
+            Money maintCosts = c.getHangar().getUnitCosts(
+                u -> !(u.getEntity() instanceof Infantry) || (u.getEntity() instanceof BattleArmor),
+                Unit::getWeeklyMaintenanceCost);
             maintCosts = maintCosts.multipliedBy(4);
             supportAmount = maintCosts
                                 .multipliedBy(getLength())
@@ -633,7 +633,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         if (c.getCampaignOptions().usePeacetimeCost()
                 && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
             //contract base * transport period * reputation * employer modifier
-            transitAmount = c.getContractBase()
+            transitAmount = accountant.getContractBase()
                                     .multipliedBy(((getJumpPath(c).getJumps()) * 2.0) / 4.0)
                                     .multipliedBy(c.getUnitRatingMod() * 0.2 + 0.5)
                                     .multipliedBy(1.2);
