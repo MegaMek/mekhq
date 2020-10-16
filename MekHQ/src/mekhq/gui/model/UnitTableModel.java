@@ -265,10 +265,6 @@ public class UnitTableModel extends DataTableModel {
         return campaign;
     }
 
-    public void refreshData() {
-        setData(new ArrayList<>(getCampaign().getHangar().getUnits()));
-    }
-
     public TableCellRenderer getRenderer(boolean graphic) {
         return (graphic) ? new UnitTableModel.VisualRenderer() : new UnitTableModel.Renderer();
     }
@@ -290,9 +286,9 @@ public class UnitTableModel extends DataTableModel {
             if (!isSelected) {
                 if (u.isDeployed()) {
                     applyColors(colors.getDeployed());
-                } else if(!u.isPresent()) {
+                } else if (!u.isPresent()) {
                     applyColors(colors.getInTransit());
-                } else if(u.isRefitting()) {
+                } else if (u.isRefitting()) {
                     applyColors(colors.getRefitting());
                 } else if (u.isMothballing()) {
                     applyColors(colors.getMothballing());

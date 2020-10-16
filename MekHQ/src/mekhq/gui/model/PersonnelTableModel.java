@@ -303,12 +303,12 @@ public class PersonnelTableModel extends DataTableModel {
                 return p.getAbilityListAsString(PilotOptions.LVL3_ADVANTAGES);
             case COL_NIMP:
                 return p.getAbilityListAsString(PilotOptions.MD_ADVANTAGES);
-            case COL_ASSIGN:
+            case COL_ASSIGN: {
                 if ((p.getTechUnitIDs().size() > 1) && !loadAssignmentFromMarket) {
                     StringBuilder toReturn = new StringBuilder("<html>");
                     for (UUID id : p.getTechUnitIDs()) {
                         Unit u = getCampaign().getUnit(id);
-                        if (null != u) {
+                        if (u != null) {
                             toReturn.append(u.getName()).append("<br>");
                         }
                     }
@@ -317,6 +317,7 @@ public class PersonnelTableModel extends DataTableModel {
                 } else {
                     return null;
                 }
+            }
             default:
                 return null;
         }
@@ -333,11 +334,7 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public Person getPerson(int i) {
-        if (i >= data.size()) {
-            return null;
-        } else {
-            return (Person) data.get(i);
-        }
+        return (i < data.size()) ? (Person) data.get(i) : null;
     }
 
     public boolean isDeployed(int row) {
@@ -362,13 +359,13 @@ public class PersonnelTableModel extends DataTableModel {
                 return p.getGivenName();
             case COL_LAST_NAME:
                 return p.getLastName();
-            case COL_SURNAME:
+            case COL_SURNAME: {
                 toReturn = p.getSurname();
                 if (StringUtil.isNullOrEmpty(toReturn)) {
                     return "";
                 } else if (!getGroupByUnit()) {
                     return toReturn;
-                } else  {
+                } else {
                     // If we're grouping by unit, determine the number of persons under
                     // their command.
                     UUID unitId = p.getUnitId();
@@ -398,22 +395,13 @@ public class PersonnelTableModel extends DataTableModel {
                                     ? resources.getString("surname_soldiers.text")
                                     : resources.getString("surname_crew.text"));
                 }
+            }
             case COL_HONORIFIC:
-                toReturn = p.getHonorific();
-                if (!StringUtil.isNullOrEmpty(toReturn)) {
-                    return toReturn;
-                } else {
-                    return "";
-                }
+                return p.getHonorific();
             case COL_CALL:
                 return p.getCallsign();
             case COL_BLOODNAME:
-                toReturn = p.getBloodname();
-                if (!StringUtil.isNullOrEmpty(toReturn)) {
-                    return toReturn;
-                } else {
-                    return "";
-                }
+                return p.getBloodname();
             case COL_GENDER:
                 return GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(p.getGender());
             case COL_AGE:
@@ -591,10 +579,10 @@ public class PersonnelTableModel extends DataTableModel {
                 return Integer.toString(p.getHits());
             case COL_SKILL:
                 return p.getSkillSummary();
-            case COL_ASSIGN:
+            case COL_ASSIGN: {
                 if (loadAssignmentFromMarket) {
                     Entity en = personnelMarket.getAttachedEntity(p);
-                    return ((en != null) ?  en.getDisplayName() : "-");
+                    return ((en != null) ? en.getDisplayName() : "-");
                 } else {
                     Unit u = getCampaign().getUnit(p.getUnitId());
                     if (u != null) {
@@ -633,22 +621,18 @@ public class PersonnelTableModel extends DataTableModel {
                     }
                 }
                 break;
+            }
             case COL_XP:
                 return Integer.toString(p.getXP());
             case COL_DEPLOY:
                 Unit u = getCampaign().getUnit(p.getUnitId());
-                if ((null != u) && u.isDeployed()) {
+                if ((u != null) && u.isDeployed()) {
                     return getCampaign().getScenario(u.getScenarioId()).getName();
                 }
-
                 break;
             case COL_FORCE:
                 Force force = getCampaign().getForceFor(p);
-                if (null != force) {
-                    return force.getName();
-                } else {
-                    return resources.getString("force_none.text");
-                }
+                return (force != null) ? force.getName() : resources.getString("force_none.text");
             case COL_SALARY:
                 return p.getSalary().toAmountAndSymbolString();
             case COL_KILLS:
