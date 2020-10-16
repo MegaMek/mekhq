@@ -18,14 +18,12 @@
  */
 package mekhq.gui;
 
-import java.awt.Component;
-import java.awt.Image;
+import java.awt.*;
 import java.util.UUID;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
-import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import megamek.client.ui.Messages;
@@ -52,14 +50,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                                                   boolean expanded, boolean leaf, int row,
                                                   boolean hasFocus) {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-
-        if (sel) {
-            setBackground(UIManager.getColor("Tree.selectionBackground"));
-            setForeground(UIManager.getColor("Tree.selectionForeground"));
-        } else {
-            setBackground(UIManager.getColor("Tree.background"));
-            setForeground(UIManager.getColor("Tree.textForeground"));
-        }
+        setOpaque(false);
 
         if (value instanceof Unit) {
             String name = "<font color='red'>No Crew</font>";
@@ -150,12 +141,17 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             if (!sel && u.isDeployed()) {
                 colors.getDeployed().getColor().ifPresent(this::setBackground);
                 colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                setOpaque(true);
             }
         } else if (value instanceof Force) {
             if (!sel && ((Force) value).isDeployed()) {
                 colors.getDeployed().getColor().ifPresent(this::setBackground);
                 colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                setOpaque(true);
             }
+        } else {
+            MekHQ.getLogger().error("Attempted to render node with unknown node class of "
+                    + ((value != null) ? value.getClass() : "null"));
         }
 
         setIcon(getIcon(value));
