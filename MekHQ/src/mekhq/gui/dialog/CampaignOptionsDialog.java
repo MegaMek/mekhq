@@ -4800,7 +4800,7 @@ public class CampaignOptionsDialog extends JDialog {
             return;
         }
 
-        MekHQ.getLogger().info(this, "Saving campaign options...");
+        MekHQ.getLogger().info("Saving campaign options...");
         // Choose a file...
         Optional<File> maybeFile = FileDialogs.saveCampaignOptions(null);
 
@@ -4832,9 +4832,9 @@ public class CampaignOptionsDialog extends JDialog {
              PrintWriter pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
             preset.writeToXml(pw, 0);
             pw.flush();
-            MekHQ.getLogger().info(this, "Campaign options saved to " + file);
+            MekHQ.getLogger().info("Campaign options saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
             JOptionPane.showMessageDialog(null,
                     "Whoops, for some reason the game presets could not be saved",
                     "Could not save presets", JOptionPane.ERROR_MESSAGE);
@@ -5203,7 +5203,7 @@ public class CampaignOptionsDialog extends JDialog {
                     int cost = Integer.parseInt((String) tableXP.getValueAt(i, j));
                     SkillType.setCost(SkillType.skillList[i], cost, j);
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(this, "unreadable value in skill cost table for " + SkillType.skillList[i]);
+                    MekHQ.getLogger().error("unreadable value in skill cost table for " + SkillType.skillList[i]);
                 }
             }
         }
