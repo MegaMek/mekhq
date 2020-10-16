@@ -760,7 +760,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                             for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType,
                                     gui.getCampaign().getCampaignOptions().getTechLevel())) {
                                 cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                                if (atype.equals(curType)) {
+                                // Identity Comparison is required, not .equals
+                                if (atype == curType) {
                                     cbMenuItem.setSelected(true);
                                 } else {
                                     cbMenuItem.setActionCommand(COMMAND_SWAP_AMMO + ":" + ammo.getId()
