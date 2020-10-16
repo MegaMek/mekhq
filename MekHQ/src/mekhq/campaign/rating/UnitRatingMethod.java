@@ -48,16 +48,16 @@ public enum UnitRatingMethod {
     //endregion Constructors
 
     //region Boolean Comparison Methods
+    public boolean isEnabled() {
+        return this != NONE;
+    }
+
     public boolean isCampaignOperations() {
         return this == CAMPAIGN_OPS;
     }
 
     public boolean isFMMR() {
         return this == FLD_MAN_MERCS_REV;
-    }
-
-    public boolean isEnabled() {
-        return isCampaignOperations() || isFMMR();
     }
     //endregion Boolean Comparison Methods
 
