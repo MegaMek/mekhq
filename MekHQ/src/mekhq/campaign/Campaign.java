@@ -1431,7 +1431,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
             // Higher rated units are more likely to have Bloodnamed
-            if (getCampaignOptions().useDragoonRating()) {
+            if (getCampaignOptions().getUnitRatingMethod().isEnabled()) {
                 IUnitRating rating = getUnitRating();
                 bloodnameTarget += IUnitRating.DRAGOON_C - (getCampaignOptions().getUnitRatingMethod().equals(
                         mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV)
@@ -6050,24 +6050,20 @@ public class Campaign implements Serializable, ITechManager {
      * the user here.
      */
     public int getUnitRatingMod() {
-        if (!getCampaignOptions().useDragoonRating()) {
+        if (!getCampaignOptions().getUnitRatingMethod().isEnabled()) {
             return IUnitRating.DRAGOON_C;
         }
         IUnitRating rating = getUnitRating();
-        return getCampaignOptions().getUnitRatingMethod()
-                .equals(mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV) ? rating.getUnitRatingAsInteger()
-                        : rating.getModifier();
+        return getCampaignOptions().getUnitRatingMethod().isFMMR() ? rating.getUnitRatingAsInteger()
+                : rating.getModifier();
     }
 
     /**
      * This is a better method for pairing AtB with IOpts with regards to Prisoner Capture
      */
     public int getUnitRatingAsInteger() {
-        if (getCampaignOptions().useDragoonRating()) {
-            return getUnitRating().getUnitRatingAsInteger();
-        } else {
-            return IUnitRating.DRAGOON_C;
-        }
+        return getCampaignOptions().getUnitRatingMethod().isEnabled()
+                ? getUnitRating().getUnitRatingAsInteger() : IUnitRating.DRAGOON_C;
     }
 
     public RandomSkillPreferences getRandomSkillPreferences() {
