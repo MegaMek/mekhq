@@ -359,6 +359,32 @@ public class UnitTableModel extends DataTableModel {
                     }
                     break;
                 }
+                case COL_FORCE: {
+                    Force force = getCampaign().getForceFor(u);
+                    if (force != null) {
+                        StringBuilder desc = new StringBuilder("<html><b>").append(force.getName())
+                                .append("</b>");
+                        Force parent = force.getParentForce();
+                        //cut off after three lines and don't include the top level
+                        int lines = 1;
+                        while ((parent != null) && (parent.getParentForce() != null) && (lines < 4)) {
+                            desc.append("<br>").append(parent.getName());
+                            lines++;
+                            parent = parent.getParentForce();
+                        }
+                        desc.append("</html>");
+                        setHtmlText(desc.toString());
+                        Image forceImage = getImageFor(force);
+                        if (forceImage != null) {
+                            setImage(forceImage);
+                        } else {
+                            clearImage();
+                        }
+                    } else {
+                        clearImage();
+                    }
+                    break;
+                }
                 case COL_TECH_CRW: {
                     Person p = u.getTech();
                     if (p != null) {
