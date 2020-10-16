@@ -84,7 +84,7 @@ public final class TOETab extends CampaignGuiTab {
         orgModel = new OrgTreeModel(getCampaign());
         orgTree = new JTree(orgModel);
         orgTree.addMouseListener(new TOEMouseAdapter(getCampaignGui()));
-        orgTree.setCellRenderer(new ForceRenderer(getIconPackage()));
+        orgTree.setCellRenderer(new ForceRenderer());
         orgTree.setRowHeight(60);
         orgTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         orgTree.addTreeSelectionListener(ev -> refreshForceView());
