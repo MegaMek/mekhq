@@ -110,8 +110,8 @@ public class UnitMarket implements Serializable {
             offers.clear();
 
             AtBContract contract = null;
-            for (Mission m : campaign.getMissions()) {
-                if (m.isActive() && m instanceof AtBContract) {
+            for (Mission m : campaign.getActiveContracts()) {
+                if (m instanceof AtBContract) {
                     contract = (AtBContract)m;
                     break;
                 }

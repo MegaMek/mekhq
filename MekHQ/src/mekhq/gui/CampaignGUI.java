@@ -40,6 +40,7 @@ import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.Contract;
 import mekhq.gui.dialog.*;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
@@ -1190,8 +1191,7 @@ public class CampaignGUI extends JPanel {
             minutesAvail += getCampaign().getPossibleAstechPoolOvertime();
         }
         if (minutesAvail < totalAstechMinutesNeeded) {
-            int needed = (int) Math
-                    .ceil((totalAstechMinutesNeeded - minutesAvail) / 480D);
+            int needed = (int) Math.ceil((totalAstechMinutesNeeded - minutesAvail) / 480D);
             return JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(null,
                     "You do not have enough astechs to provide for full maintenance. You need "
                             + needed + " more astech(s). Do you wish to proceed?",
@@ -1205,18 +1205,15 @@ public class CampaignGUI extends JPanel {
         if (getCampaign().getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY) {
             return false;
         }
-        for (Mission m : getCampaign().getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract)
-                    || !getCampaign().getLocation().isOnPlanet()) {
+        for (Contract contract : getCampaign().getActiveContracts()) {
+            if (!(contract instanceof AtBContract) || !getCampaign().getLocation().isOnPlanet()) {
                 continue;
             }
-            if (getCampaign().getDeploymentDeficit((AtBContract) m) > 0) {
-                return 0 != JOptionPane
-                        .showConfirmDialog(
-                                null,
-                                "You have not met the deployment levels required by contract. Do your really wish to advance the day?",
-                                "Unmet deployment requirements",
-                                JOptionPane.YES_NO_OPTION);
+
+            if (getCampaign().getDeploymentDeficit((AtBContract) contract) > 0) {
+                return 0 != JOptionPane.showConfirmDialog(null,
+                        "You have not met the deployment levels required by contract. Do your really wish to advance the day?",
+                        "Unmet deployment requirements", JOptionPane.YES_NO_OPTION);
             }
         }
         return false;
@@ -1224,7 +1221,7 @@ public class CampaignGUI extends JPanel {
 
     public boolean nagOutstandingScenarios() {
         for (Mission m : getCampaign().getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract)) {
+            if (!m.getStatus().isActive() || !(m instanceof AtBContract)) {
                 continue;
             }
             for (Scenario s : m.getScenarios()) {
@@ -1232,11 +1229,9 @@ public class CampaignGUI extends JPanel {
                     continue;
                 }
                 if (getCampaign().getLocalDate().equals(s.getDate())) {
-                    return 0 != JOptionPane
-                            .showConfirmDialog(
-                                    null,
-                                    "You have a pending battle. Failure to deploy will result in a defeat and a minor contract breach. Do your really wish to advance the day?",
-                                    "Pending battle", JOptionPane.YES_NO_OPTION);
+                    return 0 != JOptionPane.showConfirmDialog(null,
+                            "You have a pending battle. Failure to deploy will result in a defeat and a minor contract breach. Do your really wish to advance the day?",
+                            "Pending battle", JOptionPane.YES_NO_OPTION);
                 }
             }
         }

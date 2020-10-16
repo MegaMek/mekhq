@@ -91,7 +91,7 @@ public class ContractMarketDialog extends JDialog {
         campaign = c;
         contractMarket = c.getContractMarket();
         possibleRetainerContracts = new ArrayList<>();
-        if (c.getFactionCode().equals("MERC")) { //$NON-NLS-1$
+        if (c.getFactionCode().equals("MERC")) {
             countSuccessfulContracts();
         }
         initComponents();
@@ -104,8 +104,8 @@ public class ContractMarketDialog extends JDialog {
      */
     private void countSuccessfulContracts() {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
-        for (Mission m : campaign.getMissions()) {
-            if (m.isActive() || !(m instanceof AtBContract)
+        for (Mission m : campaign.getActiveContracts()) {
+            if (!(m instanceof AtBContract)
                     || ((AtBContract) m).getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
                 continue;
             }
@@ -113,7 +113,7 @@ public class ContractMarketDialog extends JDialog {
             int num;
             num = successfulContracts.getOrDefault(contract.getEmployerCode(), 0);
             successfulContracts.put(contract.getEmployerCode(),
-                    num + ((contract.getStatus() == Mission.S_SUCCESS) ? 1 : -1));
+                    num + (contract.getStatus().isSuccess() ? 1 : -1));
         }
         for (String key : successfulContracts.keySet()) {
             if (successfulContracts.get(key) >= 6) {

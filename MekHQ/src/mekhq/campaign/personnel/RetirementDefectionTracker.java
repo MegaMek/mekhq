@@ -180,13 +180,11 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             target.addModifier(p.getExperienceLevel(false) - campaign.getUnitRatingMod(),
                     "Experience");
             /* Retirement rolls are made before the contract status is set */
-            if (null != contract && (
-                    contract.getStatus() == Mission.S_FAILED ||
-                    contract.getStatus() == Mission.S_BREACH)) {
+            if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
                 target.addModifier(1, "Failed mission");
             }
-            if (campaign.getCampaignOptions().getTrackUnitFatigue()
-                    && campaign.getFatigueLevel() >= 10) {
+
+            if (campaign.getCampaignOptions().getTrackUnitFatigue() && (campaign.getFatigueLevel() >= 10)) {
                 target.addModifier(campaign.getFatigueLevel() / 10, "Fatigue");
             }
             if (campaign.getFactionCode().equals("PIR")) {
@@ -216,10 +214,10 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                  */
                 AtBContract c = contract;
                 if (null == c) {
-                    for (Mission m : campaign.getMissions()) {
-                        if (m.isActive() && m instanceof AtBContract &&
-                                (null == c || c.getSharesPct() < ((AtBContract)m).getSharesPct())) {
-                            c = (AtBContract)m;
+                    for (Mission m : campaign.getActiveContracts()) {
+                        if ((m instanceof AtBContract)
+                                && ((c == null) || (c.getSharesPct() < ((AtBContract) m).getSharesPct()))) {
+                            c = (AtBContract) m;
                         }
                     }
                 }

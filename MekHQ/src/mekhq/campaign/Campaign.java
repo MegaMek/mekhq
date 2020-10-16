@@ -42,6 +42,7 @@ import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -892,13 +893,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * @return missions ArrayList sorted with complete missions at the bottom
+     * @return missions List sorted with complete missions at the bottom
      */
-    public ArrayList<Mission> getSortedMissions() {
-        ArrayList<Mission> msns = new ArrayList<>(missions.values());
-        msns.sort((m1, m2) -> Boolean.compare(m2.isActive(), m1.isActive()));
-
-        return msns;
+    public List<Mission> getSortedMissions() {
+        List<Mission> missions = new ArrayList<>(getMissions());
+        missions.sort(Comparator.comparing(Mission::getStatus));
+        return missions;
     }
 
     /**
@@ -3064,7 +3064,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public int getDeploymentDeficit(AtBContract contract) {
-        if (!contract.isActive()) {
+        if (!contract.getStatus().isActive()) {
             // Inactive contracts have no deficits.
             return 0;
         } else if (contract.getStartDate().compareTo(getLocalDate()) >= 0) {
@@ -3094,7 +3094,8 @@ public class Campaign implements Serializable, ITechManager {
 
     private void processNewDayATBScenarios() {
         for (Mission m : getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract) || getLocalDate().isBefore(((Contract) m).getStartDate())) {
+            if (!m.getStatus().isActive() || !(m instanceof AtBContract)
+                    || getLocalDate().isBefore(((Contract) m).getStartDate())) {
                 continue;
             }
             /*
@@ -3142,7 +3143,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         for (Mission m : getMissions()) {
-            if (m.isActive() && (m instanceof AtBContract)
+            if (m.getStatus().isActive() && (m instanceof AtBContract)
                     && !((AtBContract) m).getStartDate().isAfter(getLocalDate())) {
                 ((AtBContract) m).checkEvents(this);
             }
@@ -3194,12 +3195,11 @@ public class Campaign implements Serializable, ITechManager {
 
     private void processNewDayATBFatigue() {
         boolean inContract = false;
-        for (Mission m : getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract)
-                    || getLocalDate().isBefore(((Contract) m).getStartDate())) {
+        for (Contract contract : getActiveContracts()) {
+            if (!(contract instanceof AtBContract)) {
                 continue;
             }
-            switch (((AtBContract) m).getMissionType()) {
+            switch (((AtBContract) contract).getMissionType()) {
                 case AtBContract.MT_GARRISONDUTY:
                 case AtBContract.MT_SECURITYDUTY:
                 case AtBContract.MT_CADREDUTY:
@@ -3284,16 +3284,14 @@ public class Campaign implements Serializable, ITechManager {
             /*
              * First of the month; roll morale, track unit fatigue.
              */
-
             IUnitRating rating = getUnitRating();
             rating.reInitialize();
 
-            for (Mission m : getMissions()) {
-                if (m.isActive() && (m instanceof AtBContract)
-                        && !((AtBContract) m).getStartDate().isAfter(getLocalDate())) {
-                    ((AtBContract) m).checkMorale(getLocalDate(), getUnitRatingMod());
-                    addReport("Enemy morale is now " + ((AtBContract) m).getMoraleLevelName()
-                            + " on contract " + m.getName());
+            for (Contract contract : getActiveContracts()) {
+                if (contract instanceof AtBContract) {
+                    ((AtBContract) contract).checkMorale(getLocalDate(), getUnitRatingMod());
+                    addReport("Enemy morale is now " + ((AtBContract) contract).getMoraleLevelName()
+                            + " on contract " + contract.getName());
                 }
             }
 
@@ -3556,7 +3554,7 @@ public class Campaign implements Serializable, ITechManager {
                 continue;
             }
             Contract contract = (Contract) mission;
-            if (contract.isActive()
+            if (contract.getStatus().isActive()
                     && !getLocalDate().isAfter(contract.getEndingDate())
                     && !getLocalDate().isBefore(contract.getStartDate())) {
                 active.add(contract);
@@ -3584,7 +3582,7 @@ public class Campaign implements Serializable, ITechManager {
             }
             Contract contract = (Contract) mission;
 
-            if (contract.isActive()
+            if (contract.getStatus().isActive()
                     && !getLocalDate().isAfter(contract.getEndingDate())
                     && !getLocalDate().isBefore(contract.getStartDate())) {
                 hasActiveContract = true;
@@ -6619,9 +6617,8 @@ public class Campaign implements Serializable, ITechManager {
         });
     }
 
-    public void completeMission(int id, int status) {
-        Mission mission = getMission(id);
-        if (null == mission) {
+    public void completeMission(Mission mission, MissionStatus status) {
+        if (mission == null) {
             return;
         }
         mission.setStatus(status);
@@ -6631,8 +6628,8 @@ public class Campaign implements Serializable, ITechManager {
             // check for money in escrow
             // According to FMM(r) pg 179, both failure and breach lead to no
             // further payment even though this seems stupid
-            if ((contract.getStatus() == Mission.S_SUCCESS)
-                    && contract.getMonthsLeft(getLocalDate()) > 0) {
+            if ((contract.getStatus().isSuccess())
+                    && (contract.getMonthsLeft(getLocalDate()) > 0)) {
                 remainingMoney = contract.getMonthlyPayOut()
                         .multipliedBy(contract.getMonthsLeft(getLocalDate()));
             }

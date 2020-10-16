@@ -92,14 +92,14 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         role = AtBLanceRole.UNASSIGNED;
         missionId = -1;
         for (Mission m : c.getSortedMissions()) {
-            if (!m.isActive()) {
+            if (!m.getStatus().isActive()) {
                 break;
             }
             if (m instanceof AtBContract) {
-                if (null == ((AtBContract)m).getParentContract()) {
+                if (null == ((AtBContract) m).getParentContract()) {
                     missionId = m.getId();
                 } else {
-                    missionId = ((AtBContract)m).getParentContract().getId();
+                    missionId = ((AtBContract) m).getParentContract().getId();
                 }
             }
         }

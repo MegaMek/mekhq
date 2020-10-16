@@ -216,9 +216,8 @@ public class LanceAssignmentView extends JPanel {
     public void refresh() {
         cbContract.removeAllItems();
         List<AtBContract> activeContracts = new ArrayList<>();
-        for (Mission m : campaign.getMissions()) {
-            if ((m instanceof AtBContract) && m.isActive()
-                    && !((AtBContract) m).getStartDate().isAfter(campaign.getLocalDate())) {
+        for (Mission m : campaign.getActiveContracts()) {
+            if (m instanceof AtBContract) {
                 activeContracts.add((AtBContract)m);
                 cbContract.addItem((AtBContract)m);
             }
@@ -228,7 +227,7 @@ public class LanceAssignmentView extends JPanel {
             defaultContract = activeContracts.get(0);
         }
         for (Lance l : campaign.getLances().values()) {
-            if ((l.getContract(campaign) == null) || !l.getContract(campaign).isActive()) {
+            if ((l.getContract(campaign) == null) || !l.getContract(campaign).getStatus().isActive()) {
                 l.setContract(defaultContract);
             }
         }

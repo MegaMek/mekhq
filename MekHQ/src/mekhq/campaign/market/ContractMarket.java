@@ -150,10 +150,9 @@ public class ContractMarket implements Serializable {
 
 			int unitRatingMod = campaign.getUnitRatingMod();
 
-			for (Mission m : campaign.getMissions()) {
-				if (m instanceof AtBContract && m.isActive()) {
-					checkForSubcontracts(campaign, (AtBContract)m,
-							unitRatingMod);
+			for (Contract contract : campaign.getActiveContracts()) {
+				if (contract instanceof AtBContract) {
+					checkForSubcontracts(campaign, (AtBContract) contract, unitRatingMod);
 				}
 			}
 
@@ -357,8 +356,8 @@ public class ContractMarket implements Serializable {
 			contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
 		}
         if (contract.getSystem() == null) {
-		    MekHQ.getLogger().warning(this, "Could not find contract location for "
-		                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode());
+		    MekHQ.getLogger().warning("Could not find contract location for "
+                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode());
 			if (retries > 0) {
 				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
 			} else {

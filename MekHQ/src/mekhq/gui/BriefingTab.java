@@ -41,7 +41,6 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.com.util.UnitPrintManager;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.GMModeEvent;
@@ -63,6 +62,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -377,7 +377,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
         cmd.setVisible(true);
-        if (cmd.getStatus() <= Mission.S_ACTIVE) {
+        if (cmd.getStatus() == MissionStatus.ACTIVE) {
             return;
         }
 
@@ -420,7 +420,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        getCampaign().completeMission(mission.getId(), cmd.getStatus());
+        getCampaign().completeMission(mission, cmd.getStatus());
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
 
         if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {
@@ -778,7 +778,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // FIXME: this is not working
             EntityListFile.saveTo(unitFile, chosen);
         } catch (IOException e) {
-            MekHQ.getLogger().error(this, e);
+            MekHQ.getLogger().error(e);
         }
 
         if (undeployed.length() > 0) {
@@ -792,7 +792,7 @@ public final class BriefingTab extends CampaignGuiTab {
         choiceMission.removeAllItems();
         for (Mission m : getCampaign().getSortedMissions()) {
             String desc = m.getName();
-            if (!m.isActive()) {
+            if (!m.getStatus().isActive()) {
                 desc += " (Complete)";
             }
             choiceMission.addItem(desc);
@@ -800,7 +800,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 choiceMission.setSelectedItem(m.getName());
             }
         }
-        if (choiceMission.getSelectedIndex() == -1 && getCampaign().getSortedMissions().size() > 0) {
+        if ((choiceMission.getSelectedIndex() == -1) && (getCampaign().getSortedMissions().size() > 0)) {
             selectedMission = getCampaign().getSortedMissions().get(0).getId();
             choiceMission.setSelectedIndex(0);
         }
@@ -875,23 +875,20 @@ public final class BriefingTab extends CampaignGuiTab {
         btnDeleteMission.setEnabled(false);
         btnAddScenario.setEnabled(false);
         btnGMGenerateScenarios.setEnabled(false);
-        if (idx >= 0 && idx < getCampaign().getSortedMissions().size()) {
+        if ((idx >= 0) && (idx < getCampaign().getSortedMissions().size())) {
             Mission m = getCampaign().getSortedMissions().get(idx);
-            if (null != m) {
+            if (m != null) {
                 selectedMission = m.getId();
                 scrollMissionView.setViewportView(new MissionViewPanel(m, scenarioTable, getCampaignGui()));
-                // This odd code is to make sure that the scrollbar stays at the
-                // top
-                // I can't just call it here, because it ends up getting reset
-                // somewhere later
+                // This odd code is to make sure that the scrollbar stays at the top
+                // I can't just call it here, because it ends up getting reset somewhere later
                 javax.swing.SwingUtilities.invokeLater(() -> scrollMissionView.getVerticalScrollBar().setValue(0));
                 btnEditMission.setEnabled(true);
-                btnCompleteMission.setEnabled(m.isActive());
+                btnCompleteMission.setEnabled(m.getStatus().isActive());
                 btnDeleteMission.setEnabled(true);
-                btnAddScenario.setEnabled(m.isActive());
-                btnGMGenerateScenarios.setEnabled(m.isActive() && getCampaign().isGM());
+                btnAddScenario.setEnabled(m.getStatus().isActive());
+                btnGMGenerateScenarios.setEnabled(m.getStatus().isActive() && getCampaign().isGM());
             }
-
         } else {
             selectedMission = -1;
             scrollMissionView.setViewportView(null);

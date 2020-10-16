@@ -500,7 +500,7 @@ public class CampaignExportWizard extends JDialog {
 
         if (chkExportCompletedContracts.isSelected()) {
             for (Mission mission : sourceCampaign.getMissions()) {
-                if (!mission.isActive()) {
+                if (!mission.getStatus().isActive()) {
                     destinationCampaign.importMission(mission);
                 }
             }

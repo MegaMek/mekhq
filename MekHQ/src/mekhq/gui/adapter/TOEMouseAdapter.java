@@ -935,7 +935,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     menu.setEnabled(false);
                     JMenu missionMenu;
                     for (Mission m : gui.getCampaign().getMissions()) {
-                        if (!m.isActive()) {
+                        if (!m.getStatus().isActive()) {
                             continue;
                         }
                         missionMenu = new JMenu(m.getName());
@@ -1291,7 +1291,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     menu = new JMenu("Deploy Unit");
                     JMenu missionMenu;
                     for (Mission m : gui.getCampaign().getMissions()) {
-                        if (!m.isActive()) {
+                        if (!m.getStatus().isActive()) {
                             continue;
                         }
                         missionMenu = new JMenu(m.getName());
