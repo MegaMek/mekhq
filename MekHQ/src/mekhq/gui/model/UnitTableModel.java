@@ -304,6 +304,9 @@ public class UnitTableModel extends DataTableModel {
                     applyColors(colors.getUnmaintained());
                 } else if (u.getActiveCrew().size() < u.getFullCrewSize()) {
                     applyColors(colors.getUncrewed());
+                } else {
+                    setForeground(UIManager.getColor("Table.foreground"));
+                    setBackground(UIManager.getColor("Table.background"));
                 }
             }
             return this;

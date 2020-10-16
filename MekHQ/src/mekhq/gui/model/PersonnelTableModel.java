@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
@@ -713,13 +712,16 @@ public class PersonnelTableModel extends DataTableModel {
                 if (isDeployed(actualRow)) {
                     colors.getDeployed().getColor().ifPresent(this::setBackground);
                     colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
-                } else if ((Integer.parseInt((String) getValueAt(actualRow,COL_HITS)) > 0)
+                } else if ((Integer.parseInt((String) getValueAt(actualRow, COL_HITS)) > 0)
                         || getPerson(actualRow).hasInjuries(true)) {
                     colors.getInjured().getColor().ifPresent(this::setBackground);
                     colors.getInjured().getAlternateColor().ifPresent(this::setForeground);
                 } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
                     colors.getHealedInjuries().getColor().ifPresent(this::setBackground);
                     colors.getHealedInjuries().getAlternateColor().ifPresent(this::setForeground);
+                } else {
+                    setBackground(UIManager.getColor("Table.background"));
+                    setForeground(UIManager.getColor("Table.foreground"));
                 }
             }
             return this;
