@@ -347,11 +347,11 @@ class RequiredLancesTableModel extends DataTableModel {
             return ((AtBContract) data.get(row)).getName();
         }
         if (data.get(row) instanceof AtBContract) {
-            AtBContract contract = (AtBContract)data.get(row);
+            AtBContract contract = (AtBContract) data.get(row);
             if (column == COL_TOTAL) {
                 int t = 0;
                 for (Lance l : campaign.getLanceList()) {
-                    if (l.getContract(campaign).equals(data.get(row))
+                    if (data.get(row).equals(l.getContract(campaign))
                             && (l.getRole() != AtBLanceRole.UNASSIGNED)
                             && l.isEligible(campaign)) {
                         t++;
@@ -364,8 +364,8 @@ class RequiredLancesTableModel extends DataTableModel {
             } else if (contract.getRequiredLanceType().ordinal() == column - 2) {
                 int t = 0;
                 for (Lance l : campaign.getLanceList()) {
-                    if (l.getContract(campaign).equals(data.get(row))
-                            && l.getRole() == l.getContract(campaign).getRequiredLanceType()
+                    if (data.get(row).equals(l.getContract(campaign))
+                            && (l.getRole() == l.getContract(campaign).getRequiredLanceType())
                             && l.isEligible(campaign)) {
                         t++;
                     }

@@ -234,46 +234,46 @@ public class ShipSearchDialog extends JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-	public TargetRoll getDSTarget() {
-		return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP,
-				gui.getCampaign());
-	}
+    public TargetRoll getDSTarget() {
+        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP,
+                gui.getCampaign());
+    }
 
-	public TargetRoll getJSTarget() {
-		return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.JUMPSHIP,
-				gui.getCampaign());
-	}
+    public TargetRoll getJSTarget() {
+        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.JUMPSHIP,
+                gui.getCampaign());
+    }
 
-	public TargetRoll getWSTarget() {
-		return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.WARSHIP,
-				gui.getCampaign());
-	}
+    public TargetRoll getWSTarget() {
+        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.WARSHIP,
+                gui.getCampaign());
+    }
 
-	private int getUnitType() {
-		if (btnJumpship.isSelected()) {
-			return UnitType.JUMPSHIP;
-		} else if (btnWarship.isSelected()) {
-			return UnitType.WARSHIP;
-		} else {
-			return UnitType.DROPSHIP;
-		}
-	}
+    private int getUnitType() {
+        if (btnJumpship.isSelected()) {
+            return UnitType.JUMPSHIP;
+        } else if (btnWarship.isSelected()) {
+            return UnitType.WARSHIP;
+        } else {
+            return UnitType.DROPSHIP;
+        }
+    }
 
-	private boolean isInContract() {
-		return gui.getCampaign().getMissions().stream().anyMatch(m ->
+    private boolean isInContract() {
+        return gui.getCampaign().getMissions().stream().anyMatch(m ->
                 m.getStatus().isActive() && (m instanceof Contract)
                         && ((Contract) m).getStartDate().isBefore(gui.getCampaign().getLocalDate())
-		);
-	}
+        );
+    }
 
-	private boolean isInSearch() {
-		return gui.getCampaign().getShipSearchStart() != null;
-	}
+    private boolean isInSearch() {
+        return gui.getCampaign().getShipSearchStart() != null;
+    }
 
-	private void startSearch() {
-		gui.getCampaign().startShipSearch(getUnitType());
-		setVisible(false);
-	}
+    private void startSearch() {
+        gui.getCampaign().startShipSearch(getUnitType());
+        setVisible(false);
+    }
 
     private void endSearch() {
         gui.getCampaign().setShipSearchStart(null);
