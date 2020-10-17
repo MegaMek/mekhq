@@ -63,7 +63,8 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
-import megamek.common.Player;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Camouflage;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -5383,7 +5384,7 @@ public class CampaignOptionsDialog extends JDialog {
             return;
         }
 
-        if (Player.NO_CAMO.equals(camoCategory)) {
+        if (Camouflage.NO_CAMOUFLAGE.equals(camoCategory)) {
             int colorInd = colorIndex;
             if (colorInd == -1) {
                 colorInd = 0;
@@ -5399,7 +5400,7 @@ public class CampaignOptionsDialog extends JDialog {
         // Try to get the camo file.
         try {
             // Translate the root camo directory name.
-            if (Player.ROOT_CAMO.equals(camoCategory)) {
+            if (AbstractIcon.ROOT_CATEGORY.equals(camoCategory)) {
                 camoCategory = "";
             }
             Image camo = (Image) MHQStaticDirectoryManager.getCamouflage().getItem(camoCategory, camoFileName);
@@ -5414,7 +5415,7 @@ public class CampaignOptionsDialog extends JDialog {
                     + "data/images/camo folder.",
                     "Missing Camo File",
                     JOptionPane.WARNING_MESSAGE);
-            camoCategory = Player.NO_CAMO;
+            camoCategory = Camouflage.NO_CAMOUFLAGE;
             colorIndex = 0;
             setCamoIcon();
         }

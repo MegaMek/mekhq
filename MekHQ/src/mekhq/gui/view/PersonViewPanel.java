@@ -39,6 +39,8 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.Utilities;
@@ -47,7 +49,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.FormerSpouse;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 
-import megamek.common.Crew;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -412,7 +413,6 @@ public class PersonViewPanel extends ScrollablePanel {
      *         error loading it.
      */
     public JPanel setPortrait() {
-
         JPanel pnlPortrait = new JPanel();
 
         // Panel portrait will include the person picture and the ribbons
@@ -420,18 +420,18 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlPortrait.setLayout(new GridBagLayout());
 
         JLabel lblPortrait = new JLabel();
-        lblPortrait.setName("lblPortrait"); // NOI18N
+        lblPortrait.setName("lblPortrait");
 
         String category = person.getPortraitCategory();
         String filename = person.getPortraitFileName();
 
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
-            category = ""; //$NON-NLS-1$
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
+            category = "";
         }
 
         // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
-            filename = "default.gif"; //$NON-NLS-1$
+        if ((null == category) || (null == filename) || AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
+            filename = Portrait.DEFAULT_PORTRAIT_FILENAME;
         }
 
         // Try to get the player's portrait file.
@@ -441,7 +441,7 @@ public class PersonViewPanel extends ScrollablePanel {
             if (null != portrait) {
                 portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
             } else {
-                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", "default.gif");
+                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", Portrait.DEFAULT_PORTRAIT_FILENAME);
                 if (null != portrait) {
                     portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
                 }
