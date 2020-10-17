@@ -64,6 +64,7 @@ import javax.swing.table.TableModel;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.enums.Gender;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
@@ -976,7 +977,7 @@ public class Utilities {
             }
 
             // Only created crew can be assigned a portrait, so this is safe to put in here
-            if (!Crew.PORTRAIT_NONE.equals(oldCrew.getPortraitFileName(crewIndex))) {
+            if (!AbstractIcon.DEFAULT_ICON_FILENAME.equals(oldCrew.getPortraitFileName(crewIndex))) {
                 p.setPortraitCategory(oldCrew.getPortraitCategory(crewIndex));
                 p.setPortraitFileName(oldCrew.getPortraitFileName(crewIndex));
             }

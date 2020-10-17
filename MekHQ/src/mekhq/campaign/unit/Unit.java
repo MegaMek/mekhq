@@ -29,6 +29,8 @@ import java.util.stream.Stream;
 
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Camouflage;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.ServiceLogger;
@@ -3293,7 +3295,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             category = entity.getCamoCategory();
         }
 
-        if (Player.ROOT_CAMO.equals(category)) {
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
             category = "";
         }
 
@@ -4784,12 +4786,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isEntityCamo() {
-        return (null != entity) && (null != entity.getCamoCategory()
-                && !entity.getCamoCategory().equals(IPlayer.NO_CAMO)
+        return (entity != null) && ((entity.getCamoCategory() != null)
+                && !Camouflage.NO_CAMOUFLAGE.equals(entity.getCamoCategory())
                 && !entity.getCamoCategory().isEmpty())
-                && (null != entity.getCamoFileName())
-                && (!Player.NO_CAMO.equals(entity.getCamoFileName()))
-                && !entity.getCamoFileName().isEmpty();
+                && ((entity.getCamoFileName() != null)
+                && !Camouflage.NO_CAMOUFLAGE.equals(entity.getCamoFileName())
+                && !entity.getCamoFileName().isEmpty());
     }
 
     public int getAvailability(int era) {

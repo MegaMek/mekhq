@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import megamek.common.icons.Camouflage;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -40,7 +41,6 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
-import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
@@ -181,10 +181,10 @@ public class AtBContract extends Contract implements Serializable {
         enemyQuality = IUnitRating.DRAGOON_C;
         allyBotName = "Ally";
         enemyBotName = "Enemy";
-        allyCamoCategory = Player.NO_CAMO;
+        allyCamoCategory = Camouflage.NO_CAMOUFLAGE;
         allyCamoFileName = null;
         allyColorIndex = 1;
-        enemyCamoCategory = Player.NO_CAMO;
+        enemyCamoCategory = Camouflage.NO_CAMOUFLAGE;
         enemyCamoFileName = null;
         enemyColorIndex = 2;
 

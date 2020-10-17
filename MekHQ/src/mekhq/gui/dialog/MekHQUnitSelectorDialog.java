@@ -24,6 +24,7 @@ import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.*;
+import megamek.common.icons.Camouflage;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -173,7 +174,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
             Image camo;
             if ((selectedEntity.getCamoCategory() != null)
-                    && !selectedEntity.getCamoCategory().equals(IPlayer.NO_CAMO)) {
+                    && !Camouflage.NO_CAMOUFLAGE.equals(selectedEntity.getCamoCategory())) {
                 camo = MHQStaticDirectoryManager.getEntityCamoImage(selectedEntity);
             } else {
                 camo = MHQStaticDirectoryManager.getCamoImage(campaign.getCamoCategory(), campaign.getCamoFileName());

@@ -35,7 +35,8 @@ import java.util.Set;
 import javax.swing.*;
 
 import megamek.client.ui.swing.util.PlayerColors;
-import megamek.common.Player;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Camouflage;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
@@ -155,11 +156,11 @@ public class CustomizeAtBContractDialog extends JDialog {
         String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         // TODO : Switch me to use IUnitRating
         String[] ratingNames = {"F", "D", "C", "B", "A"};
-    	cbAllySkill = new JComboBox<String>(skillNames);
-    	cbAllyQuality = new JComboBox<String>(ratingNames);
+    	cbAllySkill = new JComboBox<>(skillNames);
+    	cbAllyQuality = new JComboBox<>(ratingNames);
         JLabel lblAllyRating = new JLabel();
-    	cbEnemySkill = new JComboBox<String>(skillNames);
-    	cbEnemyQuality = new JComboBox<String>(ratingNames);;
+    	cbEnemySkill = new JComboBox<>(skillNames);
+    	cbEnemyQuality = new JComboBox<>(ratingNames);;
     	JLabel lblAllyBotName = new JLabel();
     	txtAllyBotName = new JTextField();
     	JLabel lblEnemyBotName = new JLabel();
@@ -245,13 +246,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(chkShowAllFactions, gbc);
-        chkShowAllFactions.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				showAllFactions(chkShowAllFactions.isSelected());
-			}
-
-        });
+        chkShowAllFactions.addActionListener(arg0 -> showAllFactions(chkShowAllFactions.isSelected()));
 
         lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
         lblPlanetName.setName("lblPlanetName"); // NOI18N
@@ -478,22 +473,12 @@ public class CustomizeAtBContractDialog extends JDialog {
 
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
-            }
-        });
+        btnOK.addActionListener(this::btnOKActionPerformed);
         buttonPanel.add(btnOK, gbc);
 
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
-            }
-        });
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         buttonPanel.add(btnClose, gbc);
 
         pack();
@@ -507,48 +492,45 @@ public class CustomizeAtBContractDialog extends JDialog {
     }
 
     ActionListener camoButtonListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-	        CamoChoiceDialog ccd;
-	        if (e.getSource().equals(btnAllyCamo)) {
-	        	ccd = new CamoChoiceDialog(frame, true, allyCamoCategory, allyCamoFileName,
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            CamoChoiceDialog ccd;
+            if (e.getSource().equals(btnAllyCamo)) {
+                ccd = new CamoChoiceDialog(frame, true, allyCamoCategory, allyCamoFileName,
                         allyColorIndex);
-		        ccd.setVisible(true);
-		        allyCamoCategory = ccd.getCategory();
-		        allyCamoFileName = ccd.getFileName();
-		        if (ccd.getColorIndex() != -1) {
-		            allyColorIndex = ccd.getColorIndex();
-		        }
-		        setCamoIcon(btnAllyCamo, allyCamoCategory,
-	        			allyCamoFileName, allyColorIndex);
-	        } else {
-	        	ccd = new CamoChoiceDialog(frame, true, enemyCamoCategory, enemyCamoFileName,
-	        			enemyColorIndex);
-		        ccd.setVisible(true);
-		        enemyCamoCategory = ccd.getCategory();
-		        enemyCamoFileName = ccd.getFileName();
-		        if (ccd.getColorIndex() != -1) {
-		        	enemyColorIndex = ccd.getColorIndex();
-		        }
-		        setCamoIcon(btnEnemyCamo, enemyCamoCategory,
-		        		enemyCamoFileName, enemyColorIndex);
-	        }
-		}
+                ccd.setVisible(true);
+                allyCamoCategory = ccd.getCategory();
+                allyCamoFileName = ccd.getFileName();
+                if (ccd.getColorIndex() != -1) {
+                    allyColorIndex = ccd.getColorIndex();
+                }
+                setCamoIcon(btnAllyCamo, allyCamoCategory, allyCamoFileName, allyColorIndex);
+            } else {
+                ccd = new CamoChoiceDialog(frame, true, enemyCamoCategory, enemyCamoFileName,
+                        enemyColorIndex);
+                ccd.setVisible(true);
+                enemyCamoCategory = ccd.getCategory();
+                enemyCamoFileName = ccd.getFileName();
+                if (ccd.getColorIndex() != -1) {
+                    enemyColorIndex = ccd.getColorIndex();
+                }
+                setCamoIcon(btnEnemyCamo, enemyCamoCategory, enemyCamoFileName, enemyColorIndex);
+            }
+        }
     };
 
     /* Copied from CampaignOptionsDialog */
     private void setCamoIcon(JButton btnCamo, String camoCategory, String camoFileName, int colorIndex) {
-        if (null == camoCategory) {
+        if (camoCategory == null) {
             return;
         }
 
-        if (Player.NO_CAMO.equals(camoCategory)) {
+        if (Camouflage.NO_CAMOUFLAGE.equals(camoCategory)) {
             int colorInd = colorIndex;
             if (colorInd == -1) {
                 colorInd = 0;
             }
-            BufferedImage tempImage = new BufferedImage(84, 72,
-                                                        BufferedImage.TYPE_INT_RGB);
+            BufferedImage tempImage = new BufferedImage(84, 72, BufferedImage.TYPE_INT_RGB);
             Graphics2D graphics = tempImage.createGraphics();
             graphics.setColor(PlayerColors.getColor(colorInd));
             graphics.fillRect(0, 0, 84, 72);
@@ -559,7 +541,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         // Try to get the camo file.
         try {
             // Translate the root camo directory name.
-            if (Player.ROOT_CAMO.equals(camoCategory)) {
+            if (AbstractIcon.ROOT_CATEGORY.equals(camoCategory)) {
                 camoCategory = "";
             }
             Image camo = (Image) MHQStaticDirectoryManager.getCamouflage().getItem(camoCategory, camoFileName);
@@ -574,7 +556,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         			+ "data/images/camo folder.",
         			"Missing Camo File",
         			JOptionPane.WARNING_MESSAGE);
-        	camoCategory = Player.NO_CAMO;
+        	camoCategory = Camouflage.NO_CAMOUFLAGE;
         	colorIndex = 0;
         	setCamoIcon(btnCamo, camoCategory, camoFileName, colorIndex);
         }
@@ -604,7 +586,7 @@ public class CustomizeAtBContractDialog extends JDialog {
     	PlanetarySystem canonSystem = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
                 campaign.getLocalDate());
 
-        if(canonSystem != null) {
+        if (canonSystem != null) {
             contract.setSystemId(canonSystem.getId());
         } else {
             contract.setSystemId(null);
