@@ -40,7 +40,6 @@ import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.MapSettings;
 import megamek.common.PlanetaryConditions;
-import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.icons.Camouflage;
 import megamek.common.logging.LogLevel;
@@ -397,7 +396,7 @@ public class AtBGameThread extends GameThread {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-                if (botForce.getCamoCategory().equals(Camouflage.NO_CAMOUFLAGE)) {
+                if (Camouflage.NO_CAMOUFLAGE.equals(botForce.getCamoCategory())) {
                     if (botForce.getColorIndex() >= 0) {
                         botClient.getLocalPlayer().setColorIndex(botForce.getColorIndex());
                     }

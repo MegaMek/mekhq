@@ -20,7 +20,6 @@ package mekhq;
 
 import megamek.MegaMek;
 import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
-import megamek.common.Crew;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.fileUtils.DirectoryItems;
