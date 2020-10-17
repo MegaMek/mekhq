@@ -47,6 +47,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     
     private static final String RCLICK_COMMAND_MANAGE_FORCES = "ManageForces";
     private static final String RCLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";
+    private static final String RCLICK_COMMAND_REVEAL_TRACK = "RevealTrack";
 
     private enum DrawHexType {
         Hex,
@@ -66,6 +67,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     private JPopupMenu rightClickMenu;
     private JMenuItem menuItemManageForceAssignments;
     private JMenuItem menuItemManageScenario;
+    private JMenuItem menuItemGMReveal;
     
     private StratconScenarioWizard scenarioWizard;
     private TrackForceAssignmentUI assignmentUI;
@@ -94,6 +96,8 @@ public class StratconPanel extends JPanel implements ActionListener {
         this.campaignState = campaignState;
         currentTrack = track;
         
+        menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Track" : "Reveal Track");
+        
         this.repaint();
     }
     
@@ -113,6 +117,15 @@ public class StratconPanel extends JPanel implements ActionListener {
             menuItemManageScenario.addActionListener(this);
             rightClickMenu.add(menuItemManageScenario);
         //}
+            
+            
+        rightClickMenu.addSeparator();
+        
+        menuItemGMReveal = new JMenuItem();
+        menuItemGMReveal.setText("Reveal Track");
+        menuItemGMReveal.setActionCommand(RCLICK_COMMAND_REVEAL_TRACK);
+        menuItemGMReveal.addActionListener(this);
+        rightClickMenu.add(menuItemGMReveal);
     }
 
     @Override
@@ -196,7 +209,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                     g2D.drawPolygon(graphHex);                    
                 } else if(drawHexType == DrawHexType.Hex) {
                     
-                    if(currentTrack.coordsRevealed(x, y)) {
+                    if(currentTrack.coordsRevealed(x, y) || currentTrack.isGmRevealed()) {
                         g2D.setColor(Color.LIGHT_GRAY);
                     } else {
                         g2D.setColor(Color.DARK_GRAY);
@@ -252,8 +265,12 @@ public class StratconPanel extends JPanel implements ActionListener {
         for(int x = 0; x < currentTrack.getWidth(); x++) {            
             for(int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
+                StratconScenario scenario = currentTrack.getScenario(currentCoords);
                 
-                if(currentTrack.getScenario(currentCoords) != null) {
+                // if there's a scenario here that has a deployment/battle date
+                // or if there's a scenario here and we've gm-revealed everything
+                if((scenario != null) &&
+                        ((scenario.getDeploymentDate() != null) || currentTrack.isGmRevealed())) {
                     g2D.setColor(Color.RED);
                     g2D.drawPolygon(scenarioMarker);
                     if(currentTrack.getFacility(currentCoords) == null) {
@@ -284,7 +301,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             for(int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconFacility facility = currentTrack.getFacility(new StratconCoords(x, y));
                 
-                if((facility != null) && facility.isVisible()) {
+                if((facility != null) && (facility.isVisible() || currentTrack.isGmRevealed())) {
                     g2D.setColor(facility.getOwner() == ForceAlignment.Allied ? Color.GREEN : Color.RED);
                     g2D.drawPolygon(facilityMarker);
                     drawTextEffect(g2D, facilityMarker, facility.getDisplayableName());
@@ -476,6 +493,10 @@ public class StratconPanel extends JPanel implements ActionListener {
                     campaignState);
             scenarioWizard.toFront();
             scenarioWizard.setVisible(true);
+            break;
+        case RCLICK_COMMAND_REVEAL_TRACK:
+            currentTrack.setGmRevealed(!currentTrack.isGmRevealed());
+            menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Track" : "Reveal Track");
             break;
         }
         

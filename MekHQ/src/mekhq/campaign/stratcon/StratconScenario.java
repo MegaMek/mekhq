@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import mekhq.adapter.DateAdapter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -211,6 +213,7 @@ public class StratconScenario implements IStratconDisplayable {
         return backingScenario;
     }
 
+    @XmlJavaTypeAdapter(DateAdapter.class)
     public LocalDate getDeploymentDate() {
         return deploymentDate;
     }
@@ -219,6 +222,7 @@ public class StratconScenario implements IStratconDisplayable {
         this.deploymentDate = deploymentDate;
     }
 
+    @XmlJavaTypeAdapter(DateAdapter.class)
     public LocalDate getActionDate() {
         return actionDate;
     }
@@ -228,6 +232,7 @@ public class StratconScenario implements IStratconDisplayable {
         backingScenario.setDate(actionDate);
     }
 
+    @XmlJavaTypeAdapter(DateAdapter.class)
     public LocalDate getReturnDate() {
         return returnDate;
     }

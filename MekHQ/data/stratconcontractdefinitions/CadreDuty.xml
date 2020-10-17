@@ -4,6 +4,7 @@
     <briefing>Protect attached trainees.</briefing>
     <contractTypeName>Cadre Duty</contractTypeName>
     <hostileFacilityCount>0</hostileFacilityCount>
+	<objectivesBehaveAsVPs>true</objectivesBehaveAsVPs>
 	<scenarioOdds>
 		<scenarioOdds>10</scenarioOdds>
 		<scenarioOdds>10</scenarioOdds>
@@ -19,7 +20,6 @@
     <objectiveParameters>
         <objectiveParameter>
 		<objectiveType>AnyScenarioVictory</objectiveType>
-		<objectiveCount>-1</objectiveCount>
 		<objectiveScenarioModifiers>
                 	<objectiveScenarioModifier>AlliedTraineesGround.xml</objectiveScenarioModifier>
                 	<objectiveScenarioModifier>AlliedTraineesAir.xml</objectiveScenarioModifier>

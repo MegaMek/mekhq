@@ -569,6 +569,13 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     }
 
     /**
+     * Calculations to be performed once the contract has been accepted.
+     */
+    public void acceptContract(Campaign campaign) {
+        
+    }
+    
+    /**
      * Only do this at the time the contract is set up, otherwise amounts may change after
      * the ink is signed, which is a no-no.
      * @param c current campaign

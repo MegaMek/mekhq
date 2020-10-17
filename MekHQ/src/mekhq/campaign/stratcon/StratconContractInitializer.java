@@ -39,8 +39,8 @@ public class StratconContractInitializer {
         int numTracks = contract.getRequiredLances() / NUM_LANCES_PER_TRACK;
         
         for(int x = 0; x < numTracks; x++) {
-            int scenarioOdds = contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size() - 1));
-            int deploymentTime = contractDefinition.getDeploymentTimes().get(Compute.randomInt(contractDefinition.getDeploymentTimes().size() - 1));
+            int scenarioOdds = contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
+            int deploymentTime = contractDefinition.getDeploymentTimes().get(Compute.randomInt(contractDefinition.getDeploymentTimes().size()));
             
             StratconTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK, scenarioOdds, deploymentTime);
             track.setDisplayableName(String.format("Track %d", x));
@@ -51,8 +51,8 @@ public class StratconContractInitializer {
         // X = # required lances / 3, rounded up. The last track will have fewer required lances.
         int oddLanceCount = contract.getRequiredLances() % NUM_LANCES_PER_TRACK;
         if(oddLanceCount > 0) {
-            int scenarioOdds = contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size() - 1));
-            int deploymentTime = contractDefinition.getDeploymentTimes().get(Compute.randomInt(contractDefinition.getDeploymentTimes().size() - 1));
+            int scenarioOdds = contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
+            int deploymentTime = contractDefinition.getDeploymentTimes().get(Compute.randomInt(contractDefinition.getDeploymentTimes().size()));
             
             StratconTrackState track = initializeTrackState(oddLanceCount, scenarioOdds, deploymentTime);
             track.setDisplayableName(String.format("Track %d", campaignState.getTracks().size()));
@@ -61,11 +61,6 @@ public class StratconContractInitializer {
         
         // now seed the tracks with objectives and facilities
         for(ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
-            // kind of pointless, but...
-            if (objectiveParams.objectiveCount == 0) {
-                continue;
-            }
-            
             int objectiveCount = objectiveParams.objectiveCount > 0 ?
                     (int) objectiveParams.objectiveCount :
                     (int) (-objectiveParams.objectiveCount * contract.getRequiredLances());
@@ -187,7 +182,7 @@ public class StratconContractInitializer {
             StratconFacility sf =
                     facilitySubset == null ? 
                     StratconFacilityFactory.getRandomFacility() :
-                    StratconFacilityFactory.getFacilityByName(facilitySubset.get(Compute.randomInt(facilitySubset.size() - 1)));
+                    StratconFacilityFactory.getFacilityByName(facilitySubset.get(Compute.randomInt(facilitySubset.size())));
             sf.setOwner(owner);
             sf.setStrategicObjective(strategicObjective);
             
@@ -208,8 +203,7 @@ public class StratconContractInitializer {
                 trackState.getRevealedCoords().add(coords);
                 sf.setVisible(true);
             } else {
-                // todo: remove, debugging purposes
-                //sf.setVisible(false);
+                sf.setVisible(false);
             }
         }
     }
@@ -229,7 +223,7 @@ public class StratconContractInitializer {
         for (int sCount = 0; sCount < numScenarios; sCount++) {
             // pick
             ScenarioTemplate template = StratconScenarioFactory.getSpecificScenario(
-                    objectiveScenarios.get(Compute.randomInt(objectiveScenarios.size() - 1)));
+                    objectiveScenarios.get(Compute.randomInt(objectiveScenarios.size())));
             
             // plonk
             int x = Compute.randomInt(trackState.getWidth());

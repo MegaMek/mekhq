@@ -401,9 +401,6 @@ public class ContractMarket implements Serializable {
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
 
-        StratconContractInitializer.InitializeCampaignState(contract, campaign, 
-                StratconContractDefinition.getContractDefinition(contract.getMissionType()));
-
 		return contract;
 	}
 

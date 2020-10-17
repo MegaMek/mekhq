@@ -199,7 +199,7 @@ public class StratconCampaignState {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(stateElement, pw);
         } catch(Exception e) {
-            MekHQ.getLogger().error(StratconCampaignState.class, "Serialize", e.getMessage());
+            MekHQ.getLogger().error(e);
         }
     }
     
@@ -217,7 +217,12 @@ public class StratconCampaignState {
             JAXBElement<StratconCampaignState> templateElement = um.unmarshal(xmlNode, StratconCampaignState.class);
             resultingCampaignState = templateElement.getValue();
         } catch(Exception e) {
-            MekHQ.getLogger().error(StratconCampaignState.class, "Deserialize", "Error Deserializing Campaign State", e);
+            MekHQ.getLogger().error("Error Deserializing Campaign State", e);
+        }
+        
+        // hack: localdate doesn't serialize/deserialize nicely within a map, so we store it as a int-string map instead
+        for(StratconTrackState track : resultingCampaignState.getTracks()) {
+            track.restoreReturnDates();
         }
         
         return resultingCampaignState;

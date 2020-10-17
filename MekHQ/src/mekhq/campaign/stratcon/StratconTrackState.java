@@ -9,7 +9,9 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 
 
@@ -30,11 +32,13 @@ public class StratconTrackState {
     private String displayableName;
     private int width;
     private int height;
+    private boolean gmRevealed;
     
     private Map<StratconCoords, StratconFacility> facilities;   
     private Map<StratconCoords, StratconScenario> scenarios;    
     private Map<Integer, StratconCoords> assignedForceCoords;
     private Map<Integer, LocalDate> assignedForceReturnDates;
+    private Map<Integer, String> assignedForceReturnDatesForStorage;
     private Set<StratconCoords> revealedCoords;
 
     // don't serialize this
@@ -49,6 +53,7 @@ public class StratconTrackState {
         scenarios = new HashMap<>();
         assignedForceCoords = new HashMap<>();
         assignedForceReturnDates = new HashMap<>();
+        setAssignedForceReturnDatesForStorage(new HashMap<>());
         revealedCoords = new HashSet<>();
     }
     
@@ -160,14 +165,30 @@ public class StratconTrackState {
         this.scenarioOdds = scenarioOdds;
     }
 
+    public boolean isGmRevealed() {
+        return gmRevealed;
+    }
+
+    public void setGmRevealed(boolean gmRevealed) {
+        this.gmRevealed = gmRevealed;
+    }
+
     public void assignForce(int forceID, StratconCoords coords, LocalDate date) {
         assignedForceCoords.put(forceID, coords);
         assignedForceReturnDates.put(forceID, date.plusDays(deploymentTime));
+        getAssignedForceReturnDatesForStorage().put(forceID, date.plusDays(deploymentTime).toString());
     }
     
     public void unassignForce(int forceID) {
         assignedForceCoords.remove(forceID);
         assignedForceReturnDates.remove(forceID);
+        getAssignedForceReturnDatesForStorage().remove(forceID);
+    }
+    
+    public void restoreReturnDates() {
+        for (int forceID : getAssignedForceReturnDatesForStorage().keySet()) {
+            assignedForceReturnDates.put(forceID, MekHqXmlUtil.parseDate(getAssignedForceReturnDatesForStorage().get(forceID)));
+        }
     }
     
     public Map<Integer, StratconCoords> getAssignedForceCoords() {
@@ -178,12 +199,21 @@ public class StratconTrackState {
         this.assignedForceCoords = assignedForceCoords;
     }
     
+    @XmlTransient
     public Map<Integer, LocalDate> getAssignedForceReturnDates() {
         return assignedForceReturnDates;
     }
 
     public void setAssignedForceReturnDates(Map<Integer, LocalDate> assignedForceReturnDates) {
         this.assignedForceReturnDates = assignedForceReturnDates;
+    }
+
+    public Map<Integer, String> getAssignedForceReturnDatesForStorage() {
+        return assignedForceReturnDatesForStorage;
+    }
+
+    public void setAssignedForceReturnDatesForStorage(Map<Integer, String> assignedForceReturnDatesForStorage) {
+        this.assignedForceReturnDatesForStorage = assignedForceReturnDatesForStorage;
     }
 
     public boolean coordsRevealed(int x, int y) {

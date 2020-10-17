@@ -20,9 +20,9 @@
     <objectiveParameters>
         <objectiveParameter>
 		<objectiveType>AnyScenarioVictory</objectiveType>
-		<objectiveScenarioModifiers>												<objectiveScenarioModifier>OverwhelmingReinforcementsGround.xml</objectiveScenarioModifier>
+		<objectiveScenarioModifiers>															<objectiveScenarioModifier>OverwhelmingReinforcementsGround.xml</objectiveScenarioModifier>
 			<objectiveScenarioModifier>OverwhelmingReinforcementsAir.xml</objectiveScenarioModifier>
-		</<objectiveScenarioModifiers>
+		</objectiveScenarioModifiers>
         </objectiveParameter>
     </objectiveParameters>
 </ScenarioTemplate>

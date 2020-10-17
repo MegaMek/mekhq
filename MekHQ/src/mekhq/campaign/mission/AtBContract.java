@@ -52,6 +52,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconContractDefinition;
+import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -1285,6 +1287,7 @@ public class AtBContract extends Contract implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase(StratconCampaignState.ROOT_XML_ELEMENT_NAME)) {
                 stratconCampaignState = StratconCampaignState.Deserialize(wn2);
                 stratconCampaignState.setContract(this);
+                this.setStratconCampaignState(stratconCampaignState);
             }
         }
     }
@@ -1507,6 +1510,12 @@ public class AtBContract extends Contract implements Serializable {
         stratconCampaignState = state;
     }
 
+    @Override
+    public void acceptContract(Campaign campaign) {
+        StratconContractInitializer.InitializeCampaignState(this, campaign, 
+                StratconContractDefinition.getContractDefinition(getMissionType()));
+    }
+    
     public AtBContract(Contract c, Campaign campaign) {
         this(c.getName());
 
