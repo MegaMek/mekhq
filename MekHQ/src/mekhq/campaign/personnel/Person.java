@@ -221,9 +221,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region portrait
     private String portraitCategory;
     private String portraitFile;
-    // runtime override (not saved)
-    private transient String portraitCategoryOverride = null;
-    private transient String portraitFileOverride = null;
     //endregion portrait
 
     // Our rank
@@ -696,11 +693,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Names
 
     public String getPortraitCategory() {
-        return Utilities.nonNull(portraitCategoryOverride, portraitCategory);
+        return portraitCategory;
     }
 
     public String getPortraitFileName() {
-        return Utilities.nonNull(portraitFileOverride, portraitFile);
+        return portraitFile;
     }
 
     public void setPortraitCategory(String s) {
@@ -709,14 +706,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setPortraitFileName(String s) {
         this.portraitFile = s;
-    }
-
-    public void setPortraitCategoryOverride(String s) {
-        this.portraitCategoryOverride = s;
-    }
-
-    public void setPortraitFileNameOverride(String s) {
-        this.portraitFileOverride = s;
     }
 
     //region Personnel Roles

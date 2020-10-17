@@ -178,13 +178,9 @@ public class BasicInfo extends JPanel {
         Image portrait;
         try {
             portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
-            if (null == portrait) {
+            if (portrait == null) {
                 // the image could not be found so switch to default one
-                p.setPortraitCategoryOverride(AbstractIcon.ROOT_CATEGORY);
-                category = "";
-                p.setPortraitFileNameOverride(AbstractIcon.DEFAULT_ICON_FILENAME);
-                filename = Portrait.DEFAULT_PORTRAIT_FILENAME;
-                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
+                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", Portrait.DEFAULT_PORTRAIT_FILENAME);
             }
             // make sure no images are longer than 72 pixels
             if (null != portrait) {
