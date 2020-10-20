@@ -4627,12 +4627,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return false;
         }
         final Unit other = (Unit) obj;
-        return Objects.equals(id, other.id) && Objects.equals(getName(), other.getName());
+        return Objects.equals(id, other.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, getName());
+        return Objects.hash(id);
     }
 
     public Person getEngineer() {
