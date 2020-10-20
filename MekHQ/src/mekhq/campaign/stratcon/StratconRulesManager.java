@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import megamek.common.Compute;
+import megamek.common.Minefield;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
@@ -18,6 +19,7 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -29,6 +31,7 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
 
@@ -316,7 +319,32 @@ public class StratconRulesManager {
             scenario.setReturnDate(campaign.getLocalDate().plusDays(trackState.getDeploymentTime()));
         }
         
+        // set the # of rerolls based on the actual lance assigned.
+        int tactics = scenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_TACTICS, campaign);
+        scenario.getBackingScenario().setRerolls(tactics);
+        // The number of defensive points available to a force entering a scenario is
+        // 2 x tactics. By default, those points are spent on conventional minefields.
+        if (commanderLanceHasDefensiveAssignment(scenario.getBackingScenario(), campaign)) {
+            scenario.setNumDefensivePoints(tactics * 2);
+            scenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, tactics * 2);
+        }
+        
         scenario.commitPrimaryForces(campaign, contract);
+    }
+    
+    /**
+     * Utility method to determine if the current scenario's force commander
+     * is on defence 
+     */
+    private static boolean commanderLanceHasDefensiveAssignment(AtBDynamicScenario scenario, Campaign campaign) {
+        Unit commanderUnit = campaign.getUnit(scenario.getLanceCommander(campaign).getUnitId());
+        Lance lance = campaign.getLances().get(commanderUnit.getForceId());
+        
+        if ((lance != null) && (lance.getRole() == AtBLanceRole.DEFENCE)) {
+            return true;
+        }
+        
+        return false;
     }
     
     /**

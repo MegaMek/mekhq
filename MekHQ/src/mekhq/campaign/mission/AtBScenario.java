@@ -218,6 +218,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     // key-value pairs linking transports and the units loaded onto them.
     private Map<String, List<String>> transportLinkages;
     protected Map<String, Entity> externalIDLookup;
+    
+    private Map<Integer, Integer> numPlayerMinefields;
 
     protected static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
     //endregion Variable Declarations
@@ -235,6 +237,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         entityIds = new HashMap<>();
         transportLinkages = new HashMap<>();
         externalIDLookup = new HashMap<>();
+        numPlayerMinefields = new HashMap<>();
 
         light = PlanetaryConditions.L_DAY;
         weather = PlanetaryConditions.WE_NONE;
@@ -1642,6 +1645,19 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</transportLinkages>");
         }
+        
+        if (numPlayerMinefields.size() > 0) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<numPlayerMinefields>");
+
+            for (int key : numPlayerMinefields.keySet()) {
+                pw1.println(MekHqXmlUtil.indentStr(indent+2) + "<numPlayerMinefield>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "minefieldType", key);
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "minefieldCount", numPlayerMinefields.get(key).toString());
+                pw1.println(MekHqXmlUtil.indentStr(indent+2) + "</numPlayerMinefield>");
+            }
+
+            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</numPlayerMinefields>");
+        }
 
         super.writeToXmlEnd(pw1, indent);
     }
@@ -1838,7 +1854,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 try {
                     loadTransportLinkages(wn2);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(this, "Error loading transport linkages in scenario", e);
+                    MekHQ.getLogger().error("Error loading transport linkages in scenario", e);
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("numPlayerMinefields")) {
+                try {
+                    loadMinefieldCounts(wn2);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error("Error loading minefield counts in scenario", e);
                 }
             }
         }
@@ -1865,6 +1887,19 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             List<String> transportedUnitIDs = Arrays.asList(transporteeIDs.item(x).getTextContent().split(","));
 
             transportLinkages.put(transportID, transportedUnitIDs);
+        }
+    }
+    
+    private void loadMinefieldCounts(Node wn) throws XPathExpressionException {
+        XPath xp = MekHqXmlUtil.getXPathInstance();
+        NodeList minefieldTypes = (NodeList) xp.evaluate("numPlayerMinefields/minefieldType", wn, XPathConstants.NODESET);
+        NodeList minefieldCounts = (NodeList) xp.evaluate("numPlayerMinefields/minefieldCount", wn, XPathConstants.NODESET);
+
+        for (int x = 0; x < minefieldTypes.getLength(); x++) {
+            int minefieldType = Integer.parseInt(minefieldTypes.item(x).getTextContent());
+            int minefieldCount = Integer.parseInt(minefieldCounts.item(x).getTextContent());
+            
+            numPlayerMinefields.put(minefieldType, minefieldCount);
         }
     }
 
@@ -2077,7 +2112,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         rerollsRemaining--;
     }
 
-    protected void setRerolls(int rerolls) {
+    public void setRerolls(int rerolls) {
         rerollsRemaining = rerolls;
     }
 
@@ -2087,6 +2122,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setEnemyHome(int enemyHome) {
         this.enemyHome = enemyHome;
+    }
+
+    public int getNumPlayerMinefields(int minefieldType) {
+        return numPlayerMinefields.containsKey(minefieldType) ? numPlayerMinefields.get(minefieldType) : 0;
+    }
+
+    public void setNumPlayerMinefields(int minefieldType, int numPlayerMinefields) {
+        this.numPlayerMinefields.put(minefieldType, numPlayerMinefields);
     }
 
     public Map<String, List<String>> getTransportLinkages() {

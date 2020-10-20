@@ -21,6 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import megamek.common.Minefield;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -32,13 +33,13 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 
+/**
+ * UI for managing force/unit assignments for individual StratCon scenarios.
+ */
 public class StratconScenarioWizard extends JDialog {
-    private final static int TACTICS_NOT_LOADED = -1;
-    
     StratconScenario currentScenario;
     Campaign campaign;
     StratconTrackState currentTrackState;
@@ -52,16 +53,6 @@ public class StratconScenarioWizard extends JDialog {
     
     JList<Unit> availableInfantryUnits = new JList<>();
     JLabel defensiveOptionStatus = new JLabel();
-
-    // lazy-loaded commander tactics property and backing field    
-    private int commanderTactics = TACTICS_NOT_LOADED;
-    private int getCommanderTactics() {
-        if(commanderTactics == TACTICS_NOT_LOADED) {
-            commanderTactics = currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_TACTICS, campaign);
-        }
-        
-        return commanderTactics;
-    }
     
     public StratconScenarioWizard(Campaign campaign) {
         this.campaign = campaign;
@@ -72,8 +63,6 @@ public class StratconScenarioWizard extends JDialog {
         currentScenario = scenario;
         currentCampaignState = campaignState;
         currentTrackState = trackState;
-        commanderTactics = TACTICS_NOT_LOADED;
-        
         availableForceLists.clear();
         availableUnitLists.clear();
         
@@ -100,9 +89,10 @@ public class StratconScenarioWizard extends JDialog {
                 gbc.gridy++;
                 setAssignForcesUI(gbc, true);
                 gbc.gridy++;
-                setDefensiveUI(gbc);
-                gbc.gridy++;
-                //setSupportUI(gbc, true);
+                if (currentScenario.getNumDefensivePoints() > 0) {
+                    setDefensiveUI(gbc);
+                    gbc.gridy++;
+                }
                 break;
         }
 
@@ -178,12 +168,13 @@ public class StratconScenarioWizard extends JDialog {
      */
     private void setDefensiveUI(GridBagConstraints gbc) {
         gbc.anchor = GridBagConstraints.WEST;
-        JLabel lblDefensivePostureInstructions = new JLabel("lblDefensivePostureInstructions.Text");
+        JLabel lblDefensivePostureInstructions = new JLabel(resourceMap.getString("lblDefensivePostureInstructions.Text"));
         getContentPane().add(lblDefensivePostureInstructions, gbc);
         
         gbc.gridy++;
         availableInfantryUnits =
-                addIndividualUnitSelector(StratconRulesManager.getEligibleDefensiveUnits(campaign), gbc, getCommanderTactics());
+                addIndividualUnitSelector(StratconRulesManager.getEligibleDefensiveUnits(campaign), 
+                        gbc, currentScenario.getNumDefensivePoints());
         
         
         
@@ -191,7 +182,7 @@ public class StratconScenarioWizard extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         
         JLabel lblDefensiveMinefieldCount = new JLabel(String.format(resourceMap.getString("lblDefensiveMinefieldCount.text"), 
-                getCommanderTactics()));
+                currentScenario.getNumDefensivePoints()));
         
         availableInfantryUnits.addListSelectionListener(new ListSelectionListener() { 
             @Override
@@ -441,8 +432,10 @@ public class StratconScenarioWizard extends JDialog {
             AtBDynamicScenarioFactory.finalizeScenario(currentScenario.getBackingScenario(), currentCampaignState.getContract(), campaign);
             StratconRulesManager.commitPrimaryForces(campaign, currentCampaignState.getContract(), currentScenario, currentTrackState);
             setCurrentScenario(currentScenario, currentTrackState, currentCampaignState);
+            currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
         // if we've just committed reinforcements then simply close it down
         } else {
+            currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
             setVisible(false);
         }
     }
@@ -513,15 +506,13 @@ public class StratconScenarioWizard extends JDialog {
     /**
      * Specific event handler for logic related to available infantry units.
      * Updates the defensive minefield count
-     * @param e
      */
     private void availableInfantrySelectorChanged(ListSelectionEvent e, JLabel defensiveMineCountLabel) {
-        if(!(e.getSource() instanceof JList<?>)) {
-            return;
-        }
-        
-        JList<Unit> changedList = (JList<Unit>) e.getSource();
         defensiveMineCountLabel.setText(String.format(resourceMap.getString("lblDefensiveMinefieldCount.text"), 
-                Math.max(0, getCommanderTactics() - changedList.getSelectedIndices().length)));        
+                getNumMinefields()));        
+    }
+    
+    private int getNumMinefields() {
+        return Math.max(0, currentScenario.getNumDefensivePoints() - availableInfantryUnits.getSelectedIndices().length);
     }
 }

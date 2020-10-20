@@ -56,6 +56,7 @@ public class StratconScenario implements IStratconDisplayable {
     private LocalDate actionDate;
     private LocalDate returnDate;
     private StratconCoords coords;
+    private int numDefensivePoints;
 
     /**
      * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the scenario template.
@@ -182,6 +183,10 @@ public class StratconScenario implements IStratconDisplayable {
         stateBuilder.append("</html>");
         return stateBuilder.toString();
     }
+    
+    public void updateMinefieldCount(int minefieldType, int number) {
+        backingScenario.setNumPlayerMinefields(minefieldType, number);
+    }
 
     public String getName() {
         return backingScenario.getName();
@@ -271,5 +276,17 @@ public class StratconScenario implements IStratconDisplayable {
 
     public void setBackingScenarioID(int backingScenarioID) {
         this.backingScenarioID = backingScenarioID;
+    }
+
+    public int getNumDefensivePoints() {
+        return numDefensivePoints;
+    }
+
+    public void setNumDefensivePoints(int numDefensivePoints) {
+        this.numDefensivePoints = numDefensivePoints;
+    }
+    
+    public void useDefensivePoint() {
+        numDefensivePoints--;
     }
 }
