@@ -21,11 +21,10 @@
  */
 package mekhq.campaign.work;
 
-import java.util.UUID;
-
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -53,7 +52,7 @@ public interface IPartWork extends IWork {
 
     TargetRoll getAllModsForMaintenance();
 
-    void setTech(Person tech);
+    void setTech(@Nullable Person tech);
     boolean hasWorkedOvertime();
     void setWorkedOvertime(boolean b);
     int getShorthandedMod();
@@ -88,7 +87,7 @@ public interface IPartWork extends IWork {
     String getDetails(boolean includeRepairDetails);
     int getLocation();
 
-    Unit getUnit();
+    @Nullable Unit getUnit();
 
     boolean isSalvaging();
 

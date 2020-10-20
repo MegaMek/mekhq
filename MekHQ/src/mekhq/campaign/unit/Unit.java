@@ -3648,10 +3648,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 nCrew++;
             }
         }
-        if (null != navigator) {
-            if (navigator.getHits() == 0) {
-                nCrew++;
-            }
+        if ((getNavigator() != null) && (getNavigator().getHits() == 0)) {
+            nCrew++;
         }
         //Using the tech officer field for the secondary commander; if nobody assigned to the command
         //console we will flag the entity as using the console commander, which has the effect of limiting
@@ -4020,11 +4018,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean canTakeNavigator() {
-        return entity instanceof Jumpship && !(entity instanceof SpaceStation) && navigator == null;
+        return entity instanceof Jumpship && !(entity instanceof SpaceStation) && (navigator == null);
     }
 
     public boolean canTakeTechOfficer() {
-        return techOfficer == null &&
+        return (techOfficer == null) &&
                 (entity.getCrew().getCrewType().getTechPos() >= 0
                 //Use techOfficer field for secondary commander
                 || (entity instanceof Tank && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)));
@@ -4076,10 +4074,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addDriver(Person p) {
-        addDriver(p, false);
+        addDriver(Objects.requireNonNull(p), false);
     }
 
     public void addDriver(Person p, boolean useTransfers) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
         drivers.add(p);
         p.setUnitId(getId());
@@ -4093,10 +4093,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addGunner(Person p) {
-        addGunner(p, false);
+        addGunner(Objects.requireNonNull(p), false);
     }
 
     public void addGunner(Person p, boolean useTransfers) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
         gunners.add(p);
         p.setUnitId(getId());
@@ -4110,10 +4112,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addVesselCrew(Person p) {
-        addVesselCrew(p, false);
+        addVesselCrew(Objects.requireNonNull(p), false);
     }
 
     public void addVesselCrew(Person p, boolean useTransfers) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
         vesselCrew.add(p);
         p.setUnitId(getId());
@@ -4127,10 +4131,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void setNavigator(Person p) {
-        setNavigator(p, false);
+        setNavigator(Objects.requireNonNull(p), false);
     }
 
     public void setNavigator(Person p, boolean useTransfers) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
         navigator = p;
         p.setUnitId(getId());
@@ -4143,15 +4149,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
 
-    public boolean isTechOfficer(Person p) {
-        return Objects.equals(techOfficer, p);
+    public boolean isTechOfficer(@Nullable Person p) {
+        return (techOfficer != null) && techOfficer.equals(p);
     }
 
     public void setTechOfficer(Person p) {
-        setTechOfficer(p, false);
+        setTechOfficer(Objects.requireNonNull(p), false);
     }
 
     public void setTechOfficer(Person p, boolean useTransfers) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
         techOfficer = p;
         p.setUnitId(getId());
@@ -4165,6 +4173,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void setTech(Person p) {
+        Objects.requireNonNull(p);
+
         if (null != tech) {
             MekHQ.getLogger().warning(String.format("New tech assigned %s without removing previous tech %s", p.getFullName(), tech));
         }
@@ -4193,10 +4203,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addPilotOrSoldier(Person p) {
-        addPilotOrSoldier(p, false);
+        addPilotOrSoldier(Objects.requireNonNull(p), false);
     }
 
     public void addPilotOrSoldier(Person p, boolean useTransfers) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
         drivers.add(p);
         //Multi-crew cockpits should not set the pilot to the gunner position
@@ -4214,21 +4226,23 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void remove(Person p, boolean log) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
-        if (p == tech) {
+        if (p.equals(tech)) {
             removeTech();
         } else {
             p.setUnitId(null);
             drivers.remove(p);
             gunners.remove(p);
             vesselCrew.remove(p);
-            if (p == navigator) {
+            if (p.equals(navigator)) {
                 navigator = null;
             }
-            if (p == techOfficer) {
+            if (p.equals(techOfficer)) {
                 techOfficer = null;
             }
-            if (p == engineer) {
+            if (p.equals(engineer)) {
                 engineer = null;
             }
             resetPilotAndEntity();
@@ -4293,19 +4307,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return Collections.unmodifiableList(vesselCrew);
     }
 
-    public Person getTechOfficer() {
+    public @Nullable Person getTechOfficer() {
         return techOfficer;
     }
 
-    public Person getNavigator() {
+    public @Nullable Person getNavigator() {
         return navigator;
     }
 
-    public Person getTech() {
-        if (null != engineer) {
-            return engineer;
-        }
-        return tech;
+    public @Nullable Person getTech() {
+        return (engineer != null) ? engineer : tech;
     }
 
     //region Mothballing/Activation
@@ -4355,7 +4366,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.mothballed = b;
         // Tech gets removed either way bug [#488]
         if (null != tech) {
-            remove(getTech(), true);
+            remove(tech, true);
         }
         if (mothballed) {
             //remove any other personnel
@@ -4383,13 +4394,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param isGM A value indicating if the mothball action should
      *             be performed immediately by the GM.
      */
-    public void startMothballing(Person mothballTech, boolean isGM) {
+    public void startMothballing(@Nullable Person mothballTech, boolean isGM) {
         if (!isMothballed() && MekHQ.getMekHQOptions().getSaveMothballState()) {
             mothballInfo = new MothballInfo(this);
         }
 
         //set this person as tech
-        if (!isSelfCrewed() && (null != tech) && (tech != mothballTech)) {
+        if (!isSelfCrewed() && (tech != null) && !tech.equals(mothballTech)) {
             remove(tech, true);
         }
         tech = mothballTech;
@@ -4414,8 +4425,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * Completes the mothballing of a unit.
      */
     public void completeMothball() {
-        if (getTech() != null) {
-            remove(getTech(), false);
+        if (tech != null) {
+            remove(tech, false);
         }
 
         setMothballTime(0);
@@ -4437,13 +4448,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param isGM A value indicating if the activation action should
      *             be performed immediately by the GM.
      */
-    public void startActivating(Person activationTech, boolean isGM) {
+    public void startActivating(@Nullable Person activationTech, boolean isGM) {
         if (!isMothballed()) {
             return;
         }
 
-        //set this person as tech
-        if (!isSelfCrewed() && (tech != null) && (tech != activationTech)) {
+        // set this person as tech
+        if (!isSelfCrewed() && (tech != null) && !tech.equals(activationTech)) {
             remove(tech, true);
         }
         tech = activationTech;
@@ -4555,11 +4566,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         // return count;
     }
 
-    public boolean isDriver(Person person) {
+    public boolean isDriver(@Nullable Person person) {
         return drivers.contains(person);
     }
 
-    public boolean isGunner(Person person) {
+    public boolean isGunner(@Nullable Person person) {
         return gunners.contains(person);
     }
 
@@ -4573,13 +4584,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      *
      * @see {@link #getCommander()}
      */
-    public boolean isCommander(Person person) {
+    public boolean isCommander(@Nullable Person person) {
         Person commander = getCommander();
-        return (null != person) && (null != commander) && (commander == person);
+        return (commander != null) && commander.equals(person);
     }
 
-    public boolean isNavigator(Person person) {
-        return person == navigator;
+    public boolean isNavigator(@Nullable Person person) {
+        return (navigator != null) && navigator.equals(person);
     }
 
     public void setRefit(Refit r) {
@@ -5297,7 +5308,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
     }
 
-	public void fixReferences(Campaign campaign) {
+    public void fixReferences(Campaign campaign) {
         if (tech instanceof UnitPersonRef) {
             UUID id = tech.getId();
             tech = campaign.getPerson(id);
@@ -5364,5 +5375,5 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if (mothballInfo != null) {
             mothballInfo.fixReferences(campaign);
         }
-	}
+    }
 }

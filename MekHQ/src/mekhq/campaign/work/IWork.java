@@ -22,6 +22,7 @@
 package mekhq.campaign.work;
 
 import megamek.common.TargetRoll;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.Person;
 
 public interface IWork {
@@ -37,7 +38,7 @@ public interface IWork {
     String fail(int rating);
 
     /** @return the team assigned to this work unit, or <tt>null</tt> if nobody is working on it */
-    Person getTech();
+    @Nullable Person getTech();
 
     /**
      * @return the current work time modifier set for this work unit; only override if the work

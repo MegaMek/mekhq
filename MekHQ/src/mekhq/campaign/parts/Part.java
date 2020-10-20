@@ -23,7 +23,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -1069,12 +1068,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     @Override
-    public Person getTech() {
+    public @Nullable Person getTech() {
         return tech;
     }
 
     @Override
-    public void setTech(Person tech) {
+    public void setTech(@Nullable Person tech) {
         //keep track of whether this was a salvage operation
         //because the entity may change
         if (null == tech) {
@@ -1092,9 +1091,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     /**
      * Sets the the team member who has reserved this part for work they are
      * performing overnight.
-     * @param teamId The team member.
+     * @param tech The team member.
      */
-    public void setReserveId(Person tech) {
+    public void setReserveId(@Nullable Person tech) {
         this.reservedBy = tech;
     }
 

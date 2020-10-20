@@ -2009,8 +2009,10 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public boolean isWorkingOnRefit(Person p) {
+        Objects.requireNonNull(p);
+
         Unit unit = getHangar().findUnit(u ->
-            u.isRefitting() && p == u.getRefit().getTech());
+            u.isRefitting() && p.equals(u.getRefit().getTech()));
         return unit != null;
     }
 
@@ -3689,15 +3691,15 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
         getHangar().forEachUnit(u -> {
-            if (tech == u.getTech()) {
+            if (tech.equals(u.getTech())) {
                 u.removeTech();
             }
-            if ((u.getRefit() != null) && (tech == u.getRefit().getTech())) {
+            if ((u.getRefit() != null) && tech.equals(u.getRefit().getTech())) {
                 u.getRefit().setTech(null);
             }
         });
         for (Part p : getParts()) {
-            if (tech == p.getTech()) {
+            if (tech.equals(p.getTech())) {
                 p.setTech(null);
             }
         }
@@ -5134,7 +5136,7 @@ public class Campaign implements Serializable, ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "This unit is not currently available!");
         }
-        if ((partWork.getTech() != null) && (partWork.getTech() != tech)) {
+        if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "Already being worked on by another team");
         }
