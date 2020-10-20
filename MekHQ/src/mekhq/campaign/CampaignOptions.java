@@ -109,7 +109,6 @@ public class CampaignOptions implements Serializable {
     //endregion Unlisted Variables
 
     //region General Tab
-    private boolean useUnitRating;
     private UnitRatingMethod unitRatingMethod;
     private int manualUnitRatingModifier;
     //endregion General Tab
@@ -425,7 +424,6 @@ public class CampaignOptions implements Serializable {
         //endregion Unlisted Variables
 
         //region General Tab
-        useUnitRating = true;
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         manualUnitRatingModifier = 0;
         //endregion General Tab
@@ -1915,14 +1913,6 @@ public class CampaignOptions implements Serializable {
         this.resetToFirstTech = resetToFirstTech;
     }
 
-    public boolean useDragoonRating() {
-        return useUnitRating;
-    }
-
-    public void setDragoonRating(boolean b) {
-        this.useUnitRating = b;
-    }
-
     public int getRepairSystem() {
         return repairSystem;
     }
@@ -3101,7 +3091,6 @@ public class CampaignOptions implements Serializable {
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useOriginFactionForNames);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnitRating", useUnitRating);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignedTechFirst", assignedTechFirst);
@@ -3607,9 +3596,11 @@ public class CampaignOptions implements Serializable {
                 retVal.factionIntroDate = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
                 retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating")
-                    || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) {
-                retVal.useUnitRating = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") // Legacy
+                    || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) { // Legacy
+                if (!Boolean.parseBoolean(wn2.getTextContent())) {
+                    retVal.setUnitRatingMethod(UnitRatingMethod.NONE);
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod")
                     || wn2.getNodeName().equalsIgnoreCase("dragoonsRatingMethod")) {
                 retVal.setUnitRatingMethod(UnitRatingMethod.parseFromString(wn2.getTextContent().trim()));
