@@ -85,7 +85,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         }
 
         for (Person driver : drivers) {
-            if (driver.getStatus().isActive() && driver.getUnitId() == null) {
+            if (driver.getStatus().isActive() && (driver.getUnitId() == null)) {
                 unit.addDriver(driver);
             }
         }
@@ -100,7 +100,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         }
 
         for (Person crew : vesselCrew) {
-            if (crew.getStatus().isActive() && crew.getUnitId() == null) {
+            if (crew.getStatus().isActive() && (crew.getUnitId() == null)) {
                 unit.addVesselCrew(crew);
             }
         }
@@ -125,14 +125,14 @@ public class MothballInfo implements MekHqXmlSerializable {
      */
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<mothballInfo>");
+        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<mothballInfo>");
 
         if (tech != null) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", tech.getId());
         }
 
         if (forceID > 0) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent,  "forceID", forceID);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "forceID", forceID);
         }
 
         for (Person driver : drivers) {
@@ -155,7 +155,7 @@ public class MothballInfo implements MekHqXmlSerializable {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techOfficerId", techOfficer.getId());
         }
 
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</mothballInfo>");
+        pw1.println(MekHqXmlUtil.indentStr(--indent) + "</mothballInfo>");
     }
 
     /**
