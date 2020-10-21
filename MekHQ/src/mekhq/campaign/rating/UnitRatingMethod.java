@@ -20,26 +20,48 @@
  */
 package mekhq.campaign.rating;
 
+import megamek.common.util.EncodeControl;
+
+import java.util.ResourceBundle;
+
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
- * @version %Id%
  * @since 9/24/2013
  */
 public enum UnitRatingMethod {
-    CAMPAIGN_OPS("Campaign Ops"),
-    FLD_MAN_MERCS_REV("FM: Mercenaries (rev)");
+    //region Enum Declarations
+    NONE("UnitRatingMethod.NONE.text"),
+    CAMPAIGN_OPS("UnitRatingMethod.CAMPAIGN_OPS.text"),
+    FLD_MAN_MERCS_REV("UnitRatingMethod.FLD_MAN_MERCS_REV.text");
+    //endregion Enum Declarations
 
-    private final String description;
+    //region Variable Declarations
+    private final String name;
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Rating",
+            new EncodeControl());
+    //endregion Variable Declarations
 
-    UnitRatingMethod(String description) {
-        this.description = description;
+    //region Constructors
+    UnitRatingMethod(String name) {
+        this.name = resources.getString(name);
+    }
+    //endregion Constructors
+
+    //region Boolean Comparison Methods
+    public boolean isEnabled() {
+        return this != NONE;
     }
 
-    @Override
-    public String toString() {
-        return description;
+    public boolean isCampaignOperations() {
+        return this == CAMPAIGN_OPS;
     }
 
+    public boolean isFMMR() {
+        return this == FLD_MAN_MERCS_REV;
+    }
+    //endregion Boolean Comparison Methods
+
+    //region File IO
     public static UnitRatingMethod parseFromString(String text) {
         try {
             return valueOf(text);
@@ -56,5 +78,11 @@ public enum UnitRatingMethod {
             default:
                 return FLD_MAN_MERCS_REV;
         }
+    }
+    //endregion File IO
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

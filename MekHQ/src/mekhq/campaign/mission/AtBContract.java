@@ -31,6 +31,7 @@ import java.util.UUID;
 
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.enums.MissionStatus;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,7 +48,6 @@ import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -354,20 +354,16 @@ public class AtBContract extends Contract implements Serializable {
         int unitRatingMod = campaign.getUnitRatingMod();
         double multiplier = 1.0;
         // IntOps reputation factor then Dragoons rating
-        if (campaign.getCampaignOptions().useDragoonRating()
-            && campaign.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
+        if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
             multiplier *= (unitRatingMod * 0.2) + 0.5;
         } else {
             if (unitRatingMod >= IUnitRating.DRAGOON_A) {
                 multiplier *= 2.0;
-            }
-            if (unitRatingMod == IUnitRating.DRAGOON_B) {
+            } else if (unitRatingMod == IUnitRating.DRAGOON_B) {
                 multiplier *= 1.5;
-            }
-            if (unitRatingMod == IUnitRating.DRAGOON_D) {
+            } else if (unitRatingMod == IUnitRating.DRAGOON_D) {
                 multiplier *= 0.8;
-            }
-            if (unitRatingMod == IUnitRating.DRAGOON_F) {
+            } else if (unitRatingMod == IUnitRating.DRAGOON_F) {
                 multiplier *= 0.5;
             }
         }
@@ -900,9 +896,8 @@ public class AtBContract extends Contract implements Serializable {
                             partsAvailabilityLevel++;
                             break;
                         case 6:
-                            String unit = c.getUnitMarket().addSingleUnit(c, UnitMarket.MARKET_EMPLOYER,
-                                UnitType.MEK, getEmployerCode(),
-                                IUnitRating.DRAGOON_F, 50);
+                            String unit = c.getUnitMarket().addSingleUnit(c, UnitMarketType.EMPLOYER,
+                                UnitType.MEK, getEmployerCode(), IUnitRating.DRAGOON_F, 50);
                             if (unit != null) {
                                 text += String.format("Surplus Sale: %s offered by employer on the <a href='UNIT_MARKET'>unit market</a>", unit);
                             }
