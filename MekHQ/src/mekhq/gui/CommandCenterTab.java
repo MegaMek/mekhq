@@ -53,6 +53,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     // basic info panel
     private JPanel panInfo;
+    private JLabel lblRatingHead;
     private JLabel lblRating;
     private JLabel lblExperience;
     private JLabel lblPersonnel;
@@ -78,6 +79,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     // available reports
     private JPanel panReports;
+    private JButton btnUnitRating;
 
     //icon panel
     private JPanel panIcon;
@@ -162,20 +164,20 @@ public final class CommandCenterTab extends CampaignGuiTab {
         int y = 0;
 
         /* Unit Rating */
+        lblRatingHead = new JLabel(resourceMap.getString("lblRating.text"));
+        lblRatingHead.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 1, 5);
+        panInfo.add(lblRatingHead, gridBagConstraints);
         lblRating = new JLabel(getCampaign().getUnitRatingText());
-        if (getCampaign().getCampaignOptions().useDragoonRating()) {
-            JLabel lblRatingHead = new JLabel(resourceMap.getString("lblRating.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.insets = new Insets(5, 5, 1, 5);
-            panInfo.add(lblRatingHead, gridBagConstraints);
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.weightx = 1.0;
-            panInfo.add(lblRating, gridBagConstraints);
-        }
+        lblRating.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        panInfo.add(lblRating, gridBagConstraints);
         JLabel lblExperienceHead = new JLabel(resourceMap.getString("lblExperience.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -430,7 +432,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnCargoCapacity.addActionListener(evt -> getCampaignGui().showReport(new CargoReport(getCampaign())));
         panReports.add(btnCargoCapacity);
 
-        JButton btnUnitRating = new JButton(resourceMap.getString("btnUnitRating.text"));
+        btnUnitRating = new JButton(resourceMap.getString("btnUnitRating.text"));
+        btnUnitRating.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
         btnUnitRating.addActionListener(evt -> getCampaignGui().showReport(new RatingReport(getCampaign())));
         panReports.add(btnUnitRating);
 
@@ -599,6 +602,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(OptionsChangedEvent evt) {
+        lblRatingHead.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
+        lblRating.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
+        btnUnitRating.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
         basicInfoScheduler.schedule();
         procurementListScheduler.schedule();
         setIcon();
@@ -624,5 +630,4 @@ public final class CommandCenterTab extends CampaignGuiTab {
     public void handle(AssetEvent ev) {
         basicInfoScheduler.schedule();
     }
-
 }

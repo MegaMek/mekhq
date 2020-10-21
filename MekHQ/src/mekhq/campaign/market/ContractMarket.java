@@ -24,8 +24,11 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import mekhq.campaign.market.enums.ContractMarketMethod;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -57,7 +60,6 @@ import mekhq.campaign.universe.Systems;
 public class ContractMarket implements Serializable {
 	private static final long serialVersionUID = 1303462872220110093L;
 
-	public static int TYPE_ATBMONTHLY = 0;
 	//TODO: Implement a method that rolls each day to see whether a new contract appears or an offer disappears
 
 	public final static int CLAUSE_COMMAND = 0;
@@ -66,12 +68,12 @@ public class ContractMarket implements Serializable {
 	public final static int CLAUSE_TRANSPORT = 3;
 	public final static int CLAUSE_NUM = 4;
 
-	private int method = TYPE_ATBMONTHLY;
+	private ContractMarketMethod method = ContractMarketMethod.ATB_MONTHLY;
 
-	private ArrayList<Contract> contracts;
+	private List<Contract> contracts;
 	private int lastId = 0;
-	private HashMap<Integer, Contract> contractIds;
-	private HashMap<Integer, ClauseMods> clauseMods;
+	private Map<Integer, Contract> contractIds;
+	private Map<Integer, ClauseMods> clauseMods;
 
 	/* It is possible to call addFollowup more than once for the
 	 * same contract by canceling the dialog and running it again;
@@ -89,7 +91,7 @@ public class ContractMarket implements Serializable {
 		followupContracts = new HashMap<>();
 	}
 
-	public ArrayList<Contract> getContracts() {
+	public List<Contract> getContracts() {
 		return contracts;
 	}
 
@@ -141,7 +143,7 @@ public class ContractMarket implements Serializable {
 	}
 
 	public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-		if (((method == TYPE_ATBMONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1))
+		if (((method == ContractMarketMethod.ATB_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1))
                 || newCampaign) {
 			Contract[] list = contracts.toArray(new Contract[contracts.size()]);
 			for (Contract c : list) {

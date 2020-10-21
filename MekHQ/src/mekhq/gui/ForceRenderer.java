@@ -1,20 +1,35 @@
+/*
+ * Copyright (c) 2013-2020 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui;
 
-import java.awt.Component;
-import java.awt.Image;
+import java.awt.*;
 import java.util.UUID;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
-import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import megamek.client.ui.Messages;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
-import mekhq.IconPackage;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
@@ -22,57 +37,44 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
-
     private static final long serialVersionUID = -553191867660269247L;
 
-    private final IconPackage icons;
     private final MekHqColors colors = new MekHqColors();
 
-    public ForceRenderer(IconPackage i) {
-        icons = i;
+    public ForceRenderer() {
+
     }
 
-    public Component getTreeCellRendererComponent(
-            JTree tree,
-            Object value,
-            boolean sel,
-            boolean expanded,
-            boolean leaf,
-            int row,
-            boolean hasFocus) {
+    @Override
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
+                                                  boolean expanded, boolean leaf, int row,
+                                                  boolean hasFocus) {
+        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+        setOpaque(false);
 
-        super.getTreeCellRendererComponent(
-                tree, value, sel,
-                expanded, leaf, row,
-                hasFocus);
-        setBackground(UIManager.getColor("Tree.background"));
-        setForeground(UIManager.getColor("Tree.textForeground"));
-        if(sel) {
-            setBackground(UIManager.getColor("Tree.selectionBackground"));
-            setForeground(UIManager.getColor("Tree.selectionForeground"));
-        }
-
-        if(value instanceof Unit) {
+        if (value instanceof Unit) {
             String name = "<font color='red'>No Crew</font>";
             if (((Unit) value).getEntity() instanceof GunEmplacement) {
                 name = "AutoTurret";
             }
-            String uname = "";
+            String uname;
             String c3network = "";
-            String transport = "";
-            Unit u = (Unit)value;
-            Person pp = u.getCommander();
-            if(null != pp) {
-                name = pp.getFullTitle();
-                name += " (" + u.getEntity().getCrew().getGunnery() + "/" + u.getEntity().getCrew().getPiloting() + ")";
-                if(pp.needsFixing() || u.getEntity().getCrew().getHits() > 0) {
+            StringBuilder transport = new StringBuilder();
+            Unit u = (Unit) value;
+            Person person = u.getCommander();
+            if (person != null) {
+                name = person.getFullTitle();
+                name += " (" + u.getEntity().getCrew().getGunnery() + "/"
+                        + u.getEntity().getCrew().getPiloting() + ")";
+                if (person.needsFixing() || (u.getEntity().getCrew().getHits() > 0)) {
                     name = "<font color='red'>" + name + "</font>";
                 }
             }
             uname = "<i>" + u.getName() + "</i>";
-            if(u.isDamaged()) {
+            if (u.isDamaged()) {
                 uname = "<font color='red'>" + uname + "</font>";
             }
+
             Entity entity = u.getEntity();
             if (entity.hasNavalC3()) {
                 if (entity.calculateFreeC3Nodes() >= 5) {
@@ -83,90 +85,91 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                             + entity.getC3NetId();
                     if (entity.calculateFreeC3Nodes() > 0) {
                         c3network += Messages.getString("ChatLounge.NC3Nodes",
-                                new Object[] { entity.calculateFreeC3Nodes() });
+                                entity.calculateFreeC3Nodes());
                     }
                 }
             } else if (entity.hasC3i()) {
                 if (entity.calculateFreeC3Nodes() >= 5) {
                     c3network += Messages.getString("ChatLounge.C3iNone");
                 } else {
-                    c3network += c3network += Messages
-                            .getString("ChatLounge.C3iNetwork")
+                    c3network += c3network += Messages.getString("ChatLounge.C3iNetwork")
                             + entity.getC3NetId();
                     if (entity.calculateFreeC3Nodes() > 0) {
                         c3network += Messages.getString("ChatLounge.C3Nodes",
-                                new Object[] { entity.calculateFreeC3Nodes() });
+                                entity.calculateFreeC3Nodes());
                     }
                 }
             } else if (entity.hasC3()) {
                 if (entity.C3MasterIs(entity)) {
                     c3network += Messages.getString("ChatLounge.C3Master");
                     c3network += Messages.getString("ChatLounge.C3MNodes",
-                            new Object[] { entity.calculateFreeC3MNodes() });
-                    if(entity.hasC3MM()) {
+                            entity.calculateFreeC3MNodes());
+                    if (entity.hasC3MM()) {
                         c3network += Messages.getString("ChatLounge.C3SNodes",
-                                new Object[] { entity.calculateFreeC3Nodes() });
+                                entity.calculateFreeC3Nodes());
                     }
                 } else if (!entity.hasC3S()) {
                     c3network += Messages.getString("ChatLounge.C3Master");
                     c3network += Messages.getString("ChatLounge.C3SNodes",
-                            new Object[] { entity.calculateFreeC3Nodes() });
-                    // an independent master might also be a slave to a company
-                    // master
+                            entity.calculateFreeC3Nodes());
+                    // an independent master might also be a slave to a company master
                     if (entity.getC3Master() != null) {
-                        c3network += "<br>" + Messages.getString("ChatLounge.C3Slave") + entity.getC3Master().getShortName(); //$NON-NLS-1$
+                        c3network += "<br>" + Messages.getString("ChatLounge.C3Slave")
+                                + entity.getC3Master().getShortName();
                     }
                 } else if (entity.getC3Master() != null) {
-                    c3network += Messages.getString("ChatLounge.C3Slave") + entity.getC3Master().getShortName(); //$NON-NLS-1$
+                    c3network += Messages.getString("ChatLounge.C3Slave")
+                            + entity.getC3Master().getShortName();
                 } else {
                     c3network += Messages.getString("ChatLounge.C3None");
                 }
             }
-            if(!c3network.isEmpty()) {
+
+            if (!c3network.isEmpty()) {
                 c3network = "<br><i>" + c3network + "</i>";
             }
-            if(u.hasTransportShipId()) {
+
+            if (u.hasTransportShipId()) {
                 for (UUID id : u.getTransportShipId().keySet()) {
                     Unit ship = u.getCampaign().getUnit(id);
                     if (ship != null) {
-                        transport += "<br>" + "Transported by: " + ship.getName();
+                        transport.append("<br>" + "Transported by: ").append(ship.getName());
                     }
                 }
             }
             setText("<html>" + name + ", " + uname + c3network + transport + "</html>");
-            if(u.isDeployed() && !sel) {
-                colors.getDeployed().getColor().ifPresent(c -> setBackground(c));
-                colors.getDeployed().getAlternateColor().ifPresent(c -> setForeground(c));
+            if (!sel && u.isDeployed()) {
+                colors.getDeployed().getColor().ifPresent(this::setBackground);
+                colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                setOpaque(true);
             }
-        }
-        if(value instanceof Force) {
-            if(!hasFocus && ((Force)value).isDeployed()) {
-                colors.getDeployed().getColor().ifPresent(c -> setBackground(c));
-                colors.getDeployed().getAlternateColor().ifPresent(c -> setForeground(c));
+        } else if (value instanceof Force) {
+            if (!sel && ((Force) value).isDeployed()) {
+                colors.getDeployed().getColor().ifPresent(this::setBackground);
+                colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                setOpaque(true);
             }
+        } else {
+            MekHQ.getLogger().error("Attempted to render node with unknown node class of "
+                    + ((value != null) ? value.getClass() : "null"));
         }
+
         setIcon(getIcon(value));
-
-
 
         return this;
     }
 
-    private IconPackage getIconPackage() {
-        return icons;
-    }
-
     protected Icon getIcon(Object node) {
-
-        if(node instanceof Unit) {
-            return getIconFrom((Unit)node);
-        } else if(node instanceof Force) {
-            return getIconFrom((Force)node);
+        if (node instanceof Unit) {
+            return getIconFrom((Unit) node);
+        } else if (node instanceof Force) {
+            return getIconFrom((Force) node);
         } else {
             return null;
         }
     }
 
+    @Deprecated // TODO : AbstractIcon - Portrait Icon - Swapover Required
     protected Icon getIconFrom(Unit unit) {
         Person person = unit.getCommander();
         if (null == person) {
@@ -202,6 +205,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         }
     }
 
+    @Deprecated // TODO : AbstractIcon - Force Icon - Swapover Required
     protected Icon getIconFrom(Force force) {
         Image forceImage = MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
                 force.getIconFileName(), force.getIconMap());
