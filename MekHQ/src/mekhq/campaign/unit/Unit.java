@@ -4074,7 +4074,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addDriver(Person p) {
-        addDriver(Objects.requireNonNull(p), false);
+        addDriver(p, false);
     }
 
     public void addDriver(Person p, boolean useTransfers) {
@@ -4093,7 +4093,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addGunner(Person p) {
-        addGunner(Objects.requireNonNull(p), false);
+        addGunner(p, false);
     }
 
     public void addGunner(Person p, boolean useTransfers) {
@@ -4112,7 +4112,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addVesselCrew(Person p) {
-        addVesselCrew(Objects.requireNonNull(p), false);
+        addVesselCrew(p, false);
     }
 
     public void addVesselCrew(Person p, boolean useTransfers) {
@@ -4131,7 +4131,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void setNavigator(Person p) {
-        setNavigator(Objects.requireNonNull(p), false);
+        setNavigator(p, false);
     }
 
     public void setNavigator(Person p, boolean useTransfers) {
@@ -4154,7 +4154,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void setTechOfficer(Person p) {
-        setTechOfficer(Objects.requireNonNull(p), false);
+        setTechOfficer(p, false);
     }
 
     public void setTechOfficer(Person p, boolean useTransfers) {
@@ -4203,7 +4203,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addPilotOrSoldier(Person p) {
-        addPilotOrSoldier(Objects.requireNonNull(p), false);
+        addPilotOrSoldier(p, false);
     }
 
     public void addPilotOrSoldier(Person p, boolean useTransfers) {
