@@ -31,6 +31,7 @@ import java.util.UUID;
 
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.market.enums.UnitMarketType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -46,7 +47,6 @@ import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -895,9 +895,8 @@ public class AtBContract extends Contract implements Serializable {
                             partsAvailabilityLevel++;
                             break;
                         case 6:
-                            String unit = c.getUnitMarket().addSingleUnit(c, UnitMarket.MARKET_EMPLOYER,
-                                UnitType.MEK, getEmployerCode(),
-                                IUnitRating.DRAGOON_F, 50);
+                            String unit = c.getUnitMarket().addSingleUnit(c, UnitMarketType.EMPLOYER,
+                                UnitType.MEK, getEmployerCode(), IUnitRating.DRAGOON_F, 50);
                             if (unit != null) {
                                 text += String.format("Surplus Sale: %s offered by employer on the <a href='UNIT_MARKET'>unit market</a>", unit);
                             }
