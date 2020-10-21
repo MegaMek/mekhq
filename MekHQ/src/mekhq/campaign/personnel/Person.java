@@ -3262,11 +3262,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return false;
     }
 
-    public Unit getUnit() {
+    public @Nullable Unit getUnit() {
         return unit;
     }
 
-    public void setUnit(Unit unit) {
+    public void setUnit(@Nullable Unit unit) {
         this.unit = unit;
     }
 
@@ -3275,6 +3275,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void addTechUnit(Unit unit) {
+        Objects.requireNonNull(unit);
+
         if (!techUnits.contains(unit)) {
             techUnits.add(unit);
         }
@@ -3285,7 +3287,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public List<Unit> getTechUnits() {
-        return techUnits;
+        return Collections.unmodifiableList(techUnits);
     }
 
     public int getMinutesLeft() {
@@ -3697,7 +3699,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void addInjury(Injury i) {
-        injuries.add(i);
+        injuries.add(Objects.requireNonNull(i));
         if (null != getUnit()) {
             getUnit().resetPilotAndEntity();
         }
