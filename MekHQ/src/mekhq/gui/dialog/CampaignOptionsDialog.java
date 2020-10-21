@@ -89,6 +89,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
@@ -266,8 +267,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkLogConception;
     private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
     private JCheckBox chkDetermineFatherAtBirth;
-    private JCheckBox chkDisplayParentage;
-    private JComboBox<String> comboDisplayFamilyLevel;
+    private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
     private JCheckBox chkUseRandomDeaths;
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     //Salary
@@ -1788,15 +1788,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(chkDetermineFatherAtBirth, gridBagConstraints);
 
-        chkDisplayParentage = new JCheckBox(resourceMap.getString("displayParentage.text"));
-        gridBagConstraints.gridy = ++gridy;
-        panFamily.add(chkDisplayParentage, gridBagConstraints);
-
-        DefaultComboBoxModel<String> familyLevelStatusModel = new DefaultComboBoxModel<>();
-        familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.ParentsChildren"));
-        familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.GrandparentsGrandchildren"));
-        familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.AuntsUnclesCousins"));
-        comboDisplayFamilyLevel = new JComboBox<>(familyLevelStatusModel);
+        comboDisplayFamilyLevel = new JComboBox<>(FamilialRelationshipDisplayLevel.values());
         JPanel pnlDisplayFamilyLevel = new JPanel();
         pnlDisplayFamilyLevel.add(comboDisplayFamilyLevel);
         pnlDisplayFamilyLevel.add(new JLabel(resourceMap.getString("displayFamilyLevel.text")));
@@ -4482,8 +4474,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkLogConception.setSelected(options.logConception());
         comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
         chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
-        chkDisplayParentage.setSelected(options.displayParentage());
-        comboDisplayFamilyLevel.setSelectedIndex(options.displayFamilyLevel());
+        comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
         chkUseRandomDeaths.setSelected(options.useRandomDeaths());
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
 
@@ -4798,7 +4789,7 @@ public class CampaignOptionsDialog extends JDialog {
             return;
         }
 
-        MekHQ.getLogger().info(this, "Saving campaign options...");
+        MekHQ.getLogger().info("Saving campaign options...");
         // Choose a file...
         Optional<File> maybeFile = FileDialogs.saveCampaignOptions(null);
 
@@ -4830,9 +4821,9 @@ public class CampaignOptionsDialog extends JDialog {
              PrintWriter pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
             preset.writeToXml(pw, 0);
             pw.flush();
-            MekHQ.getLogger().info(this, "Campaign options saved to " + file);
+            MekHQ.getLogger().info("Campaign options saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
             JOptionPane.showMessageDialog(null,
                     "Whoops, for some reason the game presets could not be saved",
                     "Could not save presets", JOptionPane.ERROR_MESSAGE);
@@ -5077,8 +5068,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setLogConception(chkLogConception.isSelected());
         options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
         options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
-        options.setDisplayParentage(chkDisplayParentage.isSelected());
-        options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());
+        options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
         options.setUseRandomDeaths(chkUseRandomDeaths.isSelected());
         options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
         //Salary
@@ -5201,7 +5191,7 @@ public class CampaignOptionsDialog extends JDialog {
                     int cost = Integer.parseInt((String) tableXP.getValueAt(i, j));
                     SkillType.setCost(SkillType.skillList[i], cost, j);
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(this, "unreadable value in skill cost table for " + SkillType.skillList[i]);
+                    MekHQ.getLogger().error("unreadable value in skill cost table for " + SkillType.skillList[i]);
                 }
             }
         }

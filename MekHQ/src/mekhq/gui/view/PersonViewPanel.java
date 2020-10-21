@@ -42,7 +42,6 @@ import javax.swing.table.TableColumn;
 import megamek.common.options.IOption;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.Utilities;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.FormerSpouse;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
@@ -891,9 +890,9 @@ public class PersonViewPanel extends ScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().displayParentage()) {
+        if (campaign.getCampaignOptions().getDisplayFamilyLevel().displayExtendedFamily()) {
             List<UUID> children = person.getGenealogy().getChildren();
-            if (!children.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
+            if (!children.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
                 lblChildren1.setName("lblChildren1");
                 lblChildren1.setText(resourceMap.getString("lblChildren1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -927,7 +926,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             List<UUID> grandchildren = person.getGenealogy().getGrandchildren(campaign);
-            if (!grandchildren.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.GRANDPARENTS_GRANDCHILDREN)) {
+            if (!grandchildren.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayGrandparentsGrandchildren()) {
                 lblGrandchildren1.setName("lblGrandchildren1");
                 lblGrandchildren1.setText(resourceMap.getString("lblGrandchildren1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -963,12 +962,13 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            if (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS) {
+            if (campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
                 List<UUID> parents = person.getGenealogy().getParents();
                 for (UUID parentId : parents) {
                     Person parent = campaign.getPerson(parentId);
 
-                    JLabel labelParent = new JLabel(resourceMap.getString(parent.getGender().isMale() ? "lblFather1.text" : "lblMother1.text"));
+                    JLabel labelParent = new JLabel(resourceMap.getString(parent.getGender().isMale()
+                            ? "lblFather1.text" : "lblMother1.text"));
                     labelParent.setName("lblParent");
                     gridBagConstraints = new GridBagConstraints();
                     gridBagConstraints.gridx = 0;
@@ -995,7 +995,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             List<UUID> siblings = person.getGenealogy().getSiblings(campaign);
-            if (!siblings.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
+            if (!siblings.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
                 lblSiblings1.setName("lblSiblings1");
                 lblSiblings1.setText(resourceMap.getString("lblSiblings1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1031,7 +1031,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             List<UUID> grandparents = person.getGenealogy().getGrandparents(campaign);
-            if (!grandparents.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.GRANDPARENTS_GRANDCHILDREN)) {
+            if (!grandparents.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayGrandparentsGrandchildren()) {
                 lblGrandparents1.setName("lblGrandparents1");
                 lblGrandparents1.setText(resourceMap.getString("lblGrandparents1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1068,7 +1068,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             List<UUID> auntsAndUncles = person.getGenealogy().getsAuntsAndUncles(campaign);
-            if (!auntsAndUncles.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.AUNTS_UNCLES_COUSINS)) {
+            if (!auntsAndUncles.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayAuntsUnclesCousins()) {
                 lblAuntsOrUncles1.setName("lblAuntsOrUncles1");
                 lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1105,7 +1105,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             List<UUID> cousins = person.getGenealogy().getCousins(campaign);
-            if (!cousins.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.AUNTS_UNCLES_COUSINS)) {
+            if (!cousins.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayAuntsUnclesCousins()) {
                 lblCousins1.setName("lblCousins1");
                 lblCousins1.setText(resourceMap.getString("lblCousins1.text"));
                 gridBagConstraints = new GridBagConstraints();
