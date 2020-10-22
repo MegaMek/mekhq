@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.service.MassRepairOption;
@@ -228,11 +229,7 @@ public class CampaignOptions implements Serializable {
     private boolean logConception;
     private BabySurnameStyle babySurnameStyle;
     private boolean determineFatherAtBirth;
-    private boolean displayParentage;
-    private int displayFamilyLevel;
-    public static final int PARENTS_CHILDREN_SIBLINGS = 0;
-    public static final int GRANDPARENTS_GRANDCHILDREN = 1;
-    public static final int AUNTS_UNCLES_COUSINS = 2;
+    private FamilialRelationshipDisplayLevel displayFamilyLevel;
     private boolean useRandomDeaths;
     private boolean keepMarriedNameUponSpouseDeath;
 
@@ -575,8 +572,7 @@ public class CampaignOptions implements Serializable {
         logConception = false;
         babySurnameStyle = BabySurnameStyle.MOTHERS;
         determineFatherAtBirth = false;
-        displayParentage = false;
-        displayFamilyLevel = PARENTS_CHILDREN_SIBLINGS;
+        displayFamilyLevel = FamilialRelationshipDisplayLevel.SPOUSE;
         useRandomDeaths = true;
         keepMarriedNameUponSpouseDeath = true;
 
@@ -1486,31 +1482,17 @@ public class CampaignOptions implements Serializable {
     }
 
     /**
-     * @return whether or not to display parentage for personnel
-     */
-    public boolean displayParentage() {
-        return displayParentage;
-    }
-
-    /**
-     * @param b whether or not to display parentage for personnel
-     */
-    public void setDisplayParentage(boolean b) {
-        displayParentage = b;
-    }
-
-    /**
      * @return the level of familial relation to display
      */
-    public int displayFamilyLevel() {
+    public FamilialRelationshipDisplayLevel getDisplayFamilyLevel() {
         return displayFamilyLevel;
     }
 
     /**
-     * @param b the level of familial relation to display
+     * @param displayFamilyLevel the level of familial relation to display
      */
-    public void setDisplayFamilyLevel(int b) {
-        displayFamilyLevel = b;
+    public void setDisplayFamilyLevel(FamilialRelationshipDisplayLevel displayFamilyLevel) {
+        this.displayFamilyLevel = displayFamilyLevel;
     }
 
     /**
@@ -3202,8 +3184,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "determineFatherAtBirth", determineFatherAtBirth);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", displayParentage);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomDeaths", useRandomDeaths);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "keepMarriedNameUponSpouseDeath", keepMarriedNameUponSpouseDeath);
         //endregion family
@@ -3675,10 +3656,8 @@ public class CampaignOptions implements Serializable {
                 retVal.setBabySurnameStyle(BabySurnameStyle.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
                 retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
-                retVal.displayParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
-                retVal.displayFamilyLevel = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDeaths")) {
                 retVal.useRandomDeaths = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
