@@ -1581,7 +1581,7 @@ public class CampaignGUI extends JPanel {
                                 "No Engineer", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            r.setTeamId(engineer.getId());
+            r.setTech(engineer);
         } else if (getCampaign().getTechs().size() > 0) {
             String name;
             Map<String, Person> techHash = new HashMap<>();
@@ -1624,7 +1624,7 @@ public class CampaignGUI extends JPanel {
                 return;
             }
 
-            r.setTeamId(techHash.get(s).getId());
+            r.setTech(techHash.get(s));
         } else {
             JOptionPane.showMessageDialog(frame,
                     "You have no techs available to work on this refit.",
@@ -1637,7 +1637,7 @@ public class CampaignGUI extends JPanel {
             rnd.setVisible(true);
             if (rnd.wasCancelled()) {
                 // Set the tech team to null since we may want to change it when we re-do the refit
-                r.setTeamId(null);
+                r.setTech(null);
                 return;
             }
         }
