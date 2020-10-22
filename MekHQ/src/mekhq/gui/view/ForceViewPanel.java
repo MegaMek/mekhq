@@ -163,7 +163,7 @@ public class ForceViewPanel extends ScrollablePanel {
 
         // Return a null if the player has selected no portrait file.
         if ((null == category) || (null == filename)
-                || (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)&& !Force.ROOT_LAYERED.equals(category))) {
+                || (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
         	filename = "empty.png";
         }
 
