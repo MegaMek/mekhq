@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.*;
 import megamek.common.enums.Gender;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.*;
@@ -220,9 +221,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region portrait
     private String portraitCategory;
     private String portraitFile;
-    // runtime override (not saved)
-    private transient String portraitCategoryOverride = null;
-    private transient String portraitFileOverride = null;
     //endregion portrait
 
     // Our rank
@@ -365,8 +363,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         tryingToConceive = true;
         dueDate = null;
         expectedDueDate = null;
-        portraitCategory = Crew.ROOT_PORTRAIT;
-        portraitFile = Crew.PORTRAIT_NONE;
+        portraitCategory = AbstractIcon.ROOT_CATEGORY;
+        portraitFile = AbstractIcon.DEFAULT_ICON_FILENAME;
         xp = 0;
         daysToWaitForHealing = 0;
         gender = Gender.MALE;
@@ -697,11 +695,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Names
 
     public String getPortraitCategory() {
-        return Utilities.nonNull(portraitCategoryOverride, portraitCategory);
+        return portraitCategory;
     }
 
     public String getPortraitFileName() {
-        return Utilities.nonNull(portraitFileOverride, portraitFile);
+        return portraitFile;
     }
 
     public void setPortraitCategory(String s) {
@@ -710,14 +708,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setPortraitFileName(String s) {
         this.portraitFile = s;
-    }
-
-    public void setPortraitCategoryOverride(String s) {
-        this.portraitCategoryOverride = s;
-    }
-
-    public void setPortraitFileNameOverride(String s) {
-        this.portraitFileOverride = s;
     }
 
     //region Personnel Roles
@@ -1718,10 +1708,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "expectedDueDate",
                         MekHqXmlUtil.saveFormattedDate(expectedDueDate));
             }
-            if (!portraitCategory.equals(Crew.ROOT_PORTRAIT)) {
+            if (!AbstractIcon.ROOT_CATEGORY.equals(portraitCategory)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", portraitCategory);
             }
-            if (!portraitFile.equals(Crew.PORTRAIT_NONE)) {
+            if (!AbstractIcon.DEFAULT_ICON_FILENAME.equals(portraitFile)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", portraitFile);
             }
             // Always save the current XP
