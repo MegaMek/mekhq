@@ -32,6 +32,7 @@ import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.*;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
@@ -220,7 +221,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         person.setManeiDominiClass(mdClass);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(this, "Failed to assign Manei Domini Class", e);
+                    MekHQ.getLogger().error("Failed to assign Manei Domini Class", e);
                 }
                 break;
             }
@@ -231,7 +232,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         person.setPrimaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(this, "Failed to assign ROM designator", e);
+                    MekHQ.getLogger().error("Failed to assign ROM designator", e);
                 }
                 break;
             }
@@ -242,7 +243,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         person.setSecondaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(this, "Failed to assign ROM secondary designator", e);
+                    MekHQ.getLogger().error("Failed to assign ROM secondary designator", e);
                 }
                 break;
             }
@@ -253,7 +254,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     gui.getCampaign().personUpdated(person);
                     if (gui.getCampaign().getCampaignOptions().usePortraitForType(role)
                             && gui.getCampaign().getCampaignOptions().getAssignPortraitOnRoleChange()
-                            && person.getPortraitFileName().equals(Crew.PORTRAIT_NONE)) {
+                            && AbstractIcon.DEFAULT_ICON_FILENAME.equals(person.getPortraitFileName())) {
                         gui.getCampaign().assignRandomPortraitFor(person);
                     }
                 }
@@ -520,7 +521,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                                     gui.getCampaign().getLocalDate());
                         }
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(this, "Could not remove award.", e);
+                        MekHQ.getLogger().error("Could not remove award.", e);
                     }
                 }
                 break;
@@ -637,7 +638,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         }
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(this, "Unknown PrisonerStatus Option. No changes will be made.", e);
+                    MekHQ.getLogger().error("Unknown PrisonerStatus Option. No changes will be made.", e);
                 }
                 break;
             }

@@ -63,7 +63,8 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
-import megamek.common.Player;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Camouflage;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -89,6 +90,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
@@ -145,8 +147,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JPanel panGeneral;
     private JTextField txtName;
     private JComboBox<String> comboFaction;
-    SortedComboBoxModel<String> factionModel;
-    private JCheckBox useUnitRatingCheckBox;
+    private SortedComboBoxModel<String> factionModel;
     private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JSpinner manualUnitRatingModifier;
     private JButton btnDate;
@@ -267,8 +268,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkLogConception;
     private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
     private JCheckBox chkDetermineFatherAtBirth;
-    private JCheckBox chkDisplayParentage;
-    private JComboBox<String> comboDisplayFamilyLevel;
+    private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
     private JCheckBox chkUseRandomDeaths;
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     //Salary
@@ -658,31 +658,22 @@ public class CampaignOptionsDialog extends JDialog {
 
         JPanel unitRatingPanel = new JPanel(new GridBagLayout());
 
-        useUnitRatingCheckBox = new JCheckBox(resourceMap.getString("useUnitRatingCheckBox.text"));
-        useUnitRatingCheckBox.setName("useUnitRatingCheckBox");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        unitRatingPanel.add(useUnitRatingCheckBox);
-
         JLabel unitRatingMethodLabel = new JLabel(resourceMap.getString("unitRatingMethodLabel.text"));
         unitRatingMethodLabel.setName("unitRatingMethodLabel");
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         unitRatingPanel.add(unitRatingMethodLabel, gridBagConstraints);
 
         unitRatingMethodCombo = new JComboBox<>(UnitRatingMethod.values());
         unitRatingMethodCombo.setName("unitRatingMethodCombo");
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         unitRatingPanel.add(unitRatingMethodCombo, gridBagConstraints);
 
         JLabel manualUnitRatingModifierLabel = new JLabel(resourceMap.getString("manualUnitRatingModifierLabel.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 2;
         unitRatingPanel.add(manualUnitRatingModifierLabel, gridBagConstraints);
 
         manualUnitRatingModifier = new JSpinner(new SpinnerNumberModel(0, -100, 100, 1));
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 3;
         unitRatingPanel.add(manualUnitRatingModifier, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
@@ -1798,15 +1789,7 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(chkDetermineFatherAtBirth, gridBagConstraints);
 
-        chkDisplayParentage = new JCheckBox(resourceMap.getString("displayParentage.text"));
-        gridBagConstraints.gridy = ++gridy;
-        panFamily.add(chkDisplayParentage, gridBagConstraints);
-
-        DefaultComboBoxModel<String> familyLevelStatusModel = new DefaultComboBoxModel<>();
-        familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.ParentsChildren"));
-        familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.GrandparentsGrandchildren"));
-        familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.AuntsUnclesCousins"));
-        comboDisplayFamilyLevel = new JComboBox<>(familyLevelStatusModel);
+        comboDisplayFamilyLevel = new JComboBox<>(FamilialRelationshipDisplayLevel.values());
         JPanel pnlDisplayFamilyLevel = new JPanel();
         pnlDisplayFamilyLevel.add(comboDisplayFamilyLevel);
         pnlDisplayFamilyLevel.add(new JLabel(resourceMap.getString("displayFamilyLevel.text")));
@@ -4370,7 +4353,6 @@ public class CampaignOptionsDialog extends JDialog {
         }
 
         //region General Tab
-        useUnitRatingCheckBox.setSelected(options.useDragoonRating());
         unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod());
         manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
         //endregion General Tab
@@ -4493,8 +4475,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkLogConception.setSelected(options.logConception());
         comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
         chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
-        chkDisplayParentage.setSelected(options.displayParentage());
-        comboDisplayFamilyLevel.setSelectedIndex(options.displayFamilyLevel());
+        comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
         chkUseRandomDeaths.setSelected(options.useRandomDeaths());
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
 
@@ -4809,7 +4790,7 @@ public class CampaignOptionsDialog extends JDialog {
             return;
         }
 
-        MekHQ.getLogger().info(this, "Saving campaign options...");
+        MekHQ.getLogger().info("Saving campaign options...");
         // Choose a file...
         Optional<File> maybeFile = FileDialogs.saveCampaignOptions(null);
 
@@ -4841,9 +4822,9 @@ public class CampaignOptionsDialog extends JDialog {
              PrintWriter pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
             preset.writeToXml(pw, 0);
             pw.flush();
-            MekHQ.getLogger().info(this, "Campaign options saved to " + file);
+            MekHQ.getLogger().info("Campaign options saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
             JOptionPane.showMessageDialog(null,
                     "Whoops, for some reason the game presets could not be saved",
                     "Could not save presets", JOptionPane.ERROR_MESSAGE);
@@ -4902,7 +4883,6 @@ public class CampaignOptionsDialog extends JDialog {
         }
         options.setDamagedPartsValue((Double) spnDamagedPartsValue.getModel().getValue());
         options.setCanceledOrderReimbursement((Double) spnOrderRefund.getModel().getValue());
-        options.setDragoonRating(useUnitRatingCheckBox.isSelected());
         options.setUnitRatingMethod((UnitRatingMethod) unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((Integer) manualUnitRatingModifier.getValue());
         options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
@@ -5089,8 +5069,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setLogConception(chkLogConception.isSelected());
         options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
         options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
-        options.setDisplayParentage(chkDisplayParentage.isSelected());
-        options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());
+        options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
         options.setUseRandomDeaths(chkUseRandomDeaths.isSelected());
         options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
         //Salary
@@ -5213,7 +5192,7 @@ public class CampaignOptionsDialog extends JDialog {
                     int cost = Integer.parseInt((String) tableXP.getValueAt(i, j));
                     SkillType.setCost(SkillType.skillList[i], cost, j);
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(this, "unreadable value in skill cost table for " + SkillType.skillList[i]);
+                    MekHQ.getLogger().error("unreadable value in skill cost table for " + SkillType.skillList[i]);
                 }
             }
         }
@@ -5383,7 +5362,7 @@ public class CampaignOptionsDialog extends JDialog {
             return;
         }
 
-        if (Player.NO_CAMO.equals(camoCategory)) {
+        if (Camouflage.NO_CAMOUFLAGE.equals(camoCategory)) {
             int colorInd = colorIndex;
             if (colorInd == -1) {
                 colorInd = 0;
@@ -5399,7 +5378,7 @@ public class CampaignOptionsDialog extends JDialog {
         // Try to get the camo file.
         try {
             // Translate the root camo directory name.
-            if (Player.ROOT_CAMO.equals(camoCategory)) {
+            if (AbstractIcon.ROOT_CATEGORY.equals(camoCategory)) {
                 camoCategory = "";
             }
             Image camo = (Image) MHQStaticDirectoryManager.getCamouflage().getItem(camoCategory, camoFileName);
@@ -5414,7 +5393,7 @@ public class CampaignOptionsDialog extends JDialog {
                     + "data/images/camo folder.",
                     "Missing Camo File",
                     JOptionPane.WARNING_MESSAGE);
-            camoCategory = Player.NO_CAMO;
+            camoCategory = Camouflage.NO_CAMOUFLAGE;
             colorIndex = 0;
             setCamoIcon();
         }

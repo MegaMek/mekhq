@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.*;
 import megamek.common.enums.Gender;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.*;
@@ -220,9 +221,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region portrait
     private String portraitCategory;
     private String portraitFile;
-    // runtime override (not saved)
-    private transient String portraitCategoryOverride = null;
-    private transient String portraitFileOverride = null;
     //endregion portrait
 
     // Our rank
@@ -301,13 +299,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region Reverse Compatibility
     // Unknown version
     private int oldId;
-    private int oldUnitId = -1;
-    private int oldDoctorId = -1;
     //endregion Reverse Compatibility
     //endregion Variable Declarations
 
     //region Constructors
     //default constructor
+    protected Person(UUID id) {
+        this.id = id;
+    }
+
     public Person(Campaign campaign) {
         this(RandomNameGenerator.UNNAMED, RandomNameGenerator.UNNAMED_SURNAME, campaign);
     }
@@ -363,8 +363,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         tryingToConceive = true;
         dueDate = null;
         expectedDueDate = null;
-        portraitCategory = Crew.ROOT_PORTRAIT;
-        portraitFile = Crew.PORTRAIT_NONE;
+        portraitCategory = AbstractIcon.ROOT_CATEGORY;
+        portraitFile = AbstractIcon.DEFAULT_ICON_FILENAME;
         xp = 0;
         daysToWaitForHealing = 0;
         gender = Gender.MALE;
@@ -695,11 +695,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Names
 
     public String getPortraitCategory() {
-        return Utilities.nonNull(portraitCategoryOverride, portraitCategory);
+        return portraitCategory;
     }
 
     public String getPortraitFileName() {
-        return Utilities.nonNull(portraitFileOverride, portraitFile);
+        return portraitFile;
     }
 
     public void setPortraitCategory(String s) {
@@ -708,14 +708,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setPortraitFileName(String s) {
         this.portraitFile = s;
-    }
-
-    public void setPortraitCategoryOverride(String s) {
-        this.portraitCategoryOverride = s;
-    }
-
-    public void setPortraitFileNameOverride(String s) {
-        this.portraitFileOverride = s;
     }
 
     //region Personnel Roles
@@ -957,7 +949,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             // If we're assigned to any repairs or refits, remove that assignment
             for (Part part : campaign.getParts()) {
-                if (getId().equals(part.getTeamId())) {
+                if (this == part.getTech()) {
                     part.cancelAssignment();
                 }
             }
@@ -1716,10 +1708,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "expectedDueDate",
                         MekHqXmlUtil.saveFormattedDate(expectedDueDate));
             }
-            if (!portraitCategory.equals(Crew.ROOT_PORTRAIT)) {
+            if (!AbstractIcon.ROOT_CATEGORY.equals(portraitCategory)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", portraitCategory);
             }
-            if (!portraitFile.equals(Crew.PORTRAIT_NONE)) {
+            if (!AbstractIcon.DEFAULT_ICON_FILENAME.equals(portraitFile)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", portraitFile);
             }
             // Always save the current XP
@@ -1868,7 +1860,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 extraData.writeToXml(pw1);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(this, "Failed to write " + getFullName() + " to the XML File", e);
+            MekHQ.getLogger().error("Failed to write " + getFullName() + " to the XML File", e);
             throw e; // we want to rethrow to ensure that that the save fails
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
@@ -1995,20 +1987,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
                     retVal.maneiDominiClass = ManeiDominiClass.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        if (!wn2.getTextContent().equals("null")) {
-                            retVal.doctorId = UUID.fromString(wn2.getTextContent());
-                        }
+                    if (!wn2.getTextContent().equals("null")) {
+                        retVal.doctorId = UUID.fromString(wn2.getTextContent());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldUnitId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        if (!wn2.getTextContent().equals("null")) {
-                            retVal.unitId = UUID.fromString(wn2.getTextContent());
-                        }
+                    if (!wn2.getTextContent().equals("null")) {
+                        retVal.unitId = UUID.fromString(wn2.getTextContent());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     retVal.setStatus(PersonnelStatus.parseFromString(wn2.getTextContent().trim()));
@@ -3580,11 +3564,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public int getOldId() {
         return oldId;
-    }
-
-    public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> pHash) {
-        unitId = uHash.get(oldUnitId);
-        doctorId = pHash.get(oldDoctorId);
     }
 
     public int getNTasks() {

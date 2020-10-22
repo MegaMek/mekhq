@@ -27,9 +27,9 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import megamek.client.ui.Messages;
-import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
+import megamek.common.icons.AbstractIcon;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
@@ -178,12 +178,12 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         String category = person.getPortraitCategory();
         String filename = person.getPortraitFileName();
 
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
             category = "";
         }
 
         // Return a null if the unit has no selected portrait file.
-        if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
+        if ((null == category) || (null == filename) || AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
             filename = "default.gif";
         }
         // Try to get the unit's portrait file.

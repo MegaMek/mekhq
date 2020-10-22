@@ -14,6 +14,9 @@ VERSION HISTORY:
 + Issue #2138: Fixing GM Mothballing
 + Issue #2139: Fixing Award Tracker Data Manipulation
 + Issue #2130: Fixing TOE “Deployed” and “Undeployed” Background Colour Display
++ Issue #1723: Fixing Missing Personnel and Hangar Tab Selection Highlights
++ PR #2153: UnitRatingMethod: Add Disabled Case
++ Issue #1537: Fixing Null AmmoType NPE in Hangar Tab
 
 0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo

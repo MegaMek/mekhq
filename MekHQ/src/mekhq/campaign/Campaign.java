@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import megamek.common.icons.Camouflage;
 import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
@@ -224,7 +225,7 @@ public class Campaign implements Serializable, ITechManager {
     private boolean gmMode;
     private transient boolean overviewLoadingValue = true;
 
-    private String camoCategory = Player.NO_CAMO;
+    private String camoCategory = Camouflage.NO_CAMOUFLAGE;
     private String camoFileName = null;
     private int colorIndex = 0;
 
@@ -1431,7 +1432,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
             // Higher rated units are more likely to have Bloodnamed
-            if (getCampaignOptions().useDragoonRating()) {
+            if (getCampaignOptions().getUnitRatingMethod().isEnabled()) {
                 IUnitRating rating = getUnitRating();
                 bloodnameTarget += IUnitRating.DRAGOON_C - (getCampaignOptions().getUnitRatingMethod().equals(
                         mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV)
@@ -1689,14 +1690,10 @@ public class Campaign implements Serializable, ITechManager {
             p.setCampaign(this);
             addPartWithoutId(p);
         }
-
-        for (Part p : newParts) {
-            p.fixupPartReferences(parts);
-        }
     }
 
     public void addPartWithoutId(Part p) {
-        if (p instanceof MissingPart && null == p.getUnitId()) {
+        if ((p instanceof MissingPart) && (null == p.getUnitId())) {
             // we shouldn't have spare missing parts. I think their existence is
             // a relic.
             return;
@@ -1706,56 +1703,8 @@ public class Campaign implements Serializable, ITechManager {
         // which may occur if a replacement ID is assigned
         lastPartId = Math.max(lastPartId, p.getId());
 
-        // go ahead and check for existing parts because some version weren't
-        // properly collecting parts
-        Part mergedWith = null;
-        if (!(p instanceof MissingPart) && (null == p.getUnitId())
-                && !p.isReservedForRefit() && !p.isReservedForReplacement()) {
-            Part spare = checkForExistingSparePart(p);
-            if (null != spare) {
-                if (p instanceof Armor) {
-                    if (spare instanceof Armor) {
-                        ((Armor) spare).setAmount(((Armor) spare).getAmount()
-                                + ((Armor) p).getAmount());
-                        mergedWith = spare;
-                    }
-                } else if (p instanceof AmmoStorage) {
-                    if (spare instanceof AmmoStorage) {
-                        ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
-                                .getShots());
-                        mergedWith = spare;
-                    }
-                } else {
-                    spare.incrementQuantity();
-                    mergedWith = spare;
-                }
-            }
-        }
-
-        // If we weren't merged we are being added
-        if (null == mergedWith) {
-            parts.put(p.getId(), p);
-            MekHQ.triggerEvent(new PartNewEvent(p));
-        } else {
-            // Go through each unit and its refits to see if the new armor should be updated
-            // CAW: I believe all other parts on a refit have a unit assigned to them.
-            if (mergedWith instanceof Armor) {
-                for (Unit u : getUnits()) {
-                    Refit r = u.getRefit();
-                    // If there is a refit and this part matches the new armor, update the armor entry
-                    if (null != r) {
-                        if (r.getNewArmorSupplies() == p) {
-                            MekHQ.getLogger().info(
-                                String.format("%s (%d) was merged with %s (%d) used in a refit for %s", p.getName(),
-                                    p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
-                            Armor mergedArmor = (Armor) mergedWith;
-                            r.setNewArmorSupplies(mergedArmor);
-                        }
-                    }
-                }
-            }
-            MekHQ.triggerEvent(new PartRemovedEvent(p));
-        }
+        parts.put(p.getId(), p);
+        MekHQ.triggerEvent(new PartNewEvent(p));
     }
 
     /**
@@ -2061,8 +2010,10 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public boolean isWorkingOnRefit(Person p) {
+        Objects.requireNonNull(p);
+
         Unit unit = getHangar().findUnit(u ->
-            u.isRefitting() && Objects.equals(p.getId(), u.getRefit().getTeamId()));
+            u.isRefitting() && p.equals(u.getRefit().getTech()));
         return unit != null;
     }
 
@@ -2749,8 +2700,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void refit(Refit r) {
-        Person tech = r.getUnit().getEngineer() == null?
-                getPerson(r.getTeamId()) : r.getUnit().getEngineer();
+        Person tech = r.getUnit().getEngineer() == null
+                ? r.getTech() : r.getUnit().getEngineer();
         if (null == tech) {
             addReport("No tech is assigned to refit " + r.getOriginalEntity().getShortName() + ". Refit cancelled.");
             r.cancel();
@@ -2922,7 +2873,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (partWork.getShorthandedMod() < helpMod) {
                     partWork.setShorthandedMod(helpMod);
                 }
-                partWork.setTeamId(tech.getId());
+                partWork.setTech(tech);
                 partWork.reservePart();
                 report += " - <b>Not enough time, the remainder of the task";
                 if (null != partWork.getUnit()) {
@@ -2934,7 +2885,7 @@ public class Campaign implements Serializable, ITechManager {
                     report += " cannot be finished because there was no time left after maintenance tasks.</b>";
                     partWork.resetTimeSpent();
                     partWork.resetOvertime();
-                    partWork.setTeamId(null);
+                    partWork.setTech(null);
                     partWork.cancelReservation();
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
@@ -3036,7 +2987,7 @@ public class Campaign implements Serializable, ITechManager {
         report += wrongType;
         partWork.resetTimeSpent();
         partWork.resetOvertime();
-        partWork.setTeamId(null);
+        partWork.setTech(null);
         partWork.cancelReservation();
         MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(report);
@@ -3402,61 +3353,55 @@ public class Campaign implements Serializable, ITechManager {
 
         // need to check for assigned tasks in two steps to avoid
         // concurrent mod problems
-        ArrayList<Integer> assignedPartIds = new ArrayList<>();
-        ArrayList<Integer> arrivedPartIds = new ArrayList<>();
+        List<Part> assignedParts = new ArrayList<>();
+        List<Part> arrivedParts = new ArrayList<>();
         for (Part part : getParts()) {
             if (part instanceof Refit) {
                 continue;
             }
-            if (part.getTeamId() != null) {
-                assignedPartIds.add(part.getId());
+            if (part.getTech() != null) {
+                assignedParts.add(part);
             }
             if (part.checkArrival()) {
-                arrivedPartIds.add(part.getId());
+                arrivedParts.add(part);
             }
         }
 
         // arrive parts before attempting refit or parts will not get reserved that day
-        for (int pid : arrivedPartIds) {
-            Part part = getPart(pid);
-            if (null != part) {
-                arrivePart(part);
-            }
+        for (Part part : arrivedParts) {
+            arrivePart(part);
         }
 
         // finish up any overnight assigned tasks
-        for (int pid : assignedPartIds) {
-            Part part = getPart(pid);
-            if (null != part) {
-                Person tech;
-                if ((part.getUnit() != null) && (part.getUnit().getEngineer() != null)) {
-                    tech = part.getUnit().getEngineer();
+        for (Part part : assignedParts) {
+            Person tech;
+            if ((part.getUnit() != null) && (part.getUnit().getEngineer() != null)) {
+                tech = part.getUnit().getEngineer();
+            } else {
+                tech = part.getTech();
+            }
+            if (null != tech) {
+                if (null != tech.getSkillForWorkingOn(part)) {
+                    fixPart(part, tech);
                 } else {
-                    tech = getPerson(part.getTeamId());
+                    addReport(String.format(
+                            "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
+                            tech.getHyperlinkedFullTitle(), part.getName()));
+                    part.setTech(null);
                 }
-                if (null != tech) {
-                    if (null != tech.getSkillForWorkingOn(part)) {
-                        fixPart(part, tech);
-                    } else {
-                        addReport(String.format(
-                                "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
-                                tech.getHyperlinkedFullTitle(), part.getName()));
-                        part.setTeamId(null);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null,
-                            "Could not find tech for part: " + part.getName() + " on unit: "
-                                    + part.getUnit().getHyperlinkedName(),
-                            "Invalid Auto-continue", JOptionPane.ERROR_MESSAGE);
-                }
-                // check to see if this part can now be combined with other
-                // spare parts
-                if (part.isSpare()) {
-                    Part spare = checkForExistingSparePart(part);
-                    if (null != spare) {
-                        spare.incrementQuantity();
-                        removePart(part);
-                    }
+            } else {
+                JOptionPane.showMessageDialog(null,
+                        "Could not find tech for part: " + part.getName() + " on unit: "
+                                + part.getUnit().getHyperlinkedName(),
+                        "Invalid Auto-continue", JOptionPane.ERROR_MESSAGE);
+            }
+            // check to see if this part can now be combined with other
+            // spare parts
+            if (part.isSpare()) {
+                Part spare = checkForExistingSparePart(part);
+                if (null != spare) {
+                    spare.incrementQuantity();
+                    removePart(part);
                 }
             }
         }
@@ -3747,16 +3692,16 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
         getHangar().forEachUnit(u -> {
-            if (tech.getId().equals(u.getTechId())) {
+            if (tech.equals(u.getTech())) {
                 u.removeTech();
             }
-            if (u.getRefit() != null && tech.getId().equals(u.getRefit().getTeamId())) {
-                u.getRefit().setTeamId(null);
+            if ((u.getRefit() != null) && tech.equals(u.getRefit().getTech())) {
+                u.getRefit().setTech(null);
             }
         });
         for (Part p : getParts()) {
-            if (tech.getId().equals(p.getTeamId())) {
-                p.setTeamId(null);
+            if (tech.equals(p.getTech())) {
+                p.setTech(null);
             }
         }
         for (Force f : forceIds.values()) {
@@ -5192,8 +5137,7 @@ public class Campaign implements Serializable, ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "This unit is not currently available!");
         }
-        if (partWork.getTeamId() != null
-                && !partWork.getTeamId().equals(tech.getId())) {
+        if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "Already being worked on by another team");
         }
@@ -6050,24 +5994,20 @@ public class Campaign implements Serializable, ITechManager {
      * the user here.
      */
     public int getUnitRatingMod() {
-        if (!getCampaignOptions().useDragoonRating()) {
+        if (!getCampaignOptions().getUnitRatingMethod().isEnabled()) {
             return IUnitRating.DRAGOON_C;
         }
         IUnitRating rating = getUnitRating();
-        return getCampaignOptions().getUnitRatingMethod()
-                .equals(mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV) ? rating.getUnitRatingAsInteger()
-                        : rating.getModifier();
+        return getCampaignOptions().getUnitRatingMethod().isFMMR() ? rating.getUnitRatingAsInteger()
+                : rating.getModifier();
     }
 
     /**
      * This is a better method for pairing AtB with IOpts with regards to Prisoner Capture
      */
     public int getUnitRatingAsInteger() {
-        if (getCampaignOptions().useDragoonRating()) {
-            return getUnitRating().getUnitRatingAsInteger();
-        } else {
-            return IUnitRating.DRAGOON_C;
-        }
+        return getCampaignOptions().getUnitRatingMethod().isEnabled()
+                ? getUnitRating().getUnitRatingAsInteger() : IUnitRating.DRAGOON_C;
     }
 
     public RandomSkillPreferences getRandomSkillPreferences() {

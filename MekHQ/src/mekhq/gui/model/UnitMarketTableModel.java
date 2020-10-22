@@ -101,7 +101,7 @@ public class UnitMarketTableModel extends DataTableModel {
         }
 
         if (col == COL_MARKET) {
-            return UnitMarket.marketNames[o.market];
+            return o.market;
         } else if (col == COL_UNITTYPE) {
             return UnitType.getTypeName(o.unitType);
         } else if (col == COL_WEIGHTCLASS) {

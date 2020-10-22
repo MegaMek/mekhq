@@ -35,7 +35,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import megamek.common.Crew;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Portrait;
 import mekhq.IconPackage;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
@@ -204,10 +205,9 @@ public class ScenarioViewPanel extends ScrollablePanel {
 
     }
 
-    protected class StubTreeModel implements TreeModel {
-
+    protected static class StubTreeModel implements TreeModel {
         private ForceStub rootForce;
-        private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
+        private Vector<TreeModelListener> listeners = new Vector<>();
 
         public StubTreeModel(ForceStub root) {
             rootForce = root;
@@ -215,24 +215,24 @@ public class ScenarioViewPanel extends ScrollablePanel {
 
         @Override
         public Object getChild(Object parent, int index) {
-            if(parent instanceof ForceStub) {
-                return ((ForceStub)parent).getAllChildren().get(index);
+            if (parent instanceof ForceStub) {
+                return ((ForceStub) parent).getAllChildren().get(index);
             }
             return null;
         }
 
         @Override
         public int getChildCount(Object parent) {
-            if(parent instanceof ForceStub) {
-                return ((ForceStub)parent).getAllChildren().size();
+            if (parent instanceof ForceStub) {
+                return ((ForceStub) parent).getAllChildren().size();
             }
             return 0;
         }
 
         @Override
         public int getIndexOfChild(Object parent, Object child) {
-            if(parent instanceof ForceStub) {
-                return ((ForceStub)parent).getAllChildren().indexOf(child);
+            if (parent instanceof ForceStub) {
+                return ((ForceStub) parent).getAllChildren().indexOf(child);
             }
             return 0;
         }
@@ -244,7 +244,7 @@ public class ScenarioViewPanel extends ScrollablePanel {
 
         @Override
         public boolean isLeaf(Object node) {
-            return node instanceof UnitStub || (node instanceof ForceStub && ((ForceStub)node).getAllChildren().size() == 0);
+            return node instanceof UnitStub || (node instanceof ForceStub && ((ForceStub) node).getAllChildren().size() == 0);
         }
 
         @Override
@@ -255,20 +255,20 @@ public class ScenarioViewPanel extends ScrollablePanel {
 
         @Override
         public void addTreeModelListener( TreeModelListener listener ) {
-              if ( listener != null && !listeners.contains( listener ) ) {
-                 listeners.addElement( listener );
+              if ((listener != null) && !listeners.contains(listener)) {
+                 listeners.addElement(listener);
               }
-           }
+        }
 
-           @Override
+        @Override
         public void removeTreeModelListener( TreeModelListener listener ) {
-              if ( listener != null ) {
-                 listeners.removeElement( listener );
-              }
-           }
+            if (listener != null) {
+                listeners.removeElement(listener);
+            }
+        }
     }
 
-    protected class ForceStubRenderer extends DefaultTreeCellRenderer {
+    protected static class ForceStubRenderer extends DefaultTreeCellRenderer {
         private static final long serialVersionUID = 4076620029822185784L;
 
         public ForceStubRenderer() {
@@ -276,19 +276,11 @@ public class ScenarioViewPanel extends ScrollablePanel {
         }
 
         @Override
-        public Component getTreeCellRendererComponent(
-                            JTree tree,
-                            Object value,
-                            boolean sel,
-                            boolean expanded,
-                            boolean leaf,
-                            int row,
-                            boolean hasFocus) {
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
+                                                      boolean expanded, boolean leaf, int row,
+                                                      boolean hasFocus) {
 
-            super.getTreeCellRendererComponent(
-                            tree, value, sel,
-                            expanded, leaf, row,
-                            hasFocus);
+            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             //setOpaque(true);
             setIcon(getIcon(value));
 
@@ -309,13 +301,13 @@ public class ScenarioViewPanel extends ScrollablePanel {
             String category = unit.getPortraitCategory();
             String filename = unit.getPortraitFileName();
 
-            if (Crew.ROOT_PORTRAIT.equals(category)) {
+            if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
                 category = "";
             }
 
             // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
-                filename = "default.gif";
+            if ((null == category) || (null == filename) || AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
+                filename = Portrait.DEFAULT_PORTRAIT_FILENAME;
             }
             // Try to get the player's portrait file.
             Image portrait;
@@ -324,7 +316,7 @@ public class ScenarioViewPanel extends ScrollablePanel {
                 if (null != portrait) {
                     portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
                 } else {
-                    portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", "default.gif");
+                    portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", Portrait.DEFAULT_PORTRAIT_FILENAME);
                     if (null != portrait) {
                         portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
                     }
@@ -341,13 +333,13 @@ public class ScenarioViewPanel extends ScrollablePanel {
             String filename = force.getIconFileName();
             LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
 
-            if (Crew.ROOT_PORTRAIT.equals(category)) {
+            if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
                 category = "";
             }
 
             // Return a null if the player has selected no portrait file.
             if ((null == category) || (null == filename)
-                    || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
+                    || (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
                 filename = "empty.png";
             }
 
