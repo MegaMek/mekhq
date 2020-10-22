@@ -4316,7 +4316,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public @Nullable Person getTech() {
-        return (engineer != null) ? engineer : tech;
+        return (getEngineer() != null) ? getEngineer() : tech;
     }
 
     //region Mothballing/Activation
