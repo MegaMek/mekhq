@@ -23,8 +23,11 @@ package mekhq.campaign.market;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
+import mekhq.campaign.market.enums.UnitMarketMethod;
+import mekhq.campaign.market.enums.UnitMarketType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -56,14 +59,14 @@ public class UnitMarket implements Serializable {
     private static final long serialVersionUID = -2085002038852079114L;
 
     public static class MarketOffer {
-        public int market;
+        public UnitMarketType market;
         public int unitType;
         public int unitWeight;
         public MechSummary unit;
         public int pct;
 
-        public MarketOffer(int m, int t, int w, MechSummary u, int p) {
-            market = m;
+        public MarketOffer(UnitMarketType market, int t, int w, MechSummary u, int p) {
+            this.market = market;
             unitType = t;
             unitWeight = w;
             unit = u;
@@ -71,33 +74,20 @@ public class UnitMarket implements Serializable {
         }
 
         public MarketOffer() {
+
         }
     }
 
-    public static int TYPE_ATBMONTHLY = 0;
-    //TODO: Implement a method that rolls each day and adds or removes units
-
-    public static int MARKET_OPEN = 0;
-    public static int MARKET_EMPLOYER = 1;
-    public static int MARKET_MERCENARY = 2;
-    public static int MARKET_FACTORY = 3;
-    public static int MARKET_BLACK = 4;
-    public static int MARKET_NUM = 5;
-    public static String [] marketNames = {
-            "Open Market", "Employer Market", "Mercenary Auction",
-            "Factory Line", "Black Market"
-    };
-
-    private int method = TYPE_ATBMONTHLY;
+    private UnitMarketMethod method = UnitMarketMethod.ATB_MONTHLY;
 
     //master list
-    private ArrayList<MarketOffer> offers;
+    private List<MarketOffer> offers;
 
     public UnitMarket() {
         offers = new ArrayList<>();
     }
 
-    public ArrayList<MarketOffer> getOffers() {
+    public List<MarketOffer> getOffers() {
         return offers;
     }
 
@@ -106,7 +96,7 @@ public class UnitMarket implements Serializable {
     }
 
     public void generateUnitOffers(Campaign campaign) {
-        if (method == TYPE_ATBMONTHLY && campaign.getLocalDate().getDayOfMonth() == 1) {
+        if ((method == UnitMarketMethod.ATB_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1)) {
             offers.clear();
 
             AtBContract contract = null;
@@ -117,82 +107,52 @@ public class UnitMarket implements Serializable {
                 }
             }
 
-            addOffers(campaign, Compute.d6() - 2, MARKET_OPEN,
-                    UnitType.MEK, null,
-                    IUnitRating.DRAGOON_F, 7);
-            addOffers(campaign, Compute.d6() - 1, MARKET_OPEN,
-                    UnitType.TANK, null,
-                    IUnitRating.DRAGOON_F, 7);
-            addOffers(campaign, Compute.d6() - 2, MARKET_OPEN,
-                    UnitType.AERO, null,
-                    IUnitRating.DRAGOON_F, 7);
+            addOffers(campaign, Compute.d6() - 2, UnitMarketType.OPEN, UnitType.MEK,
+                    null, IUnitRating.DRAGOON_F, 7);
+            addOffers(campaign, Compute.d6() - 1, UnitMarketType.OPEN, UnitType.TANK,
+                    null, IUnitRating.DRAGOON_F, 7);
+            addOffers(campaign, Compute.d6() - 2, UnitMarketType.OPEN, UnitType.AERO,
+                    null, IUnitRating.DRAGOON_F, 7);
 
             if (contract != null) {
-                addOffers(campaign, Compute.d6() - 3,
-                        MARKET_EMPLOYER,
-                        UnitType.MEK,
-                        contract.getEmployerCode(),
+                addOffers(campaign, Compute.d6() - 3, UnitMarketType.EMPLOYER, UnitType.MEK,
+                        contract.getEmployerCode(), IUnitRating.DRAGOON_D, 7);
+                addOffers(campaign, Compute.d6() - 2, UnitMarketType.EMPLOYER,
+                        UnitType.TANK, contract.getEmployerCode(),
                         IUnitRating.DRAGOON_D, 7);
-                addOffers(campaign, Compute.d6() - 2,
-                        MARKET_EMPLOYER,
-                        UnitType.TANK,
-                        contract.getEmployerCode(),
-                        IUnitRating.DRAGOON_D, 7);
-                addOffers(campaign, Compute.d6() - 3,
-                        MARKET_EMPLOYER,
-                        UnitType.AERO,
-                        contract.getEmployerCode(),
-                        IUnitRating.DRAGOON_D, 7);
+                addOffers(campaign, Compute.d6() - 3, UnitMarketType.EMPLOYER, UnitType.AERO,
+                        contract.getEmployerCode(), IUnitRating.DRAGOON_D, 7);
             }
 
             if (!campaign.getFaction().isClan()) {
-                addOffers(campaign, Compute.d6(3) - 9,
-                        MARKET_MERCENARY,
-                        UnitType.MEK, "MERC",
-                        IUnitRating.DRAGOON_C, 5);
-                addOffers(campaign, Compute.d6(3) - 6,
-                        MARKET_MERCENARY,
-                        UnitType.TANK, "MERC",
-                        IUnitRating.DRAGOON_C, 5);
-                addOffers(campaign, Compute.d6(3) - 9,
-                        MARKET_MERCENARY,
-                        UnitType.AERO, "MERC",
-                        IUnitRating.DRAGOON_C, 5);
+                addOffers(campaign, Compute.d6(3) - 9, UnitMarketType.MERCENARY, UnitType.MEK,
+                        "MERC", IUnitRating.DRAGOON_C, 5);
+                addOffers(campaign, Compute.d6(3) - 6, UnitMarketType.MERCENARY, UnitType.TANK,
+                        "MERC", IUnitRating.DRAGOON_C, 5);
+                addOffers(campaign, Compute.d6(3) - 9, UnitMarketType.MERCENARY, UnitType.AERO,
+                        "MERC", IUnitRating.DRAGOON_C, 5);
             }
 
             if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
                 Set<Faction> factions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
                 String faction = Utilities.getRandomItem(factions).getShortName();
-                if (campaign.getFaction().isClan() ||
-                        !Faction.getFaction(faction).isClan()) {
-                    addOffers(campaign, Compute.d6() - 3,
-                            MARKET_FACTORY,
-                            UnitType.MEK, faction,
-                            IUnitRating.DRAGOON_A, 6);
-                    addOffers(campaign, Compute.d6() - 2,
-                            MARKET_FACTORY,
-                            UnitType.TANK, faction,
-                            IUnitRating.DRAGOON_A, 6);
-                    addOffers(campaign, Compute.d6() - 3,
-                            MARKET_FACTORY,
-                            UnitType.AERO, faction,
-                            IUnitRating.DRAGOON_A, 6);
+                if (campaign.getFaction().isClan() || !Faction.getFaction(faction).isClan()) {
+                    addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.MEK,
+                            faction, IUnitRating.DRAGOON_A, 6);
+                    addOffers(campaign, Compute.d6() - 2, UnitMarketType.FACTORY, UnitType.TANK,
+                            faction, IUnitRating.DRAGOON_A, 6);
+                    addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.AERO,
+                            faction, IUnitRating.DRAGOON_A, 6);
                 }
             }
 
             if (!campaign.getFaction().isClan()) {
-                addOffers(campaign, Compute.d6(2) - 6,
-                        MARKET_BLACK,
-                        UnitType.MEK, null,
-                        IUnitRating.DRAGOON_C, 6);
-                addOffers(campaign, Compute.d6(2) - 4,
-                        MARKET_BLACK,
-                        UnitType.TANK, null,
-                        IUnitRating.DRAGOON_C, 6);
-                addOffers(campaign, Compute.d6(2) - 6,
-                        MARKET_BLACK,
-                        UnitType.AERO, null,
-                        IUnitRating.DRAGOON_C, 6);
+                addOffers(campaign, Compute.d6(2) - 6, UnitMarketType.BLACK_MARKET, UnitType.MEK,
+                        null, IUnitRating.DRAGOON_C, 6);
+                addOffers(campaign, Compute.d6(2) - 4, UnitMarketType.BLACK_MARKET, UnitType.TANK,
+                        null, IUnitRating.DRAGOON_C, 6);
+                addOffers(campaign, Compute.d6(2) - 6, UnitMarketType.BLACK_MARKET, UnitType.AERO,
+                        null, IUnitRating.DRAGOON_C, 6);
             }
 
             if (campaign.getCampaignOptions().getUnitMarketReportRefresh()) {
@@ -201,14 +161,14 @@ public class UnitMarket implements Serializable {
         }
     }
 
-    private void addOffers(Campaign campaign, int num, int market,
-            int unitType, String faction, int quality, int priceTarget) {
+    private void addOffers(Campaign campaign, int num, UnitMarketType market, int unitType,
+                           String faction, int quality, int priceTarget) {
         if (faction == null) {
             faction = RandomFactionGenerator.getInstance().getEmployer();
         }
         if (faction == null) {
             faction = campaign.getFactionCode();
-            market = MARKET_EMPLOYER;
+            market = UnitMarketType.EMPLOYER;
         }
 
         UnitGeneratorParameters params = new UnitGeneratorParameters();
@@ -249,8 +209,8 @@ public class UnitMarket implements Serializable {
     }
 
     /* Used by special event */
-    public String addSingleUnit(Campaign campaign, int market, int unitType,
-            String faction, int quality, int pricePct) {
+    public String addSingleUnit(Campaign campaign, UnitMarketType market, int unitType,
+                                String faction, int quality, int pricePct) {
         int weight = getRandomWeight(unitType, faction,
                 campaign.getCampaignOptions().getRegionalMechVariations());
         MechSummary ms = campaign.getUnitGenerator().generate(faction, unitType, weight,
@@ -265,23 +225,27 @@ public class UnitMarket implements Serializable {
 
     }
 
-    public static int getRandomWeight(int unitType, String faction,
-            boolean regionalVariations) {
+    public static int getRandomWeight(int unitType, String faction, boolean regionalVariations) {
         if (unitType == UnitType.AERO) {
             return getRandomAeroWeight();
-        }
-        if (unitType == UnitType.MEK && regionalVariations) {
+        } else if ((unitType == UnitType.MEK) && regionalVariations) {
             return getRegionalMechWeight(faction);
+        } else {
+            return getRandomMechWeight();
         }
-        return getRandomMechWeight();
     }
 
     public static int getRandomMechWeight() {
         int roll = Compute.randomInt(10);
-        if (roll <= 2) return EntityWeightClass.WEIGHT_LIGHT;
-        if (roll <= 6) return EntityWeightClass.WEIGHT_MEDIUM;
-        if (roll <= 8) return EntityWeightClass.WEIGHT_HEAVY;
-        return EntityWeightClass.WEIGHT_ASSAULT;
+        if (roll <= 2) {
+            return EntityWeightClass.WEIGHT_LIGHT;
+        } else if (roll <= 6) {
+            return EntityWeightClass.WEIGHT_MEDIUM;
+        } else if (roll <= 8) {
+            return EntityWeightClass.WEIGHT_HEAVY;
+        } else {
+            return EntityWeightClass.WEIGHT_ASSAULT;
+        }
     }
 
     public static int getRegionalMechWeight(String faction) {
@@ -358,7 +322,7 @@ public class UnitMarket implements Serializable {
                 if (!wn2.getNodeName().equalsIgnoreCase("offer")) {
                     // Error condition of sorts!
                     // Errr, what should we do here?
-                    MekHQ.getLogger().error(UnitMarket.class, "Unknown node type not loaded in offer nodes: " + wn2.getNodeName());
+                    MekHQ.getLogger().error("Unknown node type not loaded in offer nodes: " + wn2.getNodeName());
                     continue;
                 }
 
@@ -370,7 +334,7 @@ public class UnitMarket implements Serializable {
                         continue;
                     }
                     if (wn3.getNodeName().equalsIgnoreCase("market")) {
-                        o.market = Integer.parseInt(wn3.getTextContent().trim());
+                        o.market = UnitMarketType.parseFromString(wn3.getTextContent().trim());
                     } else if (wn3.getNodeName().equalsIgnoreCase("unitType")) {
                         o.unitType = Integer.parseInt(wn3.getTextContent().trim());
                     } else if (wn3.getNodeName().equalsIgnoreCase("unitWeight")) {
@@ -388,7 +352,7 @@ public class UnitMarket implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(UnitMarket.class, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         return retVal;

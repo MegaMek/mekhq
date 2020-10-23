@@ -549,13 +549,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 boolean wasNull = false;
                 // Temporarily set the Team ID if it isn't already.
                 // This is needed for the Clan Tech flag
-                if (part.getTeamId() == null) {
-                    part.setTeamId(tech.getId());
+                if (part.getTech() == null) {
+                    part.setTech(tech);
                     wasNull = true;
                 }
                 target = getCampaign().getTargetFor(part, tech);
                 if (wasNull) { // If it was null, make it null again
-                    part.setTeamId(null);
+                    part.setTech(null);
                 }
             }
             ((TechSorter) techSorter.getComparator(0)).clearPart();

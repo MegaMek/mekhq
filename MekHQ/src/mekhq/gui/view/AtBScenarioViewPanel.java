@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.view;
 
@@ -27,7 +27,6 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
@@ -59,9 +58,10 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.client.ui.swing.UnitEditorDialog;
-import megamek.common.Crew;
 import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Portrait;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.MHQStaticDirectoryManager;
@@ -80,7 +80,6 @@ import mekhq.gui.dialog.PrincessBehaviorDialog;
 
 /**
  * @author Neoancient
- *
  */
 public class AtBScenarioViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = -3104784717190158181L;
@@ -380,12 +379,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             gridBagConstraints.gridwidth = 1;
             panStats.add(btnReroll, gridBagConstraints);
             btnReroll.setEnabled(scenario.getRerollsRemaining() > 0);
-            btnReroll.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-                    rerollBattleConditions();
-                }
-            });
+            btnReroll.addActionListener(arg0 -> rerollBattleConditions());
         }
 
         txtDesc.setName("txtDesc");
@@ -449,7 +443,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             objectiveBuilder.append("\n");
         }
 
-        objectiveBuilder.append(((AtBScenario) scenario).getBattlefieldControlDescription());
+        objectiveBuilder.append(scenario.getBattlefieldControlDescription());
 
         txtDetails.setText(objectiveBuilder.toString());
         txtDetails.setLineWrap(true);
@@ -749,12 +743,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         return y;
     }
 
-    private ItemListener checkBoxListener = new ItemListener() {
-        @Override
-        public void itemStateChanged(ItemEvent e) {
-            countRerollBoxes();
-        }
-    };
+    private ItemListener checkBoxListener = e -> countRerollBoxes();
 
     private void countRerollBoxes() {
         int checkedBoxes = 0;
@@ -816,10 +805,9 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         countRerollBoxes();
     }
 
-    protected class StubTreeModel implements TreeModel {
-
+    protected static class StubTreeModel implements TreeModel {
         private ForceStub rootForce;
-        private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
+        private Vector<TreeModelListener> listeners = new Vector<>();
 
         public StubTreeModel(ForceStub root) {
             rootForce = root;
@@ -827,7 +815,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
         @Override
         public Object getChild(Object parent, int index) {
-            if(parent instanceof ForceStub) {
+            if (parent instanceof ForceStub) {
                 return ((ForceStub)parent).getAllChildren().get(index);
             }
             return null;
@@ -835,7 +823,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
         @Override
         public int getChildCount(Object parent) {
-            if(parent instanceof ForceStub) {
+            if (parent instanceof ForceStub) {
                 return ((ForceStub)parent).getAllChildren().size();
             }
             return 0;
@@ -843,7 +831,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
         @Override
         public int getIndexOfChild(Object parent, Object child) {
-            if(parent instanceof ForceStub) {
+            if (parent instanceof ForceStub) {
                 return ((ForceStub)parent).getAllChildren().indexOf(child);
             }
             return 0;
@@ -880,7 +868,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
            }
     }
 
-    protected class ForceStubRenderer extends DefaultTreeCellRenderer {
+    protected static class ForceStubRenderer extends DefaultTreeCellRenderer {
         private static final long serialVersionUID = 4076620029822185784L;
 
         public ForceStubRenderer() {
@@ -921,23 +909,23 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             String category = unit.getPortraitCategory();
             String filename = unit.getPortraitFileName();
 
-            if (Crew.ROOT_PORTRAIT.equals(category)) {
+            if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
                 category = "";
             }
 
             // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
-                filename = "default.gif";
+            if ((null == category) || (null == filename) || AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
+                filename = Portrait.DEFAULT_PORTRAIT_FILENAME;
             }
             // Try to get the player's portrait file.
             Image portrait = null;
             try {
                 portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
-                if(null != portrait) {
+                if (null != portrait) {
                     portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
                 } else {
-                    portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", "default.gif");
-                    if(null != portrait) {
+                    portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", Portrait.DEFAULT_PORTRAIT_FILENAME);
+                    if (null != portrait) {
                         portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
                     }
                 }
@@ -953,13 +941,13 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             String filename = force.getIconFileName();
             LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
 
-            if (Crew.ROOT_PORTRAIT.equals(category)) {
+            if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
                 category = "";
             }
 
             // Return a null if the player has selected no portrait file.
             if ((null == category) || (null == filename)
-                    || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
+                    || (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
                 filename = "empty.png";
             }
 
@@ -1099,7 +1087,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             JPopupMenu popup = new JPopupMenu();
             if (e.isPopupTrigger()) {
                 TreePath path = tree.getPathForLocation(e.getX(), e.getY());
-                JMenuItem menuItem = null;
+                JMenuItem menuItem;
                 if (path.getPathCount() > 1) {
                     menuItem = new JMenuItem("Edit Unit...");
                     menuItem.setActionCommand("EDIT_UNIT");

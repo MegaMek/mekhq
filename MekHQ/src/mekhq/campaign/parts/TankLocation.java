@@ -308,7 +308,7 @@ public class TankLocation extends Part {
         }
         String toReturn = "<html><font size='2'";
         String scheduled = "";
-        if (getTeamId() != null) {
+        if (getTech() != null) {
             scheduled = " (scheduled) ";
         }
 

@@ -20,28 +20,27 @@
  */
 package mekhq.campaign.unit.actions;
 
-import java.util.UUID;
-
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 /**
  * Mothballs a unit.
  */
 public class MothballUnitAction implements IUnitAction {
-    private final UUID techId;
+    private final Person tech;
     private final boolean isGM;
 
     /**
      * Initializes a new instance of the MothballUnitAction class.
-     * @param techId The ID of the technician performing the work, or null
-     *               if noone is needed to perform the work (self crewed or GM).
+     * @param tech The ID of the technician performing the work, or null
+     *             if noone is needed to perform the work (self crewed or GM).
      * @param isGM A boolean value indicating whether or not GM mode should be used
      *             to complete the action.
      */
-    public MothballUnitAction(@Nullable UUID techId, boolean isGM) {
-        this.techId = techId;
+    public MothballUnitAction(@Nullable Person tech, boolean isGM) {
+        this.tech = tech;
         this.isGM = isGM;
     }
 
@@ -50,11 +49,11 @@ public class MothballUnitAction implements IUnitAction {
         if (isGM) {
             unit.startMothballing(null, true);
         } else {
-            if (!unit.isSelfCrewed() && (null == techId)) {
+            if (!unit.isSelfCrewed() && (null == tech)) {
                 return;
             }
 
-            unit.startMothballing(techId);
+            unit.startMothballing(tech);
         }
     }
 }

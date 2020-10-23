@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import megamek.common.icons.Camouflage;
 import megamek.common.logging.LogLevel;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -36,7 +37,6 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.Player;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -63,11 +63,11 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     }
 
     public BotForce(String name, int team, int start, List<Entity> entityList) {
-        this(name, team, start, start, entityList, Player.NO_CAMO, null, -1);
+        this(name, team, start, start, entityList, Camouflage.NO_CAMOUFLAGE, null, -1);
     }
 
     public BotForce(String name, int team, int start, int home, List<Entity> entityList) {
-        this(name, team, start, home, entityList, Player.NO_CAMO, null, -1);
+        this(name, team, start, home, entityList, Camouflage.NO_CAMOUFLAGE, null, -1);
     }
 
     public BotForce(String name, int team, int start, int home, List<Entity> entityList,

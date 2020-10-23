@@ -78,6 +78,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.MhqFileUtil;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitRefitEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -141,8 +142,7 @@ public class Refit extends Part implements IAcquisitionWork {
     private int oldLargeCraftSinkType;
     private int newLargeCraftHeatSinks;
 
-    private UUID assignedTechId;
-    private int oldTechId = -1;
+    private Person assignedTech;
 
     public Refit() {
         oldUnitParts = new ArrayList<>();
@@ -1782,13 +1782,13 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public UUID getTeamId() {
-        return assignedTechId;
+    public Person getTech() {
+        return assignedTech;
     }
 
     @Override
-    public void setTeamId(UUID id) {
-        assignedTechId = id;
+    public void setTech(Person tech) {
+        assignedTech = tech;
     }
 
     @Override
@@ -1910,8 +1910,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 + "</armorNeeded>");
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<sameArmorType>" + sameArmorType
                 + "</sameArmorType>");
-        if (null != assignedTechId) {
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<assignedTechId>" + assignedTechId.toString()
+        if (null != assignedTech) {
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<assignedTechId>" + assignedTech.getId()
                     + "</assignedTechId>");
         }
         pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
@@ -1983,11 +1983,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("newArmorSuppliesId")) {
                     retVal.newArmorSupplies = new RefitArmorRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("assignedTechId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldTechId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        retVal.assignedTechId = UUID.fromString(wn2.getTextContent());
-                    }
+                    retVal.assignedTech = new RefitPersonRef(UUID.fromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("failedCheck")) {
                     retVal.failedCheck = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("customJob")) {
@@ -2250,16 +2246,6 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public int getTechBase() {
         return Part.T_BOTH;
-    }
-
-    public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> pHash) {
-        assignedTechId = pHash.get(oldTechId);
-        if (null != newArmorSupplies) {
-            newArmorSupplies.fixIdReferences(uHash, pHash);
-        }
-        for (Part p : shoppingList) {
-            p.fixIdReferences(uHash, pHash);
-        }
     }
 
     @Override
@@ -2587,9 +2573,9 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public void fixupPartReferences(Map<Integer, Part> knownParts) {
+    public void fixReferences(Campaign campaign) {
         if (newArmorSupplies instanceof RefitArmorRef) {
-            Part realPart = knownParts.get(newArmorSupplies.getId());
+            Part realPart = campaign.getPart(newArmorSupplies.getId());
             if (realPart instanceof Armor) {
                 newArmorSupplies = (Armor) realPart;
             } else {
@@ -2603,7 +2589,7 @@ public class Refit extends Part implements IAcquisitionWork {
         for (int ii = oldUnitParts.size() - 1; ii >= 0; --ii) {
             Part part = oldUnitParts.get(ii);
             if (part instanceof RefitPartRef) {
-                Part realPart = knownParts.get(part.getId());
+                Part realPart = campaign.getPart(part.getId());
                 if (realPart != null) {
                     oldUnitParts.set(ii, realPart);
                 } else if (part.getId() > 0) {
@@ -2618,7 +2604,7 @@ public class Refit extends Part implements IAcquisitionWork {
         for (int ii = newUnitParts.size() - 1; ii >= 0; --ii) {
             Part part = newUnitParts.get(ii);
             if (part instanceof RefitPartRef) {
-                Part realPart = knownParts.get(part.getId());
+                Part realPart = campaign.getPart(part.getId());
                 if (realPart != null) {
                     newUnitParts.set(ii, realPart);
                 } else if (part.getId() > 0) {
@@ -2635,7 +2621,7 @@ public class Refit extends Part implements IAcquisitionWork {
         while (it.hasNext()) {
             Part part = it.next();
             if (part instanceof RefitPartRef) {
-                Part realPart = knownParts.get(part.getId());
+                Part realPart = campaign.getPart(part.getId());
                 it.remove();
                 if (realPart != null) {
                     realParts.add(realPart);
@@ -2648,12 +2634,22 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         lcBinsToChange.addAll(realParts);
+
+        if (assignedTech instanceof RefitPersonRef) {
+            UUID id = assignedTech.getId();
+            assignedTech = campaign.getPerson(id);
+            if (assignedTech == null) {
+                MekHQ.getLogger().error(
+                    String.format("Refit %s (Unit: %s) references missing tech %s",
+                        getRefitId(), getUnitId(), id));
+            }
+        }
     }
 
     public static class RefitArmorRef extends Armor {
         private static final long serialVersionUID = 1L;
 
-        public RefitArmorRef(int id) {
+        private RefitArmorRef(int id) {
             this.id = id;
         }
     }
@@ -2662,7 +2658,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         private static final long serialVersionUID = 1L;
 
-        public RefitPartRef(int id) {
+        private RefitPartRef(int id) {
             this.id = id;
         }
 
@@ -2746,5 +2742,14 @@ public class Refit extends Part implements IAcquisitionWork {
             return null;
         }
 
+    }
+
+    public static class RefitPersonRef extends Person {
+
+        private static final long serialVersionUID = 1L;
+
+        private RefitPersonRef(UUID id) {
+            super(id);
+        }
     }
 }

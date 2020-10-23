@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq;
 
@@ -64,6 +64,7 @@ import javax.swing.table.TableModel;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.enums.Gender;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
@@ -226,7 +227,7 @@ public class Utilities {
      */
     public static int lerp(int min, int max, double f) {
         // The order of operations is important here, to not lose precision
-        return (int)Math.round(min * (1.0 - f) + max * f);
+        return (int) Math.round(min * (1.0 - f) + max * f);
     }
 
     /**
@@ -268,60 +269,63 @@ public class Utilities {
         return result;
     }
 
-    public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype, int techLvl) {
-        ArrayList<AmmoType> atypes = new ArrayList<>();
-        for (AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
+    public static List<AmmoType> getMunitionsFor(Entity entity, AmmoType currentAmmoType, int techLvl) {
+        if (currentAmmoType == null) {
+            return Collections.emptyList();
+        }
+
+        List<AmmoType> ammoTypes = new ArrayList<>();
+        for (AmmoType ammoType : AmmoType.getMunitionsFor(currentAmmoType.getAmmoType())) {
             //this is an abbreviated version of setupMunitions in the CustomMechDialog
             //TODO: clan/IS limitations?
 
             if ((entity instanceof Aero)
-                    && !atype.canAeroUse(entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AERO_ARTILLERY_MUNITIONS))) {
+                    && !ammoType.canAeroUse(entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AERO_ARTILLERY_MUNITIONS))) {
                 continue;
             }
 
-            int lvl = atype.getTechLevel(entity.getTechLevelYear());
+            int lvl = ammoType.getTechLevel(entity.getTechLevelYear());
             if (lvl < 0) {
                 lvl = 0;
             }
+
             if (techLvl < Utilities.getSimpleTechLevel(lvl)) {
                 continue;
-            }
-            if (TechConstants.isClan(cur_atype.getTechLevel(entity.getTechLevelYear())) != TechConstants.isClan(lvl)) {
+            } else if (TechConstants.isClan(currentAmmoType.getTechLevel(entity.getTechLevelYear())) != TechConstants.isClan(lvl)) {
                 continue;
             }
 
             // Only Protos can use Proto-specific ammo
-            if (atype.hasFlag(AmmoType.F_PROTOMECH) && !(entity instanceof Protomech)) {
+            if (ammoType.hasFlag(AmmoType.F_PROTOMECH) && !(entity instanceof Protomech)) {
                 continue;
             }
 
-            // When dealing with machine guns, Protos can only
-            // use proto-specific machine gun ammo
+            // When dealing with machine guns, Protos can only use proto-specific machine gun ammo
             if ((entity instanceof Protomech)
-                    && atype.hasFlag(AmmoType.F_MG)
-                    && !atype.hasFlag(AmmoType.F_PROTOMECH)) {
+                    && ammoType.hasFlag(AmmoType.F_MG)
+                    && !ammoType.hasFlag(AmmoType.F_PROTOMECH)) {
                 continue;
             }
 
-            if (atype.hasFlag(AmmoType.F_NUCLEAR) && atype.hasFlag(AmmoType.F_CAP_MISSILE)
+            if (ammoType.hasFlag(AmmoType.F_NUCLEAR) && ammoType.hasFlag(AmmoType.F_CAP_MISSILE)
                     && !entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AT2_NUKES)) {
                 continue;
             }
 
             // Battle Armor ammo can't be selected at all.
             // All other ammo types need to match on rack size and tech.
-            if ((atype.getRackSize() == cur_atype.getRackSize())
-                    && (atype.hasFlag(AmmoType.F_BATTLEARMOR) == cur_atype.hasFlag(AmmoType.F_BATTLEARMOR))
-                    && (atype.hasFlag(AmmoType.F_ENCUMBERING) == cur_atype.hasFlag(AmmoType.F_ENCUMBERING))
-                    && ((atype.getTonnage(entity) == cur_atype.getTonnage(entity))
-                    || atype.hasFlag(AmmoType.F_CAP_MISSILE))) {
-                atypes.add(atype);
+            if ((ammoType.getRackSize() == currentAmmoType.getRackSize())
+                    && (ammoType.hasFlag(AmmoType.F_BATTLEARMOR) == currentAmmoType.hasFlag(AmmoType.F_BATTLEARMOR))
+                    && (ammoType.hasFlag(AmmoType.F_ENCUMBERING) == currentAmmoType.hasFlag(AmmoType.F_ENCUMBERING))
+                    && ((ammoType.getTonnage(entity) == currentAmmoType.getTonnage(entity))
+                    || ammoType.hasFlag(AmmoType.F_CAP_MISSILE))) {
+                ammoTypes.add(ammoType);
             }
         }
-        return atypes;
+        return ammoTypes;
     }
 
-    public static boolean compareMounted (Mounted a, Mounted b) {
+    public static boolean compareMounted(Mounted a, Mounted b) {
         if (!a.getType().equals(b.getType()))
             return false;
         if (!a.getClass().equals(b.getClass()))
@@ -976,7 +980,7 @@ public class Utilities {
             }
 
             // Only created crew can be assigned a portrait, so this is safe to put in here
-            if (!Crew.PORTRAIT_NONE.equals(oldCrew.getPortraitFileName(crewIndex))) {
+            if (!AbstractIcon.DEFAULT_ICON_FILENAME.equals(oldCrew.getPortraitFileName(crewIndex))) {
                 p.setPortraitCategory(oldCrew.getPortraitCategory(crewIndex));
                 p.setPortraitFileName(oldCrew.getPortraitFileName(crewIndex));
             }
