@@ -23,90 +23,105 @@ import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public enum PersonnelFilter {
     //region Personnel Filters
     //region Standard Personnel Filters
-    ALL("PersonnelFilter.ALL", true, true, true),
-    ACTIVE("PersonnelFilter.ACTIVE", true, true, true),
-    COMBAT("PersonnelFilter.COMBAT", true, true, true),
-    SUPPORT("PersonnelFilter.SUPPORT", true, true, true),
-    MECHWARRIOR("PersonnelFilter.MECHWARRIOR", true, true, true),
-    VEHICLE_CREWMEMBER("PersonnelFilter.VEHICLE_CREWMEMBER", true, true, false),
-    GROUND_VEHICLE_DRIVER("PersonnelFilter.GROUND_VEHICLE_DRIVER", false, false, true),
-    NAVAL_VEHICLE_DRIVER("PersonnelFilter.NAVAL_VEHICLE_DRIVER", false, false, true),
-    VEHICLE_GUNNER("PersonnelFilter.VEHICLE_GUNNER", false, false, true),
-    VEHICLE_CREW("PersonnelFilter.VEHICLE_CREW", false, false, true),
-    VTOL_PILOT("PersonnelFilter.VTOL_PILOT", false, false, true),
-    AEROSPACE_PILOT("PersonnelFilter.AEROSPACE_PILOT", true, true, true),
-    CONVENTIONAL_AIRCRAFT_PILOT("PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT", true, true,true),
-    PROTOMECH_PILOT("PersonnelFilter.PROTOMECH_PILOT", true, true, true),
-    BATTLE_ARMOUR("PersonnelFilter.BATTLE_ARMOUR", true, true, true),
-    SOLDIER("PersonnelFilter.SOLDIER", true, true, true),
-    VESSEL_CREWMEMBER("PersonnelFilter.VESSEL_CREWMEMBER", true, true, false),
-    VESSEL_PILOT("PersonnelFilter.VESSEL_PILOT", false, false, true),
-    VESSEL_CREW("PersonnelFilter.VESSEL_CREW", false, false, true),
-    VESSEL_GUNNER("PersonnelFilter.VESSEL_GUNNER", false, false, true),
-    VESSEL_NAVIGATOR("PersonnelFilter.VESSEL_NAVIGATOR", false, false, true),
-    TECH("PersonnelFilter.TECH", true, true, false),
-    MECH_TECH("PersonnelFilter.MECH_TECH", false, false, true),
-    MECHANIC("PersonnelFilter.MECHANIC", false, false, true),
-    AERO_TECH("PersonnelFilter.AERO_TECH", false, false, true),
-    BA_TECH("PersonnelFilter.BA_TECH", false, false, true),
-    ASTECH("PersonnelFilter.ASTECH", false, false, true),
-    MEDICAL("PersonnelFilter.MEDICAL", true, true, false),
-    DOCTOR("PersonnelFilter.DOCTOR", false, false, true),
-    MEDIC("PersonnelFilter.MEDIC",  false, false, true),
-    ADMINISTRATOR("PersonnelFilter.ADMINISTRATOR", true, true, false),
-    ADMINISTRATOR_COMMAND("PersonnelFilter.ADMINISTRATOR_COMMAND", false, false, true),
-    ADMINISTRATOR_LOGISTICS("PersonnelFilter.ADMINISTRATOR_LOGISTICS", false, false, true),
-    ADMINISTRATOR_TRANSPORT("PersonnelFilter.ADMINISTRATOR_TRANSPORT", false, false, true),
-    ADMINISTRATOR_HR("PersonnelFilter.ADMINISTRATOR_HR", false, false, true),
+    ALL("PersonnelFilter.ALL"),
+    ACTIVE("PersonnelFilter.ACTIVE"),
+    COMBAT("PersonnelFilter.COMBAT"),
+    SUPPORT("PersonnelFilter.SUPPORT"),
+    MECHWARRIOR("PersonnelFilter.MECHWARRIOR"),
+    VEHICLE_CREWMEMBER("PersonnelFilter.VEHICLE_CREWMEMBER", true, false),
+    GROUND_VEHICLE_DRIVER("PersonnelFilter.GROUND_VEHICLE_DRIVER", false, true),
+    NAVAL_VEHICLE_DRIVER("PersonnelFilter.NAVAL_VEHICLE_DRIVER", false, true),
+    VEHICLE_GUNNER("PersonnelFilter.VEHICLE_GUNNER", false, true),
+    VEHICLE_CREW("PersonnelFilter.VEHICLE_CREW", false, true),
+    VTOL_PILOT("PersonnelFilter.VTOL_PILOT", false, true),
+    AEROSPACE_PILOT("PersonnelFilter.AEROSPACE_PILOT"),
+    CONVENTIONAL_AIRCRAFT_PILOT("PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT"),
+    PROTOMECH_PILOT("PersonnelFilter.PROTOMECH_PILOT"),
+    BATTLE_ARMOUR("PersonnelFilter.BATTLE_ARMOUR"),
+    SOLDIER("PersonnelFilter.SOLDIER"),
+    VESSEL_CREWMEMBER("PersonnelFilter.VESSEL_CREWMEMBER", true, false),
+    VESSEL_PILOT("PersonnelFilter.VESSEL_PILOT", false, true),
+    VESSEL_CREW("PersonnelFilter.VESSEL_CREW", false, true),
+    VESSEL_GUNNER("PersonnelFilter.VESSEL_GUNNER", false, true),
+    VESSEL_NAVIGATOR("PersonnelFilter.VESSEL_NAVIGATOR", false, true),
+    TECH("PersonnelFilter.TECH", true, false),
+    MECH_TECH("PersonnelFilter.MECH_TECH", false, true),
+    MECHANIC("PersonnelFilter.MECHANIC", false, true),
+    AERO_TECH("PersonnelFilter.AERO_TECH", false, true),
+    BA_TECH("PersonnelFilter.BA_TECH", false, true),
+    ASTECH("PersonnelFilter.ASTECH", false, true),
+    MEDICAL("PersonnelFilter.MEDICAL", true, false),
+    DOCTOR("PersonnelFilter.DOCTOR", false, true),
+    MEDIC("PersonnelFilter.MEDIC",  false, true),
+    ADMINISTRATOR("PersonnelFilter.ADMINISTRATOR", true, false),
+    ADMINISTRATOR_COMMAND("PersonnelFilter.ADMINISTRATOR_COMMAND", false, true),
+    ADMINISTRATOR_LOGISTICS("PersonnelFilter.ADMINISTRATOR_LOGISTICS", false, true),
+    ADMINISTRATOR_TRANSPORT("PersonnelFilter.ADMINISTRATOR_TRANSPORT", false, true),
+    ADMINISTRATOR_HR("PersonnelFilter.ADMINISTRATOR_HR", false, true),
     //endregion Standard Personnel Filters
 
     //region Expanded Personnel Tab Filters
-    DEPENDENT("PersonnelFilter.DEPENDENT", false, true, true),
-    FOUNDER("PersonnelFilter.FOUNDER", false, true, true),
-    PRISONER("PersonnelFilter.PRISONER", false, true, true),
-    INACTIVE("PersonnelFilter.INACTIVE", false, true, true),
-    RETIRED("PersonnelFilter.RETIRED", false, true, true),
-    MIA("PersonnelFilter.MIA", false, true, true),
-    KIA("PersonnelFilter.KIA", false, true, true),
-    DEAD("PersonnelFilter.DEAD", false, true, true);
+    DEPENDENT("PersonnelFilter.DEPENDENT", false, false),
+    FOUNDER("PersonnelFilter.FOUNDER", false, false),
+    PRISONER("PersonnelFilter.PRISONER", false, false),
+    INACTIVE("PersonnelFilter.INACTIVE", false, false),
+    RETIRED("PersonnelFilter.RETIRED", false, false),
+    MIA("PersonnelFilter.MIA", false, false),
+    KIA("PersonnelFilter.KIA", false, false),
+    DEAD("PersonnelFilter.DEAD", false, false);
     //endregion Expanded Personnel Tab Filters
     //endregion Personnel Filters
 
+    //region Variable Declarations
     private final String name;
+    private final boolean baseline;
     private final boolean standard;
-    private final boolean expanded;
-    private final boolean individualRolesExpanded;
+    private final boolean individualRole;
 
-    PersonnelFilter(String name, boolean standard, boolean expanded, boolean individualRolesExpanded) {
-        this.name = ResourceBundle.getBundle("mekhq.resources.GUIEnums", new EncodeControl())
-                .getString(name);
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUIEnums", new EncodeControl());
+    //endregion Variable Declarations
+
+    //region Constructors
+    PersonnelFilter(String name) {
+        this(name, true, true, true);
+    }
+
+    PersonnelFilter(String name, boolean standard, boolean individualRole) {
+        this(name, false, standard, individualRole);
+    }
+    PersonnelFilter(String name, boolean baseline, boolean standard, boolean individualRole) {
+        this.name = resources.getString(name);
+        this.baseline = baseline;
         this.standard = standard;
-        this.expanded = expanded;
-        this.individualRolesExpanded = individualRolesExpanded;
+        this.individualRole = individualRole;
+    }
+    //endregion Constructors
+
+    //region Getters
+    public boolean isBaseline() {
+        return baseline;
     }
 
     public boolean isStandard() {
         return standard;
     }
 
-    public boolean isExpanded() {
-        return expanded;
+    public boolean isIndividualRole() {
+        return individualRole;
     }
-
-    public boolean isIndividualRolesExpanded() {
-        return individualRolesExpanded;
-    }
+    //endregion Getters
 
     public static List<PersonnelFilter> getStandardPersonnelFilters() {
         List<PersonnelFilter> standardFilters = new ArrayList<>();
         for (PersonnelFilter filter : values()) {
-            if (filter.isStandard()) {
+            if (filter.isBaseline() || filter.isStandard()) {
                 standardFilters.add(filter);
             }
         }
@@ -116,21 +131,45 @@ public enum PersonnelFilter {
     public static List<PersonnelFilter> getExpandedPersonnelFilters() {
         List<PersonnelFilter> expandedFilters = new ArrayList<>();
         for (PersonnelFilter filter : values()) {
-            if (filter.isExpanded()) {
+            if (filter.isBaseline() || !filter.isIndividualRole()) {
                 expandedFilters.add(filter);
             }
         }
         return expandedFilters;
     }
 
+    public static List<PersonnelFilter> getIndividualRolesStandardPersonnelFilters() {
+        List<PersonnelFilter> individualRolesStandardFilters = new ArrayList<>();
+        for (PersonnelFilter filter : values()) {
+            if (filter.isBaseline() || filter.isIndividualRole()) {
+                individualRolesStandardFilters.add(filter);
+            }
+        }
+        return individualRolesStandardFilters;
+    }
+
     public static List<PersonnelFilter> getIndividualRolesExpandedPersonnelFilters() {
         List<PersonnelFilter> individualRolesExpandedFilters = new ArrayList<>();
         for (PersonnelFilter filter : values()) {
-            if (filter.isIndividualRolesExpanded()) {
+            if (filter.isBaseline() || !filter.isStandard() || filter.isIndividualRole()) {
                 individualRolesExpandedFilters.add(filter);
             }
         }
         return individualRolesExpandedFilters;
+    }
+
+    public static List<PersonnelFilter> getAllStandardFilters() {
+        List<PersonnelFilter> allStandardFilters = new ArrayList<>();
+        for (PersonnelFilter filter : values()) {
+            if (filter.isBaseline() || filter.isStandard() || filter.isIndividualRole()) {
+                allStandardFilters.add(filter);
+            }
+        }
+        return allStandardFilters;
+    }
+
+    public static List<PersonnelFilter> getAllIndividualRoleFilters() {
+        return new ArrayList<>(Arrays.asList(values()));
     }
 
     public boolean getFilteredInformation(Person person) {
