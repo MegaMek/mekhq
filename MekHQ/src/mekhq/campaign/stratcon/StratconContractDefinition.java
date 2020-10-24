@@ -392,8 +392,7 @@ class ContractDefinitionManifest {
     public Map<Integer, String> definitionFileNames;
     
     /**
-     * Attempt to deserialize an instance of an contract definition manifest from the passed-in file 
-     * @param inputFile The path to the manifest
+     * Attempt to deserialize an instance of an contract definition manifest from the passed-in file path
      * @return Possibly an instance of a contract definition Manifest
      */
     public static ContractDefinitionManifest Deserialize(String fileName) {

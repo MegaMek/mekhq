@@ -103,8 +103,7 @@ public class StratconScenarioFactory {
                     dynamicScenarioNameMap.put(fileName, template);
                 }
             } catch(Exception e) {
-                MekHQ.getLogger().error(StratconScenarioFactory.class, "loadScenariosFromManifest", 
-                        String.format("Error loading file: %s", filePath), e);
+                MekHQ.getLogger().error(String.format("Error loading file: %s", filePath), e);
             }
         }
     }
@@ -128,7 +127,7 @@ public class StratconScenarioFactory {
     
     /**
      * Retrieves a random scenario template appropriate for the given unit type.
-     * @param location The desired unit type.
+     * @param unitType The desired unit type, as per megamek.common.UnitType
      * @return Random scenario template.
      */
     public static ScenarioTemplate getRandomScenario(int unitType) {
@@ -140,8 +139,7 @@ public class StratconScenarioFactory {
             actualUnitType = convertSpecificUnitTypeToGeneral(unitType);
             
             if(!dynamicScenarioUnitTypeMap.containsKey(actualUnitType)) {            
-                MekHQ.getLogger().warning(StratconScenarioFactory.class, "getRandomScenario", 
-                        String.format("No scenarios configured for unit type %d", unitType));
+                MekHQ.getLogger().warning(String.format("No scenarios configured for unit type %d", unitType));
                 return null;
             }
         }

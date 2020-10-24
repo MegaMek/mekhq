@@ -271,7 +271,7 @@ public class StratconContractInitializer {
     private static String generateCommandLevelText(AtBContract contract) {
         switch (contract.getCommandRights()) {
         case AtBContract.COM_INTEGRATED:
-            return "Lance assignments will be made by the employer."
+            return "Lance assignments will be made by the employer. "
                     + "Complete required scenarios to fulfill contract conditions."; 
         case AtBContract.COM_HOUSE:
             return "Complete required scenarios to fulfill contract conditions.";

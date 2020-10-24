@@ -40,15 +40,14 @@ public class StratconFacilityManifest {
     public List<String> facilityFileNames;
     
     /**
-     * Attempt to deserialize an instance of a StratconFacilityManifest from the passed-in file 
-     * @param inputFile The path to the manifest
+     * Attempt to deserialize an instance of a StratconFacilityManifest from the passed-in file path
      * @return Possibly an instance of a StratconFacilityManifest
      */
     public static StratconFacilityManifest Deserialize(String fileName) {
         StratconFacilityManifest resultingManifest = null;
         File inputFile = new File(fileName);
         if(!inputFile.exists()) {
-            MekHQ.getLogger().warning(StratconFacilityManifest.class, "Deserialize", String.format("Specified file %s does not exist", fileName));
+            MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
             return null;
         }
 
@@ -61,7 +60,7 @@ public class StratconFacilityManifest {
                 resultingManifest = manifestElement.getValue();
             }
         } catch(Exception e) {
-            MekHQ.getLogger().error(StratconFacilityManifest.class, "Deserialize", "Error Deserializing Facility Manifest", e);
+            MekHQ.getLogger().error("Error Deserializing Facility Manifest", e);
         }
 
         return resultingManifest;

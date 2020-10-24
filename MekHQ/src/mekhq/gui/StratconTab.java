@@ -4,7 +4,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.time.DayOfWeek;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -19,7 +18,6 @@ import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 
 public class StratconTab extends CampaignGuiTab {
@@ -229,7 +227,7 @@ public class StratconTab extends CampaignGuiTab {
         
         @Override
         public boolean equals(Object other) {
-            if(!(other instanceof TrackDropdownItem) || (other == null)) {
+            if(!(other instanceof TrackDropdownItem)) {
                 return false;
             } else {
                 TrackDropdownItem otherTDI = (TrackDropdownItem) other;

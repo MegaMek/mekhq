@@ -41,8 +41,7 @@ public class AtBScenarioManifest {
     public Map<Integer, String> scenarioFileNames;
     
     /**
-     * Attempt to deserialize an instance of an AtBScenarioManifest from the passed-in file 
-     * @param inputFile The path to the manifest
+     * Attempt to deserialize an instance of an AtBScenarioManifest from the passed-in file path
      * @return Possibly an instance of a ScenarioManifest
      */
     public static AtBScenarioManifest Deserialize(String fileName) {

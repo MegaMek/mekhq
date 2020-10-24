@@ -216,13 +216,15 @@ public class StratconCampaignState {
             Unmarshaller um = context.createUnmarshaller();
             JAXBElement<StratconCampaignState> templateElement = um.unmarshal(xmlNode, StratconCampaignState.class);
             resultingCampaignState = templateElement.getValue();
-        } catch(Exception e) {
+        } catch (Exception e) {
             MekHQ.getLogger().error("Error Deserializing Campaign State", e);
         }
         
         // hack: localdate doesn't serialize/deserialize nicely within a map, so we store it as a int-string map instead
-        for(StratconTrackState track : resultingCampaignState.getTracks()) {
-            track.restoreReturnDates();
+        if (resultingCampaignState != null) {
+            for (StratconTrackState track : resultingCampaignState.getTracks()) {
+                track.restoreReturnDates();
+            }
         }
         
         return resultingCampaignState;

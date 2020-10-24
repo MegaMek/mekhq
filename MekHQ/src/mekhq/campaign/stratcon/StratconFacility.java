@@ -186,9 +186,8 @@ public class StratconFacility implements Cloneable {
     }
     
     /**
-     * Attempt to deserialize an instance of a StratconFacilityManifest from the passed-in file 
-     * @param inputFile The path to the manifest
-     * @return Possibly an instance of a StratconFacilityManifest
+     * Attempt to deserialize an instance of a StratconFacility from the passed-in file name
+     * @return Possibly an instance of a StratconFacility
      */
     public static StratconFacility Deserialize(String fileName) {
         StratconFacility resultingManifest = null;

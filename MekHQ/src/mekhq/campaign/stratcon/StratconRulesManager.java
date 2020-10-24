@@ -644,9 +644,6 @@ public class StratconRulesManager {
     
     /**
      * Determines whether the force in question has the same primary unit type as the force template.
-     * @param force The force to check.
-     * @param forceTemplate The force template to check.
-     * @param campaign The working campaign.
      * @return Whether or not the unit types match.
      */
     public static boolean forceCompositionMatchesDeclaredUnitType(int primaryUnitType, int unitType, boolean reinforcements) {        
@@ -721,11 +718,15 @@ public class StratconRulesManager {
             }
         }
         
-        for(int key : campaign.getLances().keySet()) {
+        for (int key : campaign.getLances().keySet()) {
             Force force = campaign.getForce(key);
+            
+            if (force == null) {
+                continue;
+            }
+            
             int primaryUnitType = force.getPrimaryUnitType(campaign);
-            if(force != null && 
-                    !force.isDeployed() && 
+            if (!force.isDeployed() && 
                     (force.getScenarioId() <= 0) &&
                     !force.getUnits().isEmpty() &&
                     !forcesInTracks.contains(force.getId()) &&
@@ -774,7 +775,7 @@ public class StratconRulesManager {
         
         // if the force is a "fight" lance that has been deployed to the track
         // then the result is FightLance
-        if(campaign.getLances().contains(force.getId()) &&
+        if(campaign.getLances().containsKey(force.getId()) &&
             campaign.getLances().get(force.getId()).getRole() == AtBLanceRole.FIGHTING &&
             trackState.getAssignedForceCoords().containsKey(force.getId())) {
             return ReinforcementEligibilityType.FightLance;
