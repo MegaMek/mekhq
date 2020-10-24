@@ -17,6 +17,7 @@ VERSION HISTORY:
 + Issue #1723: Fixing Missing Personnel and Hangar Tab Selection Highlights
 + PR #2153: UnitRatingMethod: Add Disabled Case
 + Issue #1537: Fixing Null AmmoType NPE in Hangar Tab
++ Issue #2159: Fixing Soldier Filter Name
 
 0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo
