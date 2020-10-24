@@ -304,7 +304,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 if((facility != null) && (facility.isVisible() || currentTrack.isGmRevealed())) {
                     g2D.setColor(facility.getOwner() == ForceAlignment.Allied ? Color.GREEN : Color.RED);
                     g2D.drawPolygon(facilityMarker);
-                    drawTextEffect(g2D, facilityMarker, facility.getDisplayableName());
+                    drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName());
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -436,7 +436,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 }
                 infoBuilder.append((facility.getOwner() == ForceAlignment.Allied) ? "<span color='green'>" : "<span color='red'>");
                 infoBuilder.append("<br/>");
-                infoBuilder.append(facility.getDisplayableName());
+                infoBuilder.append(facility.getFormattedDisplayableName());
                 infoBuilder.append("<span>");
             }
             

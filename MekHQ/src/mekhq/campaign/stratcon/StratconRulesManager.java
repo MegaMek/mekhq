@@ -329,6 +329,12 @@ public class StratconRulesManager {
             scenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, tactics * 2);
         }
         
+        for (int forceID : scenario.getPrimaryPlayerForceIDs()) {
+            Force force = campaign.getForce(forceID);
+            force.clearScenarioIds(campaign, true);
+            force.setScenarioId(scenario.getBackingScenarioID());
+        }
+        
         scenario.commitPrimaryForces(campaign, contract);
     }
     
@@ -499,7 +505,7 @@ public class StratconRulesManager {
             for (String modifierID : modifierIDs) {
                 AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
                 if(modifier == null) {
-                    MekHQ.getLogger().error(String.format("Modifier %s not found for facility %s", modifierID, facility.getDisplayableName()));
+                    MekHQ.getLogger().error(String.format("Modifier %s not found for facility %s", modifierID, facility.getFormattedDisplayableName()));
                     continue;
                 }
                 

@@ -99,9 +99,12 @@ public class StratconFacility implements Cloneable {
         this.owner = owner;
     }
     
+    public String getFormattedDisplayableName() {
+        return String.format("%s %s", getOwner() == ForceAlignment.Allied ? "Allied" : "Hostile", getDisplayableName());
+    }
+    
     public String getDisplayableName() {
-        return String.format("%s %s", getOwner() == ForceAlignment.Allied ? "Allied" : "Hostile", 
-                displayableName);
+        return displayableName;
     }
     
     public void setDisplayableName(String displayableName) {
@@ -191,7 +194,7 @@ public class StratconFacility implements Cloneable {
         StratconFacility resultingManifest = null;
         File inputFile = new File(fileName);
         if(!inputFile.exists()) {
-            MekHQ.getLogger().warning(StratconFacility.class, "Deserialize", String.format("Specified file %s does not exist", fileName));
+            MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
             return null;
         }
 
@@ -204,7 +207,7 @@ public class StratconFacility implements Cloneable {
                 resultingManifest = manifestElement.getValue();
             }
         } catch(Exception e) {
-            MekHQ.getLogger().error(StratconFacilityManifest.class, "Deserialize", String.format("Error Deserializing Facility %s", fileName), e);
+            MekHQ.getLogger().error(String.format("Error Deserializing Facility %s", fileName), e);
         }
 
         return resultingManifest;
