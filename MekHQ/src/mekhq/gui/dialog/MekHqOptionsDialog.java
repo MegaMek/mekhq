@@ -22,12 +22,14 @@ package mekhq.gui.dialog;
 
 import mekhq.MekHQ;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
+import mekhq.gui.enums.PersonnelFilterStyle;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MekHqOptionsDialog extends BaseDialog {
@@ -45,7 +47,7 @@ public class MekHqOptionsDialog extends BaseDialog {
     //endregion Command Center Display
 
     //region Personnel Tab Display Options
-    private JCheckBox optionPersonnelIndividualRoleFilters;
+    private JComboBox<PersonnelFilterStyle> optionPersonnelFilterStyle;
     private JCheckBox optionPersonnelFilterOnPrimaryRole;
     //endregion Personnel Tab Display Options
     //endregion Display
@@ -124,7 +126,25 @@ public class MekHqOptionsDialog extends BaseDialog {
         //region Personnel Tab Display Options
         JLabel labelPersonnelDisplay = new JLabel(resources.getString("labelPersonnelDisplay.text"));
 
-        optionPersonnelIndividualRoleFilters = new JCheckBox(resources.getString("optionPersonnelIndividualRoleFilters.text"));
+        JLabel labelPersonnelFilterStyle = new JLabel(resources.getString("optionPersonnelFilterStyle.text"));
+        labelPersonnelFilterStyle.setToolTipText(resources.getString("optionPersonnelFilterStyle.toolTipText"));
+
+        optionPersonnelFilterStyle = new JComboBox<>(PersonnelFilterStyle.values());
+        optionPersonnelFilterStyle.setRenderer(new DefaultListCellRenderer() {
+            private static final long serialVersionUID = -543354619818226314L;
+
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (isSelected && (index > -1)) {
+                    list.setToolTipText((list.getSelectedValue() instanceof PersonnelFilterStyle)
+                            ? ((PersonnelFilterStyle) list.getSelectedValue()).getToolTipText() : "");
+                }
+
+                return this;
+            }
+        });
 
         optionPersonnelFilterOnPrimaryRole = new JCheckBox(resources.getString("optionPersonnelFilterOnPrimaryRole.text"));
         //endregion Personnel Tab Display Options
@@ -218,7 +238,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(optionCommandCenterUseUnitMarket)
                     .addComponent(optionCommandCenterMRMS)
                     .addComponent(labelPersonnelDisplay)
-                    .addComponent(optionPersonnelIndividualRoleFilters)
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelPersonnelFilterStyle)
+                            .addComponent(optionPersonnelFilterStyle, GroupLayout.Alignment.TRAILING))
                     .addComponent(optionPersonnelFilterOnPrimaryRole)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
@@ -258,7 +280,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                     .addComponent(optionCommandCenterUseUnitMarket)
                     .addComponent(optionCommandCenterMRMS)
                     .addComponent(labelPersonnelDisplay)
-                    .addComponent(optionPersonnelIndividualRoleFilters)
+                    .addGroup(layout.createSequentialGroup()
+                            .addComponent(labelPersonnelFilterStyle)
+                            .addComponent(optionPersonnelFilterStyle))
                     .addComponent(optionPersonnelFilterOnPrimaryRole)
                     .addComponent(labelSavedInfo)
                     .addComponent(optionNoSave)
@@ -296,7 +320,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
         MekHQ.getMekHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
         MekHQ.getMekHQOptions().setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
-        MekHQ.getMekHQOptions().setPersonnelIndividualRoleFilters(optionPersonnelIndividualRoleFilters.isSelected());
+        MekHQ.getMekHQOptions().setPersonnelFilterStyle((PersonnelFilterStyle) Objects.requireNonNull(optionPersonnelFilterStyle.getSelectedItem()));
         MekHQ.getMekHQOptions().setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
 
         MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
@@ -324,7 +348,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionHistoricalDailyLog.setSelected(MekHQ.getMekHQOptions().getHistoricalDailyLog());
         optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket());
         optionCommandCenterMRMS.setSelected(MekHQ.getMekHQOptions().getCommandCenterMRMS());
-        optionPersonnelIndividualRoleFilters.setSelected(MekHQ.getMekHQOptions().getPersonnelIndividualRoleFilters());
+        optionPersonnelFilterStyle.setSelectedItem(MekHQ.getMekHQOptions().getPersonnelFilterStyle());
         optionPersonnelFilterOnPrimaryRole.setSelected(MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole());
 
         optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
