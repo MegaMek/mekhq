@@ -20,8 +20,8 @@ package mekhq;
 
 import megamek.MegaMek;
 import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
-import megamek.common.Crew;
 import megamek.common.annotations.Nullable;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.util.fileUtils.DirectoryItems;
 import mekhq.campaign.force.Force;
 import mekhq.gui.enums.LayeredForceIcon;
@@ -158,13 +158,13 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                                        LinkedHashMap<String, Vector<String>> iconMap) {
         Image retVal = null;
 
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
             category = "";
         }
 
         // Return a null if the player has selected no force icon file.
         if ((null == category) || (null == filename)
-                || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
+                || (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
             filename = "empty.png";
         }
 

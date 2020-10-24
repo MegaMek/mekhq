@@ -43,6 +43,7 @@ import javax.swing.event.MouseInputAdapter;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.loaders.BLKFile;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
@@ -386,7 +387,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
         } else if (command.equals(COMMAND_INDI_CAMO)) { // Single Unit only
             String category = selectedUnit.getCamoCategory();
             if (StringUtil.isNullOrEmpty(category)) {
-                category = Player.ROOT_CAMO;
+                category = AbstractIcon.ROOT_CATEGORY;
             }
             CamoChoiceDialog ccd = new CamoChoiceDialog(gui.getFrame(), true, category,
                     selectedUnit.getCamoFileName(), gui.getCampaign().getColorIndex());

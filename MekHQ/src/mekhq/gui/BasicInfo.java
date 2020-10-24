@@ -34,7 +34,8 @@ import javax.swing.border.LineBorder;
 
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.PlayerColors;
-import megamek.common.Crew;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Portrait;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
@@ -165,25 +166,21 @@ public class BasicInfo extends JPanel {
             return;
         }
 
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
             category = "";
         }
 
-        if (Crew.PORTRAIT_NONE.equals(filename)) {
-            filename = "default.gif";
+        if (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
+            filename = Portrait.DEFAULT_PORTRAIT_FILENAME;
         }
 
         // Try to get the player's portrait file.
         Image portrait;
         try {
             portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
-            if (null == portrait) {
+            if (portrait == null) {
                 // the image could not be found so switch to default one
-                p.setPortraitCategoryOverride(Crew.ROOT_PORTRAIT);
-                category = "";
-                p.setPortraitFileNameOverride(Crew.PORTRAIT_NONE);
-                filename = "default.gif";
-                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
+                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", Portrait.DEFAULT_PORTRAIT_FILENAME);
             }
             // make sure no images are longer than 72 pixels
             if (null != portrait) {
@@ -200,13 +197,13 @@ public class BasicInfo extends JPanel {
         String filename = force.getIconFileName();
         LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
 
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
             category = "";
         }
 
         // Return a null if the player has selected no portrait file.
         if ((null == category) || (null == filename)
-                || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
+                || (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
             filename = "empty.png";
         }
 
