@@ -21,6 +21,8 @@
 
 package mekhq.campaign.parts;
 
+import java.util.Objects;
+
 import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -128,7 +130,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     public boolean isSamePartType(Part part) {
         return (part instanceof BaArmor)
                 && (isClanTechBase() == part.isClanTechBase())
-                && (getRefitUnit() == part.getRefitUnit())
+                && Objects.equals(getRefitUnit(), part.getRefitUnit())
                 && (((BaArmor) part).getType() == getType());
     }
 

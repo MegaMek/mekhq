@@ -229,7 +229,7 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof Armor)
-                && (getRefitUnit() == part.getRefitUnit())
+                && Objects.equals(getRefitUnit(), part.getRefitUnit())
                 && isSameType((Armor)part);
     }
 
@@ -579,7 +579,7 @@ public class Armor extends Part implements IAcquisitionWork {
         Armor a = (Armor)campaign.findSparePart(part -> {
             return (part instanceof Armor)
                 && part.isPresent()
-                && (getRefitUnit() == part.getRefitUnit())
+                && Objects.equals(getRefitUnit(), part.getRefitUnit())
                 && isSameType((Armor)part);
         });
 

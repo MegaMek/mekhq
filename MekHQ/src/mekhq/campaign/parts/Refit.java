@@ -1322,7 +1322,7 @@ public class Refit extends Part implements IAcquisitionWork {
         toRemove.add(this);
         if (getRefitUnit() != null) {
             for (IAcquisitionWork part : campaign.getShoppingList().getPartList()) {
-                if ((part instanceof Part) && (((Part) part).getRefitUnit() == getRefitUnit())) {
+                if ((part instanceof Part) && Objects.equals(getRefitUnit(), ((Part) part).getRefitUnit())) {
                     toRemove.add(part);
                 }
             }

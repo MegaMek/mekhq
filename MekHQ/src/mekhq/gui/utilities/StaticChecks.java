@@ -18,6 +18,7 @@
  */
 package mekhq.gui.utilities;
 
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.Vector;
 
@@ -731,7 +732,7 @@ public class StaticChecks {
 
         Unit unit = people[0].getUnit();
         for (Person person : people) {
-            if (unit != person.getUnit()) {
+            if (!Objects.equals(unit, person.getUnit())) {
                 return false;
             }
         }
