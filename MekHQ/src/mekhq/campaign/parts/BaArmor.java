@@ -129,7 +129,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
         return (part instanceof BaArmor)
                 && (isClanTechBase() == part.isClanTechBase())
                 && (getRefitUnit() == part.getRefitUnit())
-                && (((BaArmor)part).getType() == getType());
+                && (((BaArmor) part).getType() == getType());
     }
 
     @Override

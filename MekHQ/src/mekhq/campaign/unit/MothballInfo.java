@@ -85,7 +85,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         }
 
         for (Person driver : drivers) {
-            if (driver.getStatus().isActive() && driver.getUnit() == null) {
+            if (driver.getStatus().isActive() && (driver.getUnit() == null)) {
                 unit.addDriver(driver);
             }
         }
@@ -100,16 +100,16 @@ public class MothballInfo implements MekHqXmlSerializable {
         }
 
         for (Person crew : vesselCrew) {
-            if (crew.getStatus().isActive() && crew.getUnit() == null) {
+            if (crew.getStatus().isActive() && (crew.getUnit() == null)) {
                 unit.addVesselCrew(crew);
             }
         }
 
-        if (techOfficer != null && techOfficer.getStatus().isActive() && techOfficer.getUnit() == null) {
+        if ((techOfficer != null) && (techOfficer.getStatus().isActive()) && (techOfficer.getUnit() == null)) {
             unit.setTechOfficer(techOfficer);
         }
 
-        if (navigator != null && navigator.getStatus().isActive() && navigator.getUnit() == null) {
+        if ((navigator != null) && (navigator.getStatus().isActive()) && (navigator.getUnit() == null)) {
             unit.setNavigator(navigator);
         }
 

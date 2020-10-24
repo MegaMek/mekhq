@@ -1012,7 +1012,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     //and if your selection does not include a transport
                     if (!shipInSelection && !gui.getCampaign().getTransportShips().isEmpty()) {
                         for (Unit ship : gui.getCampaign().getTransportShips()) {
-                            if (ship.isSalvage() || ship.getCommander() == null) {
+                            if (ship.isSalvage() || (ship.getCommander() == null)) {
                                 continue;
                             }
 
@@ -1366,7 +1366,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         //is submitted.
                         menu = new JMenu("Assign Unit to Transport Ship");
                         for (Unit ship : gui.getCampaign().getTransportShips()) {
-                            if (ship.isSalvage() || ship.getCommander() == null) {
+                            if (ship.isSalvage() || (ship.getCommander() == null)) {
                                 continue;
                             }
 
