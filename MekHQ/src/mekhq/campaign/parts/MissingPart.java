@@ -424,7 +424,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
             setReplacementPart(null);
             replacement.setReserveId(null);
             if (replacement.isSpare()) {
-                Part spare = campaign.checkForExistingSparePart(replacement);
+                Part spare = campaign.getWarehouse().checkForExistingSparePart(replacement);
                 if (null != spare) {
                     spare.incrementQuantity();
                     campaign.removePart(replacement);

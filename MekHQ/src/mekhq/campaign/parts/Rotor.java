@@ -1,20 +1,20 @@
 /*
  * Rotor.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,13 +44,13 @@ public class Rotor extends TankLocation {
     public Rotor() {
         this(0, null);
     }
-    
+
     public Rotor(int tonnage, Campaign c) {
         super(VTOL.LOC_ROTOR, tonnage, c);
         this.name = "Rotor";
         this.damage = 0;
     }
-    
+
     public Rotor clone() {
         Rotor clone = new Rotor(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
@@ -59,10 +59,10 @@ public class Rotor extends TankLocation {
         clone.breached = this.breached;
         return clone;
     }
- 
+
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof Rotor 
+        return part instanceof Rotor
                 && getLoc() == ((Rotor)part).getLoc()
                 && getUnitTonnage() == ((Rotor)part).getUnitTonnage()
                 && this.getDamage() == ((Rotor)part).getDamage()
@@ -92,7 +92,7 @@ public class Rotor extends TankLocation {
     public void remove(boolean salvage) {
         if(null != unit && unit.getEntity() instanceof VTOL) {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, VTOL.LOC_ROTOR);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
                 campaign.removePart(this);
             } else if(null != spare) {

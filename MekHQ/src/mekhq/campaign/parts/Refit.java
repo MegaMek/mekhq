@@ -1300,7 +1300,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     ((AmmoBin) part).unload();
                     oldUnit.getCampaign().removePart(part);
                 } else {
-                    Part spare = oldUnit.getCampaign().checkForExistingSparePart(part);
+                    Part spare = oldUnit.getCampaign().getWarehouse().checkForExistingSparePart(part);
                     if (null != spare) {
                         spare.incrementQuantity();
                         oldUnit.getCampaign().removePart(part);
@@ -1395,7 +1395,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 if (part instanceof AmmoBin) {
                     ((AmmoBin) part).unload();
                 }
-                Part spare = oldUnit.getCampaign().checkForExistingSparePart(part);
+                Part spare = oldUnit.getCampaign().getWarehouse().checkForExistingSparePart(part);
                 if (spare != null) {
                     spare.incrementQuantity();
                     oldUnit.getCampaign().removePart(part);

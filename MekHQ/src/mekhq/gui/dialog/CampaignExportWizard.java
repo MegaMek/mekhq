@@ -574,7 +574,7 @@ public class CampaignExportWizard extends JDialog {
                 // it comes back as null if the part we're looking for is there but has the same ID,
                 // which is likely to happen when exporting to a brand new campaign
                 newPart.setId(-1);
-                Part existingPart = destinationCampaign.checkForExistingSparePart(newPart);
+                Part existingPart = destinationCampaign.getWarehouse().checkForExistingSparePart(newPart);
                 if (existingPart == null) {
                     // addpart doesn't allow adding multiple parts, so we update it afterwards
                     destinationCampaign.addPart(newPart, 0);
