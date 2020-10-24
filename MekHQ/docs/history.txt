@@ -18,6 +18,8 @@ VERSION HISTORY:
 + PR #2153: UnitRatingMethod: Add Disabled Case
 + Issue #1537: Fixing Null AmmoType NPE in Hangar Tab
 + Issue #2159: Fixing Soldier Filter Name
++ PR #2164: Fixing Historical Daily Log Disabled Message
++ Issue #2159: Personnel Filter Style for All Options
 
 0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo
