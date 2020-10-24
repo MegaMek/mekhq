@@ -966,6 +966,8 @@ public class Campaign implements Serializable, ITechManager {
      * @param u A {@link Unit} to import into the campaign.
      */
     public void importUnit(Unit u) {
+        Objects.requireNonNull(u);
+
         MekHQ.getLogger().debug("Importing unit: (" + u.getId() + "): " + u.getName());
 
         getHangar().addUnit(u);
@@ -995,7 +997,7 @@ public class Campaign implements Serializable, ITechManager {
     public void addTransportShip(Unit unit) {
         MekHQ.getLogger().debug("Adding DropShip/WarShip: " + unit.getId());
 
-        transportShips.add(unit);
+        transportShips.add(Objects.requireNonNull(unit));
     }
 
     /**
