@@ -1253,7 +1253,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     /**
      * Sets the unit which has reserved this part for a refit.
-     * @param unitId The unit reserving this part for a refit.
+     * @param unit The unit reserving this part for a refit.
      */
     public void setRefitUnit(@Nullable Unit unit) {
         refitUnit = unit;

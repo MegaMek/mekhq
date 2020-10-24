@@ -990,7 +990,7 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * Adds an entry to the list of transit-capable transport ships. We'll use this
      * to look for empty bays that ground units can be assigned to
-     * @param id - The unique ID of the ship we want to add to this Set
+     * @param unit - The ship we want to add to this Set
      */
     public void addTransportShip(Unit unit) {
         MekHQ.getLogger().debug("Adding DropShip/WarShip: " + unit.getId());
@@ -1001,7 +1001,7 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * Deletes an entry from the list of transit-capable transport ships. This gets updated when
      * the ship is removed from the campaign for one reason or another
-     * @param id - The unique ID of the ship we want to remove from this Set
+     * @param unit - The ship we want to remove from this Set
      */
     public void removeTransportShip(Unit unit) {
         MekHQ.getLogger().debug("Removing DropShip/WarShip: " + unit.getId());
