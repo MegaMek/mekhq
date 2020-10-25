@@ -173,8 +173,8 @@ public class StratconRulesManager {
             
             // we may generate a facility scenario randomly - if so, do the facility-related stuff
             // and add a new facility to the track
-            if(scenario.getBackingScenario().getTemplate().isHostileFacility()) {
-                StratconFacility facility = scenario.getBackingScenario().getTemplate().isHostileFacility ?
+            if(scenario.getBackingScenario().getTemplate().isFacilityScenario()) {
+                StratconFacility facility = scenario.getBackingScenario().getTemplate().isHostileFacility() ?
                         StratconFacilityFactory.getRandomHostileFacility() : StratconFacilityFactory.getRandomAlliedFacility();
                 track.addFacility(coords, facility);
                 setupFacilityScenario(scenario, track, coords, facility);
@@ -427,6 +427,7 @@ public class StratconRulesManager {
             int forceID, StratconCoords coords) {
         int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
         ScenarioTemplate template = StratconScenarioFactory.getRandomScenario(unitType);
+        //ScenarioTemplate template = StratconScenarioFactory.getSpecificScenario("Breakthrough.xml");
         
         return generateScenario(campaign, contract, track, forceID, coords, template);
     }
@@ -957,14 +958,18 @@ public class StratconRulesManager {
     
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
-        if(ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-            // run scenario generation routine for every track attached to an active contract
-            for(Contract contract : ev.getCampaign().getActiveContracts()) {
-                if((contract instanceof AtBContract) && contract.isActive() && (((AtBContract) contract).getStratconCampaignState() != null)) {
-                    for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
+        boolean isMonday = ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY;
+        
+        
+        // run scenario generation routine for every track attached to an active contract
+        for (Contract contract : ev.getCampaign().getActiveContracts()) {
+            if ((contract instanceof AtBContract) && contract.isActive() && (((AtBContract) contract).getStratconCampaignState() != null)) {
+                for (StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
+                    if (isMonday) {
                         generateScenariosForTrack(ev.getCampaign(), (AtBContract) contract, track);
-                        processTrackForceReturnDates(track, ev.getCampaign().getLocalDate());
                     }
+                    
+                    processTrackForceReturnDates(track, ev.getCampaign().getLocalDate());
                 }
             }
         }

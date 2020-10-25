@@ -129,7 +129,7 @@ public class AtBDynamicScenarioFactory {
         // apply any fixed modifiers
         for (String modifierName : template.scenarioModifiers) {
             if (AtBScenarioModifier.getScenarioModifiers().containsKey(modifierName)) {
-                scenario.getScenarioModifiers().add(AtBScenarioModifier.getScenarioModifiers().get(modifierName));
+                scenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifiers().get(modifierName));
             }
         }
 
@@ -848,18 +848,23 @@ public class AtBDynamicScenarioFactory {
     public static void setScenarioModifiers(AtBDynamicScenario scenario) {
         // this is hardcoded for now, but the eventual plan is to let the user configure how many modifiers
         // they want applied
-        int numMods = Compute.randomInt(3);
+        int numModsRoll = Compute.d6(2);
+        int numMods = 0;
+        if (numModsRoll >= 11) {
+            numMods = 3;
+        } else if (numModsRoll >= 9) {
+            numMods = 2;
+        } else if (numModsRoll >= 7) {
+            numMods = 1;
+        }
 
         for (int x = 0; x < numMods; x++) {
             AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation());
 
-            if ((scenarioMod.getAllowedMapLocations() == null) ||
-                    scenarioMod.getAllowedMapLocations().contains(scenario.getTemplate().mapParameters.getMapLocation())) {
-                scenario.getScenarioModifiers().add(scenarioMod);
+            scenario.addScenarioModifier(scenarioMod);
 
-                if (scenarioMod.getBlockFurtherEvents()) {
-                    break;
-                }
+            if (scenarioMod.getBlockFurtherEvents()) {
+                break;
             }
         }
     }

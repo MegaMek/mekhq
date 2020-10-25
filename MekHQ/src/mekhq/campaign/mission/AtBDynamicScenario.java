@@ -301,8 +301,17 @@ public class AtBDynamicScenario extends AtBScenario {
         return scenarioModifiers;
     }
 
+    /**
+     * Adds a scenario modifier and any linked modifiers to this scenario,
+     * provided that the modifier exists and can be applied to the scenario (e.g. ground units on air map)
+     */
     public void addScenarioModifier(AtBScenarioModifier modifier) {
         if (modifier == null) {
+            return;
+        }
+        
+        if ((modifier.getAllowedMapLocations() != null) && !modifier.getAllowedMapLocations().isEmpty() &&
+                !modifier.getAllowedMapLocations().contains(getTemplate().mapParameters.getMapLocation())) {
             return;
         }
         

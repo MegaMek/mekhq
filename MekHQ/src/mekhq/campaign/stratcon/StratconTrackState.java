@@ -36,6 +36,7 @@ public class StratconTrackState {
     
     private Map<StratconCoords, StratconFacility> facilities;   
     private Map<StratconCoords, StratconScenario> scenarios;    
+    private Map<StratconCoords, Integer> assignedCoordForces; 
     private Map<Integer, StratconCoords> assignedForceCoords;
     private Map<Integer, LocalDate> assignedForceReturnDates;
     private Map<Integer, String> assignedForceReturnDatesForStorage;
@@ -53,6 +54,7 @@ public class StratconTrackState {
         scenarios = new HashMap<>();
         assignedForceCoords = new HashMap<>();
         assignedForceReturnDates = new HashMap<>();
+        assignedCoordForces = new HashMap<>();
         setAssignedForceReturnDatesForStorage(new HashMap<>());
         revealedCoords = new HashSet<>();
     }
@@ -176,10 +178,12 @@ public class StratconTrackState {
     public void assignForce(int forceID, StratconCoords coords, LocalDate date) {
         assignedForceCoords.put(forceID, coords);
         assignedForceReturnDates.put(forceID, date.plusDays(deploymentTime));
+        assignedCoordForces.put(coords, forceID);
         getAssignedForceReturnDatesForStorage().put(forceID, date.plusDays(deploymentTime).toString());
     }
     
     public void unassignForce(int forceID) {
+        assignedCoordForces.remove(assignedForceCoords.get(forceID));
         assignedForceCoords.remove(forceID);
         assignedForceReturnDates.remove(forceID);
         getAssignedForceReturnDatesForStorage().remove(forceID);
@@ -199,6 +203,14 @@ public class StratconTrackState {
         this.assignedForceCoords = assignedForceCoords;
     }
     
+    public Map<StratconCoords, Integer> getAssignedCoordForces() {
+        return assignedCoordForces;
+    }
+
+    public void setAssignedCoordForces(Map<StratconCoords, Integer> assignedCoordForces) {
+        this.assignedCoordForces = assignedCoordForces;
+    }
+
     @XmlTransient
     public Map<Integer, LocalDate> getAssignedForceReturnDates() {
         return assignedForceReturnDates;

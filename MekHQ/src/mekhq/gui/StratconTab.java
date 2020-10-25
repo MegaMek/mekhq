@@ -150,6 +150,8 @@ public class StratconTab extends CampaignGuiTab {
         
         sb.append("<br/>Support Points: ").append(campaignState.getSupportPoints());
         
+        sb.append("<br/>Deployment Period: ").append(currentTDI.track.getDeploymentTime()).append(" days");
+        
         sb.append("</html>");
         
         campaignStatusText.setText(sb.toString());

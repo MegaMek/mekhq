@@ -22,6 +22,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
@@ -409,7 +410,9 @@ public class StratconPanel extends JPanel implements ActionListener {
             }
              
             menuItemManageForceAssignments.setEnabled(selectedScenario == null);
-            menuItemManageScenario.setEnabled(selectedScenario != null);
+            menuItemManageScenario.setEnabled(selectedScenario != null);            
+            menuItemGMReveal.setEnabled(campaign.isGM());
+            
             repaint();
             rightClickMenu.show(this, e.getX(), e.getY());
         }
@@ -424,9 +427,18 @@ public class StratconPanel extends JPanel implements ActionListener {
         StringBuilder infoBuilder = new StringBuilder();
         infoBuilder.append("<html>");
         
-        if(currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords())) {
-            infoBuilder.append("<span color='green'>Recon complete</span>");
-            
+        boolean coordsRevealed = currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
+        if (coordsRevealed) {
+            infoBuilder.append("<span color='green'>Recon complete</span><br/>");
+        }
+        
+        if (currentTrack.getAssignedCoordForces().containsKey(boardState.getSelectedCoords())) {
+            Force force = campaign.getForce(currentTrack.getAssignedCoordForces().get(boardState.getSelectedCoords()));
+            infoBuilder.append(force.getName()).append(" assigned<br/>");
+            infoBuilder.append("Returns on ").append(campaign.getLocalDate());
+        }
+        
+        if (coordsRevealed || currentTrack.isGmRevealed()) {
             StratconFacility facility = currentTrack.getFacility(boardState.getSelectedCoords());
             
             if((facility != null) && (facility.getFacilityType() != null)) {
@@ -447,7 +459,8 @@ public class StratconPanel extends JPanel implements ActionListener {
         
         
         StratconScenario selectedScenario = getSelectedScenario();
-        if (selectedScenario != null) {
+        if ((selectedScenario != null) &&
+                ((selectedScenario.getDeploymentDate() != null) || currentTrack.isGmRevealed())) {
             infoBuilder.append(selectedScenario.getInfo());
         }
         

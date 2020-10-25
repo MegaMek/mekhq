@@ -107,11 +107,15 @@ public class StratconScenarioWizard extends JDialog {
         JLabel lblInfo = new JLabel();
         StringBuilder labelBuilder = new StringBuilder();
         labelBuilder.append("<html>");
-        labelBuilder.append(currentScenario.getInfo(true, true));
+        
+        if (currentTrackState.isGmRevealed() || currentTrackState.getRevealedCoords().contains(currentScenario.getCoords()) ||
+                (currentScenario.getDeploymentDate() != null)) {
+            labelBuilder.append(currentScenario.getInfo(true, true));
+        }
         
         switch(currentScenario.getCurrentState()) {
         case UNRESOLVED:
-            labelBuilder.append("primaryForceAssignemntInstructions.text");
+            labelBuilder.append("primaryForceAssignmentInstructions.text");
             break;
         default:
             labelBuilder.append("reinforcementsAndSupportInstructions.text");

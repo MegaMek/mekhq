@@ -85,7 +85,9 @@ public class StratconContractInitializer {
                     initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing, null, true);
                     break;
                 case AnyScenarioVictory:
-                    campaignState.getGlobalScenarioModifiers().addAll(objectiveParams.objectiveScenarioModifiers);
+                    if (objectiveParams.objectiveScenarioModifiers != null) {
+                        campaignState.getGlobalScenarioModifiers().addAll(objectiveParams.objectiveScenarioModifiers);
+                    }
                     break;
                 }
             }
