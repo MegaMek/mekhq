@@ -42,6 +42,8 @@ import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.loaders.BLKFile;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
@@ -385,7 +387,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
         } else if (command.equals(COMMAND_INDI_CAMO)) { // Single Unit only
             String category = selectedUnit.getCamoCategory();
             if (StringUtil.isNullOrEmpty(category)) {
-                category = Player.ROOT_CAMO;
+                category = AbstractIcon.ROOT_CATEGORY;
             }
             CamoChoiceDialog ccd = new CamoChoiceDialog(gui.getFrame(), true, category,
                     selectedUnit.getCamoFileName(), gui.getCampaign().getColorIndex());
@@ -413,8 +415,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (units.length > 1) {
                 gui.showMassMothballDialog(units, false);
             } else {
-                UUID techId = pickTechForMothballOrActivation(selectedUnit, "mothballing");
-                MothballUnitAction mothballUnitAction = new MothballUnitAction(techId, false);
+                Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
+                MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
                 mothballUnitAction.Execute(gui.getCampaign(), selectedUnit);
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
@@ -422,8 +424,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (units.length > 1) {
                 gui.showMassMothballDialog(units, true);
             } else {
-                UUID techId = pickTechForMothballOrActivation(selectedUnit, "activation");
-                ActivateUnitAction activateUnitAction = new ActivateUnitAction(techId, false);
+                Person tech = pickTechForMothballOrActivation(selectedUnit, "activation");
+                ActivateUnitAction activateUnitAction = new ActivateUnitAction(tech, false);
                 activateUnitAction.Execute(gui.getCampaign(), selectedUnit);
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
@@ -480,7 +482,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                             part.fix();
                             part.resetTimeSpent();
                             part.resetOvertime();
-                            part.setTeamId(null);
+                            part.setTech(null);
                             part.cancelReservation();
                             part.remove(false);
                             needsCheck = true;
@@ -493,7 +495,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                             }
                             part.resetTimeSpent();
                             part.resetOvertime();
-                            part.setTeamId(null);
+                            part.setTech(null);
                             part.cancelReservation();
                         }
 
@@ -558,24 +560,24 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
         }
     }
 
-    private UUID pickTechForMothballOrActivation(Unit unit, String description) {
-        UUID id = null;
+    private @Nullable Person pickTechForMothballOrActivation(Unit unit, String description) {
+        Person tech = null;
         if (!unit.isSelfCrewed()) {
-            id = gui.selectTech(unit, description, true);
+            UUID id = gui.selectTech(unit, description, true);
             if (null != id) {
-                Person tech = gui.getCampaign().getPerson(id);
+                tech = gui.getCampaign().getPerson(id);
                 if (tech.getTechUnitIDs().size() > 0) {
                     if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(gui.getFrame(),
                             tech.getFullName() + " will not be able to perform maintenance on "
                                     + tech.getTechUnitIDs().size() + " assigned units. Proceed?",
                                     "Unmaintained unit warning",
                                     JOptionPane.YES_NO_OPTION)) {
-                        id = null;
+                        tech = null;
                     }
                 }
             }
         }
-        return id;
+        return tech;
     }
 
     @Override
@@ -871,7 +873,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                                         + " (" + tech.getMaintenanceTimeUsing() + "m)");
                                 cbMenuItem.setActionCommand(COMMAND_ASSIGN_TECH + ":" + tech.getId());
 
-                                if (tech.getId().equals(unit.getTechId())) {
+                                if (tech.equals(unit.getTech())) {
                                     cbMenuItem.setSelected(true);
                                 } else {
                                     cbMenuItem.addActionListener(this);

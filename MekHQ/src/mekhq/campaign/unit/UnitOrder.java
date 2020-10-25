@@ -106,7 +106,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     }
 
     @Override
-    public UUID getTeamId() {
+    public Person getTech() {
         // TODO Auto-generated method stub
         return null;
     }

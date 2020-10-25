@@ -35,6 +35,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
+import megamek.common.icons.Camouflage;
 import megamek.utils.MegaMekXmlUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -47,7 +48,6 @@ import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.FighterSquadron;
 import megamek.common.IBomber;
-import megamek.common.IPlayer;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
@@ -159,13 +159,13 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         }
 
          if ((null != tgtEnt.getCamoCategory())
-                 && !IPlayer.NO_CAMO.equals(tgtEnt.getCamoCategory())
+                 && !Camouflage.NO_CAMOUFLAGE.equals(tgtEnt.getCamoCategory())
                  && !tgtEnt.getCamoCategory().isEmpty()) {
              retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamoCategory()));
          }
 
          if ((null != tgtEnt.getCamoFileName())
-                 && !IPlayer.NO_CAMO.equals(tgtEnt.getCamoFileName())
+                 && !Camouflage.NO_CAMOUFLAGE.equals(tgtEnt.getCamoFileName())
                  && !tgtEnt.getCamoFileName().isEmpty()) {
              retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamoFileName()));
          }

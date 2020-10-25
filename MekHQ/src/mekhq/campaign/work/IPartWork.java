@@ -1,7 +1,7 @@
 /*
  * IPartWork.java
  *
- * Copyright (C) 2016 MegaMek team
+ * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -21,15 +21,15 @@
  */
 package mekhq.campaign.work;
 
-import java.util.UUID;
-
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 public interface IPartWork extends IWork {
@@ -52,7 +52,8 @@ public interface IPartWork extends IWork {
 
     TargetRoll getAllModsForMaintenance();
 
-    void setTeamId(UUID id);
+    void setTech(@Nullable Person tech);
+
     boolean hasWorkedOvertime();
     void setWorkedOvertime(boolean b);
     int getShorthandedMod();
@@ -88,7 +89,7 @@ public interface IPartWork extends IWork {
 
     int getLocation();
 
-    Unit getUnit();
+    @Nullable Unit getUnit();
 
     boolean isSalvaging();
 
