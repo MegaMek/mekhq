@@ -131,7 +131,7 @@ public class Warehouse {
      * @param part The part to remove.
      * @return A value indicating whether or not the part was removed.
      */
-	public boolean removePart(Part part) {
+    public boolean removePart(Part part) {
         Objects.requireNonNull(part);
 
         boolean didRemove = (parts.remove(part.getId()) != null);
@@ -146,7 +146,7 @@ public class Warehouse {
         }
 
         return didRemove;
-	}
+    }
 
     /**
      * Merges a part with an existing part, if possible.
@@ -199,7 +199,7 @@ public class Warehouse {
         return null;
     }
 
-	public void writeToXml(PrintWriter pw1, int indent, String tag) {
+    public void writeToXml(PrintWriter pw1, int indent, String tag) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, tag);
 
         forEachPart(part -> {
@@ -207,5 +207,5 @@ public class Warehouse {
         });
 
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, tag);
-	}
+    }
 }
