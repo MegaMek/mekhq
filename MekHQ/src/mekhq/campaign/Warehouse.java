@@ -136,7 +136,9 @@ public class Warehouse {
 
         boolean didRemove = (parts.remove(part.getId()) != null);
 
-        MekHQ.triggerEvent(new PartRemovedEvent(part));
+        if (didRemove) {
+            MekHQ.triggerEvent(new PartRemovedEvent(part));
+        }
 
         return didRemove;
 	}

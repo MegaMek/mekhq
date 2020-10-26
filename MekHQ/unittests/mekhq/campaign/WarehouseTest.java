@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import mekhq.EventSpy;
 import mekhq.campaign.event.PartNewEvent;
+import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.parts.Part;
 
 import static org.junit.Assert.*;
@@ -178,6 +179,42 @@ public class WarehouseTest {
                             .stream()
                             .filter(e -> e instanceof PartNewEvent)
                             .filter(e -> mockPart == ((PartNewEvent) e).getPart())
+                            .count());
+        }
+    }
+
+    @Test
+    public void testWarehouseRemovePart() {
+        Warehouse warehouse = new Warehouse();
+
+        // Create a mock part
+        int mockId = 10;
+        Part mockPart = mock(Part.class);
+        when(mockPart.getId()).thenReturn(mockId);
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            // Ensure we can't remove a part that doesn't exist
+            assertFalse(warehouse.removePart(mockPart));
+
+            // If we didn't remove a part, we should have no event
+            assertTrue(eventSpy.getEvents()
+                    .stream()
+                    .filter(e -> e instanceof PartRemovedEvent)
+                    .findAny()
+                    .isEmpty());
+
+            // Add the mock part to our warehouse
+            warehouse.addPart(mockPart);
+
+            // Ensure we can then remove the part
+            assertTrue(warehouse.removePart(mockPart));
+
+            // There should be an event where we removed the mock part
+            assertEquals(1,
+                    eventSpy.getEvents()
+                            .stream()
+                            .filter(e -> e instanceof PartRemovedEvent)
+                            .filter(e -> mockPart == ((PartRemovedEvent) e).getPart())
                             .count());
         }
     }
