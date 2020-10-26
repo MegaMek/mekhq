@@ -3714,11 +3714,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public void removePart(Part part) {
         parts.removePart(part);
-
-        //remove child parts as well
-        for (Part childPart : part.getChildParts()) {
-            removePart(childPart);
-        }
     }
 
     public void removeKill(Kill k) {

@@ -29,6 +29,8 @@ import mekhq.campaign.parts.Part;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
+
 public class WarehouseTest {
     @Test
     public void testWarehouseSimplePartActions() {
@@ -217,5 +219,57 @@ public class WarehouseTest {
                             .filter(e -> mockPart == ((PartRemovedEvent) e).getPart())
                             .count());
         }
+    }
+
+    @Test
+    public void testWarehouseRemoveChildParts() {
+        Warehouse warehouse = new Warehouse();
+
+        // Add a parent part to the warehouse
+        Part mockParentPart = createMockPart(1);
+        warehouse.addPart(mockParentPart);
+
+        // Create child parts for the parent part
+        ArrayList<Part> mockChildParts = new ArrayList<>();
+        mockChildParts.add(createMockPart(2));
+        mockChildParts.add(createMockPart(3));
+        when(mockParentPart.getChildParts()).thenReturn(mockChildParts);
+
+        for (Part mockChildPart : mockChildParts) {
+            when(mockChildPart.getParentPart()).thenReturn(mockParentPart);
+            when(mockChildPart.hasParentPart()).thenReturn(true);
+
+            warehouse.addPart(mockChildPart);
+        }
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            // Ensure we can then remove the part
+            assertTrue(warehouse.removePart(mockParentPart));
+
+            // There should be three events where we removed parts
+            assertEquals(3,
+                    eventSpy.getEvents()
+                            .stream()
+                            .filter(e -> e instanceof PartRemovedEvent)
+                            .count());
+
+            // And the three events should correlate to the child parts being removed
+            assertNotNull(eventSpy.findEvent(PartRemovedEvent.class, e -> mockParentPart == e.getPart()));
+            for (Part mockChildPart : mockChildParts) {
+                assertNotNull(eventSpy.findEvent(PartRemovedEvent.class, e -> mockChildPart == e.getPart()));
+            }
+        }
+    }
+
+    /**
+     * Creates a mock part with the given ID.
+     * @param id The unique ID of the part.
+     * @return The mocked part with the given ID.
+     */
+    private Part createMockPart(int id) {
+        Part mockPart = mock(Part.class);
+        when(mockPart.getId()).thenReturn(id);
+
+        return mockPart;
     }
 }

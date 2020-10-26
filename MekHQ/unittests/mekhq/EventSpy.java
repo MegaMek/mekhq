@@ -22,7 +22,9 @@ package mekhq;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.event.MMEvent;
 import megamek.common.event.Subscribe;
 import mekhq.campaign.event.*;
@@ -59,6 +61,25 @@ public class EventSpy implements AutoCloseable {
      */
     public List<MMEvent> getEvents() {
         return Collections.unmodifiableList(events);
+    }
+
+    /**
+     * Finds an event of a certain type matching a given predicate.
+     * @param clazz The event class in question.
+     * @param predicate The predicate to apply when searching for an event.
+     * @return The first matching event, otherwise null.
+     */
+    public @Nullable <TEvent extends MMEvent> TEvent findEvent(Class<TEvent> clazz, Predicate<TEvent> predicate) {
+        for (MMEvent e : events) {
+            if (clazz.isInstance(e)) {
+                TEvent instance = clazz.cast(e);
+                if (predicate.test(instance)) {
+                    return instance;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
