@@ -187,7 +187,6 @@ public class Campaign implements Serializable, ITechManager {
     private int astechPoolOvertime;
     private int medicPool;
 
-    private int lastPartId;
     private int lastForceId;
     private int lastMissionId;
     private int lastScenarioId;
@@ -1581,30 +1580,23 @@ public class Campaign implements Serializable, ITechManager {
 
     public void addPart(Part p, int transitDays) {
         if ((p.getUnit() != null) && (p.getUnit() instanceof TestUnit)) {
-            // if this is a test unit, then we won't add the part, so there
-            return;
-        }
-        p.setDaysToArrival(transitDays);
-        p.setBrandNew(false);
-        //need to add ID here in case post-processing part stuff needs it
-        //we will set the id back one if we don't end up adding this part
-        int id = lastPartId + 1;
-        p.setId(id);
-        //be careful in using this next line
-        p.postProcessCampaignAddition();
-        // don't add missing parts if they don't have units or units with not id
-        if ((p instanceof MissingPart) && (null == p.getUnit())) {
-            p.setId(-1);
+            // If this is a test unit, then we won't add the part
             return;
         }
 
-        // Add the part to our warehouse and merge it with any existing part if possible
-        p = parts.addPart(p, true);
-        if (id == p.getId()) {
-            // We have a new part!
-            lastPartId = id;
-            MekHQ.triggerEvent(new PartNewEvent(p));
+        // don't add missing parts if they don't have units or units with not id
+        if ((p instanceof MissingPart) && (null == p.getUnit())) {
+            return;
         }
+
+        p.setDaysToArrival(transitDays);
+        p.setBrandNew(false);
+
+        // be careful in using this next line
+        p.postProcessCampaignAddition();
+
+        // Add the part to our warehouse and merge it with any existing part if possible
+        parts.addPart(p, true);
     }
 
     /**
@@ -1663,25 +1655,21 @@ public class Campaign implements Serializable, ITechManager {
      *                 to import into the campaign.
      */
     public void importParts(Collection<Part> newParts) {
+        Objects.requireNonNull(newParts);
+
         for (Part p : newParts) {
+            if ((p instanceof MissingPart) && (null == p.getUnit())) {
+                // Let's not import missing parts without a valid unit.
+                continue;
+            }
+
+            // Track this part as part of our Campaign
             p.setCampaign(this);
-            addPartWithoutId(p);
+
+            // Add the part to the campaign, but do not
+            // merge it with any existing parts
+            parts.addPart(p, false);
         }
-    }
-
-    public void addPartWithoutId(Part p) {
-        if ((p instanceof MissingPart) && (null == p.getUnit())) {
-            // we shouldn't have spare missing parts. I think their existence is
-            // a relic.
-            return;
-        }
-
-        // Update the lastPartId we've seen to avoid overwriting a part,
-        // which may occur if a replacement ID is assigned
-        lastPartId = Math.max(lastPartId, p.getId());
-
-        parts.addPart(p, false);
-        MekHQ.triggerEvent(new PartNewEvent(p));
     }
 
     /**
@@ -3725,16 +3713,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void removePart(Part part) {
-        if (null != part.getUnit() && part.getUnit() instanceof TestUnit) {
-            // if this is a test unit, then we won't remove the part because its not there
-            return;
-        }
         parts.removePart(part);
+
         //remove child parts as well
         for (Part childPart : part.getChildParts()) {
             removePart(childPart);
         }
-        MekHQ.triggerEvent(new PartRemovedEvent(part));
     }
 
     public void removeKill(Kill k) {
@@ -4357,7 +4341,6 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colorIndex", colorIndex);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastPartId", lastPartId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastForceId", lastForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastMissionId", lastMissionId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastScenarioId", lastScenarioId);

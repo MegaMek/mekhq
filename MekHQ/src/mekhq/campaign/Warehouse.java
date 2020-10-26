@@ -29,10 +29,15 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.event.PartNewEvent;
+import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 
+/**
+ * Stores parts for a Campaign.
+ */
 public class Warehouse {
     private final TreeMap<Integer, Part> parts = new TreeMap<>();
 
@@ -56,11 +61,41 @@ public class Warehouse {
     public Part addPart(Part part, boolean mergeWithExisting) {
         Objects.requireNonNull(part);
 
-        if (mergeWithExisting) {
-            part = mergePartWithExisting(part);
+        if (mergeWithExisting && part.isSpare()) {
+            Part mergedPart = mergePartWithExisting(part);
+
+            // CAW: intentional reference equality
+            if (mergedPart != part) {
+                // We've merged parts, so let interested parties know we've
+                // updated the merged part.
+                MekHQ.triggerEvent(new PartChangedEvent(mergedPart));
+
+                // Check if the part being added exists, and if so
+                // remove it from the warehouse
+                if (part.getId() > 0) {
+                    removePart(part);
+                }
+
+                return mergedPart;
+            }
+
+            // ...we did not merge parts, so fall through to the
+            // normal addPart logic.
         }
 
+        // is this a new part? if so set its next ID
+        if (part.getId() <= 0) {
+            part.setId(parts.isEmpty() ? 1 : (parts.lastKey() + 1));
+        }
+
+        // Is this a part we've never tracked before?
+        boolean isNewPart = !parts.containsKey(part.getId());
+
         parts.put(part.getId(), part);
+
+        if (isNewPart) {
+            MekHQ.triggerEvent(new PartNewEvent(part));
+        }
 
         return part;
     }
@@ -97,7 +132,13 @@ public class Warehouse {
      * @return A value indicating whether or not the part was removed.
      */
 	public boolean removePart(Part part) {
-        return (parts.remove(part.getId()) != null);
+        Objects.requireNonNull(part);
+
+        boolean didRemove = (parts.remove(part.getId()) != null);
+
+        MekHQ.triggerEvent(new PartRemovedEvent(part));
+
+        return didRemove;
 	}
 
     /**
@@ -116,22 +157,16 @@ public class Warehouse {
                     if (spare instanceof Armor) {
                         ((Armor) spare).setAmount(((Armor) spare).getAmount()
                                 + ((Armor) part).getAmount());
-                        MekHQ.triggerEvent(new PartChangedEvent(spare));
-                        part.setId(-1);
                         return spare;
                     }
                 } else if (part instanceof AmmoStorage) {
                     if (spare instanceof AmmoStorage) {
                         ((AmmoStorage) spare).changeShots(((AmmoStorage) part)
                                 .getShots());
-                        MekHQ.triggerEvent(new PartChangedEvent(spare));
-                        part.setId(-1);
                         return spare;
                     }
                 } else {
                     spare.incrementQuantity();
-                    MekHQ.triggerEvent(new PartChangedEvent(spare));
-                    part.setId(-1);
                     return spare;
                 }
             }
