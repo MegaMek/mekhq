@@ -199,11 +199,11 @@ public class WarehouseTest {
             assertFalse(warehouse.removePart(mockPart));
 
             // If we didn't remove a part, we should have no event
-            assertTrue(eventSpy.getEvents()
+            assertFalse(eventSpy.getEvents()
                     .stream()
                     .filter(e -> e instanceof PartRemovedEvent)
                     .findAny()
-                    .isEmpty());
+                    .isPresent());
 
             // Add the mock part to our warehouse
             warehouse.addPart(mockPart);
