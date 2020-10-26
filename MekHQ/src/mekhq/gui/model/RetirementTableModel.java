@@ -168,7 +168,7 @@ public class RetirementTableModel extends AbstractTableModel {
         try {
             retVal = getValueAt(0, col).getClass();
         } catch (NullPointerException e) {
-            MekHQ.getLogger().error(RetirementTableModel.class, "getColumnClass", e);
+            MekHQ.getLogger().error(e);
         }
         return retVal;
     }
@@ -185,7 +185,7 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_PERSON:
                 return p.makeHTMLRank();
             case COL_ASSIGN:
-                Unit u = campaign.getUnit(p.getUnitId());
+                Unit u = p.getUnit();
                 if (null != u) {
                     String name = u.getName();
                     if (u.getEntity() instanceof Tank) {
@@ -209,14 +209,14 @@ public class RetirementTableModel extends AbstractTableModel {
                     return name;
                 }
                 //check for tech
-                if (!p.getTechUnitIDs().isEmpty()) {
-                    if (p.getTechUnitIDs().size() == 1) {
-                        u = campaign.getUnit(p.getTechUnitIDs().get(0));
+                if (!p.getTechUnits().isEmpty()) {
+                    if (p.getTechUnits().size() == 1) {
+                        u = p.getTechUnits().get(0);
                         if (null != u) {
                             return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
                         }
                     } else {
-                        return "" + p.getTechUnitIDs().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
+                        return "" + p.getTechUnits().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
                     }
                 }
                 return "-";
@@ -424,9 +424,9 @@ public class RetirementTableModel extends AbstractTableModel {
                 setText(p.getFullDesc());
             }
             if (actualCol == COL_ASSIGN) {
-                Unit u = campaign.getUnit(p.getUnitId());
-                if (!p.getTechUnitIDs().isEmpty()) {
-                    u = campaign.getUnit(p.getTechUnitIDs().get(0));
+                Unit u = p.getUnit();
+                if (!p.getTechUnits().isEmpty()) {
+                    u = p.getTechUnits().get(0);
                 }
                 if (null != u) {
                     String desc = "<b>" + u.getName() + "</b><br>";

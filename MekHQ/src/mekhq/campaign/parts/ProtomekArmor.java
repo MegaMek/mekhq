@@ -90,7 +90,7 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
         return part instanceof ProtomekArmor
                 && getType() == ((ProtomekArmor) part).getType()
                 && isClanTechBase() == part.isClanTechBase()
-                && Objects.equals(getRefitId(), part.getRefitId());
+                && Objects.equals(getRefitUnit(), part.getRefitUnit());
     }
 
     @Override

@@ -368,8 +368,9 @@ public class CampaignXmlParser {
         // Process parts...
         List<Part> removeParts = new ArrayList<>();
         for (Part prt : retVal.getParts()) {
-            Unit u = retVal.getUnit(prt.getUnitId());
-            prt.setUnit(u);
+            prt.fixReferences(retVal);
+
+            Unit u = prt.getUnit();
             if (null != u) {
                 // get rid of any equipmentparts without locations or mounteds
                 if (prt instanceof EquipmentPart) {
@@ -481,10 +482,6 @@ public class CampaignXmlParser {
         }
         for (Part prt : removeParts) {
             retVal.removePart(prt);
-        }
-
-        for (Part prt : retVal.getParts()) {
-            prt.fixReferences(retVal);
         }
 
         MekHQ.getLogger().info(String.format("[Campaign Load] Parts processed in %dms",
@@ -606,6 +603,14 @@ public class CampaignXmlParser {
                 System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
+        for (Person person : retVal.getPersonnel()) {
+            person.fixReferences(retVal);
+        }
+
+        MekHQ.getLogger().info(String.format("[Campaign Load] Personnel initialized in %dms",
+                System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
+
         retVal.reloadNews();
 
         MekHQ.getLogger().info(String.format("[Campaign Load] News loaded in %dms",
@@ -655,9 +660,9 @@ public class CampaignXmlParser {
         //is not refitting or is gone then unreserve
         for (Part part : retVal.getParts()) {
             if (part.isReservedForRefit()) {
-                Unit u = retVal.getUnit(part.getRefitId());
-                if (null == u || !u.isRefitting()) {
-                    part.setRefitId(null);
+                Unit u = part.getRefitUnit();
+                if ((null == u) || !u.isRefitting()) {
+                    part.setRefitUnit(null);
                 }
             }
         }
@@ -721,25 +726,20 @@ public class CampaignXmlParser {
     private void fixupUnitTechProblems(Campaign retVal) {
         // Cleanup problems with techs and units
         for (Person tech : retVal.getTechs()) {
-            for (UUID id : new ArrayList<>(tech.getTechUnitIDs())) {
-                Unit u = retVal.getUnit(id);
-
+            for (Unit u : new ArrayList<>(tech.getTechUnits())) {
                 String reason = null;
-                String unitDesc = id.toString();
-                if (null == u) {
-                    reason = "referenced missing unit";
-                    tech.removeTechUnitId(id);
-                } else if (null == u.getTech()) {
+                String unitDesc = u.getId().toString();
+                if (null == u.getTech()) {
                     reason = "was not referenced by unit";
                     u.setTech(tech);
                 } else if (u.isMothballed()) {
                     reason = "referenced mothballed unit";
                     unitDesc = u.getName();
-                    tech.removeTechUnitId(id);
+                    tech.removeTechUnit(u);
                 } else if (u.getTech() != null && !tech.getId().equals(u.getTech().getId())) {
                     reason = String.format("referenced tech %s's maintained unit", u.getTech().getFullName());
                     unitDesc = u.getName();
-                    tech.removeTechUnitId(id);
+                    tech.removeTechUnit(u);
                 }
                 if (null != reason) {
                     MekHQ.getLogger().warning(String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));
@@ -1476,12 +1476,12 @@ public class CampaignXmlParser {
                 p = null;
             }
 
-            if ((null != p) && (p.getUnitId() != null)
+            if ((null != p) && (p.getUnit() != null)
                     && ((version.getMinorVersion() < 43)
                             || ((version.getMinorVersion() == 43) && (version.getSnapshot() < 5)))
                     && ((p instanceof AmmoBin) || (p instanceof MissingAmmoBin))) {
-                Unit u = retVal.getUnit(p.getUnitId());
-                if ((null != u) && (u.getEntity().usesWeaponBays())) {
+                Unit u = p.getUnit();
+                if (u.getEntity().usesWeaponBays()) {
                     Mounted ammo;
                     if (p instanceof EquipmentPart) {
                         ammo = u.getEntity().getEquipment(((EquipmentPart) p).getEquipmentNum());
@@ -1514,7 +1514,7 @@ public class CampaignXmlParser {
 
         retVal.importParts(parts);
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, "Load Part Nodes Complete!");
+        MekHQ.getLogger().info("Load Part Nodes Complete!");
     }
 
     /**
