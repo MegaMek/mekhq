@@ -27,9 +27,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
@@ -4059,56 +4056,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setIconFileName(String s) {
         this.iconFileName = s;
-    }
-
-    public ArrayList<Part> getSpareParts() {
-        ArrayList<Part> spares = new ArrayList<>();
-        for (Part part : getParts()) {
-            if (part.isSpare()) {
-                spares.add(part);
-            }
-        }
-        return spares;
-    }
-
-    /**
-     * Executes a method for each spare part in the campaign.
-     *
-     * @param consumer The method to apply to each spare part
-     *                 in the campaign.
-     */
-    public void forEachSparePart(Consumer<Part> consumer) {
-        for (Part part : getParts()) {
-            if (part.isSpare()) {
-                consumer.accept(part);
-            }
-        }
-    }
-
-    /**
-     * Finds the first spare part matching a predicate.
-     *
-     * @param predicate The predicate to use when searching
-     *                  for a suitable spare part.
-     * @return A matching spare {@link Part} or {@code null}
-     *         if no suitable match was found.
-     */
-    @Nullable
-    public Part findSparePart(Predicate<Part> predicate) {
-        for (Part part : parts.getParts()) {
-            if (part.isSpare() && predicate.test(part)) {
-                return part;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Streams the spare parts in the campaign.
-     * @return A stream of spare parts in the campaign.
-     */
-    public Stream<Part> streamSpareParts() {
-        return parts.getParts().stream().filter(Part::isSpare);
     }
 
     public void addFunds(Money quantity) {

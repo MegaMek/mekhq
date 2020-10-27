@@ -20,10 +20,14 @@
 package mekhq.campaign;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
@@ -194,15 +198,65 @@ public class Warehouse {
      * @return The matching spare part or null if none were found.
      */
     public @Nullable Part checkForExistingSparePart(Part part) {
-        for (Part spare : parts.values()) {
-            if (!spare.isSpare() || spare.getId() == part.getId()) {
-                continue;
+        Objects.requireNonNull(part);
+
+        return findSparePart(spare ->
+                (spare.getId() != part.getId())
+                && part.isSamePartTypeAndStatus(spare));
+    }
+
+    /**
+     * Gets a list of spare parts in the warehouse.
+     * @return A list of spare parts in the warehouse.
+     */
+    public List<Part> getSpareParts() {
+        List<Part> spares = new ArrayList<>();
+        for (Part part : getParts()) {
+            if (part.isSpare()) {
+                spares.add(part);
             }
-            if (part.isSamePartTypeAndStatus(spare)) {
-                return spare;
+        }
+        return spares;
+    }
+
+    /**
+     * Executes a method for each spare part in the warehouse.
+     *
+     * @param consumer The method to apply to each spare part
+     *                 in the warehouse.
+     */
+    public void forEachSparePart(Consumer<Part> consumer) {
+        for (Part part : getParts()) {
+            if (part.isSpare()) {
+                consumer.accept(part);
+            }
+        }
+    }
+
+    /**
+     * Finds the first spare part matching a predicate.
+     *
+     * @param predicate The predicate to use when searching
+     *                  for a suitable spare part.
+     * @return A matching spare {@link Part} or {@code null}
+     *         if no suitable match was found.
+     */
+    public @Nullable Part findSparePart(Predicate<Part> predicate) {
+        for (Part part : getParts()) {
+            if (part.isSpare() && predicate.test(part)) {
+                return part;
             }
         }
         return null;
+    }
+
+    /**
+     * Streams the spare parts in the campaign.
+     *
+     * @return A stream of spare parts in the campaign.
+     */
+    public Stream<Part> streamSpareParts() {
+        return getParts().stream().filter(Part::isSpare);
     }
 
     public void writeToXml(PrintWriter pw1, int indent, String tag) {

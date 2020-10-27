@@ -215,7 +215,7 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public void changeAmountAvailable(int amount, final AmmoType curType) {
-        InfantryAmmoStorage a = (InfantryAmmoStorage) campaign.findSparePart(part ->
+        InfantryAmmoStorage a = (InfantryAmmoStorage) campaign.getWarehouse().findSparePart(part ->
             InfantryAmmoStorage.isRightAmmo(part, (AmmoType) getType(), getWeaponType()));
 
         if (a != null) {
@@ -235,7 +235,7 @@ public class InfantryAmmoBin extends AmmoBin {
 
     public int getAmountAvailable() {
         final AmmoType thisType = (AmmoType) getType();
-        return campaign.streamSpareParts()
+        return campaign.getWarehouse().streamSpareParts()
             .filter(part -> part instanceof InfantryAmmoStorage && part.isPresent()
                     && InfantryAmmoStorage.isRightAmmo(part, thisType, weaponType))
             .mapToInt(part -> ((InfantryAmmoStorage) part).getShots())

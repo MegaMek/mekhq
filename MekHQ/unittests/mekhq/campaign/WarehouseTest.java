@@ -40,7 +40,9 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class WarehouseTest {
     @Test
@@ -746,6 +748,208 @@ public class WarehouseTest {
 
         // We should have 2 instances of these parts
         assertEquals(2, warehouse.getParts().size());
+    }
+
+    @Test
+    public void testGetSpareParts() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+
+        // Spare
+        Part mockSparePart = spy(new MekLocation());
+        Part addedPart = warehouse.addPart(mockSparePart, true);
+        assertEquals(mockSparePart, addedPart);
+
+        Part mockUnitPart = spy(new MekLocation());
+        mockUnitPart.setUnit(createMockUnit());
+        addedPart = warehouse.addPart(mockUnitPart, true);
+        assertEquals(mockUnitPart, addedPart);
+
+        // Spare (being repaired)
+        Part mockSparePartUnderRepair = spy(new MekLocation());
+        mockSparePartUnderRepair.setTech(createMockTech());
+        addedPart = warehouse.addPart(mockSparePartUnderRepair, true);
+        assertEquals(mockSparePartUnderRepair, addedPart);
+
+        Part mockPartForRefit = spy(new MekLocation());
+        mockPartForRefit.setRefitUnit(createMockUnit());
+        addedPart = warehouse.addPart(mockPartForRefit, true);
+        assertEquals(mockPartForRefit, addedPart);
+
+        Part mockPartForRepairTask = spy(new MekLocation());
+        mockPartForRepairTask.setReservedBy(createMockTech());
+        addedPart = warehouse.addPart(mockPartForRepairTask, true);
+        assertEquals(mockPartForRepairTask, addedPart);
+
+        // Spare
+        Armor mockSpareArmor = createMockArmor(mockCampaign, EquipmentType.T_ARMOR_STANDARD, 16);
+        addedPart = warehouse.addPart(mockSpareArmor, true);
+        assertEquals(mockSpareArmor, addedPart);
+
+        Armor mockUnitArmor = createMockArmor(mockCampaign, EquipmentType.T_ARMOR_STANDARD, 16);
+        mockUnitArmor.setUnit(createMockUnit());
+        addedPart = warehouse.addPart(mockUnitArmor, true);
+        assertEquals(mockUnitArmor, addedPart);
+
+        // Spare
+        AmmoStorage mockSpareAmmo = createMockAmmoStorage(mockCampaign, getAmmoType(""), 20);
+        addedPart = warehouse.addPart(mockSpareAmmo, true);
+        assertEquals(mockSpareAmmo, addedPart);
+
+        AmmoStorage mockRefitAmmo = createMockAmmoStorage(mockCampaign, getAmmoType(""), 20);
+        mockRefitAmmo.setRefitUnit(createMockUnit());
+        addedPart = warehouse.addPart(mockRefitAmmo, true);
+        assertEquals(mockRefitAmmo, addedPart);
+
+        // Test: getSpareParts
+        List<Part> spareParts = warehouse.getSpareParts();
+        assertEquals(4, spareParts.size());
+        assertTrue(spareParts.contains(mockSparePart));
+        assertTrue(spareParts.contains(mockSparePartUnderRepair));
+        assertTrue(spareParts.contains(mockSpareArmor));
+        assertTrue(spareParts.contains(mockSpareAmmo));
+
+        // Test: streamSpareParts
+        spareParts = warehouse.streamSpareParts().collect(Collectors.toList());
+        assertEquals(4, spareParts.size());
+        assertTrue(spareParts.contains(mockSparePart));
+        assertTrue(spareParts.contains(mockSparePartUnderRepair));
+        assertTrue(spareParts.contains(mockSpareArmor));
+        assertTrue(spareParts.contains(mockSpareAmmo));
+    }
+
+    @Test
+    public void testForEachSpareParts() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+
+        // The warehouse is empty!
+        warehouse.forEachSparePart(spare -> {
+            assertTrue(false);
+        });
+
+        // Spare
+        Part mockSparePart = spy(new MekLocation());
+        Part addedPart = warehouse.addPart(mockSparePart, true);
+        assertEquals(mockSparePart, addedPart);
+
+        Part mockUnitPart = spy(new MekLocation());
+        mockUnitPart.setUnit(createMockUnit());
+        addedPart = warehouse.addPart(mockUnitPart, true);
+        assertEquals(mockUnitPart, addedPart);
+
+        // Spare (being repaired)
+        Part mockSparePartUnderRepair = spy(new MekLocation());
+        mockSparePartUnderRepair.setTech(createMockTech());
+        addedPart = warehouse.addPart(mockSparePartUnderRepair, true);
+        assertEquals(mockSparePartUnderRepair, addedPart);
+
+        Part mockPartForRefit = spy(new MekLocation());
+        mockPartForRefit.setRefitUnit(createMockUnit());
+        addedPart = warehouse.addPart(mockPartForRefit, true);
+        assertEquals(mockPartForRefit, addedPart);
+
+        Part mockPartForRepairTask = spy(new MekLocation());
+        mockPartForRepairTask.setReservedBy(createMockTech());
+        addedPart = warehouse.addPart(mockPartForRepairTask, true);
+        assertEquals(mockPartForRepairTask, addedPart);
+
+        // Spare
+        Armor mockSpareArmor = createMockArmor(mockCampaign, EquipmentType.T_ARMOR_STANDARD, 16);
+        addedPart = warehouse.addPart(mockSpareArmor, true);
+        assertEquals(mockSpareArmor, addedPart);
+
+        Armor mockUnitArmor = createMockArmor(mockCampaign, EquipmentType.T_ARMOR_STANDARD, 16);
+        mockUnitArmor.setUnit(createMockUnit());
+        addedPart = warehouse.addPart(mockUnitArmor, true);
+        assertEquals(mockUnitArmor, addedPart);
+
+        // Spare
+        AmmoStorage mockSpareAmmo = createMockAmmoStorage(mockCampaign, getAmmoType(""), 20);
+        addedPart = warehouse.addPart(mockSpareAmmo, true);
+        assertEquals(mockSpareAmmo, addedPart);
+
+        AmmoStorage mockRefitAmmo = createMockAmmoStorage(mockCampaign, getAmmoType(""), 20);
+        mockRefitAmmo.setRefitUnit(createMockUnit());
+        addedPart = warehouse.addPart(mockRefitAmmo, true);
+        assertEquals(mockRefitAmmo, addedPart);
+
+        List<Part> spareParts = warehouse.getSpareParts();
+        assertEquals(4, spareParts.size());
+
+        warehouse.forEachSparePart(spare -> {
+            assertTrue(spareParts.contains(spare));
+        });
+    }
+
+    @Test
+    public void testFindSparePart() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+
+        // The warehouse is empty!
+        assertNull(warehouse.findSparePart(spare -> true));
+
+        // Spare
+        Part mockSparePart = spy(new MekLocation());
+        Part addedPart = warehouse.addPart(mockSparePart, true);
+        assertEquals(mockSparePart, warehouse.findSparePart(spare -> spare.getId() == mockSparePart.getId()));
+
+        Part mockUnitPart = spy(new MekLocation());
+        mockUnitPart.setUnit(createMockUnit());
+        addedPart = warehouse.addPart(mockUnitPart, true);
+        assertNull(warehouse.findSparePart(spare -> spare.getId() == mockUnitPart.getId()));
+
+        // Spare (being repaired)
+        Part mockSparePartUnderRepair = spy(new MekLocation());
+        mockSparePartUnderRepair.setTech(createMockTech());
+        addedPart = warehouse.addPart(mockSparePartUnderRepair, true);
+        assertEquals(mockSparePartUnderRepair, addedPart);
+        assertEquals(mockSparePartUnderRepair, warehouse.findSparePart(spare -> spare.getId() == mockSparePartUnderRepair.getId()));
+
+        Part mockPartForRefit = spy(new MekLocation());
+        mockPartForRefit.setRefitUnit(createMockUnit());
+        addedPart = warehouse.addPart(mockPartForRefit, true);
+        assertEquals(mockPartForRefit, addedPart);
+        assertNull(warehouse.findSparePart(spare -> spare.getId() == mockPartForRefit.getId()));
+
+        Part mockPartForRepairTask = spy(new MekLocation());
+        mockPartForRepairTask.setReservedBy(createMockTech());
+        addedPart = warehouse.addPart(mockPartForRepairTask, true);
+        assertEquals(mockPartForRepairTask, addedPart);
+        assertNull(warehouse.findSparePart(spare -> spare.getId() == mockPartForRepairTask.getId()));
+
+        // Spare
+        Armor mockSpareArmor = createMockArmor(mockCampaign, EquipmentType.T_ARMOR_STANDARD, 16);
+        addedPart = warehouse.addPart(mockSpareArmor, true);
+        assertEquals(mockSpareArmor, addedPart);
+        assertEquals(mockSpareArmor, warehouse.findSparePart(spare -> spare.getId() == mockSpareArmor.getId()));
+
+        Armor mockUnitArmor = createMockArmor(mockCampaign, EquipmentType.T_ARMOR_STANDARD, 16);
+        mockUnitArmor.setUnit(createMockUnit());
+        addedPart = warehouse.addPart(mockUnitArmor, true);
+        assertEquals(mockUnitArmor, addedPart);
+        assertNull(warehouse.findSparePart(spare -> spare.getId() == mockUnitArmor.getId()));
+
+        // Spare
+        AmmoStorage mockSpareAmmo = createMockAmmoStorage(mockCampaign, getAmmoType(""), 20);
+        addedPart = warehouse.addPart(mockSpareAmmo, true);
+        assertEquals(mockSpareAmmo, addedPart);
+        assertEquals(mockSpareAmmo, warehouse.findSparePart(spare -> spare.getId() == mockSpareAmmo.getId()));
+
+        AmmoStorage mockRefitAmmo = createMockAmmoStorage(mockCampaign, getAmmoType(""), 20);
+        mockRefitAmmo.setRefitUnit(createMockUnit());
+        addedPart = warehouse.addPart(mockRefitAmmo, true);
+        assertEquals(mockRefitAmmo, addedPart);
+        assertNull(warehouse.findSparePart(spare -> spare.getId() == mockRefitAmmo.getId()));
+
+        // Ensure we actually test the predicate, no matter how silly
+        assertNull(warehouse.findSparePart(spare -> false));
+
+        // The warehouse full of spare parts, so find (any) one!
+        Part sparePart = warehouse.findSparePart(spare -> true);
+        assertNotNull(sparePart);
+        assertTrue(sparePart.isSpare());
     }
 
     /**

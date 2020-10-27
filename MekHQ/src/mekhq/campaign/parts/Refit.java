@@ -1260,7 +1260,7 @@ public class Refit extends Part implements IAcquisitionWork {
         if (null == newArmorSupplies) {
             return null;
         }
-        return (Armor) oldUnit.getCampaign().findSparePart(part -> {
+        return (Armor) oldUnit.getCampaign().getWarehouse().findSparePart(part -> {
             if (part instanceof Armor && ((Armor) part).getType() == newArmorSupplies.getType()
                     && part.isClanTechBase() == newArmorSupplies.isClanTechBase()
                     && !part.isReservedForRefit()

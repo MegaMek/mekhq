@@ -305,7 +305,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupPartList() {
         partList = new JList<>();
         DefaultListModel<Part> partListModel = new DefaultListModel<>();
-        List<Part> parts = sourceCampaign.getSpareParts();
+        List<Part> parts = sourceCampaign.getWarehouse().getSpareParts();
         parts.sort(Comparator.comparing(Part::getName));
 
         for (Part part : parts) {

@@ -123,7 +123,7 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        ProtomekArmor a = (ProtomekArmor)campaign.findSparePart(part -> {
+        ProtomekArmor a = (ProtomekArmor)campaign.getWarehouse().findSparePart(part -> {
             return part instanceof ProtomekArmor
                 && part.isPresent()
                 && !part.isReservedForRefit()
@@ -135,7 +135,7 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
     }
 
     public void changeAmountAvailable(int amount) {
-        ProtomekArmor a = (ProtomekArmor)campaign.findSparePart(part -> {
+        ProtomekArmor a = (ProtomekArmor)campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part)
                 && part.isPresent();
         });
