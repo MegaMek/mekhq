@@ -125,8 +125,7 @@ public class CampaignOptionsDialog extends JDialog {
     private String camoCategory;
     private String camoFileName;
     private int colorIndex;
-    private String 
-      Category;
+    private String iconCategory;
     private String iconFileName;
     private Hashtable<String, JSpinner> hashSkillTargets;
     private Hashtable<String, JSpinner> hashGreenSkill;
