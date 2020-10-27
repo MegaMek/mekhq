@@ -72,7 +72,6 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.IconPackage;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -494,7 +493,7 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
-    public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c, IconPackage icons) {
+    public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c) {
         super(parent, modal);
         this.campaign = c;
         //this is a hack but I have no idea what is going on here
