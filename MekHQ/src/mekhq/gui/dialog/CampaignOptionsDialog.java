@@ -553,8 +553,6 @@ public class CampaignOptionsDialog extends JDialog {
         useToughnessBox = new JCheckBox();
         useArtilleryBox = new JCheckBox();
         useAbilitiesBox = new JCheckBox();
-        useEdgeBox = new JCheckBox();
-        useSupportEdgeBox = new JCheckBox();
         useImplantsBox = new JCheckBox();
         useAdvancedMedicalBox = new JCheckBox();
         useDylansRandomXpBox = new JCheckBox();
@@ -1505,13 +1503,14 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(useAbilitiesBox, gridBagConstraints);
 
-        useEdgeBox.setText(resourceMap.getString("useEdgeBox.text"));
+        useEdgeBox = new JCheckBox(resourceMap.getString("useEdgeBox.text"));
         useEdgeBox.setToolTipText(resourceMap.getString("useEdgeBox.toolTipText"));
         useEdgeBox.setName("useEdgeBox");
+        useEdgeBox.addActionListener(evt -> useSupportEdgeBox.setEnabled(useEdgeBox.isSelected()));
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(useEdgeBox, gridBagConstraints);
 
-        useSupportEdgeBox.setText(resourceMap.getString("useSupportEdgeBox.text"));
+        useSupportEdgeBox = new JCheckBox(resourceMap.getString("useSupportEdgeBox.text"));
         useSupportEdgeBox.setToolTipText(resourceMap.getString("useSupportEdgeBox.toolTipText"));
         useSupportEdgeBox.setName("useSupportEdgeBox");
         gridBagConstraints.gridy = ++gridy;
@@ -4431,7 +4430,9 @@ public class CampaignOptionsDialog extends JDialog {
         useToughnessBox.setSelected(options.useToughness());
         useArtilleryBox.setSelected(options.useArtillery());
         useAbilitiesBox.setSelected(options.useAbilities());
-        useEdgeBox.setSelected(options.useEdge());
+        if (useEdgeBox.isSelected() != options.useEdge()) {
+            useEdgeBox.doClick();
+        }
         useSupportEdgeBox.setSelected(options.useSupportEdge());
         useImplantsBox.setSelected(options.useImplants());
         altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
@@ -5025,7 +5026,7 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.getGameOptions().getOption("pilot_advantages").setValue(useAbilitiesBox.isSelected());
         options.setEdge(useEdgeBox.isSelected());
         campaign.getGameOptions().getOption("edge").setValue(useEdgeBox.isSelected());
-        options.setSupportEdge(useSupportEdgeBox.isSelected());
+        options.setSupportEdge(useEdgeBox.isSelected() && useSupportEdgeBox.isSelected());
         options.setImplants(useImplantsBox.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
