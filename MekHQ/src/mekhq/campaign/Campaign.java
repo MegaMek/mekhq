@@ -2051,8 +2051,8 @@ public class Campaign implements Serializable, ITechManager {
         int xpGained = 0;
         //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
         if (getCampaignOptions().useSupportEdge()
-                && (doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL))) {
-            if (roll == 2  && doctor.getCurrentEdge() > 0 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+                && doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL)) {
+            if ((roll == 2)  && (doctor.getCurrentEdge() > 0) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 doctor.setCurrentEdge(doctor.getCurrentEdge() - 1);
                 roll = Compute.d6(2);
                 report += medWork.fail() + "\n" + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
