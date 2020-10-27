@@ -3086,7 +3086,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void changeEdge(int amount) {
-        setEdge(getEdge() + amount);
+        setEdge(Math.max(getEdge() + amount, 0));
     }
 
     /**
@@ -3105,7 +3105,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void changeCurrentEdge(int amount) {
-        currentEdge += amount;
+        currentEdge = Math.max(currentEdge + amount, 0);
     }
 
     /**

@@ -2053,7 +2053,7 @@ public class Campaign implements Serializable, ITechManager {
         //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
         if (getCampaignOptions().useSupportEdge()
                 && doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL)) {
-            if ((roll == 2)  && (doctor.getCurrentEdge() > 0) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
+            if ((roll == 2) && (doctor.getCurrentEdge() > 0) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 doctor.changeCurrentEdge(-1);
                 roll = Compute.d6(2);
                 report += medWork.fail() + "\n" + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
@@ -2919,8 +2919,9 @@ public class Campaign implements Serializable, ITechManager {
             if ((getCampaignOptions().isDestroyByMargin()
                     && (getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll)))
                     || (!getCampaignOptions().isDestroyByMargin()
-                    && ((tech.getExperienceLevel(false) == SkillType.EXP_ELITE) //if an elite, primary tech and destroy by margin is NOT on
-                    || (tech.getPrimaryRole() == Person.T_SPACE_CREW))) // For vessel crews
+                            //if an elite, primary tech and destroy by margin is NOT on
+                            && ((tech.getExperienceLevel(false) == SkillType.EXP_ELITE)
+                                    || (tech.getPrimaryRole() == Person.T_SPACE_CREW))) // For vessel crews
                     && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
                 roll = tech.isRightTechTypeFor(partWork) ? Compute.d6(2) : Utilities.roll3d6();
