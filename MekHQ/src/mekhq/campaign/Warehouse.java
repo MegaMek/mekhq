@@ -140,6 +140,9 @@ public class Warehouse {
             MekHQ.triggerEvent(new PartRemovedEvent(part));
         }
 
+        // Clear the part's ID
+        part.setId(-1);
+
         // Remove child parts as well
         for (Part childPart : part.getChildParts()) {
             removePart(childPart);
@@ -173,7 +176,10 @@ public class Warehouse {
                         return spare;
                     }
                 } else {
-                    spare.incrementQuantity();
+                    // Add more spare parts
+                    for (int count = 0; count < part.getQuantity(); ++count) {
+                        spare.incrementQuantity();
+                    }
                     return spare;
                 }
             }
