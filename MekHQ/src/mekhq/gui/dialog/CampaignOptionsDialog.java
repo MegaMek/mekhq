@@ -71,6 +71,7 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.IconPackage;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
@@ -2816,28 +2817,7 @@ public class CampaignOptionsDialog extends JDialog {
         btnAddSPA = new JButton("Add Another Special Ability");
         btnAddSPA.addActionListener(evt -> btnAddSPA());
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panSpecialAbilities.add(btnAddSPA, gridBagConstraints);
-        btnAddSPA.setEnabled(!getUnusedSPA().isEmpty());
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-
-        for (String name : spaNames) {
-            panSpecialAbilities.add(new SpecialAbilityPanel(getCurrentSPA().get(name), this), gridBagConstraints);
-            gridBagConstraints.gridy++;
-        }
+        recreateSPAPanel(!getUnusedSPA().isEmpty());
 
         JScrollPane scrSPA = new JScrollPane(panSpecialAbilities);
         scrSPA.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -5352,10 +5332,13 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weighty = 1.0;
 
-        for (String title : getCurrentSPA().keySet()) {
-            panSpecialAbilities.add(new SpecialAbilityPanel(getCurrentSPA().get(title), this), gridBagConstraints);
+        NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+        getCurrentSPA().values().stream().sorted((o1, o2) ->
+                naturalOrderComparator.compare(o1.getDisplayName(), o2.getDisplayName())
+        ).forEach(spa -> {
+            panSpecialAbilities.add(new SpecialAbilityPanel(spa, this), gridBagConstraints);
             gridBagConstraints.gridy++;
-        }
+        });
         panSpecialAbilities.revalidate();
         panSpecialAbilities.repaint();
     }
