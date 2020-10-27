@@ -33,6 +33,7 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 import static org.junit.Assert.*;
@@ -341,13 +342,7 @@ public class WarehouseTest {
         Part mockUnitPart = spy(new MekLocation());
         mockUnitPart.setCampaign(mockCampaign);
         mockUnitPart.setQuantity(1);
-
-        Unit mockUnit = mock(Unit.class);
-        when(mockUnit.getId()).thenReturn(UUID.randomUUID());
-        Mech mockEntity = mock(Mech.class);
-        when(mockEntity.getWeight()).thenReturn(0.0); // CAW: match the 0 ton MekLocation above.
-        when(mockUnit.getEntity()).thenReturn(mockEntity);
-        mockUnitPart.setUnit(mockUnit);
+        mockUnitPart.setUnit(createMockUnit());
 
         // Add the new part that is part of a unit
         addedPart = warehouse.addPart(mockUnitPart, true);
@@ -476,6 +471,283 @@ public class WarehouseTest {
         assertEquals(60, ((AmmoStorage) addedAmmo).getShots());
     }
 
+    @Test
+    public void testAddSparePartWontMixWithRefitPart() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+
+        // Add a spare part to the warehouse reserved for a refit
+        Part mockPart = spy(new MekLocation());
+        mockPart.setCampaign(mockCampaign);
+        mockPart.setQuantity(1);
+        mockPart.setRefitUnit(createMockUnit());
+
+        // Add the part to our warehouse, merging it
+        // with any existing part (there are none)
+        Part addedPart = warehouse.addPart(mockPart, true);
+
+        // We should only have one of these parts
+        assertEquals(1, warehouse.getParts().size());
+        assertEquals(mockPart, addedPart);
+        assertFalse(addedPart.isSpare());
+        assertEquals(1, addedPart.getQuantity());
+
+        // Make a new part, also spare
+        Part mockSparePart = spy(new MekLocation());
+        mockSparePart.setCampaign(mockCampaign);
+        mockSparePart.setQuantity(2);
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            // Add the spare part to our warehouse, and
+            // ask that it be merged with an existing part
+            addedPart = warehouse.addPart(mockSparePart, true);
+            assertTrue(mockSparePart.getId() > 0);
+            assertEquals(mockSparePart, addedPart);
+            assertTrue(addedPart.isSpare());
+            assertEquals(2, addedPart.getQuantity());
+
+            // We should see that the original part was NOT changed as it is part
+            // of a refit
+            assertNull(eventSpy.findEvent(PartChangedEvent.class, e -> mockPart == e.getPart()));
+
+            // And we should see that the other part was added
+            assertNotNull(eventSpy.findEvent(PartNewEvent.class, e -> mockSparePart == e.getPart()));
+        }
+
+        // We should have two instances of the parts
+        assertEquals(2, warehouse.getParts().size());
+    }
+
+    @Test
+    public void testAddSparePartWontMixWithReplacementPart() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+
+        // Add a spare part to the warehouse reserved for
+        // an overnight task on a unit
+        Part mockPart = spy(new MekLocation());
+        mockPart.setCampaign(mockCampaign);
+        mockPart.setQuantity(1);
+        mockPart.setReservedBy(createMockTech());
+
+        // Add the part to our warehouse, merging it
+        // with any existing part (there are none)
+        Part addedPart = warehouse.addPart(mockPart, true);
+
+        // We should only have one of these parts
+        assertEquals(1, warehouse.getParts().size());
+        assertEquals(mockPart, addedPart);
+        assertFalse(addedPart.isSpare());
+        assertEquals(1, addedPart.getQuantity());
+
+        // Make a new part, also spare
+        Part mockSparePart = spy(new MekLocation());
+        mockSparePart.setCampaign(mockCampaign);
+        mockSparePart.setQuantity(2);
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            // Add the spare part to our warehouse, and
+            // ask that it be merged with an existing part
+            addedPart = warehouse.addPart(mockSparePart, true);
+            assertTrue(mockSparePart.getId() > 0);
+            assertEquals(mockSparePart, addedPart);
+            assertTrue(addedPart.isSpare());
+            assertEquals(2, addedPart.getQuantity());
+
+            // We should see that the original part was NOT changed as it is part
+            // of an overnight task
+            assertNull(eventSpy.findEvent(PartChangedEvent.class, e -> mockPart == e.getPart()));
+
+            // And we should see that the other part was added
+            assertNotNull(eventSpy.findEvent(PartNewEvent.class, e -> mockSparePart == e.getPart()));
+        }
+
+        // We should have two instances of the parts
+        assertEquals(2, warehouse.getParts().size());
+    }
+
+    @Test
+    public void testAddSparePartWontMixWithPartUnderRepair() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+
+        // Add a spare part under repair to the warehouse
+        Part mockPart = spy(new MekLocation());
+        mockPart.setCampaign(mockCampaign);
+        mockPart.setQuantity(1);
+        mockPart.setTech(createMockTech());
+
+        // Add the part to our warehouse, merging it
+        // with any existing part (there are none)
+        Part addedPart = warehouse.addPart(mockPart, true);
+
+        // We should only have one of these parts
+        assertEquals(1, warehouse.getParts().size());
+        assertEquals(mockPart, addedPart);
+        assertTrue(addedPart.isSpare());
+        assertEquals(1, addedPart.getQuantity());
+
+        // Make a new part, also spare
+        Part mockSparePart = spy(new MekLocation());
+        mockSparePart.setCampaign(mockCampaign);
+        mockSparePart.setQuantity(2);
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            // Add the spare part to our warehouse, and
+            // ask that it be merged with an existing part
+            addedPart = warehouse.addPart(mockSparePart, true);
+            assertTrue(mockSparePart.getId() > 0);
+            assertEquals(mockSparePart, addedPart);
+            assertTrue(addedPart.isSpare());
+            assertEquals(2, addedPart.getQuantity());
+
+            // We should see that the original part was NOT changed as it is part
+            // of an overnight task
+            assertNull(eventSpy.findEvent(PartChangedEvent.class, e -> mockPart == e.getPart()));
+
+            // And we should see that the other part was added
+            assertNotNull(eventSpy.findEvent(PartNewEvent.class, e -> mockSparePart == e.getPart()));
+        }
+
+        // We should have two instances of the parts
+        assertEquals(2, warehouse.getParts().size());
+    }
+
+    @Test
+    public void testAddSpareArmorWontMixWithRefitArmor() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+
+        // Add a spare armor to the warehouse reserved for a refit
+        Armor mockArmor = createMockArmor(mockCampaign, EquipmentType.T_ARMOR_STANDARD, 16);
+        mockArmor.setRefitUnit(createMockUnit());
+
+        // Add the armor to our warehouse
+        Part addedArmor = warehouse.addPart(mockArmor, true);
+        assertTrue(addedArmor instanceof Armor);
+
+        // We should only have one of these parts
+        assertEquals(1, warehouse.getParts().size());
+        assertEquals(mockArmor, addedArmor);
+        assertFalse(addedArmor.isSpare());
+
+        // Make some new armor, also spare
+        Armor mockSpareArmor = createMockArmor(mockCampaign, EquipmentType.T_ARMOR_STANDARD, 32);
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            // Add the spare part to our warehouse, and
+            // ask that it be merged with an existing part
+            addedArmor = warehouse.addPart(mockSpareArmor, true);
+            assertTrue(mockSpareArmor.getId() > 0);
+            assertEquals(mockSpareArmor, addedArmor);
+            assertTrue(addedArmor.isSpare());
+
+            // Double check the math from above.
+            assertEquals(2.0, addedArmor.getTonnage(), 0.000001);
+            assertEquals(32, ((Armor) addedArmor).getAmount());
+
+            // We should see that the original part was NOT changed as it is part
+            // of a refit
+            assertNull(eventSpy.findEvent(PartChangedEvent.class, e -> mockArmor == e.getPart()));
+
+            // And we should see that the other part was added
+            assertNotNull(eventSpy.findEvent(PartNewEvent.class, e -> mockSpareArmor == e.getPart()));
+        }
+
+        // We should have two instances of the parts
+        assertEquals(2, warehouse.getParts().size());
+    }
+
+    @Test
+    public void testAddSpareArmorWontMixWithReplacementArmor() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+
+        // Add a spare part to the warehouse reserved for
+        // an overnight task on a unit
+        Armor mockArmor = createMockArmor(mockCampaign, EquipmentType.T_ARMOR_STANDARD, 16);
+        mockArmor.setReservedBy(createMockTech());
+
+        // Add the armor to our warehouse
+        Part addedArmor = warehouse.addPart(mockArmor, true);
+        assertTrue(addedArmor instanceof Armor);
+
+        // We should only have one of these parts
+        assertEquals(1, warehouse.getParts().size());
+        assertEquals(mockArmor, addedArmor);
+        assertFalse(addedArmor.isSpare());
+
+        // Make some new armor, also spare
+        Armor mockSpareArmor = createMockArmor(mockCampaign, EquipmentType.T_ARMOR_STANDARD, 32);
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            // Add the spare part to our warehouse, and
+            // ask that it be merged with an existing part
+            addedArmor = warehouse.addPart(mockSpareArmor, true);
+            assertTrue(mockSpareArmor.getId() > 0);
+            assertEquals(mockSpareArmor, addedArmor);
+            assertTrue(addedArmor.isSpare());
+
+            // Double check the math from above.
+            assertEquals(2.0, addedArmor.getTonnage(), 0.000001);
+            assertEquals(32, ((Armor) addedArmor).getAmount());
+
+            // We should see that the original part was NOT changed as it is part
+            // of a refit
+            assertNull(eventSpy.findEvent(PartChangedEvent.class, e -> mockArmor == e.getPart()));
+
+            // And we should see that the other part was added
+            assertNotNull(eventSpy.findEvent(PartNewEvent.class, e -> mockSpareArmor == e.getPart()));
+        }
+
+        // We should have two instances of the parts
+        assertEquals(2, warehouse.getParts().size());
+    }
+
+    @Test
+    public void testAddSpareAmmoStorageWonMixWithRefitAmmoStorage() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+
+        // Add some spare ammo to the warehouse reserved for a refit
+        AmmoStorage mockAmmoStorage = createMockAmmoStorage(mockCampaign, getAmmoType("ISAC5 Ammo"), 20);
+        mockAmmoStorage.setRefitUnit(createMockUnit());
+
+        // Add the ammo to our warehouse, merging it
+        // with any existing part (there are none)
+        Part addedAmmo = warehouse.addPart(mockAmmoStorage, true);
+        assertTrue(addedAmmo instanceof AmmoStorage);
+
+        // We should only have one of these parts
+        assertEquals(1, warehouse.getParts().size());
+        assertEquals(mockAmmoStorage, addedAmmo);
+        assertFalse(addedAmmo.isSpare());
+
+        // Make some new ammo, also spare
+        AmmoStorage mockSpareAmmo = createMockAmmoStorage(mockCampaign, getAmmoType("ISAC5 Ammo"), 40);
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            // Add the spare ammo to our warehouse, and
+            // ask that it be merged with an existing part
+            addedAmmo = warehouse.addPart(mockSpareAmmo, true);
+            assertTrue(addedAmmo instanceof AmmoStorage);
+            assertTrue(mockSpareAmmo.getId() > 0);
+            assertEquals(mockSpareAmmo, addedAmmo);
+            assertTrue(addedAmmo.isSpare());
+            assertEquals(2.0, addedAmmo.getTonnage(), 0.000001);
+            assertEquals(40, ((AmmoStorage) addedAmmo).getShots());
+
+            // We should see that the original part was changed
+            assertNull(eventSpy.findEvent(PartChangedEvent.class, e -> mockAmmoStorage == e.getPart()));
+
+            // And we should see that the other part was never added
+            assertNotNull(eventSpy.findEvent(PartNewEvent.class, e -> mockSpareAmmo == e.getPart()));
+        }
+
+        // We should have 2 instances of these parts
+        assertEquals(2, warehouse.getParts().size());
+    }
+
     /**
      * Creates a mock part with the given ID.
      * @param id The unique ID of the part.
@@ -486,6 +758,30 @@ public class WarehouseTest {
         when(mockPart.getId()).thenReturn(id);
 
         return mockPart;
+    }
+
+    /**
+     * Creates a mock unit.
+     * @return The mock unit.
+     */
+    private Unit createMockUnit() {
+        Unit mockUnit = mock(Unit.class);
+        when(mockUnit.getId()).thenReturn(UUID.randomUUID());
+        Mech mockEntity = mock(Mech.class);
+        when(mockEntity.getWeight()).thenReturn(0.0); // CAW: match spare parts without unit tonnage.
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+
+        return mockUnit;
+    }
+
+    /**
+     * Creates a mock tech.
+     * @return The mock tech.
+     */
+    private Person createMockTech() {
+        Person mockTech = mock(Person.class);
+        when(mockTech.getId()).thenReturn(UUID.randomUUID());
+        return mockTech;
     }
 
     /**
@@ -514,19 +810,7 @@ public class WarehouseTest {
      * @param name The lookup name for the AmmoType.
      * @return The ammo type for the given name.
      */
-    private AmmoType getAmmoType(String name) {
-        initializeAmmoTypes();
-
+    private synchronized static AmmoType getAmmoType(String name) {
         return (AmmoType) EquipmentType.get(name);
-    }
-
-    private static boolean initializedAmmoTypes;
-
-    private synchronized static void initializeAmmoTypes() {
-        if (!initializedAmmoTypes) {
-            initializedAmmoTypes = true;
-
-            AmmoType.initializeTypes();
-        }
     }
 }

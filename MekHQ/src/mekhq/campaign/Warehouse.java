@@ -160,7 +160,7 @@ public class Warehouse {
         Objects.requireNonNull(part);
 
         if ((null == part.getUnit()) && !part.hasParentPart()
-                && !part.isReservedForRefit() && !part.isReservedForReplacement()) {
+                && !part.isReservedForReplacement()) {
             Part spare = checkForExistingSparePart(part);
             if (null != spare) {
                 if (part instanceof Armor) {

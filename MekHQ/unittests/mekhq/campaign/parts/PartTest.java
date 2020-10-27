@@ -98,7 +98,7 @@ public class PartTest {
         when(mockTech.getId()).thenReturn(UUID.randomUUID());
 
         Part part = new MekSensor();
-        part.setReserveId(mockTech);
+        part.setReservedBy(mockTech);
 
         assertNull(part.getUnit());
         assertNull(part.getParentPart());
