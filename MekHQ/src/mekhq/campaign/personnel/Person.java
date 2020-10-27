@@ -3093,9 +3093,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    public void changeEdge(int amount) {
+        setEdge(getEdge() + amount);
+    }
+
     /**
      * Resets support personnel edge points to the purchased level. Used for weekly refresh.
-     *
      */
     public void resetCurrentEdge() {
         setCurrentEdge(getEdge());
@@ -3111,7 +3114,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     /**
      *  Returns this person's currently available edge points. Used for weekly refresh.
-     *
      */
     public int getCurrentEdge() {
         return currentEdge;
