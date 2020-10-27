@@ -4611,9 +4611,11 @@ public class CampaignOptionsDialog extends JDialog {
                 allSelected = false;
             }
         }
-        if (allSelected && !allPortraitsBox.isSelected()) {
+        if (allSelected != allPortraitsBox.isSelected()) {
             allPortraitsBox.doClick();
-        } else if (noneSelected && !noPortraitsBox.isSelected()) {
+        }
+
+        if (noneSelected != noPortraitsBox.isSelected()) {
             noPortraitsBox.doClick();
         }
 
