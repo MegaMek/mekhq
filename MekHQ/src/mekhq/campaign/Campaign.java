@@ -173,7 +173,7 @@ public class Campaign implements Serializable, ITechManager {
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
     // and more still - we're tracking DropShips and WarShips in a separate set so that we can assign units to transports
     private Hangar units = new Hangar();
-    private Set<UUID> transportShips = new HashSet<>();
+    private Set<Unit> transportShips = new HashSet<>();
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
     private TreeMap<Integer, Part> parts = new TreeMap<>();
     private TreeMap<Integer, Force> forceIds = new TreeMap<>();
@@ -966,6 +966,8 @@ public class Campaign implements Serializable, ITechManager {
      * @param u A {@link Unit} to import into the campaign.
      */
     public void importUnit(Unit u) {
+        Objects.requireNonNull(u);
+
         MekHQ.getLogger().debug("Importing unit: (" + u.getId() + "): " + u.getName());
 
         getHangar().addUnit(u);
@@ -976,7 +978,7 @@ public class Campaign implements Serializable, ITechManager {
         //Jumpships and space stations are intentionally ignored at present, because this functionality is being
         //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
         if ((u.getEntity() instanceof Dropship) || (u.getEntity() instanceof Warship)) {
-            addTransportShip(u.getId());
+            addTransportShip(u);
         }
 
         // Assign an entity ID to our new unit
@@ -990,23 +992,23 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * Adds an entry to the list of transit-capable transport ships. We'll use this
      * to look for empty bays that ground units can be assigned to
-     * @param id - The unique ID of the ship we want to add to this Set
+     * @param unit - The ship we want to add to this Set
      */
-    public void addTransportShip(UUID id) {
-        MekHQ.getLogger().debug("Adding DropShip/WarShip: " + id);
+    public void addTransportShip(Unit unit) {
+        MekHQ.getLogger().debug("Adding DropShip/WarShip: " + unit.getId());
 
-        transportShips.add(id);
+        transportShips.add(Objects.requireNonNull(unit));
     }
 
     /**
      * Deletes an entry from the list of transit-capable transport ships. This gets updated when
      * the ship is removed from the campaign for one reason or another
-     * @param id - The unique ID of the ship we want to remove from this Set
+     * @param unit - The ship we want to remove from this Set
      */
-    public void removeTransportShip(UUID id) {
-        MekHQ.getLogger().debug("Removing DropShip/WarShip: " + id);
+    public void removeTransportShip(Unit unit) {
+        MekHQ.getLogger().debug("Removing DropShip/WarShip: " + unit.getId());
 
-        transportShips.remove(id);
+        transportShips.remove(unit);
     }
 
     /**
@@ -1072,7 +1074,7 @@ public class Campaign implements Serializable, ITechManager {
         //Jumpships and space stations are intentionally ignored at present, because this functionality is being
         //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
         if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Warship)) {
-            addTransportShip(id);
+            addTransportShip(unit);
         }
 
         unit.initializeParts(true);
@@ -1592,8 +1594,7 @@ public class Campaign implements Serializable, ITechManager {
         //be careful in using this next line
         p.postProcessCampaignAddition();
         // don't add missing parts if they don't have units or units with not id
-        if (p instanceof MissingPart
-                && (null == p.getUnit() || null == p.getUnitId())) {
+        if ((p instanceof MissingPart) && (null == p.getUnit())) {
             p.setId(-1);
             return;
         }
@@ -1693,7 +1694,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void addPartWithoutId(Part p) {
-        if ((p instanceof MissingPart) && (null == p.getUnitId())) {
+        if ((p instanceof MissingPart) && (null == p.getUnit())) {
             // we shouldn't have spare missing parts. I think their existence is
             // a relic.
             return;
@@ -1721,7 +1722,7 @@ public class Campaign implements Serializable, ITechManager {
         if (p instanceof AmmoStorage) {
             return ((AmmoStorage) p).getShots();
         }
-        return ((p.getUnit() != null) || (p.getUnitId() != null)) ? 1 : p.getQuantity();
+        return (p.getUnit() != null) ? 1 : p.getQuantity();
     }
 
     private PartInUse getPartInUse(Part p) {
@@ -1745,7 +1746,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private void updatePartInUseData(PartInUse piu, Part p) {
-        if ((p.getUnit() != null) || (p.getUnitId() != null) || (p instanceof MissingPart)) {
+        if ((p.getUnit() != null) || (p instanceof MissingPart)) {
             piu.setUseCount(piu.getUseCount() + getQuantity(p));
         } else {
             if (p.isPresent()) {
@@ -2051,9 +2052,9 @@ public class Campaign implements Serializable, ITechManager {
         int xpGained = 0;
         //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
         if (getCampaignOptions().useSupportEdge()
-                && (doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL))) {
-            if (roll == 2  && doctor.getCurrentEdge() > 0 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
-                doctor.setCurrentEdge(doctor.getCurrentEdge() - 1);
+                && doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL)) {
+            if ((roll == 2) && (doctor.getCurrentEdge() > 0) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
+                doctor.changeCurrentEdge(-1);
                 roll = Compute.d6(2);
                 report += medWork.fail() + "\n" + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
                         + " rolls " + roll + ":";
@@ -2061,7 +2062,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         if (roll >= target.getValue()) {
             report = report + medWork.succeed();
-            Unit u = getHangar().getUnit(medWork.getUnitId());
+            Unit u = medWork.getUnit();
             if (null != u) {
                 u.resetPilotAndEntity();
             }
@@ -2532,12 +2533,10 @@ public class Campaign implements Serializable, ITechManager {
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ":";
         //Edge reroll, if applicable
-        if (roll < target.getValue()
-                && getCampaignOptions().useSupportEdge()
-                && null != person
+        if (getCampaignOptions().useSupportEdge() && (roll < target.getValue()) && (person != null)
                 && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
-                && person.getCurrentEdge() > 0) {
-            person.setCurrentEdge(person.getCurrentEdge() - 1);
+                && (person.getCurrentEdge() > 0)) {
+            person.changeCurrentEdge(-1);
             roll = Compute.d6(2);
             report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
         }
@@ -2700,9 +2699,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void refit(Refit r) {
-        Person tech = r.getUnit().getEngineer() == null
-                ? r.getTech() : r.getUnit().getEngineer();
-        if (null == tech) {
+        Person tech = (r.getUnit().getEngineer() == null) ? r.getTech() : r.getUnit().getEngineer();
+        if (tech == null) {
             addReport("No tech is assigned to refit " + r.getOriginalEntity().getShortName() + ". Refit cancelled.");
             r.cancel();
             return;
@@ -2734,21 +2732,18 @@ public class Campaign implements Serializable, ITechManager {
                     wrongType = " <b>Warning: wrong tech type for this refit.</b>";
                 }
                 report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ": ";
-                if (roll < target.getValue() && getCampaignOptions().useSupportEdge()
+                if (getCampaignOptions().useSupportEdge() && (roll < target.getValue())
                         && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT)
-                        && tech.getCurrentEdge() > 0) {
-                    tech.setCurrentEdge(tech.getCurrentEdge() - 1);
-                    if (tech.isRightTechTypeFor(r)) {
-                        roll = Compute.d6(2);
-                    } else {
-                        roll = Utilities.roll3d6();
-                    }
+                        && (tech.getCurrentEdge() > 0)) {
+                    tech.changeCurrentEdge(-1);
+                    roll = tech.isRightTechTypeFor(r) ? Compute.d6(2) : Utilities.roll3d6();
                     // This is needed to update the edge values of individual crewmen
                     if (tech.isEngineer()) {
                         tech.setEdgeUsed(tech.getEdgeUsed() - 1);
                     }
                     report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
                 }
+
                 if (roll >= target.getValue()) {
                     report += r.succeed();
                 } else {
@@ -2919,19 +2914,17 @@ public class Campaign implements Serializable, ITechManager {
         //if we fail and would break a part, here's a chance to use Edge for a reroll...
         if (getCampaignOptions().useSupportEdge()
                 && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)
-                && tech.getCurrentEdge() > 0
-                && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+                && (tech.getCurrentEdge() > 0)
+                && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
             if ((getCampaignOptions().isDestroyByMargin()
-                    && getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll))
-                    || (!getCampaignOptions().isDestroyByMargin() && (tech.getExperienceLevel(false) == SkillType.EXP_ELITE //if an elite, primary tech and destroy by margin is NOT on
-                                    || tech.getPrimaryRole() == Person.T_SPACE_CREW)) // For vessel crews
-                            && roll < target.getValue()) {
-                tech.setCurrentEdge(tech.getCurrentEdge() - 1);
-                if (tech.isRightTechTypeFor(partWork)) {
-                    roll = Compute.d6(2);
-                } else {
-                    roll = Utilities.roll3d6();
-                }
+                    && (getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll)))
+                    || (!getCampaignOptions().isDestroyByMargin()
+                            //if an elite, primary tech and destroy by margin is NOT on
+                            && ((tech.getExperienceLevel(false) == SkillType.EXP_ELITE)
+                                    || (tech.getPrimaryRole() == Person.T_SPACE_CREW))) // For vessel crews
+                    && (roll < target.getValue())) {
+                tech.changeCurrentEdge(-1);
+                roll = tech.isRightTechTypeFor(partWork) ? Compute.d6(2) : Utilities.roll3d6();
                 //This is needed to update the edge values of individual crewmen
                 if (tech.isEngineer()) {
                     tech.setEdgeUsed(tech.getEdgeUsed() + 1);
@@ -2939,6 +2932,7 @@ public class Campaign implements Serializable, ITechManager {
                 report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " + roll + ":";
             }
         }
+
         if (roll >= target.getValue()) {
             report = report + partWork.succeed();
             if (getCampaignOptions().payForRepairs()
@@ -2962,8 +2956,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         } else {
             int modePenalty = partWork.getMode().expReduction;
-            int effectiveSkillLvl = tech.getSkillForWorkingOn(partWork)
-                    .getExperienceLevel() - modePenalty;
+            int effectiveSkillLvl = tech.getSkillForWorkingOn(partWork).getExperienceLevel() - modePenalty;
             if (getCampaignOptions().isDestroyByMargin()) {
                 if (getCampaignOptions().getDestroyMargin() > (target.getValue() - roll)) {
                     // not destroyed - set the effective level as low as
@@ -3280,7 +3273,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 } else if (p.checkNaturalHealing(15)) {
                     addReport(p.getHyperlinkedFullTitle() + " heals naturally!");
-                    Unit u = getHangar().getUnit(p.getUnitId());
+                    Unit u = p.getUnit();
                     if (u != null) {
                         u.resetPilotAndEntity();
                     }
@@ -3289,7 +3282,7 @@ public class Campaign implements Serializable, ITechManager {
             // TODO Advanced Medical needs to go away from here later on
             if (getCampaignOptions().useAdvancedMedical()) {
                 InjuryUtil.resolveDailyHealing(this, p);
-                Unit u = getHangar().getUnit(p.getUnitId());
+                Unit u = p.getUnit();
                 if (u != null) {
                     u.resetPilotAndEntity();
                 }
@@ -3569,7 +3562,7 @@ public class Campaign implements Serializable, ITechManager {
         removeUnitFromForce(unit);
 
         //If this is a ship, remove it from the list of potential transports
-        removeTransportShip(id);
+        removeTransportShip(unit);
 
         // finally remove the unit
         getHangar().removeUnit(unit.getId());
@@ -3592,7 +3585,7 @@ public class Campaign implements Serializable, ITechManager {
 
         person.getGenealogy().clearGenealogy(this);
 
-        Unit u = getHangar().getUnit(person.getUnitId());
+        Unit u = person.getUnit();
         if (null != u) {
             u.remove(person, true);
         }
@@ -3839,7 +3832,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Force getForceFor(Person p) {
-        Unit u = getHangar().getUnit(p.getUnitId());
+        Unit u = p.getUnit();
         if (u != null) {
             return getForceFor(u);
         } else if (p.isTech()) {
@@ -3856,8 +3849,8 @@ public class Campaign implements Serializable, ITechManager {
     public void restore() {
         // if we fail to restore equipment parts then remove them
         // and possibly re-initialize and diagnose unit
-        ArrayList<Part> partsToRemove = new ArrayList<>();
-        ArrayList<UUID> unitsToCheck = new ArrayList<>();
+        List<Part> partsToRemove = new ArrayList<>();
+        Set<Unit> unitsToCheck = new HashSet<>();
 
         for (Part part : getParts()) {
             if (part instanceof EquipmentPart) {
@@ -3875,8 +3868,8 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         for (Part remove : partsToRemove) {
-            if (null != remove.getUnitId() && !unitsToCheck.contains(remove.getUnitId())) {
-                unitsToCheck.add(remove.getUnitId());
+            if (remove.getUnit() != null) {
+                unitsToCheck.add(remove.getUnit());
             }
             removePart(remove);
         }
@@ -3890,19 +3883,16 @@ public class Campaign implements Serializable, ITechManager {
                 // Aerospace parts have changed after 0.45.4. Reinitialize parts for Small Craft and up
                 if (unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)
                         || unit.getEntity().hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)) {
-                    unitsToCheck.add(unit.getId());
+                    unitsToCheck.add(unit);
                 }
             }
 
             unit.resetEngineer();
         }
 
-        for (UUID uid : unitsToCheck) {
-            Unit u = getHangar().getUnit(uid);
-            if (null != u) {
-                u.initializeParts(true);
-                u.runDiagnostic(false);
-            }
+        for (Unit u : unitsToCheck) {
+            u.initializeParts(true);
+            u.runDiagnostic(false);
         }
 
         shoppingList.restore();
@@ -5123,7 +5113,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void personUpdated(Person p) {
-        Unit u = getHangar().getUnit(p.getUnitId());
+        Unit u = p.getUnit();
         if (null != u) {
             u.resetPilotAndEntity();
         }
@@ -6829,8 +6819,8 @@ public class Campaign implements Serializable, ITechManager {
      * Returns our list of potential transport ships
      * @return
      */
-    public Set<UUID> getTransportShips() {
-        return transportShips;
+    public Set<Unit> getTransportShips() {
+        return Collections.unmodifiableSet(transportShips);
     }
 
     public void doMaintenance(Unit u) {
@@ -7182,9 +7172,9 @@ public class Campaign implements Serializable, ITechManager {
                                     // TODO : Fix this so we aren't using a hack that just assumes IS2
                                     p.setOriginalUnitTech(Person.TECH_IS2);
                                 }
-                                if ((null != p.getUnitId()) && (null != getHangar().getUnit(p.getUnitId()))
-                                        && ms.getName().equals(getHangar().getUnit(p.getUnitId()).getEntity().getShortNameRaw())) {
-                                    p.setOriginalUnitId(p.getUnitId());
+                                if ((null != p.getUnit())
+                                        && ms.getName().equals(p.getUnit().getEntity().getShortNameRaw())) {
+                                    p.setOriginalUnitId(p.getUnit().getId());
                                 }
                             }
                         }

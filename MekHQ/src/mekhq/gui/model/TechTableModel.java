@@ -88,7 +88,7 @@ public class TechTableModel extends DataTableModel {
     public String getTechDesc(Person tech, boolean overtimeAllowed, IPartWork part) {
         StringBuilder toReturn = new StringBuilder(128);
         toReturn.append("<html><font size='2'");
-        if (null != part && null != part.getUnit() && tech.getTechUnitIDs().contains(part.getUnit().getId())) {
+        if ((null != part) && (null != part.getUnit()) && tech.getTechUnits().contains(part.getUnit())) {
             toReturn.append(" color='green'><b>@");
         }
         else {

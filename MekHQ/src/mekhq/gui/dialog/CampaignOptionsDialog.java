@@ -71,6 +71,7 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -124,7 +125,8 @@ public class CampaignOptionsDialog extends JDialog {
     private String camoCategory;
     private String camoFileName;
     private int colorIndex;
-    private String iconCategory;
+    private String 
+      Category;
     private String iconFileName;
     private Hashtable<String, JSpinner> hashSkillTargets;
     private Hashtable<String, JSpinner> hashGreenSkill;
@@ -552,8 +554,6 @@ public class CampaignOptionsDialog extends JDialog {
         useToughnessBox = new JCheckBox();
         useArtilleryBox = new JCheckBox();
         useAbilitiesBox = new JCheckBox();
-        useEdgeBox = new JCheckBox();
-        useSupportEdgeBox = new JCheckBox();
         useImplantsBox = new JCheckBox();
         useAdvancedMedicalBox = new JCheckBox();
         useDylansRandomXpBox = new JCheckBox();
@@ -1504,13 +1504,14 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(useAbilitiesBox, gridBagConstraints);
 
-        useEdgeBox.setText(resourceMap.getString("useEdgeBox.text"));
+        useEdgeBox = new JCheckBox(resourceMap.getString("useEdgeBox.text"));
         useEdgeBox.setToolTipText(resourceMap.getString("useEdgeBox.toolTipText"));
         useEdgeBox.setName("useEdgeBox");
+        useEdgeBox.addActionListener(evt -> useSupportEdgeBox.setEnabled(useEdgeBox.isSelected()));
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(useEdgeBox, gridBagConstraints);
 
-        useSupportEdgeBox.setText(resourceMap.getString("useSupportEdgeBox.text"));
+        useSupportEdgeBox = new JCheckBox(resourceMap.getString("useSupportEdgeBox.text"));
         useSupportEdgeBox.setToolTipText(resourceMap.getString("useSupportEdgeBox.toolTipText"));
         useSupportEdgeBox.setName("useSupportEdgeBox");
         gridBagConstraints.gridy = ++gridy;
@@ -2816,28 +2817,7 @@ public class CampaignOptionsDialog extends JDialog {
         btnAddSPA = new JButton("Add Another Special Ability");
         btnAddSPA.addActionListener(evt -> btnAddSPA());
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panSpecialAbilities.add(btnAddSPA, gridBagConstraints);
-        btnAddSPA.setEnabled(!getUnusedSPA().isEmpty());
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-
-        for (String name : spaNames) {
-            panSpecialAbilities.add(new SpecialAbilityPanel(getCurrentSPA().get(name), this), gridBagConstraints);
-            gridBagConstraints.gridy++;
-        }
+        recreateSPAPanel(!getUnusedSPA().isEmpty());
 
         JScrollPane scrSPA = new JScrollPane(panSpecialAbilities);
         scrSPA.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -4430,7 +4410,9 @@ public class CampaignOptionsDialog extends JDialog {
         useToughnessBox.setSelected(options.useToughness());
         useArtilleryBox.setSelected(options.useArtillery());
         useAbilitiesBox.setSelected(options.useAbilities());
-        useEdgeBox.setSelected(options.useEdge());
+        if (useEdgeBox.isSelected() != options.useEdge()) {
+            useEdgeBox.doClick();
+        }
         useSupportEdgeBox.setSelected(options.useSupportEdge());
         useImplantsBox.setSelected(options.useImplants());
         altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
@@ -4610,9 +4592,11 @@ public class CampaignOptionsDialog extends JDialog {
                 allSelected = false;
             }
         }
-        if (allSelected && !allPortraitsBox.isSelected()) {
+        if (allSelected != allPortraitsBox.isSelected()) {
             allPortraitsBox.doClick();
-        } else if (noneSelected && !noPortraitsBox.isSelected()) {
+        }
+
+        if (noneSelected != noPortraitsBox.isSelected()) {
             noPortraitsBox.doClick();
         }
 
@@ -5022,7 +5006,7 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.getGameOptions().getOption("pilot_advantages").setValue(useAbilitiesBox.isSelected());
         options.setEdge(useEdgeBox.isSelected());
         campaign.getGameOptions().getOption("edge").setValue(useEdgeBox.isSelected());
-        options.setSupportEdge(useSupportEdgeBox.isSelected());
+        options.setSupportEdge(useEdgeBox.isSelected() && useSupportEdgeBox.isSelected());
         options.setImplants(useImplantsBox.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
@@ -5348,10 +5332,13 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weighty = 1.0;
 
-        for (String title : getCurrentSPA().keySet()) {
-            panSpecialAbilities.add(new SpecialAbilityPanel(getCurrentSPA().get(title), this), gridBagConstraints);
+        NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+        getCurrentSPA().values().stream().sorted((o1, o2) ->
+                naturalOrderComparator.compare(o1.getDisplayName(), o2.getDisplayName())
+        ).forEach(spa -> {
+            panSpecialAbilities.add(new SpecialAbilityPanel(spa, this), gridBagConstraints);
             gridBagConstraints.gridy++;
-        }
+        });
         panSpecialAbilities.revalidate();
         panSpecialAbilities.repaint();
     }

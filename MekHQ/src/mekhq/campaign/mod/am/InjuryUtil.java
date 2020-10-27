@@ -105,7 +105,7 @@ public final class InjuryUtil {
 
     /** Generate combat injuries spread through the whole body */
     public static Collection<Injury> genInjuries(Campaign c, Person p, int hits) {
-        final Unit u = c.getUnit(p.getUnitId());
+        final Unit u = p.getUnit();
         final Entity en = (null != u) ? u.getEntity() : null;
         final boolean mwasf = ((en instanceof Mech) || (en instanceof Aero));
         final int critMod = mwasf ? 0 : 2;
@@ -270,20 +270,22 @@ public final class InjuryUtil {
                 if (roll < Math.max(1, fumbleLimit / 10)) {
                     mistakeXP += c.getCampaignOptions().getMistakeXP();
                     xpGained += mistakeXP;
-                } else if (roll > Math.min(98, 99 - (int)Math.round((99 - critLimit) / 10.0))) {
+                } else if (roll > Math.min(98, 99 - (int) Math.round((99 - critLimit) / 10.0))) {
                     successXP += c.getCampaignOptions().getSuccessXP();
                     xpGained += successXP;
                 }
                 final int critTimeReduction = i.getTime() - (int) Math.floor(i.getTime() * 0.9);
                 //Reroll fumbled treatment check with Edge if applicable
-                if (roll < fumbleLimit && c.getCampaignOptions().useSupportEdge()
-                        && (doc.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL) && doc.getCurrentEdge() > 0)) {
+                if (c.getCampaignOptions().useSupportEdge() && (roll < fumbleLimit)
+                        && doc.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL)
+                        && (doc.getCurrentEdge() > 0)) {
                     result.add(new GameEffect(
                     String.format("%s made a mistake in the treatment of %s, but used Edge to reroll.",
                             doc.getHyperlinkedFullTitle(), p.getHyperlinkedName())));
-                    doc.setCurrentEdge(doc.getCurrentEdge() - 1);
+                    doc.changeCurrentEdge(-1);
                     roll = Compute.randomInt(100);
                 }
+
                 if (roll < fumbleLimit) {
                     result.add(new GameEffect(
                         String.format("%s made a mistake in the treatment of %s and caused %s %s to worsen.",
@@ -327,14 +329,14 @@ public final class InjuryUtil {
                             }
                             i.setWorkedOn(true);
                             MedicalLogger.successfullyTreated(doc, p, c.getLocalDate(), i);
-                            Unit u = c.getUnit(p.getUnitId());
+                            Unit u = p.getUnit();
                             if (null != u) {
                                 u.resetPilotAndEntity();
                             }
                         }));
                 }
                 i.setWorkedOn(true);
-                Unit u = c.getUnit(p.getUnitId());
+                Unit u = p.getUnit();
                 if (null != u) {
                     u.resetPilotAndEntity();
                 }
