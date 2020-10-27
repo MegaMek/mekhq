@@ -3509,7 +3509,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 //This overwrites the Edge value assigned above.
                 if (getCampaign().getCampaignOptions().useEdge()) {
                     double sumEdge = 0;
-                    int edge = 0;
+                    int edge;
                     for (Person p : drivers) {
                         sumEdge += p.getEdge();
                     }
@@ -3893,7 +3893,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         if (engineer.getEdgeUsed() > 0) {
                             //Don't subtract an Edge if the individual has none left
                             if (p.getCurrentEdge() > 0) {
-                                p.setCurrentEdge(p.getCurrentEdge() - 1);
+                                p.changeCurrentEdge(-1);
                                 engineer.setEdgeUsed(engineer.getEdgeUsed() - 1);
                             }
                         }

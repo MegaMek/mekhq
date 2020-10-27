@@ -2052,7 +2052,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            MekHQ.getLogger().error(Person.class, "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
@@ -2067,7 +2067,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            MekHQ.getLogger().error(Person.class, "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -2096,7 +2096,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            MekHQ.getLogger().error(Person.class, "Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
@@ -2112,7 +2112,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            MekHQ.getLogger().error(Person.class, "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -2129,7 +2129,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
-                            MekHQ.getLogger().error(Person.class, "Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
@@ -3102,6 +3102,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public void setCurrentEdge(int e) {
         currentEdge = e;
+    }
+
+    public void changeCurrentEdge(int amount) {
+        currentEdge += amount;
     }
 
     /**
