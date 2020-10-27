@@ -99,7 +99,7 @@ public enum ROMDesignation {
             case Person.T_SPACE_GUNNER:
             case Person.T_SPACE_PILOT:
             case Person.T_NAVIGATOR:
-                Unit u = campaign.getUnit(person.getUnitId());
+                Unit u = person.getUnit();
                 if (u != null) {
                     Entity en = u.getEntity();
                     if (en instanceof Dropship) {

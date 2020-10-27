@@ -239,7 +239,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 if (null != tech) {
                     if (singleForce.getTechID() != null) {
                         Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
-                        oldTech.clearTechUnitIDs();
+                        oldTech.clearTechUnits();
                         ServiceLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
                     }
                     singleForce.setTechID(tech.getId());
@@ -433,7 +433,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         } else if (command.contains(TOEMouseAdapter.REMOVE_LANCE_TECH)) {
             if (null != singleForce && singleForce.getTechID() != null) {
                 Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
-                oldTech.clearTechUnitIDs();
+                oldTech.clearTechUnits();
 
                 ServiceLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
 
@@ -1011,12 +1011,12 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     //Only display the Assign to Ship command if your command has at least 1 valid transport
                     //and if your selection does not include a transport
                     if (!shipInSelection && !gui.getCampaign().getTransportShips().isEmpty()) {
-                        for (UUID id : gui.getCampaign().getTransportShips()) {
-                            Unit ship = gui.getCampaign().getUnit(id);
-                            if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
+                        for (Unit ship : gui.getCampaign().getTransportShips()) {
+                            if (ship.isSalvage() || (ship.getCommander() == null)) {
                                 continue;
                             }
 
+                            UUID id = ship.getId();
                             if (allUnitsSameType) {
                                 double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
                                 if (capacity > 0) {
@@ -1365,11 +1365,12 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         //is in a basic state that can accept units. Capacity gets checked once the action
                         //is submitted.
                         menu = new JMenu("Assign Unit to Transport Ship");
-                        for (UUID id : gui.getCampaign().getTransportShips()) {
-                            Unit ship = gui.getCampaign().getUnit(id);
-                            if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
+                        for (Unit ship : gui.getCampaign().getTransportShips()) {
+                            if (ship.isSalvage() || (ship.getCommander() == null)) {
                                 continue;
                             }
+
+                            UUID id = ship.getId();
                             if (allUnitsSameType) {
                                 double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
                                 if (capacity > 0) {

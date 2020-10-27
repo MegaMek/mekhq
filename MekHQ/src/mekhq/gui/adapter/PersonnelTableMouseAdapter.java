@@ -270,21 +270,18 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
             case CMD_REMOVE_UNIT: {
                 for (Person person : people) {
-                    Unit u = gui.getCampaign().getUnit(person.getUnitId());
+                    Unit u = person.getUnit();
                     if (null != u) {
                         u.remove(person, true);
                         u.resetEngineer();
                         u.runDiagnostic(false);
                     }
                     // check for tech unit assignments
-                    if (!person.getTechUnitIDs().isEmpty()) {
-                        for (UUID id : new ArrayList<>(person.getTechUnitIDs())) {
-                            u = gui.getCampaign().getUnit(id);
-                            if (null != u) {
-                                u.remove(person, true);
-                                u.resetEngineer();
-                                u.runDiagnostic(false);
-                            }
+                    if (!person.getTechUnits().isEmpty()) {
+                        for (Unit unitWeTech : new ArrayList<>(person.getTechUnits())) {
+                            unitWeTech.remove(person, true);
+                            unitWeTech.resetEngineer();
+                            unitWeTech.runDiagnostic(false);
                         }
                         /*
                          * Incase there's still some assignments for this tech,
@@ -293,7 +290,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                          * but to a null unit and it will never go away
                          * otherwise.
                          */
-                        person.clearTechUnitIDs();
+                        person.clearTechUnits();
                     }
                 }
                 break;
@@ -301,7 +298,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             case CMD_ADD_PILOT: {
                 UUID selected = UUID.fromString(data[1]);
                 Unit u = gui.getCampaign().getUnit(selected);
-                Unit oldUnit = gui.getCampaign().getUnit(selectedPerson.getUnitId());
+                Unit oldUnit = selectedPerson.getUnit();
                 boolean useTransfers = false;
                 boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                 if (null != oldUnit) {
@@ -321,7 +318,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 if (null != u) {
                     for (Person p : people) {
                         if (u.canTakeMoreGunners()) {
-                            Unit oldUnit = gui.getCampaign().getUnit(p.getUnitId());
+                            Unit oldUnit = p.getUnit();
                             boolean useTransfers = false;
                             boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                             if (null != oldUnit) {
@@ -340,7 +337,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             case CMD_ADD_DRIVER: {
                 UUID selected = UUID.fromString(data[1]);
                 Unit u = gui.getCampaign().getUnit(selected);
-                Unit oldUnit = gui.getCampaign().getUnit(selectedPerson.getUnitId());
+                Unit oldUnit = selectedPerson.getUnit();
                 boolean useTransfers = false;
                 boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                 if (null != oldUnit) {
@@ -360,7 +357,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 if (null != u) {
                     for (Person p : people) {
                         if (u.canTakeMoreDrivers()) {
-                            Unit oldUnit = gui.getCampaign().getUnit(p.getUnitId());
+                            Unit oldUnit = p.getUnit();
                             boolean useTransfers = false;
                             boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                             if (null != oldUnit) {
@@ -381,7 +378,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 if (null != u) {
                     for (Person p : people) {
                         if (u.canTakeMoreGunners()) {
-                            Unit oldUnit = gui.getCampaign().getUnit(p.getUnitId());
+                            Unit oldUnit = p.getUnit();
                             boolean useTransfers = false;
                             boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                             if (null != oldUnit) {
@@ -403,7 +400,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 if (null != u) {
                     for (Person p : people) {
                         if (u.canTakeMoreVesselCrew()) {
-                            Unit oldUnit = gui.getCampaign().getUnit(p.getUnitId());
+                            Unit oldUnit = p.getUnit();
                             boolean useTransfers = false;
                             boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                             if (null != oldUnit) {
@@ -425,7 +422,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 if (null != u) {
                     for (Person p : people) {
                         if (u.canTakeNavigator()) {
-                            Unit oldUnit = gui.getCampaign().getUnit(p.getUnitId());
+                            Unit oldUnit = p.getUnit();
                             boolean useTransfers = false;
                             boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                             if (null != oldUnit) {
@@ -447,7 +444,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 if (null != u) {
                     for (Person p : people) {
                         if (u.canTakeTechOfficer()) {
-                            Unit oldUnit = gui.getCampaign().getUnit(p.getUnitId());
+                            Unit oldUnit = p.getUnit();
                             boolean useTransfers = false;
                             boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                             if (null != oldUnit) {
@@ -894,7 +891,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
             case CMD_ADD_KILL: {
                 AddOrEditKillEntryDialog nkd;
-                Unit unit = gui.getCampaign().getUnit(selectedPerson.getUnitId());
+                Unit unit = selectedPerson.getUnit();
                 if (people.length > 1) {
                     nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true, null,
                             (unit != null) ? unit.getName() : resourceMap.getString("bareHands.text"),
@@ -1046,7 +1043,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             case CMD_CLEAR_INJURIES: {
                 for (Person person : people) {
                     person.clearInjuries();
-                    Unit u = gui.getCampaign().getUnit(person.getUnitId());
+                    Unit u = person.getUnit();
                     if (null != u) {
                         u.resetPilotAndEntity();
                     }
@@ -1065,7 +1062,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 if (toRemove != null) {
                     selectedPerson.removeInjury(toRemove);
                 }
-                Unit u = gui.getCampaign().getUnit(selectedPerson.getUnitId());
+                Unit u = selectedPerson.getUnit();
                 if (null != u) {
                     u.resetPilotAndEntity();
                 }
@@ -1492,7 +1489,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         } else if (unit.usesSoldiers()) {
                             if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 soldierEntityWeightMenu.add(cbMenuItem);
@@ -1500,7 +1497,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         } else {
                             if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_DRIVER, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 if (unit.getEntity() instanceof Aero || unit.getEntity() instanceof Mech) {
@@ -1511,7 +1508,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                             }
                             if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 gunnerEntityWeightMenu.add(cbMenuItem);
@@ -1520,14 +1517,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                                     && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
                                     || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 crewEntityWeightMenu.add(cbMenuItem);
                             }
                             if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 navEntityWeightMenu.add(cbMenuItem);
@@ -1537,14 +1534,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                                 if (unit.getEntity() instanceof Tank) {
                                     if (person.canDrive(unit.getEntity()) || person.canGun(unit.getEntity())) {
                                         cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                        cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                        cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                         cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
                                         cbMenuItem.addActionListener(this);
                                         consoleCmdrEntityWeightMenu.add(cbMenuItem);
                                     }
                                 } else if (person.canDrive(unit.getEntity()) && person.canGun(unit.getEntity())) {
                                     cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                    cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                    cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                     cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
                                     cbMenuItem.addActionListener(this);
                                     techOfficerEntityWeightMenu.add(cbMenuItem);
@@ -1555,7 +1552,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                                 && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime() <= 480)) {
                             cbMenuItem = new JCheckBoxMenuItem(String.format(resourceMap.getString("maintenanceTimeDesc.format"), //$NON-NLS-1$
                                     unit.getName(), unit.getMaintenanceTime()));
-                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                            cbMenuItem.setSelected(unit.equals(person.getUnit()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             techEntityWeightMenu.add(cbMenuItem);
@@ -1625,7 +1622,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                             }
                             if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 soldierEntityWeightMenu.add(cbMenuItem);
@@ -1636,7 +1633,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                             }
                             if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 soldierEntityWeightMenu.add(cbMenuItem);
@@ -1647,7 +1644,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                             }
                             if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 gunnerEntityWeightMenu.add(cbMenuItem);
@@ -1658,7 +1655,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                             }
                             if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 gunnerEntityWeightMenu.add(cbMenuItem);
@@ -1671,7 +1668,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                                     && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
                                     || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 crewEntityWeightMenu.add(cbMenuItem);
@@ -1682,7 +1679,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                             }
                             if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_VESSEL_PILOT, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 pilotEntityWeightMenu.add(cbMenuItem);
@@ -1693,7 +1690,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                             }
                             if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
+                                cbMenuItem.setSelected(unit.equals(person.getUnit()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 navEntityWeightMenu.add(cbMenuItem);
@@ -1741,8 +1738,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
 
-                if ((menu.getItemCount() > 1) || (gui.getCampaign().getUnit(person.getUnitId()) != null)
-                        || (person.getTechUnitIDs().size() > 0)) {
+                if ((menu.getItemCount() > 1) || (person.getUnit() != null)
+                        || !person.getTechUnits().isEmpty()) {
                     JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
                 }
             }
@@ -1927,7 +1924,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         }
                         boolean available = (cost >= 0) && (person.getXP() >= cost);
                         if (spa.getName().equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
-                            Unit u = gui.getCampaign().getUnit(person.getUnitId());
+                            Unit u = person.getUnit();
                             if (null != u) {
                                 JMenu specialistMenu = new JMenu(resourceMap.getString("weaponSpecialist.text"));
                                 TreeSet<String> uniqueWeapons = new TreeSet<>();

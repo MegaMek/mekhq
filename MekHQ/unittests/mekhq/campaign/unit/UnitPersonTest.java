@@ -55,7 +55,7 @@ public class UnitPersonTest {
         unit.setTech(mockTech);
 
         // Ensure we were added to the unit
-        verify(mockTech, times(1)).addTechUnitID(eq(unitId));
+        verify(mockTech, times(1)).addTechUnit(eq(unit));
 
         // Ensure when getting the tech that it is the same tech
         assertEquals(mockTech, unit.getTech());
@@ -81,7 +81,7 @@ public class UnitPersonTest {
         unit.setTech(mockTech);
 
         // Ensure we were added to the unit
-        verify(mockTech, times(1)).addTechUnitID(eq(unitId));
+        verify(mockTech, times(1)).addTechUnit(eq(unit));
 
         // Add an engineer to the unit
         Person mockEngineer = mock(Person.class);
@@ -127,13 +127,13 @@ public class UnitPersonTest {
         unit.setTech(mockTech);
 
         // Ensure we were added to the unit
-        verify(mockTech, times(1)).addTechUnitID(eq(unitId));
+        verify(mockTech, times(1)).addTechUnit(eq(unit));
 
         // Remove the tech
         unit.removeTech();
 
         // Ensure we were removed from the unit
-        verify(mockTech, times(1)).removeTechUnitId(eq(unitId));
+        verify(mockTech, times(1)).removeTechUnit(eq(unit));
     }
 
     @Test
@@ -190,7 +190,7 @@ public class UnitPersonTest {
         unit.completeActivation();
 
         // Ensure we were removed from the unit after activation
-        verify(mockTech, times(1)).removeTechUnitId(eq(unitId));
+        verify(mockTech, times(1)).removeTechUnit(eq(unit));
     }
 
     @Test
@@ -239,7 +239,7 @@ public class UnitPersonTest {
         unit.addDriver(mockDriver);
 
         // Ensure we were added to the unit
-        verify(mockDriver, times(1)).setUnitId(eq(unitId));
+        verify(mockDriver, times(1)).setUnit(eq(unit));
         verify(unit, times(1)).resetPilotAndEntity();
 
         // Ensure when getting the driver that it is the same driver
@@ -263,7 +263,7 @@ public class UnitPersonTest {
         unit.remove(mockDriver, false);
 
         // Make sure we are removed from the person
-        verify(mockDriver, times(1)).setUnitId(eq(null));
+        verify(mockDriver, times(1)).setUnit(eq(null));
         verify(unit, times(2)).resetPilotAndEntity();
 
         // Make sure we were removed from the unit
@@ -297,7 +297,7 @@ public class UnitPersonTest {
         unit.addGunner(mockGunner);
 
         // Ensure we were added to the unit
-        verify(mockGunner, times(1)).setUnitId(eq(unitId));
+        verify(mockGunner, times(1)).setUnit(eq(unit));
         verify(unit, times(1)).resetPilotAndEntity();
 
         // Ensure when getting the gunner that it is the same gunner
@@ -321,7 +321,7 @@ public class UnitPersonTest {
         unit.remove(mockGunner, false);
 
         // Make sure we are removed from the person
-        verify(mockGunner, times(1)).setUnitId(eq(null));
+        verify(mockGunner, times(1)).setUnit(eq(null));
         verify(unit, times(2)).resetPilotAndEntity();
 
         // Make sure we were removed from the unit
@@ -352,7 +352,7 @@ public class UnitPersonTest {
         unit.addVesselCrew(mockVesselCrew);
 
         // Ensure we were added to the unit
-        verify(mockVesselCrew, times(1)).setUnitId(eq(unitId));
+        verify(mockVesselCrew, times(1)).setUnit(eq(unit));
         verify(unit, times(1)).resetPilotAndEntity();
 
         // Ensure when getting the vessel crew that it is the same vessel crew
@@ -369,7 +369,7 @@ public class UnitPersonTest {
         unit.remove(mockVesselCrew, false);
 
         // Make sure we are removed from the person
-        verify(mockVesselCrew, times(1)).setUnitId(eq(null));
+        verify(mockVesselCrew, times(1)).setUnit(eq(null));
         verify(unit, times(2)).resetPilotAndEntity();
 
         // Make sure we were removed from the unit
@@ -402,7 +402,7 @@ public class UnitPersonTest {
         unit.setTechOfficer(mockTechOfficer);
 
         // Ensure we were added to the unit
-        verify(mockTechOfficer, times(1)).setUnitId(eq(unitId));
+        verify(mockTechOfficer, times(1)).setUnit(eq(unit));
         verify(unit, times(1)).resetPilotAndEntity();
 
         // Ensure when getting the tech officer that it is the same tech officer
@@ -425,7 +425,7 @@ public class UnitPersonTest {
         unit.remove(mockTechOfficer, false);
 
         // Make sure we are removed from the person
-        verify(mockTechOfficer, times(1)).setUnitId(eq(null));
+        verify(mockTechOfficer, times(1)).setUnit(eq(null));
         verify(unit, times(2)).resetPilotAndEntity();
 
         // Make sure we were removed from the unit
@@ -459,7 +459,7 @@ public class UnitPersonTest {
         unit.setNavigator(mockNavigator);
 
         // Ensure we were added to the unit
-        verify(mockNavigator, times(1)).setUnitId(eq(unitId));
+        verify(mockNavigator, times(1)).setUnit(eq(unit));
         verify(unit, times(1)).resetPilotAndEntity();
 
         // Make sure we're part of the crew!
@@ -482,7 +482,7 @@ public class UnitPersonTest {
         unit.remove(mockNavigator, false);
 
         // Make sure we are removed from the person
-        verify(mockNavigator, times(1)).setUnitId(eq(null));
+        verify(mockNavigator, times(1)).setUnit(eq(null));
         verify(unit, times(2)).resetPilotAndEntity();
 
         // Make sure we were removed from the unit
