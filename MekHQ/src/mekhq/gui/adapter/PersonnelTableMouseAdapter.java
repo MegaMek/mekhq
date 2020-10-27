@@ -2268,6 +2268,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     }
                     JMenuHelpers.addMenuIfNonEmpty(popup, menu);
                 }
+                //endregion Edge Triggers
 
                 menu = new JMenu(resourceMap.getString("specialFlags.text"));
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("dependent.text"));
