@@ -566,10 +566,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             UUID id = gui.selectTech(unit, description, true);
             if (null != id) {
                 tech = gui.getCampaign().getPerson(id);
-                if (tech.getTechUnitIDs().size() > 0) {
+                if (!tech.getTechUnits().isEmpty()) {
                     if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(gui.getFrame(),
                             tech.getFullName() + " will not be able to perform maintenance on "
-                                    + tech.getTechUnitIDs().size() + " assigned units. Proceed?",
+                                    + tech.getTechUnits().size() + " assigned units. Proceed?",
                                     "Unmaintained unit warning",
                                     JOptionPane.YES_NO_OPTION)) {
                         tech = null;

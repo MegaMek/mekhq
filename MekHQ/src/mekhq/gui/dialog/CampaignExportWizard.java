@@ -414,10 +414,8 @@ public class CampaignExportWizard extends JDialog {
         }
 
         for (Person person : personList.getSelectedValuesList()) {
-            if (person.getUnitId() != null) {
-                Unit unit = sourceCampaign.getUnit(person.getUnitId());
-
-                unitList.setSelectedValue(unit, false);
+            if (person.getUnit() != null) {
+                unitList.setSelectedValue(person.getUnit(), false);
                 selectedIndices.add(unitList.getSelectedIndex());
             }
         }

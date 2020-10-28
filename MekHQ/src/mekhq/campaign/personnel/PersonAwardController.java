@@ -108,7 +108,7 @@ public class PersonAwardController {
             awards.add(award);
         }
         person.awardXP(award.getXPReward());
-        person.setEdge(person.getEdge() + award.getEdgeReward());
+        person.changeEdge(award.getEdgeReward());
         person.resetCurrentEdge(); //Reset the person's edge points
 
         award.addDate(date);

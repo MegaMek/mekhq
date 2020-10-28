@@ -20,7 +20,6 @@ package mekhq.gui;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -248,12 +247,10 @@ public final class PersonnelTab extends CampaignGuiTab {
     private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {
         DefaultComboBoxModel<PersonnelFilter> personGroupModel = new DefaultComboBoxModel<>();
 
-        List<PersonnelFilter> personnelFilters = MekHQ.getMekHQOptions().getPersonnelIndividualRoleFilters()
-                ? PersonnelFilter.getIndividualRolesExpandedPersonnelFilters()
-                : PersonnelFilter.getExpandedPersonnelFilters();
-        for (PersonnelFilter filter : personnelFilters) {
+        for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(false)) {
             personGroupModel.addElement(filter);
         }
+
         return personGroupModel;
     }
 

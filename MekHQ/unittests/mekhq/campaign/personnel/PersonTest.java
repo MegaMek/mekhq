@@ -2,11 +2,15 @@ package mekhq.campaign.personnel;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import megamek.common.Entity;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 
 import java.time.LocalDate;
@@ -161,6 +165,198 @@ public class PersonTest {
             assertEquals(clanWeightClass, mockPerson.getOriginalUnitWeight());
             assertEquals(clanId, mockPerson.getOriginalUnitId());
         }
+    }
+
+    @Test
+    public void testTechUnits() {
+        initPerson();
+
+        UUID id0 = UUID.randomUUID();
+        Unit unit0 = Mockito.mock(Unit.class);
+        Mockito.when(unit0.getId()).thenReturn(id0);
+
+        UUID id1 = UUID.randomUUID();
+        Unit unit1 = Mockito.mock(Unit.class);
+        Mockito.when(unit1.getId()).thenReturn(id1);
+
+        // Add a tech unit
+        mockPerson.addTechUnit(unit0);
+        assertNotNull(mockPerson.getTechUnits());
+        assertFalse(mockPerson.getTechUnits().isEmpty());
+        assertTrue(mockPerson.getTechUnits().contains(unit0));
+
+        // Add a second unit
+        mockPerson.addTechUnit(unit1);
+        assertEquals(2, mockPerson.getTechUnits().size());
+        assertTrue(mockPerson.getTechUnits().contains(unit1));
+
+        // Adding the same unit twice does not add it again!
+        mockPerson.addTechUnit(unit1);
+        assertEquals(2, mockPerson.getTechUnits().size());
+        assertTrue(mockPerson.getTechUnits().contains(unit1));
+
+        // Remove the first unit
+        mockPerson.removeTechUnit(unit0);
+        assertEquals(1, mockPerson.getTechUnits().size());
+        assertFalse(mockPerson.getTechUnits().contains(unit0));
+        assertTrue(mockPerson.getTechUnits().contains(unit1));
+
+        // Ensure we can clear the units
+        mockPerson.clearTechUnits();
+        assertNotNull(mockPerson.getTechUnits());
+        assertTrue(mockPerson.getTechUnits().isEmpty());
+    }
+
+    @Test
+    public void testIsDeployed() {
+        initPerson();
+
+        // No unit? We're not deployed
+        assertFalse(mockPerson.isDeployed());
+
+        UUID id0 = UUID.randomUUID();
+        Unit unit0 = Mockito.mock(Unit.class);
+        Mockito.when(unit0.getId()).thenReturn(id0);
+        Mockito.when(unit0.getScenarioId()).thenReturn(-1);
+
+        mockPerson.setUnit(unit0);
+        assertEquals(unit0, mockPerson.getUnit());
+
+        // If the unit is not deployed, the person is not delpoyed
+        assertFalse(mockPerson.isDeployed());
+
+        // Deploy the unit
+        Mockito.when(unit0.getScenarioId()).thenReturn(1);
+
+        // The person should now be deployed
+        assertTrue(mockPerson.isDeployed());
+    }
+
+    @Test
+    public void testAddInjuriesResetsUnitStatus() {
+        initPerson();
+
+        // Add an injury without a unit
+        Injury injury0 = Mockito.mock(Injury.class);
+        mockPerson.addInjury(injury0);
+
+        // Add a unit to the person
+        UUID id0 = UUID.randomUUID();
+        Unit unit0 = Mockito.mock(Unit.class);
+        Mockito.when(unit0.getId()).thenReturn(id0);
+
+        mockPerson.setUnit(unit0);
+
+        // Add an injury with a unit
+        Injury injury1 = Mockito.mock(Injury.class);
+        mockPerson.addInjury(injury1);
+
+        // Ensure the unit had its status reset to reflect crew damage
+        verify(unit0, Mockito.times(1)).resetPilotAndEntity();
+    }
+
+    @Test
+    public void testPrisonerRemovedFromUnit() {
+        initPerson();
+
+        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
+        Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
+        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+
+        Mockito.when(mockPerson.getCampaign()).thenReturn(mockCampaign);
+
+        // Add a unit to the person
+        UUID id0 = UUID.randomUUID();
+        Unit unit0 = Mockito.mock(Unit.class);
+        Mockito.when(unit0.getId()).thenReturn(id0);
+
+        mockPerson.setUnit(unit0);
+
+        mockPerson.setPrisonerStatus(PrisonerStatus.PRISONER, true);
+
+        // Ensure the unit removes the person
+        verify(unit0, Mockito.times(1)).remove(Mockito.eq(mockPerson), Mockito.anyBoolean());
+    }
+
+    @Test
+    public void testPrisonerDefectorRemovedFromUnit() {
+        initPerson();
+
+        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
+        Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
+        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+
+        Mockito.when(mockPerson.getCampaign()).thenReturn(mockCampaign);
+
+        // Add a unit to the person
+        UUID id0 = UUID.randomUUID();
+        Unit unit0 = Mockito.mock(Unit.class);
+        Mockito.when(unit0.getId()).thenReturn(id0);
+
+        mockPerson.setUnit(unit0);
+
+        mockPerson.setPrisonerStatus(PrisonerStatus.PRISONER_DEFECTOR, true);
+
+        // Ensure the unit removes the person
+        verify(unit0, Mockito.times(1)).remove(Mockito.eq(mockPerson), Mockito.anyBoolean());
+    }
+
+    @Test
+    public void testBondsmanRemovedFromUnit() {
+        initPerson();
+
+        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
+        Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
+        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+
+        Mockito.when(mockPerson.getCampaign()).thenReturn(mockCampaign);
+
+        // Add a unit to the person
+        UUID id0 = UUID.randomUUID();
+        Unit unit0 = Mockito.mock(Unit.class);
+        Mockito.when(unit0.getId()).thenReturn(id0);
+
+        mockPerson.setUnit(unit0);
+
+        mockPerson.setPrisonerStatus(PrisonerStatus.BONDSMAN, true);
+
+        // Ensure the unit removes the person
+        verify(unit0, Mockito.times(1)).remove(Mockito.eq(mockPerson), Mockito.anyBoolean());
+    }
+
+    @Test
+    public void testFreeNotRemovedFromUnit() {
+        initPerson();
+
+        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
+        Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
+        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+
+        Mockito.when(mockPerson.getCampaign()).thenReturn(mockCampaign);
+
+        // Add a unit to the person
+        UUID id0 = UUID.randomUUID();
+        Unit unit0 = Mockito.mock(Unit.class);
+        Mockito.when(unit0.getId()).thenReturn(id0);
+
+        mockPerson.setUnit(unit0);
+
+        mockPerson.setPrisonerStatus(PrisonerStatus.FREE, true);
+
+        // Ensure the unit DOES NOT remove the person
+        verify(unit0, Mockito.times(0)).remove(Mockito.eq(mockPerson), Mockito.anyBoolean());
     }
 
     private void initPerson(){

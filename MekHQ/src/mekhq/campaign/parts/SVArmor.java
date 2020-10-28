@@ -144,7 +144,7 @@ public class SVArmor extends Armor {
         SVArmor a = (SVArmor)campaign.findSparePart(part -> {
             return isSamePartType(part)
                 && part.isPresent()
-                && Objects.equals(getRefitId(), part.getRefitId());
+                && Objects.equals(getRefitUnit(), part.getRefitUnit());
         });
 
         if (null != a) {

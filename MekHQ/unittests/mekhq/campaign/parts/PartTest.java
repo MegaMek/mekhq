@@ -37,9 +37,9 @@ public class PartTest {
     public void sparePart() {
         Part part = new MekSensor();
 
-        assertNull(part.getUnitId());
+        assertNull(part.getUnit());
         assertNull(part.getParentPart());
-        assertNull(part.getRefitId());
+        assertNull(part.getRefitUnit());
         assertFalse(part.isReservedForReplacement());
         assertTrue(part.isSpare());
     }
@@ -56,21 +56,24 @@ public class PartTest {
         Part part = new MekSensor();
         part.setUnit(mockUnit);
 
-        assertNotNull(part.getUnitId());
+        assertNotNull(part.getUnit());
         assertNull(part.getParentPart());
-        assertNull(part.getRefitId());
+        assertNull(part.getRefitUnit());
         assertFalse(part.isReservedForReplacement());
         assertFalse(part.isSpare());
     }
 
     @Test
     public void isReservedForRefitNotSpare() {
-        Part part = new MekSensor();
-        part.setRefitId(UUID.randomUUID());
+        Unit mockUnit = mock(Unit.class);
+        when(mockUnit.getId()).thenReturn(UUID.randomUUID());
 
-        assertNull(part.getUnitId());
+        Part part = new MekSensor();
+        part.setRefitUnit(mockUnit);
+
+        assertNull(part.getUnit());
         assertNull(part.getParentPart());
-        assertNotNull(part.getRefitId());
+        assertNotNull(part.getRefitUnit());
         assertFalse(part.isReservedForReplacement());
         assertFalse(part.isSpare());
     }
@@ -82,9 +85,9 @@ public class PartTest {
         Part part = new MekSensor();
         part.setParentPart(parent);
 
-        assertNull(part.getUnitId());
+        assertNull(part.getUnit());
         assertNotNull(part.getParentPart());
-        assertNull(part.getRefitId());
+        assertNull(part.getRefitUnit());
         assertFalse(part.isReservedForReplacement());
         assertFalse(part.isSpare());
     }
@@ -97,9 +100,9 @@ public class PartTest {
         Part part = new MekSensor();
         part.setReserveId(mockTech);
 
-        assertNull(part.getUnitId());
+        assertNull(part.getUnit());
         assertNull(part.getParentPart());
-        assertNull(part.getRefitId());
+        assertNull(part.getRefitUnit());
         assertTrue(part.isReservedForReplacement());
         assertFalse(part.isSpare());
     }
