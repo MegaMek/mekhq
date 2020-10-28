@@ -243,7 +243,7 @@ public class WarehouseTest {
         warehouse.addPart(mockParentPart);
 
         // Create child parts for the parent part
-        ArrayList<Part> mockChildParts = new ArrayList<>();
+        List<Part> mockChildParts = new ArrayList<>();
         mockChildParts.add(createMockPart(2));
         mockChildParts.add(createMockPart(3));
         when(mockParentPart.getChildParts()).thenReturn(mockChildParts);
