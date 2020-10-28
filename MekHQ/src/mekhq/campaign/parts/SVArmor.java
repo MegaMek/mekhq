@@ -131,7 +131,7 @@ public class SVArmor extends Armor {
     }
 
     public int getAmountAvailable() {
-        SVArmor a = (SVArmor)campaign.getWarehouse().findSparePart(part -> {
+        SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part)
                 && part.isPresent()
                 && !part.isReservedForRefit();
@@ -141,7 +141,7 @@ public class SVArmor extends Armor {
     }
 
     public void changeAmountAvailable(int amount) {
-        SVArmor a = (SVArmor)campaign.getWarehouse().findSparePart(part -> {
+        SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part)
                 && part.isPresent()
                 && Objects.equals(getRefitUnit(), part.getRefitUnit());

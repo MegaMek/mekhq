@@ -153,7 +153,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        BaArmor a = (BaArmor)campaign.getWarehouse().findSparePart(part -> {
+        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> {
             return part instanceof BaArmor
                 && part.isPresent()
                 && !part.isReservedForRefit()
@@ -166,7 +166,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
 
     @Override
     public void changeAmountAvailable(int amount) {
-        BaArmor a = (BaArmor)campaign.getWarehouse().findSparePart(part -> {
+        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part)
                 && part.isPresent();
         });
