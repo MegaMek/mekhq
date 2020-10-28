@@ -78,8 +78,7 @@ import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.OvertimeModeEvent;
 import mekhq.campaign.event.PartArrivedEvent;
-import mekhq.campaign.event.PartNewEvent;
-import mekhq.campaign.event.PartRemovedEvent;
+import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonNewEvent;
@@ -1575,75 +1574,56 @@ public class Campaign implements Serializable, ITechManager {
         return service;
     }
 
-    public void addPart(Part p, int transitDays) {
-        if ((p.getUnit() != null) && (p.getUnit() instanceof TestUnit)) {
+    /**
+     * Adds a part to the campaign, arriving in a set number of days.
+     * @param part The part to add to the campaign.
+     * @param transitDays The number of days until the part arrives, or zero
+     *                    if the part is already here.
+     */
+    public void addPart(Part part, int transitDays) {
+        if ((part.getUnit() != null) && (part.getUnit() instanceof TestUnit)) {
             // If this is a test unit, then we won't add the part
             return;
         }
 
         // don't add missing parts if they don't have units or units with not id
-        if ((p instanceof MissingPart) && (null == p.getUnit())) {
+        if ((part instanceof MissingPart) && (null == part.getUnit())) {
             return;
         }
 
-        p.setDaysToArrival(transitDays);
-        p.setBrandNew(false);
+        part.setDaysToArrival(Math.max(transitDays, 0));
+        part.setBrandNew(false);
 
         // be careful in using this next line
-        p.postProcessCampaignAddition();
+        part.postProcessCampaignAddition();
 
         // Add the part to our warehouse and merge it with any existing part if possible
-        parts.addPart(p, true);
+        parts.addPart(part, true);
     }
 
     /**
-     * This is similar to addPart, but we just check to see if this part can be added to an existing part, without actually
-     * adding it to the campaign (because its already there). Should be called up when a part goes from 1 daysToArrival to
-     * zero.
+     * Denotes that a part in-transit has arrived.
+     * Should be called when a part goes from 1 daysToArrival to zero.
      *
-     * @param p
+     * @param part The part which has arrived.
      */
-    public void arrivePart(Part p) {
-        if (null != p.getUnit()) {
+    public void arrivePart(Part part) {
+        Objects.requireNonNull(part);
+
+        // Parts on a unit do not need to be reported as being "arrived",
+        // the unit itself will receive an arrival event.
+        if (part.getUnit() != null) {
             return;
         }
-        p.setDaysToArrival(0);
-        addReport(p.getArrivalReport());
-        Part spare = p.isReservedForRefit() ? null : getWarehouse().checkForExistingSparePart(p);
-        if (null != spare) {
-            int quantity = p.getQuantity();
-            if (p instanceof Armor) {
-                if (spare instanceof Armor) {
-                    while (quantity > 0) {
-                        ((Armor) spare).setAmount(((Armor) spare).getAmount()
-                                + ((Armor) p).getAmount());
-                        quantity--;
-                    }
-                    removePart(p);
-                }
-            } else if (p instanceof AmmoStorage) {
-                if (spare instanceof AmmoStorage) {
-                    while (quantity > 0) {
-                        ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
-                                .getShots());
-                        quantity--;
-                    }
-                    removePart(p);
-                }
-            } else {
-                while (quantity > 0) {
-                    spare.incrementQuantity();
-                    quantity--;
-                }
-                removePart(p);
-            }
-            MekHQ.triggerEvent(new PartArrivedEvent(spare));
-        } else {
-            MekHQ.triggerEvent(new PartArrivedEvent(p));
-        }
+
+        part.setDaysToArrival(0);
+        addReport(part.getArrivalReport());
+
+        // Add the part back to the Warehouse, asking that
+        // it be merged with any existing spare part.
+        part = parts.addPart(part, true);
+        MekHQ.triggerEvent(new PartArrivedEvent(part));
     }
-
-
 
     /**
      * Imports a collection of parts into the campaign.
@@ -2734,9 +2714,17 @@ public class Campaign implements Serializable, ITechManager {
         // get a new cloned part to work with and decrement original
         Part repairable = part.clone();
         part.decrementQuantity();
+
         fixPart(repairable, tech);
         if (!(repairable instanceof OmniPod)) {
             addPart(repairable, 0);
+        }
+
+        // If there is at least one remaining unit of the part
+        // then we need to notify interested parties that we have
+        // changed the quantity of the spare part.
+        if (part.getQuantity() > 0) {
+            MekHQ.triggerEvent(new PartChangedEvent(part));
         }
 
         return repairable;
@@ -2753,7 +2741,7 @@ public class Campaign implements Serializable, ITechManager {
         String report = "";
         String action = " fix ";
 
-        // TODO: this should really be a method on the part
+        // TODO: this should really be a method on its own class
         if (partWork instanceof AmmoBin) {
             action = " reload ";
         }
@@ -3299,11 +3287,9 @@ public class Campaign implements Serializable, ITechManager {
 
     public void processNewDayUnits() {
         // need to loop through units twice, the first time to do all maintenance and
-        // the second
-        // time to do whatever else. Otherwise, maintenance minutes might get sucked up
-        // by other
-        // stuff. This is also a good place to ensure that a unit's engineer gets reset
-        // and updated.
+        // the second time to do whatever else. Otherwise, maintenance minutes might
+        // get sucked up by other stuff. This is also a good place to ensure that a
+        // unit's engineer gets reset and updated.
         for (Unit u : getUnits()) {
             u.resetEngineer();
             if (null != u.getEngineer()) {
@@ -3315,20 +3301,29 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // need to check for assigned tasks in two steps to avoid
-        // concurrent mod problems
+        // concurrent modification problems
         List<Part> assignedParts = new ArrayList<>();
         List<Part> arrivedParts = new ArrayList<>();
-        for (Part part : getParts()) {
+        getWarehouse().forEachPart(part -> {
             if (part instanceof Refit) {
-                continue;
+                return;
             }
+
             if (part.getTech() != null) {
                 assignedParts.add(part);
             }
-            if (part.checkArrival()) {
-                arrivedParts.add(part);
+
+            // If the part is currently in-transit...
+            if (!part.isPresent()) {
+                // ... decrement the number of days until it arrives...
+                part.setDaysToArrival(part.getDaysToArrival() - 1);
+
+                if (part.isPresent()) {
+                    // ... and mark the part as arrived if it is now here.
+                    arrivedParts.add(part);
+                }
             }
-        }
+        });
 
         // arrive parts before attempting refit or parts will not get reserved that day
         for (Part part : arrivedParts) {
@@ -3343,6 +3338,7 @@ public class Campaign implements Serializable, ITechManager {
             } else {
                 tech = part.getTech();
             }
+
             if (null != tech) {
                 if (null != tech.getSkillForWorkingOn(part)) {
                     fixPart(part, tech);
@@ -3358,6 +3354,7 @@ public class Campaign implements Serializable, ITechManager {
                                 + part.getUnit().getHyperlinkedName(),
                         "Invalid Auto-continue", JOptionPane.ERROR_MESSAGE);
             }
+
             // check to see if this part can now be combined with other
             // spare parts
             if (part.isSpare()) {
@@ -3365,6 +3362,8 @@ public class Campaign implements Serializable, ITechManager {
                 if (null != spare) {
                     spare.incrementQuantity();
                     removePart(part);
+
+                    MekHQ.triggerEvent(new PartChangedEvent(spare));
                 }
             }
         }
@@ -4089,38 +4088,71 @@ public class Campaign implements Serializable, ITechManager {
     public void sellUnit(UUID id) {
         Unit unit = getHangar().getUnit(id);
         Money sellValue = unit.getSellValue();
+
         finances.credit(sellValue, Transaction.C_UNIT_SALE,
                 "Sale of " + unit.getName(), getLocalDate());
+
         removeUnit(id);
-        MekHQ.triggerEvent(new UnitRemovedEvent(unit));
     }
 
+    /**
+     * Sell one or more units of a part.
+     * @param part The part to sell.
+     * @param quantity The amount to sell of the part.
+     */
     public void sellPart(Part part, int quantity) {
+        Objects.requireNonNull(part);
+
+        if (quantity <= 0) {
+            return;
+        }
+
         if (part instanceof AmmoStorage) {
             sellAmmo((AmmoStorage) part, quantity);
             return;
-        }
-        if (part instanceof Armor) {
+        } else if (part instanceof Armor) {
             sellArmor((Armor) part, quantity);
             return;
         }
+
+        // Do not sell more than we have
+        quantity = Math.min(quantity, part.getQuantity());
+
         Money cost = part.getActualValue().multipliedBy(quantity);
         String plural = "";
         if (quantity > 1) {
             plural = "s";
         }
+
         finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + quantity
                 + " " + part.getName() + plural, getLocalDate());
-        while (quantity > 0 && part.getQuantity() > 0) {
-            part.decrementQuantity();
-            quantity--;
+
+        if (quantity == part.getQuantity()) {
+            parts.removePart(part);
+        } else {
+            while (quantity > 0) {
+                part.decrementQuantity();
+                quantity--;
+            }
+
+            MekHQ.triggerEvent(new PartChangedEvent(part));
         }
-        MekHQ.triggerEvent(new PartRemovedEvent(part));
     }
 
+    /**
+     * Sell one or more shots of ammo.
+     * @param ammo The ammo to sell.
+     * @param shots The number of shots of ammo to sell.
+     */
     public void sellAmmo(AmmoStorage ammo, int shots) {
+        Objects.requireNonNull(ammo);
+
+        if (shots <= 0) {
+            return;
+        }
+
+        // Do not sell more than we have
         shots = Math.min(shots, ammo.getShots());
-        boolean sellingAllAmmo = shots == ammo.getShots();
 
         Money cost = Money.zero();
         if (ammo.getShots() > 0) {
@@ -4129,46 +4161,88 @@ public class Campaign implements Serializable, ITechManager {
 
         finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + shots
                 + " " + ammo.getName(), getLocalDate());
-        if (sellingAllAmmo) {
-            ammo.decrementQuantity();
+
+        if (shots == ammo.getShots()) {
+            parts.removePart(ammo);
         } else {
             ammo.changeShots(-1 * shots);
+            MekHQ.triggerEvent(new PartChangedEvent(ammo));
         }
-        MekHQ.triggerEvent(new PartRemovedEvent(ammo));
     }
 
+    /**
+     * Sell one or more points of armor
+     * @param armor The armor to sell.
+     * @param shots The number of points of armor to sell.
+     */
     public void sellArmor(Armor armor, int points) {
+        Objects.requireNonNull(armor);
+
+        if (points <= 0) {
+            return;
+        }
+
+        // Do not sell more than we have
         points = Math.min(points, armor.getAmount());
+
         boolean sellingAllArmor = points == armor.getAmount();
         double proportion = ((double) points / armor.getAmount());
+
         if (sellingAllArmor) {
             // to avoid rounding error
             proportion = 1.0;
         }
+
         Money cost = armor.getActualValue().multipliedBy(proportion);
         finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + points
                 + " " + armor.getName(), getLocalDate());
+
         if (sellingAllArmor) {
-            armor.decrementQuantity();
+            parts.removePart(armor);
         } else {
-            armor.changeAmountAvailable(-1 * points);
+            armor.changeAmountAvailable(-points);
+            MekHQ.triggerEvent(new PartChangedEvent(armor));
         }
-        MekHQ.triggerEvent(new PartRemovedEvent(armor));
     }
 
+    /**
+     * Removes one or more parts from its OmniPod.
+     * @param part The omnipodded part.
+     * @param quantity The number of omnipodded parts to de-pod.
+     */
     public void depodPart(Part part, int quantity) {
+        Objects.requireNonNull(part);
+
+        if (quantity == 0) {
+            return;
+        }
+
+        if (!part.isOmniPodded()) {
+            // We cannot depod non-omnipodded parts.
+            return;
+        }
+
+        // We cannot depod any more than we have
+        quantity = Math.min(quantity, part.getQuantity());
+
         Part unpodded = part.clone();
         unpodded.setOmniPodded(false);
+
         OmniPod pod = new OmniPod(unpodded, this);
-        while (quantity > 0 && part.getQuantity() > 0) {
+        while (quantity > 0) {
             addPart(unpodded.clone(), 0);
             addPart(pod.clone(), 0);
+
             part.decrementQuantity();
             quantity--;
         }
-        MekHQ.triggerEvent(new PartRemovedEvent(part));
-        MekHQ.triggerEvent(new PartRemovedEvent(pod));
-        MekHQ.triggerEvent(new PartRemovedEvent(unpodded));
+
+        // Part::decrementQuantity will handle PartRemovedEvent
+        // if the part reaches 0 quantity, otherwise we need to
+        // send along the PartChangedEvent if some parts remain.
+        if (part.getQuantity() > 0) {
+            MekHQ.triggerEvent(new PartChangedEvent(part));
+        }
     }
 
     public boolean buyRefurbishment(Part part) {
@@ -4192,7 +4266,6 @@ public class Campaign implements Serializable, ITechManager {
                 } else {
                     addPart(part, transitDays);
                 }
-                MekHQ.triggerEvent(new PartNewEvent(part));
                 return true;
             } else {
                 return false;
@@ -4203,7 +4276,6 @@ public class Campaign implements Serializable, ITechManager {
             } else {
                 addPart(part, transitDays);
             }
-            MekHQ.triggerEvent(new PartNewEvent(part));
             return true;
         }
     }
