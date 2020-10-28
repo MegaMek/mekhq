@@ -4173,7 +4173,7 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * Sell one or more points of armor
      * @param armor The armor to sell.
-     * @param shots The number of points of armor to sell.
+     * @param points The number of points of armor to sell.
      */
     public void sellArmor(Armor armor, int points) {
         Objects.requireNonNull(armor);
