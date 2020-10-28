@@ -143,8 +143,12 @@ public class StratconTab extends CampaignGuiTab {
         sb.append(currentContract.getMissionTypeName()).append(": ").append(currentContract.getName());
         sb.append("<br/>");
         sb.append(campaignState.getBriefingText());
-        sb.append("<br/>Strategic Objectives: ").append(campaignState.getStrategicObjectiveCompletedCount())
-            .append("/").append(campaignState.getPendingStrategicObjectiveCount());
+        
+        // avoid confusing users by showing strategic objectives when there are none to show
+        if (!campaignState.strategicObjectivesBehaveAsVPs()) {
+            sb.append("<br/>Strategic Objectives: ").append(campaignState.getStrategicObjectiveCompletedCount())
+                .append("/").append(campaignState.getPendingStrategicObjectiveCount());
+        }
         
         sb.append("<br/>Victory Points: ").append(campaignState.getVictoryPoints());
         

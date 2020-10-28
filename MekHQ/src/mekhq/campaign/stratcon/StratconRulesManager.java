@@ -261,6 +261,18 @@ public class StratconRulesManager {
         track.assignForce(forceID, coords, campaign.getLocalDate());
     }
     
+    public static void processReinforcementDeployment(StratconScenario scenario, int forceID, StratconCampaignState campaignState) {
+        // if the force is already deployed to the track, we're done
+        // if there is an SP to burn, burn it and we're done
+        // if there is a VP to burn, burn it and we're done
+        // now, roll 2d6 + lance commander tactics
+        // 9+ = deploy
+        // 6+ = deploy, if lance != fight, track scenario odds up
+        // 2+ = apply negative modifier to scenario
+        StratconTrackState track;
+        track.getScenarioOdds()
+    }
+    
     /**
      * Assigns a force to the scenario such that the majority of the force can be deployed
      * @param scenario
@@ -343,7 +355,7 @@ public class StratconRulesManager {
      * is on defence 
      */
     private static boolean commanderLanceHasDefensiveAssignment(AtBDynamicScenario scenario, Campaign campaign) {
-        Unit commanderUnit = campaign.getUnit(scenario.getLanceCommander(campaign).getUnitId());
+        Unit commanderUnit = scenario.getLanceCommander(campaign).getUnit();
         Lance lance = campaign.getLances().get(commanderUnit.getForceId());
         
         if ((lance != null) && (lance.getRole() == AtBLanceRole.DEFENCE)) {
@@ -426,8 +438,8 @@ public class StratconRulesManager {
     private static StratconScenario generateScenario(Campaign campaign, AtBContract contract, StratconTrackState track, 
             int forceID, StratconCoords coords) {
         int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
-        ScenarioTemplate template = StratconScenarioFactory.getRandomScenario(unitType);
-        //ScenarioTemplate template = StratconScenarioFactory.getSpecificScenario("Breakthrough.xml");
+        //ScenarioTemplate template = StratconScenarioFactory.getRandomScenario(unitType);
+        ScenarioTemplate template = StratconScenarioFactory.getSpecificScenario("Convoy Escort.xml");
         
         return generateScenario(campaign, contract, track, forceID, coords, template);
     }
@@ -928,8 +940,6 @@ public class StratconRulesManager {
                             campaignState.decrementStrategicObjectiveCompletedCount();
                         }
                     }
-                    
-                    track.removeScenario(scenario);
                 } else {
                     // if it's an open-field
                     // move scenario towards nearest allied facility
@@ -938,6 +948,7 @@ public class StratconRulesManager {
                     if(closestAlliedFacilityCoords != null) {
                         StratconCoords newCoords = scenario.getCoords().translate(scenario.getCoords().direction(closestAlliedFacilityCoords));
                         scenario.setCoords(newCoords);
+                        //scenario.setDeploymentDate(scenario.getDeploymentDate().plusDays(daysToAdd));
                         
                         // TODO: if the allied facility is in the new coords, replace this scenario
                         // with a facility defense, with the opfor coming directly from all hostiles assigned to this scenario
@@ -948,6 +959,9 @@ public class StratconRulesManager {
                         
                     }
                 }
+                
+                // either way, it's gone
+                track.removeScenario(scenario);
             }
         }
     }
@@ -963,12 +977,25 @@ public class StratconRulesManager {
         
         // run scenario generation routine for every track attached to an active contract
         for (Contract contract : ev.getCampaign().getActiveContracts()) {
-            if ((contract instanceof AtBContract) && contract.isActive() && (((AtBContract) contract).getStratconCampaignState() != null)) {
+            StratconCampaignState campaignState = ((AtBContract) contract).getStratconCampaignState();
+            
+            if ((contract instanceof AtBContract) && contract.isActive() && (campaignState != null)) {
                 for (StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
-                    if (isMonday) {
-                        generateScenariosForTrack(ev.getCampaign(), (AtBContract) contract, track);
+                    // loop through scenarios - if we haven't deployed in time, fail it and apply consequences
+                    for (StratconScenario scenario : track.getScenarios().values()) {
+                        if (scenario.getDeploymentDate().isBefore(ev.getCampaign().getLocalDate())) {
+                            processIgnoredScenario(scenario, campaignState);
+                        }
                     }
                     
+                    // on monday, generate new scenarios and decay modifiers
+                    if (isMonday) {
+                        generateScenariosForTrack(ev.getCampaign(), (AtBContract) contract, track);
+                        
+                        // 
+                    }
+                    
+                    // check if some of the forces have finished deployment
                     processTrackForceReturnDates(track, ev.getCampaign().getLocalDate());
                 }
             }

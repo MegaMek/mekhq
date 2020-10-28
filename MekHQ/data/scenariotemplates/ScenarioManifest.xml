@@ -14,7 +14,7 @@
 	</entry>
 	<entry>
 		<key>3</key>
-		<value>Hostile Convoy.xml</value>
+		<value>Convoy Attack.xml</value>
 	</entry>
 	<entry>
 		<key>4</key>
@@ -50,7 +50,7 @@
 	</entry>
 	<entry>
 		<key>12</key>
-		<value>Allied Convoy.xml</value>
+		<value>Convoy Escort.xml</value>
 	</entry>
 	<entry>
 		<key>13</key>
@@ -78,7 +78,7 @@
 	</entry>
 	<entry>
 		<key>19</key>
-		<value>Low Atmo - Escort Dropship.xml</value>
+		<value>Low Atmo - Escort.xml</value>
 	</entry>
 	<entry>
 		<key>20</key>
