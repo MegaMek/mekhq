@@ -33,15 +33,13 @@ import mekhq.campaign.event.*;
  * Provides a list of events captured during its lifetime.
  * Use this as part of a try-with-resources block.
  *
- * If you need to listen to a new event, add a handler to this
- * class.
+ * If you need to listen to a new event, add a handler to this class.
  */
 public class EventSpy implements AutoCloseable {
     private final List<MMEvent> events = new ArrayList<>();
 
     /**
-     * Creates a new EventSpy and registers it with
-     * MekHQ's event bus.
+     * Creates a new EventSpy and registers it with MekHQ's event bus.
      */
     public EventSpy() {
         MekHQ.registerHandler(this);
@@ -56,8 +54,7 @@ public class EventSpy implements AutoCloseable {
 
     /**
      * Gets the list of events which occurred.
-     * @return The list of events which occurred, in the order
-     *         received.
+     * @return The list of events which occurred, in the order received.
      */
     public List<MMEvent> getEvents() {
         return Collections.unmodifiableList(events);
