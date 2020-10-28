@@ -781,7 +781,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         Part retVal = null;
         try {
             // Instantiate the correct child class, and call its parsing function.
-            retVal = (Part) Class.forName(className).newInstance();
+            retVal = (Part) Class.forName(className).getDeclaredConstructor().newInstance();
             retVal.loadFieldsFromXmlNode(wn);
 
             // Okay, now load Part-specific fields!
@@ -1841,7 +1841,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public void fixReferences(Campaign campaign) {
         if (replacementPart instanceof PartRef) {
             int id = replacementPart.getId();
-            replacementPart = campaign.getPart(id);
+            replacementPart = campaign.getWarehouse().getPart(id);
             if ((replacementPart == null) && (id > 0)) {
                 MekHQ.getLogger().error(
                     String.format("Part %d ('%s') references missing replacement part %d",
@@ -1851,7 +1851,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
         if (parentPart instanceof PartRef) {
             int id = parentPart.getId();
-            parentPart = campaign.getPart(id);
+            parentPart = campaign.getWarehouse().getPart(id);
             if ((parentPart == null) && (id > 0)) {
                 MekHQ.getLogger().error(
                     String.format("Part %d ('%s') references missing parent part %d",
@@ -1862,7 +1862,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         for (int ii = childParts.size() - 1; ii >= 0; --ii) {
             Part childPart = childParts.get(ii);
             if (childPart instanceof PartRef) {
-                Part realPart = campaign.getPart(childPart.getId());
+                Part realPart = campaign.getWarehouse().getPart(childPart.getId());
                 if (realPart != null) {
                     childParts.set(ii, realPart);
                 } else if (childPart.getId() > 0) {
