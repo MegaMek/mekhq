@@ -1083,7 +1083,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
      * performing overnight.
      * @param tech The team member.
      */
-    public void setReserveId(@Nullable Person tech) {
+    public void setReservedBy(@Nullable Person tech) {
         this.reservedBy = tech;
     }
 

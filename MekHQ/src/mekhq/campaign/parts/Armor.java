@@ -565,7 +565,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        Armor a = (Armor)campaign.findSparePart(part -> {
+        Armor a = (Armor) campaign.getWarehouse().findSparePart(part -> {
             return part instanceof Armor
                 && part.isPresent()
                 && !part.isReservedForRefit()
@@ -576,7 +576,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public void changeAmountAvailable(int amount) {
-        Armor a = (Armor)campaign.findSparePart(part -> {
+        Armor a = (Armor) campaign.getWarehouse().findSparePart(part -> {
             return (part instanceof Armor)
                 && part.isPresent()
                 && Objects.equals(getRefitUnit(), part.getRefitUnit())

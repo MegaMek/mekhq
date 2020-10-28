@@ -27,9 +27,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
@@ -81,7 +78,6 @@ import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.OvertimeModeEvent;
 import mekhq.campaign.event.PartArrivedEvent;
-import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
 import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.event.PartWorkEvent;
@@ -175,7 +171,7 @@ public class Campaign implements Serializable, ITechManager {
     private Hangar units = new Hangar();
     private Set<Unit> transportShips = new HashSet<>();
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
-    private TreeMap<Integer, Part> parts = new TreeMap<>();
+    private Warehouse parts = new Warehouse();
     private TreeMap<Integer, Force> forceIds = new TreeMap<>();
     private TreeMap<Integer, Mission> missions = new TreeMap<>();
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
@@ -188,7 +184,6 @@ public class Campaign implements Serializable, ITechManager {
     private int astechPoolOvertime;
     private int medicPool;
 
-    private int lastPartId;
     private int lastForceId;
     private int lastMissionId;
     private int lastScenarioId;
@@ -1582,53 +1577,23 @@ public class Campaign implements Serializable, ITechManager {
 
     public void addPart(Part p, int transitDays) {
         if ((p.getUnit() != null) && (p.getUnit() instanceof TestUnit)) {
-            // if this is a test unit, then we won't add the part, so there
+            // If this is a test unit, then we won't add the part
             return;
         }
-        p.setDaysToArrival(transitDays);
-        p.setBrandNew(false);
-        //need to add ID here in case post-processing part stuff needs it
-        //we will set the id back one if we don't end up adding this part
-        int id = lastPartId + 1;
-        p.setId(id);
-        //be careful in using this next line
-        p.postProcessCampaignAddition();
+
         // don't add missing parts if they don't have units or units with not id
         if ((p instanceof MissingPart) && (null == p.getUnit())) {
-            p.setId(-1);
             return;
         }
-        if ((null == p.getUnit()) && !p.hasParentPart()
-                && !p.isReservedForRefit() && !p.isReservedForReplacement()) {
-            Part spare = checkForExistingSparePart(p);
-            if (null != spare) {
-                if (p instanceof Armor) {
-                    if (spare instanceof Armor) {
-                        ((Armor) spare).setAmount(((Armor) spare).getAmount()
-                                + ((Armor) p).getAmount());
-                        MekHQ.triggerEvent(new PartChangedEvent(spare));
-                        p.setId(-1);
-                        return;
-                    }
-                } else if (p instanceof AmmoStorage) {
-                    if (spare instanceof AmmoStorage) {
-                        ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
-                                .getShots());
-                        MekHQ.triggerEvent(new PartChangedEvent(spare));
-                        p.setId(-1);
-                        return;
-                    }
-                } else {
-                    spare.incrementQuantity();
-                    MekHQ.triggerEvent(new PartChangedEvent(spare));
-                    p.setId(-1);
-                    return;
-                }
-            }
-        }
-        parts.put(id, p);
-        lastPartId = id;
-        MekHQ.triggerEvent(new PartNewEvent(p));
+
+        p.setDaysToArrival(transitDays);
+        p.setBrandNew(false);
+
+        // be careful in using this next line
+        p.postProcessCampaignAddition();
+
+        // Add the part to our warehouse and merge it with any existing part if possible
+        parts.addPart(p, true);
     }
 
     /**
@@ -1644,7 +1609,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         p.setDaysToArrival(0);
         addReport(p.getArrivalReport());
-        Part spare = p.isReservedForRefit() ? null : checkForExistingSparePart(p);
+        Part spare = p.isReservedForRefit() ? null : getWarehouse().checkForExistingSparePart(p);
         if (null != spare) {
             int quantity = p.getQuantity();
             if (p instanceof Armor) {
@@ -1687,32 +1652,36 @@ public class Campaign implements Serializable, ITechManager {
      *                 to import into the campaign.
      */
     public void importParts(Collection<Part> newParts) {
+        Objects.requireNonNull(newParts);
+
         for (Part p : newParts) {
+            if ((p instanceof MissingPart) && (null == p.getUnit())) {
+                // Let's not import missing parts without a valid unit.
+                continue;
+            }
+
+            // Track this part as part of our Campaign
             p.setCampaign(this);
-            addPartWithoutId(p);
+
+            // Add the part to the campaign, but do not
+            // merge it with any existing parts
+            parts.addPart(p, false);
         }
-    }
-
-    public void addPartWithoutId(Part p) {
-        if ((p instanceof MissingPart) && (null == p.getUnit())) {
-            // we shouldn't have spare missing parts. I think their existence is
-            // a relic.
-            return;
-        }
-
-        // Update the lastPartId we've seen to avoid overwriting a part,
-        // which may occur if a replacement ID is assigned
-        lastPartId = Math.max(lastPartId, p.getId());
-
-        parts.put(p.getId(), p);
-        MekHQ.triggerEvent(new PartNewEvent(p));
     }
 
     /**
-     * @return an <code>ArrayList</code> of SupportTeams in the campaign
+     * Gets the Warehouse which stores parts.
      */
+    public Warehouse getWarehouse() {
+        return parts;
+    }
+
+    /**
+     * @return A collection of parts in the Warehouse.
+     */
+    @Deprecated
     public Collection<Part> getParts() {
-        return parts.values();
+        return parts.getParts();
     }
 
     private int getQuantity(Part p) {
@@ -1763,12 +1732,12 @@ public class Campaign implements Serializable, ITechManager {
         piu.setStoreCount(0);
         piu.setTransferCount(0);
         piu.setPlannedCount(0);
-        for (Part p : getParts()) {
+        getWarehouse().forEachPart(p -> {
             PartInUse newPiu = getPartInUse(p);
             if (piu.equals(newPiu)) {
                 updatePartInUseData(piu, p);
             }
-        }
+        });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             PartInUse newPiu = getPartInUse((Part) maybePart);
             if (piu.equals(newPiu)) {
@@ -1782,18 +1751,18 @@ public class Campaign implements Serializable, ITechManager {
     public Set<PartInUse> getPartsInUse() {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<>();
-        for (Part p : getParts()) {
+        getWarehouse().forEachPart(p -> {
             PartInUse piu = getPartInUse(p);
             if (null == piu) {
-                continue;
+                return;
             }
-            if ( inUse.containsKey(piu) ) {
+            if (inUse.containsKey(piu)) {
                 piu = inUse.get(piu);
             } else {
                 inUse.put(piu, piu);
             }
             updatePartInUseData(piu, p);
-        }
+        });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             if (!(maybePart instanceof Part)) {
                 continue;
@@ -1815,8 +1784,9 @@ public class Campaign implements Serializable, ITechManager {
         return inUse.keySet();
     }
 
+    @Deprecated
     public Part getPart(int id) {
-        return parts.get(id);
+        return parts.getPart(id);
     }
 
     public Force getForce(int id) {
@@ -3391,7 +3361,7 @@ public class Campaign implements Serializable, ITechManager {
             // check to see if this part can now be combined with other
             // spare parts
             if (part.isSpare()) {
-                Part spare = checkForExistingSparePart(part);
+                Part spare = getWarehouse().checkForExistingSparePart(part);
                 if (null != spare) {
                     spare.incrementQuantity();
                     removePart(part);
@@ -3732,16 +3702,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void removePart(Part part) {
-        if (null != part.getUnit() && part.getUnit() instanceof TestUnit) {
-            // if this is a test unit, then we won't remove the part because its not there
-            return;
-        }
-        parts.remove(part.getId());
-        //remove child parts as well
-        for (Part childPart : part.getChildParts()) {
-            removePart(childPart);
-        }
-        MekHQ.triggerEvent(new PartRemovedEvent(part));
+        parts.removePart(part);
     }
 
     public void removeKill(Kill k) {
@@ -4089,56 +4050,6 @@ public class Campaign implements Serializable, ITechManager {
         this.iconFileName = s;
     }
 
-    public ArrayList<Part> getSpareParts() {
-        ArrayList<Part> spares = new ArrayList<>();
-        for (Part part : getParts()) {
-            if (part.isSpare()) {
-                spares.add(part);
-            }
-        }
-        return spares;
-    }
-
-    /**
-     * Executes a method for each spare part in the campaign.
-     *
-     * @param consumer The method to apply to each spare part
-     *                 in the campaign.
-     */
-    public void forEachSparePart(Consumer<Part> consumer) {
-        for (Part part : getParts()) {
-            if (part.isSpare()) {
-                consumer.accept(part);
-            }
-        }
-    }
-
-    /**
-     * Finds the first spare part matching a predicate.
-     *
-     * @param predicate The predicate to use when searching
-     *                  for a suitable spare part.
-     * @return A matching spare {@link Part} or {@code null}
-     *         if no suitable match was found.
-     */
-    @Nullable
-    public Part findSparePart(Predicate<Part> predicate) {
-        for (Part part : parts.values()) {
-            if (part.isSpare() && predicate.test(part)) {
-                return part;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Streams the spare parts in the campaign.
-     * @return A stream of spare parts in the campaign.
-     */
-    public Stream<Part> streamSpareParts() {
-        return parts.values().stream().filter(Part::isSpare);
-    }
-
     public void addFunds(Money quantity) {
         addFunds(quantity, "Rich Uncle", Transaction.C_MISC);
     }
@@ -4364,7 +4275,6 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colorIndex", colorIndex);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastPartId", lastPartId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastForceId", lastForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastMissionId", lastMissionId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastScenarioId", lastScenarioId);
@@ -4428,7 +4338,7 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "specialAbilities");
         rskillPrefs.writeToXml(pw1, indent);
         // parts is the biggest so it goes last
-        writeMapToXml(pw1, indent, "parts", parts); // Parts
+        parts.writeToXml(pw1, indent, "parts"); // Parts
 
         writeGameOptions(pw1);
 
@@ -6216,18 +6126,6 @@ public class Campaign implements Serializable, ITechManager {
         // TODO: still a lot of stuff to do here, but oh well
         entity.setOwner(player);
         entity.setGame(game);
-    }
-
-    public Part checkForExistingSparePart(Part part) {
-        for (Part spare : parts.values()) {
-            if (!spare.isSpare() || spare.getId() == part.getId()) {
-                continue;
-            }
-            if (part.isSamePartTypeAndStatus(spare)) {
-                return spare;
-            }
-        }
-        return null;
     }
 
     public void refreshNetworks() {

@@ -2183,7 +2183,7 @@ public class CampaignGUI extends JPanel {
 
         File partsFile = maybeFile.get();
 
-        MekHQ.getLogger().info(this, "Starting load of parts file from XML...");
+        MekHQ.getLogger().info("Starting load of parts file from XML...");
         // Initialize variables.
         Document xmlDoc;
 
@@ -2195,7 +2195,7 @@ public class CampaignGUI extends JPanel {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
             return;
         }
 
@@ -2210,6 +2210,7 @@ public class CampaignGUI extends JPanel {
 
         // we need to iterate through three times, the first time to collect
         // any custom units that might not be written yet
+        List<Part> parts = new ArrayList<>();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
@@ -2221,17 +2222,18 @@ public class CampaignGUI extends JPanel {
             if (!wn2.getNodeName().equalsIgnoreCase("part")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.getLogger().error(this, "Unknown node type not loaded in Parts nodes: " + wn2.getNodeName());
+                MekHQ.getLogger().error("Unknown node type not loaded in Parts nodes: " + wn2.getNodeName());
                 continue;
             }
 
             Part p = Part.generateInstanceFromXML(wn2, version);
             if (p != null) {
-                p.setCampaign(getCampaign());
-                getCampaign().addPartWithoutId(p);
+                parts.add(p);
             }
         }
-        MekHQ.getLogger().info(this, "Finished load of parts file");
+
+        getCampaign().importParts(parts);
+        MekHQ.getLogger().info("Finished load of parts file");
     }
 
     protected void loadOptionsFile() {

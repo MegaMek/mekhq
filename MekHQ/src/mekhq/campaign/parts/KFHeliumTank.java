@@ -157,7 +157,7 @@ public class KFHeliumTank extends Part {
                 js.setKFHeliumTankHit(true);
                 //You can transport a helium tank
                 //See SO p130 for reference
-                Part spare = campaign.checkForExistingSparePart(this);
+                Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
                 if(!salvage) {
                     campaign.removePart(this);
                 } else if (null != spare) {

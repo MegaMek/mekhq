@@ -311,7 +311,7 @@ public class MissingBattleArmorSuit extends MissingPart {
             return getReplacementPart();
         }
         // don't just return with the first part if it is damaged
-        return campaign.streamSpareParts()
+        return campaign.getWarehouse().streamSpareParts()
             .filter(MissingPart::isAvailableAsReplacement)
             .reduce(null, (bestPart, part) -> {
                 if (isAcceptableReplacement(part, refit)) {

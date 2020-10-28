@@ -469,7 +469,7 @@ public class BattleArmorSuit extends Part {
         for(Part p : trooperParts) {
             p.remove(salvage);
         }
-        Part spare = campaign.checkForExistingSparePart(this);
+        Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
         if(!salvage) {
             campaign.removePart(this);
         } else if(null != spare) {
