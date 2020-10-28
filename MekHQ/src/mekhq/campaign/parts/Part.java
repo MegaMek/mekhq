@@ -1463,32 +1463,67 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public abstract String getLocationName();
 
-    public void setParentPart(Part part) {
+    /**
+     * Sets the parent part.
+     * @param part The parent part.
+     */
+    public void setParentPart(@Nullable Part part) {
         parentPart = part;
     }
 
-    public Part getParentPart() {
+    /**
+     * Gets the parent part, or null if none exists.
+     */
+    public @Nullable Part getParentPart() {
         return parentPart;
     }
 
+    /**
+     * Gets a value indicating whether or not this part
+     * has a parent part.
+     */
     public boolean hasParentPart() {
         return parentPart != null;
     }
 
-    public ArrayList<Part> getChildParts() {
-        return childParts;
+    /**
+     * Gets a value indicating whether or not this part has child parts.
+     */
+    public boolean hasChildParts() {
+        return !childParts.isEmpty();
     }
 
-    public void addChildPart(Part child) {
-        childParts.add(child);
-        child.setParentPart(this);
+    /**
+     * Gets a list of child parts for this part.
+     */
+    public List<Part> getChildParts() {
+        return Collections.unmodifiableList(childParts);
     }
 
+    /**
+     * Adds a child part to this part.
+     * @param childPart The part to add as a child.
+     */
+    public void addChildPart(Part childPart) {
+        childParts.add(Objects.requireNonNull(childPart));
+        childPart.setParentPart(this);
+    }
+
+    /**
+     * Removes a child part from this part.
+     * @param childPart The child part to remove.
+     */
     public void removeChildPart(Part childPart) {
-        childPart.setParentPart(null);
-        childParts.remove(childPart);
+        Objects.requireNonNull(childPart);
+
+        if (childParts.remove(childPart)) {
+            childPart.setParentPart(null);
+        }
     }
 
+    /**
+     * Removes all child parts from this part.
+     */
     public void removeAllChildParts() {
         for (Part childPart : childParts) {
             childPart.setParentPart(null);

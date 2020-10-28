@@ -274,4 +274,66 @@ public class PartTest {
         assertEquals(0, part.getDaysToArrival());
         assertTrue(part.isPresent());
     }
+
+    @Test
+    public void childParts() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Part part = new MekLocation();
+        part.setCampaign(mockCampaign);
+
+        // Parts should start without child parts.
+        assertFalse(part.hasChildParts());
+        assertNotNull(part.getChildParts());
+        assertTrue(part.getChildParts().isEmpty());
+
+        // Add a child part
+        Part childPart0 = mock(Part.class);
+        part.addChildPart(childPart0);
+
+        assertTrue(part.hasChildParts());
+        assertNotNull(part.getChildParts());
+        assertEquals(1, part.getChildParts().size());
+        assertTrue(part.getChildParts().contains(childPart0));
+        verify(childPart0, times(1)).setParentPart(eq(part));
+
+        // Add a second child part
+        Part childPart1 = mock(Part.class);
+        part.addChildPart(childPart1);
+
+        assertTrue(part.hasChildParts());
+        assertNotNull(part.getChildParts());
+        assertEquals(2, part.getChildParts().size());
+        assertTrue(part.getChildParts().contains(childPart0));
+        assertTrue(part.getChildParts().contains(childPart1));
+        verify(childPart1, times(1)).setParentPart(eq(part));
+
+        // Remove a random part not associated with this part
+        Part randomPart = mock(Part.class);
+        part.removeChildPart(randomPart);
+
+        assertTrue(part.hasChildParts());
+        assertNotNull(part.getChildParts());
+        assertEquals(2, part.getChildParts().size());
+        assertTrue(part.getChildParts().contains(childPart0));
+        assertTrue(part.getChildParts().contains(childPart1));
+        verify(randomPart, times(0)).setParentPart(eq(null));
+
+        // Remove one of the actual child parts
+        part.removeChildPart(childPart1);
+
+        assertTrue(part.hasChildParts());
+        assertNotNull(part.getChildParts());
+        assertEquals(1, part.getChildParts().size());
+        assertTrue(part.getChildParts().contains(childPart0));
+        assertFalse(part.getChildParts().contains(childPart1));
+        verify(childPart1, times(1)).setParentPart(eq(null));
+
+        // Now remove al lthe remaining parts
+        part.removeAllChildParts();
+
+        assertFalse(part.hasChildParts());
+        assertNotNull(part.getChildParts());
+        assertTrue(part.getChildParts().isEmpty());
+        verify(childPart0, times(1)).setParentPart(eq(null));
+    }
 }
