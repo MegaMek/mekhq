@@ -209,6 +209,8 @@ public class AtBDynamicScenarioFactory {
         if (campaign.getCampaignOptions().useAbilities()) {
             upgradeBotCrews(scenario);
         }
+        
+        scenario.setFinalized(true);
     }
 
     /**

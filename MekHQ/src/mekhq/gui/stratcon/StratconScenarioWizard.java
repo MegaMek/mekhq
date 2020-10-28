@@ -433,7 +433,11 @@ public class StratconScenarioWizard extends JDialog {
         // and the scenario gets published to the campaign and may be played immediately from the briefing room
         // that being said, give the player a chance to commit reinforcements too
         if(currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
-            AtBDynamicScenarioFactory.finalizeScenario(currentScenario.getBackingScenario(), currentCampaignState.getContract(), campaign);
+            // if we've already generated forces and applied modifiers, no need to do it twice
+            if(!currentScenario.getBackingScenario().isFinalized()) {
+                AtBDynamicScenarioFactory.finalizeScenario(currentScenario.getBackingScenario(), currentCampaignState.getContract(), campaign);
+            }
+            
             StratconRulesManager.commitPrimaryForces(campaign, currentCampaignState.getContract(), currentScenario, currentTrackState);
             setCurrentScenario(currentScenario, currentTrackState, currentCampaignState);
             currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());

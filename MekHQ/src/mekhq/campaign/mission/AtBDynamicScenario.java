@@ -52,6 +52,8 @@ public class AtBDynamicScenario extends AtBScenario {
     private Map<UUID, ScenarioForceTemplate> playerUnitTemplates;
 
     private List<AtBScenarioModifier> scenarioModifiers;
+    
+    private boolean finalized;
 
     public AtBDynamicScenario() {
         super();
@@ -236,6 +238,14 @@ public class AtBDynamicScenario extends AtBScenario {
 
     public void setEffectiveOpforQuality(int qualityLevel) {
         effectiveOpforQuality = qualityLevel;
+    }
+
+    public boolean isFinalized() {
+        return finalized;
+    }
+
+    public void setFinalized(boolean finalized) {
+        this.finalized = finalized;
     }
 
     /**
