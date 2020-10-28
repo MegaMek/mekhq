@@ -23,6 +23,9 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -1267,10 +1270,17 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return refitUnit;
     }
 
+    /**
+     * Gets a value indicating if the part is reserved for a refit.
+     */
     public boolean isReservedForRefit() {
         return refitUnit != null;
     }
 
+    /**
+     * Gets a value indicating if the part is reserved for an
+     * overnight replacement task.
+     */
     public boolean isReservedForReplacement() {
         return reservedBy != null;
     }
@@ -1283,22 +1293,24 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         usedForRefitPlanning = flag;
     }
 
+    /**
+     * Sets the number of days until the part arrives.
+     * @param days The number of days until the part arrives.
+     */
     public void setDaysToArrival(int days) {
-        daysToArrival = days;
+        daysToArrival = Math.max(days, 0);
     }
 
+    /**
+     * Gets the number of days until the part arrives.
+     */
     public int getDaysToArrival() {
         return daysToArrival;
     }
 
-    public boolean checkArrival() {
-        if (daysToArrival > 0) {
-            daysToArrival--;
-            return (daysToArrival == 0);
-        }
-        return false;
-    }
-
+    /**
+     * Gets a value indicating whether or not the part is present.
+     */
     public boolean isPresent() {
         return daysToArrival == 0;
     }
@@ -1323,17 +1335,36 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return true;
     }
 
+    /**
+     * Gets the number of parts on-hand.
+     */
     public int getQuantity() {
         return quantity;
     }
 
+    /**
+     * Increments the number of parts in stock by one.
+     */
     public void incrementQuantity() {
-        quantity++;
+        setQuantity(getQuantity() + 1);
     }
 
+    /**
+     * Decrements the number of parts in stock by one,
+     * and removes the part from the campaign if it
+     * reaches zero.
+     */
     public void decrementQuantity() {
-        quantity--;
-        if (quantity <= 0) {
+        setQuantity(getQuantity() - 1);
+    }
+
+    /**
+     * A method to set the number of parts en masse.
+     * @param number The new number of spares in the pile.
+     */
+    public void setQuantity(int number) {
+        quantity = Math.max(number, 0);
+        if (quantity == 0) {
             for (Part childPart : childParts) {
                 campaign.removePart(childPart);
             }
@@ -1342,19 +1373,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     /**
-     * A method to set the number of parts en masse
-     * @param number The new number of spares in the pile
+     * Gets a value indicating whether or not this is a spare part.
      */
-    public void setQuantity(int number) {
-        quantity = number;
-        if (quantity <= 0) {
-            for (Part childPart : childParts) {
-                campaign.removePart(childPart);
-            }
-            campaign.removePart(this);
-        }
-    }
-
     public boolean isSpare() {
         return (unit == null)
             && (parentPart == null)
