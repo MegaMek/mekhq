@@ -22,6 +22,7 @@ import java.awt.*;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -795,7 +796,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void refreshTaskList() {
         selectedRow = taskTable.getSelectedRow();
 
-        taskModel.setData(getCampaign().getPartsNeedingServiceFor(getSelectedServicedUnit()));
+        List<IPartWork> partsNeedingService = (getSelectedServicedUnit() != null)
+                ? getSelectedServicedUnit().getPartsNeedingService()
+                : Collections.emptyList();
+        taskModel.setData(partsNeedingService);
 
         if ((getSelectedServicedUnit() != null) && (getSelectedServicedUnit().getEntity() != null)) {
             // Retain the selected index while the contents is refreshed.

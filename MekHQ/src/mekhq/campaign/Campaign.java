@@ -4643,25 +4643,6 @@ public class Campaign implements Serializable, ITechManager {
         return new Accountant(this);
     }
 
-    public List<IPartWork> getPartsNeedingServiceFor(@Nullable Unit unit) {
-        return getPartsNeedingServiceFor(unit, false);
-    }
-
-    public List<IPartWork> getPartsNeedingServiceFor(@Nullable Unit unit, boolean onlyNotBeingWorkedOn) {
-        if (unit == null) {
-            return Collections.emptyList();
-        }
-        if (unit.isSalvage() || !unit.isRepairable()) {
-            return unit.getSalvageableParts(onlyNotBeingWorkedOn);
-        } else {
-            return unit.getPartsNeedingFixing(onlyNotBeingWorkedOn);
-        }
-    }
-
-    public List<IAcquisitionWork> getAcquisitionsForUnit(@Nullable Unit unit) {
-        return (unit != null) ? unit.getPartsNeeded() : Collections.emptyList();
-    }
-
     /**
      * Use an A* algorithm to find the best path between two planets For right now, we are just going to minimize the number
      * of jumps but we could extend this to take advantage of recharge information or other variables as well Based on

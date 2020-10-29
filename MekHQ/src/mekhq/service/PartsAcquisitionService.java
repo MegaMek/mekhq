@@ -105,9 +105,7 @@ public class PartsAcquisitionService {
 		acquisitionMap = new HashMap<>();
 
 		for (Unit unit : campaign.getServiceableUnits()) {
-			List<IAcquisitionWork> unitPartsList = campaign.getAcquisitionsForUnit(unit);
-
-			for (IAcquisitionWork aw : unitPartsList) {
+			for (IAcquisitionWork aw : unit.getPartsNeeded()) {
 				if (null == aw.getAcquisitionPart()) {
 					continue;
 				}

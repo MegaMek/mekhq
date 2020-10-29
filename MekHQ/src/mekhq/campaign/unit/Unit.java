@@ -498,6 +498,27 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return (!onlyNotBeingWorkedOn || (onlyNotBeingWorkedOn && !partWork.isBeingWorkedOn()));
     }
 
+    /**
+     * Gets a list of every part on a unit which need service (either repair or salvage),
+     * including parts currently being worked on.
+     */
+    public List<IPartWork> getPartsNeedingService() {
+        return getPartsNeedingService(false);
+    }
+
+    /**
+     * Gets a list of parts on a unit which need service (either repair or salvage),
+     * optionally excluding parts already being worked on.
+     * @param onlyNotBeingWorkedOn When true, excludes parts currently being repaired or salvaged.
+     */
+    public List<IPartWork> getPartsNeedingService(boolean onlyNotBeingWorkedOn) {
+        if (isSalvage() || !isRepairable()) {
+            return getSalvageableParts(onlyNotBeingWorkedOn);
+        } else {
+            return getPartsNeedingFixing(onlyNotBeingWorkedOn);
+        }
+    }
+
     public ArrayList<IPartWork> getPartsNeedingFixing() {
         return getPartsNeedingFixing(false);
     }
