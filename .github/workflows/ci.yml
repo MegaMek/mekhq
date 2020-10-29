@@ -179,6 +179,15 @@ jobs:
       run: ./gradlew -I .github/build-scan-init.gradle build --stacktrace --scan
       
     #
+    # Publish the Unit Test report
+    #
+    - name: Publish Test Report
+      uses: mikepenz/action-junit-report@v1
+      with:
+        report_paths: './mekhq/MekHQ/build/test-results/test/TEST-*.xml'
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+      
+    #
     # If the build step fails, try to upload any
     # test logs in case it was a unit test failure.
     #
