@@ -65,6 +65,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.CancelMothballUnitAction;
+import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.campaign.unit.actions.ShowUnitBvAction;
@@ -352,8 +353,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             }
         } else if (command.contains(COMMAND_HIRE_FULL)) {
             boolean isGM = command.equals(COMMAND_HIRE_FULL_GM);
+            HirePersonnelUnitAction hireAction = new HirePersonnelUnitAction(isGM);
             for (Unit unit : units) {
-                gui.getCampaign().hirePersonnelFor(unit.getId(), isGM);
+                hireAction.Execute(gui.getCampaign(), unit);
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
             ((MekLabTab) gui.getTab(GuiTabType.MEKLAB)).loadUnit(selectedUnit);

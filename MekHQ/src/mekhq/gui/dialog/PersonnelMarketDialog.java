@@ -41,6 +41,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.PersonnelTableModel;
@@ -382,7 +383,8 @@ public class PersonnelMarketDialog extends JDialog {
             unit.addVesselCrew(selectedPerson);
         }
 
-        campaign.hirePersonnelFor(unit.getId(), !pay);
+        HirePersonnelUnitAction hireAction = new HirePersonnelUnitAction(!pay);
+        hireAction.Execute(campaign, unit);
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
