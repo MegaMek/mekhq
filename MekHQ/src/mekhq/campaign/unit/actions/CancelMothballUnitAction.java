@@ -30,7 +30,7 @@ import mekhq.campaign.unit.Unit;
 public class CancelMothballUnitAction implements IUnitAction {
 
     @Override
-    public void Execute(Campaign campaign, Unit unit) {
+    public void execute(Campaign campaign, Unit unit) {
         unit.cancelMothballOrActivation();
     }
 

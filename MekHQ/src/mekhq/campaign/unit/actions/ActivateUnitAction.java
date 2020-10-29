@@ -47,7 +47,7 @@ public class ActivateUnitAction implements IUnitAction {
     }
 
     @Override
-    public void Execute(Campaign campaign, Unit unit) {
+    public void execute(Campaign campaign, Unit unit) {
         if (isGM) {
             unit.startActivating(null, true);
         }

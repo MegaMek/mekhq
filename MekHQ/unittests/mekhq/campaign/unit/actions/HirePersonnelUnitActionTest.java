@@ -34,7 +34,7 @@ public class HirePersonnelUnitActionTest {
         doNothing().when(unit).runDiagnostic(false);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(0)).newPerson(eq(Person.T_MECHWARRIOR));
         verify(mockCampaign, times(0)).recruitPerson(any(Person.class), eq(false));
@@ -61,7 +61,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockDriver), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(true);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_MECHWARRIOR));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(true));
@@ -89,7 +89,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockDriver), anyBoolean())).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_MECHWARRIOR));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
@@ -117,7 +117,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockDriver), anyBoolean())).thenReturn(false);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_MECHWARRIOR));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
@@ -145,7 +145,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockDriver), anyBoolean())).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_MECHWARRIOR), eq(Person.T_AERO_PILOT));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
@@ -172,7 +172,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean())).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_MECHWARRIOR));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
@@ -199,7 +199,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean())).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_VEE_GUNNER));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
@@ -226,7 +226,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean())).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_SPACE_GUNNER));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
@@ -253,7 +253,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean())).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_SPACE_GUNNER));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
@@ -281,7 +281,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockCrew), anyBoolean())).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_SPACE_CREW));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
@@ -309,7 +309,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockCrew), anyBoolean())).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_VEHICLE_CREW));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
@@ -337,7 +337,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockNavigator), anyBoolean())).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_NAVIGATOR));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
@@ -364,7 +364,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockTechOfficer), anyBoolean())).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_MECHWARRIOR));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
@@ -391,7 +391,7 @@ public class HirePersonnelUnitActionTest {
         when(mockCampaign.recruitPerson(eq(mockTechOfficer), anyBoolean())).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
-        action.Execute(mockCampaign, unit);
+        action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(eq(Person.T_VEE_GUNNER));
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));

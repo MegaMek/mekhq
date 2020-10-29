@@ -384,7 +384,7 @@ public class PersonnelMarketDialog extends JDialog {
         }
 
         HirePersonnelUnitAction hireAction = new HirePersonnelUnitAction(!pay);
-        hireAction.Execute(campaign, unit);
+        hireAction.execute(campaign, unit);
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {

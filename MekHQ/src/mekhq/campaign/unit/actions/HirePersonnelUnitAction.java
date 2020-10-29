@@ -43,7 +43,7 @@ public class HirePersonnelUnitAction implements IUnitAction {
     }
 
     @Override
-    public void Execute(Campaign campaign, Unit unit) {
+    public void execute(Campaign campaign, Unit unit) {
         while (unit.canTakeMoreDrivers()) {
             Person p = null;
             if (unit.getEntity() instanceof LandAirMech) {
