@@ -4643,34 +4643,23 @@ public class Campaign implements Serializable, ITechManager {
         return new Accountant(this);
     }
 
-    public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid) {
-        return getPartsNeedingServiceFor(uid, false);
+    public List<IPartWork> getPartsNeedingServiceFor(@Nullable Unit unit) {
+        return getPartsNeedingServiceFor(unit, false);
     }
 
-    public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid, boolean onlyNotBeingWorkedOn) {
-        if (null == uid) {
-            return new ArrayList<>();
+    public List<IPartWork> getPartsNeedingServiceFor(@Nullable Unit unit, boolean onlyNotBeingWorkedOn) {
+        if (unit == null) {
+            return Collections.emptyList();
         }
-        Unit u = getHangar().getUnit(uid);
-        if (u != null) {
-            if (u.isSalvage() || !u.isRepairable()) {
-                return u.getSalvageableParts(onlyNotBeingWorkedOn);
-            } else {
-                return u.getPartsNeedingFixing(onlyNotBeingWorkedOn);
-            }
+        if (unit.isSalvage() || !unit.isRepairable()) {
+            return unit.getSalvageableParts(onlyNotBeingWorkedOn);
+        } else {
+            return unit.getPartsNeedingFixing(onlyNotBeingWorkedOn);
         }
-        return new ArrayList<>();
     }
 
-    public ArrayList<IAcquisitionWork> getAcquisitionsForUnit(UUID uid) {
-        if (null == uid) {
-            return new ArrayList<>();
-        }
-        Unit u = getHangar().getUnit(uid);
-        if (u != null) {
-            return u.getPartsNeeded();
-        }
-        return new ArrayList<>();
+    public List<IAcquisitionWork> getAcquisitionsForUnit(@Nullable Unit unit) {
+        return (unit != null) ? unit.getPartsNeeded() : Collections.emptyList();
     }
 
     /**

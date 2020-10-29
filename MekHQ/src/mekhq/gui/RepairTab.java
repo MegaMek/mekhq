@@ -795,11 +795,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void refreshTaskList() {
         selectedRow = taskTable.getSelectedRow();
 
-        UUID uuid = null;
-        if (null != getSelectedServicedUnit()) {
-            uuid = getSelectedServicedUnit().getId();
-        }
-        taskModel.setData(getCampaign().getPartsNeedingServiceFor(uuid));
+        taskModel.setData(getCampaign().getPartsNeedingServiceFor(getSelectedServicedUnit()));
 
         if ((getSelectedServicedUnit() != null) && (getSelectedServicedUnit().getEntity() != null)) {
             // Retain the selected index while the contents is refreshed.

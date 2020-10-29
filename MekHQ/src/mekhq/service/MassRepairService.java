@@ -170,7 +170,7 @@ public class MassRepairService {
         List<Person> techs = campaign.getTechs(false);
 
         if (!techs.isEmpty()) {
-            List<IPartWork> parts = campaign.getPartsNeedingServiceFor(unit.getId(), true);
+            List<IPartWork> parts = campaign.getPartsNeedingServiceFor(unit, true);
             parts = filterParts(parts, null, techs, campaign);
 
             if (!parts.isEmpty()) {
@@ -302,7 +302,7 @@ public class MassRepairService {
 
                 for (List<MassRepairUnitAction> list : unitActionsByStatus.values()) {
                     for (MassRepairUnitAction mrua : list) {
-                        List<IPartWork> parts = campaign.getPartsNeedingServiceFor(mrua.getUnit().getId(), true);
+                        List<IPartWork> parts = campaign.getPartsNeedingServiceFor(mrua.getUnit(), true);
                         int tempCount = filterParts(parts, null, techs, campaign).size();
 
                         if (tempCount > 0) {
@@ -423,10 +423,10 @@ public class MassRepairService {
                                                                   Map<Integer, MassRepairOption> mroByTypeMap,
                                                                   boolean salvaging,
                                                                   MassRepairConfiguredOptions configuredOptions) {
-        List<IPartWork> parts = campaign.getPartsNeedingServiceFor(unit.getId(), true);
+        List<IPartWork> parts = campaign.getPartsNeedingServiceFor(unit, true);
 
         if (parts.isEmpty()) {
-            parts = campaign.getPartsNeedingServiceFor(unit.getId(), false);
+            parts = campaign.getPartsNeedingServiceFor(unit, false);
 
             if (!parts.isEmpty()) {
                 return new MassRepairUnitAction(unit, salvaging, MassRepairUnitAction.STATUS.ALL_PARTS_IN_PROCESS);
@@ -457,7 +457,7 @@ public class MassRepairService {
             }
 
             if (refreshParts) {
-                parts = campaign.getPartsNeedingServiceFor(unit.getId(), true);
+                parts = campaign.getPartsNeedingServiceFor(unit, true);
             }
         }
 
@@ -538,7 +538,7 @@ public class MassRepairService {
                     unit.setSalvage(true);
                 }
 
-                List<IPartWork> partsTemp = campaign.getPartsNeedingServiceFor(unit.getId(), true);
+                List<IPartWork> partsTemp = campaign.getPartsNeedingServiceFor(unit, true);
                 List<IPartWork> partsToBeRemoved = new ArrayList<>();
                 Map<Integer, Integer> countOfPartsPerLocation = new HashMap<>();
 
@@ -578,7 +578,7 @@ public class MassRepairService {
                         unit.setSalvage(false);
                     }
 
-                    parts = campaign.getPartsNeedingServiceFor(unit.getId(), true);
+                    parts = campaign.getPartsNeedingServiceFor(unit, true);
                 } else {
                     for (int locId : countOfPartsPerLocation.keySet()) {
                         boolean unfixable = false;

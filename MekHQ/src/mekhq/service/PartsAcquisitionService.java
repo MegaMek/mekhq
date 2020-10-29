@@ -105,7 +105,7 @@ public class PartsAcquisitionService {
 		acquisitionMap = new HashMap<>();
 
 		for (Unit unit : campaign.getServiceableUnits()) {
-			ArrayList<IAcquisitionWork> unitPartsList = campaign.getAcquisitionsForUnit(unit.getId());
+			List<IAcquisitionWork> unitPartsList = campaign.getAcquisitionsForUnit(unit);
 
 			for (IAcquisitionWork aw : unitPartsList) {
 				if (null == aw.getAcquisitionPart()) {
@@ -183,7 +183,7 @@ public class PartsAcquisitionService {
 		missingTotalPrice = Money.zero();
 
 		//campaign.addReport("***START: generateSummaryCounts");
-		
+
 		for (PartCountInfo pci : partCountInfoMap.values()) {
 			inTransitCount += pci.getInTransitCount();
 			onOrderCount += pci.getOnOrderCount();
@@ -202,7 +202,7 @@ public class PartsAcquisitionService {
 
 			//campaign.addReport(pci.toString());
 		}
-		
+
 		//campaign.addReport("***END: generateSummaryCounts");
 	}
 
@@ -313,7 +313,7 @@ public class PartsAcquisitionService {
 			sb.append(",failedMessage='" + failedMessage + "'");
 			sb.append(",canBeAcquired=" + canBeAcquired);
 			sb.append("}");
-			
+
 			return sb.toString();
 		}
 	}
