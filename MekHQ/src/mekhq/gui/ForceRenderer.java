@@ -19,7 +19,6 @@
 package mekhq.gui;
 
 import java.awt.*;
-import java.util.UUID;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -129,13 +128,9 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 c3network = "<br><i>" + c3network + "</i>";
             }
 
-            if (u.hasTransportShipId()) {
-                for (UUID id : u.getTransportShipId().keySet()) {
-                    Unit ship = u.getCampaign().getUnit(id);
-                    if (ship != null) {
-                        transport.append("<br>" + "Transported by: ").append(ship.getName());
-                    }
-                }
+            if (u.hasTransportShipAssignment()) {
+                transport.append("<br>Transported by: ")
+                        .append(u.getTransportShipAssignment().getTransportShip().getName());
             }
             setText("<html>" + name + ", " + uname + c3network + transport + "</html>");
             if (!sel && u.isDeployed()) {
