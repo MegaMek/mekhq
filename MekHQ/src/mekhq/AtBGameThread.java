@@ -237,14 +237,7 @@ public class AtBGameThread extends GameThread {
                     if (unit.hasTransportShipAssignment()) {
                         Unit transportShip = unit.getTransportShipAssignment().getTransportShip();
                         if (scenario.getPlayerTransportLinkages().containsKey(transportShip.getId())) {
-
                             scenario.addPlayerTransportRelationship(transportShip.getId(), unit.getId());
-                            // Set these flags so we know what prompts to display later
-                            if (unit.getEntity().isAero()) {
-                                campaign.getUnit(transportShip.getId()).setCarryingAero(true);
-                            } else {
-                                campaign.getUnit(transportShip.getId()).setCarryingGround(true);
-                            }
                         }
                     }
                 }

@@ -103,9 +103,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private double protoCapacity = 0.0;
     private double shVeeCapacity = 0.0;
     private double scCapacity = 0.0;
-    // Convenience data used by GameThread
-    private boolean carryingAero = false;
-    private boolean carryingGround = false;
 
     //assignments
     private int forceId;
@@ -359,20 +356,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         transportedUnits.clear();
     }
 
+    /**
+     * Gets a value indicating whether or not we are transporting any aero units.
+     */
     public boolean isCarryingAero() {
-        return carryingAero;
+        return transportedUnits.stream().anyMatch(u -> u.getEntity().isAero());
     }
 
-    public void setCarryingAero(boolean b) {
-        carryingAero = b;
-    }
-
+    /**
+     * Gets a value indicating whether or not we are transporting any ground units.
+     */
     public boolean isCarryingGround() {
-        return carryingGround;
-    }
-
-    public void setCarryingGround(boolean b) {
-        carryingGround = b;
+        return transportedUnits.stream().anyMatch(u -> !u.getEntity().isAero());
     }
 
     public int getSite() {
