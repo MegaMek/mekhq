@@ -261,7 +261,8 @@ public class StratconRulesManager {
         track.assignForce(forceID, coords, campaign.getLocalDate());
     }
     
-    public static void processReinforcementDeployment(StratconScenario scenario, int forceID, StratconCampaignState campaignState) {
+    public static void processReinforcementDeployment(ReinforcementEligibilityType reinforcementType, 
+            StratconCampaignState campaignState) {
         // if the force is already deployed to the track, we're done
         // if there is an SP to burn, burn it and we're done
         // if there is a VP to burn, burn it and we're done
@@ -269,8 +270,21 @@ public class StratconRulesManager {
         // 9+ = deploy
         // 6+ = deploy, if lance != fight, track scenario odds up
         // 2+ = apply negative modifier to scenario
-        StratconTrackState track;
-        track.getScenarioOdds()
+        
+        switch(reinforcementType) {
+        case FightLance:
+            //if 9
+            break;
+        case SupportPoint:
+            if (campaignState.getSupportPoints() > 0) {
+                campaignState.useSupportPoint();
+                return;
+            } else {
+                campaignState.updateVictoryPoints(-1);
+                return;
+            }
+        default:
+        }
     }
     
     /**
@@ -781,30 +795,34 @@ public class StratconRulesManager {
         return retVal;
     }
     
-    public static ReinforcementEligibilityType getReinforcementType(Force force, 
+    /**
+     * Determines what rules to use when deploying a force for reinforcements to the given track.
+     */
+    public static ReinforcementEligibilityType getReinforcementType(int forceID, 
             StratconTrackState trackState, Campaign campaign) {
-        // if the force is part of the track state's chained scenario reinforcement pool 
-        // then the result is ChainedScenario
+        // if the force is currently deployed to the track, it'll be able to deploy "for free"
+        if (trackState.isForceDeployed(forceID)) {
+            return ReinforcementEligibilityType.ChainedScenario;
+        }
         
-        // if the force is a "fight" lance that has been deployed to the track
-        // then the result is FightLance
-        if(campaign.getLances().containsKey(force.getId()) &&
-            campaign.getLances().get(force.getId()).getRole() == AtBLanceRole.FIGHTING &&
-            trackState.getAssignedForceCoords().containsKey(force.getId())) {
+        // if the force is in 'fight' stance, it'll be able to deploy using 'fight lance' rules
+        if (campaign.getLances().containsKey(forceID) &&
+                campaign.getLances().get(forceID).getRole() == AtBLanceRole.FIGHTING) {
             return ReinforcementEligibilityType.FightLance;
         }
         
-        // if the force is deployed elsewhere
+        // if the force is deployed elsewhere, it cannot be deployed as reinforcements
         for(Contract contract : campaign.getActiveContracts()) {
             if(contract instanceof AtBContract) {
                 for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
-                    if(track != trackState && track.getAssignedForceCoords().containsKey(force.getId())) {
+                    if(track != trackState && track.getAssignedForceCoords().containsKey(forceID)) {
                         return ReinforcementEligibilityType.None;
                     }
                 }
             }
         }
         
+        // otherwise, the force requires support points / vps to deploy
         return ReinforcementEligibilityType.SupportPoint;
     }
     

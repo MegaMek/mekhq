@@ -33,8 +33,10 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType;
 
 /**
  * UI for managing force/unit assignments for individual StratCon scenarios.
@@ -53,6 +55,8 @@ public class StratconScenarioWizard extends JDialog {
     
     JList<Unit> availableInfantryUnits = new JList<>();
     JLabel defensiveOptionStatus = new JLabel();
+    
+    JButton btnCommit;
     
     public StratconScenarioWizard(Campaign campaign) {
         this.campaign = campaign;
@@ -142,7 +146,11 @@ public class StratconScenarioWizard extends JDialog {
             GridBagConstraints localGbc = new GridBagConstraints();
             localGbc.gridx = 0;
             localGbc.gridy = 0;
-            JLabel assignForceListInstructions = new JLabel("selectForceForTemplate.text");
+            
+            int forceLimit = reinforcements ? 
+                    currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_LEADER, campaign) : 1;               
+            
+            JLabel assignForceListInstructions = new JLabel(String.format(resourceMap.getString("selectForceForTemplate.Text"), forceLimit));
             forcePanel.add(assignForceListInstructions, localGbc);
             
             localGbc.gridy = 1;
@@ -152,7 +160,7 @@ public class StratconScenarioWizard extends JDialog {
             availableForceList.addListSelectionListener(new ListSelectionListener() { 
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
-                    availableForceSelectorChanged(e, selectedForceInfo, reinforcements);
+                    availableForceSelectorChanged(e, selectedForceInfo, reinforcements, forceLimit);
                 }
             });
             
@@ -295,7 +303,7 @@ public class StratconScenarioWizard extends JDialog {
         sb.append(f.getFullName());
         sb.append(": ");
         if(showForceCost) {
-            sb.append(buildForceCost(f));
+            sb.append(buildForceCost(f.getId()));
         }
         sb.append("<br/>");
         
@@ -335,11 +343,11 @@ public class StratconScenarioWizard extends JDialog {
         return sb.toString();
     }
     
-    private String buildForceCost(Force f) {
+    private String buildForceCost(int forceID) {
         StringBuilder costBuilder = new StringBuilder();
         costBuilder.append("(");
         
-        switch(StratconRulesManager.getReinforcementType(f, currentTrackState, campaign)) {
+        switch(StratconRulesManager.getReinforcementType(forceID, currentTrackState, campaign)) {
         case SupportPoint:
             costBuilder.append("supportPoint.text");
             if(currentCampaignState.getSupportPoints() <= 0) {
@@ -356,7 +364,7 @@ public class StratconScenarioWizard extends JDialog {
             }
             break;
         case ChainedScenario:
-            costBuilder.append(String.format("fromChainedScenario.text %s <span color='red'>%d hostile units reinforcing</span>", 
+            costBuilder.append(String.format("", 
                     "scenarioname", "unitsfromscenario[stratconscenarioid]"));
             break;
         case FightLance:
@@ -379,7 +387,7 @@ public class StratconScenarioWizard extends JDialog {
         // you're on one of two screens:
         // the 'primary force selection' screen
         // the 'reinforcement selection' screen
-        JButton btnCommit = new JButton("Commit");
+        btnCommit = new JButton("Commit");
         btnCommit.setActionCommand("COMMIT_CLICK");
         btnCommit.addActionListener(new ActionListener() { 
             @Override
@@ -427,6 +435,13 @@ public class StratconScenarioWizard extends JDialog {
         // every force that's been deployed to this scenario gets assigned to the track
         for(int forceID : currentScenario.getAssignedForces()) {
             StratconRulesManager.processForceDeployment(currentScenario.getCoords(), forceID, campaign, currentTrackState);
+            
+            // if we are assigning reinforcements, pay the price if appropriate
+            if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
+                ReinforcementEligibilityType reinforcementType = 
+                        StratconRulesManager.getReinforcementType(forceID, currentTrackState, campaign);
+                StratconRulesManager.processReinforcementDeployment(reinforcementType, currentCampaignState);
+            }
         }
         
         // scenarios that haven't had primary forces committed yet get those committed now
@@ -452,7 +467,7 @@ public class StratconScenarioWizard extends JDialog {
      * Event handler for when the user makes a selection on the available force selector.
      * @param e The event fired. 
      */
-    private void availableForceSelectorChanged(ListSelectionEvent e, JLabel forceStatusLabel, boolean reinforcements) {
+    private void availableForceSelectorChanged(ListSelectionEvent e, JLabel forceStatusLabel, boolean reinforcements, int forceLimit) {
         if(!(e.getSource() instanceof JList<?>)) {
             return;
         }
@@ -492,10 +507,13 @@ public class StratconScenarioWizard extends JDialog {
         
         JList<Unit> changedList = (JList<Unit>) e.getSource();
         selectionCountLabel.setText(String.format("%d selected", changedList.getSelectedIndices().length));
+        // if we've selected too many units here, change the label and disable the commit button
         if(changedList.getSelectedIndices().length > maxSelectionSize) {
             selectionCountLabel.setForeground(Color.RED);
+            btnCommit.setEnabled(false);
         } else {
             selectionCountLabel.setForeground(Color.BLACK);
+            btnCommit.setEnabled(true);
         }
 
         StringBuilder sb = new StringBuilder();

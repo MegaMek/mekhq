@@ -284,6 +284,13 @@ public class StratconTrackState {
         return backingScenarioMap;
     }
     
+    /**
+     * Convenience method - returns true if the force with the given ID is currently deployed to this track
+     */
+    public boolean isForceDeployed(int forceID) {
+        return assignedForceCoords.containsKey(forceID);
+    }
+    
     @Override
     public String toString() {
         return getDisplayableName();
