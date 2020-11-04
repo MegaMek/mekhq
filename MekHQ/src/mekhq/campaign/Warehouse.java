@@ -298,19 +298,19 @@ public class Warehouse {
      * @param ammo Ammo in the warehouse.
      * @param shots The amount of ammo to add to the warehouse.
      */
-	public void addAmmo(AmmoStorage ammo, int shots) {
+    public void addAmmo(AmmoStorage ammo, int shots) {
         Objects.requireNonNull(ammo);
 
         ammo.changeShots(shots);
         MekHQ.triggerEvent(new PartChangedEvent(ammo));
-	}
+    }
 
     /**
      * Removes ammo from the warehouse.
      * @param ammo Ammo in the warehouse.
      * @param shots The amount of ammo to remove from the warehouse.
      */
-	public boolean removeAmmo(AmmoStorage ammo, int shots) {
+    public boolean removeAmmo(AmmoStorage ammo, int shots) {
         Objects.requireNonNull(ammo);
 
         if (shots >= ammo.getShots()) {
