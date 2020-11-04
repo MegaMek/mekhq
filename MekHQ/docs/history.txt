@@ -26,6 +26,7 @@ VERSION HISTORY:
 + PR #2173: Implementing sort order for SPAs in Campaign Options
 + PR #2174: Tabbed MekHQ Options Dialog
 + PR #2161: Improving Zipped Force Icon folders
++ PR #2162: Standardized Portrait Chooser
 
 0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo
