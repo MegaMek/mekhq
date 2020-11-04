@@ -374,15 +374,16 @@ public class Quartermaster {
     /**
      * Tries to buy a part with a cost multiplier, arriving in a given number of days.
      * @param part The part to buy.
-     * @param multiplier The cost multiplier for the purchase.
+     * @param costMultiplier The cost multiplier for the purchase.
      * @param transitDays The number of days until the new part arrives.
      * @return True if the part was purchased, otherwise false.
      */
-    public boolean buyPart(Part part, double multiplier, int transitDays) {
+    public boolean buyPart(Part part, double costMultiplier, int transitDays) {
         Objects.requireNonNull(part);
 
         if (getCampaignOptions().payForParts()) {
-            if (getCampaign().getFinances().debit(part.getStickerPrice().multipliedBy(multiplier),
+            Money cost = part.getStickerPrice().multipliedBy(costMultiplier);
+            if (getCampaign().getFinances().debit(cost,
                     Transaction.C_EQUIP, "Purchase of " + part.getName(), getCampaign().getLocalDate())) {
                 if (part instanceof Refit) {
                     ((Refit) part).addRefitKitParts(transitDays);
