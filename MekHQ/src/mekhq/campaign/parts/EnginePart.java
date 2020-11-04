@@ -239,7 +239,7 @@ public class EnginePart extends Part {
             if (unit.getEntity() instanceof Protomech) {
                 ((Protomech) unit.getEntity()).setEngineHit(true);
             }
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.removePart(this);
             } else if (null != spare) {

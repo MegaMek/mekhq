@@ -280,10 +280,11 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             // to approximately # units / # techs in mothball/reactivation tasks
             for (Unit unit : unitsByType.get(unitType)) {
                 UUID id = selectedTechs.get(techIndex).getId();
+                Person tech = campaign.getPerson(id);
                 if (isMothballing) {
-                    unit.startMothballing(id);
+                    unit.startMothballing(tech);
                 } else {
-                    unit.startActivating(id);
+                    unit.startActivating(tech);
                 }
                 MekHQ.triggerEvent(new UnitChangedEvent(unit));
 
@@ -353,7 +354,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
             Person person = (Person) value;
 
-            boolean maintainsUnits = person.getTechUnitIDs().size() > 0;
+            boolean maintainsUnits = !person.getTechUnits().isEmpty();
             setText((maintainsUnits ? "(*) " : "") + person.getFullTitle() + " ("
                     + person.getMinutesLeft() + " min)");
 

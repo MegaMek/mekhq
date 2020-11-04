@@ -132,7 +132,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
     }
 
     public void changeAmountAvailable(int amount, final AmmoType curType) {
-        InfantryAmmoStorage a = (InfantryAmmoStorage) campaign.findSparePart(part ->
+        InfantryAmmoStorage a = (InfantryAmmoStorage) campaign.getWarehouse().findSparePart(part ->
                 isRightAmmo(part, curType, weaponType));
 
         if (null != a) {

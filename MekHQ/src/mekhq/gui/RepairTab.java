@@ -22,6 +22,7 @@ import java.awt.*;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -472,13 +473,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 boolean wasNull = false;
                 // Temporarily set the Team ID if it isn't already.
                 // This is needed for the Clan Tech flag
-                if (part.getTeamId() == null) {
-                    part.setTeamId(tech.getId());
+                if (part.getTech() == null) {
+                    part.setTech(tech);
                     wasNull = true;
                 }
                 target = getCampaign().getTargetFor(part, tech);
                 if (wasNull) { // If it was null, make it null again
-                    part.setTeamId(null);
+                    part.setTech(null);
                 }
             }
         }
@@ -728,7 +729,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                     }
                     // check whether the engineer is assigned to the correct
                     // unit
-                    return unit.getId().equals(tech.getUnitId());
+                    return unit.equals(tech.getUnit());
                 } else if ((tech.getPrimaryRole() == Person.T_SPACE_CREW) && (unit != null) && !unit.isSelfCrewed()) {
                     return false;
                 } else if (!tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
@@ -795,11 +796,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void refreshTaskList() {
         selectedRow = taskTable.getSelectedRow();
 
-        UUID uuid = null;
-        if (null != getSelectedServicedUnit()) {
-            uuid = getSelectedServicedUnit().getId();
-        }
-        taskModel.setData(getCampaign().getPartsNeedingServiceFor(uuid));
+        List<IPartWork> partsNeedingService = (getSelectedServicedUnit() != null)
+                ? getSelectedServicedUnit().getPartsNeedingService()
+                : Collections.emptyList();
+        taskModel.setData(partsNeedingService);
 
         if ((getSelectedServicedUnit() != null) && (getSelectedServicedUnit().getEntity() != null)) {
             // Retain the selected index while the contents is refreshed.

@@ -37,7 +37,7 @@ import mekhq.campaign.unit.Unit;
 public class ShowUnitBvAction implements IUnitAction {
 
     @Override
-    public void Execute(Campaign campaign, Unit unit) {
+    public void execute(Campaign campaign, Unit unit) {
         if (unit == null) {
             return;
         }

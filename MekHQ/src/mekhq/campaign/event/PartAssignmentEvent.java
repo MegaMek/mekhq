@@ -21,21 +21,23 @@ package mekhq.campaign.event;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 
+import megamek.common.annotations.Nullable;
+
 /**
  * Triggered when a part is assigned to a tech for repair. If getTech() == null, the tech has
  * been removed from the assignment.
  *
  */
 public class PartAssignmentEvent extends PartChangedEvent {
-    
+
     private final Person tech;
-    
-    public PartAssignmentEvent(Part part, Person tech) {
+
+    public PartAssignmentEvent(Part part, @Nullable Person tech) {
         super(part);
         this.tech = tech;
     }
-    
-    public Person getTech() {
+
+    public @Nullable Person getTech() {
         return tech;
     }
 

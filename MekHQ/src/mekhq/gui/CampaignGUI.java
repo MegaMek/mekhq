@@ -1399,8 +1399,7 @@ public class CampaignGUI extends JPanel {
         boolean retirementDateTracking = getCampaign().getCampaignOptions().useRetirementDateTracking();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
-        CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
-                getCampaign(), getIconPackage());
+        CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true, getCampaign());
         cod.setVisible(true);
         if (timeIn != getCampaign().getCampaignOptions().getUseTimeInService()) {
             if (getCampaign().getCampaignOptions().getUseTimeInService()) {
@@ -1581,7 +1580,7 @@ public class CampaignGUI extends JPanel {
                                 "No Engineer", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            r.setTeamId(engineer.getId());
+            r.setTech(engineer);
         } else if (getCampaign().getTechs().size() > 0) {
             String name;
             Map<String, Person> techHash = new HashMap<>();
@@ -1624,7 +1623,7 @@ public class CampaignGUI extends JPanel {
                 return;
             }
 
-            r.setTeamId(techHash.get(s).getId());
+            r.setTech(techHash.get(s));
         } else {
             JOptionPane.showMessageDialog(frame,
                     "You have no techs available to work on this refit.",
@@ -1637,7 +1636,7 @@ public class CampaignGUI extends JPanel {
             rnd.setVisible(true);
             if (rnd.wasCancelled()) {
                 // Set the tech team to null since we may want to change it when we re-do the refit
-                r.setTeamId(null);
+                r.setTech(null);
                 return;
             }
         }
@@ -2004,8 +2003,8 @@ public class CampaignGUI extends JPanel {
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have
                     // changed...
-                    p.setUnitId(null);
-                    p.clearTechUnitIDs();
+                    p.setUnit(null);
+                    p.clearTechUnits();
                 }
             }
 
@@ -2184,7 +2183,7 @@ public class CampaignGUI extends JPanel {
 
         File partsFile = maybeFile.get();
 
-        MekHQ.getLogger().info(this, "Starting load of parts file from XML...");
+        MekHQ.getLogger().info("Starting load of parts file from XML...");
         // Initialize variables.
         Document xmlDoc;
 
@@ -2196,7 +2195,7 @@ public class CampaignGUI extends JPanel {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
             return;
         }
 
@@ -2211,6 +2210,7 @@ public class CampaignGUI extends JPanel {
 
         // we need to iterate through three times, the first time to collect
         // any custom units that might not be written yet
+        List<Part> parts = new ArrayList<>();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
@@ -2222,17 +2222,18 @@ public class CampaignGUI extends JPanel {
             if (!wn2.getNodeName().equalsIgnoreCase("part")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.getLogger().error(this, "Unknown node type not loaded in Parts nodes: " + wn2.getNodeName());
+                MekHQ.getLogger().error("Unknown node type not loaded in Parts nodes: " + wn2.getNodeName());
                 continue;
             }
 
             Part p = Part.generateInstanceFromXML(wn2, version);
             if (p != null) {
-                p.setCampaign(getCampaign());
-                getCampaign().addPartWithoutId(p);
+                parts.add(p);
             }
         }
-        MekHQ.getLogger().info(this, "Finished load of parts file");
+
+        getCampaign().importParts(parts);
+        MekHQ.getLogger().info("Finished load of parts file");
     }
 
     protected void loadOptionsFile() {

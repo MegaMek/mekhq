@@ -17,6 +17,15 @@ VERSION HISTORY:
 + Issue #1723: Fixing Missing Personnel and Hangar Tab Selection Highlights
 + PR #2153: UnitRatingMethod: Add Disabled Case
 + Issue #1537: Fixing Null AmmoType NPE in Hangar Tab
++ Issue #2159: Fixing Soldier Filter Name
++ PR #2164: Fixing Historical Daily Log Disabled Message
++ Issue #2159: Personnel Filter Style for All Options
++ PR #2168: Properly implementing AtB edge assignment if MekHQ cannot assign an SPA
++ PR #2169: Fixing all and none portraits click when changing options preset
++ PR #2170: Support Edge is now properly reliant on Edge being enabled
++ PR #2173: Implementing sort order for SPAs in Campaign Options
++ PR #2174: Tabbed MekHQ Options Dialog
++ PR #2161: Improving Zipped Force Icon folders
 
 0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo

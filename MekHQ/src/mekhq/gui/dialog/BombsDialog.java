@@ -82,7 +82,7 @@ public class BombsDialog extends JDialog implements ActionListener {
     private void initGUI() {
         //Using bombCatalog to store the part ID's of the bombs so don't have to keep full spare list in memory
         //and for ease of access later
-        campaign.forEachSparePart(spare -> {
+        campaign.getWarehouse().forEachSparePart(spare -> {
             if ((spare instanceof AmmoStorage)
                     && (((EquipmentPart)spare).getType() instanceof BombType)
                     && spare.isPresent()) {

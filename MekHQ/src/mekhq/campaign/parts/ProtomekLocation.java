@@ -293,7 +293,7 @@ public class ProtomekLocation extends Part {
         if(null != unit) {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
             unit.getEntity().setLocationBlownOff(loc, false);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
                 campaign.removePart(this);
             } else if(null != spare) {
@@ -590,7 +590,7 @@ public class ProtomekLocation extends Part {
         }
         String toReturn = "<html><font size='2'";
         String scheduled = "";
-        if (getTeamId() != null) {
+        if (getTech() != null) {
             scheduled = " (scheduled) ";
         }
 

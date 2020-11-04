@@ -140,7 +140,7 @@ public class BattleArmorSuit extends Part {
     public double getTonnage() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
-        if ((null == unit) && getChildParts().isEmpty()) {
+        if ((null == unit) && !hasChildParts()) {
             return alternateTon;
         }
         double tons = 0;
@@ -219,7 +219,7 @@ public class BattleArmorSuit extends Part {
         }
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded extra costs
-        if ((null == unit) && getChildParts().isEmpty()) {
+        if ((null == unit) && !hasChildParts()) {
             tons += alternateTon;
         }
         for (Part p : getChildParts()) {
@@ -234,7 +234,7 @@ public class BattleArmorSuit extends Part {
     public Money getStickerPrice() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
-        if ((null == unit) && getChildParts().isEmpty()) {
+        if ((null == unit) && !hasChildParts()) {
             return alternateCost;
         }
         Money cost = Money.zero();
@@ -469,7 +469,7 @@ public class BattleArmorSuit extends Part {
         for(Part p : trooperParts) {
             p.remove(salvage);
         }
-        Part spare = campaign.checkForExistingSparePart(this);
+        Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
         if(!salvage) {
             campaign.removePart(this);
         } else if(null != spare) {
@@ -526,7 +526,7 @@ public class BattleArmorSuit extends Part {
         } else {
             int nEquip = 0;
             int armor = 0;
-            if (!getChildParts().isEmpty()) {
+            if (!hasChildParts()) {
                 for (Part p : getChildParts()) {
                     if (p instanceof BaArmor) {
                         armor = ((BaArmor)p).getAmount();
@@ -648,7 +648,7 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public void postProcessCampaignAddition() {
-        if (!isReplacement && getChildParts().isEmpty()) {
+        if (!isReplacement && !hasChildParts()) {
             addSubParts();
         }
     }
