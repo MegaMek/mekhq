@@ -694,15 +694,15 @@ public class PersonnelTableModel extends DataTableModel {
 
             if (!isSelected) {
                 if (isDeployed(actualRow)) {
-                    MekHQ.getMekHQOptions().getColors().getDeployed().getColor().ifPresent(this::setBackground);
-                    MekHQ.getMekHQOptions().getColors().getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                    MekHQ.getMekHQOptions().getDeployed().getColor().ifPresent(this::setBackground);
+                    MekHQ.getMekHQOptions().getDeployed().getAlternateColor().ifPresent(this::setForeground);
                 } else if ((Integer.parseInt((String) getValueAt(actualRow, COL_HITS)) > 0)
                         || getPerson(actualRow).hasInjuries(true)) {
-                    MekHQ.getMekHQOptions().getColors().getInjured().getColor().ifPresent(this::setBackground);
-                    MekHQ.getMekHQOptions().getColors().getInjured().getAlternateColor().ifPresent(this::setForeground);
+                    MekHQ.getMekHQOptions().getInjured().getColor().ifPresent(this::setBackground);
+                    MekHQ.getMekHQOptions().getInjured().getAlternateColor().ifPresent(this::setForeground);
                 } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
-                    MekHQ.getMekHQOptions().getColors().getHealedInjuries().getColor().ifPresent(this::setBackground);
-                    MekHQ.getMekHQOptions().getColors().getHealedInjuries().getAlternateColor().ifPresent(this::setForeground);
+                    MekHQ.getMekHQOptions().getHealedInjuries().getColor().ifPresent(this::setBackground);
+                    MekHQ.getMekHQOptions().getHealedInjuries().getAlternateColor().ifPresent(this::setForeground);
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                     setForeground(UIManager.getColor("Table.foreground"));

@@ -298,8 +298,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     campaign.getRetirementDefectionTracker().getPayout(data.get(row));
                 if (null == pay) {
                     return "";
-                }
-                if (pay.getDependents() > 0) {
+                } else if (pay.getDependents() > 0) {
                     return pay.getDependents() + " Dependents";
                 } else if (pay.hasRecruit()) {
                     return Person.getRoleDesc(pay.getRecruitType(),
@@ -394,8 +393,8 @@ public class RetirementTableModel extends AbstractTableModel {
             if (!isSelected) {
                 if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
                     campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                    MekHQ.getMekHQOptions().getColors().getPaidRetirement().getColor().ifPresent(this::setBackground);
-                    MekHQ.getMekHQOptions().getColors().getPaidRetirement().getAlternateColor().ifPresent(this::setForeground);
+                    MekHQ.getMekHQOptions().getPaidRetirement().getColor().ifPresent(this::setBackground);
+                    MekHQ.getMekHQOptions().getPaidRetirement().getAlternateColor().ifPresent(this::setForeground);
                 }
             }
             return this;
@@ -471,8 +470,8 @@ public class RetirementTableModel extends AbstractTableModel {
             if (!isSelected) {
                 if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
                         campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                    MekHQ.getMekHQOptions().getColors().getPaidRetirement().getColor().ifPresent(this::setBackground);
-                    MekHQ.getMekHQOptions().getColors().getPaidRetirement().getAlternateColor().ifPresent(this::setForeground);
+                    MekHQ.getMekHQOptions().getPaidRetirement().getColor().ifPresent(this::setBackground);
+                    MekHQ.getMekHQOptions().getPaidRetirement().getAlternateColor().ifPresent(this::setForeground);
                 }
             }
 

@@ -283,25 +283,25 @@ public class UnitTableModel extends DataTableModel {
 
             if (!isSelected) {
                 if (u.isDeployed()) {
-                    applyColors(MekHQ.getMekHQOptions().getColors().getDeployed());
+                    applyColors(MekHQ.getMekHQOptions().getDeployed());
                 } else if (!u.isPresent()) {
-                    applyColors(MekHQ.getMekHQOptions().getColors().getInTransit());
+                    applyColors(MekHQ.getMekHQOptions().getInTransit());
                 } else if (u.isRefitting()) {
-                    applyColors(MekHQ.getMekHQOptions().getColors().getRefitting());
+                    applyColors(MekHQ.getMekHQOptions().getRefitting());
                 } else if (u.isMothballing()) {
-                    applyColors(MekHQ.getMekHQOptions().getColors().getMothballing());
+                    applyColors(MekHQ.getMekHQOptions().getMothballing());
                 } else if (u.isMothballed()) {
-                    applyColors(MekHQ.getMekHQOptions().getColors().getMothballed());
+                    applyColors(MekHQ.getMekHQOptions().getMothballed());
                 } else if (!u.isRepairable()) {
-                    applyColors(MekHQ.getMekHQOptions().getColors().getNotRepairable());
+                    applyColors(MekHQ.getMekHQOptions().getNotRepairable());
                 } else if (!u.isFunctional()) {
-                    applyColors(MekHQ.getMekHQOptions().getColors().getNonFunctional());
+                    applyColors(MekHQ.getMekHQOptions().getNonFunctional());
                 } else if (u.hasPartsNeedingFixing()) {
-                    applyColors(MekHQ.getMekHQOptions().getColors().getNeedsPartsFixed());
+                    applyColors(MekHQ.getMekHQOptions().getNeedsPartsFixed());
                 } else if (u.isUnmaintained()) {
-                    applyColors(MekHQ.getMekHQOptions().getColors().getUnmaintained());
+                    applyColors(MekHQ.getMekHQOptions().getUnmaintained());
                 } else if (u.getActiveCrew().size() < u.getFullCrewSize()) {
-                    applyColors(MekHQ.getMekHQOptions().getColors().getUncrewed());
+                    applyColors(MekHQ.getMekHQOptions().getUncrewed());
                 } else {
                     setForeground(UIManager.getColor("Table.foreground"));
                     setBackground(UIManager.getColor("Table.background"));
