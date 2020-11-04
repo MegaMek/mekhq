@@ -689,7 +689,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setPortrait(AbstractIcon portrait) {
-        this.portrait = portrait;
+        assert (portrait != null) : "Illegal assignment: cannot have a null AbstractIcon for a Portrait";
+        this.portrait = Objects.requireNonNull(portrait);
     }
 
     public String getPortraitCategory() {
