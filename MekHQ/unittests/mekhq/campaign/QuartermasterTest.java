@@ -22,36 +22,23 @@ package mekhq.campaign;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import megamek.common.AmmoType;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.Infantry;
-import megamek.common.Mech;
 import mekhq.EventSpy;
 import mekhq.campaign.event.PartArrivedEvent;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.PartNewEvent;
-import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class QuartermasterTest {
     @Test
@@ -187,10 +174,10 @@ public class QuartermasterTest {
         Quartermaster quartermaster = new Quartermaster(mockCampaign);
 
         Part mockPart = mock(Part.class);
+        doReturn(mockPart).when(mockWarehouse).addPart(eq(mockPart), eq(true));
 
         // Arrive a part...
         quartermaster.arrivePart(mockPart);
-        doReturn(mockPart).when(mockWarehouse).addPart(eq(mockPart), eq(true));
 
         // ...and ensure it is is now 'present'.
         ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
@@ -706,7 +693,7 @@ public class QuartermasterTest {
         assertTrue(quartermaster.buyPart(mockPart, 0));
 
         // ...and it should be added to the warehouse.
-        verify(mockWarehouse, times(0)).addPart(eq(mockPart), eq(true));
+        verify(mockWarehouse, times(1)).addPart(eq(mockPart), eq(true));
     }
 
     @Test
