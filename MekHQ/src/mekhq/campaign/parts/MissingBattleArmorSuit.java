@@ -231,7 +231,7 @@ public class MissingBattleArmorSuit extends MissingPart {
             //lets also clone the subparts
             unit.addPart(newSuit);
             newSuit.isReplacement(true);
-            campaign.addPart(newSuit, 0);
+            campaign.getQuartermaster().addPart(newSuit, 0);
             newSuit.isReplacement(false);
             newSuit.setTrooper(trooper);
             newSuit.updateConditionFromPart();

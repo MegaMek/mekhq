@@ -221,10 +221,10 @@ public class InfantryAmmoBin extends AmmoBin {
         if (a != null) {
             a.changeShots(amount);
             if (a.getShots() <= 0) {
-                campaign.removePart(a);
+                campaign.getWarehouse().removePart(a);
             }
         } else if (amount > 0) {
-            campaign.addPart(new InfantryAmmoStorage(1, curType, amount, weaponType, campaign), 0);
+            campaign.getQuartermaster().addPart(new InfantryAmmoStorage(1, curType, amount, weaponType, campaign), 0);
         }
     }
 

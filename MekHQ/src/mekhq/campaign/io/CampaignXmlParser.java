@@ -481,7 +481,7 @@ public class CampaignXmlParser {
             }
         }
         for (Part prt : removeParts) {
-            retVal.removePart(prt);
+            retVal.getWarehouse().removePart(prt);
         }
 
         MekHQ.getLogger().info(String.format("[Campaign Load] Parts processed in %dms",
@@ -548,7 +548,7 @@ public class CampaignXmlParser {
                     && (version.getMinorVersion() <= 2 ||
                             (version.getMinorVersion() <= 3 && version.getSnapshot() < 16))) {
                 for (Part p : unit.getParts()) {
-                    retVal.removePart(p);
+                    retVal.getWarehouse().removePart(p);
                 }
                 unit.resetParts();
                 if (version.getSnapshot() < 4) {
@@ -706,7 +706,7 @@ public class CampaignXmlParser {
             }
         }
         for (Part toRemove : partsToRemove) {
-            retVal.removePart(toRemove);
+            retVal.getWarehouse().removePart(toRemove);
         }
 
         MekHQ.getLogger().info(String.format("[Campaign Load] Warehouse cleaned up in %dms",

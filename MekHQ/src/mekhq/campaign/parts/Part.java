@@ -1366,9 +1366,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         quantity = Math.max(number, 0);
         if (quantity == 0) {
             for (Part childPart : childParts) {
-                campaign.removePart(childPart);
+                campaign.getWarehouse().removePart(childPart);
             }
-            campaign.removePart(this);
+            campaign.getWarehouse().removePart(this);
         }
     }
 

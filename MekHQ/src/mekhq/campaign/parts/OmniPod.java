@@ -229,7 +229,7 @@ public class OmniPod extends Part {
         Part oldPart = campaign.getWarehouse().checkForExistingSparePart(newPart.clone());
         if (null != oldPart) {
             newPart.setOmniPodded(true);
-            campaign.addPart(newPart, 0);
+            campaign.getQuartermaster().addPart(newPart, 0);
             oldPart.decrementQuantity();
         }
     }
@@ -244,7 +244,7 @@ public class OmniPod extends Part {
             return " <font color='red'><b> failed and part destroyed.</b></font>";
         } else {
             //OmniPod is only added back to warehouse if repair fails without destroying part.
-            campaign.addPart(this, 0);
+            campaign.getQuartermaster().addPart(this, 0);
             return " <font color='red'><b> failed.</b></font>";
         }
     }

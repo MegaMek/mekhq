@@ -192,10 +192,10 @@ public class TankLocation extends Part {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
         }

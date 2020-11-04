@@ -295,16 +295,16 @@ public class ProtomekLocation extends Part {
             unit.getEntity().setLocationBlownOff(loc, false);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             if(loc != Protomech.LOC_TORSO) {
                 Part missing = getMissingPart();
                 unit.addPart(missing);
-                campaign.addPart(missing, 0);
+                campaign.getQuartermaster().addPart(missing, 0);
             }
             //According to StratOps, this always destroys all equipment in that location as well
             for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {

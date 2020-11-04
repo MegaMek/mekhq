@@ -131,7 +131,7 @@ public class PartsReportDialog extends JDialog {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
-                campaign.addPart((Part) partToBuy.getNewEquipment(), 0);
+                campaign.getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
@@ -148,7 +148,7 @@ public class PartsReportDialog extends JDialog {
                 quantity = pcd.getValue();
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 while (quantity > 0) {
-                    campaign.addPart((Part) partToBuy.getNewEquipment(), 0);
+                    campaign.getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
                     --quantity;
                 }
                 refreshOverviewSpecificPart(row, piu, partToBuy);
