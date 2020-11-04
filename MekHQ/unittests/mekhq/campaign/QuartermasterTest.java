@@ -25,12 +25,15 @@ import org.mockito.ArgumentCaptor;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Infantry;
 import megamek.common.Mech;
 import mekhq.EventSpy;
 import mekhq.campaign.event.PartArrivedEvent;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
 import mekhq.campaign.event.PartRemovedEvent;
+import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MekLocation;
@@ -234,5 +237,181 @@ public class QuartermasterTest {
             // ...and make sure we got a notification!
             assertNotNull(eventSpy.findEvent(PartArrivedEvent.class, e -> e.getPart() == mockPart));
         }
+    }
+
+    @Test
+    public void buyUnitAddsUnconditionallyIfNotPayingForUnits() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // If we don't pay for units...
+        when(mockOptions.payForUnits()).thenReturn(false);
+
+        // ...then we should automatically buy a unit...
+        Entity mockEntity = mock(Entity.class);
+        int transitDays = 10;
+        assertTrue(quartermaster.buyUnit(mockEntity, transitDays));
+
+        // ...and the new unit should be added to the campaign.
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(transitDays));
+    }
+
+    @Test
+    public void buyUnitReturnsFalseIfOutOfCash() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // If we pay for units...
+        when(mockOptions.payForUnits()).thenReturn(true);
+
+        // ...but can't afford a unit...
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getFinances()).thenReturn(mockFinances);
+        doReturn(false).when(mockFinances).debit(any(), anyInt(), anyString(), any());
+
+        Entity mockEntity = mock(Entity.class);
+        doReturn(1.0).when(mockEntity).getCost(anyBoolean());
+
+        // ...then we should not be able to buy the unit...
+        assertFalse(quartermaster.buyUnit(mockEntity, 0));
+
+        // ...and the new unit should NOT be added to the campaign.
+        verify(mockCampaign, times(0)).addNewUnit(eq(mockEntity), eq(false), eq(0));
+    }
+
+    @Test
+    public void buyUnitBuysAUnitIfWeCanAffordIt() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // If we pay for units...
+        when(mockOptions.payForUnits()).thenReturn(true);
+
+        // ...and can afford a unit...
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getFinances()).thenReturn(mockFinances);
+        ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
+        doReturn(true).when(mockFinances).debit(captor.capture(), anyInt(), anyString(), any());
+
+        Entity mockEntity = mock(Entity.class);
+        double cost = 1.0;
+        doReturn(cost).when(mockEntity).getCost(anyBoolean());
+
+        // ...then we should be able to buy the unit...
+        assertTrue(quartermaster.buyUnit(mockEntity, 0));
+
+        // ...and the new unit should be added to the campaign...
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0));
+
+        // ...and it should cost the right amount.
+        assertEquals(Money.of(cost), captor.getValue());
+    }
+
+    @Test
+    public void buyUnitBuysInfantryUsingAlternateCost() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // If we pay for units...
+        when(mockOptions.payForUnits()).thenReturn(true);
+
+        // ...and can afford a unit...
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getFinances()).thenReturn(mockFinances);
+        ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
+        doReturn(true).when(mockFinances).debit(captor.capture(), anyInt(), anyString(), any());
+
+        Infantry mockEntity = mock(Infantry.class);
+        double cost = 2.0;
+        when(mockEntity.getAlternateCost()).thenReturn(cost);
+
+        // ...then we should be able to buy the infantry...
+        assertTrue(quartermaster.buyUnit(mockEntity, 0));
+
+        // ...and the new infantry should be added to the campaign...
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0));
+
+        // ...and it should cost the right amount.
+        assertEquals(Money.of(cost), captor.getValue());
+    }
+
+    @Test
+    public void buyUnitAppliesClanCostMultiplier() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // If we pay for units...
+        when(mockOptions.payForUnits()).thenReturn(true);
+
+        // ...and clan units cost 2x...
+        double clanMultiplier = 2.0;
+        when(mockOptions.getClanPriceModifier()).thenReturn(clanMultiplier);
+
+        // ...and can afford a unit...
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getFinances()).thenReturn(mockFinances);
+        ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
+        doReturn(true).when(mockFinances).debit(captor.capture(), anyInt(), anyString(), any());
+
+        // ...and the unit is a clan unit...
+        Entity mockEntity = mock(Entity.class);
+        when(mockEntity.isClan()).thenReturn(true);
+        double cost = 1.0;
+        doReturn(cost).when(mockEntity).getCost(anyBoolean());
+
+        // ...then we should be able to buy the unit...
+        assertTrue(quartermaster.buyUnit(mockEntity, 0));
+
+        // ...and the new unit should be added to the campaign...
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0));
+
+        // ...and it should cost the right amount.
+        assertEquals(Money.of(clanMultiplier * cost), captor.getValue());
+    }
+
+    @Test
+    public void buyUnitAppliesClanCostMultiplierToInfantryAlso() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // If we pay for units...
+        when(mockOptions.payForUnits()).thenReturn(true);
+
+        // ...and clan units cost 2x...
+        double clanMultiplier = 2.0;
+        when(mockOptions.getClanPriceModifier()).thenReturn(clanMultiplier);
+
+        // ...and can afford a unit...
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getFinances()).thenReturn(mockFinances);
+        ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
+        doReturn(true).when(mockFinances).debit(captor.capture(), anyInt(), anyString(), any());
+
+        // ...and the unit is clan infantry...
+        Infantry mockEntity = mock(Infantry.class);
+        when(mockEntity.isClan()).thenReturn(true);
+        double cost = 1.0;
+        when(mockEntity.getAlternateCost()).thenReturn(cost);
+
+        // ...then we should be able to buy the clan infantry...
+        assertTrue(quartermaster.buyUnit(mockEntity, 0));
+
+        // ...and the new clan infantry should be added to the campaign...
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0));
+
+        // ...and it should cost the right amount.
+        assertEquals(Money.of(clanMultiplier * cost), captor.getValue());
     }
 }
