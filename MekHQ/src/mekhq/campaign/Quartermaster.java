@@ -78,7 +78,9 @@ public class Quartermaster {
      *                    if the part is already here.
      */
     public void addPart(Part part, int transitDays) {
-        if ((part.getUnit() != null) && (part.getUnit() instanceof TestUnit)) {
+        Objects.requireNonNull(part);
+
+        if (part.getUnit() instanceof TestUnit) {
             // If this is a test unit, then we won't add the part
             return;
         }
@@ -114,7 +116,11 @@ public class Quartermaster {
         }
 
         part.setDaysToArrival(0);
-        getCampaign().addReport(part.getArrivalReport()); // TODO: move to event listener
+
+        // TODO: move to an event listener, but ensure PartArrivedEvent
+        //       includes the quantity which arrived rather than the
+        //       quantity in the warehouse.
+        getCampaign().addReport(part.getArrivalReport());
 
         // Add the part back to the Warehouse, asking that
         // it be merged with any existing spare part.
