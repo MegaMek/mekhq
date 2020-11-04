@@ -34,6 +34,7 @@ import mekhq.campaign.event.PartNewEvent;
 import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MekLocation;
@@ -271,7 +272,7 @@ public class QuartermasterTest {
         // ...but can't afford a unit...
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
-        doReturn(false).when(mockFinances).debit(any(), anyInt(), anyString(), any());
+        doReturn(false).when(mockFinances).debit(any(), eq(Transaction.C_UNIT), anyString(), any());
 
         Entity mockEntity = mock(Entity.class);
         doReturn(1.0).when(mockEntity).getCost(anyBoolean());
@@ -297,7 +298,7 @@ public class QuartermasterTest {
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
         ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
-        doReturn(true).when(mockFinances).debit(captor.capture(), anyInt(), anyString(), any());
+        doReturn(true).when(mockFinances).debit(captor.capture(), eq(Transaction.C_UNIT), anyString(), any());
 
         Entity mockEntity = mock(Entity.class);
         double cost = 1.0;
@@ -327,7 +328,7 @@ public class QuartermasterTest {
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
         ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
-        doReturn(true).when(mockFinances).debit(captor.capture(), anyInt(), anyString(), any());
+        doReturn(true).when(mockFinances).debit(captor.capture(), eq(Transaction.C_UNIT), anyString(), any());
 
         Infantry mockEntity = mock(Infantry.class);
         double cost = 2.0;
@@ -361,7 +362,7 @@ public class QuartermasterTest {
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
         ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
-        doReturn(true).when(mockFinances).debit(captor.capture(), anyInt(), anyString(), any());
+        doReturn(true).when(mockFinances).debit(captor.capture(), eq(Transaction.C_UNIT), anyString(), any());
 
         // ...and the unit is a clan unit...
         Entity mockEntity = mock(Entity.class);
@@ -397,7 +398,7 @@ public class QuartermasterTest {
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
         ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
-        doReturn(true).when(mockFinances).debit(captor.capture(), anyInt(), anyString(), any());
+        doReturn(true).when(mockFinances).debit(captor.capture(), eq(Transaction.C_UNIT), anyString(), any());
 
         // ...and the unit is clan infantry...
         Infantry mockEntity = mock(Infantry.class);
@@ -413,5 +414,44 @@ public class QuartermasterTest {
 
         // ...and it should cost the right amount.
         assertEquals(Money.of(clanMultiplier * cost), captor.getValue());
+    }
+
+    @Test
+    public void sellUnitCreditsCorrectAmount() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getFinances()).thenReturn(mockFinances);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        Unit mockUnit = mock(Unit.class);
+        when(mockUnit.getId()).thenReturn(UUID.randomUUID());
+        Money sellValue = Money.of(42.0);
+        when(mockUnit.getSellValue()).thenReturn(sellValue);
+
+        // When you sell a unit with a certain value...
+        quartermaster.sellUnit(mockUnit);
+
+        // ...make sure we get that money!
+        verify(mockFinances, times(1)).credit(eq(sellValue), eq(Transaction.C_UNIT_SALE),
+                anyString(), any());
+    }
+
+    @Test
+    public void sellUnitRemovesTheUnitFromTheCampaign() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getFinances()).thenReturn(mockFinances);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        Unit mockUnit = mock(Unit.class);
+        UUID mockId = UUID.randomUUID();
+        when(mockUnit.getId()).thenReturn(mockId);
+        when(mockUnit.getSellValue()).thenReturn(Money.of(42.0));
+
+        // When you sell a unit...
+        quartermaster.sellUnit(mockUnit);
+
+        // ...make sure we don't get to keep the unit.
+        verify(mockCampaign, times(1)).removeUnit(eq(mockId));
     }
 }
