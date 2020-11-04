@@ -18,6 +18,7 @@
  */
 package mekhq;
 
+import mekhq.gui.MekHqColors;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import java.time.LocalDate;
@@ -25,7 +26,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.prefs.Preferences;
 
 public final class MekHQOptions {
+    //region Variable Declarations
+    private static final MekHqColors colours = new MekHqColors();
+
     private static final Preferences userPreferences = Preferences.userRoot();
+    //endregion Variable Declarations
 
     //region Display
     public String getDisplayDateFormat() {
@@ -64,6 +69,14 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.HISTORICAL_DAILY_LOG, value);
     }
 
+    //region Colours
+    // TODO : Finish Implementing Me
+    public MekHqColors getColors() {
+        return colours;
+    }
+    //endregion Colours
+
+    //region Expanded MekHQ Display Options
     //region Command Center Display
     public boolean getCommandCenterUseUnitMarket() {
         return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
@@ -100,6 +113,7 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, value);
     }
     //endregion Personnel Tab Display Options
+    //endregion Expanded MekHQ Display Options
     //endregion Display
 
     //region Autosave

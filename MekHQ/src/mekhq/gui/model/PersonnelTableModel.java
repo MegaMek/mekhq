@@ -37,6 +37,7 @@ import megamek.common.UnitType;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
@@ -46,7 +47,6 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.BasicInfo;
-import mekhq.gui.MekHqColors;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
@@ -62,7 +62,6 @@ public class PersonnelTableModel extends DataTableModel {
     private boolean loadAssignmentFromMarket;
     private boolean groupByUnit;
 
-    private final MekHqColors colors = new MekHqColors();
 
     public static final int COL_RANK            = 0;
     public static final int COL_GIVEN_NAME      = 1;
@@ -695,15 +694,15 @@ public class PersonnelTableModel extends DataTableModel {
 
             if (!isSelected) {
                 if (isDeployed(actualRow)) {
-                    colors.getDeployed().getColor().ifPresent(this::setBackground);
-                    colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                    MekHQ.getMekHQOptions().getColors().getDeployed().getColor().ifPresent(this::setBackground);
+                    MekHQ.getMekHQOptions().getColors().getDeployed().getAlternateColor().ifPresent(this::setForeground);
                 } else if ((Integer.parseInt((String) getValueAt(actualRow, COL_HITS)) > 0)
                         || getPerson(actualRow).hasInjuries(true)) {
-                    colors.getInjured().getColor().ifPresent(this::setBackground);
-                    colors.getInjured().getAlternateColor().ifPresent(this::setForeground);
+                    MekHQ.getMekHQOptions().getColors().getInjured().getColor().ifPresent(this::setBackground);
+                    MekHQ.getMekHQOptions().getColors().getInjured().getAlternateColor().ifPresent(this::setForeground);
                 } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
-                    colors.getHealedInjuries().getColor().ifPresent(this::setBackground);
-                    colors.getHealedInjuries().getAlternateColor().ifPresent(this::setForeground);
+                    MekHQ.getMekHQOptions().getColors().getHealedInjuries().getColor().ifPresent(this::setBackground);
+                    MekHQ.getMekHQOptions().getColors().getHealedInjuries().getAlternateColor().ifPresent(this::setForeground);
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                     setForeground(UIManager.getColor("Table.foreground"));

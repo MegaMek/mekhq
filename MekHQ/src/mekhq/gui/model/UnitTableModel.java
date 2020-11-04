@@ -33,12 +33,12 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
-import mekhq.gui.MekHqColors;
 import mekhq.gui.preferences.ColorPreference;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
@@ -72,8 +72,6 @@ public class UnitTableModel extends DataTableModel {
     public final static int N_COL =          19;
 
     private Campaign campaign;
-
-    private final MekHqColors colors = new MekHqColors();
     //endregion Variable Declarations
 
     public UnitTableModel(Campaign c) {
@@ -285,25 +283,25 @@ public class UnitTableModel extends DataTableModel {
 
             if (!isSelected) {
                 if (u.isDeployed()) {
-                    applyColors(colors.getDeployed());
+                    applyColors(MekHQ.getMekHQOptions().getColors().getDeployed());
                 } else if (!u.isPresent()) {
-                    applyColors(colors.getInTransit());
+                    applyColors(MekHQ.getMekHQOptions().getColors().getInTransit());
                 } else if (u.isRefitting()) {
-                    applyColors(colors.getRefitting());
+                    applyColors(MekHQ.getMekHQOptions().getColors().getRefitting());
                 } else if (u.isMothballing()) {
-                    applyColors(colors.getMothballing());
+                    applyColors(MekHQ.getMekHQOptions().getColors().getMothballing());
                 } else if (u.isMothballed()) {
-                    applyColors(colors.getMothballed());
+                    applyColors(MekHQ.getMekHQOptions().getColors().getMothballed());
                 } else if (!u.isRepairable()) {
-                    applyColors(colors.getNotRepairable());
+                    applyColors(MekHQ.getMekHQOptions().getColors().getNotRepairable());
                 } else if (!u.isFunctional()) {
-                    applyColors(colors.getNonFunctional());
+                    applyColors(MekHQ.getMekHQOptions().getColors().getNonFunctional());
                 } else if (u.hasPartsNeedingFixing()) {
-                    applyColors(colors.getNeedsPartsFixed());
+                    applyColors(MekHQ.getMekHQOptions().getColors().getNeedsPartsFixed());
                 } else if (u.isUnmaintained()) {
-                    applyColors(colors.getUnmaintained());
+                    applyColors(MekHQ.getMekHQOptions().getColors().getUnmaintained());
                 } else if (u.getActiveCrew().size() < u.getFullCrewSize()) {
-                    applyColors(colors.getUncrewed());
+                    applyColors(MekHQ.getMekHQOptions().getColors().getUncrewed());
                 } else {
                     setForeground(UIManager.getColor("Table.foreground"));
                     setBackground(UIManager.getColor("Table.background"));

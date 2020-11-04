@@ -37,13 +37,15 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
+    //region Variable Declarations
     private static final long serialVersionUID = -553191867660269247L;
+    //endregion Variable Declarations
 
-    private final MekHqColors colors = new MekHqColors();
-
+    //region Constructors
     public ForceRenderer() {
 
     }
+    //endregion Constructors
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
@@ -139,14 +141,14 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
             setText("<html>" + name + ", " + uname + c3network + transport + "</html>");
             if (!sel && u.isDeployed()) {
-                colors.getDeployed().getColor().ifPresent(this::setBackground);
-                colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                MekHQ.getMekHQOptions().getColors().getDeployed().getColor().ifPresent(this::setBackground);
+                MekHQ.getMekHQOptions().getColors().getDeployed().getAlternateColor().ifPresent(this::setForeground);
                 setOpaque(true);
             }
         } else if (value instanceof Force) {
             if (!sel && ((Force) value).isDeployed()) {
-                colors.getDeployed().getColor().ifPresent(this::setBackground);
-                colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                MekHQ.getMekHQOptions().getColors().getDeployed().getColor().ifPresent(this::setBackground);
+                MekHQ.getMekHQOptions().getColors().getDeployed().getAlternateColor().ifPresent(this::setForeground);
                 setOpaque(true);
             }
         } else {

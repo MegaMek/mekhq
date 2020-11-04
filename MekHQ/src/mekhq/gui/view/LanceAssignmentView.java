@@ -44,6 +44,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.force.Force;
@@ -51,7 +52,6 @@ import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.gui.MekHqColors;
 import mekhq.gui.model.DataTableModel;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
@@ -68,7 +68,6 @@ public class LanceAssignmentView extends JPanel {
     private static final long serialVersionUID = 7280552346074838142L;
 
     private final Campaign campaign;
-    private final MekHqColors colors = new MekHqColors();
 
     private JTable tblRequiredLances;
     private JTable tblAssignments;
@@ -115,7 +114,7 @@ public class LanceAssignmentView extends JPanel {
                             getAlignment(table.convertColumnIndexToModel(column)));
                     if (table.convertColumnIndexToModel(column) > RequiredLancesTableModel.COL_CONTRACT) {
                         if (((String) value).indexOf('/') >= 0) {
-                            colors.getBelowContractMinimum().getAlternateColor().ifPresent(this::setForeground);
+                            MekHQ.getMekHQOptions().getColors().getBelowContractMinimum().getAlternateColor().ifPresent(this::setForeground);
                         }
                     }
                     return this;
