@@ -737,4 +737,81 @@ public class QuartermasterTest {
         // ...and it should add its parts.
         verify(mockRefit, times(1)).addRefitKitParts(anyInt());
     }
+
+    @Test
+    public void buyRefurbishmentReturnsTrueIfNotPayingForParts() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getFinances()).thenReturn(mockFinances);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // If we don't pay for parts...
+        when(mockOptions.payForParts()).thenReturn(false);
+
+        Part mockPart = mock(Part.class);
+        Money cost = Money.of(42.0);
+        when(mockPart.getStickerPrice()).thenReturn(cost);
+
+        // ...then we should be able to refurbish the part...
+        assertTrue(quartermaster.buyRefurbishment(mockPart));
+
+        // ...and we never should have tried to spend our money!
+        verify(mockFinances, times(0)).debit(any(), anyInt(), anyString(), any());
+    }
+
+    @Test
+    public void buyRefurbishmentReturnsFalseIfOutOfCash() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getFinances()).thenReturn(mockFinances);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // If we pay for parts...
+        when(mockOptions.payForParts()).thenReturn(true);
+
+        Part mockPart = mock(Part.class);
+        Money cost = Money.of(42.0);
+        when(mockPart.getStickerPrice()).thenReturn(cost);
+
+        // ...and we can't afford the refurbishment...
+        doReturn(false).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP),
+                anyString(), any());
+
+        // ...then we should not be able to refurbish the part.
+        assertFalse(quartermaster.buyRefurbishment(mockPart));
+    }
+
+    @Test
+    public void buyRefurbishmentReturnsTrueIfWeHaveTheMoney() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getFinances()).thenReturn(mockFinances);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // If we pay for parts...
+        when(mockOptions.payForParts()).thenReturn(true);
+
+        Part mockPart = mock(Part.class);
+        Money cost = Money.of(42.0);
+        when(mockPart.getStickerPrice()).thenReturn(cost);
+
+        // ...and we can afford the refurbishment...
+        doReturn(true).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP),
+                anyString(), any());
+
+        // ...then we should be able to refurbish the part.
+        assertTrue(quartermaster.buyRefurbishment(mockPart));
+    }
 }
