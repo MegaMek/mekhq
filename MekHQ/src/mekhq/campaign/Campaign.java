@@ -31,6 +31,7 @@ import java.util.*;
 import javax.swing.JOptionPane;
 
 import megamek.common.icons.Camouflage;
+import megamek.common.icons.Portrait;
 import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
@@ -5955,8 +5956,7 @@ public class Campaign implements Serializable, ITechManager {
             if (temp.length != 2) {
                 return;
             }
-            p.setPortraitCategory(temp[0]);
-            p.setPortraitFileName(temp[1]);
+            p.setPortrait(new Portrait(temp[0], temp[1]));
         }
     }
     //endregion Portraits

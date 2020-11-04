@@ -981,8 +981,7 @@ public class Utilities {
 
             // Only created crew can be assigned a portrait, so this is safe to put in here
             if (!AbstractIcon.DEFAULT_ICON_FILENAME.equals(oldCrew.getPortraitFileName(crewIndex))) {
-                p.setPortraitCategory(oldCrew.getPortraitCategory(crewIndex));
-                p.setPortraitFileName(oldCrew.getPortraitFileName(crewIndex));
+                p.setPortrait(oldCrew.getPortrait(crewIndex));
             }
         }
     }
