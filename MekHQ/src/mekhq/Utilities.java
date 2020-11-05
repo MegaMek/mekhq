@@ -1078,11 +1078,19 @@ public class Utilities {
     }
 
     public static Money[] readMoneyArray(Node node) {
+        return readMoneyArray(node, 0);
+    }
+
+    public static Money[] readMoneyArray(Node node, int minimumSize) {
         String[] values = node.getTextContent().split(",");
-        Money[] result = new Money[values.length];
+        Money[] result = new Money[Math.max(values.length, minimumSize)];
 
         for (int i = 0; i < values.length; i++) {
             result[i] = Money.fromXmlString(values[i]);
+        }
+
+        for (int i = values.length; i < result.length; i++) {
+            result[i] = Money.zero();
         }
 
         return result;

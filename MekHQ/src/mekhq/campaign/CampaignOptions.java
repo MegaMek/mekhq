@@ -3787,7 +3787,9 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                 retVal.salaryAntiMekMultiplier = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
-                retVal.salaryTypeBase = Utilities.readMoneyArray(wn2);
+                // CAW: we need at least the correct number of salaries as are expected in this version,
+                //      otherwise we'll not be able to set a salary for a role.
+                retVal.salaryTypeBase = Utilities.readMoneyArray(wn2, Person.T_NUM);
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
