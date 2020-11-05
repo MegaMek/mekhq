@@ -193,10 +193,6 @@ public class Quartermaster {
     public void sellPart(Part part, int quantity) {
         Objects.requireNonNull(part);
 
-        if (quantity <= 0) {
-            return;
-        }
-
         if (part instanceof AmmoStorage) {
             sellAmmo((AmmoStorage) part, quantity);
             return;
@@ -207,6 +203,9 @@ public class Quartermaster {
 
         // Do not sell more than we have
         quantity = Math.min(quantity, part.getQuantity());
+        if (quantity <= 0) {
+            return;
+        }
 
         Money cost = part.getActualValue().multipliedBy(quantity);
         String plural = "";
@@ -238,12 +237,11 @@ public class Quartermaster {
     public void sellAmmo(AmmoStorage ammo, int shots) {
         Objects.requireNonNull(ammo);
 
+        // Do not sell more than we have
+        shots = Math.min(shots, ammo.getShots());
         if (shots <= 0) {
             return;
         }
-
-        // Do not sell more than we have
-        shots = Math.min(shots, ammo.getShots());
 
         Money cost = Money.zero();
         if (ammo.getShots() > 0) {
@@ -274,12 +272,11 @@ public class Quartermaster {
     public void sellArmor(Armor armor, int points) {
         Objects.requireNonNull(armor);
 
+        // Do not sell more than we have
+        points = Math.min(points, armor.getAmount());
         if (points <= 0) {
             return;
         }
-
-        // Do not sell more than we have
-        points = Math.min(points, armor.getAmount());
 
         boolean sellingAllArmor = points == armor.getAmount();
         double proportion = ((double) points / armor.getAmount());
