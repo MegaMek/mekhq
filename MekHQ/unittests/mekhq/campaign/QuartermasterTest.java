@@ -21,17 +21,21 @@ package mekhq.campaign;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import megamek.common.Entity;
 import megamek.common.Infantry;
 import mekhq.EventSpy;
 import mekhq.campaign.event.PartArrivedEvent;
+import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.TestUnit;
@@ -40,6 +44,7 @@ import mekhq.campaign.unit.Unit;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 import java.util.UUID;
 
 public class QuartermasterTest {
@@ -422,8 +427,7 @@ public class QuartermasterTest {
         quartermaster.sellUnit(mockUnit);
 
         // ...make sure we get that money!
-        verify(mockFinances, times(1)).credit(eq(sellValue), eq(Transaction.C_UNIT_SALE),
-                anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(sellValue), eq(Transaction.C_UNIT_SALE), anyString(), any());
     }
 
     @Test
@@ -512,8 +516,7 @@ public class QuartermasterTest {
         when(mockPart.getStickerPrice()).thenReturn(cost);
 
         // ...and we can't afford the part...
-        doReturn(false).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP),
-                anyString(), any());
+        doReturn(false).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP), anyString(), any());
 
         // ...then we should not be able to buy the part...
         assertFalse(quartermaster.buyPart(mockPart, 0));
@@ -541,8 +544,7 @@ public class QuartermasterTest {
         when(mockRefit.getStickerPrice()).thenReturn(cost);
 
         // ...and we can't afford the refit kit...
-        doReturn(false).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP),
-                anyString(), any());
+        doReturn(false).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP), anyString(), any());
 
         // ...then we should not be able to buy the refit kit...
         assertFalse(quartermaster.buyPart(mockRefit, 0));
@@ -570,8 +572,7 @@ public class QuartermasterTest {
         when(mockPart.getStickerPrice()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
-        doReturn(false).when(mockFinances).debit(costCaptor.capture(), eq(Transaction.C_EQUIP),
-                anyString(), any());
+        doReturn(false).when(mockFinances).debit(costCaptor.capture(), eq(Transaction.C_EQUIP), anyString(), any());
 
         // ...when we try to buy the part...
         quartermaster.buyPart(mockPart, 0);
@@ -599,8 +600,7 @@ public class QuartermasterTest {
         when(mockPart.getStickerPrice()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
-        doReturn(false).when(mockFinances).debit(costCaptor.capture(), eq(Transaction.C_EQUIP),
-                anyString(), any());
+        doReturn(false).when(mockFinances).debit(costCaptor.capture(), eq(Transaction.C_EQUIP), anyString(), any());
 
         // ...when we try to buy the part...
         double costMultiplier = 10.0;
@@ -629,8 +629,7 @@ public class QuartermasterTest {
         when(mockRefit.getStickerPrice()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
-        doReturn(false).when(mockFinances).debit(costCaptor.capture(), eq(Transaction.C_EQUIP),
-                anyString(), any());
+        doReturn(false).when(mockFinances).debit(costCaptor.capture(), eq(Transaction.C_EQUIP), anyString(), any());
 
         // ...when we try to buy the refit kit...
         quartermaster.buyPart(mockRefit, 0);
@@ -658,8 +657,7 @@ public class QuartermasterTest {
         when(mockRefit.getStickerPrice()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
-        doReturn(false).when(mockFinances).debit(costCaptor.capture(), eq(Transaction.C_EQUIP),
-                anyString(), any());
+        doReturn(false).when(mockFinances).debit(costCaptor.capture(), eq(Transaction.C_EQUIP), anyString(), any());
 
         // ...when we try to buy the refit kit with a cost multiplier...
         double costMultiplier = 2.0;
@@ -688,8 +686,7 @@ public class QuartermasterTest {
         when(mockPart.getStickerPrice()).thenReturn(cost);
 
         // ...and we can afford the part...
-        doReturn(true).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP),
-                anyString(), any());
+        doReturn(true).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP), anyString(), any());
 
         // ...then we should be able to buy the part...
         assertTrue(quartermaster.buyPart(mockPart, 0));
@@ -717,8 +714,7 @@ public class QuartermasterTest {
         when(mockRefit.getStickerPrice()).thenReturn(cost);
 
         // ...and we can afford the refit kit...
-        doReturn(true).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP),
-                anyString(), any());
+        doReturn(true).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP), anyString(), any());
 
         // ...then we should be able to buy the refit kit...
         assertTrue(quartermaster.buyPart(mockRefit, 0));
@@ -771,8 +767,7 @@ public class QuartermasterTest {
         when(mockPart.getStickerPrice()).thenReturn(cost);
 
         // ...and we can't afford the refurbishment...
-        doReturn(false).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP),
-                anyString(), any());
+        doReturn(false).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP), anyString(), any());
 
         // ...then we should not be able to refurbish the part.
         assertFalse(quartermaster.buyRefurbishment(mockPart));
@@ -797,8 +792,7 @@ public class QuartermasterTest {
         when(mockPart.getStickerPrice()).thenReturn(cost);
 
         // ...and we can afford the refurbishment...
-        doReturn(true).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP),
-                anyString(), any());
+        doReturn(true).when(mockFinances).debit(eq(cost), eq(Transaction.C_EQUIP), anyString(), any());
 
         // ...then we should be able to refurbish the part.
         assertTrue(quartermaster.buyRefurbishment(mockPart));
@@ -1140,8 +1134,7 @@ public class QuartermasterTest {
         quartermaster.sellAmmo(mockAmmo, saleQuantity);
 
         // ...and we should be credited for no more than we have!
-        verify(mockFinances, times(1)).credit(eq(Money.of(value)), eq(Transaction.C_EQUIP_SALE),
-                anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(Money.of(value)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
     }
 
     @Test
@@ -1378,8 +1371,7 @@ public class QuartermasterTest {
         quartermaster.sellArmor(mockArmor, saleQuantity);
 
         // ...and we should be credited for no more than we have!
-        verify(mockFinances, times(1)).credit(eq(Money.of(value)), eq(Transaction.C_EQUIP_SALE),
-                anyString(), any());
+        verify(mockFinances, times(1)).credit(eq(Money.of(value)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
     }
 
     @Test
@@ -1470,5 +1462,243 @@ public class QuartermasterTest {
         // ...and we should sell and remove all of them!
         verify(mockFinances, times(1)).credit(eq(Money.of(100.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
         verify(mockWarehouse, times(1)).removeArmor(eq(mockArmor), eq(warehouseQuantity));
+    }
+
+    @Test
+    public void depodPartOnlyDepodsOmniPoddedParts() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        Part mockOmniPart = mock(Part.class);
+        when(mockOmniPart.isOmniPodded()).thenReturn(false);
+        when(mockOmniPart.getQuantity()).thenReturn(1);
+
+        quartermaster.depodPart(mockOmniPart, 1);
+
+        verify(mockOmniPart, times(0)).decrementQuantity();
+    }
+
+    @Test
+    public void depodPartDoesNotDepodZeroParts() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        Part mockOmniPart = mock(Part.class);
+        when(mockOmniPart.isOmniPodded()).thenReturn(true);
+        when(mockOmniPart.getQuantity()).thenReturn(1);
+
+        quartermaster.depodPart(mockOmniPart, 0);
+
+        verify(mockOmniPart, times(0)).decrementQuantity();
+    }
+
+    @Test
+    public void depodPartDoesNotDepodNegativeParts() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        Part mockOmniPart = mock(Part.class);
+        when(mockOmniPart.isOmniPodded()).thenReturn(true);
+        when(mockOmniPart.getQuantity()).thenReturn(1);
+
+        quartermaster.depodPart(mockOmniPart, -10);
+
+        verify(mockOmniPart, times(0)).decrementQuantity();
+    }
+
+    @Test
+    public void depodPartAddsPartAndCorrectOmniPod() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // Create a spare omni-podded part...
+        Part mockOmniPart = mock(Part.class);
+        when(mockOmniPart.isOmniPodded()).thenReturn(true);
+        when(mockOmniPart.getQuantity()).thenReturn(1);
+
+        // ...and create a clone of the part...
+        Part mockOmniPartClone = mock(Part.class);
+        when(mockOmniPartClone.getStickerPrice()).thenReturn(Money.of(5.0));
+        when(mockOmniPart.clone()).thenReturn(mockOmniPartClone);
+        when(mockOmniPartClone.clone()).thenReturn(mockOmniPartClone); // CAW: test only.
+
+        // ...and depod that part...
+        quartermaster.depodPart(mockOmniPart, 1);
+
+        // ...giving us a clone of the part...
+        verify(mockWarehouse, times(1)).addPart(eq(mockOmniPartClone), eq(true));
+        verify(mockOmniPartClone, atLeast(1)).setOmniPodded(eq(false));
+
+        // ...and a new omnipod for the clone...
+        ArgumentCaptor<Part> omniPodCaptor = ArgumentCaptor.forClass(Part.class);
+        verify(mockWarehouse, times(2)).addPart(omniPodCaptor.capture(), eq(true));
+
+        // ...and decrementing the number of the original parts.
+        verify(mockOmniPart, times(1)).decrementQuantity();
+
+        // The second call contains the omnipod.
+        Part omniPod = omniPodCaptor.getAllValues().get(1);
+        assertTrue(omniPod instanceof OmniPod);
+        // OmniPods cost 1/5th the part's cost, so since our mock part costs
+        // 5 C-bills, if we're calculating things propertly then the OmniPod
+        // will cost only a buck.
+        assertEquals(Money.of(1.0), omniPod.getStickerPrice());
+    }
+
+    @Test
+    public void depodPartAddsCorrectNumberOfPartAndOmniPod() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // Create a spare omni-podded part...
+        Part mockOmniPart = mock(Part.class);
+        when(mockOmniPart.isOmniPodded()).thenReturn(true);
+        when(mockOmniPart.getQuantity()).thenReturn(10);
+        when(mockOmniPart.clone()).then(createOmniPodPartAnswer());
+
+        // ...and depod four of that part...
+        int quantity = 4;
+        quartermaster.depodPart(mockOmniPart, quantity);
+
+        // ...giving us four clones of the part and its omnipod...
+        ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
+        verify(mockWarehouse, times(2 * quantity)).addPart(partCaptor.capture(), eq(true));
+
+        // ...and decrementing the number of the original parts.
+        verify(mockOmniPart, times(quantity)).decrementQuantity();
+
+        // There should then be 4 of the parts and 4 of their omnipods
+        List<Part> addedParts = partCaptor.getAllValues();
+        assertEquals(quantity, addedParts.stream().filter(p -> !(p instanceof OmniPod)).count());
+        assertEquals(quantity, addedParts.stream().filter(p -> (p instanceof OmniPod)).count());
+    }
+
+    @Test
+    public void depodPartAddsCorrectNumberOfPartAndOmniPodIfLessOnHand() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // Create a spare omni-podded part...
+        Part mockOmniPart = mock(Part.class);
+        when(mockOmniPart.isOmniPodded()).thenReturn(true);
+        int warehouseQuantity = 2;
+        when(mockOmniPart.getQuantity()).thenReturn(warehouseQuantity);
+        when(mockOmniPart.clone()).then(createOmniPodPartAnswer());
+
+        // ...and try to depod four of that part...
+        int quantity = 4;
+        quartermaster.depodPart(mockOmniPart, quantity);
+
+        // ...giving us only two clones of the part and its omnipod...
+        ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
+        verify(mockWarehouse, times(2 * warehouseQuantity)).addPart(partCaptor.capture(), eq(true));
+
+        // ...and decrementing the number of the original parts.
+        verify(mockOmniPart, times(warehouseQuantity)).decrementQuantity();
+
+        // There should then be two of the parts and two of their omnipods
+        List<Part> addedParts = partCaptor.getAllValues();
+        assertEquals(warehouseQuantity, addedParts.stream().filter(p -> !(p instanceof OmniPod)).count());
+        assertEquals(warehouseQuantity, addedParts.stream().filter(p -> (p instanceof OmniPod)).count());
+    }
+
+    @Test
+    public void depodAllPartsAddsCorrectNumberOfPartAndOmniPod() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // Create a spare omni-podded part...
+        Part mockOmniPart = mock(Part.class);
+        when(mockOmniPart.isOmniPodded()).thenReturn(true);
+        int quantity = 4;
+        when(mockOmniPart.getQuantity()).thenReturn(quantity);
+        when(mockOmniPart.clone()).then(createOmniPodPartAnswer());
+
+        // ...and depod all of that part...
+        quartermaster.depodPart(mockOmniPart);
+
+        // ...giving us four clones of the part and its omnipod...
+        ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
+        verify(mockWarehouse, times(2 * quantity)).addPart(partCaptor.capture(), eq(true));
+
+        // ...and decrementing the number of the original parts.
+        verify(mockOmniPart, times(quantity)).decrementQuantity();
+
+        // There should then be 4 of the parts and 4 of their omnipods
+        List<Part> addedParts = partCaptor.getAllValues();
+        assertEquals(quantity, addedParts.stream().filter(p -> !(p instanceof OmniPod)).count());
+        assertEquals(quantity, addedParts.stream().filter(p -> (p instanceof OmniPod)).count());
+    }
+
+    @Test
+    public void depodPartRaisesChangedEventIfSomeRemain() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // Create a spare omni-podded part...
+        Part mockOmniPart = mock(Part.class);
+        when(mockOmniPart.isOmniPodded()).thenReturn(true);
+        when(mockOmniPart.getQuantity()).thenReturn(10).thenReturn(5);
+        when(mockOmniPart.clone()).then(createOmniPodPartAnswer());
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            // ...and depod some of that part...
+            quartermaster.depodPart(mockOmniPart, 5);
+
+            // ...and since some remain, we should receive a PartChangedEvent.
+            assertNotNull(eventSpy.findEvent(PartChangedEvent.class, e -> e.getPart() == mockOmniPart));
+        }
+    }
+
+    @Test
+    public void depodPartDoesNotRaiseChangedEventIfNoneRemain() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // Create a spare omni-podded part...
+        Part mockOmniPart = mock(Part.class);
+        when(mockOmniPart.isOmniPodded()).thenReturn(true);
+        when(mockOmniPart.getQuantity()).thenReturn(10).thenReturn(0);
+        when(mockOmniPart.clone()).then(createOmniPodPartAnswer());
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            // ...and depod all of that part...
+            quartermaster.depodPart(mockOmniPart);
+
+            // ...and since none remain, we should NOT receive a PartChangedEvent.
+            assertNull(eventSpy.findEvent(PartChangedEvent.class, e -> e.getPart() == mockOmniPart));
+        }
+    }
+
+    private Answer<Part> createOmniPodPartAnswer() {
+        return new Answer<Part>() {
+            @Override
+            public Part answer(InvocationOnMock invocation) throws Throwable {
+                Part mockOmniPart = mock(Part.class);
+                when(mockOmniPart.isOmniPodded()).thenReturn(true);
+                when(mockOmniPart.getQuantity()).thenReturn(1);
+                // ...omniception!
+                when(mockOmniPart.clone()).then(createOmniPodPartAnswer());
+                return mockOmniPart;
+            }
+        };
     }
 }

@@ -315,10 +315,6 @@ public class Quartermaster {
     public void depodPart(Part part, int quantity) {
         Objects.requireNonNull(part);
 
-        if (quantity == 0) {
-            return;
-        }
-
         if (!part.isOmniPodded()) {
             // We cannot depod non-omnipodded parts.
             return;
@@ -326,12 +322,20 @@ public class Quartermaster {
 
         // We cannot depod any more than we have
         quantity = Math.min(quantity, part.getQuantity());
+        if (quantity <= 0) {
+            return;
+        }
 
+        // Create a copy of the part that is no longer in an OmniPod.
         Part unpodded = part.clone();
         unpodded.setOmniPodded(false);
 
+        // Create a new OmniPod part to hold a part of this type
         OmniPod pod = new OmniPod(unpodded, getCampaign());
+
         while (quantity > 0) {
+            // Now when we 'depod' the part we add to the warehouse
+            // the part itself and the omnipod which held the part.
             addPart(unpodded.clone(), 0);
             addPart(pod.clone(), 0);
 
