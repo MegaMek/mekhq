@@ -299,7 +299,6 @@ public class Quartermaster {
     /**
      * Removes one or more parts from its OmniPod.
      * @param part The omnipodded part.
-     * @param quantity The number of omnipodded parts to de-pod.
      */
     public void depodPart(Part part) {
         Objects.requireNonNull(part);
