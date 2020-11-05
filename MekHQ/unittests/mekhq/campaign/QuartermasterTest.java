@@ -1186,4 +1186,50 @@ public class QuartermasterTest {
         verify(mockFinances, times(1)).credit(eq(Money.of(100.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
         verify(mockWarehouse, times(1)).removeAmmo(eq(mockAmmo), eq(warehouseQuantity));
     }
+
+    @Test
+    public void sellPartWithAmmoSellsAmmo() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getFinances()).thenReturn(mockFinances);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // Ten rounds of ammo on hand worth 1 C-bill each...
+        AmmoStorage mockAmmo = mock(AmmoStorage.class);
+        when(mockAmmo.getShots()).thenReturn(10);
+        when(mockAmmo.getActualValue()).thenReturn(Money.of(10.0));
+
+        // ...so try to sell some of them...
+        int saleQuantity = 7;
+        quartermaster.sellPart(mockAmmo, saleQuantity);
+
+        // ...and we should sell and remove that exact number!
+        verify(mockFinances, times(1)).credit(eq(Money.of(7.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockWarehouse, times(1)).removeAmmo(eq(mockAmmo), eq(saleQuantity));
+    }
+
+    @Test
+    public void sellAllPartsWithAmmoSellsAllAmmo() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getFinances()).thenReturn(mockFinances);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+
+        // One hundred rounds of ammo on hand worth 1 C-bill each...
+        AmmoStorage mockAmmo = mock(AmmoStorage.class);
+        int warehouseQuantity = 100;
+        when(mockAmmo.getShots()).thenReturn(warehouseQuantity);
+        when(mockAmmo.getActualValue()).thenReturn(Money.of(100.0));
+
+        // ...so try to sell all of them...
+        quartermaster.sellPart(mockAmmo);
+
+        // ...and we should sell and remove all of them!
+        verify(mockFinances, times(1)).credit(eq(Money.of(100.0)), eq(Transaction.C_EQUIP_SALE), anyString(), any());
+        verify(mockWarehouse, times(1)).removeAmmo(eq(mockAmmo), eq(warehouseQuantity));
+    }
 }
