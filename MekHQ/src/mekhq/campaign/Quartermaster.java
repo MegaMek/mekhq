@@ -243,10 +243,14 @@ public class Quartermaster {
             return;
         }
 
-        Money cost = Money.zero();
-        if (ammo.getShots() > 0) {
-            cost = ammo.getActualValue().multipliedBy(shots).dividedBy(ammo.getShots());
+        // How much are we selling?
+        double saleProportion = (shots / (double) ammo.getShots());
+        if (shots == ammo.getShots()) {
+            // Correct for rounding errors
+            saleProportion = 1.0;
         }
+
+        Money cost = ammo.getActualValue().multipliedBy(saleProportion);
 
         getCampaign().getFinances().credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + shots
                 + " " + ammo.getName(), getCampaign().getLocalDate());
@@ -278,15 +282,15 @@ public class Quartermaster {
             return;
         }
 
-        boolean sellingAllArmor = points == armor.getAmount();
-        double proportion = ((double) points / armor.getAmount());
-
-        if (sellingAllArmor) {
-            // to avoid rounding error
-            proportion = 1.0;
+        // How much are we selling?
+        double saleProportion = ((double) points / armor.getAmount());
+        if (points == armor.getAmount()) {
+            // Correct for rounding errors
+            saleProportion = 1.0;
         }
 
-        Money cost = armor.getActualValue().multipliedBy(proportion);
+        Money cost = armor.getActualValue().multipliedBy(saleProportion);
+
         getCampaign().getFinances().credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + points
                 + " " + armor.getName(), getCampaign().getLocalDate());
 
