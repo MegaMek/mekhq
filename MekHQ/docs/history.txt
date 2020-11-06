@@ -31,6 +31,8 @@ VERSION HISTORY:
 + Issue #2193: Unit Market: Units No Longer Reset to Open Market upon load
 + Data: Megamek Portrait Data Pack. Notes and licensing in Megamek contributors file which I will push
   with the next Data work in Megamek.
++ Issue #2171: Implementing Campaign Option and Campaign Preset Versioning
++ Issue #2181: Personnel File CSV Export Toughness, Status, and Portrait Path
 
 
 0.47.11 (2020-10-04 2100 UTC)
