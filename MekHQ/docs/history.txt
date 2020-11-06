@@ -28,6 +28,7 @@ VERSION HISTORY:
 + PR #2161: Improving Zipped Force Icon folders
 + PR #2162: Standardized Portrait Chooser
 + Issue #2188: Cannot assign salary to LAM Pilots or Vehicle Crew loading older CPNX files
++ Issue #2193: Unit Market: Units No Longer Reset to Open Market upon load
 
 0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo
