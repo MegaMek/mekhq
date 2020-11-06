@@ -33,6 +33,7 @@ VERSION HISTORY:
   with the next Data work in Megamek.
 + Issue #2171: Implementing Campaign Option and Campaign Preset Versioning
 + Issue #2181: Personnel File CSV Export Toughness, Status, and Portrait Path
++ Issue #785: SLDF Ranks are Wrong
 
 
 0.47.11 (2020-10-04 2100 UTC)
