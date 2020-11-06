@@ -35,7 +35,7 @@ public class StripUnitActionTest {
         StripUnitAction action = new StripUnitAction();
         Campaign campaign = TestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
-        action.Execute(campaign, unit);
+        action.execute(campaign, unit);
 
         Assert.assertTrue(0 == unit.getSalvageableParts().size());
     }
@@ -45,7 +45,7 @@ public class StripUnitActionTest {
         StripUnitAction action = new StripUnitAction();
         Campaign campaign = TestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getWaspLAMMk1());
-        action.Execute(campaign, unit);
+        action.execute(campaign, unit);
 
         Assert.assertTrue(0 == unit.getSalvageableParts().size());
     }
@@ -55,7 +55,7 @@ public class StripUnitActionTest {
         StripUnitAction action = new StripUnitAction();
         Campaign campaign = TestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getArionStandard());
-        action.Execute(campaign, unit);
+        action.execute(campaign, unit);
 
         Assert.assertTrue(0 == unit.getSalvageableParts().size());
     }
@@ -65,7 +65,7 @@ public class StripUnitActionTest {
         StripUnitAction action = new StripUnitAction();
         Campaign campaign = TestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
-        action.Execute(campaign, unit);
+        action.execute(campaign, unit);
 
         Assert.assertTrue(unit.isSalvage());
     }

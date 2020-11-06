@@ -110,7 +110,7 @@ public class VeeStabiliser extends Part {
     public void remove(boolean salvage) {
         if(null != unit && unit.getEntity() instanceof Tank) {
             ((Tank)unit.getEntity()).setStabiliserHit(loc);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
                 campaign.removePart(this);
             } else if(null != spare) {

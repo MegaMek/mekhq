@@ -26,9 +26,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.Version;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -131,7 +133,8 @@ public class GamePreset implements MekHqXmlSerializable {
     @Override
     public void writeToXml(PrintWriter pw, int indent) {
         pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "gamePreset");
+        pw.println("<gamePreset version=\"" + ResourceBundle.getBundle("mekhq.resources.MekHQ")
+                .getString("Application.version") + "\">");
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "title", title);
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "description", description);
         if (getOptions() != null) {
@@ -185,6 +188,11 @@ public class GamePreset implements MekHqXmlSerializable {
         // Stupid weird parsing of XML. At least this cleans it up.
         optionsEle.normalize();
 
+        // Legacy Parsing method for any presets created before 0.47.11, as they did not include a version
+        final String versionString = optionsEle.getAttribute("version");
+        // TODO : Java 11 : Move to isBlank
+        Version version = new Version(versionString.trim().isEmpty() ? "0.47.11" : versionString);
+
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn = nl.item(x);
@@ -199,7 +207,7 @@ public class GamePreset implements MekHqXmlSerializable {
                 } else if (xn.equalsIgnoreCase("description")) {
                     preset.description = wn.getTextContent();
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
-                    preset.setOptions(CampaignOptions.generateCampaignOptionsFromXml(wn));
+                    preset.setOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     preset.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn));
                 } else if (xn.equalsIgnoreCase("skillTypes")) {

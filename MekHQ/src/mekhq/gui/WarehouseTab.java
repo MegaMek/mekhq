@@ -598,7 +598,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshPartsList() {
-        partsModel.setData(getCampaign().getSpareParts());
+        partsModel.setData(getCampaign().getWarehouse().getSpareParts());
         getCampaign().getShoppingList().removeZeroQuantityFromList(); // To
                                                                       // prevent
                                                                       // zero

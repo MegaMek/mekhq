@@ -157,7 +157,7 @@ public class AeroLifeSupport extends Part {
     public void remove(boolean salvage) {
         if(null != unit && unit.getEntity() instanceof Aero) {
             ((Aero)unit.getEntity()).setLifeSupport(false);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
                 campaign.removePart(this);
             } else if(null != spare) {

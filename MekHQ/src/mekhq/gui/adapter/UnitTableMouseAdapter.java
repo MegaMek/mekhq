@@ -65,6 +65,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.CancelMothballUnitAction;
+import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.campaign.unit.actions.ShowUnitBvAction;
@@ -352,8 +353,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             }
         } else if (command.contains(COMMAND_HIRE_FULL)) {
             boolean isGM = command.equals(COMMAND_HIRE_FULL_GM);
+            HirePersonnelUnitAction hireAction = new HirePersonnelUnitAction(isGM);
             for (Unit unit : units) {
-                gui.getCampaign().hirePersonnelFor(unit.getId(), isGM);
+                hireAction.execute(gui.getCampaign(), unit);
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
             ((MekLabTab) gui.getTab(GuiTabType.MEKLAB)).loadUnit(selectedUnit);
@@ -417,7 +419,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
                 MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
-                mothballUnitAction.Execute(gui.getCampaign(), selectedUnit);
+                mothballUnitAction.execute(gui.getCampaign(), selectedUnit);
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.equals(COMMAND_ACTIVATE)) {
@@ -426,14 +428,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "activation");
                 ActivateUnitAction activateUnitAction = new ActivateUnitAction(tech, false);
-                activateUnitAction.Execute(gui.getCampaign(), selectedUnit);
+                activateUnitAction.execute(gui.getCampaign(), selectedUnit);
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.equals(COMMAND_CANCEL_MOTHBALL)) {
             CancelMothballUnitAction cancelAction = new CancelMothballUnitAction();
             for (Unit u : units) {
                 if (u.isMothballing()) {
-                    cancelAction.Execute(gui.getCampaign(), u);
+                    cancelAction.execute(gui.getCampaign(), u);
                     MekHQ.triggerEvent(new UnitChangedEvent(u));
                 }
             }
@@ -460,7 +462,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equals(COMMAND_SHOW_BV_CALC)) {
             IUnitAction showUnitBvAction = new ShowUnitBvAction();
-            showUnitBvAction.Execute(gui.getCampaign(), selectedUnit);
+            showUnitBvAction.execute(gui.getCampaign(), selectedUnit);
         } else if (command.equals(COMMAND_RESTORE_UNIT)) {
             for (Unit unit : units) {
                 unit.setSalvage(false);
@@ -537,14 +539,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
         } else if (command.equals(COMMAND_STRIP_UNIT)) {
             IUnitAction stripUnitAction = new StripUnitAction();
             for (Unit u : units) {
-                stripUnitAction.Execute(gui.getCampaign(), u);
+                stripUnitAction.execute(gui.getCampaign(), u);
             }
         } else if (command.equals(COMMAND_GM_MOTHBALL)) {
             MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
             for (Unit u : units) {
                 // this is so we can have this show with a mixture of Mothballed and non-Mothballed units
                 if (!u.isMothballed()) {
-                    mothballUnitAction.Execute(gui.getCampaign(), u);
+                    mothballUnitAction.execute(gui.getCampaign(), u);
                     MekHQ.triggerEvent(new UnitChangedEvent(u));
                 }
             }
@@ -553,7 +555,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             for (Unit u : units) {
                 // this is so we can have this show with a mixture of Mothballed and non-Mothballed units
                 if (u.isMothballed()) {
-                    activateUnitAction.Execute(gui.getCampaign(), u);
+                    activateUnitAction.execute(gui.getCampaign(), u);
                     MekHQ.triggerEvent(new UnitChangedEvent(u));
                 }
             }
@@ -566,10 +568,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             UUID id = gui.selectTech(unit, description, true);
             if (null != id) {
                 tech = gui.getCampaign().getPerson(id);
-                if (tech.getTechUnitIDs().size() > 0) {
+                if (!tech.getTechUnits().isEmpty()) {
                     if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(gui.getFrame(),
                             tech.getFullName() + " will not be able to perform maintenance on "
-                                    + tech.getTechUnitIDs().size() + " assigned units. Proceed?",
+                                    + tech.getTechUnits().size() + " assigned units. Proceed?",
                                     "Unmaintained unit warning",
                                     JOptionPane.YES_NO_OPTION)) {
                         tech = null;

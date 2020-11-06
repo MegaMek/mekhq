@@ -29,6 +29,7 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -154,7 +155,7 @@ public class PayCollateralDialog extends JDialog {
         i = 0;
         j = 0;
         JSlider partSlider;
-        ArrayList<Part> spareParts = campaign.getSpareParts();
+        List<Part> spareParts = campaign.getWarehouse().getSpareParts();
         for(Part p : spareParts) {
             j++;
             int quantity = p.getQuantity();
@@ -290,7 +291,7 @@ public class PayCollateralDialog extends JDialog {
         for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
             int quantity = m.getKey().getValue();
             if(quantity > 0) {
-                amount = amount.plus(campaign.getPart(m.getValue()).getCurrentValue().multipliedBy(quantity));
+                amount = amount.plus(campaign.getWarehouse().getPart(m.getValue()).getCurrentValue().multipliedBy(quantity));
             }
         }
 

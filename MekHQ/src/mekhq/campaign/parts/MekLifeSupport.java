@@ -99,10 +99,10 @@ public class MekLifeSupport extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.removePart(this);
             }
@@ -199,8 +199,9 @@ public class MekLifeSupport extends Part {
         if (null == unit) {
             return false;
         }
+
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-             if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i) > 0
+             if ((unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i) > 0)
                      && unit.isLocationDestroyed(i)) {
                  return true;
              }

@@ -190,22 +190,22 @@ public class MekLocation extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof MekLocation
-                && getLoc() == ((MekLocation)part).getLoc()
-                && getUnitTonnage() == ((MekLocation)part).getUnitTonnage()
-                && isTsm() == ((MekLocation)part).isTsm()
+                && getLoc() == ((MekLocation) part).getLoc()
+                && getUnitTonnage() == part.getUnitTonnage()
+                && isTsm() == ((MekLocation) part).isTsm()
                 && getStructureType() == ((MekLocation) part).getStructureType()
                 && ((getStructureType() != EquipmentType.T_STRUCTURE_ENDO_STEEL)
                         || (isClan() == part.isClan()))
-                && (!isArm() || forQuad == ((MekLocation)part).forQuad)
+                && (!isArm() || forQuad == ((MekLocation) part).forQuad)
                 // Sensors and life support only matter if we're comparing two parts in the warehouse.
                 && ((getUnit() != null) || (part.getUnit() != null)
-                        || (hasSensors() == ((MekLocation)part).hasSensors()
-                        && hasLifeSupport() == ((MekLocation)part).hasLifeSupport()));
+                        || (hasSensors() == ((MekLocation) part).hasSensors()
+                        && hasLifeSupport() == ((MekLocation) part).hasLifeSupport()));
     }
 
     @Override
     public boolean isSameStatus(Part part) {
-        return super.isSameStatus(part) && this.getPercent() == ((MekLocation)part).getPercent();
+        return super.isSameStatus(part) && this.getPercent() == ((MekLocation) part).getPercent();
     }
 
     public double getPercent() {
@@ -343,7 +343,7 @@ public class MekLocation extends Part {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
             unit.getEntity().setLocationBlownOff(loc, false);
             unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.removePart(this);
             } else if (null != spare) {

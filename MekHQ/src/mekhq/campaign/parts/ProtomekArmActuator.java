@@ -142,7 +142,7 @@ public class ProtomekArmActuator extends Part {
         if (null != unit) {
             int h = Math.max(1, hits);
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location, h);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.removePart(this);
             } else if(null != spare) {

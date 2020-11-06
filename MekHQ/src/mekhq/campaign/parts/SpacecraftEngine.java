@@ -43,6 +43,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
+<<<<<<< HEAD
+=======
+ *
+>>>>>>> upstream/master
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SpacecraftEngine extends Part {
@@ -188,7 +192,8 @@ public class SpacecraftEngine extends Part {
             if (unit.getEntity() instanceof Aero) {
                 ((Aero) unit.getEntity()).setEngineHits(((Aero) unit.getEntity()).getMaxEngineHits());
             }
-            Part spare = campaign.checkForExistingSparePart(this);
+
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.removePart(this);
             } else if (null != spare) {

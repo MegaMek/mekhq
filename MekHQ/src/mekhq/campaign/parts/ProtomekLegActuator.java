@@ -108,7 +108,7 @@ public class ProtomekLegActuator extends Part {
         if (null != unit) {
             int h = Math.max(2, hits);
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_LEGCRIT, Protomech.LOC_LEG, h);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.removePart(this);
             } else if (null != spare) {

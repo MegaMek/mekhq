@@ -227,7 +227,7 @@ public class EquipmentPart extends Part {
                 mounted.setRepairable(false);
                 unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
             }
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.removePart(this);
             } else if (null != spare) {

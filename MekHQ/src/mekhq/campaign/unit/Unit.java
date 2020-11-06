@@ -498,6 +498,27 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return (!onlyNotBeingWorkedOn || (onlyNotBeingWorkedOn && !partWork.isBeingWorkedOn()));
     }
 
+    /**
+     * Gets a list of every part on a unit which need service (either repair or salvage),
+     * including parts currently being worked on.
+     */
+    public List<IPartWork> getPartsNeedingService() {
+        return getPartsNeedingService(false);
+    }
+
+    /**
+     * Gets a list of parts on a unit which need service (either repair or salvage),
+     * optionally excluding parts already being worked on.
+     * @param onlyNotBeingWorkedOn When true, excludes parts currently being repaired or salvaged.
+     */
+    public List<IPartWork> getPartsNeedingService(boolean onlyNotBeingWorkedOn) {
+        if (isSalvage() || !isRepairable()) {
+            return getSalvageableParts(onlyNotBeingWorkedOn);
+        } else {
+            return getPartsNeedingFixing(onlyNotBeingWorkedOn);
+        }
+    }
+
     public ArrayList<IPartWork> getPartsNeedingFixing() {
         return getPartsNeedingFixing(false);
     }
@@ -3509,7 +3530,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 //This overwrites the Edge value assigned above.
                 if (getCampaign().getCampaignOptions().useEdge()) {
                     double sumEdge = 0;
-                    int edge = 0;
+                    int edge;
                     for (Person p : drivers) {
                         sumEdge += p.getEdge();
                     }
@@ -3893,7 +3914,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         if (engineer.getEdgeUsed() > 0) {
                             //Don't subtract an Edge if the individual has none left
                             if (p.getCurrentEdge() > 0) {
-                                p.setCurrentEdge(p.getCurrentEdge() - 1);
+                                p.changeCurrentEdge(-1);
                                 engineer.setEdgeUsed(engineer.getEdgeUsed() - 1);
                             }
                         }
@@ -3942,7 +3963,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
                     engineer.setEdgeUsed(sumEdgeUsed);
                     engineer.setCurrentEdge((sumEdge - sumEdgeUsed) / nCrew);
-                    engineer.setUnitId(this.getId());
+                    engineer.setUnit(this);
                 } else {
                     engineer = null;
                 }
@@ -4084,7 +4105,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         ensurePersonIsRegistered(p);
         drivers.add(p);
-        p.setUnitId(getId());
+        p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
@@ -4103,7 +4124,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         ensurePersonIsRegistered(p);
         gunners.add(p);
-        p.setUnitId(getId());
+        p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
@@ -4122,7 +4143,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         ensurePersonIsRegistered(p);
         vesselCrew.add(p);
-        p.setUnitId(getId());
+        p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
@@ -4141,7 +4162,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         ensurePersonIsRegistered(p);
         navigator = p;
-        p.setUnitId(getId());
+        p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
@@ -4164,7 +4185,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         ensurePersonIsRegistered(p);
         techOfficer = p;
-        p.setUnitId(getId());
+        p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
@@ -4182,7 +4203,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         ensurePersonIsRegistered(p);
         tech = p;
-        p.addTechUnitID(getId());
+        p.addTechUnit(this);
         ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
         MekHQ.triggerEvent(new PersonTechAssignmentEvent(p, this));
     }
@@ -4190,7 +4211,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void removeTech() {
         if (tech != null) {
             Person originalTech = tech;
-            tech.removeTechUnitId(getId());
+            tech.removeTechUnit(this);
             tech = null;
             MekHQ.triggerEvent(new PersonTechAssignmentEvent(originalTech, null));
         }
@@ -4217,7 +4238,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
             gunners.add(p);
         }
-        p.setUnitId(getId());
+        p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
@@ -4234,7 +4255,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if (p.equals(tech)) {
             removeTech();
         } else {
-            p.setUnitId(null);
+            p.setUnit(null);
             drivers.remove(p);
             gunners.remove(p);
             vesselCrew.remove(p);
@@ -4629,12 +4650,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return false;
         }
         final Unit other = (Unit) obj;
-        return Objects.equals(id, other.id) && Objects.equals(getName(), other.getName());
+        return Objects.equals(id, other.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, getName());
+        return Objects.hash(id);
     }
 
     public Person getEngineer() {

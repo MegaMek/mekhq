@@ -161,7 +161,7 @@ public class AeroSensor extends Part {
     public void remove(boolean salvage) {
         if(null != unit && unit.getEntity() instanceof Aero) {
             ((Aero)unit.getEntity()).setSensorHits(3);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
                 campaign.removePart(this);
             } else if(null != spare) {

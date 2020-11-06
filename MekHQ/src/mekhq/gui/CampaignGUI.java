@@ -1398,8 +1398,7 @@ public class CampaignGUI extends JPanel {
         boolean retirementDateTracking = getCampaign().getCampaignOptions().useRetirementDateTracking();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
-        CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
-                getCampaign(), getIconPackage());
+        CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true, getCampaign());
         cod.setVisible(true);
         if (timeIn != getCampaign().getCampaignOptions().getUseTimeInService()) {
             if (getCampaign().getCampaignOptions().getUseTimeInService()) {
@@ -2003,8 +2002,8 @@ public class CampaignGUI extends JPanel {
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have
                     // changed...
-                    p.setUnitId(null);
-                    p.clearTechUnitIDs();
+                    p.setUnit(null);
+                    p.clearTechUnits();
                 }
             }
 
@@ -2032,7 +2031,7 @@ public class CampaignGUI extends JPanel {
                 }
             }
 
-            MekHQ.getLogger().info(this, "Finished load of personnel file");
+            MekHQ.getLogger().info("Finished load of personnel file");
         }
     }
 
@@ -2210,6 +2209,7 @@ public class CampaignGUI extends JPanel {
 
         // we need to iterate through three times, the first time to collect
         // any custom units that might not be written yet
+        List<Part> parts = new ArrayList<>();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
@@ -2227,10 +2227,11 @@ public class CampaignGUI extends JPanel {
 
             Part p = Part.generateInstanceFromXML(wn2, version);
             if (p != null) {
-                p.setCampaign(getCampaign());
-                getCampaign().addPartWithoutId(p);
+                parts.add(p);
             }
         }
+
+        getCampaign().importParts(parts);
         MekHQ.getLogger().info("Finished load of parts file");
     }
 
@@ -2284,7 +2285,7 @@ public class CampaignGUI extends JPanel {
             String xn = wn.getNodeName();
 
             if (xn.equalsIgnoreCase("campaignOptions")) {
-                options = CampaignOptions.generateCampaignOptionsFromXml(wn);
+                options = CampaignOptions.generateCampaignOptionsFromXml(wn, version);
             } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                 rsp = RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn);
             } else if (xn.equalsIgnoreCase("skillTypes")) {

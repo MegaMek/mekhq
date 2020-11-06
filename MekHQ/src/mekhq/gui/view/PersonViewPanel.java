@@ -1292,14 +1292,10 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 lblEdgeAvail2.setName("lblEdgeAvail2");
                 lblEdgeAvail2.setText(Integer.toString(person.getCurrentEdge()));
-                gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
-                gridBagConstraints.gridy = firsty;
                 gridBagConstraints.gridwidth = 1;
                 gridBagConstraints.weightx = 1.0;
                 gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                gridBagConstraints.fill = GridBagConstraints.NONE;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlSkills.add(lblEdgeAvail2, gridBagConstraints);
             }
             firsty++;

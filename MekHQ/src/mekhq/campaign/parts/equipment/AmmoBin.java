@@ -552,7 +552,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         int converted = 0;
 
         // TODO: make this less intensive.
-        for (Part part : campaign.getSpareParts()) {
+        for (Part part : campaign.getWarehouse().getSpareParts()) {
             if (!part.isPresent()) {
                 continue;
             }
@@ -591,7 +591,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public static void changeAmountAvailable(Campaign campaign, int amount, final AmmoType curType) {
-        AmmoStorage a = (AmmoStorage) campaign.findSparePart(part -> {
+        AmmoStorage a = (AmmoStorage) campaign.getWarehouse().findSparePart(part -> {
             if (!(part instanceof AmmoStorage) || !part.isPresent() || part.isReservedForRefit()) {
                 return false;
             }
@@ -706,10 +706,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                         && ammoType.equals(((AmmoStorage) part).getType())
                         && ammoType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
             }
-            AmmoStorage a = (AmmoStorage) campaign.findSparePart(predicate);
+            AmmoStorage a = (AmmoStorage) campaign.getWarehouse().findSparePart(predicate);
             return a != null ? a.getShots() : 0;
         } else {
-            return campaign.streamSpareParts()
+            return campaign.getWarehouse()
+                           .streamSpareParts()
                            .filter(part -> part instanceof AmmoStorage && part.isPresent())
                            .mapToInt(part -> {
                                AmmoStorage a = (AmmoStorage)part;
