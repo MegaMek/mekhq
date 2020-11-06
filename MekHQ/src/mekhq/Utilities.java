@@ -981,8 +981,7 @@ public class Utilities {
 
             // Only created crew can be assigned a portrait, so this is safe to put in here
             if (!AbstractIcon.DEFAULT_ICON_FILENAME.equals(oldCrew.getPortraitFileName(crewIndex))) {
-                p.setPortraitCategory(oldCrew.getPortraitCategory(crewIndex));
-                p.setPortraitFileName(oldCrew.getPortraitFileName(crewIndex));
+                p.setPortrait(oldCrew.getPortrait(crewIndex));
             }
         }
     }
@@ -1079,11 +1078,19 @@ public class Utilities {
     }
 
     public static Money[] readMoneyArray(Node node) {
+        return readMoneyArray(node, 0);
+    }
+
+    public static Money[] readMoneyArray(Node node, int minimumSize) {
         String[] values = node.getTextContent().split(",");
-        Money[] result = new Money[values.length];
+        Money[] result = new Money[Math.max(values.length, minimumSize)];
 
         for (int i = 0; i < values.length; i++) {
             result[i] = Money.fromXmlString(values[i]);
+        }
+
+        for (int i = values.length; i < result.length; i++) {
+            result[i] = Money.zero();
         }
 
         return result;
