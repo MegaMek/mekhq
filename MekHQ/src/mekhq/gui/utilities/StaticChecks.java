@@ -18,8 +18,8 @@
  */
 package mekhq.gui.utilities;
 
+import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.UUID;
 import java.util.Vector;
 
 import megamek.common.Entity;
@@ -726,14 +726,15 @@ public class StaticChecks {
     }
 
     public static boolean allHaveSameUnit(Person[] people) {
-        UUID unitId = people[0].getUnitId();
-        for (Person person : people) {
-            if ((unitId == null && person.getUnitId() == null)
-                    || (person.getUnitId() != null && person.getUnitId()
-                            .equals(unitId))) {
-                continue;
-            }
+        if ((people == null) || (people.length == 0)) {
             return false;
+        }
+
+        Unit unit = people[0].getUnit();
+        for (Person person : people) {
+            if (!Objects.equals(unit, person.getUnit())) {
+                return false;
+            }
         }
         return true;
     }

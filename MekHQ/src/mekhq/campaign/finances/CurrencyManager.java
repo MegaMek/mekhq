@@ -20,7 +20,6 @@
  */
 package mekhq.campaign.finances;
 
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -197,13 +196,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
     @Override
     protected void registerCurrencies() {
-        final String METHOD_NAME = "registerCurrencies()"; //$NON-NLS-1$
-
-        MekHQ.getLogger().log(
-                CurrencyManager.class,
-                METHOD_NAME,
-                LogLevel.INFO,
-                "Starting load currency information from XML..."); //$NON-NLS-1$
+        MekHQ.getLogger().info(CurrencyManager.class, "Starting load currency information from XML...");
 
         try {
             // Using factory get an instance of document builder
@@ -298,13 +291,9 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                 }
             }
 
-            MekHQ.getLogger().log(
-                    CurrencyManager.class,
-                    METHOD_NAME,
-                    LogLevel.INFO,
-                    "Load of currency information complete!"); //$NON-NLS-1$
+            MekHQ.getLogger().info(CurrencyManager.class, "Load of currency information complete!");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(CurrencyManager.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(CurrencyManager.class, ex);
         }
     }
 

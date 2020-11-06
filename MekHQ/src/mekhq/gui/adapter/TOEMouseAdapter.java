@@ -33,6 +33,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.TreePath;
 
 import megamek.common.util.StringUtil;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.gui.utilities.JMenuHelpers;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -53,6 +54,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CamoChoiceDialog;
@@ -237,7 +239,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 if (null != tech) {
                     if (singleForce.getTechID() != null) {
                         Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
-                        oldTech.clearTechUnitIDs();
+                        oldTech.clearTechUnits();
                         ServiceLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
                     }
                     singleForce.setTechID(tech.getId());
@@ -349,7 +351,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             if (null != singleForce) {
                 ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(), true,
                         singleForce.getIconCategory(), singleForce.getIconFileName(),
-                        singleForce.getIconMap(), gui.getIconPackage().getForceIcons(), true);
+                        singleForce.getIconMap(), MHQStaticDirectoryManager.getForceIcons(), true);
                 pcd.setVisible(true);
                 if (pcd.isChanged()) {
                     singleForce.setIconCategory(pcd.getCategory());
@@ -431,7 +433,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         } else if (command.contains(TOEMouseAdapter.REMOVE_LANCE_TECH)) {
             if (null != singleForce && singleForce.getTechID() != null) {
                 Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
-                oldTech.clearTechUnitIDs();
+                oldTech.clearTechUnits();
 
                 ServiceLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
 
@@ -826,41 +828,42 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     // Or Gun Emplacements!
                     // TODO: Or Robotic Systems!
                     JMenu unsorted = new JMenu("Unsorted");
-                    for (Unit u : gui.getCampaign().getUnits(true)) {
+
+                    HangarSorter.weightSorted().forEachUnit(gui.getCampaign().getHangar(), u -> {
                         String type = UnitType.getTypeName(u.getEntity().getUnitType());
                         String className = u.getEntity().getWeightClassName();
                         if (null != u.getCommander()) {
                             Person p = u.getCommander();
                             if (p.getStatus().isActive() && (u.getForceId() < 1) && u.isPresent()) {
-                                menuItem = new JMenuItem(p.getFullTitle() + ", " + u.getName());
-                                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
-                                menuItem.addActionListener(this);
-                                menuItem.setEnabled(u.isAvailable());
+                                JMenuItem menuItem0 = new JMenuItem(p.getFullTitle() + ", " + u.getName());
+                                menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
+                                menuItem0.addActionListener(this);
+                                menuItem0.setEnabled(u.isAvailable());
                                 if (null != weightClassForUnitType.get(type + "_" + className)) {
-                                    weightClassForUnitType.get(type + "_" + className).add(menuItem);
+                                    weightClassForUnitType.get(type + "_" + className).add(menuItem0);
                                     weightClassForUnitType.get(type + "_" + className).setEnabled(true);
                                 } else {
-                                    unsorted.add(menuItem);
+                                    unsorted.add(menuItem0);
                                 }
                                 unitTypeMenus.get(type).setEnabled(true);
                             }
                         }
                         if (u.getEntity() instanceof GunEmplacement) {
                             if (u.getForceId() < 1 && u.isPresent()) {
-                                menuItem = new JMenuItem("AutoTurret, " + u.getName());
-                                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
-                                menuItem.addActionListener(this);
-                                menuItem.setEnabled(u.isAvailable());
+                                JMenuItem menuItem0 = new JMenuItem("AutoTurret, " + u.getName());
+                                menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
+                                menuItem0.addActionListener(this);
+                                menuItem0.setEnabled(u.isAvailable());
                                 if (null != weightClassForUnitType.get(type + "_" + className)) {
-                                    weightClassForUnitType.get(type + "_" + className).add(menuItem);
+                                    weightClassForUnitType.get(type + "_" + className).add(menuItem0);
                                     weightClassForUnitType.get(type + "_" + className).setEnabled(true);
                                 } else {
-                                    unsorted.add(menuItem);
+                                    unsorted.add(menuItem0);
                                 }
                                 unitTypeMenus.get(type).setEnabled(true);
                             }
                         }
-                    }
+                    });
 
                     for (int i = 0; i < UnitType.SIZE; i++)
                     {
@@ -1007,12 +1010,12 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     //Only display the Assign to Ship command if your command has at least 1 valid transport
                     //and if your selection does not include a transport
                     if (!shipInSelection && !gui.getCampaign().getTransportShips().isEmpty()) {
-                        for (UUID id : gui.getCampaign().getTransportShips()) {
-                            Unit ship = gui.getCampaign().getUnit(id);
-                            if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
+                        for (Unit ship : gui.getCampaign().getTransportShips()) {
+                            if (ship.isSalvage() || (ship.getCommander() == null)) {
                                 continue;
                             }
 
+                            UUID id = ship.getId();
                             if (allUnitsSameType) {
                                 double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
                                 if (capacity > 0) {
@@ -1361,11 +1364,12 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         //is in a basic state that can accept units. Capacity gets checked once the action
                         //is submitted.
                         menu = new JMenu("Assign Unit to Transport Ship");
-                        for (UUID id : gui.getCampaign().getTransportShips()) {
-                            Unit ship = gui.getCampaign().getUnit(id);
-                            if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
+                        for (Unit ship : gui.getCampaign().getTransportShips()) {
+                            if (ship.isSalvage() || (ship.getCommander() == null)) {
                                 continue;
                             }
+
+                            UUID id = ship.getId();
                             if (allUnitsSameType) {
                                 double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
                                 if (capacity > 0) {
@@ -1525,7 +1529,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         }
 
         return new CamoChoiceDialog(gui.getFrame(), true, category, fileName,
-            gui.getCampaign().getColorIndex(), gui.getIconPackage().getCamos());
+            gui.getCampaign().getColorIndex());
     }
 
     /**

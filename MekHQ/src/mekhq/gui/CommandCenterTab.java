@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,8 +22,8 @@ import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.MechSummaryCache;
 import megamek.common.event.Subscribe;
-import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.*;
@@ -49,11 +49,11 @@ import java.util.ResourceBundle;
  * Collates important information about the campaign and displays it, along with some actionable buttons
  */
 public final class CommandCenterTab extends CampaignGuiTab {
-
     private JPanel panCommand;
 
     // basic info panel
     private JPanel panInfo;
+    private JLabel lblRatingHead;
     private JLabel lblRating;
     private JLabel lblExperience;
     private JLabel lblPersonnel;
@@ -79,11 +79,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     // available reports
     private JPanel panReports;
+    private JButton btnUnitRating;
 
     //icon panel
     private JPanel panIcon;
     private JLabel lblIcon;
-    private DirectoryItems icons;
 
     private ResourceBundle resourceMap;
 
@@ -164,20 +164,20 @@ public final class CommandCenterTab extends CampaignGuiTab {
         int y = 0;
 
         /* Unit Rating */
+        lblRatingHead = new JLabel(resourceMap.getString("lblRating.text"));
+        lblRatingHead.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 1, 5);
+        panInfo.add(lblRatingHead, gridBagConstraints);
         lblRating = new JLabel(getCampaign().getUnitRatingText());
-        if (getCampaign().getCampaignOptions().useDragoonRating()) {
-            JLabel lblRatingHead = new JLabel(resourceMap.getString("lblRating.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.insets = new Insets(5, 5, 1, 5);
-            panInfo.add(lblRatingHead, gridBagConstraints);
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.weightx = 1.0;
-            panInfo.add(lblRating, gridBagConstraints);
-        }
+        lblRating.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        panInfo.add(lblRating, gridBagConstraints);
         JLabel lblExperienceHead = new JLabel(resourceMap.getString("lblExperience.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -432,7 +432,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnCargoCapacity.addActionListener(evt -> getCampaignGui().showReport(new CargoReport(getCampaign())));
         panReports.add(btnCargoCapacity);
 
-        JButton btnUnitRating = new JButton(resourceMap.getString("btnUnitRating.text"));
+        btnUnitRating = new JButton(resourceMap.getString("btnUnitRating.text"));
+        btnUnitRating.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
         btnUnitRating.addActionListener(evt -> getCampaignGui().showReport(new RatingReport(getCampaign())));
         panReports.add(btnUnitRating);
 
@@ -443,10 +444,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * set the icon for the unit if it exits in the icon panel
      */
     public void setIcon() {
-        if (null == icons) {
-            icons = getCampaignGui().getIconPackage().getForceIcons();
-        }
-
         lblIcon.setIcon(null);
 
         String category = getCampaign().getIconCategory();
@@ -461,7 +458,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             // Try to get the icon file.
             Image icon;
             try {
-                icon = (Image) icons.getItem(category, filename);
+                icon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem(category, filename);
                 if (null != icon) {
                     icon = icon.getScaledInstance(150, -1, Image.SCALE_DEFAULT);
                 } else {
@@ -469,7 +466,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                 }
                 lblIcon.setIcon(new ImageIcon(icon));
             } catch (Exception e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
         }
     }
@@ -605,6 +602,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(OptionsChangedEvent evt) {
+        lblRatingHead.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
+        lblRating.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
+        btnUnitRating.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
         basicInfoScheduler.schedule();
         procurementListScheduler.schedule();
         setIcon();
@@ -630,5 +630,4 @@ public final class CommandCenterTab extends CampaignGuiTab {
     public void handle(AssetEvent ev) {
         basicInfoScheduler.schedule();
     }
-
 }

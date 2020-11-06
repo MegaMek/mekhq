@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 MegaMek team
+ * Copyright (C) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel.generator;
 
@@ -34,22 +34,44 @@ public class DefaultSpecialAbilityGenerator extends AbstractSpecialAbilityGenera
             // base number of special abilities is based on a random roll
             int numAbilities = Utilities.rollSpecialAbilities(getSkillPreferences().getSpecialAbilBonus(expLvl));
 
-            // Based on the AtB rules, recruits of veteran gain one and elites gain two
-            // additional special abilities
-            if (getCampaignOptions(person).getUseAtB()) {
-                switch (expLvl) {
-                    case SkillType.EXP_VETERAN:
-                        numAbilities += 1;
-                        break;
-                    case SkillType.EXP_ELITE:
-                        numAbilities += 2;
-                        break;
-                }
-            }
-
+            // Then we generate up to that number, stopping if there are no potential abilities to generate
             while ((numAbilities > 0)
                     && singleSpecialAbilityGenerator.generateSpecialAbilities(person, expLvl)) {
                 numAbilities--;
+            }
+
+            // Based on the AtB rules, veteran recruits gain one and elite recruits gain two
+            // additional special abilities. Further, these are converted to edge if they cannot be
+            // generated.
+            if (getCampaignOptions(person).getUseAtB() && (expLvl >= SkillType.EXP_VETERAN)) {
+                // If we have more than 0 remaining abilities we can skip trying to generate after
+                // deciding on the number of further rolls and just convert it into edge
+                final boolean instantEdgeConversion = numAbilities != 0;
+
+                // then we set the number of abilities to generate at 1 for veteran and 2 for elite
+                switch (expLvl) {
+                    case SkillType.EXP_VETERAN:
+                        numAbilities = 1;
+                        break;
+                    case SkillType.EXP_ELITE:
+                        numAbilities = 2;
+                        break;
+                }
+
+                // If we aren't going to immediately convert into edge, we attempt to generate special
+                // abilities for the person
+                if (!instantEdgeConversion) {
+                    while ((numAbilities > 0)
+                            && singleSpecialAbilityGenerator.generateSpecialAbilities(person, expLvl)) {
+                        numAbilities--;
+                    }
+                }
+
+                // If edge is enabled and there are any leftover abilities that cannot be generated
+                // we assign edge
+                if (getCampaignOptions(person).useEdge() && (instantEdgeConversion || (numAbilities > 0))) {
+                    person.changeEdge(numAbilities);
+                }
             }
 
             return true;

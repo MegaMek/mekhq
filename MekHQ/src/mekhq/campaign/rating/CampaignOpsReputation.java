@@ -106,11 +106,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         // Reset counts
         setTotalSkillLevels(BigDecimal.ZERO);
 
-        List<Unit> unitList = getCampaign().getCopyOfUnits();
-        for (Unit u : unitList) {
-            if (null == u) {
-                continue;
-            }
+        for (Unit u : getCampaign().getHangar().getUnits()) {
             if (u.isMothballed()) {
                 continue;
             }
@@ -248,8 +244,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         // Count total units for transport
         getTotalCombatUnits();
 
-        List<Unit> unitList = getCampaign().getCopyOfUnits();
-        for (Unit u : unitList) {
+        for (Unit u : getCampaign().getHangar().getUnits()) {
             if (u == null) {
                 continue;
             }
@@ -665,17 +660,18 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private int calcLargeCraftSupportValue() {
-        boolean crewShortage = false;
-        for (Unit u : getCampaign().getCopyOfUnits()) {
+        Unit unit = getCampaign().getHangar().findUnit(u -> {
             if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
                 if (u.getActiveCrew().size() < u.getFullCrewSize()) {
-                    crewShortage = true;
-                    break;
+                    return true;
                 }
             }
-        }
+            return false;
+        });
 
-        return crewShortage ? -5 : 0;
+        // if we found a unit we have a crew shortage
+        // on at least one vessel in our fleet
+        return (unit != null) ? -5 : 0;
     }
 
     @Override

@@ -36,7 +36,6 @@ import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
@@ -46,6 +45,7 @@ import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.unit.HangarStatistics;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 
@@ -231,8 +231,6 @@ public class PersonnelMarket {
     }
 
     public static PersonnelMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
-
         PersonnelMarket retVal = null;
 
         try {
@@ -265,11 +263,9 @@ public class PersonnelMarket {
                     try {
                         en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
                     } catch (EntityLoadingException ex) {
-                        en = null;
-                        MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, LogLevel.ERROR,
-                                "Unable to load entity: " + ms.getSourceFile() + ": " //$NON-NLS-1$
-                                        + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                        MekHQ.getLogger().error(PersonnelMarket.class, METHOD_NAME, ex);
+                        MekHQ.getLogger().error(PersonnelMarket.class,
+                                "Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
+                        MekHQ.getLogger().error(PersonnelMarket.class, ex);
                     }
                     if (null != en) {
                         retVal.attachedEntities.put(id, en);
@@ -283,12 +279,8 @@ public class PersonnelMarket {
                 } else  {
                     // Error condition of sorts!
                     // Errr, what should we do here?
-                    MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, LogLevel.ERROR,
-                            "Unknown node type not loaded in Personnel nodes: " //$NON-NLS-1$
-                            + wn2.getNodeName());
-
+                    MekHQ.getLogger().error(PersonnelMarket.class, "Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
                 }
-
             }
 
             // All personnel need the rank reference fixed
@@ -302,7 +294,7 @@ public class PersonnelMarket {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(PersonnelMarket.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(PersonnelMarket.class, ex);
         }
 
         return retVal;
@@ -351,15 +343,16 @@ public class PersonnelMarket {
     }
 
     public static long getUnitMainForceTypes(Campaign c) {
-        int mechs = c.getNumberOfUnitsByType(Entity.ETYPE_MECH);
-        int ds = c.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
-        int sc = c.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
-        int cf = c.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
-        int asf = c.getNumberOfUnitsByType(Entity.ETYPE_AERO);
-        int vee = c.getNumberOfUnitsByType(Entity.ETYPE_TANK, true) + c.getNumberOfUnitsByType(Entity.ETYPE_TANK);
-        int inf = c.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
-        int ba = c.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
-        int proto = c.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
+        HangarStatistics hangarStats = c.getHangarStatistics();
+        int mechs = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MECH);
+        int ds = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
+        int sc = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
+        int cf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
+        int asf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AERO);
+        int vee = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true) + hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
+        int inf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
+        int ba = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
+        int proto = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
         int most = mechs;
         if (ds > most) {
             most = ds;

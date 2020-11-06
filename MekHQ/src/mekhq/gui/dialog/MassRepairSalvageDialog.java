@@ -26,6 +26,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,7 +41,6 @@ import javax.swing.table.TableRowSorter;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -48,6 +48,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
+import mekhq.service.MassRepairConfiguredOptions;
 import mekhq.service.MassRepairMassSalvageMode;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.UnitTableModel;
@@ -57,6 +58,7 @@ import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.preferences.PreferencesNode;
+import mekhq.service.MassRepairOption;
 import mekhq.service.MassRepairService;
 import mekhq.service.MassRepairService.MassRepairPartSet;
 
@@ -64,6 +66,7 @@ import mekhq.service.MassRepairService.MassRepairPartSet;
  * @author Kipsta
  */
 public class MassRepairSalvageDialog extends JDialog {
+    //region Variable Declarations
     private static final long serialVersionUID = -7859207613578378162L;
 
     private CampaignGUI campaignGUI;
@@ -87,6 +90,8 @@ public class MassRepairSalvageDialog extends JDialog {
     private JScrollPane scrollPartsTable;
     private JButton btnSelectAllParts;
 
+    private JCheckBox useRepairBox;
+    private JCheckBox useSalvageBox;
     private JCheckBox useExtraTimeBox;
     private JCheckBox useRushJobBox;
     private JCheckBox allowCarryoverBox;
@@ -101,7 +106,12 @@ public class MassRepairSalvageDialog extends JDialog {
     private List<Part> completePartsList = null;
     private List<Part> filteredPartsList = null;
 
-    public MassRepairSalvageDialog(JFrame parent, boolean modal, CampaignGUI campaignGUI, MassRepairMassSalvageMode mode) {
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair", new EncodeControl());
+    //endregion Variable Declarations
+
+    //region Constructors
+    public MassRepairSalvageDialog(JFrame parent, boolean modal, CampaignGUI campaignGUI,
+                                   MassRepairMassSalvageMode mode) {
         this(parent, modal, campaignGUI, null, mode);
     }
 
@@ -110,24 +120,24 @@ public class MassRepairSalvageDialog extends JDialog {
         super(parent, modal);
         this.campaignGUI = campaignGUI;
         this.selectedUnit = selectedUnit;
+        this.mode = mode;
 
         campaignOptions = campaignGUI.getCampaign().getCampaignOptions();
 
-        this.mode = mode;
-
         initComponents();
+        refreshOptions();
 
-        if (isModeUnits()) {
-            filterUnits();
+        if (getMode().isUnits()) {
+            filterUnits(new MassRepairConfiguredOptions(this));
 
-            if (null != selectedUnit) {
+            if (selectedUnit != null) {
                 int unitCount = unitTable.getRowCount();
 
                 for (int i = 0; i < unitCount; i++) {
                     int rowIdx = unitTable.convertRowIndexToModel(i);
                     Unit unit = unitTableModel.getUnit(rowIdx);
 
-                    if (null == unit) {
+                    if (unit == null) {
                         continue;
                     }
 
@@ -137,23 +147,29 @@ public class MassRepairSalvageDialog extends JDialog {
                     }
                 }
             }
-        } else if (isModeWarehouse()) {
+        } else if (getMode().isWarehouse()) {
             filterCompletePartsList(true);
         }
 
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
+    //endregion Constructors
 
-    private boolean isModeUnits() {
-        return mode == MassRepairMassSalvageMode.UNITS;
+    //region Initialization
+    //endregion Initialization
+
+    //region Getters and Setters
+    public MassRepairMassSalvageMode getMode() {
+        return mode;
     }
 
-    private boolean isModeWarehouse() {
-        return mode == MassRepairMassSalvageMode.WAREHOUSE;
+    public Map<Integer, MassRepairOptionControl> getMassRepairOptionControlMap() {
+        return massRepairOptionControlMap;
     }
+    //endregion Getters and Setters
 
-    private void filterUnits() {
+    private void filterUnits(MassRepairConfiguredOptions configuredOptions) {
         // Store selections so after the table is refreshed we can re-select
         // them
         Map<String, Unit> selectedUnitMap = new HashMap<>();
@@ -164,7 +180,7 @@ public class MassRepairSalvageDialog extends JDialog {
             int rowIdx = unitTable.convertRowIndexToModel(selectedRow);
             Unit unit = unitTableModel.getUnit(rowIdx);
 
-            if (null == unit) {
+            if (unit == null) {
                 continue;
             }
 
@@ -177,8 +193,7 @@ public class MassRepairSalvageDialog extends JDialog {
         unitList = new ArrayList<>();
 
         for (Unit unit : campaignGUI.getCampaign().getServiceableUnits()) {
-
-            if (!MassRepairService.isValidMRMSUnit(unit)) {
+            if (!MassRepairService.isValidMRMSUnit(unit, configuredOptions)) {
                 continue;
             }
 
@@ -191,8 +206,10 @@ public class MassRepairSalvageDialog extends JDialog {
             }
         }
 
-        btnSelectAssigned.setText("Select Active Units (" + activeCount + ")");
-        btnSelectUnassigned.setText("Select Inactive Units (" + inactiveCount + ")");
+        btnSelectAssigned.setText(MessageFormat.format(resources.getString("btnSelectAssigned.format"),
+                activeCount));
+        btnSelectUnassigned.setText(MessageFormat.format(resources.getString("btnSelectUnassigned.format"),
+                inactiveCount));
 
         unitTableModel.setData(unitList);
 
@@ -218,7 +235,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
             MassRepairOptionControl mroc = massRepairOptionControlMap.get(type);
 
-            if ((mroc == null) || !mroc.activeBox.isSelected()) {
+            if ((mroc == null) || !mroc.getActiveBox().isSelected()) {
                 continue;
             }
 
@@ -228,12 +245,12 @@ public class MassRepairSalvageDialog extends JDialog {
         if (refreshCompleteList) {
             completePartsList = new ArrayList<>();
 
-            for (Part part : campaignGUI.getCampaign().getSpareParts()) {
+            campaignGUI.getCampaign().getWarehouse().forEachSparePart(part -> {
                 if (!part.isBeingWorkedOn() && part.needsFixing() && !(part instanceof AmmoBin)
                         && (part.getSkillMin() <= SkillType.EXP_ELITE)) {
                     completePartsList.add(part);
                 }
-            }
+            });
         }
 
         filteredPartsList = new ArrayList<>();
@@ -249,7 +266,8 @@ public class MassRepairSalvageDialog extends JDialog {
             }
         }
 
-        btnSelectAllParts.setText("Select All (" + quantity + ")");
+        btnSelectAllParts.setText(MessageFormat.format(resources.getString("btnSelectAllParts.format"),
+                quantity));
         partsTableModel.setData(filteredPartsList);
 
         int count = partsTable.getRowCount();
@@ -260,15 +278,8 @@ public class MassRepairSalvageDialog extends JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MassRepair", new EncodeControl());
-
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-        if (isModeUnits()) {
-            setTitle("Mass Repair/Salvage");
-        } else if (isModeWarehouse()) {
-            setTitle("Mass Repair");
-        }
+        setTitle(resources.getString(getMode().isUnits() ? "MassRepairMassSalvage.title" : "MassRepair.title"));
 
         final Container content = getContentPane();
         content.setLayout(new BorderLayout());
@@ -276,15 +287,15 @@ public class MassRepairSalvageDialog extends JDialog {
         JPanel pnlMain = new JPanel();
         pnlMain.setLayout(new GridBagLayout());
 
-        if (isModeUnits()) {
+        if (getMode().isUnits()) {
             pnlMain.add(createUnitsPanel(), createBaseConstraints(0));
             pnlMain.add(createUnitActionButtons(), createBaseConstraints(1));
-        } else if (isModeWarehouse()) {
+        } else if (getMode().isWarehouse()) {
             pnlMain.add(createPartsPanel(), createBaseConstraints(0));
             pnlMain.add(createPartsActionButtons(), createBaseConstraints(1));
         }
 
-        pnlMain.add(createOptionsPanel(resourceMap), createBaseConstraints(2));
+        pnlMain.add(createOptionsPanel(), createBaseConstraints(2));
 
         content.add(new JScrollPane(pnlMain), BorderLayout.CENTER);
         content.add(createActionButtons(), BorderLayout.SOUTH);
@@ -306,7 +317,8 @@ public class MassRepairSalvageDialog extends JDialog {
 
     private JPanel createUnitsPanel() {
         pnlUnits = new JPanel(new GridBagLayout());
-        pnlUnits.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Units"),
+        pnlUnits.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(resources.getString("UnitsPanel.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         unitTableModel = new UnitTableModel(campaignGUI.getCampaign());
@@ -332,7 +344,7 @@ public class MassRepairSalvageDialog extends JDialog {
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = ((XTableColumnModel) unitTable.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(unitTableModel.getColumnWidth(i));
-            column.setCellRenderer(unitTableModel.getRenderer(false, null));
+            column.setCellRenderer(unitTableModel.getRenderer(false));
 
             if ((i != UnitTableModel.COL_NAME) && (i != UnitTableModel.COL_STATUS)
                     && (i != UnitTableModel.COL_TYPE) && (i != UnitTableModel.COL_RSTATUS)) {
@@ -362,7 +374,8 @@ public class MassRepairSalvageDialog extends JDialog {
 
     private JPanel createPartsPanel() {
         pnlParts = new JPanel(new GridBagLayout());
-        pnlParts.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Parts"),
+        pnlParts.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(resources.getString("PartsPanel.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         partsTableModel = new PartsTableModel();
@@ -407,95 +420,76 @@ public class MassRepairSalvageDialog extends JDialog {
         return pnlParts;
     }
 
-    private JPanel createOptionsPanel(ResourceBundle resourceMap) {
+    private JPanel createOptionsPanel() {
         JPanel pnlOptions = new JPanel(new GridBagLayout());
-        pnlOptions.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Options"),
+        pnlOptions.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(resources.getString("OptionsPanel.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         int gridRowIdx = 0;
 
         GridBagConstraints gridBagConstraints;
 
-        useExtraTimeBox = new JCheckBox(resourceMap.getString("useExtraTimeBox.text"));
-        useExtraTimeBox.setToolTipText(resourceMap.getString("useExtraTimeBox.toolTipText"));
-        useExtraTimeBox.setName("massRepairUseExtraTimeBox");
-        useExtraTimeBox.setSelected(campaignOptions.massRepairUseExtraTime());
+        useRepairBox = new JCheckBox(resources.getString("useRepairBox.text"));
+        useRepairBox.setToolTipText(resources.getString("useRepairBox.toolTipText"));
+        useRepairBox.setName("useRepairBox");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridRowIdx++;
         gridBagConstraints.weightx = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlOptions.add(useRepairBox, gridBagConstraints);
+
+        useSalvageBox = new JCheckBox(resources.getString("useSalvageBox.text"));
+        useSalvageBox.setToolTipText(resources.getString("useSalvageBox.toolTipText"));
+        useSalvageBox.setName("useSalvageBox");
+        gridBagConstraints.gridy = gridRowIdx++;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        pnlOptions.add(useSalvageBox, gridBagConstraints);
+
+        useExtraTimeBox = new JCheckBox(resources.getString("useExtraTimeBox.text"));
+        useExtraTimeBox.setToolTipText(resources.getString("useExtraTimeBox.toolTipText"));
+        useExtraTimeBox.setName("massRepairUseExtraTimeBox");
+        gridBagConstraints.gridy = gridRowIdx++;
         pnlOptions.add(useExtraTimeBox, gridBagConstraints);
 
-        useRushJobBox = new JCheckBox(resourceMap.getString("useRushJobBox.text"));
-        useRushJobBox.setToolTipText(resourceMap.getString("useRushJobBox.toolTipText"));
+        useRushJobBox = new JCheckBox(resources.getString("useRushJobBox.text"));
+        useRushJobBox.setToolTipText(resources.getString("useRushJobBox.toolTipText"));
         useRushJobBox.setName("massRepairUseRushJobBox");
-        useRushJobBox.setSelected(campaignOptions.massRepairUseRushJob());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridRowIdx++;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlOptions.add(useRushJobBox, gridBagConstraints);
 
-        allowCarryoverBox = new JCheckBox(resourceMap.getString("allowCarryoverBox.text"));
-        allowCarryoverBox.setToolTipText(resourceMap.getString("allowCarryoverBox.toolTipText"));
+        allowCarryoverBox = new JCheckBox(resources.getString("allowCarryoverBox.text"));
+        allowCarryoverBox.setToolTipText(resources.getString("allowCarryoverBox.toolTipText"));
         allowCarryoverBox.setName("massRepairAllowCarryoverBox");
-        allowCarryoverBox.setSelected(campaignOptions.massRepairAllowCarryover());
         allowCarryoverBox.addActionListener(e -> optimizeToCompleteTodayBox.setEnabled(allowCarryoverBox.isSelected()));
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridRowIdx++;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlOptions.add(allowCarryoverBox, gridBagConstraints);
 
-        optimizeToCompleteTodayBox = new JCheckBox(resourceMap.getString("optimizeToCompleteTodayBox.text"));
-        optimizeToCompleteTodayBox.setToolTipText(resourceMap.getString("optimizeToCompleteTodayBox.toolTipText"));
+        optimizeToCompleteTodayBox = new JCheckBox(resources.getString("optimizeToCompleteTodayBox.text"));
+        optimizeToCompleteTodayBox.setToolTipText(resources.getString("optimizeToCompleteTodayBox.toolTipText"));
         optimizeToCompleteTodayBox.setName("massRepairOptimizeToCompleteTodayBox");
-        optimizeToCompleteTodayBox.setSelected(campaignOptions.massRepairOptimizeToCompleteToday());
-        optimizeToCompleteTodayBox.setEnabled(campaignOptions.massRepairAllowCarryover());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridRowIdx++;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlOptions.add(optimizeToCompleteTodayBox, gridBagConstraints);
 
-        if (!isModeWarehouse()) {
-            useAssignedTechsFirstBox = new JCheckBox(resourceMap.getString("useAssignedTechsFirstBox.text"));
-            useAssignedTechsFirstBox.setToolTipText(resourceMap.getString("useAssignedTechsFirstBox.toolTipText"));
+        if (!getMode().isWarehouse()) {
+            useAssignedTechsFirstBox = new JCheckBox(resources.getString("useAssignedTechsFirstBox.text"));
+            useAssignedTechsFirstBox.setToolTipText(resources.getString("useAssignedTechsFirstBox.toolTipText"));
             useAssignedTechsFirstBox.setName("massRepairUseAssignedTechsFirstBox");
-            useAssignedTechsFirstBox.setSelected(campaignOptions.massRepairUseAssignedTechsFirst());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridRowIdx++;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlOptions.add(useAssignedTechsFirstBox, gridBagConstraints);
 
-            scrapImpossibleBox = new JCheckBox(resourceMap.getString("scrapImpossibleBox.text"));
-            scrapImpossibleBox.setToolTipText(resourceMap.getString("scrapImpossibleBox.toolTipText"));
+            scrapImpossibleBox = new JCheckBox(resources.getString("scrapImpossibleBox.text"));
+            scrapImpossibleBox.setToolTipText(resources.getString("scrapImpossibleBox.toolTipText"));
             scrapImpossibleBox.setName("massRepairScrapImpossibleBox");
-            scrapImpossibleBox.setSelected(campaignOptions.massRepairScrapImpossible());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridRowIdx++;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlOptions.add(scrapImpossibleBox, gridBagConstraints);
 
-            replacePodPartsBox = new JCheckBox(resourceMap.getString("replacePodPartsBox.text"));
-            replacePodPartsBox.setToolTipText(resourceMap.getString("replacePodPartsBox.toolTipText"));
+            replacePodPartsBox = new JCheckBox(resources.getString("replacePodPartsBox.text"));
+            replacePodPartsBox.setToolTipText(resources.getString("replacePodPartsBox.toolTipText"));
             replacePodPartsBox.setName("replacePodParts");
-            replacePodPartsBox.setSelected(campaignOptions.massRepairReplacePod());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridRowIdx++;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlOptions.add(replacePodPartsBox, gridBagConstraints);
         }
 
@@ -510,112 +504,97 @@ public class MassRepairSalvageDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         pnlOptions.add(pnlItems, gridBagConstraints);
 
-        JLabel lbl = new JLabel("Item");
-        Font boldFont = new Font(lbl.getFont().getFontName(), Font.BOLD, lbl.getFont().getSize());
+        gridRowIdx = 0;
 
-        lbl.setFont(boldFont);
-
+        JLabel itemLabel = new JLabel(resources.getString("itemLabel.text"));
+        itemLabel.setName("itemLabel");
+        Font boldFont = new Font(itemLabel.getFont().getFontName(), Font.BOLD, itemLabel.getFont().getSize());
+        itemLabel.setFont(boldFont);
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = gridRowIdx++;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        pnlItems.add(lbl, gridBagConstraints);
+        pnlItems.add(itemLabel, gridBagConstraints);
 
-        lbl = new JLabel("Min Skill");
-        lbl.setFont(boldFont);
+        JLabel minSkillLabel = new JLabel(resources.getString("minSkillLabel.text"));
+        minSkillLabel.setName("minSkillLabel");
+        minSkillLabel.setFont(boldFont);
+        gridBagConstraints.gridx = gridRowIdx++;
+        pnlItems.add(minSkillLabel, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        pnlItems.add(lbl, gridBagConstraints);
+        JLabel maxSkillLabel = new JLabel(resources.getString("maxSkillLabel.text"));
+        maxSkillLabel.setName("maxSkillLabel");
+        maxSkillLabel.setFont(boldFont);
+        gridBagConstraints.gridx = gridRowIdx++;
+        pnlItems.add(maxSkillLabel, gridBagConstraints);
 
-        lbl = new JLabel("Max Skill");
-        lbl.setFont(boldFont);
+        JLabel minBTHLabel = new JLabel(resources.getString("minBTHLabel.text"));
+        minBTHLabel.setName("minBTHLabel");
+        minBTHLabel.setFont(boldFont);
+        gridBagConstraints.gridx = gridRowIdx++;
+        pnlItems.add(minBTHLabel, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        pnlItems.add(lbl, gridBagConstraints);
+        JLabel maxBTHLabel = new JLabel(resources.getString("maxBTHLabel.text"));
+        maxBTHLabel.setName("maxBTHLabel");
+        maxBTHLabel.setFont(boldFont);
+        gridBagConstraints.gridx = gridRowIdx++;
+        pnlItems.add(maxBTHLabel, gridBagConstraints);
 
-        lbl = new JLabel("Min BTH");
-        lbl.setFont(boldFont);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        pnlItems.add(lbl, gridBagConstraints);
-
-        lbl = new JLabel("Max BTH");
-        lbl.setFont(boldFont);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        pnlItems.add(lbl, gridBagConstraints);
-
-        int rowIdx = 1;
+        gridRowIdx = 1;
 
         massRepairOptionControlMap = new HashMap<>();
 
-        if (!isModeWarehouse()) {
+        if (!getMode().isWarehouse()) {
             massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.ARMOR,
-                    createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ARMOR, "Repair/Salvage Armor",
-                            "Allow mass repair/salvage of armor", "massRepairItemArmor", pnlItems, rowIdx++));
+                    createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ARMOR,
+                            "massRepairItemArmor.text", "massRepairItemArmor.toolTipText",
+                            "massRepairItemArmor", pnlItems, gridRowIdx++));
 
             massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.AMMO,
-                    createMassRepairOptionControls(Part.REPAIR_PART_TYPE.AMMO, "Repair/Salvage Ammo",
-                            "Allow mass repair/salvage of ammo", "massRepairItemAmmo", pnlItems, rowIdx++));
+                    createMassRepairOptionControls(Part.REPAIR_PART_TYPE.AMMO,
+                            "massRepairItemAmmo.text", "massRepairItemAmmo.toolTipText",
+                            "massRepairItemAmmo", pnlItems, gridRowIdx++));
         }
 
         massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.WEAPON,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.WEAPON, "Repair/Salvage Weapons",
-                        "Allow mass repair/salvage of weapons", "massRepairItemWeapons", pnlItems, rowIdx++));
+                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.WEAPON,
+                   "massRepairItemWeapons.text", "massRepairItemWeapons.toolTipText",
+                        "massRepairItemWeapons", pnlItems, gridRowIdx++));
         massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.GENERAL_LOCATION,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.GENERAL_LOCATION, "Repair/Salvage Locations",
-                        "Allow mass repair/salvage of mek body parts and vehicle locations", "massRepairItemLocations",
-                        pnlItems, rowIdx++));
+                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.GENERAL_LOCATION,
+                        "massRepairItemLocations.text", "massRepairItemLocations.toolTipText",
+                        "massRepairItemLocations", pnlItems, gridRowIdx++));
         massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.ENGINE,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ENGINE, "Repair/Salvage Engines",
-                        "Allow mass repair/salvage of engines", "massRepairItemEngines", pnlItems, rowIdx++));
+                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ENGINE,
+                        "massRepairItemEngines.text", "massRepairItemEngines.toolTipText",
+                        "massRepairItemEngines", pnlItems, gridRowIdx++));
         massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.GYRO,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.GYRO, "Repair/Salvage Gyros",
-                        "Allow mass repair/salvage of gyros", "massRepairItemGyros", pnlItems, rowIdx++));
+                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.GYRO,
+                        "massRepairItemGyros.text", "massRepairItemGyros.toolTipText",
+                        "massRepairItemGyros", pnlItems, gridRowIdx++));
         massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.ACTUATOR,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ACTUATOR, "Repair/Salvage Actuators",
-                        "Allow mass repair/salvage of actuators", "massRepairItemActuators", pnlItems, rowIdx++));
+                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ACTUATOR,
+                        "massRepairItemActuators.text", "massRepairItemActuators.toolTipText",
+                        "massRepairItemActuators", pnlItems, gridRowIdx++));
         massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.ELECTRONICS,
                 createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ELECTRONICS,
-                        "Repair/Salvage Cockpits/Sensors/Life Support",
-                        "Allow mass repair/salvage of cockpits, life support, and sensors", "massRepairItemHead",
-                        pnlItems, rowIdx++));
+                        "massRepairItemHead.text", "massRepairItemHead.toolTipText",
+                        "massRepairItemHead", pnlItems, gridRowIdx++));
         massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.GENERAL,
-                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.GENERAL, "Repair/Salvage Other",
-                        "Allow mass repair/salvage of items which do not fall into the specific categories",
-                        "massRepairItemOther", pnlItems, rowIdx++));
+                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.GENERAL,
+                        "massRepairItemOther.text", "massRepairItemOther.toolTipText",
+                        "massRepairItemOther", pnlItems, gridRowIdx++));
         massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.POD_SPACE,
                 createMassRepairOptionControls(Part.REPAIR_PART_TYPE.POD_SPACE,
-                        "Replace/Salvage OmniPod Equipment",
-                        "All pod-mounted equipment will be replaced or salvaged regardless of other categories selected",
-                        "massRepairItemPod", pnlItems, rowIdx++));
+                        "massRepairItemPod.text", "massRepairItemPod.toolTipText",
+                        "massRepairItemPod", pnlItems, gridRowIdx++));
 
         return pnlOptions;
     }
 
-    private MassRepairOptionControl createMassRepairOptionControls(int type, String text,String tooltipText,
+    private MassRepairOptionControl createMassRepairOptionControls(int type, String text, String tooltipText,
                                                                    String activeBoxName, JPanel pnlItems,
                                                                    int rowIdx) {
         MassRepairOption mro = null;
@@ -634,26 +613,28 @@ public class MassRepairSalvageDialog extends JDialog {
         int columnIdx = 0;
 
         MassRepairOptionControl mroc = new MassRepairOptionControl();
-        mroc.activeBox = createMassRepairOptionItemBox(text, tooltipText, activeBoxName, mro.isActive(), pnlItems,
-                rowIdx, columnIdx++);
-        mroc.minSkillCBox = createMassRepairSkillCBox(mro.getSkillMin(), mro.isActive(), pnlItems, rowIdx, columnIdx++);
-        mroc.maxSkillCBox = createMassRepairSkillCBox(mro.getSkillMax(), mro.isActive(), pnlItems, rowIdx, columnIdx++);
-        mroc.minBTHSpn = createMassRepairSkillBTHSpinner(mro.getBthMin(), mro.isActive(), pnlItems, rowIdx,
-                columnIdx++);
-        mroc.maxBTHSpn = createMassRepairSkillBTHSpinner(mro.getBthMax(), mro.isActive(), pnlItems, rowIdx,
-                columnIdx++);
+        mroc.setActiveBox(createMassRepairOptionItemBox(text, tooltipText, activeBoxName, mro.isActive(),
+                pnlItems, rowIdx, columnIdx++));
+        mroc.setMinSkillCBox(createMassRepairSkillCBox(mro.getSkillMin(), mro.isActive(), pnlItems,
+                rowIdx, columnIdx++));
+        mroc.setMaxSkillCBox(createMassRepairSkillCBox(mro.getSkillMax(), mro.isActive(), pnlItems,
+                rowIdx, columnIdx++));
+        mroc.setMinBTHSpn(createMassRepairSkillBTHSpinner(mro.getBthMin(), mro.isActive(), pnlItems,
+                rowIdx, columnIdx++));
+        mroc.setMaxBTHSpn(createMassRepairSkillBTHSpinner(mro.getBthMax(), mro.isActive(), pnlItems,
+                rowIdx, columnIdx++));
 
-        mroc.activeBox.addActionListener(evt -> {
-            if (mroc.activeBox.isSelected()) {
-                mroc.minSkillCBox.setEnabled(true);
-                mroc.maxSkillCBox.setEnabled(true);
-                mroc.minBTHSpn.setEnabled(true);
-                mroc.maxBTHSpn.setEnabled(true);
+        mroc.getActiveBox().addActionListener(evt -> {
+            if (mroc.getActiveBox().isSelected()) {
+                mroc.getMinSkillCBox().setEnabled(true);
+                mroc.getMaxSkillCBox().setEnabled(true);
+                mroc.getMinBTHSpn().setEnabled(true);
+                mroc.getMaxBTHSpn().setEnabled(true);
             } else {
-                mroc.minSkillCBox.setEnabled(false);
-                mroc.maxSkillCBox.setEnabled(false);
-                mroc.minBTHSpn.setEnabled(false);
-                mroc.maxBTHSpn.setEnabled(false);
+                mroc.getMinSkillCBox().setEnabled(false);
+                mroc.getMaxSkillCBox().setEnabled(false);
+                mroc.getMinBTHSpn().setEnabled(false);
+                mroc.getMaxBTHSpn().setEnabled(false);
             }
         });
 
@@ -705,16 +686,16 @@ public class MassRepairSalvageDialog extends JDialog {
                                                     boolean selected, JPanel pnlItems, int rowIdx,
                                                     int columnIdx) {
         JCheckBox optionItemBox = new JCheckBox();
-        optionItemBox.setText(text);
-        optionItemBox.setToolTipText(toolTipText);
+        optionItemBox.setText(resources.getString(text));
+        optionItemBox.setToolTipText(resources.getString(toolTipText));
         optionItemBox.setName(name);
         optionItemBox.setSelected(selected);
-        if (name.equals("massRepairItemPod") && !isModeWarehouse()) {
+        if (name.equals("massRepairItemPod") && !getMode().isWarehouse()) {
             replacePodPartsBox.setEnabled(selected);
         }
         optionItemBox.addActionListener(e -> {
             mroOptionChecked();
-            if (((JCheckBox) e.getSource()).getName().equals("massRepairItemPod") && !isModeWarehouse()) {
+            if (((JCheckBox) e.getSource()).getName().equals("massRepairItemPod") && !getMode().isWarehouse()) {
                 replacePodPartsBox.setEnabled(((JCheckBox) e.getSource()).isSelected());
             }
         });
@@ -732,7 +713,7 @@ public class MassRepairSalvageDialog extends JDialog {
     }
 
     private void mroOptionChecked() {
-        if (isModeWarehouse()) {
+        if (getMode().isWarehouse()) {
             filterCompletePartsList(false);
         }
     }
@@ -748,87 +729,41 @@ public class MassRepairSalvageDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 
-        btnSelectNone = new JButton();
-        btnSelectNone.setText("Unselect All");
-        btnSelectNone.setToolTipText("Unselect all units");
+        btnSelectNone = new JButton(resources.getString("btnSelectNone.text"));
+        btnSelectNone.setToolTipText(resources.getString("btnSelectNone.toolTipText"));
         btnSelectNone.setName("btnSelectNone");
         btnSelectNone.addActionListener(this::btnUnitsSelectNoneActionPerformed);
-
         pnlButtons.add(btnSelectNone, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = btnIdx++;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-
-        btnSelectAssigned = new JButton();
-        btnSelectAssigned.setText("Select Active Units");
-        btnSelectAssigned.setToolTipText("Select units with assigned pilots/crews");
+        btnSelectAssigned = new JButton(resources.getString("btnSelectAssigned.text"));
+        btnSelectAssigned.setToolTipText(resources.getString("btnSelectAssigned.toolTipText"));
         btnSelectAssigned.setName("btnSelectAssigned");
         btnSelectAssigned.addActionListener(this::btnUnitsSelectAssignedActionPerformed);
-
+        gridBagConstraints.gridx = btnIdx++;
         pnlButtons.add(btnSelectAssigned, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = btnIdx++;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 
-        btnSelectUnassigned = new JButton();
-        btnSelectUnassigned.setText("Select Inactive Units");
-        btnSelectUnassigned.setToolTipText("Select units without assigned pilots/crews");
+        btnSelectUnassigned = new JButton(resources.getString("btnSelectUnassigned.text"));
+        btnSelectUnassigned.setToolTipText(resources.getString("btnSelectUnassigned.toolTipText"));
         btnSelectUnassigned.setName("btnSelectUnassigned");
         btnSelectUnassigned.addActionListener(this::btnUnitsSelectUnassignedActionPerformed);
-
+        gridBagConstraints.gridx = btnIdx++;
         pnlButtons.add(btnSelectUnassigned, gridBagConstraints);
 
-        String btnHideDoHideLabel = "Hide Unit List";
-        String btnHideDoHideTooltip = "Hide units to save room on small screens";
-
-        String btnHideDoShowLabel = "Show Unit List";
-        String btnHideDoShowTooltip = "Show list of units";
-
-        JDialog dlg = this;
-
-        JButton btnHideUnits = new JButton();
-
-        if (pnlUnits.isVisible()) {
-            btnHideUnits.setText(btnHideDoHideLabel);
-            btnHideUnits.setToolTipText(btnHideDoHideTooltip);
-        } else {
-            btnHideUnits.setText(btnHideDoShowLabel);
-            btnHideUnits.setToolTipText(btnHideDoShowTooltip);
-        }
-
+        JButton btnHideUnits = new JButton(resources.getString(pnlUnits.isVisible()
+                ? "btnHideUnits.Hide.text" : "btnHideUnits.Show.text"));
+        btnHideUnits.setToolTipText(resources.getString(pnlUnits.isVisible()
+                ? "btnHideUnits.Hide.toolTipText" : "btnHideUnits.Show.toolTipText"));
         btnHideUnits.setName("btnHideUnits");
         btnHideUnits.addActionListener(evt -> {
-            if (pnlUnits.isVisible()) {
-                pnlUnits.setVisible(false);
-
-                btnHideUnits.setText(btnHideDoShowLabel);
-                btnHideUnits.setToolTipText(btnHideDoShowTooltip);
-
-            } else {
-                pnlUnits.setVisible(true);
-
-                btnHideUnits.setText(btnHideDoHideLabel);
-                btnHideUnits.setToolTipText(btnHideDoHideTooltip);
-
-            }
-            dlg.pack();
+            pnlUnits.setVisible(!pnlUnits.isVisible());
+            btnHideUnits.setText(resources.getString(pnlUnits.isVisible()
+                    ? "btnHideUnits.Hide.text" : "btnHideUnits.Show.text"));
+            btnHideUnits.setToolTipText(resources.getString(pnlUnits.isVisible()
+                    ? "btnHideUnits.Hide.toolTipText" : "btnHideUnits.Show.toolTipText"));
+            this.pack();
         });
-
-        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = btnIdx++;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-
         pnlButtons.add(btnHideUnits, gridBagConstraints);
 
         return pnlButtons;
@@ -881,70 +816,33 @@ public class MassRepairSalvageDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 
-        JButton btnUnselectParts = new JButton("Unselect All");
-        btnUnselectParts.setToolTipText("Unselect all parts");
-        btnUnselectParts.setName("btnUnselectParts");
-        btnUnselectParts.addActionListener(this::btnUnselectPartsActionPerformed);
+        JButton btnDeselectParts = new JButton(resources.getString("btnDeselectParts.text"));
+        btnDeselectParts.setToolTipText(resources.getString("btnDeselectParts.toolTipText"));
+        btnDeselectParts.setName("btnDeselectParts");
+        btnDeselectParts.addActionListener(this::btnUnselectPartsActionPerformed);
+        pnlButtons.add(btnDeselectParts, gridBagConstraints);
 
-        pnlButtons.add(btnUnselectParts, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = btnIdx++;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-
-        btnSelectAllParts = new JButton("Select All");
-        btnSelectAllParts.setToolTipText("Select all parts");
+        btnSelectAllParts = new JButton(resources.getString("btnSelectAllParts.text"));
+        btnSelectAllParts.setToolTipText(resources.getString("btnSelectAllParts.toolTipText"));
         btnSelectAllParts.setName("btnSelectAllParts");
         btnSelectAllParts.addActionListener(this::btnSelectAllPartsActionPerformed);
-
+        gridBagConstraints.gridx = btnIdx++;
         pnlButtons.add(btnSelectAllParts, gridBagConstraints);
 
-        String btnHideDoHideLabel = "Hide Parts List";
-        String btnHideDoHideTooltip = "Hide parts to save room on small screens";
-
-        String btnHideDoShowLabel = "Show Parts List";
-        String btnHideDoShowTooltip = "Show list of parts";
-
-        JDialog dlg = this;
-
-        JButton btnHideParts = new JButton();
-
-        if (pnlParts.isVisible()) {
-            btnHideParts.setText(btnHideDoHideLabel);
-            btnHideParts.setToolTipText(btnHideDoHideTooltip);
-        } else {
-            btnHideParts.setText(btnHideDoShowLabel);
-            btnHideParts.setToolTipText(btnHideDoShowTooltip);
-        }
-
+        JButton btnHideParts = new JButton(resources.getString(pnlParts.isVisible()
+                ? "btnHideParts.Hide.text" : "btnHideParts.Show.text"));
+        btnHideParts.setToolTipText(resources.getString(pnlParts.isVisible()
+                ? "btnHideParts.Hide.toolTipText" : "btnHideParts.Show.toolTipText"));
         btnHideParts.setName("btnHideParts");
         btnHideParts.addActionListener(evt -> {
-            if (pnlParts.isVisible()) {
-                pnlParts.setVisible(false);
-
-                btnHideParts.setText(btnHideDoShowLabel);
-                btnHideParts.setToolTipText(btnHideDoShowTooltip);
-
-            } else {
-                pnlParts.setVisible(true);
-
-                btnHideParts.setText(btnHideDoHideLabel);
-                btnHideParts.setToolTipText(btnHideDoHideTooltip);
-
-            }
-            dlg.pack();
+            pnlParts.setVisible(!pnlParts.isVisible());
+            btnHideParts.setText(resources.getString(pnlParts.isVisible()
+                    ? "btnHideParts.Hide.text" : "btnHideParts.Show.text"));
+            btnHideParts.setToolTipText(resources.getString(pnlParts.isVisible()
+                    ? "btnHideParts.Hide.toolTipText" : "btnHideParts.Show.toolTipText"));
+            this.pack();
         });
-
-        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = btnIdx++;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-
         pnlButtons.add(btnHideParts, gridBagConstraints);
 
         return pnlButtons;
@@ -963,93 +861,42 @@ public class MassRepairSalvageDialog extends JDialog {
 
         int btnIdx = 0;
 
-        GridBagConstraints gridBagConstraints;
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = btnIdx++;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-
-        JButton btnStart = new JButton();
-
-        if (isModeUnits()) {
-            btnStart.setText("Start Mass Repair/Salvage");
-        } else if (isModeWarehouse()) {
-            btnStart.setText("Start Mass Repair");
-        }
-
-        btnStart.setName("btnStart");
-        btnStart.addActionListener(this::btnStartMassRepairActionPerformed);
-
-        pnlButtons.add(btnStart, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = btnIdx++;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-
-        JButton btnSaveAsDefault = new JButton("Save Options as Default");
-        btnSaveAsDefault.setName("btnSaveAsDefault");
-        btnSaveAsDefault.addActionListener(this::btnSaveAsDefaultActionPerformed);
-
-        pnlButtons.add(btnSaveAsDefault, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = btnIdx++;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 
-        JButton btnCancel = new JButton("Done");
-        btnCancel.setName("btnClose");
-        btnCancel.addActionListener(this::btnCancelActionPerformed);
+        JButton btnStart = new JButton(resources.getString(getMode().isUnits() ? "btnStart.MRMS.text"
+                : "btnStart.MR.text"));
+        btnStart.setName("btnStart");
+        btnStart.addActionListener(this::btnStartMassRepairActionPerformed);
+        pnlButtons.add(btnStart, gridBagConstraints);
 
-        pnlButtons.add(btnCancel, gridBagConstraints);
+        JButton btnSaveAsDefault = new JButton(resources.getString("btnSaveAsDefault.text"));
+        btnSaveAsDefault.setName("btnSaveAsDefault");
+        btnSaveAsDefault.addActionListener(this::btnSaveAsDefaultActionPerformed);
+        gridBagConstraints.gridx = btnIdx++;
+        pnlButtons.add(btnSaveAsDefault, gridBagConstraints);
+
+        JButton btnClose = new JButton(resources.getString("btnClose.text"));
+        btnClose.setName("btnClose");
+        btnClose.addActionListener(this::btnCancelActionPerformed);
+        gridBagConstraints.gridx = btnIdx++;
+        pnlButtons.add(btnClose, gridBagConstraints);
 
         return pnlButtons;
     }
 
     private void btnStartMassRepairActionPerformed(ActionEvent evt) {
-        List<MassRepairOption> activeMROs = new ArrayList<>();
-
-        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-            int type = MassRepairOption.VALID_REPAIR_TYPES[i];
-
-            MassRepairOptionControl mroc = massRepairOptionControlMap.get(type);
-
-            if ((mroc == null) || !mroc.activeBox.isSelected()) {
-                continue;
-            }
-
-            MassRepairOption mro = new MassRepairOption();
-            mro.setType(type);
-            mro.setActive(mroc.activeBox.isSelected());
-            mro.setSkillMin(mroc.minSkillCBox.getSelectedIndex());
-            mro.setSkillMax(mroc.maxSkillCBox.getSelectedIndex());
-            mro.setBthMin((Integer) mroc.minBTHSpn.getValue());
-            mro.setBthMax((Integer) mroc.maxBTHSpn.getValue());
-
-            activeMROs.add(mro);
-        }
-
-        if (activeMROs.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "No repair options are currently enabled. Please activate at least one type of item to repair.",
-                    "No repair options", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (isModeUnits()) {
+        if (getMode().isUnits()) {
             int[] selectedRows = unitTable.getSelectedRows();
 
             if ((selectedRows == null) || (selectedRows.length == 0)) {
                 JOptionPane.showMessageDialog(this,
-                        "Can not started Mass Repair/Salvage if there are no selected units.", "No selected unit",
+                        resources.getString("NoSelectedUnit.error"),
+                        resources.getString("NoSelectedUnit.errorTitle"),
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -1068,23 +915,37 @@ public class MassRepairSalvageDialog extends JDialog {
             }
 
             if (units.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No valid units selected",
-                        "No units", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, resources.getString("NoUnits.error"),
+                        resources.getString("NoUnits.errorTitle"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            MassRepairService.MassRepairConfiguredOptions configuredOptions = new MassRepairService.MassRepairConfiguredOptions();
-            configuredOptions.setup(this);
+            MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions(this);
 
-            MassRepairService.massRepairSalvageUnits(campaignGUI.getCampaign(), units, activeMROs);
+            if (!configuredOptions.isEnabled()) {
+                JOptionPane.showMessageDialog(this,
+                        resources.getString("MRMSDisabled.error"),
+                        resources.getString("MRMSDisabled.errorTitle"),
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (!configuredOptions.hasActiveMassRepairOption()) {
+                JOptionPane.showMessageDialog(this,
+                        resources.getString("NoEnabledRepairOptions.error"),
+                        resources.getString("NoEnabledRepairOptions.errorTitle"),
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-            filterUnits();
-        } else if (isModeWarehouse()) {
+            MassRepairService.massRepairSalvageUnits(campaignGUI.getCampaign(), units, configuredOptions);
+
+            filterUnits(configuredOptions);
+        } else if (getMode().isWarehouse()) {
             int[] selectedRows = partsTable.getSelectedRows();
 
             if ((selectedRows == null) || (selectedRows.length == 0)) {
-                JOptionPane.showMessageDialog(this, "Can not started Mass Repair if there are no selected parts.",
-                        "No selected parts", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        resources.getString("NoSelectedParts.error"),
+                        resources.getString("NoSelectedParts.errorTitle"),
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -1102,31 +963,31 @@ public class MassRepairSalvageDialog extends JDialog {
             }
 
             if (parts.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No valid parts selected", "No parts", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, resources.getString("NoParts.error"),
+                        resources.getString("NoParts.errorTitle"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            MassRepairService.MassRepairConfiguredOptions configuredOptions = new MassRepairService.MassRepairConfiguredOptions();
-            configuredOptions.setup(this);
+            MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions(this);
             configuredOptions.setScrapImpossible(false);
 
-            MassRepairPartSet partSet = MassRepairService.performWarehouseMassRepair(parts, activeMROs,
+            MassRepairPartSet partSet = MassRepairService.performWarehouseMassRepair(parts,
                     configuredOptions, campaignGUI.getCampaign());
 
-            String msg = "Mass Repair complete";
+            String msg = resources.getString("Completed.text");
 
             if (partSet.isHasRepairs()) {
                 int count = partSet.countRepairs();
-                msg += String.format(" - %s repair action%s performed", count, (count == 1 ? "" : "s"));
-            } else {
-                msg += ".";
+                msg += MessageFormat.format(resources.getString((count == 1)
+                        ? "Completed.repairCount.text" : "Completed.repairCountPlural.text"), count);
             }
 
             filterCompletePartsList(true);
 
             campaignGUI.getCampaign().addReport(msg);
 
-            JOptionPane.showMessageDialog(this, msg, "Complete", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, msg,
+                    resources.getString("Completed.title"), JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -1138,13 +999,32 @@ public class MassRepairSalvageDialog extends JDialog {
         this.setVisible(false);
     }
 
-    private void updateOptions() {
-        campaignOptions.setMassRepairUseExtraTime(useExtraTimeBox.isSelected());
-        campaignOptions.setMassRepairUseRushJob(useRushJobBox.isSelected());
-        campaignOptions.setMassRepairAllowCarryover(allowCarryoverBox.isSelected());
-        campaignOptions.setMassRepairOptimizeToCompleteToday(optimizeToCompleteTodayBox.isSelected());
+    //region Campaign Options
+    private void refreshOptions() {
+        getUseRepairBox().setSelected(campaignOptions.massRepairUseRepair());
+        getUseSalvageBox().setSelected(campaignOptions.massRepairUseSalvage());
+        getUseExtraTimeBox().setSelected(campaignOptions.massRepairUseExtraTime());
+        getUseRushJobBox().setSelected(campaignOptions.massRepairUseRushJob());
+        getAllowCarryoverBox().setSelected(campaignOptions.massRepairAllowCarryover());
+        getOptimizeToCompleteTodayBox().setSelected(campaignOptions.massRepairOptimizeToCompleteToday());
+        getOptimizeToCompleteTodayBox().setEnabled(campaignOptions.massRepairAllowCarryover());
 
-        if (!isModeWarehouse()) {
+        if (!getMode().isWarehouse()) {
+            getScrapImpossibleBox().setSelected(campaignOptions.massRepairScrapImpossible());
+            getUseAssignedTechsFirstBox().setSelected(campaignOptions.massRepairUseAssignedTechsFirst());
+            getReplacePodPartsBox().setSelected(campaignOptions.massRepairReplacePod());
+        }
+    }
+
+    private void updateOptions() {
+        campaignOptions.setMassRepairUseRepair(getUseRepairBox().isSelected());
+        campaignOptions.setMassRepairUseSalvage(getUseSalvageBox().isSelected());
+        campaignOptions.setMassRepairUseExtraTime(getUseExtraTimeBox().isSelected());
+        campaignOptions.setMassRepairUseRushJob(getUseRushJobBox().isSelected());
+        campaignOptions.setMassRepairAllowCarryover(getAllowCarryoverBox().isSelected());
+        campaignOptions.setMassRepairOptimizeToCompleteToday(getOptimizeToCompleteTodayBox().isSelected());
+
+        if (!getMode().isWarehouse()) {
             campaignOptions.setMassRepairScrapImpossible(scrapImpossibleBox.isSelected());
             campaignOptions.setMassRepairUseAssignedTechsFirst(useAssignedTechsFirstBox.isSelected());
             campaignOptions.setMassRepairReplacePod(replacePodPartsBox.isSelected());
@@ -1159,36 +1039,35 @@ public class MassRepairSalvageDialog extends JDialog {
                 continue;
             }
 
-            MassRepairOption mro = new MassRepairOption();
-            mro.setType(type);
-            mro.setActive(mroc.activeBox.isSelected());
-            mro.setSkillMin(mroc.minSkillCBox.getSelectedIndex());
-            mro.setSkillMax(mroc.maxSkillCBox.getSelectedIndex());
-            mro.setBthMin((Integer) mroc.minBTHSpn.getValue());
-            mro.setBthMax((Integer) mroc.maxBTHSpn.getValue());
+            MassRepairOption mro = new MassRepairOption(type, mroc.getActiveBox().isSelected(),
+                    mroc.getMinSkillCBox().getSelectedIndex(), mroc.getMaxSkillCBox().getSelectedIndex(),
+                    (Integer) mroc.getMinBTHSpn().getValue(), (Integer) mroc.getMaxBTHSpn().getValue());
 
             campaignOptions.addMassRepairOption(mro);
         }
 
         MekHQ.triggerEvent(new OptionsChangedEvent(campaignGUI.getCampaign(), campaignOptions));
 
-        JOptionPane.showMessageDialog(this, "Current settings saved as default options", "Default options saved",
+        JOptionPane.showMessageDialog(this,
+                resources.getString("DefaultOptionsSaved.text"),
+                resources.getString("DefaultOptionsSaved.title"),
                 JOptionPane.INFORMATION_MESSAGE);
     }
-
-    private static class MassRepairOptionControl {
-        protected JCheckBox activeBox = null;
-        protected JComboBox<String> minSkillCBox = null;
-        protected JComboBox<String> maxSkillCBox = null;
-        protected JSpinner minBTHSpn = null;
-        protected JSpinner maxBTHSpn = null;
-    }
+    //endregion Campaign Options
 
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(MassRepairSalvageDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
+    }
+
+    public JCheckBox getUseRepairBox() {
+        return useRepairBox;
+    }
+
+    public JCheckBox getUseSalvageBox() {
+        return useSalvageBox;
     }
 
     public JCheckBox getUseExtraTimeBox() {
@@ -1217,5 +1096,53 @@ public class MassRepairSalvageDialog extends JDialog {
 
     public JCheckBox getReplacePodPartsBox() {
         return replacePodPartsBox;
+    }
+
+    public static class MassRepairOptionControl {
+        private JCheckBox activeBox = null;
+        private JComboBox<String> minSkillCBox = null;
+        private JComboBox<String> maxSkillCBox = null;
+        private JSpinner minBTHSpn = null;
+        private JSpinner maxBTHSpn = null;
+
+        public JCheckBox getActiveBox() {
+            return activeBox;
+        }
+
+        public void setActiveBox(JCheckBox activeBox) {
+            this.activeBox = activeBox;
+        }
+
+        public JComboBox<String> getMinSkillCBox() {
+            return minSkillCBox;
+        }
+
+        public void setMinSkillCBox(JComboBox<String> minSkillCBox) {
+            this.minSkillCBox = minSkillCBox;
+        }
+
+        public JComboBox<String> getMaxSkillCBox() {
+            return maxSkillCBox;
+        }
+
+        public void setMaxSkillCBox(JComboBox<String> maxSkillCBox) {
+            this.maxSkillCBox = maxSkillCBox;
+        }
+
+        public JSpinner getMinBTHSpn() {
+            return minBTHSpn;
+        }
+
+        public void setMinBTHSpn(JSpinner minBTHSpn) {
+            this.minBTHSpn = minBTHSpn;
+        }
+
+        public JSpinner getMaxBTHSpn() {
+            return maxBTHSpn;
+        }
+
+        public void setMaxBTHSpn(JSpinner maxBTHSpn) {
+            this.maxBTHSpn = maxBTHSpn;
+        }
     }
 }

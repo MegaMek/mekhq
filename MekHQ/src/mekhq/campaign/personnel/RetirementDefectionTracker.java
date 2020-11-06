@@ -86,7 +86,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             return Money.zero();
         }
 
-        FinancialReport r = campaign.getFinancialReport();
+        FinancialReport r = FinancialReport.calculate(campaign);
 
         Money netWorth = r.getNetWorth();
         if (campaign.getCampaignOptions().getSharesExcludeLargeCraft()) {
@@ -134,8 +134,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 }
                 if (p.getPrimaryRole() >= Person.T_MECH_TECH) {
                     support++;
-                } else if ((null == p.getUnitId()) ||
-                        ((null != campaign.getUnit(p.getUnitId())) && campaign.getUnit(p.getUnitId()).isCommander(p))) {
+                } else if ((null == p.getUnit()) ||
+                        ((null != p.getUnit()) && p.getUnit().isCommander(p))) {
                     /* The AtB rules do not state that crews count as a
                      * single person for leadership purposes, but to do otherwise
                      * would tax all but the most exceptional commanders of
@@ -172,8 +172,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 continue;
             }
             /* Infantry units retire or defect by platoon */
-            if (null != p.getUnitId() && null != campaign.getUnit(p.getUnitId()) && campaign.getUnit(p.getUnitId()).usesSoldiers() &&
-                    !campaign.getUnit(p.getUnitId()).isCommander(p)) {
+            if ((null != p.getUnit()) && p.getUnit().usesSoldiers()
+                    && !p.getUnit().isCommander(p)) {
                 continue;
             }
             TargetRoll target = new TargetRoll(5, "Target");
@@ -494,7 +494,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 stolenUnit = true;
             } else {
                 if (p.getProfession() == Ranks.RPROF_INF) {
-                    if (p.getUnitId() != null) {
+                    if (p.getUnit() != null) {
                         payoutAmount = Money.of(50000);
                     }
                 } else {
@@ -725,7 +725,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(RetirementDefectionTracker.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         if (retVal != null) {

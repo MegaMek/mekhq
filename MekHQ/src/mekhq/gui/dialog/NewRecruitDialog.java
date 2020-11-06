@@ -20,15 +20,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ResourceBundle;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooser;
+import megamek.client.ui.swing.dialog.imageChooser.PortraitChooser;
 import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
@@ -232,12 +231,12 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void choosePortrait() {
-        ImageChoiceDialog pcd = new ImageChoiceDialog(hqView.getFrame(), true, person.getPortraitCategory(),
-                person.getPortraitFileName(), hqView.getIconPackage().getPortraits());
-        pcd.setVisible(true);
-        person.setPortraitCategory(pcd.getCategory());
-        person.setPortraitFileName(pcd.getFileName());
-        refreshView();
+        AbstractIconChooser portraitDialog = new PortraitChooser(hqView.getFrame(), person.getPortrait());
+        int result = portraitDialog.showDialog();
+        if ((result == JOptionPane.OK_OPTION) && (portraitDialog.getSelectedItem() != null)) {
+            person.setPortrait(portraitDialog.getSelectedItem());
+            refreshView();
+        }
     }
 
     private void editPerson() {

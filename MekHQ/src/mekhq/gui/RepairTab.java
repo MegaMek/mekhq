@@ -22,6 +22,7 @@ import java.awt.*;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -227,7 +228,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = ((XTableColumnModel) servicedUnitTable.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(servicedUnitModel.getColumnWidth(i));
-            column.setCellRenderer(servicedUnitModel.getRenderer(false, getIconPackage()));
+            column.setCellRenderer(servicedUnitModel.getRenderer(false));
             if ((i != UnitTableModel.COL_NAME) && (i != UnitTableModel.COL_STATUS)
                     && (i != UnitTableModel.COL_REPAIR) && (i != UnitTableModel.COL_SITE)
                     && (i != UnitTableModel.COL_TYPE)) {
@@ -267,7 +268,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
         techTable.setRowHeight(60);
-        techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer(getIconPackage()));
+        techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
         techTable.getSelectionModel().addListSelectionListener(this::techTableValueChanged);
         techSorter = new TableRowSorter<>(techsModel);
         techSorter.setComparator(0, new TechSorter());
@@ -472,13 +473,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 boolean wasNull = false;
                 // Temporarily set the Team ID if it isn't already.
                 // This is needed for the Clan Tech flag
-                if (part.getTeamId() == null) {
-                    part.setTeamId(tech.getId());
+                if (part.getTech() == null) {
+                    part.setTech(tech);
                     wasNull = true;
                 }
                 target = getCampaign().getTargetFor(part, tech);
                 if (wasNull) { // If it was null, make it null again
-                    part.setTeamId(null);
+                    part.setTech(null);
                 }
             }
         }
@@ -728,7 +729,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                     }
                     // check whether the engineer is assigned to the correct
                     // unit
-                    return unit.getId().equals(tech.getUnitId());
+                    return unit.equals(tech.getUnit());
                 } else if ((tech.getPrimaryRole() == Person.T_SPACE_CREW) && (unit != null) && !unit.isSelfCrewed()) {
                     return false;
                 } else if (!tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
@@ -755,7 +756,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         techSorter.setRowFilter(techTypeFilter);
     }
 
-    public void focusOnUnit(UUID id) {
+    /**
+     * Focuses on the unit with the given ID if it exists.
+     * @param id The unique identifier of the unit.
+     * @return A value indicating whether or not the unit
+     *         was focused.
+     */
+    public boolean focusOnUnit(UUID id) {
         int row = -1;
         for (int i = 0; i < servicedUnitTable.getRowCount(); i++) {
             if (servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(i)).getId().equals(id)) {
@@ -766,21 +773,19 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         if (row != -1) {
             servicedUnitTable.setRowSelectionInterval(row, row);
             servicedUnitTable.scrollRectToVisible(servicedUnitTable.getCellRect(row, 0, true));
+            return true;
         }
+        return false;
     }
 
     public void refreshServicedUnitList() {
-        int selected = servicedUnitTable.getSelectedRow();
+        UUID uuid = (getSelectedServicedUnit() != null) ? getSelectedServicedUnit().getId() : null;
+
         ignoreUnitTable = true;
         servicedUnitModel.setData(getCampaign().getServiceableUnits());
         ignoreUnitTable = false;
-        if (selected == servicedUnitTable.getRowCount()) {
-            selected--;
-        }
 
-        if ((selected > -1) && (selected < servicedUnitTable.getRowCount())) {
-            servicedUnitTable.setRowSelectionInterval(selected, selected);
-        } else {
+        if (!focusOnUnit(uuid)) {
             refreshTaskList();
             txtServicedUnitView.setText("");
         }
@@ -791,11 +796,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void refreshTaskList() {
         selectedRow = taskTable.getSelectedRow();
 
-        UUID uuid = null;
-        if (null != getSelectedServicedUnit()) {
-            uuid = getSelectedServicedUnit().getId();
-        }
-        taskModel.setData(getCampaign().getPartsNeedingServiceFor(uuid));
+        List<IPartWork> partsNeedingService = (getSelectedServicedUnit() != null)
+                ? getSelectedServicedUnit().getPartsNeedingService()
+                : Collections.emptyList();
+        taskModel.setData(partsNeedingService);
 
         if ((getSelectedServicedUnit() != null) && (getSelectedServicedUnit().getEntity() != null)) {
             // Retain the selected index while the contents is refreshed.

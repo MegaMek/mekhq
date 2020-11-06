@@ -57,8 +57,8 @@ import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Dropship;
 import megamek.common.Jumpship;
-import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.ImageUtil;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -82,7 +82,6 @@ public class PlanetarySystemMapPanel extends JPanel {
 
     private Campaign campaign;
     private CampaignGUI hqview;
-    private DirectoryItems camos;
     private PlanetarySystem system;
     private int selectedPlanet;
 
@@ -110,7 +109,6 @@ public class PlanetarySystemMapPanel extends JPanel {
         this.campaign = c;
         this.system = campaign.getCurrentSystem();
         selectedPlanet = system.getPrimaryPlanetPosition();
-        camos = hqview.getIconPackage().getCamos();
 
         final String METHOD_NAME = "PlanetarySystemMapPanel()";
         try {
@@ -573,7 +571,7 @@ public class PlanetarySystemMapPanel extends JPanel {
      */
     private BufferedImage getEntityImage(Unit u) {
         Image img;
-        img = hqview.getIconPackage().getMechTiles().imageFor(u.getEntity(), this, -1);
+        img = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
         if (img == null) {
             return null;
         }
@@ -590,9 +588,10 @@ public class PlanetarySystemMapPanel extends JPanel {
     private Image getCamo() {
         Image camo = null;
         try {
-            camo = (Image) camos.getItem(campaign.getCamoCategory(), campaign.getCamoFileName());
+            camo = (Image) MHQStaticDirectoryManager.getCamouflage()
+                    .getItem(campaign.getCamoCategory(), campaign.getCamoFileName());
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "getCamo", e);
+            MekHQ.getLogger().error(e);
         }
         return camo;
     }
@@ -668,7 +667,7 @@ public class PlanetarySystemMapPanel extends JPanel {
     private Unit getBestDropship() {
         Unit bestUnit = null;
         double bestWeight = 0.0;
-        for (Unit u : campaign.getUnits()) {
+        for (Unit u : campaign.getHangar().getUnits()) {
             if (u.getEntity() instanceof Dropship && u.getEntity().getWeight() > bestWeight) {
                 bestUnit = u;
                 bestWeight = u.getEntity().getWeight();
@@ -685,7 +684,7 @@ public class PlanetarySystemMapPanel extends JPanel {
     private Unit getBestJumpship() {
         Unit bestUnit = null;
         double bestWeight = 0.0;
-        for (Unit u : campaign.getUnits()) {
+        for (Unit u : campaign.getHangar().getUnits()) {
             if (u.getEntity() instanceof Jumpship && u.getEntity().getWeight() > bestWeight) {
                 bestUnit = u;
                 bestWeight = u.getEntity().getWeight();

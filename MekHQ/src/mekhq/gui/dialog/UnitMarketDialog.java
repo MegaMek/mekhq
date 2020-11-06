@@ -23,19 +23,15 @@ package mekhq.gui.dialog;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -47,13 +43,13 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.preferences.JToggleButtonPreference;
@@ -207,7 +203,6 @@ public class UnitMarketDialog extends JDialog {
         scrollTableUnits.setName("srcTablePersonnel");
         scrollTableUnits.setPreferredSize(new java.awt.Dimension(500, 400));
 
-        gbc = new GridBagConstraints();
         tableUnits.setModel(marketModel);
         tableUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableUnits.setColumnModel(new XTableColumnModel());
@@ -330,7 +325,7 @@ public class UnitMarketDialog extends JDialog {
             }
 
             int roll = Compute.d6();
-            if ((offer.market == UnitMarket.MARKET_BLACK) && (roll <= 2)) {
+            if ((offer.market == UnitMarketType.BLACK_MARKET) && (roll <= 2)) {
                 campaign.getFinances().debit(cost.dividedBy(roll), Transaction.C_UNIT,
                         "Purchased " + selectedEntity.getShortName() + " (lost on black market)",
                         campaign.getLocalDate());
@@ -339,7 +334,7 @@ public class UnitMarketDialog extends JDialog {
                 campaign.getFinances().debit(cost, Transaction.C_UNIT,
                         "Purchased " + selectedEntity.getShortName(),
                         campaign.getLocalDate());
-                campaign.addUnit(selectedEntity, false, transitDays);
+                campaign.addNewUnit(selectedEntity, false, transitDays);
                 if (!campaign.getCampaignOptions().getInstantUnitMarketDelivery()) {
                     campaign.addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
                 }
@@ -354,7 +349,7 @@ public class UnitMarketDialog extends JDialog {
 
     private void addUnit() {
         if (null != selectedEntity) {
-            campaign.addUnit(selectedEntity, false, 0);
+            campaign.addNewUnit(selectedEntity, false, 0);
             UnitMarket.MarketOffer selected = ((UnitMarketTableModel) tableUnits.getModel())
                     .getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
             unitMarket.removeOffer(selected);
@@ -402,7 +397,7 @@ public class UnitMarketDialog extends JDialog {
         } catch (EntityLoadingException e) {
             selectedEntity = null;
             btnPurchase.setEnabled(false);
-            MekHQ.getLogger().error(this, "Unable to load mech: " + ms.getSourceFile()
+            MekHQ.getLogger().error("Unable to load mech: " + ms.getSourceFile()
                     + ": " + ms.getEntryName() + ": " + e.getMessage(), e);
             refreshOfferView();
             return;
@@ -417,7 +412,7 @@ public class UnitMarketDialog extends JDialog {
          } else {
              mechViewPanel.setMech(selectedEntity, true);
             //This odd code is to make sure that the scrollbar stays at the top
-            //I cant just call it here, because it ends up getting reset somewhere later
+            //I can't just call it here, because it ends up getting reset somewhere later
             javax.swing.SwingUtilities.invokeLater(() -> scrollUnitView.getVerticalScrollBar().setValue(0));
          }
          btnPurchase.setEnabled(null != selectedEntity);

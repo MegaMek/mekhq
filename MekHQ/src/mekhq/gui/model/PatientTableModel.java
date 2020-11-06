@@ -7,7 +7,6 @@ import javax.swing.AbstractListModel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
@@ -23,7 +22,7 @@ public class PatientTableModel extends AbstractListModel<Person> {
     private final Campaign campaign;
 
     public PatientTableModel(Campaign c) {
-        patients = new ArrayList<Person>();
+        patients = new ArrayList<>();
         campaign = c;
     }
 
@@ -51,24 +50,25 @@ public class PatientTableModel extends AbstractListModel<Person> {
         return campaign;
     }
 
-    public PatientTableModel.Renderer getRenderer(IconPackage icons) {
-        return new PatientTableModel.Renderer(icons);
+    public PatientTableModel.Renderer getRenderer() {
+        return new PatientTableModel.Renderer();
     }
 
     public class Renderer extends BasicInfo implements ListCellRenderer<Object> {
-        public Renderer(IconPackage icons) {
-            super(icons);
+        public Renderer() {
+            super();
         }
 
         private static final long serialVersionUID = -406535109900807837L;
 
+        @Override
         public Component getListCellRendererComponent(
                 JList<?> list,
                 Object value,
                 int index,
                 boolean isSelected,
                 boolean cellHasFocus) {
-            Person p = (Person)getElementAt(index);
+            Person p = getElementAt(index);
             setPortrait(p);
             if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
                 setHtmlText(getInjuriesDesc(p));

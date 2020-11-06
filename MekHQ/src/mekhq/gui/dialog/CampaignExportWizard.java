@@ -293,9 +293,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupUnitList() {
         unitList = new JList<>();
         DefaultListModel<Unit> unitListModel = new DefaultListModel<>();
-        for (Unit unit : sourceCampaign.getUnits()) {
-            unitListModel.addElement(unit);
-        }
+        sourceCampaign.getHangar().forEachUnit(unitListModel::addElement);
         unitList.setModel(unitListModel);
         unitList.addListSelectionListener(e -> {
             lblStatus.setText(getUnitSelectionStatus());
@@ -307,7 +305,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupPartList() {
         partList = new JList<>();
         DefaultListModel<Part> partListModel = new DefaultListModel<>();
-        List<Part> parts = sourceCampaign.getSpareParts();
+        List<Part> parts = sourceCampaign.getWarehouse().getSpareParts();
         parts.sort(Comparator.comparing(Part::getName));
 
         for (Part part : parts) {
@@ -416,10 +414,8 @@ public class CampaignExportWizard extends JDialog {
         }
 
         for (Person person : personList.getSelectedValuesList()) {
-            if (person.getUnitId() != null) {
-                Unit unit = sourceCampaign.getUnit(person.getUnitId());
-
-                unitList.setSelectedValue(unit, false);
+            if (person.getUnit() != null) {
+                unitList.setSelectedValue(person.getUnit(), false);
                 selectedIndices.add(unitList.getSelectedIndex());
             }
         }
@@ -556,9 +552,7 @@ public class CampaignExportWizard extends JDialog {
             }
         }
 
-        for (Unit unit : destinationCampaign.getUnits()) {
-            unit.resetEngineer();
-        }
+        destinationCampaign.getHangar().forEachUnit(Unit::resetEngineer);
 
         // there's just no way to overwrite parts
         // so we simply add them to the destination
@@ -580,7 +574,7 @@ public class CampaignExportWizard extends JDialog {
                 // it comes back as null if the part we're looking for is there but has the same ID,
                 // which is likely to happen when exporting to a brand new campaign
                 newPart.setId(-1);
-                Part existingPart = destinationCampaign.checkForExistingSparePart(newPart);
+                Part existingPart = destinationCampaign.getWarehouse().checkForExistingSparePart(newPart);
                 if (existingPart == null) {
                     // addpart doesn't allow adding multiple parts, so we update it afterwards
                     destinationCampaign.addPart(newPart, 0);

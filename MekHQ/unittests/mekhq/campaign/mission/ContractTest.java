@@ -23,6 +23,7 @@ package mekhq.campaign.mission;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.universe.PlanetarySystem;
 
@@ -154,13 +155,16 @@ public class ContractTest {
         Money overHeadExpenses = Money.of(1);
         Money peacetimeCost = Money.of(1);
 
+        Accountant mockAccountant = Mockito.mock(Accountant.class);
+        Mockito.when(mockAccountant.getOverheadExpenses()).thenReturn(overHeadExpenses);
+        Mockito.when(mockAccountant.getContractBase()).thenReturn(contractBase);
+        Mockito.when(mockAccountant.getPeacetimeCost()).thenReturn(peacetimeCost);
+
         Mockito.when(mockCampaign.calculateJumpPath(Mockito.nullable(PlanetarySystem.class), Mockito.nullable(PlanetarySystem.class))).thenReturn(mockJumpPath);
         Mockito.when(mockCampaign.calculateCostPerJump(Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(jumpCost);
         Mockito.when(mockCampaign.getUnitRatingMod()).thenReturn(10);
-        Mockito.when(mockCampaign.getOverheadExpenses()).thenReturn(overHeadExpenses);
-        Mockito.when(mockCampaign.getContractBase()).thenReturn(contractBase);
+        Mockito.when(mockCampaign.getAccountant()).thenReturn(mockAccountant);
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Mockito.when(mockCampaign.getPeacetimeCost()).thenReturn(peacetimeCost);
         Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
     }
 }

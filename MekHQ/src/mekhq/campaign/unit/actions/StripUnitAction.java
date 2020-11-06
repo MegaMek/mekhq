@@ -36,7 +36,7 @@ public class StripUnitAction implements IUnitAction {
      * @param campaign The campaign to add the parts to after removing them from the unit.
      * @param unit The unit to remove the parts from.
      */
-    public void Execute(Campaign campaign, Unit unit) {
+    public void execute(Campaign campaign, Unit unit) {
         unit.setSalvage(true);
         for (IPartWork partWork : unit.getSalvageableParts()) {
             if (partWork instanceof SpacecraftCoolingSystem) {

@@ -84,7 +84,7 @@ public final class TOETab extends CampaignGuiTab {
         orgModel = new OrgTreeModel(getCampaign());
         orgTree = new JTree(orgModel);
         orgTree.addMouseListener(new TOEMouseAdapter(getCampaignGui()));
-        orgTree.setCellRenderer(new ForceRenderer(getIconPackage()));
+        orgTree.setCellRenderer(new ForceRenderer());
         orgTree.setRowHeight(60);
         orgTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         orgTree.addTreeSelectionListener(ev -> refreshForceView());
@@ -154,7 +154,7 @@ public final class TOETab extends CampaignGuiTab {
                         return d;
                     }
                 };
-                crewList.setCellRenderer(model.getRenderer(getIconPackage()));
+                crewList.setCellRenderer(model.getRenderer());
                 crewList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
                 crewList.setVisibleRowCount(1);
                 crewList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -178,7 +178,7 @@ public final class TOETab extends CampaignGuiTab {
                     scrollPerson.getVerticalScrollBar().setValue(0);
                 });
             }
-            final JScrollPane scrollUnit = new JScrollPane(new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));
+            final JScrollPane scrollUnit = new JScrollPane(new UnitViewPanel(u, getCampaign()));
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
             javax.swing.SwingUtilities.invokeLater(() -> {

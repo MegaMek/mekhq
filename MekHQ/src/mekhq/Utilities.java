@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq;
 
@@ -64,6 +64,7 @@ import javax.swing.table.TableModel;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.enums.Gender;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
@@ -102,7 +103,6 @@ import megamek.common.Tank;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.VTOL;
-import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
@@ -227,7 +227,7 @@ public class Utilities {
      */
     public static int lerp(int min, int max, double f) {
         // The order of operations is important here, to not lose precision
-        return (int)Math.round(min * (1.0 - f) + max * f);
+        return (int) Math.round(min * (1.0 - f) + max * f);
     }
 
     /**
@@ -269,60 +269,63 @@ public class Utilities {
         return result;
     }
 
-    public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype, int techLvl) {
-        ArrayList<AmmoType> atypes = new ArrayList<>();
-        for (AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
+    public static List<AmmoType> getMunitionsFor(Entity entity, AmmoType currentAmmoType, int techLvl) {
+        if (currentAmmoType == null) {
+            return Collections.emptyList();
+        }
+
+        List<AmmoType> ammoTypes = new ArrayList<>();
+        for (AmmoType ammoType : AmmoType.getMunitionsFor(currentAmmoType.getAmmoType())) {
             //this is an abbreviated version of setupMunitions in the CustomMechDialog
             //TODO: clan/IS limitations?
 
             if ((entity instanceof Aero)
-                    && !atype.canAeroUse(entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AERO_ARTILLERY_MUNITIONS))) {
+                    && !ammoType.canAeroUse(entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AERO_ARTILLERY_MUNITIONS))) {
                 continue;
             }
 
-            int lvl = atype.getTechLevel(entity.getTechLevelYear());
+            int lvl = ammoType.getTechLevel(entity.getTechLevelYear());
             if (lvl < 0) {
                 lvl = 0;
             }
+
             if (techLvl < Utilities.getSimpleTechLevel(lvl)) {
                 continue;
-            }
-            if (TechConstants.isClan(cur_atype.getTechLevel(entity.getTechLevelYear())) != TechConstants.isClan(lvl)) {
+            } else if (TechConstants.isClan(currentAmmoType.getTechLevel(entity.getTechLevelYear())) != TechConstants.isClan(lvl)) {
                 continue;
             }
 
             // Only Protos can use Proto-specific ammo
-            if (atype.hasFlag(AmmoType.F_PROTOMECH) && !(entity instanceof Protomech)) {
+            if (ammoType.hasFlag(AmmoType.F_PROTOMECH) && !(entity instanceof Protomech)) {
                 continue;
             }
 
-            // When dealing with machine guns, Protos can only
-            // use proto-specific machine gun ammo
+            // When dealing with machine guns, Protos can only use proto-specific machine gun ammo
             if ((entity instanceof Protomech)
-                    && atype.hasFlag(AmmoType.F_MG)
-                    && !atype.hasFlag(AmmoType.F_PROTOMECH)) {
+                    && ammoType.hasFlag(AmmoType.F_MG)
+                    && !ammoType.hasFlag(AmmoType.F_PROTOMECH)) {
                 continue;
             }
 
-            if (atype.hasFlag(AmmoType.F_NUCLEAR) && atype.hasFlag(AmmoType.F_CAP_MISSILE)
+            if (ammoType.hasFlag(AmmoType.F_NUCLEAR) && ammoType.hasFlag(AmmoType.F_CAP_MISSILE)
                     && !entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AT2_NUKES)) {
                 continue;
             }
 
             // Battle Armor ammo can't be selected at all.
             // All other ammo types need to match on rack size and tech.
-            if ((atype.getRackSize() == cur_atype.getRackSize())
-                    && (atype.hasFlag(AmmoType.F_BATTLEARMOR) == cur_atype.hasFlag(AmmoType.F_BATTLEARMOR))
-                    && (atype.hasFlag(AmmoType.F_ENCUMBERING) == cur_atype.hasFlag(AmmoType.F_ENCUMBERING))
-                    && ((atype.getTonnage(entity) == cur_atype.getTonnage(entity))
-                    || atype.hasFlag(AmmoType.F_CAP_MISSILE))) {
-                atypes.add(atype);
+            if ((ammoType.getRackSize() == currentAmmoType.getRackSize())
+                    && (ammoType.hasFlag(AmmoType.F_BATTLEARMOR) == currentAmmoType.hasFlag(AmmoType.F_BATTLEARMOR))
+                    && (ammoType.hasFlag(AmmoType.F_ENCUMBERING) == currentAmmoType.hasFlag(AmmoType.F_ENCUMBERING))
+                    && ((ammoType.getTonnage(entity) == currentAmmoType.getTonnage(entity))
+                    || ammoType.hasFlag(AmmoType.F_CAP_MISSILE))) {
+                ammoTypes.add(ammoType);
             }
         }
-        return atypes;
+        return ammoTypes;
     }
 
-    public static boolean compareMounted (Mounted a, Mounted b) {
+    public static boolean compareMounted(Mounted a, Mounted b) {
         if (!a.getType().equals(b.getType()))
             return false;
         if (!a.getClass().equals(b.getClass()))
@@ -381,7 +384,6 @@ public class Utilities {
     }
 
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
-        final String METHOD_NAME = "getAllVariants(Entity, Campaign)"; // $NON-NLS-1$
         CampaignOptions options = campaign.getCampaignOptions();
         ArrayList<String> variants = new ArrayList<>();
         for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
@@ -414,9 +416,8 @@ public class Utilities {
             if (null == techProg) {
                 // This should never happen unless there was an exception thrown when calculating the progression.
                 // In such a case we will log it and take the least restrictive action, which is to let it through.
-                MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.WARNING,
-                        "Could not determine tech progression for " + summary.getName() // $NON-NLS-1$
-                                + ", including among available refits."); // $NON-NLS-1$
+                MekHQ.getLogger().warning(Utilities.class, "Could not determine tech progression for " + summary.getName()
+                                + ", including among available refits.");
             } else if (!campaign.isLegal(techProg)) {
                 continue;
             }
@@ -979,9 +980,8 @@ public class Utilities {
             }
 
             // Only created crew can be assigned a portrait, so this is safe to put in here
-            if (!Crew.PORTRAIT_NONE.equals(oldCrew.getPortraitFileName(crewIndex))) {
-                p.setPortraitCategory(oldCrew.getPortraitCategory(crewIndex));
-                p.setPortraitFileName(oldCrew.getPortraitFileName(crewIndex));
+            if (!AbstractIcon.DEFAULT_ICON_FILENAME.equals(oldCrew.getPortraitFileName(crewIndex))) {
+                p.setPortrait(oldCrew.getPortrait(crewIndex));
             }
         }
     }
@@ -1078,11 +1078,19 @@ public class Utilities {
     }
 
     public static Money[] readMoneyArray(Node node) {
+        return readMoneyArray(node, 0);
+    }
+
+    public static Money[] readMoneyArray(Node node, int minimumSize) {
         String[] values = node.getTextContent().split(",");
-        Money[] result = new Money[values.length];
+        Money[] result = new Money[Math.max(values.length, minimumSize)];
 
         for (int i = 0; i < values.length; i++) {
             result[i] = Money.fromXmlString(values[i]);
+        }
+
+        for (int i = values.length; i < result.length; i++) {
+            result[i] = Money.zero();
         }
 
         return result;
@@ -1114,7 +1122,7 @@ public class Utilities {
     }
 
     //copied from http://www.roseindia.net/java/beginners/copyfile.shtml
-    public static void copyfile(File inFile, File outFile){
+    public static void copyfile(File inFile, File outFile) {
         try {
             InputStream in = new FileInputStream(inFile);
 
@@ -1126,17 +1134,16 @@ public class Utilities {
 
             byte[] buf = new byte[1024];
             int len;
-            while ((len = in.read(buf)) > 0){
+            while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
             }
             in.close();
             out.close();
-            MekHQ.getLogger().info(Utilities.class, "copyFile", "File copied."); //$NON-NLS-1$
+            MekHQ.getLogger().info(Utilities.class, "File copied.");
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().error(Utilities.class, "copyFile",
-                    e.getMessage() + " in the specified directory."); //$NON-NLS-1$
+            MekHQ.getLogger().error(Utilities.class, e.getMessage() + " in the specified directory.");
         } catch (IOException e) {
-            MekHQ.getLogger().error(Utilities.class, "copyFile", e.getMessage());
+            MekHQ.getLogger().error(Utilities.class, e.getMessage());
         }
     }
 
@@ -1293,7 +1300,7 @@ public class Utilities {
                 boolean isAvailable = equipNums.contains(equipNum);
                 builder.append(String.format(" %d: %s %s%s\r\n", equipNum, m.getName(), mType.getName(), isAvailable ? " (Available)" : ""));
             }
-            MekHQ.getLogger().log(Utilities.class, "unscrambleEquipmentNumbers", LogLevel.WARNING, builder.toString());
+            MekHQ.getLogger().warning(Utilities.class, builder.toString());
         }
     }
 
@@ -1389,8 +1396,8 @@ public class Utilities {
             csvPrinter.close();
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
-        } catch(Exception ioe) {
-            MekHQ.getLogger().log(Utilities.class, "exportTableToCSV", LogLevel.INFO, "Error exporting JTable");
+        } catch (Exception ioe) {
+            MekHQ.getLogger().error("Error exporting JTable", ioe);
             report = "Error exporting JTable. See log for details.";
         }
         return report;
@@ -1507,16 +1514,12 @@ public class Utilities {
      * Run through the directory and call parser.parse(fis) for each XML file found.
      */
     public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser, boolean recurse) {
-        final String METHOD_NAME = "parseXMLFiles(String,FileParser,boolean)"; //$NON-NLS-1$
-
         if ((null == dirName) || (null == parser)) {
             throw new NullPointerException();
         }
         File dir = new File(dirName);
         if (dir.isDirectory()) {
-            File[] files = dir.listFiles((dir1, name) -> {
-                return name.toLowerCase(Locale.ROOT).endsWith(".xml"); //$NON-NLS-1$
-            });
+            File[] files = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".xml"));
             if ((null != files) && (files.length > 0)) {
                 // Case-insensitive sorting. Yes, even on Windows. Deal with it.
                 Arrays.sort(files, Comparator.comparing(File::getPath));
@@ -1527,9 +1530,8 @@ public class Utilities {
                             parser.accept(fis);
                         } catch (Exception ex) {
                             // Ignore this file then
-                            MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
-                            MekHQ.getLogger().error(Utilities.class, METHOD_NAME, ex);
+                            MekHQ.getLogger().error(Utilities.class, "Exception trying to parse " + file.getPath() + " - ignoring.");
+                            MekHQ.getLogger().error(Utilities.class, ex);
                         }
                     }
                 }
@@ -1586,9 +1588,8 @@ public class Utilities {
      * @param loadFighters - Should aero type units be loaded?
      * @param loadGround - should ground units be loaded?
      */
-    public static void loadPlayerTransports(int trnId, Set<Integer> toLoad,
-                Client client, boolean loadFighters, boolean loadGround) {
-        String METHOD_NAME = "loadPlayerTransports(int,Set<Integer>,Client,boolean,boolean)";
+    public static void loadPlayerTransports(int trnId, Set<Integer> toLoad, Client client,
+                                            boolean loadFighters, boolean loadGround) {
         if (!loadFighters && !loadGround) {
             //Nothing to do. Get outta here!
             return;
@@ -1616,7 +1617,7 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(Utilities.class, METHOD_NAME, e); //$NON-NLS-1$
+                    MekHQ.getLogger().error(Utilities.class, e);
                 }
             } else if(loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
                 client.sendLoadEntity(id, trnId, cargo.getTargetBay());
@@ -1624,7 +1625,7 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(Utilities.class, METHOD_NAME, e); //$NON-NLS-1$
+                    MekHQ.getLogger().error(Utilities.class, e);
                 }
             }
         }

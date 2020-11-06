@@ -342,7 +342,7 @@ public class MekLocation extends Part {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
 			unit.getEntity().setLocationBlownOff(loc, false);
 			unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-			Part spare = campaign.checkForExistingSparePart(this);
+			Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
 			if(!salvage) {
 				campaign.removePart(this);
 			} else if(null != spare) {
@@ -711,7 +711,7 @@ public class MekLocation extends Part {
 		}
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
-		if (getTeamId() != null) {
+		if (getTech() != null) {
 			scheduled = " (scheduled) ";
 		}
 

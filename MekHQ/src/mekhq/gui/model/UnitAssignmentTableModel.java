@@ -13,7 +13,6 @@ import javax.swing.table.TableCellRenderer;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.UnitType;
-import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
@@ -21,10 +20,6 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class UnitAssignmentTableModel extends AbstractTableModel {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 7740627991191879456L;
 
     public final static int COL_UNIT = 0;
@@ -101,7 +96,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int row, int col) {
         Unit u;
-        if(data.isEmpty()) {
+        if (data.isEmpty()) {
             return "";
         } else {
             u = campaign.getUnit(data.get(row));
@@ -111,14 +106,14 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
         }
 
         switch (col) {
-        case COL_UNIT:
-            return u.getName();
-        case COL_CLASS:
-            return RetirementDefectionDialog.weightClassIndex(u);
-        case COL_COST:
-            return u.getBuyCost().toAmountAndSymbolString();
-        default:
-            return "?";
+            case COL_UNIT:
+                return u.getName();
+            case COL_CLASS:
+                return RetirementDefectionDialog.weightClassIndex(u);
+            case COL_COST:
+                return u.getBuyCost().toAmountAndSymbolString();
+            default:
+                return "?";
         }
     }
 
@@ -126,17 +121,11 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
         return campaign.getUnit(data.get(row));
     }
 
-    public TableCellRenderer getRenderer(int col, IconPackage icons) {
-        if (col == COL_UNIT) {
-            return new VisualRenderer(icons);
-        } else return new TextRenderer();
+    public TableCellRenderer getRenderer(int col) {
+        return (col == COL_UNIT) ? new VisualRenderer() : new TextRenderer();
     }
 
     public class TextRenderer extends MekHqTableCellRenderer {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = -3368335772600192895L;
 
         public Component getTableCellRendererComponent(JTable table,
@@ -151,29 +140,25 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = 7261885081786958754L;
 
-        public VisualRenderer(IconPackage icons) {
-            super(icons);
+        public VisualRenderer() {
+            super();
         }
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus,
-                int row, int column) {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                       boolean hasFocus, int row, int column) {
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
             Unit u = getUnit(actualRow);
             setText(getValueAt(actualRow, actualCol).toString());
             if (actualCol == COL_UNIT) {
-                if(null != u) {
+                if (null != u) {
                     String desc = "<b>" + u.getName() + "</b><br>";
                     desc += u.getEntity().getWeightClassName();
-                    if(!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
+                    if (!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
                         desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
                     desc += "<br>" + u.getStatus() + "";

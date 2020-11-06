@@ -39,18 +39,17 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.Utilities;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.FormerSpouse;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 
-import megamek.common.Crew;
 import megamek.common.options.PilotOptions;
-import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
-import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.Campaign;
@@ -85,20 +84,13 @@ public class PersonViewPanel extends ScrollablePanel {
     private final Person person;
     private final Campaign campaign;
 
-    private final DirectoryItems portraits;
-    private final DirectoryItems awardIcons;
-    private final IconPackage ip;
-
     ResourceBundle resourceMap;
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
         this.person = p;
         this.campaign = c;
         this.gui = gui;
-        this.ip = gui.getIconPackage();
-        this.portraits = this.ip.getPortraits();
-        this.awardIcons = this.ip.getAwardIcons();
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl());
         initComponents();
     }
 
@@ -320,7 +312,8 @@ public class PersonViewPanel extends ScrollablePanel {
             try {
                 int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
                 String ribbonFileName = award.getRibbonFileName(numberOfAwards);
-                ribbon = (Image) awardIcons.getItem(award.getSet() + "/ribbons/", ribbonFileName);
+                ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons()
+                        .getItem(award.getSet() + "/ribbons/", ribbonFileName);
                 if (ribbon == null)
                     continue;
                 ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
@@ -328,7 +321,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "drawRibbons", e);
+                MekHQ.getLogger().error(e);
             }
 
             i++;
@@ -364,7 +357,8 @@ public class PersonViewPanel extends ScrollablePanel {
             try {
                 int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
                 String medalFileName = award.getMedalFileName(numberOfAwards);
-                medal = (Image) awardIcons.getItem(award.getSet() + "/medals/", medalFileName);
+                medal = (Image) MHQStaticDirectoryManager.getAwardIcons()
+                        .getItem(award.getSet() + "/medals/", medalFileName);
                 if (medal == null)
                     continue;
                 medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
@@ -372,7 +366,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "drawMedals", e);
+                MekHQ.getLogger().error(e);
             }
         }
 
@@ -394,7 +388,8 @@ public class PersonViewPanel extends ScrollablePanel {
             try {
                 int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
                 String miscFileName = award.getMiscFileName(numberOfAwards);
-                Image miscAwardBufferedImage = (Image) awardIcons.getItem(award.getSet() + "/misc/", miscFileName);
+                Image miscAwardBufferedImage = (Image) MHQStaticDirectoryManager.getAwardIcons()
+                        .getItem(award.getSet() + "/misc/", miscFileName);
                 if (miscAwardBufferedImage == null)
                     continue;
                 miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
@@ -403,7 +398,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "drawMiscAwards", e);
+                MekHQ.getLogger().error(e);
             }
         }
         return pnlMiscAwards;
@@ -417,7 +412,6 @@ public class PersonViewPanel extends ScrollablePanel {
      *         error loading it.
      */
     public JPanel setPortrait() {
-
         JPanel pnlPortrait = new JPanel();
 
         // Panel portrait will include the person picture and the ribbons
@@ -425,35 +419,35 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlPortrait.setLayout(new GridBagLayout());
 
         JLabel lblPortrait = new JLabel();
-        lblPortrait.setName("lblPortrait"); // NOI18N
+        lblPortrait.setName("lblPortrait");
 
         String category = person.getPortraitCategory();
         String filename = person.getPortraitFileName();
 
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
-            category = ""; //$NON-NLS-1$
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
+            category = "";
         }
 
         // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
-            filename = "default.gif"; //$NON-NLS-1$
+        if ((null == category) || (null == filename) || AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
+            filename = Portrait.DEFAULT_PORTRAIT_FILENAME;
         }
 
         // Try to get the player's portrait file.
         Image portrait;
         try {
-            portrait = (Image) portraits.getItem(category, filename);
+            portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
             if (null != portrait) {
                 portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
             } else {
-                portrait = (Image) portraits.getItem("", "default.gif");
+                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", Portrait.DEFAULT_PORTRAIT_FILENAME);
                 if (null != portrait) {
                     portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
                 }
             }
             lblPortrait.setIcon(new ImageIcon(portrait));
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "setPortrait", e);
+            MekHQ.getLogger().error(e);
         }
 
         GridBagConstraints gbc_lblPortrait = new GridBagConstraints();
@@ -896,9 +890,9 @@ public class PersonViewPanel extends ScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().displayParentage()) {
+        if (campaign.getCampaignOptions().getDisplayFamilyLevel().displayExtendedFamily()) {
             List<UUID> children = person.getGenealogy().getChildren();
-            if (!children.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
+            if (!children.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
                 lblChildren1.setName("lblChildren1");
                 lblChildren1.setText(resourceMap.getString("lblChildren1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -932,7 +926,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             List<UUID> grandchildren = person.getGenealogy().getGrandchildren(campaign);
-            if (!grandchildren.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.GRANDPARENTS_GRANDCHILDREN)) {
+            if (!grandchildren.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayGrandparentsGrandchildren()) {
                 lblGrandchildren1.setName("lblGrandchildren1");
                 lblGrandchildren1.setText(resourceMap.getString("lblGrandchildren1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -968,12 +962,13 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            if (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS) {
+            if (campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
                 List<UUID> parents = person.getGenealogy().getParents();
                 for (UUID parentId : parents) {
                     Person parent = campaign.getPerson(parentId);
 
-                    JLabel labelParent = new JLabel(resourceMap.getString(parent.getGender().isMale() ? "lblFather1.text" : "lblMother1.text"));
+                    JLabel labelParent = new JLabel(resourceMap.getString(parent.getGender().isMale()
+                            ? "lblFather1.text" : "lblMother1.text"));
                     labelParent.setName("lblParent");
                     gridBagConstraints = new GridBagConstraints();
                     gridBagConstraints.gridx = 0;
@@ -1000,7 +995,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             List<UUID> siblings = person.getGenealogy().getSiblings(campaign);
-            if (!siblings.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
+            if (!siblings.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
                 lblSiblings1.setName("lblSiblings1");
                 lblSiblings1.setText(resourceMap.getString("lblSiblings1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1036,7 +1031,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             List<UUID> grandparents = person.getGenealogy().getGrandparents(campaign);
-            if (!grandparents.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.GRANDPARENTS_GRANDCHILDREN)) {
+            if (!grandparents.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayGrandparentsGrandchildren()) {
                 lblGrandparents1.setName("lblGrandparents1");
                 lblGrandparents1.setText(resourceMap.getString("lblGrandparents1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1073,7 +1068,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             List<UUID> auntsAndUncles = person.getGenealogy().getsAuntsAndUncles(campaign);
-            if (!auntsAndUncles.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.AUNTS_UNCLES_COUSINS)) {
+            if (!auntsAndUncles.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayAuntsUnclesCousins()) {
                 lblAuntsOrUncles1.setName("lblAuntsOrUncles1");
                 lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1110,7 +1105,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             List<UUID> cousins = person.getGenealogy().getCousins(campaign);
-            if (!cousins.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.AUNTS_UNCLES_COUSINS)) {
+            if (!cousins.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayAuntsUnclesCousins()) {
                 lblCousins1.setName("lblCousins1");
                 lblCousins1.setText(resourceMap.getString("lblCousins1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1297,14 +1292,10 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 lblEdgeAvail2.setName("lblEdgeAvail2");
                 lblEdgeAvail2.setText(Integer.toString(person.getCurrentEdge()));
-                gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
-                gridBagConstraints.gridy = firsty;
                 gridBagConstraints.gridwidth = 1;
                 gridBagConstraints.weightx = 1.0;
                 gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                gridBagConstraints.fill = GridBagConstraints.NONE;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlSkills.add(lblEdgeAvail2, gridBagConstraints);
             }
             firsty++;
@@ -1424,7 +1415,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         JButton medicalButton = new JButton(new ImageIcon("data/images/misc/medical.png"));
         medicalButton.addActionListener(event -> {
-            MedicalViewDialog medDialog = new MedicalViewDialog(SwingUtilities.getWindowAncestor(this), campaign, person, ip);
+            MedicalViewDialog medDialog = new MedicalViewDialog(SwingUtilities.getWindowAncestor(this), campaign, person);
             medDialog.setModalityType(ModalityType.APPLICATION_MODAL);
             medDialog.setVisible(true);
             removeAll();

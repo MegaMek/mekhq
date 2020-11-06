@@ -27,7 +27,6 @@ import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -35,13 +34,8 @@ import mekhq.campaign.parts.Part;
 
 /**
  * @author cwspain
- *
  */
 public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 1327103853526962103L;
 
     private int bayEqNum;
@@ -63,7 +57,6 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
      *         or null if there is no unit or the ammo bin is not in any bay.
      */
     public @Nullable Mounted getBay() {
-        final String METHOD_NAME = "getBay()"; //$NON-NLS-1$
         if ((null != bay) || (null == unit)) {
             return null;
         }
@@ -79,8 +72,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
                 return m;
             }
         }
-        MekHQ.getLogger().log(LargeCraftAmmoBin.class, METHOD_NAME, LogLevel.WARNING,
-                "Could not find weapon bay for " + typeName + " for " + unit.getName());
+        MekHQ.getLogger().warning(LargeCraftAmmoBin.class, "Could not find weapon bay for " + typeName + " for " + unit.getName());
         return null;
     }
 

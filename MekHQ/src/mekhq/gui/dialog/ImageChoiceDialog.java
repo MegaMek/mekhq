@@ -42,11 +42,10 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.client.ui.swing.util.PlayerColors;
-import megamek.common.Crew;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.EncodeControl;
-import mekhq.IconPackage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.gui.enums.LayeredForceIcon;
@@ -89,7 +88,8 @@ public class ImageChoiceDialog extends JDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    public ImageChoiceDialog(Frame parent, boolean modal, String category, String filename, DirectoryItems items) {
+    public ImageChoiceDialog(Frame parent, boolean modal, String category, String filename,
+                             DirectoryItems items) {
         this(parent, modal, category, filename, null, items, false);
     }
 
@@ -135,7 +135,7 @@ public class ImageChoiceDialog extends JDialog {
 
         DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<>();
         String match = null;
-        categoryModel.addElement(Crew.ROOT_PORTRAIT);
+        categoryModel.addElement(AbstractIcon.ROOT_CATEGORY);
         Iterator<String> names = (imageItems != null)
                 ? imageItems.getCategoryNames() : Collections.emptyIterator();
         while (names.hasNext()) {
@@ -147,7 +147,7 @@ public class ImageChoiceDialog extends JDialog {
                 }
             }
         }
-        categoryModel.setSelectedItem((match != null) ? match : Crew.ROOT_PORTRAIT);
+        categoryModel.setSelectedItem((match != null) ? match : AbstractIcon.ROOT_CATEGORY);
         JComboBox<String> comboCategories = new JComboBox<>(categoryModel);
         comboCategories.setName("comboCategories"); // NOI18N
         comboCategories.addItemListener(this::comboCategoriesItemStateChanged);
@@ -228,7 +228,7 @@ public class ImageChoiceDialog extends JDialog {
                 panel.add(scrollPane, gbc);
                 tableModel.reset();
                 tableModel.setCategory(layeredForceIcons[i].getLayerPath());
-                tableModel.addImage(Force.ICON_NONE);
+                tableModel.addImage(AbstractIcon.DEFAULT_ICON_FILENAME);
                 Iterator<String> imageIterator = (imageItems != null)
                         ? imageItems.getItemNames(layeredForceIcons[i].getLayerPath())
                         : Collections.emptyIterator();
@@ -358,7 +358,7 @@ public class ImageChoiceDialog extends JDialog {
         if (tableImages.getSelectedRow() != -1) {
             filename = (String) imageTableModel.getValueAt(tableImages.getSelectedRow(), 0);
         } else {
-            filename = Crew.PORTRAIT_NONE;
+            filename = AbstractIcon.DEFAULT_ICON_FILENAME;
         }
         changed = true;
         setVisible(false);
@@ -411,10 +411,10 @@ public class ImageChoiceDialog extends JDialog {
         }
 
         category = Force.ROOT_LAYERED;
-        filename = Force.ICON_NONE;
+        filename = AbstractIcon.DEFAULT_ICON_FILENAME;
 
         // Build the layered image
-        Image forceImage = IconPackage.buildForceIcon(category, filename, imageItems, iconMap);
+        Image forceImage = MHQStaticDirectoryManager.buildForceIcon(category, filename, iconMap);
         ImageIcon imageIcon = new ImageIcon(forceImage);
 
         // Disable selection of a static icon
@@ -430,8 +430,8 @@ public class ImageChoiceDialog extends JDialog {
         imageTableModel.setCategory(category);
         // Translate the "root image" category name.
         Iterator<String> imageNames;
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
-            imageTableModel.addImage(Crew.PORTRAIT_NONE);
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
+            imageTableModel.addImage(AbstractIcon.DEFAULT_ICON_FILENAME);
             imageNames = (imageItems != null)
                     ? imageItems.getItemNames("") : Collections.emptyIterator();
         } else {
@@ -459,7 +459,7 @@ public class ImageChoiceDialog extends JDialog {
 
         public ImageTableModel() {
             columnNames = new String[] {"Images"};
-            category = Crew.ROOT_PORTRAIT;
+            category = AbstractIcon.ROOT_CATEGORY;
             names = new ArrayList<>();
         }
 
@@ -474,7 +474,7 @@ public class ImageChoiceDialog extends JDialog {
         }
 
         public void reset() {
-            category = Crew.ROOT_PORTRAIT;
+            category = AbstractIcon.ROOT_CATEGORY;
             names = new ArrayList<>();
         }
 
@@ -585,7 +585,7 @@ public class ImageChoiceDialog extends JDialog {
         }
 
         public void setImage(String category, String name) {
-            if ((null == category) || name.equals(Force.ICON_NONE)) {
+            if ((null == category) || AbstractIcon.DEFAULT_ICON_FILENAME.equals(name)) {
                 int width = force ? 110 : 76;
                 int height = 76;
 
@@ -600,7 +600,7 @@ public class ImageChoiceDialog extends JDialog {
             // Try to get the image file.
             try {
                 // Translate the root image directory name.
-                if (Crew.ROOT_PORTRAIT.equals(category)) {
+                if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
                     category = ""; //$NON-NLS-1$
                 }
                 Image image = (Image) items.getItem(category, name);
@@ -614,7 +614,7 @@ public class ImageChoiceDialog extends JDialog {
                     lblImage.setIcon(new ImageIcon(image));
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "setImage", e);
+                MekHQ.getLogger().error(e);
             }
         }
     }

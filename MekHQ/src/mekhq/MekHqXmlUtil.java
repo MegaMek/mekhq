@@ -35,6 +35,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
+import megamek.common.icons.Camouflage;
 import megamek.utils.MegaMekXmlUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -47,12 +48,10 @@ import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.FighterSquadron;
 import megamek.common.IBomber;
-import megamek.common.IPlayer;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.Tank;
-import megamek.common.logging.LogLevel;
 
 public class MekHqXmlUtil extends MegaMekXmlUtil {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
@@ -160,13 +159,13 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         }
 
          if ((null != tgtEnt.getCamoCategory())
-                 && !IPlayer.NO_CAMO.equals(tgtEnt.getCamoCategory())
+                 && !Camouflage.NO_CAMOUFLAGE.equals(tgtEnt.getCamoCategory())
                  && !tgtEnt.getCamoCategory().isEmpty()) {
              retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamoCategory()));
          }
 
          if ((null != tgtEnt.getCamoFileName())
-                 && !IPlayer.NO_CAMO.equals(tgtEnt.getCamoFileName())
+                 && !Camouflage.NO_CAMOUFLAGE.equals(tgtEnt.getCamoFileName())
                  && !tgtEnt.getCamoFileName().isEmpty()) {
              retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamoFileName()));
          }
@@ -514,7 +513,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      *         if the given element parses to multiple entities
      */
     public static Entity parseSingleEntityMul(Element element) {
-        MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(Element)", LogLevel.TRACE, "Executing getEntityFromXmlString(Node)..."); //$NON-NLS-2$
+        MekHQ.getLogger().trace(MekHqXmlUtil.class, "Executing getEntityFromXmlString(Node)...");
 
         MULParser prs = new MULParser();
         prs.parse(element);
@@ -525,7 +524,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
                 return null;
             case 1:
                 Entity entity = entities.get(0);
-                MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(Element)", LogLevel.TRACE, "Returning " + entity + " from getEntityFromXmlString(String)..."); //$NON-NLS-1$
+                MekHQ.getLogger().trace(MekHqXmlUtil.class, "Returning " + entity + " from getEntityFromXmlString(String)...");
                 return entity;
             default:
                 throw new IllegalArgumentException("More than one entity contained in XML string!  Expecting a single entity.");

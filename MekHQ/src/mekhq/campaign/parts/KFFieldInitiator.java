@@ -156,7 +156,7 @@ public class KFFieldInitiator extends Part {
                 js.setKFFieldInitiatorHit(true);
                 //You can transport a field initiator
                 //See SO p130 for reference
-                Part spare = campaign.checkForExistingSparePart(this);
+                Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
                 if(!salvage) {
                     campaign.removePart(this);
                 } else if(null != spare) {

@@ -23,6 +23,8 @@ import megamek.common.Infantry;
 import megamek.common.UnitType;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.CargoStatistics;
+import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
 
 import java.util.ArrayList;
@@ -104,7 +106,7 @@ public class CampaignSummary {
         aeroCount = 0;
         infantryCount = 0;
         int squadCount = 0;
-        for (Unit u : campaign.getUnits()) {
+        for (Unit u : campaign.getHangar().getUnits()) {
             Entity e = u.getEntity();
             if (u.isUnmanned() || u.isSalvage() || u.isMothballed() || u.isMothballing() || !u.isPresent() || (null == e)) {
                 continue;
@@ -146,41 +148,43 @@ public class CampaignSummary {
                 countMissionByStatus[Mission.S_BREACH];
 
         //cargo capacity
-        cargoCapacity = campaign.getTotalCombinedCargoCapacity();
-        cargoTons = campaign.getCargoTonnage(false);
-        double mothballedTonnage = campaign.getCargoTonnage(false, true);
+        CargoStatistics cargoStats = campaign.getCargoStatistics();
+        cargoCapacity = cargoStats.getTotalCombinedCargoCapacity();
+        cargoTons = cargoStats.getCargoTonnage(false);
+        double mothballedTonnage = cargoStats.getCargoTonnage(false, true);
         cargoTons = (cargoTons + mothballedTonnage);
 
         //transport capacity
-        int noMech = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_MECH) - campaign.getOccupiedBays(Entity.ETYPE_MECH), 0);
-        int noSC = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - campaign.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        HangarStatistics hangarStats = campaign.getHangarStatistics();
+        int noMech = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MECH) - hangarStats.getOccupiedBays(Entity.ETYPE_MECH), 0);
+        int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
-                int noCF = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - campaign.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_AERO) - campaign.getOccupiedBays(Entity.ETYPE_AERO), 0);
-        int nolv = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) - campaign.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
-        int nohv = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_TANK) - campaign.getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int noinf = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - campaign.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int noBA = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - campaign.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+                int noCF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - hangarStats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
+        int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AERO) - hangarStats.getOccupiedBays(Entity.ETYPE_AERO), 0);
+        int nolv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) - hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
+        int nohv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) - hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int noinf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int noBA = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         @SuppressWarnings("unused") // FIXME: This should be used somewhere...
-                int noProto = Math.max(campaign.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - campaign.getOccupiedBays(Entity.ETYPE_PROTOMECH),  0);
-        int freehv = Math.max(campaign.getTotalHeavyVehicleBays() - campaign.getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int freeSC = Math.max(campaign.getTotalSmallCraftBays() - campaign.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+                int noProto = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMECH),  0);
+        int freehv = Math.max(hangarStats.getTotalHeavyVehicleBays() - hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int freeSC = Math.max(hangarStats.getTotalSmallCraftBays() - hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
 
         //check for free bays elsewhere
         noASF = Math.max(noASF - freeSC, 0);
         nolv = Math.max(nolv - freehv, 0);
 
         unitsOver = noMech + noASF + nolv + nohv + noinf + noBA + noProto;
-        unitsTransported = campaign.getOccupiedBays(Entity.ETYPE_MECH) +
-                campaign.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) +
-                campaign.getOccupiedBays(Entity.ETYPE_AERO) +
-                campaign.getOccupiedBays(Entity.ETYPE_TANK, true) +
-                campaign.getOccupiedBays(Entity.ETYPE_TANK) +
-                campaign.getOccupiedBays(Entity.ETYPE_INFANTRY) +
-                campaign.getOccupiedBays(Entity.ETYPE_BATTLEARMOR) +
-                campaign.getOccupiedBays(Entity.ETYPE_PROTOMECH);
+        unitsTransported = hangarStats.getOccupiedBays(Entity.ETYPE_MECH) +
+                hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) +
+                hangarStats.getOccupiedBays(Entity.ETYPE_AERO) +
+                hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true) +
+                hangarStats.getOccupiedBays(Entity.ETYPE_TANK) +
+                hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY) +
+                hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR) +
+                hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMECH);
 
-        nDS = campaign.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
+        nDS = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
     }
 
     /**
@@ -253,7 +257,7 @@ public class CampaignSummary {
             percentTransported = 100 - (int) Math.round(100 * unitsOver / (double) (unitsOver + unitsTransported));
         }
         String dropshipAppend = "";
-        int dockingCollars = campaign.getTotalDockingCollars();
+        int dockingCollars = campaign.getHangarStatistics().getTotalDockingCollars();
         if (nDS > 0) {
             dropshipAppend = ", " + Integer.toString(nDS) + " dropships/" + Integer.toString(dockingCollars) + " docking collars";
         }

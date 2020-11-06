@@ -5,7 +5,7 @@ package mekhq.gui.model;
 
 import java.awt.Component;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
@@ -15,7 +15,6 @@ import javax.swing.ListCellRenderer;
 import megamek.common.Aero;
 import megamek.common.Tank;
 import megamek.common.VTOL;
-import mekhq.IconPackage;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -87,9 +86,7 @@ public class CrewListModel extends AbstractListModel<Person> {
     public void setData(final Unit u) {
         this.unit = u;
         this.crew = new ArrayList<>(u.getCrew());
-        Collections.sort(crew, (p1, p2) ->
-            CrewRole.getCrewRole(p1, u).getSortOrder()
-            - CrewRole.getCrewRole(p2, u).getSortOrder());
+        crew.sort(Comparator.comparingInt(p -> CrewRole.getCrewRole(p, u).getSortOrder()));
         fireContentsChanged(this, 0, crew.size());
     }
 
@@ -105,19 +102,15 @@ public class CrewListModel extends AbstractListModel<Person> {
         return crew.get(index);
     }
 
-    public ListCellRenderer<Person> getRenderer(IconPackage icons) {
-        return new CrewRenderer(icons);
+    public ListCellRenderer<Person> getRenderer() {
+        return new CrewRenderer();
     }
 
     public class CrewRenderer extends BasicInfo implements ListCellRenderer<Person> {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = -1742201083598095886L;
 
-        public CrewRenderer(IconPackage icons) {
-            super(icons);
+        public CrewRenderer() {
+            super();
         }
 
         @Override

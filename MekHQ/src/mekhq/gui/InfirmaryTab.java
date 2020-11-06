@@ -92,7 +92,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         doctorsModel = new DocTableModel(getCampaign());
         docTable = new JTable(doctorsModel);
         docTable.setRowHeight(60);
-        docTable.getColumnModel().getColumn(0).setCellRenderer(doctorsModel.getRenderer(getIconPackage()));
+        docTable.getColumnModel().getColumn(0).setCellRenderer(doctorsModel.getRenderer());
         docTable.getSelectionModel().addListSelectionListener(ev -> docTableValueChanged());
         docTable.setOpaque(false);
         JScrollPane scrollDocTable = new JScrollPane(docTable);
@@ -131,7 +131,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
         assignedPatientModel = new PatientTableModel(getCampaign());
         listAssignedPatient = new JList<>(assignedPatientModel);
-        listAssignedPatient.setCellRenderer(assignedPatientModel.getRenderer(getIconPackage()));
+        listAssignedPatient.setCellRenderer(assignedPatientModel.getRenderer());
         listAssignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         listAssignedPatient.setVisibleRowCount(-1);
         listAssignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
@@ -143,7 +143,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         scrollAssignedPatient.getViewport().setOpaque(false);
         unassignedPatientModel = new PatientTableModel(getCampaign());
         listUnassignedPatient = new JList<>(unassignedPatientModel);
-        listUnassignedPatient.setCellRenderer(unassignedPatientModel.getRenderer(getIconPackage()));
+        listUnassignedPatient.setCellRenderer(unassignedPatientModel.getRenderer());
         listUnassignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         listUnassignedPatient.setVisibleRowCount(-1);
         listUnassignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());

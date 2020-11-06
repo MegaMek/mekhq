@@ -18,7 +18,6 @@
 package mekhq.campaign.personnel;
 
 import megamek.common.Compute;
-import megamek.common.logging.LogLevel;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -222,8 +221,7 @@ public class Clan {
         try {
             fis = new FileInputStream(f);
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().log(Bloodname.class, "loadClanData()", LogLevel.ERROR,
-                    "Cannot find file clans.xml"); //$NON-NLS-1$
+            MekHQ.getLogger().error(Bloodname.class, "Cannot find file clans.xml");
             return;
         }
 

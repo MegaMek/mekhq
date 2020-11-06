@@ -62,7 +62,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     @Override
     public String getLocationName() {
         if (unit.getEntity() instanceof Aero
-                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
             return "Fuselage";
         }
         return super.getLocationName();
@@ -71,7 +71,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     @Override
     public int getLocation() {
         if (unit.getEntity() instanceof Aero
-                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
             return Aero.LOC_NONE;
         }
         return super.getLocation();

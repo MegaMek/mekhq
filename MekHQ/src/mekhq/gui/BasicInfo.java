@@ -34,8 +34,9 @@ import javax.swing.border.LineBorder;
 
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.PlayerColors;
-import megamek.common.Crew;
-import mekhq.IconPackage;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Portrait;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -52,10 +53,8 @@ public class BasicInfo extends JPanel {
 
     private JLabel lblImage;
     private JLabel lblLoad;
-    IconPackage icons;
 
-    public BasicInfo(IconPackage i) {
-        this.icons = i;
+    public BasicInfo() {
         lblImage = new JLabel();
         lblLoad = new JLabel();
 
@@ -134,10 +133,10 @@ public class BasicInfo extends JPanel {
     }
 
     protected Image getImageFor(Unit u) {
-        if (null == icons.getMechTiles()) {
+        if (null == MHQStaticDirectoryManager.getMechTileset()) {
             return null;
         }
-        Image base = icons.getMechTiles().imageFor(u.getEntity(), this, -1);
+        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
         if (null == base) {
             return null;
         }
@@ -150,15 +149,15 @@ public class BasicInfo extends JPanel {
         // Try to get the player's camo file.
         Image camo = null;
         try {
-            camo = (Image) icons.getCamos().getItem(unit.getCamoCategory(), unit.getCamoFileName());
+            camo = (Image) MHQStaticDirectoryManager.getCamouflage()
+                    .getItem(unit.getCamoCategory(), unit.getCamoFileName());
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "getCamo", e);
+            MekHQ.getLogger().error(e);
         }
         return camo;
     }
 
     protected void setPortrait(Person p) {
-
         String category = p.getPortraitCategory();
         String filename = p.getPortraitFileName();
 
@@ -167,25 +166,21 @@ public class BasicInfo extends JPanel {
             return;
         }
 
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
             category = "";
         }
 
-        if (Crew.PORTRAIT_NONE.equals(filename)) {
-            filename = "default.gif";
+        if (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
+            filename = Portrait.DEFAULT_PORTRAIT_FILENAME;
         }
 
         // Try to get the player's portrait file.
-        Image portrait = null;
+        Image portrait;
         try {
-            portrait = (Image) icons.getPortraits().getItem(category, filename);
-            if (null == portrait) {
+            portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
+            if (portrait == null) {
                 // the image could not be found so switch to default one
-                p.setPortraitCategoryOverride(Crew.ROOT_PORTRAIT);
-                category = "";
-                p.setPortraitFileNameOverride(Crew.PORTRAIT_NONE);
-                filename = "default.gif";
-                portrait = (Image) icons.getPortraits().getItem(category, filename);
+                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", Portrait.DEFAULT_PORTRAIT_FILENAME);
             }
             // make sure no images are longer than 72 pixels
             if (null != portrait) {
@@ -193,7 +188,7 @@ public class BasicInfo extends JPanel {
                 setImage(portrait);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "setPortrait", e);
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -202,31 +197,31 @@ public class BasicInfo extends JPanel {
         String filename = force.getIconFileName();
         LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
 
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
             category = "";
         }
 
         // Return a null if the player has selected no portrait file.
         if ((null == category) || (null == filename)
-                || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
+                || (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
             filename = "empty.png";
         }
 
         // Try to get the player's portrait file.
-        Image portrait = null;
+        Image portrait;
         try {
-            portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
+            portrait = MHQStaticDirectoryManager.buildForceIcon(category, filename, iconMap);
             if (null != portrait) {
                 portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
             } else {
-                portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
+                portrait = (Image) MHQStaticDirectoryManager.getForceIcons().getItem("", "empty.png");
                 if (null != portrait) {
                     portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
                 }
             }
             return portrait;
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "getImageFor", e);
+            MekHQ.getLogger().error(e);
             return null;
         }
     }

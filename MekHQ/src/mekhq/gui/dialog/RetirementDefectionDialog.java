@@ -196,7 +196,7 @@ public class RetirementDefectionDialog extends JDialog {
             JPanel panOverview = new JPanel(new BorderLayout());
 
             cbGroupOverview = new JComboBox<>();
-            for (PersonnelFilter filter : PersonnelFilter.getStandardPersonnelFilters()) {
+            for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(true)) {
                 cbGroupOverview.addItem(filter);
             }
             JPanel panTop = new JPanel();
@@ -300,7 +300,7 @@ public class RetirementDefectionDialog extends JDialog {
         JPanel panRetirees = new JPanel(new BorderLayout());
 
         cbGroupResults = new JComboBox<>();
-        for (PersonnelFilter filter : PersonnelFilter.getStandardPersonnelFilters()) {
+        for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(true)) {
             cbGroupResults.addItem(filter);
         }
         JPanel panTop = new JPanel();
@@ -379,7 +379,7 @@ public class RetirementDefectionDialog extends JDialog {
         for (int i = 0; i < UnitAssignmentTableModel.N_COL; i++) {
             column = unitAssignmentTable.getColumnModel().getColumn(unitAssignmentTable.convertColumnIndexToView(i));
             column.setPreferredWidth(model.getColumnWidth(i));
-            column.setCellRenderer(unitModel.getRenderer(i, hqView.getIconPackage()));
+            column.setCellRenderer(unitModel.getRenderer(i));
         }
 
         unitAssignmentTable.setRowHeight(80);
@@ -505,9 +505,9 @@ public class RetirementDefectionDialog extends JDialog {
         List<UUID> unassignedMechs = new ArrayList<>();
         List<UUID> unassignedASF = new ArrayList<>();
         ArrayList<UUID> availableUnits = new ArrayList<>();
-        for (Unit u : hqView.getCampaign().getUnits()) {
+        hqView.getCampaign().getHangar().forEachUnit(u -> {
             if (!u.isAvailable() && !u.isMothballing() && !u.isMothballed()) {
-                continue;
+                return;
             }
             availableUnits.add(u.getId());
             if (UnitType.MEK == u.getEntity().getUnitType()) {
@@ -520,7 +520,8 @@ public class RetirementDefectionDialog extends JDialog {
                     unassignedASF.add(u.getId());
                 }
             }
-        }
+        });
+
         /* Defectors who steal a unit will take either the one they were
          * piloting or one of the unassigned units (50/50, unless there
          * is only one choice)
@@ -541,9 +542,9 @@ public class RetirementDefectionDialog extends JDialog {
                         && p.equals(hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander())) {
                     continue;
                 }
-                if ((hqView.getCampaign().getPerson(id).getUnitId() != null)
+                if ((p.getUnit() != null)
                         && ((Compute.d6() < 4) || !unassignedAvailable)) {
-                    unitAssignments.put(id, p.getUnitId());
+                    unitAssignments.put(id, p.getUnit().getId());
                 } else if (unassignedAvailable) {
                     if (p.getPrimaryRole() == Person.T_MECHWARRIOR) {
                         int roll = Compute.randomInt(unassignedMechs.size());
@@ -583,9 +584,9 @@ public class RetirementDefectionDialog extends JDialog {
             /* For infantry, the unit commander makes a retirement roll on behalf of the
              * entire unit. Unassigned infantry can retire individually.
              */
-            if ((p.getUnitId() != null)
+            if ((p.getUnit() != null)
                     && ((p.getPrimaryRole() == Person.T_INFANTRY) || (p.getPrimaryRole() == Person.T_BA))) {
-                unitAssignments.put(id, p.getUnitId());
+                unitAssignments.put(id, p.getUnit().getId());
             }
             ((UnitAssignmentTableModel) unitAssignmentTable.getModel()).setData(availableUnits);
         }
@@ -938,7 +939,7 @@ class RetirementTable extends JTable {
             column = getColumnModel().getColumn(convertColumnIndexToView(i));
             column.setPreferredWidth(model.getColumnWidth(i));
             if ((i != RetirementTableModel.COL_PAY_BONUS) && (i != RetirementTableModel.COL_MISC_MOD)) {
-                column.setCellRenderer(model.getRenderer(i, hqView.getIconPackage()));
+                column.setCellRenderer(model.getRenderer(i));
             }
         }
 

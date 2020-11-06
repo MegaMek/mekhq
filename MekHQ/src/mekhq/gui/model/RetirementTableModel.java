@@ -17,7 +17,6 @@ import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
-import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -32,9 +31,6 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class RetirementTableModel extends AbstractTableModel {
-    /**
-     *
-     */
     private static final long serialVersionUID = 7461821036790309952L;
 
     public final static int COL_PERSON = 0;
@@ -172,7 +168,7 @@ public class RetirementTableModel extends AbstractTableModel {
         try {
             retVal = getValueAt(0, col).getClass();
         } catch (NullPointerException e) {
-            MekHQ.getLogger().error(RetirementTableModel.class, "getColumnClass", e);
+            MekHQ.getLogger().error(e);
         }
         return retVal;
     }
@@ -189,7 +185,7 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_PERSON:
                 return p.makeHTMLRank();
             case COL_ASSIGN:
-                Unit u = campaign.getUnit(p.getUnitId());
+                Unit u = p.getUnit();
                 if (null != u) {
                     String name = u.getName();
                     if (u.getEntity() instanceof Tank) {
@@ -213,14 +209,14 @@ public class RetirementTableModel extends AbstractTableModel {
                     return name;
                 }
                 //check for tech
-                if (!p.getTechUnitIDs().isEmpty()) {
-                    if (p.getTechUnitIDs().size() == 1) {
-                        u = campaign.getUnit(p.getTechUnitIDs().get(0));
+                if (!p.getTechUnits().isEmpty()) {
+                    if (p.getTechUnits().size() == 1) {
+                        u = p.getTechUnits().get(0);
                         if (null != u) {
                             return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
                         }
                     } else {
-                        return "" + p.getTechUnitIDs().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
+                        return "" + p.getTechUnits().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
                     }
                 }
                 return "-";
@@ -375,10 +371,12 @@ public class RetirementTableModel extends AbstractTableModel {
         editPayout = edit;
     }
 
-    public TableCellRenderer getRenderer(int col, IconPackage icons) {
+    public TableCellRenderer getRenderer(int col) {
         if (col < COL_TARGET) {
-            return new VisualRenderer(icons);
-        } else return new TextRenderer();
+            return new VisualRenderer();
+        } else {
+            return new TextRenderer();
+        }
     }
 
     public class TextRenderer extends MekHqTableCellRenderer {
@@ -410,8 +408,8 @@ public class RetirementTableModel extends AbstractTableModel {
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
         private static final long serialVersionUID = 7261885081786958754L;
 
-        public VisualRenderer(IconPackage icons) {
-            super(icons);
+        public VisualRenderer() {
+            super();
         }
 
         @Override
@@ -426,9 +424,9 @@ public class RetirementTableModel extends AbstractTableModel {
                 setText(p.getFullDesc());
             }
             if (actualCol == COL_ASSIGN) {
-                Unit u = campaign.getUnit(p.getUnitId());
-                if (!p.getTechUnitIDs().isEmpty()) {
-                    u = campaign.getUnit(p.getTechUnitIDs().get(0));
+                Unit u = p.getUnit();
+                if (!p.getTechUnits().isEmpty()) {
+                    u = p.getTechUnits().get(0);
                 }
                 if (null != u) {
                     String desc = "<b>" + u.getName() + "</b><br>";

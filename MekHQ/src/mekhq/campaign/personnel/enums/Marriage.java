@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import megamek.common.util.WeightedMap;
@@ -191,8 +190,7 @@ public enum Marriage {
                 break;
             case WEIGHTED:
             default:
-                MekHQ.getLogger().log(getClass(), "marry", LogLevel.ERROR,
-                        String.format("Marriage Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
+                MekHQ.getLogger().error(this, String.format("Marriage Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
                                 origin.getFullName(), spouse.getFullName()));
                 break;
         }

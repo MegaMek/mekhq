@@ -21,7 +21,11 @@ package mekhq.gui.dialog;
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.client.ui.swing.tileset.EntityImage;
+import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.*;
+import megamek.common.icons.Camouflage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.UnitOrder;
@@ -124,7 +128,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     protected void select(boolean isGM) {
         if (getSelectedEntity() != null) {
             if (isGM) {
-                campaign.addUnit(selectedUnit.getEntity(), false, 0);
+                campaign.addNewUnit(selectedUnit.getEntity(), false, 0);
             } else {
                 campaign.getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
             }
@@ -143,10 +147,12 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         Entity entity = super.getSelectedEntity();
         if (entity == null) {
             selectedUnit = null;
-            buttonSelect.setEnabled(false);
-            buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy", TARGET_UNKNOWN));
-            buttonSelect.setToolTipText(null);
-        } else {
+            if (addToCampaign) {
+                buttonSelect.setEnabled(false);
+                buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy", TARGET_UNKNOWN));
+                buttonSelect.setToolTipText(null);
+            }
+        } else if (addToCampaign) {
             selectedUnit = new UnitOrder(entity, campaign);
             buttonSelect.setEnabled(true);
             Person logisticsPerson = campaign.getLogisticsPerson();
@@ -156,12 +162,34 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             buttonSelect.setToolTipText(campaign.getTargetForAcquisition(selectedUnit,
                     logisticsPerson, false).getDesc());
         }
+
         return entity;
     }
 
     @Override
     protected Entity refreshUnitView() {
-        return super.refreshUnitView();
+        Entity selectedEntity = super.refreshUnitView();
+        if (selectedEntity != null) {
+            Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(selectedEntity);
+
+            Image camo;
+            if ((selectedEntity.getCamoCategory() != null)
+                    && !Camouflage.NO_CAMOUFLAGE.equals(selectedEntity.getCamoCategory())) {
+                camo = MHQStaticDirectoryManager.getEntityCamoImage(selectedEntity);
+            } else {
+                camo = MHQStaticDirectoryManager.getCamoImage(campaign.getCamoCategory(), campaign.getCamoFileName());
+            }
+
+            // This seems unnecessary as the CamoManager will return an image for a playercolor
+            int tint = PlayerColors.getColorRGB(campaign.getColorIndex());
+
+            labelImage.setIcon(new ImageIcon(new EntityImage(base, tint, camo, labelImage, selectedEntity)
+                    .loadPreviewImage()));
+        } else {
+            labelImage.setIcon(null);
+        }
+
+        return selectedEntity;
     }
 
     @Override

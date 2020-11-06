@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.*;
 import megamek.common.enums.Gender;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Portrait;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.*;
@@ -165,6 +167,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private String maidenName;
     private String callsign;
     private Gender gender;
+    private AbstractIcon portrait;
 
     private int primaryRole;
     private int secondaryRole;
@@ -209,21 +212,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private Planet originPlanet;
 
     //assignments
-    private UUID unitId;
+    private Unit unit;
     private UUID doctorId;
-    private List<UUID> techUnitIds;
+    private List<Unit> techUnits;
 
     //days of rest
     private int idleMonths;
     private int daysToWaitForHealing;
-
-    //region portrait
-    private String portraitCategory;
-    private String portraitFile;
-    // runtime override (not saved)
-    private transient String portraitCategoryOverride = null;
-    private transient String portraitFileOverride = null;
-    //endregion portrait
 
     // Our rank
     private int rank;
@@ -295,19 +290,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
-
     //region Reverse Compatibility
     // Unknown version
     private int oldId;
-    private int oldUnitId = -1;
-    private int oldDoctorId = -1;
     //endregion Reverse Compatibility
     //endregion Variable Declarations
 
     //region Constructors
     //default constructor
+    protected Person(UUID id) {
+        this.id = id;
+    }
+
     public Person(Campaign campaign) {
         this(RandomNameGenerator.UNNAMED, RandomNameGenerator.UNNAMED_SURNAME, campaign);
     }
@@ -363,8 +357,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         tryingToConceive = true;
         dueDate = null;
         expectedDueDate = null;
-        portraitCategory = Crew.ROOT_PORTRAIT;
-        portraitFile = Crew.PORTRAIT_NONE;
+        setPortrait(new Portrait());
         xp = 0;
         daysToWaitForHealing = 0;
         gender = Gender.MALE;
@@ -375,7 +368,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         maneiDominiClass = ManeiDominiClass.NONE;
         nTasks = 0;
         doctorId = null;
-        unitId = null;
         salary = Money.of(-1);
         totalEarnings = Money.of(0);
         status = PersonnelStatus.ACTIVE;
@@ -391,7 +383,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         skills = new Skills();
         options = new PersonnelOptions();
         currentEdge = 0;
-        techUnitIds = new ArrayList<>();
+        techUnits = new ArrayList<>();
         personnelLog = new ArrayList<>();
         missionLog = new ArrayList<>();
         awardController = new PersonAwardController(this);
@@ -538,11 +530,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         if (!prisonerStatus.isFree()) {
-            Unit u = getCampaign().getUnit(getUnitId());
-            if (u != null) {
-                u.remove(this, true);
-            } else {
-                setUnitId(null);
+            if (getUnit() != null) {
+                getUnit().remove(this, true);
             }
         }
 
@@ -694,28 +683,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
     //endregion Names
 
+    //region Portrait
+    public AbstractIcon getPortrait() {
+        return portrait;
+    }
+
+    public void setPortrait(AbstractIcon portrait) {
+        assert (portrait != null) : "Illegal assignment: cannot have a null AbstractIcon for a Portrait";
+        this.portrait = Objects.requireNonNull(portrait);
+    }
+
     public String getPortraitCategory() {
-        return Utilities.nonNull(portraitCategoryOverride, portraitCategory);
+        return getPortrait().getCategory();
     }
 
     public String getPortraitFileName() {
-        return Utilities.nonNull(portraitFileOverride, portraitFile);
-    }
-
-    public void setPortraitCategory(String s) {
-        this.portraitCategory = s;
-    }
-
-    public void setPortraitFileName(String s) {
-        this.portraitFile = s;
-    }
-
-    public void setPortraitCategoryOverride(String s) {
-        this.portraitCategoryOverride = s;
-    }
-
-    public void setPortraitFileNameOverride(String s) {
-        this.portraitFileOverride = s;
+        return getPortrait().getFilename();
     }
 
     //region Personnel Roles
@@ -755,7 +738,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if the person has the specific role either as their primary or secondary role
      */
     public boolean hasRole(int role) {
-        return (getPrimaryRole() == role) || (getSecondaryRole() == role);
+        return hasPrimaryRole(role) || hasSecondaryRole(role);
+    }
+
+    /**
+     * @param role the role to determine
+     * @return true if the person has the specific role as their primary role
+     */
+    public boolean hasPrimaryRole(int role) {
+        return getPrimaryRole() == role;
+    }
+
+    /**
+     * @param role the role to determine
+     * @return true if the person has the specific role as their secondary role
+     */
+    public boolean hasSecondaryRole(int role) {
+        return getSecondaryRole() == role;
     }
 
     /**
@@ -824,7 +823,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if the person has a primary support role
      */
     public boolean hasPrimarySupportRole(boolean includeNoRole) {
-        return hasPrimaryRoleWithin(T_MECH_TECH, T_ADMIN_HR) || (includeNoRole && (getPrimaryRole() == T_NONE));
+        return hasPrimaryRoleWithin(T_MECH_TECH, T_ADMIN_HR) || (includeNoRole && hasPrimaryRole(T_NONE));
     }
 
     /**
@@ -929,19 +928,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (!status.isActive()) {
             setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
             // If we're assigned to a unit, remove us from it
-            Unit unit = campaign.getUnit(getUnitId());
-            if (unit != null) {
-                unit.remove(this, true);
+            if (getUnit() != null) {
+                getUnit().remove(this, true);
             }
 
             // If we're assigned as a tech for any unit, remove us from it/them
-            for (UUID techUnitId : new ArrayList<>(getTechUnitIDs())) {
-                unit = campaign.getUnit(techUnitId);
-                unit.remove(this, true);
+            for (Unit unitWeTech : new ArrayList<>(getTechUnits())) {
+                unitWeTech.remove(this, true);
             }
             // If we're assigned to any repairs or refits, remove that assignment
             for (Part part : campaign.getParts()) {
-                if (getId().equals(part.getTeamId())) {
+                if (this == part.getTech()) {
                     part.cancelAssignment();
                 }
             }
@@ -1606,9 +1603,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isDeployed() {
-        Unit u = campaign.getUnit(unitId);
-        if (null != u) {
-            return (u.getScenarioId() != -1);
+        if (null != getUnit()) {
+            return (getUnit().getScenarioId() != -1);
         }
         return false;
     }
@@ -1700,11 +1696,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "expectedDueDate",
                         MekHqXmlUtil.saveFormattedDate(expectedDueDate));
             }
-            if (!portraitCategory.equals(Crew.ROOT_PORTRAIT)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", portraitCategory);
-            }
-            if (!portraitFile.equals(Crew.PORTRAIT_NONE)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", portraitFile);
+            if (!getPortrait().isDefault()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", getPortraitCategory());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", getPortraitFileName());
             }
             // Always save the current XP
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", xp);
@@ -1733,8 +1727,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (doctorId != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "doctorId", doctorId.toString());
             }
-            if (unitId != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitId", unitId.toString());
+            if (getUnit() != null) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitId", getUnit().getId());
             }
             if (!salary.equals(Money.of(-1))) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salary", salary.toXmlString());
@@ -1798,10 +1792,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "implants",
                         getOptionList("::", PilotOptions.MD_ADVANTAGES));
             }
-            if (!techUnitIds.isEmpty()) {
+            if (!techUnits.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "techUnitIds");
-                for (UUID id : techUnitIds) {
-                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2, "id", id.toString());
+                for (Unit unit : techUnits) {
+                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2, "id", unit.getId());
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "techUnitIds");
             }
@@ -1852,15 +1846,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 extraData.writeToXml(pw1);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(this, "Failed to write " + getFullName() + " to the XML File", e);
+            MekHQ.getLogger().error("Failed to write " + getFullName() + " to the XML File", e);
             throw e; // we want to rethrow to ensure that that the save fails
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 
     public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
-
         Person retVal = new Person(c);
 
         try {
@@ -1949,9 +1941,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
                     retVal.expectedDueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
-                    retVal.setPortraitCategory(wn2.getTextContent());
+                    retVal.getPortrait().setCategory(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
-                    retVal.setPortraitFileName(wn2.getTextContent());
+                    retVal.getPortrait().setFilename(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
                     retVal.xp = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("nTasks")) {
@@ -1981,20 +1973,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
                     retVal.maneiDominiClass = ManeiDominiClass.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        if (!wn2.getTextContent().equals("null")) {
-                            retVal.doctorId = UUID.fromString(wn2.getTextContent());
-                        }
+                    if (!wn2.getTextContent().equals("null")) {
+                        retVal.doctorId = UUID.fromString(wn2.getTextContent());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldUnitId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        if (!wn2.getTextContent().equals("null")) {
-                            retVal.unitId = UUID.fromString(wn2.getTextContent());
-                        }
+                    if (!wn2.getTextContent().equals("null")) {
+                        retVal.unit = new PersonUnitRef(UUID.fromString(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     retVal.setStatus(PersonnelStatus.parseFromString(wn2.getTextContent().trim()));
@@ -2048,7 +2032,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     type = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("skill")) {
                     Skill s = Skill.generateInstanceFromXML(wn2);
-                    if (null != s && null != s.getType()) {
+                    if ((s != null) && (s.getType() != null)) {
                         retVal.skills.addSkill(s.getType().getName(), s);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("techUnitIds")) {
@@ -2061,13 +2045,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().error(Person.class, METHOD_NAME,
-                                    "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
                             continue;
                         }
-                        retVal.addTechUnitID(UUID.fromString(wn3.getTextContent()));
+                        retVal.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelLog")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -2079,10 +2060,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().error(Person.class, METHOD_NAME,
-                                    "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -2111,10 +2089,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().error(Person.class, METHOD_NAME,
-                                    "Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
@@ -2130,8 +2105,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            MekHQ.getLogger().error(Person.class, METHOD_NAME,
-                                    "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -2148,10 +2122,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().error(Person.class, METHOD_NAME,
-                                    "Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
@@ -2255,7 +2226,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(Person.class, METHOD_NAME, "Error restoring advantage: " + adv);
+                        MekHQ.getLogger().error(Person.class, "Error restoring advantage: " + adv);
                     }
                 }
             }
@@ -2269,7 +2240,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(Person.class, METHOD_NAME, "Error restoring edge: " + adv);
+                        MekHQ.getLogger().error(Person.class, "Error restoring edge: " + adv);
                     }
                 }
             }
@@ -2283,7 +2254,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(Person.class, METHOD_NAME, "Error restoring implants: " + adv);
+                        MekHQ.getLogger().error(Person.class, "Error restoring implants: " + adv);
                     }
                 }
             }
@@ -2329,8 +2300,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 retVal.setRankNumeric(0);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(Person.class, METHOD_NAME, "Failed to read person "
-                    + retVal.getFullName() + " from file", e);
+            MekHQ.getLogger().error("Failed to read person " + retVal.getFullName() + " from file", e);
             retVal = null;
         }
 
@@ -3108,9 +3078,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    public void changeEdge(int amount) {
+        setEdge(Math.max(getEdge() + amount, 0));
+    }
+
     /**
      * Resets support personnel edge points to the purchased level. Used for weekly refresh.
-     *
      */
     public void resetCurrentEdge() {
         setCurrentEdge(getEdge());
@@ -3124,9 +3097,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         currentEdge = e;
     }
 
+    public void changeCurrentEdge(int amount) {
+        currentEdge = Math.max(currentEdge + amount, 0);
+    }
+
     /**
      *  Returns this person's currently available edge points. Used for weekly refresh.
-     *
      */
     public int getCurrentEdge() {
         return currentEdge;
@@ -3257,11 +3233,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public int getMaintenanceTimeUsing() {
         int time = 0;
-        for (UUID id : getTechUnitIDs()) {
-            Unit u = campaign.getUnit(id);
-            if (null != u) {
-                time += u.getMaintenanceTime();
-            }
+        for (Unit u : getTechUnits()) {
+            time += u.getMaintenanceTime();
         }
         return time;
     }
@@ -3270,39 +3243,40 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (!isTech()) {
             return false;
         }
-        for (UUID unitId : techUnitIds) {
-            Unit u = campaign.getUnit(unitId);
-            if ((u != null) && u.isMothballing()) {
+        for (Unit u : techUnits) {
+            if (u.isMothballing()) {
                 return true;
             }
         }
         return false;
     }
 
-    public UUID getUnitId() {
-        return unitId;
+    public @Nullable Unit getUnit() {
+        return unit;
     }
 
-    public void setUnitId(UUID i) {
-        unitId = i;
+    public void setUnit(@Nullable Unit unit) {
+        this.unit = unit;
     }
 
-    public void removeTechUnitId(UUID i) {
-        techUnitIds.remove(i);
+    public void removeTechUnit(Unit unit) {
+        techUnits.remove(unit);
     }
 
-    public void addTechUnitID(UUID id) {
-        if (!techUnitIds.contains(id)) {
-            techUnitIds.add(id);
+    public void addTechUnit(Unit unit) {
+        Objects.requireNonNull(unit);
+
+        if (!techUnits.contains(unit)) {
+            techUnits.add(unit);
         }
     }
 
-    public void clearTechUnitIDs() {
-        techUnitIds.clear();
+    public void clearTechUnits() {
+        techUnits.clear();
     }
 
-    public List<UUID> getTechUnitIDs() {
-        return techUnitIds;
+    public List<Unit> getTechUnits() {
+        return Collections.unmodifiableList(techUnits);
     }
 
     public int getMinutesLeft() {
@@ -3311,13 +3285,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setMinutesLeft(int m) {
         this.minutesLeft = m;
-        if (engineer && null != getUnitId()) {
+        if (engineer && (null != getUnit())) {
             //set minutes for all crewmembers
-            Unit u = campaign.getUnit(getUnitId());
-            if (null != u) {
-                for (Person p : u.getActiveCrew()) {
-                    p.setMinutesLeft(m);
-                }
+            for (Person p : getUnit().getActiveCrew()) {
+                p.setMinutesLeft(m);
             }
         }
     }
@@ -3328,13 +3299,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setOvertimeLeft(int m) {
         this.overtimeLeft = m;
-        if (engineer && null != getUnitId()) {
+        if (engineer && (null != getUnit())) {
             //set minutes for all crewmembers
-            Unit u = campaign.getUnit(getUnitId());
-            if (null != u) {
-                for (Person p : u.getActiveCrew()) {
-                    p.setMinutesLeft(m);
-                }
+            for (Person p : getUnit().getActiveCrew()) {
+                p.setMinutesLeft(m);
             }
         }
     }
@@ -3581,11 +3549,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return oldId;
     }
 
-    public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> pHash) {
-        unitId = uHash.get(oldUnitId);
-        doctorId = pHash.get(oldDoctorId);
-    }
-
     public int getNTasks() {
         return nTasks;
     }
@@ -3725,9 +3688,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void addInjury(Injury i) {
-        injuries.add(i);
-        if (null != getUnitId()) {
-            campaign.getUnit(getUnitId()).resetPilotAndEntity();
+        injuries.add(Objects.requireNonNull(i));
+        if (null != getUnit()) {
+            getUnit().resetPilotAndEntity();
         }
     }
     //endregion injuries
@@ -3878,6 +3841,38 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return MECHWARRIOR_AERO_RANSOM_VALUES.get(getExperienceLevel(false));
         } else {
             return OTHER_RANSOM_VALUES.get(getExperienceLevel(false));
+        }
+    }
+
+    public static class PersonUnitRef extends Unit {
+        private PersonUnitRef(UUID id) {
+            setId(id);
+        }
+    }
+
+    public void fixReferences(Campaign campaign) {
+        if (unit instanceof PersonUnitRef) {
+            UUID id = unit.getId();
+            unit = campaign.getUnit(id);
+            if (unit == null) {
+                MekHQ.getLogger().error(
+                    String.format("Person %s ('%s') references missing unit %s",
+                        getId(), getFullName(), id));
+            }
+        }
+        for (int ii = techUnits.size() - 1; ii >= 0; --ii) {
+            Unit techUnit = techUnits.get(ii);
+            if (techUnit instanceof PersonUnitRef) {
+                Unit realUnit = campaign.getUnit(techUnit.getId());
+                if (realUnit != null) {
+                    techUnits.set(ii, realUnit);
+                } else {
+                    MekHQ.getLogger().error(
+                        String.format("Person %s ('%s') techs missing unit %s",
+                            getId(), getFullName(), techUnit.getId()));
+                    techUnits.remove(ii);
+                }
+            }
         }
     }
 }

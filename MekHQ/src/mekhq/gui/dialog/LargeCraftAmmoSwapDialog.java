@@ -1,18 +1,18 @@
 /*
  * Copyright (c) 2017 - The MegaMek Team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,18 +45,18 @@ import mekhq.preferences.PreferencesNode;
 public class LargeCraftAmmoSwapDialog extends JDialog {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -5367208345530677347L;
-    
+
     private final Unit unit;
     private final BayMunitionsChoicePanel mainPanel;
     private boolean canceled = true;
-    
+
     public LargeCraftAmmoSwapDialog(Frame frame, Unit unit) {
         super(frame, true);
         this.unit = unit;
-        
+
         getContentPane().setLayout(new BorderLayout());
         mainPanel = new BayMunitionsChoicePanel(unit.getEntity(), unit.getCampaign().getGame());
         getContentPane().add(new JScrollPane(mainPanel), BorderLayout.CENTER);
@@ -68,13 +68,13 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
         button.addActionListener(ev -> setVisible(false));
         panButtons.add(button);
         getContentPane().add(panButtons, BorderLayout.SOUTH);
-        
+
         pack();
         setUserPreferences();
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(AcquisitionsDialog.class);
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(LargeCraftAmmoSwapDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -83,7 +83,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
     public boolean wasCanceled() {
         return canceled;
     }
-    
+
     private void apply() {
         // Save the current number of shots by bay and ammo type
         Map<Mounted, Map<String, Integer>> shotsByBay = new HashMap<>();
@@ -116,7 +116,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
                     shotsToChange = oldShots;
                 }
                 if (shotsToChange > 0) {
-                    bin.changeAmountAvailable(shotsToChange, (AmmoType) bin.getType()); 
+                    bin.changeAmountAvailable(shotsToChange, (AmmoType) bin.getType());
                 }
                 if (shotsByBay.containsKey(bin.getBay())) {
                     Map<String,Integer> oldAmmo = shotsByBay.get(bin.getBay());
