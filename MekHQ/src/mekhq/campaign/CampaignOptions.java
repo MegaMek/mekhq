@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import mekhq.Version;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -3375,8 +3376,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "campaignOptions");
     }
 
-    public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-        MekHQ.getLogger().info("Loading Campaign Options from XML...");
+    public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {
+        MekHQ.getLogger().info("Loading Campaign Options from Version " + version.toString() + " XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();

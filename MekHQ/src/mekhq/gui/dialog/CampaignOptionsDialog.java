@@ -4802,7 +4802,7 @@ public class CampaignOptionsDialog extends JDialog {
         // Then save it out to that file.
         try (FileOutputStream fos = new FileOutputStream(file);
              PrintWriter pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
-            preset.writeToXml(pw, 0);
+            preset.writeToXml(pw, 1);
             pw.flush();
             MekHQ.getLogger().info("Campaign options saved to " + file);
         } catch (Exception ex) {
