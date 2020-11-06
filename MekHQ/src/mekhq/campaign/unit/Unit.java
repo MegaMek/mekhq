@@ -1620,7 +1620,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         // then update its transport ship assignment (provided the
         // assignment is actually to us!).
         if (u.hasTransportShipAssignment()
-                && u.getTransportShipAssignment().equals(this)) {
+                && u.getTransportShipAssignment().getTransportShip().equals(this)) {
             double unitWeight;
             if (u.getEntity().getUnitType() == UnitType.INFANTRY) {
                 unitWeight = calcInfantryBayWeight(u.getEntity());
