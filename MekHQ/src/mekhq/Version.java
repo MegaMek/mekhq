@@ -193,7 +193,7 @@ public class Version {
 
     @Override
     public String toString() {
-        return hasRevision() ? String.format("%d-%d-%d-%d", getMajorVersion(), getMinorVersion(), getSnapshot(), getRevision())
-                : String.format("%d-%d-%d", getMajorVersion(), getMinorVersion(), getSnapshot());
+        return String.format("%d.%d.%d", getMajorVersion(), getMinorVersion(), getSnapshot())
+                + (hasRevision() ? ("." + getRevision()) : "");
     }
 }
