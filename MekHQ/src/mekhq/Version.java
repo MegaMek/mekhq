@@ -1,29 +1,29 @@
 /*
  * Version.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2019 The MekHQ Team.
- * 
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq;
 
+import megamek.common.util.StringUtil;
+
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  * This is a very simple class that keeps track of versioning
  */
@@ -33,24 +33,24 @@ public class Version {
     private int minor;
     private int major;
     private int revision = NO_REVISION;
-    
+
     public Version(String version) {
-        if(null != version && version.length() > 0) {
+        if (!StringUtil.isNullOrEmpty(version)) {
             String[] temp = version.split("\\.");
-            if(temp.length < 3) {
+            if (temp.length < 3) {
                 return;
             }
             major = Integer.parseInt(temp[0]);
             minor = Integer.parseInt(temp[1]);
             String snap = temp[2].replace("-dev", "");
-            
+
             // Check for other information embedded in the snapshot & handle it
             if (snap.indexOf("-") > 0) {
                 // Create a new temporary array split by the hyphen
                 temp = snap.split("\\-");
                 // The snapshot is the first element of the new array
                 snap = temp[0];
-                
+
                 // Loop over other elements searching for usable parameters
                 for (int i = 1; i < temp.length; i++) {
                     // For now the only usable parameter is the revision
@@ -60,7 +60,7 @@ public class Version {
                     }
                 }
             }
-            
+
             // Finally, file the snapshot
             snapshot = Integer.parseInt(snap);
         }
@@ -69,31 +69,31 @@ public class Version {
     public boolean hasRevision() {
         return revision != NO_REVISION;
     }
-    
+
     public int getRevision() {
         return revision;
     }
-    
+
     public int getSnapshot() {
         return snapshot;
     }
-    
+
     public int getMinorVersion() {
         return minor;
     }
-    
+
     public int getMajorVersion() {
         return major;
     }
-    
+
     /**
      * Compare Versions
-     * 
+     *
      * Use this method to determine if this version is higher than
      * the version passed
-     * 
+     *
      * @param other  The version we want to see if it is lower than this version.
-     * 
+     *
      * @return true if this is higher than checkVersion
      */
     public boolean isHigherThan(String other) {
@@ -144,10 +144,10 @@ public class Version {
 
     /**
      * Compare versions
-     * 
+     *
      * @param left  left version to compare
      * @param right right version to compare
-     * 
+     *
      * @return a positive value if left is higher, a negative value if right is higher. 0 if they are equal.
      */
     private static int compare(Version left, Version right) {
@@ -189,5 +189,11 @@ public class Version {
         }
 
         return 0;
+    }
+
+    @Override
+    public String toString() {
+        return hasRevision() ? String.format("%d-%d-%d-%d", getMajorVersion(), getMinorVersion(), getSnapshot(), getRevision())
+                : String.format("%d-%d-%d", getMajorVersion(), getMinorVersion(), getSnapshot());
     }
 }

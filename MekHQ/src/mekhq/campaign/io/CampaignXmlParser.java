@@ -251,7 +251,7 @@ public class CampaignXmlParser {
                 String xn = wn.getNodeName();
 
                 if (xn.equalsIgnoreCase("campaignOptions")) {
-                    retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn));
+                    retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     retVal.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn));
                 } /* We don't need this since info is processed above in the first iteration...
