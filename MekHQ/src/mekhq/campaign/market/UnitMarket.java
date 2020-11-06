@@ -291,7 +291,7 @@ public class UnitMarket implements Serializable {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "pct", o.pct);
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "offer");
         }
-        pw1.println(MekHqXmlUtil.indentStr(--indent) + "</unitMarket>");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "unitMarket");
     }
 
     public static UnitMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
