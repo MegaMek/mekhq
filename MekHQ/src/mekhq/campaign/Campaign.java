@@ -1005,7 +1005,7 @@ public class Campaign implements Serializable, ITechManager {
         // we need to remove any transported units from it
         if (transportShips.remove(unit)
                 && unit.hasTransportedUnits()) {
-             List<Unit> transportedUnits = new ArrayList<>(unit.getTransportedUnits());
+            List<Unit> transportedUnits = new ArrayList<>(unit.getTransportedUnits());
             for (Unit transportedUnit : transportedUnits) {
                 unit.removeTransportedUnit(transportedUnit);
             }
