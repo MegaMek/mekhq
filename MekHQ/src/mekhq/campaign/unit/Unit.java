@@ -1611,9 +1611,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param u The unit that we wish to unload from this transport
      */
     public void unloadFromTransportShip(Unit u) {
-        // Only unload and update the transport assignment for a unit
-        // if we have actually transported them.
-        if (removeTransportedUnit(u)) {
+        Objects.requireNonNull(u);
+
+        // Remove this unit from our collection of transported units.
+        removeTransportedUnit(u);
+
+        // And if the unit is being transported by us,
+        // then update its transport ship assignment (provided the
+        // assignment is actually to us!).
+        if (u.hasTransportShipAssignment()
+                && u.getTransportShipAssignment().equals(this)) {
             double unitWeight;
             if (u.getEntity().getUnitType() == UnitType.INFANTRY) {
                 unitWeight = calcInfantryBayWeight(u.getEntity());
@@ -1621,10 +1628,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 unitWeight = u.getEntity().getWeight();
             }
 
-            if (u.hasTransportShipAssignment()) {
-                updateBayCapacity(u.getEntity().getUnitType(), unitWeight,
-                        true, u.getTransportShipAssignment().getBayNumber());
-            }
+            updateBayCapacity(u.getEntity().getUnitType(), unitWeight,
+                    true, u.getTransportShipAssignment().getBayNumber());
 
             u.setTransportShipAssignment(null);
         }
