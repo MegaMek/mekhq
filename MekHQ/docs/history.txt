@@ -28,6 +28,8 @@ VERSION HISTORY:
 + PR #2161: Improving Zipped Force Icon folders
 + PR #2162: Standardized Portrait Chooser
 + Issue #2188: Cannot assign salary to LAM Pilots or Vehicle Crew loading older CPNX files
++ Data: Megamek Portrait Data Pack. Notes and licensing in Megamek contributors file which I will push
+  with the next Data work in Megamek.
 
 0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo
