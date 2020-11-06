@@ -20,6 +20,7 @@
  */
 package mekhq.campaign;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -5867,12 +5868,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     //region Portraits
-    private List<String> getPossibleRandomPortraits (List<String> existingPortraits, String subDir ) {
+    private List<String> getPossibleRandomPortraits(List<String> existingPortraits, File subDir) {
         List<String> possiblePortraits = new ArrayList<>();
         Iterator<String> categories = MHQStaticDirectoryManager.getPortraits().getCategoryNames();
         while (categories.hasNext()) {
             String category = categories.next();
-            if (category.endsWith(subDir)) {
+            if (new File(category).compareTo(subDir) == 0) {
                 Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
                 while (names.hasNext()) {
                     String name = names.next();
@@ -5901,55 +5902,43 @@ public class Campaign implements Serializable, ITechManager {
         // Will search for portraits in the /gender/primaryrole folder first,
         // and if none are found then /gender/rolegroup, then /gender/combat or
         // /gender/support, then in /gender.
-        String searchCat_Gender = "";
-        if (p.getGender().isFemale()) {
-            searchCat_Gender += "Female/";
-        } else {
-            searchCat_Gender += "Male/";
-        }
-        String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), true) + "/";
-        String searchCat_RoleGroup = "";
-        String searchCat_CombatSupport = "";
-        if (p.getPrimaryRole() == Person.T_ADMIN_COM
-                || p.getPrimaryRole() == Person.T_ADMIN_HR
-                || p.getPrimaryRole() == Person.T_ADMIN_LOG
-                || p.getPrimaryRole() == Person.T_ADMIN_TRA) {
-            searchCat_RoleGroup = "Admin/";
-        }
-        if (p.getPrimaryRole() == Person.T_MECHANIC
-                || p.getPrimaryRole() == Person.T_AERO_TECH
-                || p.getPrimaryRole() == Person.T_MECH_TECH
-                || p.getPrimaryRole() == Person.T_BA_TECH) {
-            searchCat_RoleGroup = "Tech/";
-        }
-        if (p.getPrimaryRole() == Person.T_MEDIC
-                || p.getPrimaryRole() == Person.T_DOCTOR) {
-            searchCat_RoleGroup = "Medical/";
-        }
-        if (p.getPrimaryRole() == Person.T_SPACE_CREW
-                || p.getPrimaryRole() == Person.T_SPACE_GUNNER
-                || p.getPrimaryRole() == Person.T_SPACE_PILOT
-                || p.getPrimaryRole() == Person.T_NAVIGATOR) {
-            searchCat_RoleGroup = "Vessel Crew/";
-        }
+        File genderFile = new File(p.getGender().isFemale() ? "Female" : "Male");
+        File searchFile = new File(genderFile, Person.getRoleDesc(p.getPrimaryRole(), p.isClanner()));
 
-        if (p.hasPrimarySupportRole(true)) {
-            searchCat_CombatSupport = "Support/";
-        } else {
-            searchCat_CombatSupport = "Combat/";
-        }
+        possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
 
-        possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchCat_Gender + searchCat_Role);
-
-        if (possiblePortraits.isEmpty() && !searchCat_RoleGroup.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchCat_Gender + searchCat_RoleGroup);
-        }
         if (possiblePortraits.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchCat_Gender + searchCat_CombatSupport);
+            String searchCat_RoleGroup = "";
+            if (p.isAdminPrimary()) {
+                searchCat_RoleGroup = "Admin";
+            } else if (p.getPrimaryRole() == Person.T_SPACE_CREW
+                    || p.getPrimaryRole() == Person.T_SPACE_GUNNER
+                    || p.getPrimaryRole() == Person.T_SPACE_PILOT
+                    || p.getPrimaryRole() == Person.T_NAVIGATOR) {
+                searchCat_RoleGroup = "Vessel Crew";
+            } else if (p.isTechPrimary()) {
+                searchCat_RoleGroup = "Tech";
+            } else if (p.getPrimaryRole() == Person.T_MEDIC
+                    || p.getPrimaryRole() == Person.T_DOCTOR) {
+                searchCat_RoleGroup = "Medical";
+            }
+
+            // TODO : Java 11 : Swap to isBlank
+            if (!searchCat_RoleGroup.trim().isEmpty()) {
+                searchFile = new File(genderFile, searchCat_RoleGroup);
+                possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
+            }
         }
+
         if (possiblePortraits.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchCat_Gender);
+            searchFile = new File(genderFile, p.hasPrimaryCombatRole() ? "Combat" : "Support");
+            possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
         }
+
+        if (possiblePortraits.isEmpty()) {
+            possiblePortraits = getPossibleRandomPortraits(existingPortraits, genderFile);
+        }
+
         if (!possiblePortraits.isEmpty()) {
             String chosenPortrait = possiblePortraits.get(Compute.randomInt(possiblePortraits.size()));
             String[] temp = chosenPortrait.split(":");
@@ -5957,6 +5946,9 @@ public class Campaign implements Serializable, ITechManager {
                 return;
             }
             p.setPortrait(new Portrait(temp[0], temp[1]));
+        } else {
+            MekHQ.getLogger().warning("Failed to generate portrait for " + p.getFullTitle()
+                    + ". No possible portraits found.");
         }
     }
     //endregion Portraits
