@@ -31,6 +31,7 @@ import org.junit.Test;
 import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.Mech;
+import megamek.common.UnitType;
 
 public class UnitTransportTest {
     @Test
@@ -136,5 +137,43 @@ public class UnitTransportTest {
         assertTrue(transport.hasTransportedUnits());
         assertTrue(transport.isCarryingAero());
         assertFalse(transport.isCarryingGround());
+    }
+
+    @Test
+    public void unloadFromTransportShipDoesNothingIfNotLoaded() {
+        Unit transport = spy(new Unit());
+
+        Unit randomUnit = mock(Unit.class);
+        when(randomUnit.hasTransportShipAssignment()).thenReturn(false);
+
+        // Try removing a ship that's not on our transport.
+        transport.removeTransportedUnit(randomUnit);
+
+        // The unit should NOT have its assignment changed.
+        verify(randomUnit, times(0)).setTransportShipAssignment(eq(null));
+
+        // And we should not have had our bay space recalculated.
+        verify(transport, times(0)).updateBayCapacity(anyInt(), anyDouble(),
+                anyBoolean(), anyInt());
+    }
+
+    @Test
+    public void unloadFromTransportShipDoesNothingIfLoadedOnAnotherShip() {
+        Unit transport0 = spy(new Unit());
+
+        Unit transport1 = mock(Unit.class);
+        Unit randomUnit = mock(Unit.class);
+        when(randomUnit.hasTransportShipAssignment()).thenReturn(true);
+        when(randomUnit.getTransportShipAssignment()).thenReturn(new TransportShipAssignment(transport1, 0));
+
+        // Try removing a ship that's on somebody else's transport
+        transport0.removeTransportedUnit(randomUnit);
+
+        // The unit should NOT have its assignment changed.
+        verify(randomUnit, times(0)).setTransportShipAssignment(eq(null));
+
+        // And we should not have had our bay space recalculated.
+        verify(transport0, times(0)).updateBayCapacity(anyInt(), anyDouble(),
+                anyBoolean(), anyInt());
     }
 }
