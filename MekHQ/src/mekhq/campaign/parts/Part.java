@@ -337,10 +337,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return false;
     }
 
-    protected Money adjustCostsForCampaignOptions(Money cost) {
+    protected Money adjustCostsForCampaignOptions(@Nullable Money cost) {
         // if the part doesn't cost anything, no amount of multiplication will change it
-        if (cost.isZero()) {
-            return cost;
+        if ((cost == null) || cost.isZero()) {
+            return Money.zero();
         }
 
         if (getTechBase() == T_CLAN) {
