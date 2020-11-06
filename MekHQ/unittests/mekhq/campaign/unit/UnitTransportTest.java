@@ -57,7 +57,7 @@ public class UnitTransportTest {
         // Adding the same unit again...
         transport.addTransportedUnit(mockUnit);
 
-        // ...should leave everything the same.
+        // ... should leave everything the same.
         assertTrue(transport.hasTransportedUnits());
         assertEquals(1, transport.getTransportedUnits().size());
         assertTrue(transport.getTransportedUnits().contains(mockUnit));
@@ -76,18 +76,18 @@ public class UnitTransportTest {
         assertTrue(transport.getTransportedUnits().contains(mockUnit));
         assertTrue(transport.getTransportedUnits().contains(mockOtherUnit));
 
-        // ...and removing the first...
+        // ... and removing the first...
         assertTrue(transport.removeTransportedUnit(mockUnit));
 
-        // ...should leave us with just that one other unit.
+        // ... should leave us with just that one other unit.
         assertTrue(transport.hasTransportedUnits());
         assertEquals(1, transport.getTransportedUnits().size());
         assertTrue(transport.getTransportedUnits().contains(mockOtherUnit));
 
-        // ...and clearing out our transport bays...
+        // ... and clearing out our transport bays...
         transport.clearTransportedUnits();
 
-        // ...should leave us empty again.
+        // ... should leave us empty again.
         assertFalse(transport.hasTransportedUnits());
         assertNotNull(transport.getTransportedUnits());
         assertTrue(transport.getTransportedUnits().isEmpty());
