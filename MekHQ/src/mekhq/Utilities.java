@@ -1396,8 +1396,8 @@ public class Utilities {
             csvPrinter.close();
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
-        } catch(Exception ioe) {
-            MekHQ.getLogger().error(Utilities.class, "Error exporting JTable");
+        } catch (Exception ioe) {
+            MekHQ.getLogger().error("Error exporting JTable", ioe);
             report = "Error exporting JTable. See log for details.";
         }
         return report;
