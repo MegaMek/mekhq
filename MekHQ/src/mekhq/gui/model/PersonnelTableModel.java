@@ -72,46 +72,49 @@ public class PersonnelTableModel extends DataTableModel {
     public static final int COL_HONORIFIC       = 5;
     public static final int COL_CALL            = 6;
     public static final int COL_AGE             = 7;
-    public static final int COL_GENDER          = 8;
-    public static final int COL_SKILL           = 9;
-    public static final int COL_TYPE            = 10;
-    public static final int COL_ASSIGN          = 11;
-    public static final int COL_FORCE           = 12;
-    public static final int COL_DEPLOY          = 13;
-    public static final int COL_MECH            = 14;
-    public static final int COL_AERO            = 15;
-    public static final int COL_JET             = 16;
-    public static final int COL_VEE             = 17;
-    public static final int COL_VTOL            = 18;
-    public static final int COL_NVEE            = 19;
-    public static final int COL_SPACE           = 20;
-    public static final int COL_ARTY            = 21;
-    public static final int COL_GUN_BA          = 22;
-    public static final int COL_SMALL_ARMS      = 23;
-    public static final int COL_ANTI_MECH       = 24;
-    public static final int COL_TACTICS         = 25;
-    public static final int COL_STRATEGY        = 26;
-    public static final int COL_TECH_MECH       = 27;
-    public static final int COL_TECH_AERO       = 28;
-    public static final int COL_TECH_VEE        = 29;
-    public static final int COL_TECH_BA         = 30;
-    public static final int COL_MEDICAL         = 31;
-    public static final int COL_ADMIN           = 32;
-    public static final int COL_NEG             = 33;
-    public static final int COL_SCROUNGE        = 34;
-    public static final int COL_TOUGH           = 35;
-    public static final int COL_EDGE            = 36;
-    public static final int COL_NABIL           = 37;
-    public static final int COL_NIMP            = 38;
-    public static final int COL_HITS            = 39;
-    public static final int COL_KILLS           = 40;
-    public static final int COL_SALARY          = 41;
-    public static final int COL_XP              = 42;
-    public static final int COL_ORIGIN_FACTION  = 43;
-    public static final int COL_ORIGIN_PLANET   = 44;
-    public static final int COL_RECRUIT_DATE    = 45;
-    public static final int COL_DEATH_DATE      = 46;
-    public static final int N_COL               = 47;
+    public static final int COL_STATUS          = 8;
+    public static final int COL_GENDER          = 9;
+    public static final int COL_SKILL           = 10;
+    public static final int COL_TYPE            = 11;
+    public static final int COL_ASSIGN          = 12;
+    public static final int COL_FORCE           = 13;
+    public static final int COL_DEPLOY          = 14;
+    public static final int COL_MECH            = 15;
+    public static final int COL_AERO            = 16;
+    public static final int COL_JET             = 17;
+    public static final int COL_VEE             = 18;
+    public static final int COL_VTOL            = 19;
+    public static final int COL_NVEE            = 20;
+    public static final int COL_SPACE           = 21;
+    public static final int COL_ARTY            = 22;
+    public static final int COL_GUN_BA          = 23;
+    public static final int COL_SMALL_ARMS      = 24;
+    public static final int COL_ANTI_MECH       = 25;
+    public static final int COL_TACTICS         = 26;
+    public static final int COL_STRATEGY        = 27;
+    public static final int COL_TECH_MECH       = 28;
+    public static final int COL_TECH_AERO       = 29;
+    public static final int COL_TECH_VEE        = 30;
+    public static final int COL_TECH_BA         = 31;
+    public static final int COL_MEDICAL         = 32;
+    public static final int COL_ADMIN           = 33;
+    public static final int COL_NEG             = 34;
+    public static final int COL_SCROUNGE        = 35;
+    public static final int COL_HITS            = 36;
+    public static final int COL_KILLS           = 37;
+    public static final int COL_SALARY          = 38;
+    public static final int COL_XP              = 39;
+    public static final int COL_ORIGIN_FACTION  = 40;
+    public static final int COL_ORIGIN_PLANET   = 41;
+    public static final int COL_RECRUIT_DATE    = 42;
+    public static final int COL_DEATH_DATE      = 43;
+    //Export Only Columns
+    public static final int COL_TOUGH           = 44;
+    public static final int COL_EDGE            = 45;
+    public static final int COL_NABIL           = 46;
+    public static final int COL_NIMP            = 47;
+    public static final int COL_PORTRAIT        = 48;
+    public static final int N_COL               = 49;
 
     private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.PersonnelTableModel", new EncodeControl());
     //endregion Variable Declarations
@@ -166,6 +169,8 @@ public class PersonnelTableModel extends DataTableModel {
                 return resources.getString("col_bloodname.text");
             case COL_AGE:
                 return resources.getString("col_age.text");
+            case COL_STATUS:
+                return resources.getString("col_status.text");
             case COL_GENDER:
                 return resources.getString("col_gender.text");
             case COL_TYPE:
@@ -212,18 +217,10 @@ public class PersonnelTableModel extends DataTableModel {
                 return resources.getString("col_neg.text");
             case COL_SCROUNGE:
                 return resources.getString("col_scrounge.text");
-            case COL_TOUGH:
-                return resources.getString("col_tough.text");
             case COL_SKILL:
                 return resources.getString("col_skill.text");
             case COL_ASSIGN:
                 return resources.getString("col_assign.text");
-            case COL_EDGE:
-                return resources.getString("col_edge.text");
-            case COL_NABIL:
-                return resources.getString("col_nabil.text");
-            case COL_NIMP:
-                return resources.getString("col_nimp.text");
             case COL_HITS:
                 return resources.getString("col_hits.text");
             case COL_XP:
@@ -244,6 +241,16 @@ public class PersonnelTableModel extends DataTableModel {
                 return resources.getString("col_recruit_date.text");
             case COL_DEATH_DATE:
                 return resources.getString("col_death_date.text");
+            case COL_TOUGH:
+                return resources.getString("col_tough.text");
+            case COL_EDGE:
+                return resources.getString("col_edge.text");
+            case COL_NABIL:
+                return resources.getString("col_nabil.text");
+            case COL_NIMP:
+                return resources.getString("col_nimp.text");
+            case COL_PORTRAIT:
+                return resources.getString("col_portrait.text");
             default:
                 return resources.getString("col_unknown.text");
         }
@@ -394,6 +401,8 @@ public class PersonnelTableModel extends DataTableModel {
                 return GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(p.getGender());
             case COL_AGE:
                 return Integer.toString(p.getAge(getCampaign().getLocalDate()));
+            case COL_STATUS:
+                return p.getStatus();
             case COL_TYPE:
                 return p.getRoleDesc();
             case COL_MECH:
@@ -638,6 +647,9 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_DEATH_DATE:
                 return p.getDeathDateAsString();
             case COL_TOUGH:
+                return p.getToughness();
+            case COL_PORTRAIT:
+                return p.getPortrait();
             default:
                return resources.getString("col_unknown.text");
         }
