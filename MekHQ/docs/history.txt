@@ -35,6 +35,7 @@ VERSION HISTORY:
 + Issue #2181: Personnel File CSV Export Toughness, Status, and Portrait Path
 + Issue #785: SLDF Ranks are Wrong
 + Issue #572: Random Portrait Fails to Properly Compare File Paths
++ Issue #564: AbstractIcon: Fixing Basic Info Portrait Scaling
 
 
 0.47.11 (2020-10-04 2100 UTC)
