@@ -160,7 +160,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
     protected Icon getIcon(Object node) {
         if (node instanceof Unit) {
-            Person person = ((Unit) node).getCommander();
+            final Person person = ((Unit) node).getCommander();
             return (person == null) ? null : person.getPortrait().getImageIcon(58);
         } else if (node instanceof Force) {
             return getIconFrom((Force) node);
