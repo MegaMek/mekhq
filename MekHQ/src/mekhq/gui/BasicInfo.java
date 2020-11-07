@@ -35,7 +35,6 @@ import javax.swing.border.LineBorder;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.icons.AbstractIcon;
-import megamek.common.icons.Portrait;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
@@ -158,38 +157,7 @@ public class BasicInfo extends JPanel {
     }
 
     protected void setPortrait(Person p) {
-        String category = p.getPortraitCategory();
-        String filename = p.getPortraitFileName();
-
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename)) {
-            return;
-        }
-
-        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-            category = "";
-        }
-
-        if (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
-            filename = Portrait.DEFAULT_PORTRAIT_FILENAME;
-        }
-
-        // Try to get the player's portrait file.
-        Image portrait;
-        try {
-            portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
-            if (portrait == null) {
-                // the image could not be found so switch to default one
-                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", Portrait.DEFAULT_PORTRAIT_FILENAME);
-            }
-            // make sure no images are longer than 72 pixels
-            if (null != portrait) {
-                portrait = portrait.getScaledInstance(-1, 58, Image.SCALE_SMOOTH);
-                setImage(portrait);
-            }
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-        }
+        setImage(p.getPortrait().getImage(54));
     }
 
     protected Image getImageFor(Force force) {
