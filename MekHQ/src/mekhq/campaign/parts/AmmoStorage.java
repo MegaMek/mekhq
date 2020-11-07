@@ -58,10 +58,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public AmmoStorage(int tonnage, EquipmentType et, int shots, Campaign c) {
         super(tonnage, et, -1, 1.0, c);
         this.shots = shots;
-        if (type instanceof AmmoType) {
-        	this.munition = ((AmmoType) type).getMunitionType();
-        }
-
+        this.munition = getType().getMunitionType();
     }
 
     public AmmoStorage clone() {
