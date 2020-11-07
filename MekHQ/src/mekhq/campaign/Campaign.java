@@ -1002,9 +1002,15 @@ public class Campaign implements Serializable, ITechManager {
      * @param unit - The ship we want to remove from this Set
      */
     public void removeTransportShip(Unit unit) {
-        MekHQ.getLogger().debug("Removing DropShip/WarShip: " + unit.getId());
-
-        transportShips.remove(unit);
+        // If we remove a transport ship from the campaign,
+        // we need to remove any transported units from it
+        if (transportShips.remove(unit)
+                && unit.hasTransportedUnits()) {
+            List<Unit> transportedUnits = new ArrayList<>(unit.getTransportedUnits());
+            for (Unit transportedUnit : transportedUnits) {
+                unit.removeTransportedUnit(transportedUnit);
+            }
+        }
     }
 
     /**
@@ -3532,8 +3538,15 @@ public class Campaign implements Serializable, ITechManager {
         // remove unit from any forces
         removeUnitFromForce(unit);
 
-        //If this is a ship, remove it from the list of potential transports
+        // If this is a ship, remove it from the list of potential transports
         removeTransportShip(unit);
+
+        // If this unit was assigned to a transport ship, remove it from the transport
+        if (unit.hasTransportShipAssignment()) {
+            unit.getTransportShipAssignment()
+                    .getTransportShip()
+                    .unloadFromTransportShip(unit);
+        }
 
         // finally remove the unit
         getHangar().removeUnit(unit.getId());
