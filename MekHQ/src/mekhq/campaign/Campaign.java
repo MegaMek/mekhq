@@ -31,6 +31,7 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
+import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
 import megamek.common.util.EncodeControl;
@@ -4025,6 +4026,10 @@ public class Campaign implements Serializable, ITechManager {
 
     public String getCamoFileName() {
         return camoFileName;
+    }
+
+    public AbstractIcon getCamouflage() {
+        return new Camouflage(getCamoCategory(), getCamoFileName());
     }
 
     public int getColorIndex() {

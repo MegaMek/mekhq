@@ -1696,9 +1696,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "expectedDueDate",
                         MekHqXmlUtil.saveFormattedDate(expectedDueDate));
             }
-            if (!getPortrait().isDefault()) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", getPortraitCategory());
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", getPortraitFileName());
+            if (!getPortrait().hasDefaultCategory()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", getPortrait().getCategory());
+            }
+            if (!getPortrait().hasDefaultFilename()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", getPortrait().getFilename());
             }
             // Always save the current XP
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", xp);
