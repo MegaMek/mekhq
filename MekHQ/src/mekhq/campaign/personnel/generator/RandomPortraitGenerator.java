@@ -28,8 +28,10 @@ import mekhq.campaign.personnel.Person;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class RandomPortraitGenerator {
     private RandomPortraitGenerator() {
@@ -46,7 +48,7 @@ public class RandomPortraitGenerator {
     public static AbstractIcon generate(Collection<Person> personnel, Person p) {
         // first create a list of existing portrait strings, so we can check for
         // duplicates
-        List<String> existingPortraits = new ArrayList<>();
+        Set<String> existingPortraits = new HashSet<>();
         for (Person existingPerson : personnel) {
             existingPortraits.add(existingPerson.getPortraitCategory() + ":"
                     + existingPerson.getPortraitFileName());
@@ -119,7 +121,7 @@ public class RandomPortraitGenerator {
      * @param subDir the subdirectory to search
      * @return a list of all possible unassigned random portraits
      */
-    private static List<String> getPossibleRandomPortraits(List<String> existingPortraits, File subDir) {
+    private static List<String> getPossibleRandomPortraits(Set<String> existingPortraits, File subDir) {
         List<String> possiblePortraits = new ArrayList<>();
         Iterator<String> categories = MHQStaticDirectoryManager.getPortraits().getCategoryNames();
         while (categories.hasNext()) {
