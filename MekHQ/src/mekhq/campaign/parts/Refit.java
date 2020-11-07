@@ -1130,7 +1130,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
                 while(armorSupplied < armorNeeded) {
                     armorSupplied += ((Armor)newArmorSupplies.getNewPart()).getAmount();
-                    getCampaign().getShoppingList().addShoppingItem((Armor)newArmorSupplies.getNewPart(),1,getCampaign());
+                    getCampaign().getShoppingList().addShoppingItem((Armor) newArmorSupplies.getNewPart(), 1, getCampaign());
                 }
             }
         } else {
@@ -1430,7 +1430,7 @@ public class Refit extends Part implements IAcquisitionWork {
         //We've already made the old suits go *poof*; now we materialize new ones.
         if (newEntity instanceof BattleArmor) {
             for (int t = BattleArmor.LOC_TROOPER_1; t < newEntity.locations(); t++) {
-                Part suit = new BattleArmorSuit((BattleArmor)newEntity, t, getCampaign());
+                Part suit = new BattleArmorSuit((BattleArmor) newEntity, t, getCampaign());
                 newParts.add(suit);
                 suit.setUnit(oldUnit);
             }
@@ -1895,7 +1895,7 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public void writeToXml(PrintWriter pw1, int indentLvl) {
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<refit>");
-        pw1.println(MekHqXmlUtil.writeEntityToXmlString(newEntity, indentLvl+1, getCampaign().getEntities()));
+        pw1.println(MekHqXmlUtil.writeEntityToXmlString(newEntity, indentLvl + 1, getCampaign().getEntities()));
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<time>"
                 + time + "</time>");
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<timeSpent>" + timeSpent

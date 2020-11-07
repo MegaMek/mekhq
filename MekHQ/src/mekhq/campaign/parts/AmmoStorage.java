@@ -95,7 +95,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         //      should be sold for more based on the unit which carries
         //      it, or which location the ammo is stored in, or if
         //      the unit which carries the ammo does so in an armored
-        //      location...but I don't think that's likely.
+        //      location... but I don't think that's likely.
         return Money.of(getType().getRawCost());
     }
 
@@ -126,8 +126,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                 return ((EquipmentPart)part).getType() instanceof BombType
                         && ((BombType)getType()).getBombType() == ((BombType)((EquipmentPart)part).getType()).getBombType();
             } else {
-                return getType().getMunitionType() == ((AmmoStorage)part).getType().getMunitionType()
-                        && getType().equals( (Object)((EquipmentPart)part).getType());
+                return getType().getMunitionType() == ((AmmoStorage) part).getType().getMunitionType()
+                        && getType().equals( (Object) ((EquipmentPart) part).getType());
             }
 
         }
@@ -283,7 +283,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public static boolean IsRightAmmo(Part part, AmmoType curType) {
         return part instanceof AmmoStorage
                 && part.isPresent()
-                && ((AmmoStorage)part).getType().equals(curType)
+                && ((AmmoStorage) part).getType().equals(curType)
                 && curType.getMunitionType() == ((AmmoStorage) part).getType().getMunitionType();
     }
 
