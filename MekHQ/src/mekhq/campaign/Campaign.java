@@ -20,7 +20,6 @@
  */
 package mekhq.campaign;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -31,8 +30,8 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
+import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
-import megamek.common.icons.Portrait;
 import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
@@ -48,6 +47,7 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
+import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 
@@ -5880,91 +5880,16 @@ public class Campaign implements Serializable, ITechManager {
         p.addLogEntry(entry);
     }
 
-    //region Portraits
-    private List<String> getPossibleRandomPortraits(List<String> existingPortraits, File subDir) {
-        List<String> possiblePortraits = new ArrayList<>();
-        Iterator<String> categories = MHQStaticDirectoryManager.getPortraits().getCategoryNames();
-        while (categories.hasNext()) {
-            String category = categories.next();
-            if (new File(category).compareTo(subDir) == 0) {
-                Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
-                while (names.hasNext()) {
-                    String name = names.next();
-                    String location = category + ":" + name;
-                    if (existingPortraits.contains(location)) {
-                        continue;
-                    }
-                    possiblePortraits.add(location);
-                }
-            }
-        }
-        return possiblePortraits;
-    }
-
+    /**
+     * Assigns a random portrait to a {@link Person}.
+     * @param p The {@link Person} who should receive a randomized portrait.
+     */
     public void assignRandomPortraitFor(Person p) {
-        // first create a list of existing portrait strings, so we can check for
-        // duplicates
-        List<String> existingPortraits = new ArrayList<>();
-        for (Person existingPerson : this.getPersonnel()) {
-            existingPortraits.add(existingPerson.getPortraitCategory() + ":"
-                    + existingPerson.getPortraitFileName());
-        }
-
-        List<String> possiblePortraits;
-
-        // Will search for portraits in the /gender/primaryrole folder first,
-        // and if none are found then /gender/rolegroup, then /gender/combat or
-        // /gender/support, then in /gender.
-        File genderFile = new File(p.getGender().isFemale() ? "Female" : "Male");
-        File searchFile = new File(genderFile, Person.getRoleDesc(p.getPrimaryRole(), p.isClanner()));
-
-        possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
-
-        if (possiblePortraits.isEmpty()) {
-            String searchCat_RoleGroup = "";
-            if (p.isAdminPrimary()) {
-                searchCat_RoleGroup = "Admin";
-            } else if (p.getPrimaryRole() == Person.T_SPACE_CREW
-                    || p.getPrimaryRole() == Person.T_SPACE_GUNNER
-                    || p.getPrimaryRole() == Person.T_SPACE_PILOT
-                    || p.getPrimaryRole() == Person.T_NAVIGATOR) {
-                searchCat_RoleGroup = "Vessel Crew";
-            } else if (p.isTechPrimary()) {
-                searchCat_RoleGroup = "Tech";
-            } else if (p.getPrimaryRole() == Person.T_MEDIC
-                    || p.getPrimaryRole() == Person.T_DOCTOR) {
-                searchCat_RoleGroup = "Medical";
-            }
-
-            // TODO : Java 11 : Swap to isBlank
-            if (!searchCat_RoleGroup.trim().isEmpty()) {
-                searchFile = new File(genderFile, searchCat_RoleGroup);
-                possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
-            }
-        }
-
-        if (possiblePortraits.isEmpty()) {
-            searchFile = new File(genderFile, p.hasPrimaryCombatRole() ? "Combat" : "Support");
-            possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
-        }
-
-        if (possiblePortraits.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(existingPortraits, genderFile);
-        }
-
-        if (!possiblePortraits.isEmpty()) {
-            String chosenPortrait = possiblePortraits.get(Compute.randomInt(possiblePortraits.size()));
-            String[] temp = chosenPortrait.split(":");
-            if (temp.length != 2) {
-                return;
-            }
-            p.setPortrait(new Portrait(temp[0], temp[1]));
-        } else {
-            MekHQ.getLogger().warning("Failed to generate portrait for " + p.getFullTitle()
-                    + ". No possible portraits found.");
+        AbstractIcon portrait = RandomPortraitGenerator.generate(getPersonnel(), p);
+        if (!portrait.isDefault()) {
+            p.setPortrait(portrait);
         }
     }
-    //endregion Portraits
 
     /**
      * Assigns a random origin to a {@link Person}.
