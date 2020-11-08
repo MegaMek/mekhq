@@ -1,7 +1,7 @@
 /*
  * AtBScenarioViewPanel.java
  *
- * Copyright (C) 2014-2016 MegaMek team
+ * Copyright (C) 2014-2020 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2014 Carl Spain. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -31,7 +31,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -60,14 +59,10 @@ import javax.swing.tree.TreeSelectionModel;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
-import megamek.common.icons.AbstractIcon;
-import megamek.common.icons.Portrait;
 import megamek.common.util.EncodeControl;
-import mekhq.IconPackage;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -89,7 +84,6 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
     private ForceStub playerForces;
     private List<String> attachedAllyStub;
     private List<BotForceStub> botStubs;
-    private IconPackage icons;
     private JFrame frame;
 
     private JPanel panStats;
@@ -130,7 +124,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
     private final static int REROLL_WEATHER = 4;
     private final static int REROLL_NUM = 5;
     private JCheckBox[] chkReroll = new JCheckBox[REROLL_NUM];
-    JButton btnReroll;
+    private JButton btnReroll;
 
     private JTree playerForceTree;
 
@@ -139,14 +133,13 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
     private StubTreeModel playerForceModel;
 
-    public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame frame) {
+    public AtBScenarioViewPanel(AtBScenario s, Campaign c, JFrame frame) {
         this.frame = frame;
         this.scenario = s;
         this.campaign = c;
-        this.icons = ip;
         botStubs = new ArrayList<>();
 
-        if(s.isCurrent()) {
+        if (s.isCurrent()) {
             s.refresh(c);
             this.playerForces = new ForceStub(s.getForces(campaign), campaign);
             attachedAllyStub = s.generateEntityStub(s.getAlliesPlayer());
@@ -897,73 +890,19 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
         protected Icon getIcon(Object node) {
             if (node instanceof UnitStub) {
-                return getIconFrom((UnitStub)node);
+                return ((UnitStub) node).getPortrait().getImageIcon(50);
             } else if (node instanceof ForceStub) {
-                return getIconFrom((ForceStub)node);
+                return getIconFrom((ForceStub) node);
             } else {
                 return null;
             }
         }
 
-        protected Icon getIconFrom(UnitStub unit) {
-            String category = unit.getPortraitCategory();
-            String filename = unit.getPortraitFileName();
-
-            if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-                category = "";
-            }
-
-            // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == filename) || AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
-                filename = Portrait.DEFAULT_PORTRAIT_FILENAME;
-            }
-            // Try to get the player's portrait file.
-            Image portrait = null;
-            try {
-                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
-                if (null != portrait) {
-                    portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
-                } else {
-                    portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", Portrait.DEFAULT_PORTRAIT_FILENAME);
-                    if (null != portrait) {
-                        portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
-                    }
-                }
-                return new ImageIcon(portrait);
-            } catch (Exception e) {
-                MekHQ.getLogger().error(e);
-                return null;
-            }
-        }
-
         protected Icon getIconFrom(ForceStub force) {
-            String category = force.getIconCategory();
-            String filename = force.getIconFileName();
-            LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
-
-            if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-                category = "";
-            }
-
-            // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == filename)
-                    || (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
-                filename = "empty.png";
-            }
-
-            // Try to get the player's portrait file.
-            Image portrait;
             try {
-                portrait = MHQStaticDirectoryManager.buildForceIcon(category, filename, iconMap);
-                if (null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-                } else {
-                    portrait = (Image) MHQStaticDirectoryManager.getForceIcons().getItem("", "empty.png");
-                    if (null != portrait) {
-                        portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-                    }
-                }
-                return new ImageIcon(portrait);
+                return new ImageIcon(MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
+                        force.getIconFileName(), force.getIconMap())
+                        .getScaledInstance(58, -1, Image.SCALE_SMOOTH));
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);
                 return null;

@@ -3323,6 +3323,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return ammo;
     }
 
+    public AbstractIcon getCamouflage() {
+        return new Camouflage(getCamoCategory(), getCamoFileName());
+    }
+
     public String getCamoCategory() {
         if (null == entity) {
             return "";

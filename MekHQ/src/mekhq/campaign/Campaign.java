@@ -226,10 +226,8 @@ public class Campaign implements Serializable, ITechManager {
     private int colorIndex = 0;
 
     //unit icon
-    public static final String ROOT_ICON = "-- General --";
-    public static final String ICON_NONE = "None";
-    private String iconCategory = ROOT_ICON;
-    private String iconFileName = ICON_NONE;
+    private String iconCategory = AbstractIcon.ROOT_CATEGORY;
+    private String iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
 
     private Finances finances;
 
@@ -239,7 +237,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private PartsStore partsStore;
 
-    private ArrayList<String> customs;
+    private List<String> customs;
 
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
@@ -4038,6 +4036,10 @@ public class Campaign implements Serializable, ITechManager {
 
     public String getCamoFileName() {
         return camoFileName;
+    }
+
+    public AbstractIcon getCamouflage() {
+        return new Camouflage(getCamoCategory(), getCamoFileName());
     }
 
     public int getColorIndex() {
