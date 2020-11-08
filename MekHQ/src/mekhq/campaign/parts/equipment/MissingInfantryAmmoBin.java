@@ -19,6 +19,7 @@
 
 package mekhq.campaign.parts.equipment;
 
+import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
@@ -54,7 +55,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
      * @param omniPodded  Whether the weapon is pod-mounted on an omnivehicle
      * @param c           The campaign instance
      */
-    public MissingInfantryAmmoBin(int tonnage, EquipmentType ammoType, int equipNum, InfantryWeapon weaponType,
+    public MissingInfantryAmmoBin(int tonnage, AmmoType ammoType, int equipNum, InfantryWeapon weaponType,
                                   double size, boolean omniPodded, Campaign c) {
         super(tonnage, ammoType, equipNum, false, omniPodded, c);
         this.weaponType = weaponType;
@@ -67,7 +68,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
     @Override
     public void restore() {
         super.restore();
-        name = weaponType.getName() + " Ammo Bin";
+        name = getWeaponType().getName() + " Ammo Bin";
     }
 
     public InfantryWeapon getWeaponType() {
@@ -110,7 +111,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         if (part instanceof InfantryAmmoBin) {
             InfantryAmmoBin bin = (InfantryAmmoBin) part;
-            return type.equals(bin.getType()) && weaponType.equals(bin.getWeaponType())
+            return getType().equals(bin.getType()) && getWeaponType().equals(bin.getWeaponType())
                     && (bin.getFullShots() == getFullShots());
         }
         return false;
@@ -118,18 +119,18 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
 
     @Override
     protected int getFullShots() {
-        return weaponType.getShots() * (int) size;
+        return getWeaponType().getShots() * (int) size;
     }
 
     @Override
     public Part getNewPart() {
-        return new InfantryAmmoBin(getUnitTonnage(), type, -1, getFullShots(),
-                weaponType, size, omniPodded, campaign);
+        return new InfantryAmmoBin(getUnitTonnage(), getType(), -1, getFullShots(),
+                getWeaponType(), size, omniPodded, campaign);
     }
 
     @Override
     public void writeToXmlEnd(PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "weaponType", weaponType.getInternalName());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "weaponType", getWeaponType().getInternalName());
         super.writeToXmlEnd(pw, indent);
     }
 

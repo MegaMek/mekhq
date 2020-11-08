@@ -2647,11 +2647,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 int fullShots = oneShot ? 1 : ((AmmoType) m.getType()).getShots();
                 if (null == apart) {
                     if (entity instanceof BattleArmor) {
-                        apart = new BattleArmorAmmoBin((int) entity.getWeight(), m.getType(), eqnum,
+                        apart = new BattleArmorAmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqnum,
                                 ((BattleArmor) entity).getSquadSize() * (fullShots - m.getBaseShotsLeft()),
                                 oneShot, getCampaign());
                     } else if (entity.usesWeaponBays()) {
-                        apart = new LargeCraftAmmoBin((int) entity.getWeight(), m.getType(), eqnum,
+                        apart = new LargeCraftAmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqnum,
                                 fullShots - m.getBaseShotsLeft(), m.getSize(), getCampaign());
                         ((LargeCraftAmmoBin) apart).setBay(entity.getBayByAmmo(m));
                     } else if (entity.isSupportVehicle()
@@ -2661,11 +2661,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                             weapon = weapon.getLinkedBy();
                         }
                         int size = m.getOriginalShots() / ((InfantryWeapon) weapon.getType()).getShots();
-                        apart = new InfantryAmmoBin((int) entity.getWeight(), m.getType(), eqnum,
+                        apart = new InfantryAmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqnum,
                                 m.getOriginalShots() - m.getBaseShotsLeft(),
                                 (InfantryWeapon) weapon.getType(), size, weapon.isOmniPodMounted(), getCampaign());
                     } else {
-                        apart = new AmmoBin((int) entity.getWeight(), m.getType(), eqnum,
+                        apart = new AmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqnum,
                                 fullShots - m.getBaseShotsLeft(), oneShot, m.isOmniPodMounted(), getCampaign());
                     }
                     addPart(apart);
@@ -3242,17 +3242,19 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         for (Mounted m : entity.getAmmo()) {
+            assert(m.getType() instanceof AmmoType);
+
             int eqNum = entity.getEquipmentNum(m);
             Part part = ammoParts.get(eqNum);
             if (null == part) {
-                part = new LargeCraftAmmoBin((int)entity.getWeight(), m.getType(), eqNum,
+                part = new LargeCraftAmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqNum,
                         m.getOriginalShots() - m.getBaseShotsLeft(), m.getAmmoCapacity(), getCampaign());
                 ((LargeCraftAmmoBin) part).setBay(entity.getBayByAmmo(m));
                 toAdd.add(part);
             } else {
                 part.updateConditionFromEntity(false);
                 // Reset the name
-                ((LargeCraftAmmoBin) part).changeMunition(m.getType());
+                ((LargeCraftAmmoBin) part).changeMunition((AmmoType) m.getType());
             }
         }
         for (Part p : toAdd) {
@@ -3269,7 +3271,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param bay   The weapon bay where the ammo is located
      * @return      The new ammo bin part
      */
-    public LargeCraftAmmoBin addBayAmmoBin(EquipmentType etype, Mounted bay) {
+    public LargeCraftAmmoBin addBayAmmoBin(AmmoType etype, Mounted bay) {
         for (Part p : getParts()) {
             if (p instanceof LargeCraftAmmoBin) {
                 final LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;

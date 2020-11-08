@@ -59,7 +59,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         this(0, null, -1, 0, 0, null);
     }
 
-    public LargeCraftAmmoBin(int tonnage, EquipmentType et, int equipNum, int shotsNeeded, double capacity,
+    public LargeCraftAmmoBin(int tonnage, AmmoType et, int equipNum, int shotsNeeded, double capacity,
             Campaign c) {
         super(tonnage, et, equipNum, shotsNeeded, false, false, c);
         this.size = capacity;
@@ -385,11 +385,8 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     public IAcquisitionWork getAcquisitionWork() {
-        int shots = 1;
-        if (type instanceof AmmoType) {
-            shots = ((AmmoType) type).getShots() * (int) Math.floor(getUnusedCapacity() / type.getTonnage(null));
-        }
-        return new AmmoStorage(1, type, shots, campaign);
+        int shots = getType().getShots() * (int) Math.floor(getUnusedCapacity() / type.getTonnage(null));
+        return new AmmoStorage(1, getType(), shots, campaign);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
         this(0, null, 0, null, null);
     }
 
-    public InfantryAmmoStorage(int tonnage, EquipmentType et, int shots,
+    public InfantryAmmoStorage(int tonnage, AmmoType et, int shots,
                                InfantryWeapon weaponType, Campaign c) {
         super(tonnage, et, shots, c);
         this.weaponType = weaponType;
@@ -151,7 +151,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
     }
 
     public Part getNewPart() {
-        return new InfantryAmmoStorage(1, type, weaponType.getShots(),
+        return new InfantryAmmoStorage(1, getType(), weaponType.getShots(),
                 weaponType, campaign);
     }
 }

@@ -48,13 +48,18 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         this(0, null, -1, false, false, null);
     }
 
-    public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot,
+    public MissingAmmoBin(int tonnage, AmmoType et, int equipNum, boolean singleShot,
             boolean omniPodded, Campaign c) {
         super(tonnage, et, equipNum, c, 1.0, 1.0, omniPodded);
         this.oneShot = singleShot;
         if(null != name) {
             this.name += " Bin";
         }
+    }
+
+    @Override
+    public AmmoType getType() {
+        return (AmmoType) super.getType();
     }
 
     /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
@@ -113,7 +118,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
                 && !(part instanceof LargeCraftAmmoBin)) {
             EquipmentPart eqpart = (EquipmentPart)part;
             EquipmentType et = eqpart.getType();
-            return type.equals(et) && ((AmmoBin)part).getFullShots() == getFullShots();
+            return getType().equals(et) && ((AmmoBin)part).getFullShots() == getFullShots();
         }
         return false;
     }
@@ -123,7 +128,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     protected int getFullShots() {
-        int fullShots = ((AmmoType) type).getShots();
+        int fullShots = getType().getShots();
         if(oneShot) {
             fullShots = 1;
         }
@@ -132,7 +137,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 
     @Override
     public Part getNewPart() {
-        return new AmmoBin(getUnitTonnage(), type, -1, getFullShots(), oneShot, omniPodded, campaign);
+        return new AmmoBin(getUnitTonnage(), getType(), -1, getFullShots(), oneShot, omniPodded, campaign);
     }
 
     @Override

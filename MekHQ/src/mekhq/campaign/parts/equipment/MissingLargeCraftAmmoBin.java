@@ -46,7 +46,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
         this(0, null, -1, 1.0, null);
     }
 
-    public MissingLargeCraftAmmoBin(int tonnage, EquipmentType et, int equipNum, double capacity,
+    public MissingLargeCraftAmmoBin(int tonnage, AmmoType et, int equipNum, double capacity,
             Campaign c) {
         super(tonnage, et, equipNum, false, false, c);
         this.size = capacity;
@@ -123,12 +123,12 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
 
     @Override
     protected int getFullShots() {
-        return (int) Math.floor(size * ((AmmoType) type).getShots() / type.getTonnage(null));
+        return (int) Math.floor(size * getType().getShots() / getType().getTonnage(null));
     }
 
     @Override
     public Part getNewPart() {
-        return new LargeCraftAmmoBin(getUnitTonnage(), type, -1, getFullShots(), size, campaign);
+        return new LargeCraftAmmoBin(getUnitTonnage(), getType(), -1, getFullShots(), size, campaign);
     }
 
     @Override

@@ -30,6 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 /**
  * Ammo bin for infantry weapons used by small support vehicles
@@ -55,7 +56,7 @@ public class InfantryAmmoBin extends AmmoBin {
      * @param omniPodded  Whether the weapon is pod-mounted on an omnivehicle
      * @param c           The campaign instance
      */
-    public InfantryAmmoBin(int tonnage, EquipmentType ammoType, int equipNum, int shots,
+    public InfantryAmmoBin(int tonnage, AmmoType ammoType, int equipNum, int shots,
                            InfantryWeapon weaponType, double size, boolean omniPodded, Campaign c) {
         super(tonnage, ammoType, equipNum, shots, false, omniPodded, c);
         this.size = size;
@@ -111,12 +112,12 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public double getTonnage() {
-        return weaponType.getAmmoWeight();
+        return getWeaponType().getAmmoWeight();
     }
 
     @Override
     public int getFullShots() {
-        return weaponType.getShots() * (int) getSize();
+        return getWeaponType().getShots() * (int) getSize();
     }
 
     /**
@@ -143,12 +144,12 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     protected Money getPricePerTon() {
-        return Money.of(weaponType.getAmmoCost() / weaponType.getAmmoWeight());
+        return Money.of(getWeaponType().getAmmoCost() / getWeaponType().getAmmoWeight());
     }
 
     @Override
     protected int getShotsPerTon() {
-        return (int) Math.floor(weaponType.getShots() / weaponType.getAmmoWeight());
+        return (int) Math.floor(getWeaponType().getShots() / getWeaponType().getAmmoWeight());
     }
 
     @Override
@@ -162,7 +163,7 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public void writeToXmlEnd(PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "weaponType", weaponType.getInternalName());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "weaponType", getWeaponType().getInternalName());
         super.writeToXmlEnd(pw, indent);
     }
 
@@ -192,7 +193,7 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingInfantryAmmoBin(getUnitTonnage(), type, equipmentNum, weaponType,
+        return new MissingInfantryAmmoBin(getUnitTonnage(), getType(), equipmentNum, getWeaponType(),
                 size, omniPodded, campaign);
     }
 
@@ -200,14 +201,14 @@ public class InfantryAmmoBin extends AmmoBin {
     public boolean isSamePartType(Part part) {
         return  (part instanceof InfantryAmmoBin)
                 && super.isSamePartType(part)
-                && (weaponType == ((InfantryAmmoBin) part).weaponType)
+                && Objects.equals(getWeaponType(), ((InfantryAmmoBin) part).getWeaponType())
                 && size == ((InfantryAmmoBin) part).size;
     }
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
         if (shotsNeeded < 0) {
-            return type.getDesc() + ", remove " + (-getShotsNeeded());
+            return getType().getDesc() + ", remove " + (-getShotsNeeded());
         } else {
             return super.getDetails(includeRepairDetails);
         }
@@ -216,7 +217,7 @@ public class InfantryAmmoBin extends AmmoBin {
     @Override
     public void changeAmountAvailable(int amount, final AmmoType curType) {
         InfantryAmmoStorage a = (InfantryAmmoStorage) campaign.getWarehouse().findSparePart(part ->
-            InfantryAmmoStorage.isRightAmmo(part, (AmmoType) getType(), getWeaponType()));
+            InfantryAmmoStorage.isRightAmmo(part, getType(), getWeaponType()));
 
         if (a != null) {
             a.changeShots(amount);
@@ -224,7 +225,7 @@ public class InfantryAmmoBin extends AmmoBin {
                 campaign.getWarehouse().removePart(a);
             }
         } else if (amount > 0) {
-            campaign.getQuartermaster().addPart(new InfantryAmmoStorage(1, curType, amount, weaponType, campaign), 0);
+            campaign.getQuartermaster().addPart(new InfantryAmmoStorage(1, curType, amount, getWeaponType(), campaign), 0);
         }
     }
 
@@ -234,10 +235,10 @@ public class InfantryAmmoBin extends AmmoBin {
     }
 
     public int getAmountAvailable() {
-        final AmmoType thisType = (AmmoType) getType();
+        final AmmoType thisType = getType();
         return campaign.getWarehouse().streamSpareParts()
             .filter(part -> part instanceof InfantryAmmoStorage && part.isPresent()
-                    && InfantryAmmoStorage.isRightAmmo(part, thisType, weaponType))
+                    && InfantryAmmoStorage.isRightAmmo(part, thisType, getWeaponType()))
             .mapToInt(part -> ((InfantryAmmoStorage) part).getShots())
             .sum();
     }
@@ -266,21 +267,21 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public String getAcquisitionDisplayName() {
-        return weaponType.getName() + ": " + type.getName();
+        return getWeaponType().getName() + ": " + getType().getName();
     }
 
     @Override
     public String getAcquisitionExtraDesc() {
-        return weaponType.getShots() + " shots (1 clip)";
+        return getWeaponType().getShots() + " shots (1 clip)";
     }
 
     public Part getNewPart() {
-        return new InfantryAmmoStorage(1, type, weaponType.getShots() * (int) getSize(),
-                weaponType, campaign);
+        return new InfantryAmmoStorage(1, getType(), getWeaponType().getShots() * (int) getSize(),
+                getWeaponType(), campaign);
     }
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return weaponType.getTechAdvancement();
+        return getWeaponType().getTechAdvancement();
     }
 }
