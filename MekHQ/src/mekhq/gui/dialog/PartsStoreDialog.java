@@ -507,7 +507,7 @@ public class PartsStoreDialog extends JDialog {
             campaign.getShoppingList().addShoppingItem(part.getAcquisitionWork(), quantity, campaign);
         } else {
             while (quantity > 0) {
-                campaign.addPart(part.clone(), 0);
+                campaign.getQuartermaster().addPart(part.clone(), 0);
                 quantity--;
             }
         }

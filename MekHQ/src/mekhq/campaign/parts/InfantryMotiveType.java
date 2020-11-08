@@ -110,14 +110,14 @@ public class InfantryMotiveType extends Part {
 		if(null != unit) {
 			Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
 			if(!salvage) {
-				campaign.removePart(this);
+				campaign.getWarehouse().removePart(this);
 			} else if(null != spare) {
 				int number = quantity;
 				while(number > 0) {
 					spare.incrementQuantity();
 					number--;
 				}
-				campaign.removePart(this);
+				campaign.getWarehouse().removePart(this);
 			}
 			unit.removePart(this);
 		}

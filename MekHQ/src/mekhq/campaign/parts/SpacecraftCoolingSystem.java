@@ -204,7 +204,7 @@ public class SpacecraftCoolingSystem extends Part {
            } else {
                //Start a new collection, but make sure we don't pull them out of the engine
                spareHeatSink.setQuantity(Math.min(removeableSinks, sinkBatch));
-               campaign.addPart(spareHeatSink, 0);
+               campaign.getQuartermaster().addPart(spareHeatSink, 0);
            }
            ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
         }

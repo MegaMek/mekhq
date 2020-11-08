@@ -3204,7 +3204,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         if (addParts) {
             for (Part p : partsToAdd) {
-                getCampaign().addPart(p, 0);
+                getCampaign().getQuartermaster().addPart(p, 0);
             }
         }
         // We can't add the child parts to the transport bay part until they have been added to the
@@ -3257,7 +3257,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         for (Part p : toAdd) {
             addPart(p);
-            getCampaign().addPart(p, 0);
+            getCampaign().getQuartermaster().addPart(p, 0);
         }
     }
 
@@ -3287,7 +3287,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             LargeCraftAmmoBin bin = new LargeCraftAmmoBin((int) entity.getWeight(), etype, anum,
                     0, 0, getCampaign());
             addPart(bin);
-            getCampaign().addPart(bin, 0);
+            getCampaign().getQuartermaster().addPart(bin, 0);
             return bin;
         } catch (LocationFullException ex) {
             MekHQ.getLogger().error(Unit.class, "Location full exception attempting to add " + etype.getDesc() + " to unit " + getName());

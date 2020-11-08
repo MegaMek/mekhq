@@ -337,10 +337,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return false;
     }
 
-    protected Money adjustCostsForCampaignOptions(Money cost) {
+    protected Money adjustCostsForCampaignOptions(@Nullable Money cost) {
         // if the part doesn't cost anything, no amount of multiplication will change it
-        if (cost.isZero()) {
-            return cost;
+        if ((cost == null) || cost.isZero()) {
+            return Money.zero();
         }
 
         if (getTechBase() == T_CLAN) {
@@ -1366,9 +1366,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         quantity = Math.max(number, 0);
         if (quantity == 0) {
             for (Part childPart : childParts) {
-                campaign.removePart(childPart);
+                campaign.getWarehouse().removePart(childPart);
             }
-            campaign.removePart(this);
+            campaign.getWarehouse().removePart(this);
         }
     }
 

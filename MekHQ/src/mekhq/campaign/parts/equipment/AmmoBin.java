@@ -610,14 +610,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             }
             a.changeShots(amount);
             if (a.getShots() <= 0) {
-                campaign.removePart(a);
+                campaign.getWarehouse().removePart(a);
             }
         } else if (amount > 0) {
-            campaign.addPart(new AmmoStorage(1, curType, amount, campaign), 0);
+            campaign.getQuartermaster().addPart(new AmmoStorage(1, curType, amount, campaign), 0);
         } else if (amount < 0
                 && campaign.getCampaignOptions().useAmmoByType()
                 && AmmoBin.ALLOWED_BY_TYPE.contains(curType.getAmmoType())) {
-            campaign.addPart(new AmmoStorage(1, curType ,0, campaign), 0);
+            campaign.getQuartermaster().addPart(new AmmoStorage(1, curType ,0, campaign), 0);
             changeAmountAvailable(campaign, amount, curType);
         }
     }

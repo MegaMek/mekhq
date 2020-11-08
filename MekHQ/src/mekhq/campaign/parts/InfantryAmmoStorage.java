@@ -138,10 +138,10 @@ public class InfantryAmmoStorage extends AmmoStorage {
         if (null != a) {
             a.changeShots(amount);
             if (a.getShots() <= 0) {
-                campaign.removePart(a);
+                campaign.getWarehouse().removePart(a);
             }
         } else if (amount > 0) {
-            campaign.addPart(new InfantryAmmoStorage(1, curType, amount, weaponType, campaign), 0);
+            campaign.getQuartermaster().addPart(new InfantryAmmoStorage(1, curType, amount, weaponType, campaign), 0);
         }
     }
 

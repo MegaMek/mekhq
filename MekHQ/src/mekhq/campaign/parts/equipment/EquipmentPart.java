@@ -229,21 +229,21 @@ public class EquipmentPart extends Part {
             }
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
                 int number = quantity;
                 while (number > 0) {
                     spare.incrementQuantity();
                     number--;
                 }
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             if (null != missing) {
                 unit.addPart(missing);
             }
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         checkWeaponBay();
         setUnit(null);

@@ -22,7 +22,6 @@ package mekhq.campaign.unit;
 
 
 import java.io.PrintWriter;
-import java.util.UUID;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -200,7 +199,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     @Override
     public String find(int transitDays) {
         //TODO: probably get a duplicate entity
-        if(getCampaign().buyUnit((Entity)getNewEquipment(), transitDays)) {
+        if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
             return "<font color='green'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";

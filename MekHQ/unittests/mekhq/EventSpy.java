@@ -105,4 +105,9 @@ public class EventSpy implements AutoCloseable {
     public void handle(PartRemovedEvent e) {
         record(e);
     }
+
+    @Subscribe
+    public void handle(PartArrivedEvent e) {
+        record(e);
+    }
 }

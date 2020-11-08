@@ -88,7 +88,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         if(null != replacement) {
             Part actualReplacement = getActualReplacement((AmmoBin) replacement);
             unit.addPart(actualReplacement);
-            campaign.addPart(actualReplacement, 0);
+            campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             ((EquipmentPart)actualReplacement).setEquipmentNum(equipmentNum);
             remove(false);
