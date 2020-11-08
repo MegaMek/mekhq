@@ -21,10 +21,8 @@ package mekhq.gui.view;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 import java.util.UUID;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -35,10 +33,7 @@ import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Entity;
 import megamek.common.UnitType;
-import megamek.common.icons.AbstractIcon;
-import megamek.common.icons.Portrait;
 import megamek.common.util.EncodeControl;
-import mekhq.IconPackage;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -57,8 +52,6 @@ public class ForceViewPanel extends ScrollablePanel {
 
 	private Force force;
 	private Campaign campaign;
-
-	private IconPackage icons;
 
 	private javax.swing.JLabel lblIcon;
 	private javax.swing.JPanel pnlStats;
@@ -79,10 +72,9 @@ public class ForceViewPanel extends ScrollablePanel {
 	private javax.swing.JLabel lblTech1;
 	private javax.swing.JLabel lblTech2;
 
-	public ForceViewPanel(Force f, Campaign c, IconPackage icons) {
+	public ForceViewPanel(Force f, Campaign c) {
 		this.force = f;
 		this.campaign = c;
-		this.icons = icons;
 		initComponents();
 	}
 
@@ -153,35 +145,15 @@ public class ForceViewPanel extends ScrollablePanel {
 	}
 
 	private void setIcon(Force force, JLabel lbl, int scale) {
-        String category = force.getIconCategory();
-        String filename = force.getIconFileName();
-        LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
-
-        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-            category = "";
-        }
-
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename)
-                || (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
-        	filename = "empty.png";
-        }
-
-        // Try to get the player's portrait file.
-        Image portrait;
-        try {
-            portrait = MHQStaticDirectoryManager.buildForceIcon(category, filename, iconMap);
-            if (null != portrait) {
-        		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);
-            } else {
-            	portrait = (Image) MHQStaticDirectoryManager.getForceIcons().getItem("", "empty.png");
-            }
-        	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);
-            ImageIcon icon = new ImageIcon(portrait);
-        	lbl.setIcon(icon);
+	    ImageIcon icon = null;
+	    try {
+            icon = new ImageIcon(MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
+                    force.getIconFileName(), force.getIconMap())
+                    .getScaledInstance(scale, -1, Image.SCALE_SMOOTH));
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "setIcon", e);
+            MekHQ.getLogger().error(e);
         }
+	    lbl.setIcon(icon);
 	}
 
 
@@ -457,7 +429,7 @@ public class ForceViewPanel extends ScrollablePanel {
 			lblUnit = new JLabel();
 			if (null != p) {
 				lblPerson.setText(getSummaryFor(p, unit));
-				setPortrait(p, lblPerson);
+				lblPerson.setIcon(p.getPortrait().getImageIcon());
 			}
 			nexty++;
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -481,40 +453,6 @@ public class ForceViewPanel extends ScrollablePanel {
 			pnlSubUnits.add(lblUnit, gridBagConstraints);
 		}
 	}
-
-	/**
-     * set the portrait for the given person.
-     */
-    public void setPortrait(Person p, JLabel lbl) {
-        String category = p.getPortraitCategory();
-        String filename = p.getPortraitFileName();
-
-        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-            category = "";
-        }
-
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename) || AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
-        	filename = Portrait.DEFAULT_PORTRAIT_FILENAME;
-        }
-
-        // Try to get the player's portrait file.
-        Image portrait;
-        try {
-            portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
-            if (null != portrait) {
-                portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);
-            } else {
-            	portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", Portrait.DEFAULT_PORTRAIT_FILENAME);
-            	if (null != portrait) {
-                    portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);
-            	}
-            }
-            lbl.setIcon(new ImageIcon(portrait));
-        } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "setPortrait", e);
-        }
-    }
 
     private Image getImageFor(Unit u, Component c) {
         Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
@@ -576,15 +514,10 @@ public class ForceViewPanel extends ScrollablePanel {
             }
     		toReturn += "</i>";
         }
-        if (unit.hasTransportShipId()) {
-            for (UUID id : unit.getTransportShipId().keySet()) {
-                Unit transport = campaign.getUnit(id);
-                if (transport != null) {
-                    toReturn += "<br><i>" + "Transported by: ";
-                    toReturn += transport.getName();
-                    toReturn += "</i>";
-                }
-            }
+        if (unit.hasTransportShipAssignment()) {
+            toReturn += "<br><i>" + "Transported by: ";
+            toReturn += unit.getTransportShipAssignment().getTransportShip().getName();
+            toReturn += "</i>";
         }
         // If this is a transport ship, tell us what bay capacity is at
         if (!unit.getEntity().getTransportBays().isEmpty()) {

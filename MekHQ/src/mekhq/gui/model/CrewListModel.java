@@ -1,5 +1,20 @@
-/**
+/*
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.model;
 
@@ -114,39 +129,29 @@ public class CrewListModel extends AbstractListModel<Person> {
         }
 
         @Override
-        public Component getListCellRendererComponent(JList<? extends Person> list, Person value, int index,
-                boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<? extends Person> list, Person value,
+                                                      int index, boolean isSelected, boolean cellHasFocus) {
             Component c = this;
             setOpaque(true);
-            Person p = (Person)getElementAt(index);
-            StringBuilder sb = new StringBuilder("<html><font size='2'><b>")
-                    .append(p.getFullTitle())
-                    .append("</b><br/>")
-                    .append(CrewRole.getCrewRole(p, unit).getDisplayName())
-                    .append(" (");
+            Person p = getElementAt(index);
             String gunSkill = SkillType.getGunnerySkillFor(unit.getEntity());
             String driveSkill = SkillType.getDrivingSkillFor(unit.getEntity());
-            if (p.hasSkill(gunSkill)) {
-                sb.append(p.getSkill(gunSkill).getFinalSkillValue());
-            } else {
-                sb.append("-");
-            }
-            sb.append("/");
-            if (p.hasSkill(driveSkill)) {
-                sb.append(p.getSkill(driveSkill).getFinalSkillValue());
-            } else {
-                sb.append("-");
-            }
-            sb.append(")</font></html>");
-            setHtmlText(sb.toString());
+            String sb = "<html><font size='2'><b>" + p.getFullTitle() + "</b><br/>"
+                    + CrewRole.getCrewRole(p, unit).getDisplayName()
+                    + " ("
+                    + (p.hasSkill(gunSkill) ? p.getSkill(gunSkill).getFinalSkillValue() : "-")
+                    + "/"
+                    + (p.hasSkill(driveSkill) ? p.getSkill(driveSkill).getFinalSkillValue() : "-")
+                    + ")</font></html>";
+            setHtmlText(sb);
             if (isSelected) {
                 highlightBorder();
             } else {
                 unhighlightBorder();
             }
+
             setPortrait(p);
             return c;
         }
     }
-
 }
