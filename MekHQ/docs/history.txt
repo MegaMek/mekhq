@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-0.47.12-SNAPSHOT 
+0.47.12 (2020-11-08 2230 UTC) 
 + Issue #1970: Workaround for single hex ecm causing smallcraft to be overweight
 + Issue #1079: Add refit time for moving a part between locations
 + PR #2117: Fixing New Personnel Market Report
