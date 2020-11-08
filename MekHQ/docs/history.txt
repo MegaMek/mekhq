@@ -36,6 +36,7 @@ VERSION HISTORY:
 + Issue #785: SLDF Ranks are Wrong
 + Issue #572: Random Portrait Fails to Properly Compare File Paths
 + Issue #564: AbstractIcon: Fixing Basic Info Portrait Scaling
++ Data: Adding a CampaignAnon 3.5 AtB preset.
 
 
 0.47.11 (2020-10-04 2100 UTC)
