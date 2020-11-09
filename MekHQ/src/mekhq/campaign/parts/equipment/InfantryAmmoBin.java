@@ -37,6 +37,8 @@ import java.util.Objects;
  */
 public class InfantryAmmoBin extends AmmoBin {
 
+    private static final long serialVersionUID = 2694897334041633188L;
+
     private InfantryWeapon weaponType;
 
     // Used in deserialization
@@ -56,8 +58,8 @@ public class InfantryAmmoBin extends AmmoBin {
      * @param omniPodded  Whether the weapon is pod-mounted on an omnivehicle
      * @param c           The campaign instance
      */
-    public InfantryAmmoBin(int tonnage, AmmoType ammoType, int equipNum, int shots,
-                           InfantryWeapon weaponType, double size, boolean omniPodded, Campaign c) {
+    public InfantryAmmoBin(int tonnage, @Nullable AmmoType ammoType, int equipNum, int shots,
+            @Nullable InfantryWeapon weaponType, double size, boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, ammoType, equipNum, shots, false, omniPodded, c);
         this.size = size;
         if (weaponType != null) {

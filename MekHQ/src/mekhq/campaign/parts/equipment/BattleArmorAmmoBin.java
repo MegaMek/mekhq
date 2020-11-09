@@ -27,6 +27,7 @@ import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
@@ -38,7 +39,7 @@ import mekhq.campaign.work.IAcquisitionWork;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
+public class BattleArmorAmmoBin extends AmmoBin {
 
     /**
      * Battle Armor ammo bins need to look for shots for all the remaining troopers in the
@@ -53,7 +54,8 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         this(0, null, -1, 0, false, null);
     }
 
-    public BattleArmorAmmoBin(int tonnage, AmmoType et, int equipNum, int shots, boolean singleShot, Campaign c) {
+    public BattleArmorAmmoBin(int tonnage, @Nullable AmmoType et, int equipNum,
+            int shots, boolean singleShot, @Nullable Campaign c) {
         super(tonnage, et, equipNum, shots, singleShot, false, c);
     }
 

@@ -28,6 +28,7 @@ import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
@@ -48,8 +49,8 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         this(0, null, -1, false, false, null);
     }
 
-    public MissingAmmoBin(int tonnage, AmmoType et, int equipNum, boolean singleShot,
-            boolean omniPodded, Campaign c) {
+    public MissingAmmoBin(int tonnage, @Nullable AmmoType et, int equipNum, boolean singleShot,
+            boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, et, equipNum, c, 1.0, 1.0, omniPodded);
         this.oneShot = singleShot;
         if(null != name) {

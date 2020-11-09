@@ -26,7 +26,6 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
@@ -59,8 +58,8 @@ public class LargeCraftAmmoBin extends AmmoBin {
         this(0, null, -1, 0, 0, null);
     }
 
-    public LargeCraftAmmoBin(int tonnage, AmmoType et, int equipNum, int shotsNeeded, double capacity,
-            Campaign c) {
+    public LargeCraftAmmoBin(int tonnage, @Nullable AmmoType et, int equipNum, int shotsNeeded, double capacity,
+            @Nullable Campaign c) {
         super(tonnage, et, equipNum, shotsNeeded, false, false, c);
         this.size = capacity;
     }

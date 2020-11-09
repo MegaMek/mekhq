@@ -46,8 +46,8 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
         this(0, null, -1, 1.0, null);
     }
 
-    public MissingLargeCraftAmmoBin(int tonnage, AmmoType et, int equipNum, double capacity,
-            Campaign c) {
+    public MissingLargeCraftAmmoBin(int tonnage, @Nullable AmmoType et, int equipNum, double capacity,
+            @Nullable Campaign c) {
         super(tonnage, et, equipNum, false, false, c);
         this.size = capacity;
     }

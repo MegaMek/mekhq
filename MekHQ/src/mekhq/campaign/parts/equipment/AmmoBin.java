@@ -42,6 +42,7 @@ import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -77,13 +78,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         this(0, null, -1, 0, false, false, null);
     }
 
-    public AmmoBin(int tonnage, AmmoType et, int equipNum, int shots, boolean singleShot,
-            boolean omniPodded, Campaign c) {
+    public AmmoBin(int tonnage, @Nullable AmmoType et, int equipNum, int shots, boolean singleShot,
+            boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, et, equipNum, 1.0, omniPodded, c);
         this.shotsNeeded = shots;
         this.oneShot = singleShot;
         this.checkedToday = false;
-        this.munition = et.getMunitionType();
+        if (et != null) {
+            this.munition = et.getMunitionType();
+        }
         if(null != name) {
             this.name += " Bin";
         }
@@ -341,7 +344,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                     shotsNeeded -= shots;
                 }
                 else {
-                    MekHQ.getLogger().warning(AmmoBin.class, mType.getName() + " is not valid equipment for " + getName() + " to restock ammo on unit " + unit.getName());
+                    MekHQ.getLogger().warning(mType.getName() + " is not valid equipment for " + getName() + " to restock ammo on unit " + unit.getName());
                 }
             }
         }
