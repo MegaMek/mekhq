@@ -602,7 +602,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             if (!(part instanceof AmmoStorage) || !part.isPresent() || part.isReservedForRefit()) {
                 return false;
             }
-            AmmoType ammoType = ((AmmoStorage)part).getType();
+            AmmoType ammoType = ((AmmoStorage) part).getType();
             return ammoType.equals(curType)
                 && (curType.getMunitionType() == ammoType.getMunitionType());
         });

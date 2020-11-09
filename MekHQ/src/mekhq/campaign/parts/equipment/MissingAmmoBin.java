@@ -119,7 +119,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
                 && !(part instanceof LargeCraftAmmoBin)) {
             EquipmentPart eqpart = (EquipmentPart)part;
             EquipmentType et = eqpart.getType();
-            return getType().equals(et) && ((AmmoBin)part).getFullShots() == getFullShots();
+            return getType().equals(et) && (((AmmoBin) part).getFullShots() == getFullShots());
         }
         return false;
     }

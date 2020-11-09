@@ -197,7 +197,7 @@ public class PartsStore implements Serializable {
                         //because presumably this is happening because KgperShot is -1 or 0
                         shots = 20;
                     }
-                    parts.add(new AmmoStorage(0,(AmmoType) et, shots, c));
+                    parts.add(new AmmoStorage(0, (AmmoType) et, shots, c));
                 } else {
                     parts.add(new AmmoStorage(0, (AmmoType) et, ((AmmoType) et).getShots(), c));
                 }
