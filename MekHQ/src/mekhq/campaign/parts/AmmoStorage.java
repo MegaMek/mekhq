@@ -33,6 +33,7 @@ import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -55,10 +56,12 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     	this(0, null, 0, null);
     }
 
-    public AmmoStorage(int tonnage, EquipmentType et, int shots, Campaign c) {
+    public AmmoStorage(int tonnage, @Nullable EquipmentType et, int shots, @Nullable Campaign c) {
         super(tonnage, et, -1, 1.0, c);
         this.shots = shots;
-        this.munition = getType().getMunitionType();
+        if (et instanceof AmmoType) {
+            this.munition = ((AmmoType) et).getMunitionType();
+        }
     }
 
     public AmmoStorage clone() {
