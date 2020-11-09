@@ -657,4 +657,8 @@ test {
 jacocoTestReport {
     // tests are required to run before generating the report
     dependsOn test
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
 }
