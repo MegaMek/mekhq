@@ -175,7 +175,7 @@ public class Refit extends Part implements IAcquisitionWork {
         fixableString = null;
         kitFound = false;
         replacingLocations = false;
-        campaign = getCampaign();
+        campaign = oldUnit.getCampaign();
         calculate();
         if (customJob) {
             suggestNewName();
@@ -2101,12 +2101,12 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     public void reCalc() {
-        setCampaign(getCampaign());
+        setCampaign(oldUnit.getCampaign());
         for (Part p : shoppingList) {
-            p.setCampaign(getCampaign());
+            p.setCampaign(oldUnit.getCampaign());
         }
         if (null != newArmorSupplies) {
-            newArmorSupplies.setCampaign(getCampaign());
+            newArmorSupplies.setCampaign(oldUnit.getCampaign());
         }
     }
 
@@ -2582,6 +2582,8 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public void fixReferences(Campaign campaign) {
         super.fixReferences(campaign);
+
+        setCampaign(campaign);
 
         if (newArmorSupplies instanceof RefitArmorRef) {
             Part realPart = campaign.getWarehouse().getPart(newArmorSupplies.getId());
