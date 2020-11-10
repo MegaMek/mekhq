@@ -1,0 +1,139 @@
+#
+# Builds MekHQ for Code Coverage
+#
+# Jobs:
+#
+#    - code_coverage: Build MekHQ on Ubuntu with Java 1.8
+#          and upload the code coverage results to CodeCov.io
+#        - This job will use MM and MML source directly
+#          for the build.
+#
+
+name: MekHQ CI with Code Coverage
+
+#
+# This Action Definition should be triggered only on pushes to master.
+#
+on:
+  push:
+    branches: [ master ]
+
+#
+# Setup the Build Scan "VCS" link for all gradle invocations
+#
+env:
+  GRADLE_OPTS: "-Dscan.link.VCS=https://github.com/MegaMek/mekhq/commit/${{ github.sha }}"
+
+jobs:
+
+  #
+  # Perform build of MekHQ for Code Coverage
+  # any time master updated.
+  #
+  code_coverage:
+    
+    # For this job running on *nix is sufficient
+    runs-on: ubuntu-latest
+
+    steps:
+    #
+    # Checkout the Pull Request source
+    # and put it in: ./mekhq
+    #
+    - uses: actions/checkout@v2
+      with:
+        path: mekhq
+
+    #
+    # Setup composite build for MekHQ
+    #
+    # see: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
+    #
+    - name: Setup Composite Build for MekHQ
+      run: |
+        echo "includeBuild '../megamek'" >./mekhq/settings_local.gradle
+        echo "includeBuild '../megameklab'" >>./mekhq/settings_local.gradle
+
+    #
+    # Checkout the latest Megamek source
+    # and put it in: ./megamek
+    #
+    - name: Checkout MegaMek
+      uses: actions/checkout@v2
+      with:
+        repository: MegaMek/megamek
+        path: megamek
+
+    #
+    # Checkout the latest MegaMekLab source
+    # and put it in: ./megameklab
+    #
+    - name: Checkout MegaMekLab
+      uses: actions/checkout@v2
+      with:
+        repository: MegaMek/megameklab
+        path: megameklab
+
+    #
+    # Setup composite build for MegaMekLab
+    #
+    # see: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
+    #
+    - name: Setup Composite Build for MegaMekLab
+      run: |
+        echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
+
+    #
+    # Use Java 1.8
+    #
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    #
+    # Make sure we can execute the Gradle wrapper        
+    #
+    - name: Grant execute permission for gradlew (*nix or MacOS)
+      working-directory: mekhq  
+      run: chmod +x gradlew
+
+    #
+    # Build the MekHQ project
+    #
+    # Directory layout:
+    #    /mekhq
+    #        /gradlew
+    #    /megamek
+    #    /megameklab
+    #
+    # Output Variables:
+    #    - buildScanUri
+    #
+    - name: Build with Gradle
+      id: gradle_build
+      working-directory: mekhq
+      run: ./gradlew -I .github/build-scan-init.gradle build --stacktrace --scan
+      
+    #
+    # If the build step fails, try to upload any
+    # test logs in case it was a unit test failure.
+    #
+    # The logs will be relative to the ./mekhq directory.
+    #
+    - name: Upload Test Logs on Failure
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: cd-failure-logs
+        path: ./mekhq/MekHQ/build/reports/
+
+    #
+    # Upload our Code Coverage Reports to CodeCov.io
+    #
+    - name: CodeCov.io Coverage Report
+      uses: codecov/codecov-action@v1
+      with:
+        directory: ./mekhq/MekHQ/build/reports/jacoco/test
+        fail_ci_if_error: false
+        verbose: true
