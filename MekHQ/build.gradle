@@ -26,10 +26,6 @@ sourceSets {
     }
 }
 
-configurations {
-    jarbundler
-}
-
 dependencies {
     implementation "org.megamek:megamek${mmBranchTag}:${version}"
     implementation ("org.megamek:megameklab${mmlBranchTag}:${version}") {
@@ -52,8 +48,6 @@ dependencies {
 
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.2'
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:2.3.2'
-
-    jarbundler 'com.ultramixer.jarbundler:jarbundler-core:3.3.0'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.20.1'
@@ -221,38 +215,6 @@ task createStartScripts (type: CreateStartScripts) {
     }
 }
 
-task createOSXBundle (dependsOn: jar) {
-    ext.appName = 'MekHQ'
-    // The jar directory is hard coded into jarbundler and has no public accessor
-    ext.jarSubdir = "${appName}.app/Contents/Resources/Java"
-    doLast {
-        mkdir osxBundleDir
-        ant.taskdef(name: 'jarbundler',
-            classname: 'com.ultramixer.jarbundler.JarBundler',
-            classpath: configurations.jarbundler.asPath)
-        ant.jarbundler (
-                name: ext.appName,
-                shortName: 'MekHQ',
-                build: rootProject.version,
-                version: rootProject.version.replace('-SNAPSHOT', ''),
-                bundleid: 'org.megamek.MekHQ',
-                mainClass: project.mainClassName,
-                stubfile: osxApplicationStub,
-                dir: osxBundleDir,
-                jar: "${jar.destinationDirectory.get()}/${jar.archiveFileName.get()}",
-                jvmversion: '1.8+',
-                icon: "${projectDir}/${data}/images/misc/mekhq.icns",
-                useJavaXKey: 'true',
-                workingdirectory: '$APP_PACKAGE/../',
-                extraclasspath: files(project.sourceSets.main.runtimeClasspath.files)
-                    .filter { it.name.endsWith(".jar") }.collect { '$JAVAROOT/lib/' + it.name}.join(","),
-                vmoptions: '-Xmx1024m') {
-            javaproperty (name: 'apple.awt.brushMetal', value: 'true')
-            javaproperty (name: 'apple.laf.useScreenMenuBar', value: 'true')
-        }
-    }
-}
-
 distributions {
     // Creates tasks which package distribution with MM jar and startup script in root directory
     unix {
@@ -322,36 +284,6 @@ distributions {
             }
             from (mmlJar) {
                 into "${lib}"
-            }
-            duplicatesStrategy = 'exclude'
-        }
-    }
-    mac {
-        distributionBaseName = 'mekhq-mac'
-        contents {
-            from osxBundleDir
-            from ("${mmDir}/megamek/build/files")
-            from ("${mmDir}/docs/history.txt") {
-                rename 'history.txt', 'mml-history.txt'
-                into 'docs'
-            }
-            from ("${mmlDir}/build/files/data/images") {
-                into "data/images"
-            }
-            from ("${mmlDir}/docs/history.txt") {
-                rename 'history.txt', 'mml-history.txt'
-                into 'docs'
-            }
-            from (fileStagingDir)
-            from (mmJar) {
-                into "${createOSXBundle.jarSubdir}/${lib}"
-            }
-            from (mmlJar) {
-                into "${createOSXBundle.jarSubdir}/${lib}"
-            }
-            from (project.sourceSets.main.runtimeClasspath.files
-                    .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
-                into "${createOSXBundle.jarSubdir}/${lib}"
             }
             duplicatesStrategy = 'exclude'
         }
@@ -462,14 +394,6 @@ unixDistTar {
     compression = Compression.GZIP
 }
 
-macDistTar {
-    description = 'Creates mac OSX distribution'
-    dependsOn stageFiles
-    dependsOn createOSXBundle
-    archiveExtension = 'tar.bz2'
-    compression = Compression.BZIP2
-}
-
 // The repository can only be cloned into an empty directory so we need to delete anything left over
 // from a previous build
 task deleteRepoDir (type: Delete) {
@@ -542,7 +466,6 @@ task assembleDist(overwrite: true) {
     dependsOn test
     dependsOn unixDistTar
     dependsOn windowsDistZip
-//    dependsOn macDistTar
 }
 
 task buildFromRepo (type: GradleBuild) {
@@ -593,7 +516,7 @@ task buildAllFromRepo (type: GradleBuild) {
 
     buildFile = "${repoDir}/build.gradle"
     dir = "${repoDir}"
-    tasks = [ 'unixDistTar', 'windowsDistZip', 'macDistTar' ]
+    tasks = [ 'unixDistTar', 'windowsDistZip' ]
 }
 
 task releaseAll (type: Copy) {
