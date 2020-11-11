@@ -217,15 +217,22 @@ jobs:
 #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     #
-    # Put the releases up in a single zip file called:
-    #
-    #     releases.zip
+    # Put the Windows Release up in an artifact
     #
     # NB: Due to a GitHub Actions limitation we won't know
     #     what the filename is in order to display it somewhere.
     #
-    - name: Upload Releases
-      uses: actions/upload-artifact@v2-preview
+    - name: Upload Windows Release
+      uses: actions/upload-artifact@v2
       with:
-        name: releases
-        path: ./mekhq/MekHQ/build/distributions/
+        name: release-win-java8
+        path: ./mekhq/MekHQ/build/distributions/*.zip
+
+    #
+    # Put the non-Windows release in an artifact
+    #
+    - name: Upload Nix/Mac Release
+      uses: actions/upload-artifact@v2
+      with:
+        name: release-nix-mac-java8
+        path: ./mekhq/MekHQ/build/distributions/*.tar
