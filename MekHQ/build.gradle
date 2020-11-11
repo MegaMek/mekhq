@@ -50,6 +50,9 @@ dependencies {
     implementation 'com.atlassian.commonmark:commonmark:0.13.0'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.9.8'
 
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.2'
+    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:2.3.2'
+
     jarbundler 'com.ultramixer.jarbundler:jarbundler-core:3.3.0'
 
     testImplementation 'junit:junit:4.12'
@@ -253,7 +256,7 @@ task createOSXBundle (dependsOn: jar) {
 distributions {
     // Creates tasks which package distribution with MM jar and startup script in root directory
     unix {
-        baseName = 'mekhq'
+       distributionBaseName = 'mekhq'
         contents {
             from ("${mmDir}/megamek/build/files")
             from ("${mmDir}/megamek/build/scripts") {
@@ -291,7 +294,7 @@ distributions {
     }
     // Creates tasks which package distribution with MM jar wrapped in Windows executable
     windows {
-        baseName = 'mekhq-windows'
+        distributionBaseName = 'mekhq-windows'
         contents {
             from ("${mmDir}/docs/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
@@ -324,7 +327,7 @@ distributions {
         }
     }
     mac {
-        baseName = 'mekhq-mac'
+        distributionBaseName = 'mekhq-mac'
         contents {
             from osxBundleDir
             from ("${mmDir}/megamek/build/files")
