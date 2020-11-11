@@ -23,10 +23,10 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class AmmoStorageTest {
+public class InfantryAmmoStorageTest {
     @Test
     public void ammoStorageDeserializationCtorTest() {
-        AmmoStorage ammoStorage = new AmmoStorage();
+        InfantryAmmoStorage ammoStorage = new InfantryAmmoStorage();
         assertNotNull(ammoStorage);
     }
 }

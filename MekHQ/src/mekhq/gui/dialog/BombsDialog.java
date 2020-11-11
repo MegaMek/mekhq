@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.client.ui.swing.BombChoicePanel;
+import megamek.common.AmmoType;
 import megamek.common.BombType;
 import megamek.common.EquipmentType;
 import megamek.common.IBomber;
@@ -155,7 +156,7 @@ public class BombsDialog extends JDialog implements ActionListener {
                     //No bombs of this type in warehouse, add bombs
                     //In this case newLoadout should always be greater than 0, but check to be sure
                     } else if (bombCatalog[type] == 0 && newLoadout[type] > 0) {
-                        AmmoStorage excessBombs = new AmmoStorage(0, EquipmentType.get(BombType.getBombInternalName(type)), newLoadout[type], campaign);
+                        AmmoStorage excessBombs = new AmmoStorage(0, (AmmoType) EquipmentType.get(BombType.getBombInternalName(type)), newLoadout[type], campaign);
                         campaign.getQuartermaster().addPart(excessBombs, 0);
                     }
                 }

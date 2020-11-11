@@ -19,7 +19,9 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -27,12 +29,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 /**
  * Storage for infantry weapon ammo. The AmmoType is a placeholder and distinguishes between
  * standard and inferno munitions, but does not distinguish the type of weapon.
  */
 public class InfantryAmmoStorage extends AmmoStorage {
+
+    private static final long serialVersionUID = 930316771091252049L;
 
     private InfantryWeapon weaponType;
 
@@ -41,8 +46,8 @@ public class InfantryAmmoStorage extends AmmoStorage {
         this(0, null, 0, null, null);
     }
 
-    public InfantryAmmoStorage(int tonnage, EquipmentType et, int shots,
-                               InfantryWeapon weaponType, Campaign c) {
+    public InfantryAmmoStorage(int tonnage, @Nullable AmmoType et, int shots,
+            @Nullable InfantryWeapon weaponType, @Nullable Campaign c) {
         super(tonnage, et, shots, c);
         this.weaponType = weaponType;
     }
@@ -56,6 +61,8 @@ public class InfantryAmmoStorage extends AmmoStorage {
             } else {
                 this.name = weaponType.getShortName() + " Ammo";
             }
+        } else {
+            MekHQ.getLogger().error("InfantryAmmoStorage does not have a weapon type!");
         }
     }
 
@@ -92,8 +99,8 @@ public class InfantryAmmoStorage extends AmmoStorage {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof InfantryAmmoStorage)
-                && (getType() == ((InfantryAmmoStorage) part).getType())
-                && (getWeaponType() == ((InfantryAmmoStorage) part).getWeaponType());
+                && Objects.equals(getType(), ((InfantryAmmoStorage) part).getType())
+                && Objects.equals(getWeaponType(), ((InfantryAmmoStorage) part).getWeaponType());
     }
 
     @Override
@@ -151,7 +158,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
     }
 
     public Part getNewPart() {
-        return new InfantryAmmoStorage(1, type, weaponType.getShots(),
+        return new InfantryAmmoStorage(1, getType(), weaponType.getShots(),
                 weaponType, campaign);
     }
 }

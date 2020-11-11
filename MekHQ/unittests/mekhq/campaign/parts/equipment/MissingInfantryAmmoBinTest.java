@@ -17,16 +17,16 @@
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.parts;
+package mekhq.campaign.parts.equipment;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class AmmoStorageTest {
+public class MissingInfantryAmmoBinTest {
     @Test
-    public void ammoStorageDeserializationCtorTest() {
-        AmmoStorage ammoStorage = new AmmoStorage();
-        assertNotNull(ammoStorage);
+    public void deserializationCtorTest() {
+        MissingInfantryAmmoBin ammoBin = new MissingInfantryAmmoBin();
+        assertNotNull(ammoBin);
     }
 }

@@ -29,7 +29,6 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
 import megamek.common.BombType;
-import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
@@ -56,11 +55,11 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     	this(0, null, 0, null);
     }
 
-    public AmmoStorage(int tonnage, @Nullable EquipmentType et, int shots, @Nullable Campaign c) {
+    public AmmoStorage(int tonnage, @Nullable AmmoType et, int shots, @Nullable Campaign c) {
         super(tonnage, et, -1, 1.0, c);
         this.shots = shots;
-        if (et instanceof AmmoType) {
-            this.munition = ((AmmoType) et).getMunitionType();
+        if (et != null) {
+            this.munition = et.getMunitionType();
         }
     }
 
