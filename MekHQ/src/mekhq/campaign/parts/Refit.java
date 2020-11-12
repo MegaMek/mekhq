@@ -379,7 +379,8 @@ public class Refit extends Part implements IAcquisitionWork {
                     //need a special check for location and armor amount for armor
                     if ((oPart instanceof Armor) && (part instanceof Armor) &&
                             (oPart.getLocation() != part.getLocation()
-                            || ((Armor)oPart).getTotalAmount() != ((Armor) part).getTotalAmount())) {
+                            || ((Armor) oPart).isRearMounted() != ((Armor) part).isRearMounted()
+                            || ((Armor) oPart).getTotalAmount() != ((Armor) part).getTotalAmount())) {
                         continue;
                     }
                     if ((oPart instanceof VeeStabiliser)
@@ -434,7 +435,8 @@ public class Refit extends Part implements IAcquisitionWork {
                     //need a special check for location and armor amount for armor
                     if ((oPart instanceof Armor) && (part instanceof Armor)
                             && ((oPart.getLocation() != part.getLocation())
-                            || ((Armor) oPart).getTotalAmount() != ((Armor) part).getTotalAmount())) {
+                                    || ((Armor) oPart).isRearMounted() != ((Armor) part).isRearMounted()
+                                    || ((Armor) oPart).getTotalAmount() != ((Armor) part).getTotalAmount())) {
                         continue;
                     }
                     if ((oPart instanceof VeeStabiliser)
