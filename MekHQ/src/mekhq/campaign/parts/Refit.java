@@ -2554,10 +2554,18 @@ public class Refit extends Part implements IAcquisitionWork {
         return null;
     }
 
+    /**
+     * Gets a value indicating whether or not this refit
+     * is a custom job. If false, this is a Refit Kit (SO p188).
+     */
     public boolean isCustomJob() {
         return customJob;
     }
 
+    /**
+     * Gets a value indicating whether or not the refit
+     * kit has been found, if applicable.
+     */
     public boolean kitFound() {
         return kitFound;
     }

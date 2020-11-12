@@ -229,6 +229,9 @@ public class RefitTest {
         assertEquals(refit.getRefitClass(), deserialized.getRefitClass());
         assertEquals(refit.getTimeSpent(), deserialized.getTimeSpent());
         assertEquals(refit.getTimeLeft(), deserialized.getTimeLeft());
+        assertEquals(refit.isCustomJob(), deserialized.isCustomJob());
+        assertEquals(refit.kitFound(), deserialized.kitFound());
+        assertEquals(refit.isBeingRefurbished(), deserialized.isBeingRefurbished());
 
         // Check that we got all the correct old parts in the XML
         Set<Integer> oldUnitParts = refit.getOldUnitParts()
