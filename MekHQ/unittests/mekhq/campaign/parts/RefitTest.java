@@ -25,8 +25,11 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -142,7 +145,7 @@ public class RefitTest {
         // Cost?
         //    + 1 Medium Laser @ 40,000 ea
         //    + 2 Small Lasers @ 11,250 ea
-        //    x 1.1 (Not Custom)
+        //    x 1.1 (Refit Kit cost, SO p188)
         assertEquals(Money.of((40000 + 11250 + 11250) * 1.1), refit.getCost());
 
         // We're removing 2 machine guns and an ammo bin
@@ -218,7 +221,56 @@ public class RefitTest {
         assertNotNull(deserialized);
 
         // Spot check the values
+        assertEquals(refit.getTime(), deserialized.getTime());
         assertEquals(refit.getActualTime(), deserialized.getActualTime());
         assertEquals(refit.getCost(), deserialized.getCost());
+        assertEquals(refit.isSameArmorType(), deserialized.isSameArmorType());
+        assertEquals(refit.hasFailedCheck(), deserialized.hasFailedCheck());
+        assertEquals(refit.getRefitClass(), deserialized.getRefitClass());
+        assertEquals(refit.getTimeSpent(), deserialized.getTimeSpent());
+        assertEquals(refit.getTimeLeft(), deserialized.getTimeLeft());
+
+        // Check that we got all the correct old parts in the XML
+        Set<Integer> oldUnitParts = refit.getOldUnitParts()
+                .stream().map(p -> p.getId()).collect(Collectors.toSet());
+        Set<Integer> serializedOldParts = deserialized.getOldUnitParts()
+                .stream().map(p -> p.getId()).collect(Collectors.toSet());
+        assertEquals(oldUnitParts, serializedOldParts);
+
+        // Check that we got all the correct new parts in the XML
+        Set<Integer> newUnitParts = refit.getNewUnitParts()
+                .stream().map(p -> p.getId()).collect(Collectors.toSet());
+        Set<Integer> serializedNewParts = deserialized.getNewUnitParts()
+                .stream().map(p -> p.getId()).collect(Collectors.toSet());
+        assertEquals(newUnitParts, serializedNewParts);
+
+        // Check that we got all the shopping list entries (by name, not amazing but reasonable)
+        List<String> shoppingList = refit.getShoppingList()
+                .stream().map(p -> p.getName()).collect(Collectors.toList());
+        List<String> serializedShoppingList = deserialized.getShoppingList()
+                .stream().map(p -> p.getName()).collect(Collectors.toList());
+
+        // Make sure they're the same length first...
+        assertEquals(shoppingList.size(), serializedShoppingList.size());
+
+        // ...then make sure they're the "same" by removing them one by one...
+        for (String partName : shoppingList) {
+            assertTrue(serializedShoppingList.remove(partName));
+        }
+
+        // ...and ensuring nothing is left.
+        assertTrue(serializedShoppingList.isEmpty());
+
+        // Do the same for their descriptions, which include the quantities...
+        List<String> shoppingListDescs = Arrays.asList(refit.getShoppingListDescription());
+        // ...except the second list needs to be mutable.
+        List<String> serializedShoppingListDescs = new ArrayList<>(Arrays.asList(deserialized.getShoppingListDescription()));
+
+        assertEquals(shoppingListDescs.size(), serializedShoppingListDescs.size());
+        for (String desc : shoppingListDescs) {
+            assertTrue(serializedShoppingListDescs.remove(desc));
+        }
+
+        assertTrue(serializedShoppingListDescs.isEmpty());
     }
 }

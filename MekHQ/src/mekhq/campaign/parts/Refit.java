@@ -186,6 +186,14 @@ public class Refit extends Part implements IAcquisitionWork {
         return campaign;
     }
 
+    /**
+     * Gets a value indicating whether or not the armor type
+     * is the same for the refit.
+     */
+    public boolean isSameArmorType() {
+        return sameArmorType;
+    }
+
     public static String getRefitClassName(int refitClass) {
         switch(refitClass) {
         case NO_CHANGE:
@@ -957,8 +965,11 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
-        //multiply time by refit class
+        // multiply time by refit class
         time *= getTimeMultiplier();
+
+        // Refit Kits cost an additional 10% beyond the cost
+        // of their components. (SO p188)
         if (!customJob) {
             cost = cost.multipliedBy(1.1);
         }
@@ -1001,22 +1012,24 @@ public class Refit extends Part implements IAcquisitionWork {
 
         // Now we set the refurbishment values
         if (isRefurbishing) {
+            // Refurbishment rules (class, time, and cost) are found in SO p189.
             refitClass = CLASS_E;
 
+            final int oneWeekInMinutes = 60 * 24 * 7;
             if (newEntity instanceof megamek.common.Warship || newEntity instanceof megamek.common.SpaceStation) {
-                time = 40320;
+                time = oneWeekInMinutes * 12; // 3 Months [12 weeks]
             } else if (newEntity instanceof megamek.common.Dropship || newEntity instanceof megamek.common.Jumpship) {
-                time = 13440;
+                time = oneWeekInMinutes * 4; // 1 Month [4 weeks]
             } else if (newEntity instanceof Mech || newEntity instanceof megamek.common.Aero) { // ConvFighter and SmallCraft are derived from Aero
-                time = 6720;
+                time = oneWeekInMinutes * 2; // 2 Weeks
             } else if (newEntity instanceof BattleArmor || newEntity instanceof megamek.common.Tank || newEntity instanceof megamek.common.Protomech) {
-                time = 3360;
+                time = oneWeekInMinutes; // 1 Week
             } else {
                 time = 1111;
                 MekHQ.getLogger().error("Unit " + newEntity.getModel() + " did not set its time correctly.");
             }
 
-            // The cost is equal to 10 percent of the units base value (not modified for quality).
+            // The cost is equal to 10 percent of the units base value (not modified for quality). (SO p189)
             cost = oldUnit.getBuyCost().multipliedBy(0.1);
         }
     }
