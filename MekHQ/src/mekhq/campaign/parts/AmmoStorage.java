@@ -75,6 +75,13 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         return (AmmoType) super.getType();
     }
 
+    /**
+     * Gets the munition type for this ammo storage.
+     */
+    public long getMunitionType() {
+        return munition;
+    }
+
     @Override
     public double getTonnage() {
     	if (getType().getKgPerShot() > 0) {
@@ -119,17 +126,18 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isSamePartType(Part part) {
-        if (part instanceof AmmoStorage) {
+    public boolean isSamePartType(@Nullable Part part) {
+        if ((getType() != null) && (part instanceof AmmoStorage)) {
+            AmmoStorage other = (AmmoStorage) part;
             if (getType() instanceof BombType) {
-                return ((EquipmentPart)part).getType() instanceof BombType
-                        && ((BombType)getType()).getBombType() == ((BombType)((EquipmentPart)part).getType()).getBombType();
-            } else {
-                return getType().getMunitionType() == ((AmmoStorage) part).getType().getMunitionType()
-                        && getType().equals( (Object) ((EquipmentPart) part).getType());
+                return (other.getType() instanceof BombType)
+                        && ((BombType) getType()).getBombType() == ((BombType) other.getType()).getBombType();
+            } else if (other.getType() != null) {
+                return getType().getMunitionType() == other.getType().getMunitionType()
+                        && getType().equals(other.getType());
             }
-
         }
+
         return false;
     }
 
