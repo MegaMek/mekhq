@@ -295,6 +295,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     public void changeAmountAvailable(int amount, final AmmoType curType) {
+        if (amount == 0) {
+            return;
+        }
+
         AmmoStorage a = (AmmoStorage) campaign.getWarehouse().findSparePart(part -> {
             return isRightAmmo(part, curType);
         });
