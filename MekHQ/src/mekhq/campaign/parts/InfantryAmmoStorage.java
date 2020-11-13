@@ -157,7 +157,8 @@ public class InfantryAmmoStorage extends AmmoStorage {
         return weaponType.getShots() + " shots (1 clip)";
     }
 
-    public Part getNewPart() {
+    @Override
+    public InfantryAmmoStorage getNewPart() {
         return new InfantryAmmoStorage(1, getType(), weaponType.getShots(),
                 weaponType, campaign);
     }

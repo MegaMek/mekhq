@@ -208,7 +208,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
     public IAcquisitionWork getAcquisitionWork() {
-        return (IAcquisitionWork)getNewPart();
+        return getNewPart();
     }
 
 	@Override
@@ -274,7 +274,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
 	@Override
-    public Object getNewEquipment() {
+    public AmmoStorage getNewEquipment() {
         return getNewPart();
     }
 
@@ -287,7 +287,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
      * Boolean function that determines if the given part is of the correct ammo.
      * Useful as a predicate for campaign.findSparePart()
      */
-    public static boolean IsRightAmmo(Part part, AmmoType curType) {
+    public static boolean isRightAmmo(Part part, AmmoType curType) {
         return part instanceof AmmoStorage
                 && part.isPresent()
                 && ((AmmoStorage) part).getType().equals(curType)
@@ -296,7 +296,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     public void changeAmountAvailable(int amount, final AmmoType curType) {
         AmmoStorage a = (AmmoStorage) campaign.getWarehouse().findSparePart(part -> {
-            return IsRightAmmo(part, curType);
+            return isRightAmmo(part, curType);
         });
 
         if (null != a) {
@@ -349,7 +349,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
 	@Override
-	public Part getAcquisitionPart() {
+	public AmmoStorage getAcquisitionPart() {
 		return getNewPart();
 	}
 
@@ -370,7 +370,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         return target;
     }
 
-    public Part getNewPart() {
+    public AmmoStorage getNewPart() {
         return new AmmoStorage(1, getType(), getType().getShots(), campaign);
     }
 
@@ -386,7 +386,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String getArrivalReport() {
-        double totalShots = quantity * getShots();
+        int totalShots = quantity * getShots();
         String report = getQuantityName(quantity);
         if(totalShots == 1) {
             report += " has arrived";
