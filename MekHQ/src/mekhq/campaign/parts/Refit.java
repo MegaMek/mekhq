@@ -65,6 +65,7 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.WeaponType;
+import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.EntityVerifier;
@@ -1275,7 +1276,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
     }
 
-    public Armor getExistingArmorSupplies() {
+    public @Nullable Armor getExistingArmorSupplies() {
         if (null == newArmorSupplies) {
             return null;
         }
@@ -1803,12 +1804,12 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public Person getTech() {
+    public @Nullable Person getTech() {
         return assignedTech;
     }
 
     @Override
-    public void setTech(Person tech) {
+    public void setTech(@Nullable Person tech) {
         assignedTech = tech;
     }
 
@@ -1903,7 +1904,7 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return fixableString;
     }
 
@@ -2245,11 +2246,11 @@ public class Refit extends Part implements IAcquisitionWork {
         return roll;
     }
 
-    public Armor getNewArmorSupplies() {
+    public @Nullable Armor getNewArmorSupplies() {
         return newArmorSupplies;
     }
 
-    public void setNewArmorSupplies(Armor a) {
+    public void setNewArmorSupplies(@Nullable Armor a) {
         newArmorSupplies = a;
     }
 
