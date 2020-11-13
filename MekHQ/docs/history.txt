@@ -2,6 +2,7 @@ VERSION HISTORY:
 ----------------
 0.47.14-SNAPSHOT
 + Issues #2217 #2219: Cannot save Campaign with Refits and cannot start new Refits
++ Issue #2220: Implementing AwardFileFactory to handle loading pngs that aren't handled by Toolkit
 
 0.47.13 (2020-11-09 1600 UTC) 
 + Issue #2213: Fix disastrous bug in AmmoStorage::ctor
