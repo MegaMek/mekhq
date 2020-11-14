@@ -61,7 +61,7 @@ public class AmmoStorageTest {
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, ammoType.getShots(), mockCampaign);
 
         assertEquals(ammoType, ammoStorage.getType());
-        assertEquals(ammoType.getMunitionType(), ammoStorage.getMunitionType());
+        assertTrue(AmmoStorage.isSameAmmoType(ammoType, ammoStorage.getType()));
         assertEquals(ammoType.getShots(), ammoStorage.getShots());
         assertEquals(1.0, ammoStorage.getTonnage(), 0.001);
     }
@@ -88,7 +88,7 @@ public class AmmoStorageTest {
         assertNotNull(clone);
 
         assertEquals(ammoStorage.getType(), clone.getType());
-        assertEquals(ammoStorage.getMunitionType(), clone.getMunitionType());
+        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), clone.getType()));
         assertEquals(ammoStorage.getBuyCost(), clone.getBuyCost());
         assertEquals(ammoStorage.getCurrentValue(), clone.getCurrentValue());
         assertEquals(ammoStorage.getShots(), clone.getShots());
@@ -107,7 +107,7 @@ public class AmmoStorageTest {
 
         // ...and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
-        assertEquals(ammoStorage.getMunitionType(), newAmmoStorage.getMunitionType());
+        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), newAmmoStorage.getType()));
         assertEquals(ammoStorage.getBuyCost(), newAmmoStorage.getBuyCost());
 
         // ...except for the number of shots, which should be instead
@@ -128,7 +128,7 @@ public class AmmoStorageTest {
 
         // ...and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
-        assertEquals(ammoStorage.getMunitionType(), newAmmoStorage.getMunitionType());
+        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), newAmmoStorage.getType()));
         assertEquals(ammoStorage.getBuyCost(), newAmmoStorage.getBuyCost());
 
         // ...except for the number of shots, which should be instead
@@ -156,7 +156,7 @@ public class AmmoStorageTest {
 
         // ...and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
-        assertEquals(ammoStorage.getMunitionType(), newAmmoStorage.getMunitionType());
+        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), newAmmoStorage.getType()));
         assertEquals(ammoStorage.getBuyCost(), newAmmoStorage.getBuyCost());
 
         // ...except for the number of shots, which should be instead
@@ -172,7 +172,7 @@ public class AmmoStorageTest {
 
         // ...and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
-        assertEquals(ammoStorage.getMunitionType(), newAmmoStorage.getMunitionType());
+        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), newAmmoStorage.getType()));
         assertEquals(ammoStorage.getBuyCost(), newAmmoStorage.getBuyCost());
 
         // ...except for the number of shots, which should be instead
@@ -248,31 +248,6 @@ public class AmmoStorageTest {
         otherAmmoStorage = new AmmoStorage(0, isSRM2InfernoAmmo, isSRM2InfernoAmmo.getShots(), mockCampaign);
         assertFalse(ammoStorage.isSamePartType(otherAmmoStorage));
         assertFalse(otherAmmoStorage.isSamePartType(ammoStorage));
-    }
-
-    @Test
-    public void isRightAmmoTest() {
-        AmmoType isAC5Ammo = getAmmoType("ISAC5 Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
-
-        AmmoStorage ammoStorage = new AmmoStorage(0, isAC5Ammo, isAC5Ammo.getShots(), mockCampaign);
-
-        // We're the same as our own ammo type
-        assertTrue(AmmoStorage.isRightAmmo(ammoStorage, isAC5Ammo));
-
-        AmmoType isAC10Ammo = getAmmoType("ISAC10 Ammo");
-
-        // But not some other ammo type
-        assertFalse(AmmoStorage.isRightAmmo(ammoStorage, isAC10Ammo));
-
-        // Create an ammo type with some different munitions available
-        AmmoType isSRM2Ammo = getAmmoType("ISSRM2 Ammo");
-        ammoStorage = new AmmoStorage(0, isSRM2Ammo, isSRM2Ammo.getShots(), mockCampaign);
-
-        // And ensure they're not the same as the same type of ammo, just
-        // a different munition type.
-        AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
-        assertFalse(AmmoStorage.isRightAmmo(ammoStorage, isSRM2InfernoAmmo));
     }
 
     @Test
@@ -367,7 +342,7 @@ public class AmmoStorageTest {
         assertEquals(ammoStorage.getId(), deserialized.getId());
         assertEquals(ammoStorage.getEquipmentNum(), deserialized.getEquipmentNum());
         assertEquals(ammoStorage.getType(), deserialized.getType());
-        assertEquals(ammoStorage.getMunitionType(), deserialized.getMunitionType());
+        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), deserialized.getType()));
         assertEquals(ammoStorage.getShots(), deserialized.getShots());
     }
 
@@ -403,6 +378,7 @@ public class AmmoStorageTest {
         assertTrue(added.isSpare());
         assertTrue(added.isPresent());
         assertEquals(ammoType, added.getType());
+        assertTrue(AmmoStorage.isSameAmmoType(ammoType, added.getType()));
         assertEquals(addedShots, added.getShots());
     }
 
@@ -446,6 +422,7 @@ public class AmmoStorageTest {
         assertTrue(added.isSpare());
         assertTrue(added.isPresent());
         assertEquals(ammoType, added.getType());
+        assertTrue(AmmoStorage.isSameAmmoType(ammoType, added.getType()));
         assertEquals(addedShots, added.getShots());
     }
 
@@ -489,6 +466,7 @@ public class AmmoStorageTest {
         assertTrue(added.isSpare());
         assertTrue(added.isPresent());
         assertEquals(ammoType, added.getType());
+        assertTrue(AmmoStorage.isSameAmmoType(ammoType, added.getType()));
         assertEquals(addedShots, added.getShots());
     }
 
@@ -527,7 +505,7 @@ public class AmmoStorageTest {
         assertNotNull(updated);
         assertEquals(updated.getId(), existing.getId());
         assertEquals(existing.getType(), updated.getType());
-        assertEquals(existing.getMunitionType(), updated.getMunitionType());
+        assertTrue(AmmoStorage.isSameAmmoType(existing.getType(), updated.getType()));
         assertEquals(originalShots + addedShots, updated.getShots());
     }
 
@@ -591,6 +569,7 @@ public class AmmoStorageTest {
         assertEquals(inTransit.getId(), existing.getId());
         assertEquals(inTransit.getDaysToArrival(), existing.getDaysToArrival());
         assertEquals(ammoType, existing.getType());
+        assertTrue(AmmoStorage.isSameAmmoType(ammoType, existing.getType()));
         assertEquals(originalShots, existing.getShots());
     }
 
@@ -629,7 +608,7 @@ public class AmmoStorageTest {
         assertNotNull(updated);
         assertEquals(updated.getId(), existing.getId());
         assertEquals(existing.getType(), updated.getType());
-        assertEquals(existing.getMunitionType(), updated.getMunitionType());
+        assertTrue(AmmoStorage.isSameAmmoType(existing.getType(), updated.getType()));
         assertEquals(originalShots + removedShots, updated.getShots());
     }
 
