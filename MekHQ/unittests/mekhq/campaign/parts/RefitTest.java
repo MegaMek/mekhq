@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.parts;
@@ -90,10 +90,10 @@ public class RefitTest {
         // Should be old parts...
         assertFalse(refit.getOldUnitParts().isEmpty());
 
-        // ...and new parts.
+        // ... and new parts.
         assertFalse(refit.getNewUnitParts().isEmpty());
 
-        // ...and we'll need to buy some parts
+        // ... and we'll need to buy some parts
         assertFalse(refit.getShoppingList().isEmpty());
     }
 
@@ -261,17 +261,17 @@ public class RefitTest {
         // Make sure they're the same length first...
         assertEquals(shoppingList.size(), serializedShoppingList.size());
 
-        // ...then make sure they're the "same" by removing them one by one...
+        // ... then make sure they're the "same" by removing them one by one...
         for (String partName : shoppingList) {
             assertTrue(serializedShoppingList.remove(partName));
         }
 
-        // ...and ensuring nothing is left.
+        // ... and ensuring nothing is left.
         assertTrue(serializedShoppingList.isEmpty());
 
         // Do the same for their descriptions, which include the quantities...
         List<String> shoppingListDescs = Arrays.asList(refit.getShoppingListDescription());
-        // ...except the second list needs to be mutable.
+        // ... except the second list needs to be mutable.
         List<String> serializedShoppingListDescs = new ArrayList<>(Arrays.asList(deserialized.getShoppingListDescription()));
 
         assertEquals(shoppingListDescs.size(), serializedShoppingListDescs.size());
@@ -456,17 +456,17 @@ public class RefitTest {
         // Make sure they're the same length first...
         assertEquals(shoppingList.size(), serializedShoppingList.size());
 
-        // ...then make sure they're the "same" by removing them one by one...
+        // ... then make sure they're the "same" by removing them one by one...
         for (String partName : shoppingList) {
             assertTrue(serializedShoppingList.remove(partName));
         }
 
-        // ...and ensuring nothing is left.
+        // ... and ensuring nothing is left.
         assertTrue(serializedShoppingList.isEmpty());
 
         // Do the same for their descriptions, which include the quantities...
         List<String> shoppingListDescs = Arrays.asList(refit.getShoppingListDescription());
-        // ...except the second list needs to be mutable.
+        // ... except the second list needs to be mutable.
         List<String> serializedShoppingListDescs = new ArrayList<>(Arrays.asList(deserialized.getShoppingListDescription()));
 
         assertEquals(shoppingListDescs.size(), serializedShoppingListDescs.size());
@@ -676,17 +676,17 @@ public class RefitTest {
         // Make sure they're the same length first...
         assertEquals(shoppingList.size(), serializedShoppingList.size());
 
-        // ...then make sure they're the "same" by removing them one by one...
+        // ... then make sure they're the "same" by removing them one by one...
         for (String partName : shoppingList) {
             assertTrue(serializedShoppingList.remove(partName));
         }
 
-        // ...and ensuring nothing is left.
+        // ... and ensuring nothing is left.
         assertTrue(serializedShoppingList.isEmpty());
 
         // Do the same for their descriptions, which include the quantities...
         List<String> shoppingListDescs = Arrays.asList(refit.getShoppingListDescription());
-        // ...except the second list needs to be mutable.
+        // ... except the second list needs to be mutable.
         List<String> serializedShoppingListDescs = new ArrayList<>(Arrays.asList(deserialized.getShoppingListDescription()));
 
         assertEquals(shoppingListDescs.size(), serializedShoppingListDescs.size());
