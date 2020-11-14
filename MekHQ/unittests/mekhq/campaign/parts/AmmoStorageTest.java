@@ -36,6 +36,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import megamek.common.AmmoType;
+import megamek.common.BombType;
 import megamek.common.EquipmentType;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
@@ -251,6 +252,42 @@ public class AmmoStorageTest {
     }
 
     @Test
+    public void isSamePartTypeBombTest() {
+        BombType bombType = getBombType("HEBomb");
+        Campaign mockCampaign = mock(Campaign.class);
+
+        AmmoStorage ammoStorage = new AmmoStorage(0, bombType, bombType.getShots(), mockCampaign);
+
+        // We're the same as ourselves.
+        assertTrue(ammoStorage.isSamePartType(ammoStorage));
+
+        // We're the same as our clone.
+        AmmoStorage clone = ammoStorage.clone();
+        assertTrue(ammoStorage.isSamePartType(clone));
+        assertTrue(clone.isSamePartType(ammoStorage));
+
+        // We're the same as another ammo storage of the same type
+        // but with different constructor values.
+        AmmoStorage otherAmmoStorage = new AmmoStorage(1, bombType, 0, mockCampaign);
+        assertTrue(ammoStorage.isSamePartType(otherAmmoStorage));
+        assertTrue(otherAmmoStorage.isSamePartType(ammoStorage));
+
+        // We're not the same as some other part.
+        assertFalse(ammoStorage.isSamePartType(new MekSensor()));
+        assertFalse(ammoStorage.isSamePartType(new AmmoBin()));
+        assertFalse(ammoStorage.isSamePartType(new AmmoStorage()));
+
+        // Create a bomb ammo type with a different bomb type
+        AmmoType infernoBomb = getBombType("InfernoBomb");
+        otherAmmoStorage = new AmmoStorage(0, infernoBomb, infernoBomb.getShots(), mockCampaign);
+
+        // And ensure they're not the same as the same type of ammo, just
+        // a different munition type.
+        assertFalse(ammoStorage.isSamePartType(otherAmmoStorage));
+        assertFalse(otherAmmoStorage.isSamePartType(ammoStorage));
+    }
+
+    @Test
     public void getTonnageTest() {
         AmmoType isAC5Ammo = getAmmoType("ISAC5 Ammo");
         Campaign mockCampaign = mock(Campaign.class);
@@ -310,6 +347,47 @@ public class AmmoStorageTest {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
         Campaign mockCampaign = mock(Campaign.class);
         AmmoStorage ammoStorage = new AmmoStorage(0, isSRM2InfernoAmmo, 3 * isSRM2InfernoAmmo.getShots(), mockCampaign);
+        ammoStorage.setId(25);
+        ammoStorage.setEquipmentNum(42);
+
+        // Write the AmmoStorage XML
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ammoStorage.writeToXml(pw, 0);
+
+        // Get the AmmoStorage XML
+        String xml = sw.toString();
+        assertFalse(xml.trim().isEmpty());
+
+        // Using factory get an instance of document builder
+        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+
+        // Parse using builder to get DOM representation of the XML file
+        Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
+
+        Element partElt = xmlDoc.getDocumentElement();
+        assertEquals("part", partElt.getNodeName());
+
+        // Deserialize the AmmoStorage
+        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version("1.0.0"));
+        assertNotNull(deserializedPart);
+        assertTrue(deserializedPart instanceof AmmoStorage);
+
+        AmmoStorage deserialized = (AmmoStorage) deserializedPart;
+
+        // Check that we deserialized the part correctly.
+        assertEquals(ammoStorage.getId(), deserialized.getId());
+        assertEquals(ammoStorage.getEquipmentNum(), deserialized.getEquipmentNum());
+        assertEquals(ammoStorage.getType(), deserialized.getType());
+        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), deserialized.getType()));
+        assertEquals(ammoStorage.getShots(), deserialized.getShots());
+    }
+
+    @Test
+    public void ammoStorageBombWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
+        BombType infernoBomb = getBombType("InfernoBomb");
+        Campaign mockCampaign = mock(Campaign.class);
+        AmmoStorage ammoStorage = new AmmoStorage(0, infernoBomb, 3 * infernoBomb.getShots(), mockCampaign);
         ammoStorage.setId(25);
         ammoStorage.setEquipmentNum(42);
 
@@ -667,6 +745,45 @@ public class AmmoStorageTest {
         assertTrue(warehouse.getParts().isEmpty());
     }
 
+    @Test
+    public void changeAmountAvailableBombDecreaseNoneFound() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        // Setup a warehouse with some other bomb type
+        Warehouse warehouse = new Warehouse();
+        BombType torpedoBomb = getBombType("TorpedoBomb");
+        int originalShots = 2;
+        AmmoStorage otherAmmoStorage = new AmmoStorage(0, torpedoBomb, originalShots, mockCampaign);
+        warehouse.addPart(otherAmmoStorage);
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+
+        // And a basic quartermaster
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        BombType ammoType = getBombType("ThunderBomb");
+        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 0, mockCampaign);
+
+        // Remove shots from the Campaign when we have a bomb, but it doesn't match
+        int removedShots = -100;
+        ammoStorage.changeAmountAvailable(removedShots, ammoType);
+
+        // ...which should result in nothing changing.
+        AmmoStorage existing = null;
+        for (Part part : warehouse.getParts()) {
+            // Only one part in the campaign.
+            assertTrue(part instanceof AmmoStorage);
+            existing = (AmmoStorage) part;
+            break;
+        }
+
+        assertNotNull(existing);
+        assertEquals(otherAmmoStorage.getId(), existing.getId());
+        assertEquals(ammoType, existing.getType());
+        assertTrue(AmmoStorage.isSameAmmoType(torpedoBomb, existing.getType()));
+        assertEquals(originalShots, existing.getShots());
+    }
+
     /**
      * Gets an AmmoType by name (performing any initialization required
      * on the MM side).
@@ -674,9 +791,24 @@ public class AmmoStorageTest {
      * @return The ammo type for the given name.
      */
     private synchronized static AmmoType getAmmoType(String name) {
-        AmmoType ammoType = (AmmoType) EquipmentType.get(name);
-        assertNotNull(ammoType);
+        EquipmentType equipmentType = EquipmentType.get(name);
+        assertNotNull(equipmentType);
+        assertTrue(equipmentType instanceof AmmoType);
 
-        return ammoType;
+        return (AmmoType) equipmentType;
+    }
+
+    /**
+     * Gets a BombType by name (performing any initialization required
+     * on the MM side).
+     * @param name The lookup name for the BombType.
+     * @return The bomb type for the given name.
+     */
+    private synchronized static BombType getBombType(String name) {
+        EquipmentType equipmentType = EquipmentType.get(name);
+        assertNotNull(equipmentType);
+        assertTrue(equipmentType instanceof BombType);
+
+        return (BombType) equipmentType;
     }
 }
