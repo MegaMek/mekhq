@@ -235,7 +235,7 @@ public class BattleArmorSuit extends Part {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
         if ((null == unit) && !hasChildParts()) {
-            return alternateCost;
+            return (alternateCost != null) ? alternateCost : Money.zero();
         }
         Money cost = Money.zero();
         switch(weightClass) {
