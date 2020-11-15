@@ -138,7 +138,7 @@ public class CampaignGUI extends JPanel {
     private JLabel lblTempAstechs;
     private JLabel lblTempMedics;
     private JLabel lblPartsAvailabilityRating;
-    @SuppressWarnings("unused")
+    @SuppressWarnings(value = "unused")
     private JLabel lblCargo; // FIXME: Re-add this in an optionized form
 
     /* for the top button panel */
@@ -1113,6 +1113,7 @@ public class CampaignGUI extends JPanel {
             miPlaf.addActionListener(this::changeTheme);
         }
     }
+
     //TODO: trigger from event
     public void filterTasks() {
         if (getTab(GuiTabType.REPAIR) != null) {
@@ -1211,12 +1212,9 @@ public class CampaignGUI extends JPanel {
                 continue;
             }
             if (getCampaign().getDeploymentDeficit((AtBContract) m) > 0) {
-                return 0 != JOptionPane
-                        .showConfirmDialog(
-                                null,
-                                "You have not met the deployment levels required by contract. Do your really wish to advance the day?",
-                                "Unmet deployment requirements",
-                                JOptionPane.YES_NO_OPTION);
+                return 0 != JOptionPane.showConfirmDialog(null,
+                        "You have not met the deployment levels required by contract. Do your really wish to advance the day?",
+                        "Unmet deployment requirements", JOptionPane.YES_NO_OPTION);
             }
         }
         return false;
@@ -1232,11 +1230,9 @@ public class CampaignGUI extends JPanel {
                     continue;
                 }
                 if (getCampaign().getLocalDate().equals(s.getDate())) {
-                    return 0 != JOptionPane
-                            .showConfirmDialog(
-                                    null,
-                                    "You have a pending battle. Failure to deploy will result in a defeat and a minor contract breach. Do your really wish to advance the day?",
-                                    "Pending battle", JOptionPane.YES_NO_OPTION);
+                    return 0 != JOptionPane.showConfirmDialog(null,
+                            "You have a pending battle. Failure to deploy will result in a defeat and a minor contract breach. Do your really wish to advance the day?",
+                            "Pending battle", JOptionPane.YES_NO_OPTION);
                 }
             }
         }
@@ -1256,8 +1252,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void hireBulkPersonnel() {
-        HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(),
-                true, getCampaign());
+        HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(), true, getCampaign());
         hbpd.setVisible(true);
     }
 
@@ -1277,7 +1272,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void menuSaveXmlActionPerformed(ActionEvent evt) {
-        MekHQ.getLogger().info(this, "Saving campaign...");
+        MekHQ.getLogger().info("Saving campaign...");
         // Choose a file...
         File file = selectSaveCampaignFile();
         if (file == null) {
@@ -1326,9 +1321,9 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.getLogger().info(CampaignGUI.class, "Campaign saved to " + file);
+            MekHQ.getLogger().info("Campaign saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(CampaignGUI.class, ex);
+            MekHQ.getLogger().error(ex);
             JOptionPane.showMessageDialog(frame,
                     "Oh no! The program was unable to correctly save your game. We know this\n"
                             + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -1350,10 +1345,6 @@ public class CampaignGUI extends JPanel {
 
     private File selectSaveCampaignFile() {
         return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
-    }
-
-    private String getExtensionForSaveFile(Campaign c) {
-        return MekHQ.getMekHQOptions().getPreferGzippedOutput() ? ".cpnx.gz" : ".cpnx";
     }
 
     private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1506,7 +1497,7 @@ public class CampaignGUI extends JPanel {
             exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPlanets");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1515,7 +1506,7 @@ public class CampaignGUI extends JPanel {
             exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedFinances");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1524,7 +1515,7 @@ public class CampaignGUI extends JPanel {
             exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
                     getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPersonnel");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1533,7 +1524,7 @@ public class CampaignGUI extends JPanel {
             exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedUnits");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 
@@ -1573,11 +1564,9 @@ public class CampaignGUI extends JPanel {
         if (r.getOriginalEntity() instanceof Dropship || r.getOriginalEntity() instanceof Jumpship) {
             Person engineer = r.getOriginalUnit().getEngineer();
             if (engineer == null) {
-                JOptionPane
-                        .showMessageDialog(
-                                frame,
-                                "You cannot refit a ship that does not have an engineer. Assign a qualified vessel crew to this unit.",
-                                "No Engineer", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(frame,
+                        "You cannot refit a ship that does not have an engineer. Assign a qualified vessel crew to this unit.",
+                        "No Engineer", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             r.setTech(engineer);
@@ -2013,7 +2002,7 @@ public class CampaignGUI extends JPanel {
             // TODO : make it so that exports will automatically include both spouses
             for (Person p : getCampaign().getActivePersonnel()) {
                 if (p.getGenealogy().hasSpouse()
-                        && !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse(getCampaign()))) {
+                        && !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse())) {
                     // If this happens, we need to clear the spouse
                     if (p.getMaidenName() != null) {
                         p.setSurname(p.getMaidenName());

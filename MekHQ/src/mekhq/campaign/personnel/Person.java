@@ -1,6 +1,4 @@
 /*
- * Person.java
- *
  * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
@@ -44,6 +42,7 @@ import mekhq.campaign.log.*;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.io.idReferenceClasses.PersonIdReference;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -352,7 +351,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         bloodname = "";
         biography = "";
         idleMonths = -1;
-        genealogy = new Genealogy(getId());
+        genealogy = new Genealogy(this);
         tryingToMarry = true;
         tryingToConceive = true;
         dueDate = null;
@@ -918,7 +917,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (status.isDead()) {
             setDateOfDeath(campaign.getLocalDate());
             // Don't forget to tell the spouse
-            if (getGenealogy().hasSpouse() && !getGenealogy().getSpouse(campaign).getStatus().isDeadOrMIA()) {
+            if (getGenealogy().hasSpouse() && !getGenealogy().getSpouse().getStatus().isDeadOrMIA()) {
                 Divorce divorceType = campaign.getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
                         ? Divorce.ORIGIN_CHANGE_SURNAME : Divorce.SPOUSE_CHANGE_SURNAME;
                 divorceType.divorce(this, campaign);
@@ -1358,7 +1357,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (canProcreate(campaign)) {
             boolean conceived = false;
             if (getGenealogy().hasSpouse()) {
-                Person spouse = getGenealogy().getSpouse(campaign);
+                Person spouse = getGenealogy().getSpouse();
                 if (!spouse.isDeployed() && !spouse.getStatus().isDeadOrMIA() && !spouse.isChild()
                         && !(spouse.getGender() == getGender())) {
                     // setting is the decimal chance that this procreation attempt will create a child, base is 0.05%
@@ -1385,7 +1384,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         int size = PREGNANCY_SIZE.getAsInt();
         extraData.set(PREGNANCY_CHILDREN_DATA, size);
         extraData.set(PREGNANCY_FATHER_DATA, (getGenealogy().hasSpouse())
-                ? getGenealogy().getSpouseId().toString() : null);
+                ? getGenealogy().getSpouse().getId().toString() : null);
 
         String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
 
@@ -1393,7 +1392,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (campaign.getCampaignOptions().logConception()) {
             MedicalLogger.hasConceived(this, campaign.getLocalDate(), sizeString);
             if (getGenealogy().hasSpouse()) {
-                PersonalLogger.spouseConceived(getGenealogy().getSpouse(campaign),
+                PersonalLogger.spouseConceived(getGenealogy().getSpouse(),
                         getFullName(), getCampaign().getLocalDate(), sizeString);
             }
         }
@@ -1418,10 +1417,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
 
         // Determine father information
-        String fatherIdString = getExtraData().get(PREGNANCY_FATHER_DATA);
-        UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
-        fatherId = campaign.getCampaignOptions().determineFatherAtBirth()
-                ? Utilities.nonNull(getGenealogy().getSpouseId(), fatherId) : fatherId;
+        Person father = (getExtraData().get(PREGNANCY_FATHER_DATA) != null)
+                ? campaign.getPerson(UUID.fromString(getExtraData().get(PREGNANCY_FATHER_DATA))) : null;
+        father = campaign.getCampaignOptions().determineFatherAtBirth()
+                ? Utilities.nonNull(getGenealogy().getSpouse(), father) : father;
 
         // Determine Prisoner Status
         PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
@@ -1438,7 +1437,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             // Create the specific baby
             Person baby = campaign.newDependent(T_NONE, true);
             String surname = campaign.getCampaignOptions().getBabySurnameStyle()
-                    .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
+                    .generateBabySurname(this, father, baby.getGender());
             baby.setSurname(surname);
             baby.setBirthday(campaign.getLocalDate());
 
@@ -1446,12 +1445,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
             campaign.recruitPerson(baby, prisonerStatus, baby.isDependent(), true, true);
 
             // Create genealogy information
-            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, getId());
-            getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby.getId());
-            if (fatherId != null) {
-                baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, fatherId);
-                campaign.getPerson(fatherId).getGenealogy()
-                        .addFamilyMember(FamilialRelationshipType.CHILD, baby.getId());
+            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, this);
+            getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
+            if (father != null) {
+                baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
+                father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
             }
 
             // Create reports and log the birth
@@ -1459,9 +1457,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             if (campaign.getCampaignOptions().logConception()) {
                 MedicalLogger.deliveredBaby(this, baby, campaign.getLocalDate());
-                if (fatherId != null) {
-                    PersonalLogger.ourChildBorn(campaign.getPerson(fatherId), baby, getFullName(),
-                            campaign.getLocalDate());
+                if (father != null) {
+                    PersonalLogger.ourChildBorn(father, baby, getFullName(), campaign.getLocalDate());
                 }
             }
         }
@@ -1929,9 +1926,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) { // legacy - 0.47.6 removal
                     CampaignXmlParser.addToAncestryMigrationMap(UUID.fromString(wn2.getTextContent().trim()), retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) { // legacy - 0.47.6 removal
-                    retVal.genealogy.setSpouse(UUID.fromString(wn2.getTextContent().trim()));
+                    retVal.getGenealogy().setSpouse(new PersonIdReference(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) { // legacy - 0.47.6 removal
-                    Genealogy.loadFormerSpouses(retVal.genealogy, wn2.getChildNodes());
+                    Genealogy.loadFormerSpouses(retVal.getGenealogy(), wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
                     retVal.genealogy = Genealogy.generateInstanceFromXML(wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) {
@@ -2256,7 +2253,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(Person.class, "Error restoring implants: " + adv);
+                        MekHQ.getLogger().error("Error restoring implants: " + adv);
                     }
                 }
             }
@@ -2294,8 +2291,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 retVal.setCallsign(pilotNickname);
             }
 
-            // Ensure the Genealogy Origin Id is set to the proper id
-            retVal.getGenealogy().setOrigin(retVal.getId());
+            // Ensure the Genealogy Origin is set to this
+            retVal.getGenealogy().setOrigin(retVal);
 
             // Prisoner and Bondsman updating
             if (retVal.rank < 0) {
@@ -2577,7 +2574,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if they have the same id, otherwise false
      */
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(@Nullable Object object) {
         if (this == object) {
             return true;
         } else if (!(object instanceof Person)) {
