@@ -3314,16 +3314,9 @@ public class Campaign implements Serializable, ITechManager {
                         "Invalid Auto-continue", JOptionPane.ERROR_MESSAGE);
             }
 
-            // check to see if this part can now be combined with other
-            // spare parts
-            if (part.isSpare()) {
-                Part spare = getWarehouse().checkForExistingSparePart(part);
-                if (null != spare) {
-                    spare.incrementQuantity();
-                    getWarehouse().removePart(part);
-
-                    MekHQ.triggerEvent(new PartChangedEvent(spare));
-                }
+            // check to see if this part can now be combined with other spare parts
+            if (part.isSpare() && (part.getQuantity() > 0)) {
+                getQuartermaster().addPart(part, 0);
             }
         }
 
