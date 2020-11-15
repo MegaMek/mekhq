@@ -2,6 +2,7 @@ VERSION HISTORY:
 ----------------
 0.47.15-SNAPSHOT
 + Issue #2166: NRE in Money::plus/Money::minus
++ PR #2224: Add some basic Refit tests and fix an Armor location bug calculating armor during a refit
 
 0.47.14 (2020-11-15 1930 UTC)
 + Issues #2217 #2219: Cannot save Campaign with Refits and cannot start new Refits
