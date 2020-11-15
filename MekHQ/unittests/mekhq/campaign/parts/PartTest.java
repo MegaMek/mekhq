@@ -1,6 +1,4 @@
 /*
- * StripUnitActionTest.java
- *
  * Copyright (C) 2020 MegaMek team
  *
  * This file is part of MekHQ.
