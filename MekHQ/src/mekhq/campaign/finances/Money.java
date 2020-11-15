@@ -102,6 +102,10 @@ public class Money implements Comparable<Money> {
     }
 
     public Money plus(Money amount) {
+        if (amount == null) {
+            return plus(0L);
+        }
+
         return new Money(getWrapped().plus(amount.getWrapped()));
     }
 
@@ -114,6 +118,10 @@ public class Money implements Comparable<Money> {
     }
 
     public Money minus(Money amount) {
+        if (amount == null) {
+            return minus(0L);
+        }
+
         return new Money(getWrapped().minus(amount.getWrapped()));
     }
 
