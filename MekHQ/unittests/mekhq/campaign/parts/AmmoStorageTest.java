@@ -106,12 +106,12 @@ public class AmmoStorageTest {
         AmmoStorage newAmmoStorage = ammoStorage.getNewPart();
         assertNotNull(newAmmoStorage);
 
-        // ...and the new part should be identical in ALMOST every way...
+        // ... and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
         assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), newAmmoStorage.getType()));
         assertEquals(ammoStorage.getBuyCost(), newAmmoStorage.getBuyCost());
 
-        // ...except for the number of shots, which should be instead
+        // ... except for the number of shots, which should be instead
         // equal to the default number of shots for the type.
         assertEquals(ammoType.getShots(), newAmmoStorage.getShots());
     }
@@ -127,12 +127,12 @@ public class AmmoStorageTest {
         AmmoStorage newAmmoStorage = ammoStorage.getNewEquipment();
         assertNotNull(newAmmoStorage);
 
-        // ...and the new part should be identical in ALMOST every way...
+        // ... and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
         assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), newAmmoStorage.getType()));
         assertEquals(ammoStorage.getBuyCost(), newAmmoStorage.getBuyCost());
 
-        // ...except for the number of shots, which should be instead
+        // ... except for the number of shots, which should be instead
         // equal to the default number of shots for the type.
         assertEquals(ammoType.getShots(), newAmmoStorage.getShots());
     }
@@ -155,12 +155,12 @@ public class AmmoStorageTest {
 
         AmmoStorage newAmmoStorage = (AmmoStorage) newEquipment;
 
-        // ...and the new part should be identical in ALMOST every way...
+        // ... and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
         assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), newAmmoStorage.getType()));
         assertEquals(ammoStorage.getBuyCost(), newAmmoStorage.getBuyCost());
 
-        // ...except for the number of shots, which should be instead
+        // ... except for the number of shots, which should be instead
         // equal to the default number of shots for the type.
         assertEquals(ammoType.getShots(), newAmmoStorage.getShots());
 

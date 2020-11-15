@@ -73,9 +73,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public double getTonnage() {
         if (getType().getKgPerShot() > 0) {
-            return getType().getKgPerShot() * shots/1000.0;
+            return getType().getKgPerShot() * (shots / 1000.0);
         }
-         return ((double)shots / getType().getShots());
+         return ((double) shots / getType().getShots());
     }
 
     @Override
