@@ -171,12 +171,12 @@ public class AmmoStorageTest {
 
         newAmmoStorage = (AmmoStorage) acquisitionPart;
 
-        // ...and the new part should be identical in ALMOST every way...
+        // ... and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
         assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), newAmmoStorage.getType()));
         assertEquals(ammoStorage.getBuyCost(), newAmmoStorage.getBuyCost());
 
-        // ...except for the number of shots, which should be instead
+        // ... except for the number of shots, which should be instead
         // equal to the default number of shots for the type.
         assertEquals(ammoType.getShots(), newAmmoStorage.getShots());
     }
@@ -188,27 +188,27 @@ public class AmmoStorageTest {
         // We begin empty...
         assertEquals(0, ammoStorage.getShots());
 
-        // ...and if we add some ammo...
+        // ... and if we add some ammo...
         ammoStorage.changeShots(10);
 
-        // ...we'll then hold that amount.
+        // ... we'll then hold that amount.
         assertEquals(10, ammoStorage.getShots());
 
         // We can also remove ammo...
         ammoStorage.changeShots(-5);
         assertEquals(5, ammoStorage.getShots());
 
-        // ...but if we try to remove more than exists...
+        // ... but if we try to remove more than exists...
         ammoStorage.changeShots(-20);
 
-        // ...we'll never have less than zero.
+        // ... we'll never have less than zero.
         assertEquals(0, ammoStorage.getShots());
 
         // Likewise, if we set the amount of shots...
         ammoStorage.setShots(20);
         assertEquals(20, ammoStorage.getShots());
 
-        // ...we still can't set it to be less than zero.
+        // ... we still can't set it to be less than zero.
         ammoStorage.setShots(-20);
         assertEquals(0, ammoStorage.getShots());
     }
@@ -331,14 +331,14 @@ public class AmmoStorageTest {
         // And if we have the default quantity...
         ammoStorage.setShots(isAC5Ammo.getShots());
 
-        // ...we should cost the default amount.
+        // ... we should cost the default amount.
         assertEquals(ammoStorage.getBuyCost(), ammoStorage.getCurrentValue());
         assertEquals(ammoStorage.getStickerPrice(), ammoStorage.getCurrentValue());
 
         // And if we have twice the amount of ammo...
         ammoStorage.setShots(2 * isAC5Ammo.getShots());
 
-        // ...we should cost twice as much.
+        // ... we should cost twice as much.
         assertEquals(ammoStorage.getBuyCost().multipliedBy(2.0), ammoStorage.getCurrentValue());
     }
 
@@ -443,7 +443,7 @@ public class AmmoStorageTest {
         int addedShots = 100;
         ammoStorage.changeAmountAvailable(addedShots, ammoType);
 
-        // ...which should result in more ammo being added to the campaign.
+        // ... which should result in more ammo being added to the campaign.
         AmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             // Only one part in the campaign.
@@ -483,7 +483,7 @@ public class AmmoStorageTest {
         int addedShots = 100;
         ammoStorage.changeAmountAvailable(addedShots, ammoType);
 
-        // ...which should result in more ammo being added to the campaign.
+        // ... which should result in more ammo being added to the campaign.
         AmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             if (part.isPresent()) {
@@ -526,7 +526,7 @@ public class AmmoStorageTest {
         int addedShots = 100;
         ammoStorage.changeAmountAvailable(addedShots, ammoType);
 
-        // ...which should result in more ammo being added to the campaign.
+        // ... which should result in more ammo being added to the campaign.
         AmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             if (part.getId() != otherAmmo.getId()) {
@@ -571,7 +571,7 @@ public class AmmoStorageTest {
         int addedShots = 100;
         ammoStorage.changeAmountAvailable(addedShots, ammoType);
 
-        // ...which should result in the existing ammo count increasing in the campaign.
+        // ... which should result in the existing ammo count increasing in the campaign.
         AmmoStorage updated = null;
         for (Part part : warehouse.getParts()) {
             // Only one part present in the campaign.
@@ -606,7 +606,7 @@ public class AmmoStorageTest {
         int removedShots = -100;
         ammoStorage.changeAmountAvailable(removedShots, ammoType);
 
-        // ...which should result in nothing happening.
+        // ... which should result in nothing happening.
         assertTrue(warehouse.getParts().isEmpty());
     }
 
@@ -634,7 +634,7 @@ public class AmmoStorageTest {
         int removedShots = -100;
         ammoStorage.changeAmountAvailable(removedShots, ammoType);
 
-        // ...which should result in nothing changing.
+        // ... which should result in nothing changing.
         AmmoStorage existing = null;
         for (Part part : warehouse.getParts()) {
             // Only one part in the campaign.
@@ -674,7 +674,7 @@ public class AmmoStorageTest {
         int removedShots = -50;
         ammoStorage.changeAmountAvailable(removedShots, ammoType);
 
-        // ...which should result in the existing ammo count decreasing in the campaign.
+        // ... which should result in the existing ammo count decreasing in the campaign.
         AmmoStorage updated = null;
         for (Part part : warehouse.getParts()) {
             // Only one part in the campaign.
@@ -712,7 +712,7 @@ public class AmmoStorageTest {
         // Remove all the shots from the Campaign when we have spare ammo of that type present...
         ammoStorage.changeAmountAvailable(-originalShots, ammoType);
 
-        // ...which should result in the existing ammo being removed from the campaign.
+        // ... which should result in the existing ammo being removed from the campaign.
         assertTrue(warehouse.getParts().isEmpty());
     }
 
@@ -739,7 +739,7 @@ public class AmmoStorageTest {
         // spare ammo of that type present...
         ammoStorage.changeAmountAvailable(-(10 * originalShots), ammoType);
 
-        // ...which should result in the existing ammo being removed from the campaign,
+        // ... which should result in the existing ammo being removed from the campaign,
         // and not some weird situation where some part is there with negative or zero
         // rounds of ammo present.
         assertTrue(warehouse.getParts().isEmpty());
@@ -768,7 +768,7 @@ public class AmmoStorageTest {
         int removedShots = -100;
         ammoStorage.changeAmountAvailable(removedShots, ammoType);
 
-        // ...which should result in nothing changing.
+        // ... which should result in nothing changing.
         AmmoStorage existing = null;
         for (Part part : warehouse.getParts()) {
             // Only one part in the campaign.
