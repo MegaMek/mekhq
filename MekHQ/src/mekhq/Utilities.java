@@ -1078,11 +1078,19 @@ public class Utilities {
     }
 
     public static Money[] readMoneyArray(Node node) {
+        return readMoneyArray(node, 0);
+    }
+
+    public static Money[] readMoneyArray(Node node, int minimumSize) {
         String[] values = node.getTextContent().split(",");
-        Money[] result = new Money[values.length];
+        Money[] result = new Money[Math.max(values.length, minimumSize)];
 
         for (int i = 0; i < values.length; i++) {
             result[i] = Money.fromXmlString(values[i]);
+        }
+
+        for (int i = values.length; i < result.length; i++) {
+            result[i] = Money.zero();
         }
 
         return result;
@@ -1195,7 +1203,7 @@ public class Utilities {
                                 bin.updateConditionFromPart();
                                 // Unload bin before munition change
                                 bin.unload();
-                                bin.changeMunition(m.getType());
+                                bin.changeMunition((AmmoType) m.getType());
                                 found = true;
                                 break;
                             }
@@ -1388,8 +1396,8 @@ public class Utilities {
             csvPrinter.close();
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
-        } catch(Exception ioe) {
-            MekHQ.getLogger().error(Utilities.class, "Error exporting JTable");
+        } catch (Exception ioe) {
+            MekHQ.getLogger().error("Error exporting JTable", ioe);
             report = "Error exporting JTable. See log for details.";
         }
         return report;

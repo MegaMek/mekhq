@@ -246,7 +246,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                             "Do you really want to sell " + unit.getName()
                                     + " for " + text, "Sell Unit?",
                             JOptionPane.YES_NO_OPTION)) {
-                        gui.getCampaign().sellUnit(unit.getId());
+                        gui.getCampaign().getQuartermaster().sellUnit(unit);
                     }
                 }
             }
@@ -274,7 +274,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
         } else if (command.contains(COMMAND_SWAP_AMMO)) { // Single Unit only
             String[] fields = command.split(":");
             int selAmmoId = Integer.parseInt(fields[1]);
-            Part part = gui.getCampaign().getPart(selAmmoId);
+            Part part = gui.getCampaign().getWarehouse().getPart(selAmmoId);
             if (!(part instanceof AmmoBin)) {
                 return;
             }
@@ -480,7 +480,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                                 }
                             }
                             // We magically acquire a replacement part, then fix the missing one.
-                            part.getCampaign().addPart(((MissingPart) part).getNewPart(), 0);
+                            part.getCampaign().getQuartermaster().addPart(((MissingPart) part).getNewPart(), 0);
                             part.fix();
                             part.resetTimeSpent();
                             part.resetOvertime();

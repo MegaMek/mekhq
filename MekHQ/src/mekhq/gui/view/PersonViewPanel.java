@@ -39,8 +39,6 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
-import megamek.common.icons.AbstractIcon;
-import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.Utilities;
@@ -421,34 +419,7 @@ public class PersonViewPanel extends ScrollablePanel {
         JLabel lblPortrait = new JLabel();
         lblPortrait.setName("lblPortrait");
 
-        String category = person.getPortraitCategory();
-        String filename = person.getPortraitFileName();
-
-        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-            category = "";
-        }
-
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename) || AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
-            filename = Portrait.DEFAULT_PORTRAIT_FILENAME;
-        }
-
-        // Try to get the player's portrait file.
-        Image portrait;
-        try {
-            portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
-            if (null != portrait) {
-                portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
-            } else {
-                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", Portrait.DEFAULT_PORTRAIT_FILENAME);
-                if (null != portrait) {
-                    portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
-                }
-            }
-            lblPortrait.setIcon(new ImageIcon(portrait));
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-        }
+        lblPortrait.setIcon(person.getPortrait().getImageIcon(100));
 
         GridBagConstraints gbc_lblPortrait = new GridBagConstraints();
         gbc_lblPortrait.gridx = 0;

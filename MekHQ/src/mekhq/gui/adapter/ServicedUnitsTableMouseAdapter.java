@@ -103,7 +103,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             }
             AmmoBin ammo = (AmmoBin) part;
             sel = command.split(":")[2];
-            EquipmentType etype = EquipmentType.get(sel);
+            AmmoType etype = (AmmoType) EquipmentType.get(sel);
             ammo.changeMunition(etype);
             MekHQ.triggerEvent(new UnitChangedEvent(part.getUnit()));
         } else if (command.contains("CHANGE_SITE")) {

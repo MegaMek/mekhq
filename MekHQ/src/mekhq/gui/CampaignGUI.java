@@ -2032,7 +2032,7 @@ public class CampaignGUI extends JPanel {
                 }
             }
 
-            MekHQ.getLogger().info(this, "Finished load of personnel file");
+            MekHQ.getLogger().info("Finished load of personnel file");
         }
     }
 
@@ -2063,7 +2063,7 @@ public class CampaignGUI extends JPanel {
             PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
             int row = pt.getPersonnelTable().getSelectedRow();
             if (row < 0) {
-                MekHQ.getLogger().warning(this, "ERROR: Cannot export person if no one is selected! Ignoring.");
+                MekHQ.getLogger().warning("ERROR: Cannot export person if no one is selected! Ignoring.");
                 return;
             }
             Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
@@ -2097,9 +2097,9 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.getLogger().info(this, "Personnel saved to " + file);
+            MekHQ.getLogger().info("Personnel saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
             JOptionPane.showMessageDialog(getFrame(),
                     "Oh no! The program was unable to correctly export your personnel. We know this\n"
                             + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -2162,9 +2162,9 @@ public class CampaignGUI extends JPanel {
 
             JOptionPane.showMessageDialog(tabMain, getResourceMap().getString("dlgCampaignSettingsSaved.text"));
 
-            MekHQ.getLogger().info(this, "Campaign Options saved saved to " + file);
+            MekHQ.getLogger().info("Campaign Options saved saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
             JOptionPane.showMessageDialog(getFrame(),
                     "Oh no! The program was unable to correctly export your campaign options. We know this\n"
                             + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -2286,7 +2286,7 @@ public class CampaignGUI extends JPanel {
             String xn = wn.getNodeName();
 
             if (xn.equalsIgnoreCase("campaignOptions")) {
-                options = CampaignOptions.generateCampaignOptionsFromXml(wn);
+                options = CampaignOptions.generateCampaignOptionsFromXml(wn, version);
             } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                 rsp = RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn);
             } else if (xn.equalsIgnoreCase("skillTypes")) {
@@ -2306,7 +2306,7 @@ public class CampaignGUI extends JPanel {
                     } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
                         // Error condition of sorts!
                         // Errr, what should we do here?
-                        MekHQ.getLogger().error(this, "Unknown node type not loaded in Skill Type nodes: " + wn2.getNodeName());
+                        MekHQ.getLogger().error("Unknown node type not loaded in Skill Type nodes: " + wn2.getNodeName());
                         continue;
                     }
                     SkillType.generateInstanceFromXML(wn2, version);
@@ -2329,7 +2329,7 @@ public class CampaignGUI extends JPanel {
                     if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
                         // Error condition of sorts!
                         // Errr, what should we do here?
-                        MekHQ.getLogger().error(this, "Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
+                        MekHQ.getLogger().error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
                         continue;
                     }
 
@@ -2346,7 +2346,7 @@ public class CampaignGUI extends JPanel {
             this.getCampaign().setRandomSkillPreferences(rsp);
         }
 
-        MekHQ.getLogger().info(this, "Finished load of campaign options file");
+        MekHQ.getLogger().info("Finished load of campaign options file");
         MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign(), options));
 
         refreshCalendar();
@@ -2383,7 +2383,7 @@ public class CampaignGUI extends JPanel {
                 PartsTableModel partsModel = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsModel();
                 int row = partsTable.getSelectedRow();
                 if (row < 0) {
-                    MekHQ.getLogger().warning(this, "ERROR: Cannot export parts if none are selected! Ignoring.");
+                    MekHQ.getLogger().warning("ERROR: Cannot export parts if none are selected! Ignoring.");
                     return;
                 }
                 Part selectedPart = partsModel.getPartAt(partsTable
@@ -2420,9 +2420,9 @@ public class CampaignGUI extends JPanel {
                 if (backupFile.exists()) {
                     backupFile.delete();
                 }
-                MekHQ.getLogger().info(this, "Parts saved to " + file);
+                MekHQ.getLogger().info("Parts saved to " + file);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(this, ex);
+                MekHQ.getLogger().error(ex);
                 JOptionPane.showMessageDialog(getFrame(),
                         "Oh no! The program was unable to correctly export your parts. We know this\n"
                                 + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -2638,10 +2638,6 @@ public class CampaignGUI extends JPanel {
 
     public JFrame getFrame() {
         return frame;
-    }
-
-    public CampaignGUI getCampaignGUI() {
-        return this;
     }
 
     public int getTabIndexByName(String tabTitle) {

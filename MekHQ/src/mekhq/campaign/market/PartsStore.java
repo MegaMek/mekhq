@@ -197,9 +197,9 @@ public class PartsStore implements Serializable {
                         //because presumably this is happening because KgperShot is -1 or 0
                         shots = 20;
                     }
-                    parts.add(new AmmoStorage(0, et, shots, c));
+                    parts.add(new AmmoStorage(0, (AmmoType) et, shots, c));
                 } else {
-                    parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
+                    parts.add(new AmmoStorage(0, (AmmoType) et, ((AmmoType) et).getShots(), c));
                 }
             } else if(et instanceof MiscType && (((MiscType)et).hasFlag(MiscType.F_HEAT_SINK) || ((MiscType)et).hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
                 Part p = new HeatSink(0, et, -1, false, c);

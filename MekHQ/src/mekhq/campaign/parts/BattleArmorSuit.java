@@ -443,7 +443,7 @@ public class BattleArmorSuit extends Part {
                     BaArmor armorClone = (BaArmor)part.clone();
                     armorClone.setAmount(((BaArmor)part).getAmount());
                     armorClone.setParentPart(this);
-                    campaign.addPart(armorClone, 0);
+                    campaign.getQuartermaster().addPart(armorClone, 0);
                     addChildPart(armorClone);
                 }
             }
@@ -455,7 +455,7 @@ public class BattleArmorSuit extends Part {
             unit.getEntity().setLocationBlownOff(trooper, false);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
             trooper = 0;
             unit.removePart(this);
             //Taharqa: I am not sure why this runDiagnostic is here and I think its problematic
@@ -471,10 +471,10 @@ public class BattleArmorSuit extends Part {
         }
         Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
         if(!salvage) {
-            campaign.removePart(this);
+            campaign.getWarehouse().removePart(this);
         } else if(null != spare) {
             spare.incrementQuantity();
-            campaign.removePart(this);
+            campaign.getWarehouse().removePart(this);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -624,14 +624,14 @@ public class BattleArmorSuit extends Part {
                 if(part instanceof BattleArmorEquipmentPart && ((BattleArmorEquipmentPart)part).getTrooper() == BattleArmor.LOC_TROOPER_1) {
                     Part newEquip = part.clone();
                     newEquip.setParentPart(this);
-                    campaign.addPart(newEquip, 0);
+                    campaign.getQuartermaster().addPart(newEquip, 0);
                     addChildPart(newEquip);
                 }
                 else if(part instanceof BaArmor && ((BaArmor)part).getLocation() == BattleArmor.LOC_TROOPER_1) {
                     BaArmor armorClone = (BaArmor)part.clone();
                     armorClone.setAmount(newUnit.getEntity().getOArmor(BattleArmor.LOC_TROOPER_1));
                     armorClone.setParentPart(this);
-                    campaign.addPart(armorClone, 0);
+                    campaign.getQuartermaster().addPart(armorClone, 0);
                     addChildPart(armorClone);
                 }
             }

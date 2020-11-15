@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import mekhq.Version;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -3375,8 +3376,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "campaignOptions");
     }
 
-    public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-        MekHQ.getLogger().info("Loading Campaign Options from XML...");
+    public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {
+        MekHQ.getLogger().info("Loading Campaign Options from Version " + version.toString() + " XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3787,7 +3788,9 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                 retVal.salaryAntiMekMultiplier = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
-                retVal.salaryTypeBase = Utilities.readMoneyArray(wn2);
+                // CAW: we need at least the correct number of salaries as are expected in this version,
+                //      otherwise we'll not be able to set a salary for a role.
+                retVal.salaryTypeBase = Utilities.readMoneyArray(wn2, Person.T_NUM);
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
