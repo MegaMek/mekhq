@@ -30,6 +30,7 @@ import java.io.StringWriter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -745,6 +746,7 @@ public class AmmoStorageTest {
         assertTrue(warehouse.getParts().isEmpty());
     }
 
+    @Ignore("Fixed in PR 2229")
     @Test
     public void changeAmountAvailableBombDecreaseNoneFound() {
         Campaign mockCampaign = mock(Campaign.class);
