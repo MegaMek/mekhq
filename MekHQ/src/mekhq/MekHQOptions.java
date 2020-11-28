@@ -20,7 +20,6 @@ package mekhq;
 
 import mekhq.gui.enums.PersonnelFilterStyle;
 import mekhq.gui.preferences.ColorPreference;
-import mekhq.preferences.PreferencesNode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,70 +29,6 @@ import java.util.prefs.Preferences;
 
 public final class MekHQOptions {
     //region Variable Declarations
-    //region Colours
-    //region General Colours
-    private static ColorPreference iconButtonColors;
-    //endregion General Colours
-
-    //region Force Colours
-    private static ColorPreference deployedColors;
-    private static ColorPreference belowContractMinimumColors;
-    //endregion Force Colours
-
-    //region Unit Colours
-    private static ColorPreference inTransitColors;
-    private static ColorPreference refittingColors;
-    private static ColorPreference mothballingColors;
-    private static ColorPreference mothballedColors;
-    private static ColorPreference notRepairableColors;
-    private static ColorPreference nonfunctionalColors;
-    private static ColorPreference needsPartsFixedColors;
-    private static ColorPreference unmaintainedColors;
-    private static ColorPreference uncrewedColors;
-    //endregion Unit Colours
-
-    //region Financial Colours
-    private static ColorPreference loanOverdueColors;
-    //endregion Financial Colours
-
-    //region Personnel Colours
-    private static ColorPreference injuredColors;
-    private static ColorPreference healedInjuriesColors;
-    private static ColorPreference paidRetirementColors;
-    //endregion Personnel Colours
-
-    static {
-        final PreferencesNode preferences = MekHQ.getPreferences().forClass(MekHQOptions.class);
-
-        iconButtonColors = new ColorPreference("iconButton", Color.LIGHT_GRAY, Color.BLACK);
-
-        deployedColors = new ColorPreference("deployed", Color.LIGHT_GRAY, Color.BLACK);
-        belowContractMinimumColors = new ColorPreference("belowContractMinimum", UIManager.getColor("Table.background"), Color.RED);
-
-        inTransitColors = new ColorPreference("inTransit", Color.MAGENTA, Color.BLACK);
-        refittingColors = new ColorPreference("refitting", Color.CYAN, Color.BLACK);
-        mothballingColors = new ColorPreference("mothballing", new Color(153,153,255), Color.BLACK);
-        mothballedColors = new ColorPreference("mothballed", new Color(204, 204, 255), Color.BLACK);
-        notRepairableColors = new ColorPreference("notRepairable", new Color(190, 150, 55), Color.BLACK);
-        nonfunctionalColors = new ColorPreference("nonfunctional", new Color(205, 92, 92), Color.BLACK);
-        needsPartsFixedColors = new ColorPreference("needsPartsFixed", new Color(238, 238, 0), Color.BLACK);
-        unmaintainedColors = new ColorPreference("unmaintainedColors", Color.ORANGE, Color.BLACK);
-        uncrewedColors = new ColorPreference("uncrewed", new Color(218, 130, 255), Color.BLACK);
-
-        loanOverdueColors = new ColorPreference("loanOverdue", Color.RED, Color.BLACK);
-
-        injuredColors = new ColorPreference("injured", Color.RED, Color.BLACK);
-        healedInjuriesColors = new ColorPreference("healed", new Color(0xee9a00), Color.BLACK);
-        paidRetirementColors = new ColorPreference("paidRetirement", Color.LIGHT_GRAY, Color.BLACK);
-
-        preferences.manage(iconButtonColors, deployedColors, belowContractMinimumColors,
-                inTransitColors, refittingColors, mothballingColors, mothballedColors,
-                notRepairableColors, nonfunctionalColors, needsPartsFixedColors, unmaintainedColors,
-                uncrewedColors, loanOverdueColors, injuredColors, healedInjuriesColors,
-                paidRetirementColors);
-    }
-    //endregion Colours
-
     private static final Preferences userPreferences = Preferences.userRoot();
     //endregion Variable Declarations
 
@@ -136,68 +71,84 @@ public final class MekHQOptions {
 
     //region Colours
     // TODO : Finish Implementing Me
-    public ColorPreference getIconButton() {
-        return iconButtonColors;
+    public Color getIconButton() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).get;
+        iconButtonColors = new ColorPreference("iconButton", Color.LIGHT_GRAY, Color.BLACK);
     }
 
-    public ColorPreference getDeployed() {
+    public Color getDeployed() {
         return deployedColors;
+        deployedColors = new ColorPreference("deployed", Color.LIGHT_GRAY, Color.BLACK);
     }
 
-    public ColorPreference getBelowContractMinimum() {
+    public Color getBelowContractMinimum() {
         return belowContractMinimumColors;
+        belowContractMinimumColors = new ColorPreference("belowContractMinimum", UIManager.getColor("Table.background"), Color.RED);
     }
 
-    public ColorPreference getInTransit() {
+    public Color getInTransit() {
         return inTransitColors;
+        inTransitColors = new ColorPreference("inTransit", Color.MAGENTA, Color.BLACK);
     }
 
-    public ColorPreference getRefitting() {
+    public Color getRefitting() {
         return refittingColors;
+        refittingColors = new ColorPreference("refitting", Color.CYAN, Color.BLACK);
     }
 
-    public ColorPreference getMothballing() {
+    public Color getMothballing() {
         return mothballingColors;
+        mothballingColors = new ColorPreference("mothballing", new Color(153,153,255), Color.BLACK);
     }
 
-    public ColorPreference getMothballed() {
+    public Color getMothballed() {
         return mothballedColors;
+        mothballedColors = new ColorPreference("mothballed", new Color(204, 204, 255), Color.BLACK);
     }
 
-    public ColorPreference getNotRepairable() {
+    public Color getNotRepairable() {
         return notRepairableColors;
+        notRepairableColors = new ColorPreference("notRepairable", new Color(190, 150, 55), Color.BLACK);
     }
 
-    public ColorPreference getNonFunctional() {
+    public Color getNonFunctional() {
         return nonfunctionalColors;
+        nonfunctionalColors = new ColorPreference("nonfunctional", new Color(205, 92, 92), Color.BLACK);
     }
 
-    public ColorPreference getNeedsPartsFixed() {
+    public Color getNeedsPartsFixed() {
         return needsPartsFixedColors;
+        needsPartsFixedColors = new ColorPreference("needsPartsFixed", new Color(238, 238, 0), Color.BLACK);
     }
 
-    public ColorPreference getUnmaintained() {
+    public Color getUnmaintained() {
         return unmaintainedColors;
+        unmaintainedColors = new ColorPreference("unmaintainedColors", Color.ORANGE, Color.BLACK);
     }
 
-    public ColorPreference getUncrewed() {
+    public Color getUncrewed() {
         return uncrewedColors;
+        uncrewedColors = new ColorPreference("uncrewed", new Color(218, 130, 255), Color.BLACK);
     }
 
-    public ColorPreference getLoanOverdue() {
+    public Color getLoanOverdue() {
         return loanOverdueColors;
+        loanOverdueColors = new ColorPreference("loanOverdue", Color.RED, Color.BLACK);
     }
 
-    public ColorPreference getInjured() {
+    public Color getInjured() {
         return injuredColors;
+        injuredColors = new ColorPreference("injured", Color.RED, Color.BLACK);
     }
 
-    public ColorPreference getHealedInjuries() {
+    public Color getHealedInjuries() {
         return healedInjuriesColors;
+        healedInjuriesColors = new ColorPreference("healed", new Color(0xee9a00), Color.BLACK);
     }
 
-    public ColorPreference getPaidRetirement() {
+    public Color getPaidRetirement() {
         return paidRetirementColors;
+        paidRetirementColors = new ColorPreference("paidRetirement", Color.LIGHT_GRAY, Color.BLACK);
     }
     //endregion Colours
 

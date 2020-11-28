@@ -36,16 +36,6 @@ public class ColorPreference extends PreferenceElement {
     private Optional<Color> alternateColor = Optional.empty();
 
     /**
-     * Creates a new {@code ColorPreference} with a default {@link Color}.
-     */
-    public ColorPreference(String name, Color defaultColor) {
-        super(name);
-
-        this.defaultColor = defaultColor;
-        this.defaultAlternateColor = null;
-    }
-
-    /**
      * Creates a new {@code ColorPreference} with a default {@link Color}
      * and a default alternate color.
      */
@@ -99,7 +89,7 @@ public class ColorPreference extends PreferenceElement {
 
     @Nullable
     private static String format(Optional<Color> color) {
-        return color.isPresent() ? "#" + Integer.toHexString(color.get().getRGB()) : null;
+        return color.map(value -> "#" + Integer.toHexString(value.getRGB())).orElse(null);
     }
 
     @Override
@@ -117,7 +107,7 @@ public class ColorPreference extends PreferenceElement {
 
     private static Optional<Color> decode(String value) {
         try {
-            return Optional.ofNullable(Color.decode(value));
+            return Optional.of(Color.decode(value));
         } catch (NumberFormatException ex0) {
             try {
                 return Optional.ofNullable(Color.getColor(value));
