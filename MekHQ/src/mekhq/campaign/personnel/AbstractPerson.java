@@ -144,13 +144,11 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      * @return a String containing the person's first name including their pre-nominal
      */
     public String getFirstName() {
-        return getPreNominal() + " " + getGivenName();
+        return (getPreNominal().isEmpty() ? "" : (getPreNominal() + " ")) + getGivenName();
     }
 
     /**
-     * return a full last name which may be a bloodname or a surname with or without honorifics.
-     * A bloodname will overrule a surname but we do not disallow surnames for clanners, if the
-     * player wants to input them
+     * return a full last name which is a surname with or without honorifics.
      * @return a String of the person's last name
      */
     public String getLastName() {
@@ -161,22 +159,18 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
         }
 
         if (!StringUtil.isNullOrEmpty(getPostNominal())) {
-            lastName += " " + getPostNominal();
+            lastName += (lastName.isEmpty() ? "" : " ") + getPostNominal();
         }
         return lastName;
     }
 
     /**
-     * This is used to create the full name of the person, based on their pre-nomi
+     * This is used to create the full name of the person, based on their first and last names
      */
     public void setFullName() {
-        String lastName = getLastName();
-
-        if (!StringUtil.isNullOrEmpty(lastName)) {
-            setFullNameDirect(getFirstName() + " " + lastName);
-        } else {
-            setFullNameDirect(getFirstName());
-        }
+        final String lastName = getLastName();
+        setFullNameDirect(StringUtil.isNullOrEmpty(lastName) ? getFirstName()
+                : (getFirstName() + " " + lastName));
     }
 
     /**

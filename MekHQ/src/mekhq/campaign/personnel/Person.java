@@ -535,7 +535,7 @@ public class Person extends AbstractPerson {
         }
 
         if (!StringUtil.isNullOrEmpty(getPostNominal())) {
-            lastName += " " + getPostNominal();
+            lastName += (lastName.isEmpty() ? "" : " ") + getPostNominal();
         }
         return lastName;
     }
