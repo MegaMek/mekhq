@@ -5,6 +5,7 @@ VERSION HISTORY:
 + PR #2224: Add some basic Refit tests and fix an Armor location bug calculating armor during a refit
 + PR #2241: Fix bug where PartsStore may list INT_MAX as cost and tons for BA ammo
 + Fixing Male Soldier and Female ProtoMech Pilot Portrait Paths so they properly generate
++ Issue #2236: Making Unmaintained hangar color take priority over Damaged/Inoperable
 
 0.47.14 (2020-11-15 1930 UTC)
 + Issues #2217 #2219: Cannot save Campaign with Refits and cannot start new Refits
