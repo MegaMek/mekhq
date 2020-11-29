@@ -496,17 +496,17 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
 
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("preNominal")) {
-                    retVal.preNominal = wn2.getTextContent();
+                    retVal.preNominal = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
-                    retVal.givenName = wn2.getTextContent();
+                    retVal.givenName = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("surname")) {
-                    retVal.surname = wn2.getTextContent();
+                    retVal.surname = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("postNominal")) {
-                    retVal.postNominal = wn2.getTextContent();
+                    retVal.postNominal = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("maidenName")) {
-                    retVal.maidenName = wn2.getTextContent();
+                    retVal.maidenName = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
-                    retVal.callsign = wn2.getTextContent();
+                    retVal.callsign = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.gender = Gender.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
@@ -520,9 +520,9 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
                 } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
                     retVal.biography = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
-                    retVal.getPortrait().setCategory(wn2.getTextContent());
+                    retVal.getPortrait().setCategory(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
-                    retVal.getPortrait().setFilename(wn2.getTextContent());
+                    retVal.getPortrait().setFilename(wn2.getTextContent().trim());
                 }
             }
         } catch (Exception e) {
