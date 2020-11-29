@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.rating;
 
@@ -34,6 +34,7 @@ import megamek.common.Tank;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -54,11 +55,11 @@ import static org.junit.Assert.*;
  * @since 9/23/2013
  */
 public class FieldManualMercRevDragoonsRatingTest {
-
     private Campaign mockCampaign;
+    private Hangar mockHangar;
 
-    private ArrayList<Person> mockPersonnelList;
-    private ArrayList<Person> mockActivePersonnelList;
+    private List<Person> mockPersonnelList;
+    private List<Person> mockActivePersonnelList;
 
     private Person mockDoctor;
     private Person mockTech;
@@ -73,6 +74,8 @@ public class FieldManualMercRevDragoonsRatingTest {
     @Before
     public void setUp() {
         mockCampaign = mock(Campaign.class);
+        mockHangar = mock(Hangar.class);
+        when(mockCampaign.getHangar()).thenReturn(mockHangar);
 
         mockPersonnelList = new ArrayList<>();
         mockActivePersonnelList = new ArrayList<>();
@@ -308,7 +311,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         unitList.add(mockLightning2);
         unitList.add(mockUnion);
         unitList.add(mockInvader);
-        doReturn(unitList).when(mockCampaign).getCopyOfUnits();
+        when(mockHangar.getUnits()).thenReturn(unitList);
 
         spyRating.initValues();
     }

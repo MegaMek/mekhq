@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts.equipment;
 
@@ -34,7 +34,6 @@ import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.TechAdvancement;
 import megamek.common.WeaponType;
-import megamek.common.logging.LogLevel;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -100,7 +99,7 @@ public class EquipmentPart extends Part {
             try {
                 equipTonnage = type.getTonnage(null, size);
             } catch (NullPointerException ex) {
-                MekHQ.getLogger().error(EquipmentPart.class, "EquipmentPart", ex);
+                MekHQ.getLogger().error(ex);
             }
         }
     }
@@ -142,8 +141,7 @@ public class EquipmentPart extends Part {
         }
 
         if (type == null) {
-            MekHQ.getLogger().error(getClass(), "restore",
-                    "Mounted.restore: could not restore equipment type \"" + typeName + "\"");
+            MekHQ.getLogger().error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
         }
     }
 
@@ -228,23 +226,23 @@ public class EquipmentPart extends Part {
                 mounted.setRepairable(false);
                 unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
             }
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
                 int number = quantity;
                 while (number > 0) {
                     spare.incrementQuantity();
                     number--;
                 }
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             if (null != missing) {
                 unit.addPart(missing);
             }
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         checkWeaponBay();
         setUnit(null);
@@ -409,7 +407,7 @@ public class EquipmentPart extends Part {
             return unit != null && unit.getEntity() != null && unit.getEntity().getEquipment(equipmentNum) != null
                     && unit.isLocationDestroyed(unit.getEntity().getEquipment(equipmentNum).getLocation());
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "isMountedOnDestroyedLocation()", e);
+            MekHQ.getLogger().error(e);
         }
         return false;
         /*
@@ -569,8 +567,7 @@ public class EquipmentPart extends Part {
         }
         if (varCost.isZero()) {
             // if we don't know what it is...
-            MekHQ.getLogger().log(EquipmentPart.class, "resolveVariableCost", LogLevel.WARNING,
-                    "I don't know how much " + name + " costs.");
+            MekHQ.getLogger().debug("I don't know how much " + name + " costs.");
         }
         return varCost;
     }

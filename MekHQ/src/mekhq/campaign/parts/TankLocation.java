@@ -190,12 +190,12 @@ public class TankLocation extends Part {
     public void remove(boolean salvage) {
         if(null != unit) {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
         }
@@ -258,7 +258,7 @@ public class TankLocation extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        //shouldn't get here
+        ((Tank) unit.getEntity()).setInternal(((Tank) unit.getEntity()).getOInternal(loc) - damage, loc);
     }
 
     @Override
@@ -308,7 +308,7 @@ public class TankLocation extends Part {
         }
         String toReturn = "<html><font size='2'";
         String scheduled = "";
-        if (getTeamId() != null) {
+        if (getTech() != null) {
             scheduled = " (scheduled) ";
         }
 

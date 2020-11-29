@@ -1,11 +1,26 @@
-/**
+/*
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.model;
 
 import java.awt.Component;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
@@ -15,7 +30,6 @@ import javax.swing.ListCellRenderer;
 import megamek.common.Aero;
 import megamek.common.Tank;
 import megamek.common.VTOL;
-import mekhq.IconPackage;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -87,9 +101,7 @@ public class CrewListModel extends AbstractListModel<Person> {
     public void setData(final Unit u) {
         this.unit = u;
         this.crew = new ArrayList<>(u.getCrew());
-        Collections.sort(crew, (p1, p2) ->
-            CrewRole.getCrewRole(p1, u).getSortOrder()
-            - CrewRole.getCrewRole(p2, u).getSortOrder());
+        crew.sort(Comparator.comparingInt(p -> CrewRole.getCrewRole(p, u).getSortOrder()));
         fireContentsChanged(this, 0, crew.size());
     }
 
@@ -105,55 +117,41 @@ public class CrewListModel extends AbstractListModel<Person> {
         return crew.get(index);
     }
 
-    public ListCellRenderer<Person> getRenderer(IconPackage icons) {
-        return new CrewRenderer(icons);
+    public ListCellRenderer<Person> getRenderer() {
+        return new CrewRenderer();
     }
 
     public class CrewRenderer extends BasicInfo implements ListCellRenderer<Person> {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = -1742201083598095886L;
 
-        public CrewRenderer(IconPackage icons) {
-            super(icons);
+        public CrewRenderer() {
+            super();
         }
 
         @Override
-        public Component getListCellRendererComponent(JList<? extends Person> list, Person value, int index,
-                boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<? extends Person> list, Person value,
+                                                      int index, boolean isSelected, boolean cellHasFocus) {
             Component c = this;
             setOpaque(true);
-            Person p = (Person)getElementAt(index);
-            StringBuilder sb = new StringBuilder("<html><font size='2'><b>")
-                    .append(p.getFullTitle())
-                    .append("</b><br/>")
-                    .append(CrewRole.getCrewRole(p, unit).getDisplayName())
-                    .append(" (");
+            Person p = getElementAt(index);
             String gunSkill = SkillType.getGunnerySkillFor(unit.getEntity());
             String driveSkill = SkillType.getDrivingSkillFor(unit.getEntity());
-            if (p.hasSkill(gunSkill)) {
-                sb.append(p.getSkill(gunSkill).getFinalSkillValue());
-            } else {
-                sb.append("-");
-            }
-            sb.append("/");
-            if (p.hasSkill(driveSkill)) {
-                sb.append(p.getSkill(driveSkill).getFinalSkillValue());
-            } else {
-                sb.append("-");
-            }
-            sb.append(")</font></html>");
-            setHtmlText(sb.toString());
+            String sb = "<html><font size='2'><b>" + p.getFullTitle() + "</b><br/>"
+                    + CrewRole.getCrewRole(p, unit).getDisplayName()
+                    + " ("
+                    + (p.hasSkill(gunSkill) ? p.getSkill(gunSkill).getFinalSkillValue() : "-")
+                    + "/"
+                    + (p.hasSkill(driveSkill) ? p.getSkill(driveSkill).getFinalSkillValue() : "-")
+                    + ")</font></html>";
+            setHtmlText(sb);
             if (isSelected) {
                 highlightBorder();
             } else {
                 unhighlightBorder();
             }
+
             setPortrait(p);
             return c;
         }
     }
-
 }

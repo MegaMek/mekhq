@@ -31,7 +31,6 @@ import megamek.client.Client;
 import megamek.common.*;
 import megamek.common.event.GameVictoryEvent;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -148,7 +147,7 @@ public class ResolveScenarioTracker {
             try {
                 loadUnitsAndPilots(unitList.get());
             } catch (IOException e) {
-                MekHQ.getLogger().error(getClass(), "processMulFiles", e);
+                MekHQ.getLogger().error(this, e);
             }
         } else {
             initUnitsAndPilotsWithoutBattle();
@@ -668,7 +667,7 @@ public class ResolveScenarioTracker {
         }
 
         // And now we have potential prisoners that are crewing a unit...
-        if (campaign.getCampaignOptions().capturePrisoners()) {
+        if (campaign.getCampaignOptions().getPrisonerCaptureStyle().isEnabled()) {
             processPrisonerCapture(potentialSalvage);
             processPrisonerCapture(devastatedEnemyUnits);
         }
@@ -683,7 +682,6 @@ public class ResolveScenarioTracker {
      * @param unitStatus The post-battle status of en
      */
     private void processLargeCraft(Unit ship, Entity en, List<Person> personnel, UnitStatus unitStatus) {
-        final String METHOD_NAME = "processLargeCraft(Unit,Entity,List<Person>,UnitStatus)"; //$NON-NLS-1$
         //The entity must be an Aero for us to get here
         Aero aero = (Aero) en;
         //Find out if this large craft ejected or was in the process of ejecting,
@@ -695,8 +693,7 @@ public class ResolveScenarioTracker {
                 Entity e = entities.get(UUID.fromString(id));
                 // Invalid entity?
                 if (e == null) {
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                            "Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
+                    MekHQ.getLogger().error(this, "Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
                     continue;
                 }
                 //If the escape craft was destroyed in combat, skip it
@@ -1050,8 +1047,6 @@ public class ResolveScenarioTracker {
     }
 
     private void loadUnitsAndPilots(File unitFile) throws IOException {
-        final String METHOD_NAME = "loadUnitsAndPilots(File)"; //$NON-NLS-1$
-
         if (unitFile != null) {
             // I need to get the parser myself, because I want to pull both
             // entities and pilots from it
@@ -1063,13 +1058,12 @@ public class ResolveScenarioTracker {
                 // Read a Vector from the file.
                 parser.parse(listStream);
             } catch (Exception e) {
-                MekHQ.getLogger().error(getClass(), "loadUnitsAndPilots", e);
+                MekHQ.getLogger().error(this, e);
             }
 
             // Was there any error in parsing?
             if (parser.hasWarningMessage()) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING,
-                        parser.getWarningMessage());
+                MekHQ.getLogger().warning(this, parser.getWarningMessage());
             }
 
             killCredits = parser.getKills();
@@ -1422,7 +1416,7 @@ public class ResolveScenarioTracker {
         for (UUID pid : oppositionPersonnel.keySet()) {
             OppositionPersonnelStatus status = oppositionPersonnel.get(pid);
             Person person = status.getPerson();
-            if (null == person) {
+            if (person == null) {
                 continue;
             }
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
@@ -1435,10 +1429,10 @@ public class ResolveScenarioTracker {
                 PrisonerStatus prisonerStatus = getCampaign().getCampaignOptions().getDefaultPrisonerStatus();
 
                 // Then, we need to determine if they are a defector
-                if (prisonerStatus.isPrisoner() && getCampaign().getCampaignOptions().getUseAtB()
-                        && getCampaign().getCampaignOptions().getUseAtBCapture() && (m instanceof AtBContract)) {
+                if (prisonerStatus.isPrisoner() && getCampaign().getCampaignOptions().useAtBPrisonerDefection()
+                        && (m instanceof AtBContract)) {
                     // Are they actually a defector?
-                    if (Compute.d6(2) >= (10 + ((AtBContract) m).getEnemySkill() - getCampaign().getUnitRatingMod())) {
+                    if (Compute.d6(2) >= (10 + ((AtBContract) m).getEnemySkill() - getCampaign().getUnitRatingAsInteger())) {
                         prisonerStatus = PrisonerStatus.PRISONER_DEFECTOR;
                     }
                 }
@@ -1582,7 +1576,7 @@ public class ResolveScenarioTracker {
             }
             if (((Contract) getMission()).isSalvageExchange()) {
                 value = value.multipliedBy(((Contract) getMission()).getSalvagePct()).dividedBy(100);
-                campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for "
+                campaign.getFinances().credit(value, Transaction.C_SALVAGE, "Salvage exchange for "
                         + scenario.getName(),  campaign.getLocalDate());
                 campaign.addReport(value.toAmountAndSymbolString() + " have been credited to your account for salvage exchange.");
             } else {
@@ -1917,7 +1911,7 @@ public class ResolveScenarioTracker {
                             : unit.getEntity();
                     baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
-                    MekHQ.getLogger().error(getClass(), "Unit Status", e);
+                    MekHQ.getLogger().error(this, e);
                 }
             }
         }

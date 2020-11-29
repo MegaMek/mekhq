@@ -274,6 +274,7 @@ public class LootDialog extends javax.swing.JDialog {
         }
         AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(frame, unitLoadingDialog,
                 campaign, false);
+        usd.setVisible(true);
 
         Entity e = usd.getSelectedEntity();
         if (null != e) {

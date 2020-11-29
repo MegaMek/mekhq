@@ -36,6 +36,8 @@ import megamek.common.LightVehicleBay;
 import megamek.common.MechBay;
 import megamek.common.Tank;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
@@ -51,7 +53,9 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Vector;
 
 import static org.mockito.Mockito.*;
@@ -68,10 +72,12 @@ import static org.junit.Assert.*;
 public class CampaignOpsReputationTest {
 
     private Campaign mockCampaign;
-    private ArrayList<Unit> unitList;
-    private ArrayList<Person> personnelList;
-    private ArrayList<Person> activePersonnelList;
-    private ArrayList<Mission> missionList;
+    private CampaignOptions mockCampaignOptions;
+    private Hangar mockHangar;
+    private List<Unit> unitList;
+    private List<Person> personnelList;
+    private List<Person> activePersonnelList;
+    private List<Mission> missionList;
 
     // Mothballed units.
     private Unit mockMechMothballed;
@@ -205,6 +211,12 @@ public class CampaignOpsReputationTest {
         Faction mockFaction = mock(Faction.class);
         when(mockFaction.is(any())).thenReturn(true);
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        mockHangar = mock(Hangar.class);
+        when(mockCampaign.getHangar()).thenReturn(mockHangar);
+
+        mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaignOptions.getManualUnitRatingModifier()).thenReturn(0);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         spyReputation = spy(new CampaignOpsReputation(mockCampaign));
 
         int astechs = 0;
@@ -275,7 +287,7 @@ public class CampaignOpsReputationTest {
         mockFinances = mock(Finances.class);
         when(mockFinances.isInDebt()).thenReturn(false);
 
-        doReturn(unitList).when(mockCampaign).getCopyOfUnits();
+        when(mockHangar.getUnits()).thenReturn(unitList);
         doReturn(personnelList).when(mockCampaign).getPersonnel();
         doReturn(activePersonnelList).when(mockCampaign).getActivePersonnel();
         doReturn(astechs).when(mockCampaign).getAstechPool();
@@ -303,7 +315,7 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getBattleArmorCount());
         assertEquals(28, spyReputation.getInfantryCount());
         assertEquals(200, spyReputation.getNonAdminPersonnelCount());
-        assertEquals(1, spyReputation.getDropshipCount());
+        assertEquals(1, spyReputation.getDropShipCount());
         BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkillLevels(), 2);
         assertEquals(4, spyReputation.getMechTechTeamsNeeded());
         assertEquals(2, spyReputation.getAeroTechTeamsNeeded());
@@ -324,7 +336,7 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getBattleArmorCount());
         assertEquals(28, spyReputation.getInfantryCount());
         assertEquals(200, spyReputation.getNonAdminPersonnelCount());
-        assertEquals(1, spyReputation.getDropshipCount());
+        assertEquals(1, spyReputation.getDropShipCount());
         BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkillLevels(), 2);
         assertEquals(4, spyReputation.getMechTechTeamsNeeded());
         assertEquals(2, spyReputation.getAeroTechTeamsNeeded());
@@ -344,7 +356,7 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getBattleArmorCount());
         assertEquals(0, spyReputation.getInfantryCount());
         assertEquals(0, spyReputation.getNonAdminPersonnelCount());
-        assertEquals(0, spyReputation.getDropshipCount());
+        assertEquals(0, spyReputation.getDropShipCount());
         BigDecimalAssert.assertEquals(BigDecimal.ZERO, spyReputation.getTotalSkillLevels(), 2);
         assertEquals(0, spyReputation.getMechTechTeamsNeeded());
         assertEquals(0, spyReputation.getAeroTechTeamsNeeded());
@@ -356,7 +368,7 @@ public class CampaignOpsReputationTest {
     }
 
     private void buildFreshCampaign() {
-        doReturn(new ArrayList<Unit>(0)).when(mockCampaign).getCopyOfUnits();
+        when(mockHangar.getUnits()).thenReturn(Collections.emptyList());
         doReturn(new ArrayList<Person>(0)).when(mockCampaign).getPersonnel();
         doReturn(new ArrayList<Person>(0)).when(mockCampaign).getActivePersonnel();
         doReturn(new ArrayList<Person>(0)).when(mockCampaign).getAdmins();
@@ -414,7 +426,7 @@ public class CampaignOpsReputationTest {
         assertEquals(20, spyReputation.getTransportValue());
 
         // Test not having any DropShips (though we still have a JumpShip).
-        doReturn(0).when(spyReputation).getDropshipCount();
+        doReturn(0).when(spyReputation).getDropShipCount();
         doReturn(0).when(spyReputation).getMechBayCount();
         doReturn(0).when(spyReputation).getInfantryBayCount();
         doReturn(0).when(spyReputation).getLightVeeBayCount();
@@ -478,7 +490,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetAverageExperience() {
         spyReputation.initValues();
-        assertEquals(SkillType.getExperienceLevelName(SkillType.EXP_VETERAN),
+        assertEquals(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR),
                      spyReputation.getAverageExperience());
 
         // Test a brand new campaign.

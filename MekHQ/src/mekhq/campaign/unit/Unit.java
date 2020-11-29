@@ -25,11 +25,13 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Camouflage;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.*;
@@ -40,7 +42,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
@@ -88,39 +89,36 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private UUID id;
     private int oldId;
     private String fluffName;
-    // This is the ID of the large craft assigned to transport this unit
-    private Map<UUID,Integer> transportShipId = new HashMap<>();
+    // This is the large craft assigned to transport this unit
+    private TransportShipAssignment transportShipAssignment;
     // If this unit is a transport, list all other units assigned to it
-    private Set<UUID> transportedUnits = new HashSet<>();
-    private double aeroCapacity;
-    private double baCapacity;
-    private int dockCapacity;
-    private double hVeeCapacity;
-    private double infCapacity;
-    private double lVeeCapacity;
-    private double mechCapacity;
-    private double protoCapacity;
-    private double shVeeCapacity;
-    private double scCapacity;
-    // Convenience data used by GameThread
-    private boolean carryingAero = false;
-    private boolean carryingGround = false;
+    private Set<Unit> transportedUnits = new HashSet<>();
+    private double aeroCapacity = 0.0;
+    private double baCapacity = 0.0;
+    private int dockCapacity = 0;
+    private double hVeeCapacity = 0.0;
+    private double infCapacity = 0.0;
+    private double lVeeCapacity = 0.0;
+    private double mechCapacity = 0.0;
+    private double protoCapacity = 0.0;
+    private double shVeeCapacity = 0.0;
+    private double scCapacity = 0.0;
 
     //assignments
     private int forceId;
     protected int scenarioId;
 
-    private ArrayList<UUID> drivers;
-    private ArrayList<UUID> gunners;
-    private ArrayList<UUID> vesselCrew;
+    private List<Person> drivers;
+    private List<Person> gunners;
+    private List<Person> vesselCrew;
     // Contains unique Id of each Infantry/BA Entity assigned to this unit as marines
     // Used to calculate marine points (which are based on equipment) as well as Personnel IDs
-    private Set<UUID> marines;
+    // TODO: private Set<Person> marines;
     //this is the id of the tech officer in a superheavy tripod
-    private UUID techOfficer;
-    private UUID navigator;
+    private Person techOfficer;
+    private Person navigator;
     //this is the id of the tech assigned for maintenance if any
-    private UUID tech;
+    private Person tech;
 
     //mothballing variables - if mothball time is not zero then mothballing/activating is in progress
     private int mothballTime;
@@ -129,12 +127,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private int daysSinceMaintenance;
     private int daysActivelyMaintained;
     private int astechDaysMaintained;
-
-    //old ids for reverse compatibility
-    private ArrayList<Integer> oldDrivers;
-    private ArrayList<Integer> oldGunners;
-    private ArrayList<Integer> oldVesselCrew;
-    private Integer oldNavigator;
 
     private Campaign campaign;
 
@@ -146,10 +138,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     //a made-up person to handle repairs on Large Craft
     private Person engineer;
-
-    //for backwards compatibility with 0.1.8, but otherwise is no longer used
-    @SuppressWarnings("unused")
-    private int pilotId = -1;
 
     private String history;
 
@@ -169,30 +157,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             entity.setCamoFileName(null);
         }
         this.site = SITE_BAY;
-        this.salvaged = false;
         this.campaign = c;
         this.parts = new ArrayList<>();
         this.podSpace = new ArrayList<>();
         this.drivers = new ArrayList<>();
         this.gunners = new ArrayList<>();
         this.vesselCrew = new ArrayList<>();
-        this.marines =  new HashSet<>();
-        this.navigator = null;
-        this.tech = null;
-        this.mothballTime = 0;
-        this.mothballed = false;
-        this.oldDrivers = new ArrayList<>();
-        this.oldGunners = new ArrayList<>();
-        this.oldVesselCrew = new ArrayList<>();
-        this.oldNavigator = -1;
+        forceId = Force.FORCE_NONE;
         scenarioId = Scenario.S_DEFAULT_ID;
-        this.refit = null;
-        this.engineer = null;
         this.history = "";
-        this.daysSinceMaintenance = 0;
-        this.daysActivelyMaintained = 0;
-        this.astechDaysMaintained = 0;
-        this.lastMaintenanceReport = null;
+        this.lastMaintenanceReport = "";
         this.fluffName = "";
         reCalc();
     }
@@ -237,10 +211,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @return
      */
     public boolean isAvailable(boolean ignoreRefit) {
-        if (ignoreRefit) {
-            return isPresent() && !isDeployed() && !isMothballing() && !isMothballed();
-        }
-        return isPresent() && !isDeployed() && !isRefitting() && !isMothballing() && !isMothballed();
+        return isPresent() && !isDeployed() && (ignoreRefit || !isRefitting()) && !isMothballing() && !isMothballed();
     }
 
     public String getStatus() {
@@ -250,26 +221,19 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else {
                 return "Mothballing (" + getMothballTime() + "m)";
             }
-        }
-        if (isMothballed()) {
+        } else if (isMothballed()) {
             return "Mothballed";
-        }
-        if (isDeployed()) {
+        } else if (isDeployed()) {
             return "Deployed";
-        }
-        if (!isPresent()) {
+        } else if (!isPresent()) {
             return "In transit (" + getDaysToArrival() + " days)";
-        }
-        if (isRefitting()) {
+        } else if (isRefitting()) {
             return "Refitting";
-        }
-        if (!isRepairable()) {
+        } else if (!isRepairable()) {
             return "Salvage";
-        }
-        else if (!isFunctional()) {
+        } else if (!isFunctional()) {
             return "Inoperable";
-        }
-        else {
+        } else {
             return getDamageStateName(getDamageState());
         }
     }
@@ -316,48 +280,94 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     // A set of methods for working with transport ship assignment for this unit
 
-    public boolean hasTransportShipId() {
-        return !transportShipId.isEmpty();
+    /**
+     * Gets a value indicating whether or not this unit is assigned
+     * to a transport ship.
+     */
+    public boolean hasTransportShipAssignment() {
+        return (transportShipAssignment != null);
     }
 
-    public Map<UUID,Integer> getTransportShipId() {
-        return transportShipId;
+    /**
+     * Gets the transport ship assignment for this unit,
+     * or null if this unit is not being transported.
+     */
+    public @Nullable TransportShipAssignment getTransportShipAssignment() {
+        return transportShipAssignment;
     }
 
-    public void setTransportShipId(UUID i, int bayNumber) {
-        transportShipId.put(i, bayNumber);
+    /**
+     * Sets the transport ship assignment for this unit.
+     * @param assignment The transport ship assignment, or null if this unit
+     *                   is not being transported.
+     */
+    public void setTransportShipAssignment(@Nullable TransportShipAssignment assignment) {
+        transportShipAssignment = assignment;
     }
 
-    public Set<UUID> getTransportedUnits() {
-        return transportedUnits;
+    /**
+     * Gets a value indicating whether or not this unit is
+     * transporting units.
+     */
+    public boolean hasTransportedUnits() {
+        return !transportedUnits.isEmpty();
     }
 
-    public void addTransportedUnit(UUID id) {
-        transportedUnits.add(id);
+    /**
+     * Returns the set of units being transported by this unit.
+     */
+    public Set<Unit> getTransportedUnits() {
+        return Collections.unmodifiableSet(transportedUnits);
     }
 
-    public void removeTransportedUnit(UUID id) {
-        transportedUnits.remove(id);
+    /**
+     * Adds a unit to our set of transported units.
+     * @param unit The unit being transported by this instance.
+     */
+    public void addTransportedUnit(Unit unit) {
+        transportedUnits.add(Objects.requireNonNull(unit));
     }
 
+    /**
+     * Adds a unit to a specific bay on our unit.
+     * @param unit The unit being transported by this instance.
+     * @param bayNumber The bay which will contain the unit.
+     */
+    public void addTransportedUnit(Unit unit, int bayNumber) {
+        Objects.requireNonNull(unit);
+
+        unit.setTransportShipAssignment(new TransportShipAssignment(this, bayNumber));
+        addTransportedUnit(unit);
+    }
+
+    /**
+     * Removes a unit from our set of transported units.
+     * @param unit The unit to remove from our set of tranported units.
+     * @return True if the unit was removed from our bays, otherwise false.
+     */
+    public boolean removeTransportedUnit(Unit unit) {
+        return transportedUnits.remove(unit);
+    }
+
+    /**
+     * Clears the set of units being transported by this unit.
+     */
     public void clearTransportedUnits() {
         transportedUnits.clear();
     }
 
+    /**
+     * Gets a value indicating whether or not we are transporting any aero units.
+     */
     public boolean isCarryingAero() {
-        return carryingAero;
+        return transportedUnits.stream().anyMatch(u -> u.getEntity().isAero());
     }
 
-    public void setCarryingAero(boolean b) {
-        carryingAero = b;
-    }
-
+    /**
+     * Gets a value indicating whether or not we are transporting any ground units.
+     */
     public boolean isCarryingGround() {
-        return carryingGround;
-    }
-
-    public void setCarryingGround(boolean b) {
-        carryingGround = b;
+        return transportedUnits.stream().anyMatch(u -> !u.getEntity().isAero());
     }
 
     public int getSite() {
@@ -529,6 +539,27 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     private boolean isPartAvailableForRepairs(IPartWork partWork, boolean onlyNotBeingWorkedOn) {
         return (!onlyNotBeingWorkedOn || (onlyNotBeingWorkedOn && !partWork.isBeingWorkedOn()));
+    }
+
+    /**
+     * Gets a list of every part on a unit which need service (either repair or salvage),
+     * including parts currently being worked on.
+     */
+    public List<IPartWork> getPartsNeedingService() {
+        return getPartsNeedingService(false);
+    }
+
+    /**
+     * Gets a list of parts on a unit which need service (either repair or salvage),
+     * optionally excluding parts already being worked on.
+     * @param onlyNotBeingWorkedOn When true, excludes parts currently being repaired or salvaged.
+     */
+    public List<IPartWork> getPartsNeedingService(boolean onlyNotBeingWorkedOn) {
+        if (isSalvage() || !isRepairable()) {
+            return getSalvageableParts(onlyNotBeingWorkedOn);
+        } else {
+            return getPartsNeedingFixing(onlyNotBeingWorkedOn);
+        }
     }
 
     public ArrayList<IPartWork> getPartsNeedingFixing() {
@@ -1216,7 +1247,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param unitWeight double Weight in tons of the unit's entity. Important for tanks and infantry
      */
     public double getCorrectBayCapacity(int unitType, double unitWeight) {
-        final String METHOD_NAME = "getCorrectBayCapacity(unitType,unitWeight)";
         switch (unitType) {
             case UnitType.MEK:
                 return getCurrentMechCapacity();
@@ -1258,8 +1288,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     return getCurrentSuperHeavyVehicleCapacity();
                 }
             default:
-                MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                        "No transport bay defined for specified unit type.");
+                MekHQ.getLogger().error("No transport bay defined for specified unit type.");
                 return 0;
         }
     }
@@ -1274,7 +1303,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param bayNumber integer representing the bay number that has been assigned to a cargo entity
      */
     public void updateBayCapacity(int unitType, double unitWeight, boolean addUnit, int bayNumber) {
-        final String METHOD_NAME = "updateBayCapacity(unitType,unitWeight,addUnit)"; //$NON-NLS-1$
         // Default. Consume 1 bay of the appropriate type
         int amount = -1;
         if (addUnit) {
@@ -1299,14 +1327,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         break;
                     } else {
                         //This shouldn't happen
-                        MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                                "Fighter got assigned to a non-ASF, non-SC bay."); //$NON-NLS-1$
+                        MekHQ.getLogger().error("Fighter got assigned to a non-ASF, non-SC bay.");
                         break;
                     }
                 }
                 //This shouldn't happen either
-                MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                        "Fighter's bay number assignment produced a null bay"); //$NON-NLS-1$
+                MekHQ.getLogger().error("Fighter's bay number assignment produced a null bay");
                 break;
             case UnitType.DROPSHIP:
                 setDocks(Math.min((getCurrentDocks() + amount),getDocks()));
@@ -1338,14 +1364,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         break;
                     } else {
                         //This shouldn't happen
-                        MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                                "Vehicle got assigned to a non-light/heavy/super heavy vehicle bay."); //$NON-NLS-1$
+                        MekHQ.getLogger().error("Vehicle got assigned to a non-light/heavy/super heavy vehicle bay.");
                         break;
                     }
                 }
                 //This shouldn't happen either
-                MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                        "Vehicle's bay number assignment produced a null bay"); //$NON-NLS-1$
+                MekHQ.getLogger().error("Vehicle's bay number assignment produced a null bay");
                 break;
         }
     }
@@ -1562,8 +1586,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 unitWeight = u.getEntity().getWeight();
             }
             int bayNumber = Utilities.selectBestBayFor(u.getEntity(), getEntity());
-            u.setTransportShipId(getId(),bayNumber);
-            addTransportedUnit(u.getId());
+            addTransportedUnit(u, bayNumber);
             updateBayCapacity(unitType, unitWeight, false, bayNumber);
         }
     }
@@ -1588,20 +1611,28 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param u The unit that we wish to unload from this transport
      */
     public void unloadFromTransportShip(Unit u) {
-        int unitType = u.getEntity().getUnitType();
-        double unitWeight;
-        if (u.getEntity().getUnitType() == UnitType.INFANTRY) {
-            unitWeight = calcInfantryBayWeight(u.getEntity());
-        } else {
-            unitWeight = u.getEntity().getWeight();
-        }
-        for (UUID id : u.getTransportShipId().keySet()) {
-            int bayNumber = u.getTransportShipId().get(id);
-            updateBayCapacity(unitType, unitWeight, true, bayNumber);
-        }
-        removeTransportedUnit(u.getId());
-        u.getTransportShipId().clear();
+        Objects.requireNonNull(u);
 
+        // Remove this unit from our collection of transported units.
+        removeTransportedUnit(u);
+
+        // And if the unit is being transported by us,
+        // then update its transport ship assignment (provided the
+        // assignment is actually to us!).
+        if (u.hasTransportShipAssignment()
+                && u.getTransportShipAssignment().getTransportShip().equals(this)) {
+            double unitWeight;
+            if (u.getEntity().getUnitType() == UnitType.INFANTRY) {
+                unitWeight = calcInfantryBayWeight(u.getEntity());
+            } else {
+                unitWeight = u.getEntity().getWeight();
+            }
+
+            updateBayCapacity(u.getEntity().getUnitType(), unitWeight,
+                    true, u.getTransportShipAssignment().getBayNumber());
+
+            u.setTransportShipAssignment(null);
+        }
     }
 
     /**
@@ -1611,16 +1642,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void unloadTransportShip() {
         clearTransportedUnits();
         initializeBaySpace();
+
         // And now reset the Transported values for all the units we just booted
-        for (Unit u : campaign.getUnits()) {
-            if (u.hasTransportShipId()) {
-                for (UUID id : u.getTransportShipId().keySet()) {
-                    if (id.equals(getId())) {
-                        u.getTransportShipId().clear();
-                    }
-                }
+        campaign.getHangar().forEachUnit(u -> {
+            if (u.hasTransportShipAssignment()
+                    && Objects.equals(this, u.getTransportShipAssignment().getTransportShip())) {
+                u.setTransportShipAssignment(null);
             }
-        }
+        });
     }
 
     public double getUnitCostMultiplier() {
@@ -1692,145 +1721,152 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return cost;
     }
 
-    public int getDamageState() {
-        return getDamageState(getEntity());
-    }
-
     @Override
-    public void writeToXml(PrintWriter pw1, int indentLvl) {
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<unit id=\"" + id.toString()
+    public void writeToXml(PrintWriter pw1, int indent) {
+        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<unit id=\"" + id.toString()
                 + "\" type=\"" + this.getClass().getName() + "\">");
 
-        pw1.println(MekHqXmlUtil.writeEntityToXmlString(entity, indentLvl+1, getCampaign().getEntities()));
-        for (UUID did : drivers) {
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<driverId>"
-                    + did.toString() + "</driverId>");
+        pw1.println(MekHqXmlUtil.writeEntityToXmlString(entity, indent, getCampaign().getEntities()));
+        for (Person driver : drivers) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "driverId", driver.getId());
         }
-        for (UUID gid : gunners) {
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<gunnerId>"
-                    + gid.toString() + "</gunnerId>");
+        for (Person gunner : gunners) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "gunnerId", gunner.getId());
         }
-        for (UUID vid : vesselCrew) {
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<vesselCrewId>"
-                    + vid.toString() + "</vesselCrewId>");
+        for (Person crew : vesselCrew) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "vesselCrewId", crew.getId());
         }
-        if (null != navigator) {
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                    +"<navigatorId>"
-                    +navigator.toString()
-                    +"</navigatorId>");
+        if (navigator != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "navigatorId", navigator.getId());
         }
-        if (null != techOfficer) {
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                    +"<techOfficerId>"
-                    +techOfficer.toString()
-                    +"</techOfficerId>");
+        if (techOfficer != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techOfficerId", techOfficer.getId());
         }
-        if (null != tech) {
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                    +"<techId>"
-                    +tech.toString()
-                    +"</techId>");
+        if (tech != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", tech.getId());
         }
+
         // If this entity is assigned to a transport, write that
-        if (hasTransportShipId()) {
-            for (UUID id : getTransportShipId().keySet()) {
-                pw1.println(MekHqXmlUtil.indentStr(indentLvl+1) + "<transportShip id=\"" + id.toString()
-                        + "\" baynumber=\"" + getTransportShipId().get(id) + "\"/>");
+        if (hasTransportShipAssignment()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent) + "<transportShip id=\""
+                    + getTransportShipAssignment().getTransportShip().getId()
+                    + "\" baynumber=\"" + getTransportShipAssignment().getBayNumber() + "\"/>");
+        }
+
+        for (Unit unit : getTransportedUnits()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "transportedUnitId", unit.getId());
+        }
+
+        //Used transport bay space
+        if ((getEntity() != null) && !getEntity().getTransportBays().isEmpty()) {
+            if (aeroCapacity > 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "asfCapacity", aeroCapacity);
+            }
+
+            if (baCapacity > 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "baCapacity", baCapacity);
+            }
+
+            if (dockCapacity > 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "dockCapacity", dockCapacity);
+            }
+
+            if (hVeeCapacity > 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "hVeeCapacity", hVeeCapacity);
+            }
+
+            if (infCapacity > 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "infCapacity", infCapacity);
+            }
+
+            if (lVeeCapacity > 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "lVeeCapacity", lVeeCapacity);
+            }
+
+            if (mechCapacity > 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mechCapacity", mechCapacity);
+            }
+
+            if (protoCapacity > 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "protoCapacity", protoCapacity);
+            }
+
+            if (scCapacity > 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scCapacity", scCapacity);
+            }
+
+            if (shVeeCapacity > 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "shVeeCapacity", shVeeCapacity);
             }
         }
-        for (UUID uid : getTransportedUnits()) {
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<transportedUnitId>"
-                    + uid.toString() + "</transportedUnitId>");
-        }
-        //Used transport bay space
-        if (getEntity() != null && !getEntity().getTransportBays().isEmpty()) {
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<asfCapacity>"
-                    + aeroCapacity + "</asfCapacity>");
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<baCapacity>"
-                    + baCapacity + "</baCapacity>");
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<dockCapacity>"
-                    + dockCapacity + "</dockCapacity>");
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<hVeeCapacity>"
-                    + hVeeCapacity + "</hVeeCapacity>");
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<infCapacity>"
-                    + infCapacity + "</infCapacity>");
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<lVeeCapacity>"
-                    + lVeeCapacity + "</lVeeCapacity>");
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<mechCapacity>"
-                    + mechCapacity + "</mechCapacity>");
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<protoCapacity>"
-                    + protoCapacity + "</protoCapacity>");
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<scCapacity>"
-                    + scCapacity + "</scCapacity>");
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<shVeeCapacity>"
-                    + shVeeCapacity + "</shVeeCapacity>");
-        }
         //Salvage status
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<salvaged>"
-                + salvaged + "</salvaged>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<site>" + site
-                + "</site>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<forceId>"
-                +forceId
-                +"</forceId>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<scenarioId>"
-                +scenarioId
-                +"</scenarioId>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<daysToArrival>"
-                +daysToArrival
-                +"</daysToArrival>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<daysSinceMaintenance>"
-                +daysSinceMaintenance
-                +"</daysSinceMaintenance>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<daysActivelyMaintained>"
-                +daysActivelyMaintained
-                +"</daysActivelyMaintained>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<astechDaysMaintained>"
-                +astechDaysMaintained
-                +"</astechDaysMaintained>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<mothballTime>"
-                +mothballTime
-                +"</mothballTime>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<mothballed>"
-                +mothballed
-                +"</mothballed>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<fluffName>"
-                +MekHqXmlUtil.escape(fluffName)
-                +"</fluffName>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<history>"
-                +MekHqXmlUtil.escape(history)
-                +"</history>");
-        if (null != refit) {
-            refit.writeToXml(pw1, indentLvl+1);
-        }
-        if (null != lastMaintenanceReport && getCampaign().getCampaignOptions().checkMaintenance()) {
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                    +"<lastMaintenanceReport><![CDATA["
-                    +lastMaintenanceReport
-                    +"]]></lastMaintenanceReport>");
+        if (salvaged) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salvaged", true);
         }
 
-        if (null != mothballInfo) {
-            mothballInfo.writeToXml(pw1, indentLvl);
+        if (site != SITE_BAY) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "site", site);
         }
 
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
+        if (forceId != Force.FORCE_NONE) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "forceId", forceId);
+        }
+
+        if (scenarioId != Scenario.S_DEFAULT_ID) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scenarioId", scenarioId);
+        }
+
+        if (daysToArrival > 0) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "daysToArrival", daysToArrival);
+        }
+
+        if (daysSinceMaintenance > 0) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "daysSinceMaintenance", daysSinceMaintenance);
+        }
+
+        if (daysActivelyMaintained > 0) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "daysActivelyMaintained", daysActivelyMaintained);
+        }
+
+        if (astechDaysMaintained > 0) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "astechDaysMaintained", astechDaysMaintained);
+        }
+
+        if (mothballTime > 0) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mothballTime", mothballTime);
+        }
+
+        if (mothballed) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mothballed", true);
+        }
+
+        if (!fluffName.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "fluffName", fluffName);
+        }
+
+        if (!history.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "history", history);
+        }
+
+        if (refit != null) {
+            refit.writeToXml(pw1, indent);
+        }
+
+        if ((lastMaintenanceReport != null) && !lastMaintenanceReport.isEmpty()
+                && getCampaign().getCampaignOptions().checkMaintenance()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent)
+                    + "<lastMaintenanceReport><![CDATA[" + lastMaintenanceReport + "]]></lastMaintenanceReport>");
+
+        }
+
+        if (mothballInfo != null) {
+            mothballInfo.writeToXml(pw1, indent);
+        }
+
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "unit");
     }
 
     public static Unit generateInstanceFromXML(Node wn, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
-
         Unit retVal = new Unit();
         NamedNodeMap attrs = wn.getAttributes();
         Node idNode = attrs.getNamedItem("id");
@@ -1847,13 +1883,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         NodeList nl = wn.getChildNodes();
 
         try {
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("site")) {
                     retVal.site = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
-                    retVal.pilotId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToArrival")) {
                     retVal.daysToArrival = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysActivelyMaintained")) {
@@ -1865,91 +1899,61 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("astechDaysMaintained")) {
                     retVal.astechDaysMaintained = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldDrivers.add(Integer.parseInt(wn2.getTextContent()));
-                    } else {
-                        retVal.drivers.add(UUID.fromString(wn2.getTextContent()));
-                    }
+                    retVal.drivers.add(new UnitPersonRef(UUID.fromString(wn2.getTextContent())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("gunnerId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldGunners.add(Integer.parseInt(wn2.getTextContent()));
-                    } else {
-                        retVal.gunners.add(UUID.fromString(wn2.getTextContent()));
-                    }
+                    retVal.gunners.add(new UnitPersonRef(UUID.fromString(wn2.getTextContent())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("vesselCrewId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldVesselCrew.add(Integer.parseInt(wn2.getTextContent()));
-                    } else {
-                        retVal.vesselCrew.add(UUID.fromString(wn2.getTextContent()));
-                    }
+                    retVal.vesselCrew.add(new UnitPersonRef(UUID.fromString(wn2.getTextContent())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("navigatorId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldNavigator = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        if (!wn2.getTextContent().equals("null")) {
-                            retVal.navigator = UUID.fromString(wn2.getTextContent());
-                        }
+                    if (!wn2.getTextContent().equals("null")) {
+                        retVal.navigator = new UnitPersonRef(UUID.fromString(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("techOfficerId")) {
                     if (!wn2.getTextContent().equals("null")) {
-                        retVal.techOfficer = UUID.fromString(wn2.getTextContent());
+                        retVal.techOfficer = new UnitPersonRef(UUID.fromString(wn2.getTextContent()));
                     }
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
                     if (!wn2.getTextContent().equals("null")) {
-                        retVal.tech = UUID.fromString(wn2.getTextContent());
+                        retVal.tech = new UnitPersonRef(UUID.fromString(wn2.getTextContent()));
                     }
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("transportShip")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportShip")) {
                     NamedNodeMap attributes = wn2.getAttributes();
                     UUID id = UUID.fromString(attributes.getNamedItem("id").getTextContent());
                     int bay = Integer.parseInt(attributes.getNamedItem("baynumber").getTextContent());
-                    retVal.setTransportShipId(id, bay);
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("transportedUnitId")) {
-                    retVal.addTransportedUnit(UUID.fromString(wn2.getTextContent()));
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("asfCapacity")) {
+                    retVal.setTransportShipAssignment(new TransportShipAssignment(new UnitRef(id), bay));
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportedUnitId")) {
+                    retVal.addTransportedUnit(new UnitRef(UUID.fromString(wn2.getTextContent())));
+                } else if (wn2.getNodeName().equalsIgnoreCase("asfCapacity")) {
                     retVal.setASFCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("baCapacity")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("baCapacity")) {
                     retVal.setBattleArmorCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("dockCapacity")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("dockCapacity")) {
                     retVal.setDocks(Integer.parseInt(wn2.getTextContent()));
                     needsBayInitialization = false;
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("hVeeCapacity")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("hVeeCapacity")) {
                     retVal.setHeavyVehicleCapacity(Double.parseDouble(wn2.getTextContent()));
                    needsBayInitialization = false;
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("infCapacity")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("infCapacity")) {
                     retVal.setInfantryCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("lVeeCapacity")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("lVeeCapacity")) {
                     retVal.setLightVehicleCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("mechCapacity")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("mechCapacity")) {
                     retVal.setMechCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("protoCapacity")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("protoCapacity")) {
                     retVal.setProtoCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("scCapacity")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("scCapacity")) {
                     retVal.setSmallCraftCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("shVeeCapacity")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("shVeeCapacity")) {
                     retVal.setSuperHeavyVehicleCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
                     retVal.forceId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
@@ -1978,13 +1982,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().error(Unit.class, METHOD_NAME, "Could not parse unit " + idNode.getTextContent().trim(), ex);
+            MekHQ.getLogger().error("Could not parse unit " + idNode.getTextContent().trim(), ex);
             return null;
         }
 
         if (retVal.id == null) {
-            MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.WARNING,
-                    "ID not pre-defined; generating unit's ID."); //$NON-NLS-1$
+            MekHQ.getLogger().warning("ID not pre-defined; generating unit's ID.");
             retVal.id = UUID.randomUUID();
         }
 
@@ -2644,11 +2647,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 int fullShots = oneShot ? 1 : ((AmmoType) m.getType()).getShots();
                 if (null == apart) {
                     if (entity instanceof BattleArmor) {
-                        apart = new BattleArmorAmmoBin((int) entity.getWeight(), m.getType(), eqnum,
+                        apart = new BattleArmorAmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqnum,
                                 ((BattleArmor) entity).getSquadSize() * (fullShots - m.getBaseShotsLeft()),
                                 oneShot, getCampaign());
                     } else if (entity.usesWeaponBays()) {
-                        apart = new LargeCraftAmmoBin((int) entity.getWeight(), m.getType(), eqnum,
+                        apart = new LargeCraftAmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqnum,
                                 fullShots - m.getBaseShotsLeft(), m.getSize(), getCampaign());
                         ((LargeCraftAmmoBin) apart).setBay(entity.getBayByAmmo(m));
                     } else if (entity.isSupportVehicle()
@@ -2658,11 +2661,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                             weapon = weapon.getLinkedBy();
                         }
                         int size = m.getOriginalShots() / ((InfantryWeapon) weapon.getType()).getShots();
-                        apart = new InfantryAmmoBin((int) entity.getWeight(), m.getType(), eqnum,
+                        apart = new InfantryAmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqnum,
                                 m.getOriginalShots() - m.getBaseShotsLeft(),
                                 (InfantryWeapon) weapon.getType(), size, weapon.isOmniPodMounted(), getCampaign());
                     } else {
-                        apart = new AmmoBin((int) entity.getWeight(), m.getType(), eqnum,
+                        apart = new AmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqnum,
                                 fullShots - m.getBaseShotsLeft(), oneShot, m.isOmniPodMounted(), getCampaign());
                     }
                     addPart(apart);
@@ -2790,8 +2793,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                 }
             } else {
-                List<Part> doors = bayPart.getChildPartIds().stream()
-                        .map(id -> getCampaign().getPart(id))
+                List<Part> doors = bayPart.getChildParts().stream()
                         .filter(p -> ((p instanceof BayDoor) || (p instanceof MissingBayDoor)))
                         .collect(Collectors.toList());
                 while (bay.getDoors() > doors.size()) {
@@ -2802,8 +2804,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     doors.add(door);
                 }
                 if (btype.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
-                    List<Part> cubicles = bayPart.getChildPartIds().stream()
-                            .map(id -> getCampaign().getPart(id))
+                    List<Part> cubicles = bayPart.getChildParts().stream()
                             .filter(p -> ((p instanceof Cubicle) || (p instanceof MissingCubicle)))
                             .collect(Collectors.toList());
                     while (bay.getCapacity() > cubicles.size()) {
@@ -3203,7 +3204,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         if (addParts) {
             for (Part p : partsToAdd) {
-                getCampaign().addPart(p, 0);
+                getCampaign().getQuartermaster().addPart(p, 0);
             }
         }
         // We can't add the child parts to the transport bay part until they have been added to the
@@ -3241,22 +3242,24 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         for (Mounted m : entity.getAmmo()) {
+            assert(m.getType() instanceof AmmoType);
+
             int eqNum = entity.getEquipmentNum(m);
             Part part = ammoParts.get(eqNum);
             if (null == part) {
-                part = new LargeCraftAmmoBin((int)entity.getWeight(), m.getType(), eqNum,
+                part = new LargeCraftAmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqNum,
                         m.getOriginalShots() - m.getBaseShotsLeft(), m.getAmmoCapacity(), getCampaign());
                 ((LargeCraftAmmoBin) part).setBay(entity.getBayByAmmo(m));
                 toAdd.add(part);
             } else {
                 part.updateConditionFromEntity(false);
                 // Reset the name
-                ((LargeCraftAmmoBin) part).changeMunition(m.getType());
+                ((LargeCraftAmmoBin) part).changeMunition((AmmoType) m.getType());
             }
         }
         for (Part p : toAdd) {
             addPart(p);
-            getCampaign().addPart(p, 0);
+            getCampaign().getQuartermaster().addPart(p, 0);
         }
     }
 
@@ -3268,7 +3271,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param bay   The weapon bay where the ammo is located
      * @return      The new ammo bin part
      */
-    public LargeCraftAmmoBin addBayAmmoBin(EquipmentType etype, Mounted bay) {
+    public LargeCraftAmmoBin addBayAmmoBin(AmmoType etype, Mounted bay) {
         for (Part p : getParts()) {
             if (p instanceof LargeCraftAmmoBin) {
                 final LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
@@ -3286,19 +3289,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             LargeCraftAmmoBin bin = new LargeCraftAmmoBin((int) entity.getWeight(), etype, anum,
                     0, 0, getCampaign());
             addPart(bin);
-            getCampaign().addPart(bin, 0);
+            getCampaign().getQuartermaster().addPart(bin, 0);
             return bin;
         } catch (LocationFullException ex) {
-            MekHQ.getLogger().log(Unit.class, "addBayAmmoBin(EquipmentType, Mounted)",
-                    LogLevel.ERROR, "Location full exception attempting to add " + etype.getDesc()
-                    + " to unit " + getName());
-            MekHQ.getLogger().error(Unit.class, "addBayAmmoBin(EquipmentType, Mounted)", ex);
+            MekHQ.getLogger().error(Unit.class, "Location full exception attempting to add " + etype.getDesc() + " to unit " + getName());
+            MekHQ.getLogger().error(Unit.class, ex);
             return null;
         }
 
     }
 
-    public ArrayList<Part> getParts() {
+    public List<Part> getParts() {
         return parts;
     }
 
@@ -3306,7 +3307,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         parts = newParts;
     }
 
-    public ArrayList<PodSpace> getPodSpace() {
+    public List<PodSpace> getPodSpace() {
         return podSpace;
     }
 
@@ -3314,14 +3315,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         podSpace.forEach(ps -> ps.updateConditionFromEntity(false));
     }
 
-    public ArrayList<AmmoBin> getWorkingAmmoBins() {
-        ArrayList<AmmoBin> ammo = new ArrayList<>();
+    public List<AmmoBin> getWorkingAmmoBins() {
+        List<AmmoBin> ammo = new ArrayList<>();
         for (Part part : parts) {
             if (part instanceof AmmoBin) {
                 ammo.add((AmmoBin)part);
             }
         }
         return ammo;
+    }
+
+    public AbstractIcon getCamouflage() {
+        return new Camouflage(getCamoCategory(), getCamoFileName());
     }
 
     public String getCamoCategory() {
@@ -3334,7 +3339,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             category = entity.getCamoCategory();
         }
 
-        if (Player.ROOT_CAMO.equals(category)) {
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
             category = "";
         }
 
@@ -3383,37 +3388,24 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         Person commander = null;
 
-        for (UUID pid : vesselCrew) {
-            if (pid == null) {
-                continue;
-            }
-            Person p = getCampaign().getPerson(pid);
-            if ((p != null) && p.outRanks(commander)) {
+        for (Person p : vesselCrew) {
+            if (p.outRanks(commander)) {
                 commander = p;
             }
         }
-        for (UUID pid : gunners) {
-            if (pid == null) {
-                continue;
-            }
-            Person p = getCampaign().getPerson(pid);
-            if ((p != null) && p.outRanks(commander)) {
+        for (Person p : gunners) {
+            if (p.outRanks(commander)) {
                 commander = p;
             }
         }
-        for (UUID pid : drivers) {
-            if (pid == null) {
-                continue;
-            }
-            Person p = getCampaign().getPerson(pid);
-            if ((p != null) && p.outRanks(commander)) {
+        for (Person p : drivers) {
+            if (p.outRanks(commander)) {
                 commander = p;
             }
         }
         if (navigator != null) {
-            Person p = getCampaign().getPerson(navigator);
-            if ((p != null) && p.outRanks(commander)) {
-                commander = p;
+            if (navigator.outRanks(commander)) {
+                commander = navigator;
             }
         }
         return commander;
@@ -3427,8 +3419,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
                 //Command console; each crew is assigned as both driver and gunner
                 int slot = 0;
-                for (UUID pid : gunners) {
-                    final Person p = getCampaign().getPerson(pid);
+                for (Person p : gunners) {
                     if (p.hasSkill(gunType) && p.hasSkill(driveType) && p.getStatus().isActive()
                             && slot < entity.getCrew().getSlotCount()) {
                         assignToCrewSlot(p, slot, gunType, driveType);
@@ -3440,15 +3431,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             } else {
                 //tripod, quadvee, or dual cockpit; driver and gunner are assigned separately
-                Optional<Person> person = drivers.stream().map(id -> getCampaign().getPerson(id))
-                        .filter(p -> p.hasSkill(driveType) && p.getStatus().isActive()).findFirst();
+                Optional<Person> person = drivers.stream().filter(p -> p.hasSkill(driveType) && p.getStatus().isActive())
+                        .findFirst();
                 if (person.isPresent()) {
                     assignToCrewSlot(person.get(), 0, gunType, driveType);
                 } else {
                     entity.getCrew().setMissing(true, 0);
                 }
-                person = gunners.stream().map(id -> getCampaign().getPerson(id))
-                        .filter(p -> p.hasSkill(driveType) && p.getStatus().isActive()).findFirst();
+                person = gunners.stream().filter(p -> p.hasSkill(driveType) && p.getStatus().isActive())
+                        .findFirst();
                 if (person.isPresent()) {
                     assignToCrewSlot(person.get(), 1, gunType, driveType);
                 } else {
@@ -3456,14 +3447,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
                 int techPos = entity.getCrew().getCrewType().getTechPos();
                 if (techPos >= 0) {
-                    Person to = null;
-                    if (null != techOfficer) {
-                        to = getCampaign().getPerson(techOfficer);
+                    Person to = techOfficer;
+                    if (to != null) {
                         if (!to.hasSkill(driveType) || !to.hasSkill(gunType) || !to.getStatus().isActive()) {
                             to = null;
                         }
                     }
-                    if (null != to) {
+                    if (to != null) {
                         assignToCrewSlot(to, techPos, gunType, driveType);
                     } else {
                         entity.getCrew().setMissing(true, techPos);
@@ -3535,15 +3525,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
                 //Combine drivers and gunners into a single list
 
-                List<UUID> combatCrew = new ArrayList<>(drivers);
+                List<Person> crew = new ArrayList<>(drivers);
 
                 //Infantry and BA troops count as both drivers and gunners
                 //only count them once.
                 if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
-                    combatCrew.addAll(gunners);
+                    crew.addAll(gunners);
                 }
-                double crewSize = combatCrew.size();
-                Stream<Person> crew = combatCrew.stream().map(id -> getCampaign().getPerson(id));
+                double crewSize = crew.size();
 
                 // This does the following:
                 // 1. For each crew member, get all of their PilotOptions by name
@@ -3551,7 +3540,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 // 3. Group these options by their name
                 // 4. For each group, group by the object value and get the counts for each value
                 // 5. Take each group which has more than crewSize/2 values, and find the maximum value
-                Map<String, Optional<Object>> bestOptions = crew.flatMap(p -> optionNames.stream().map(n -> p.getOptions().getOption(n)))
+                Map<String, Optional<Object>> bestOptions = crew.stream().flatMap(p -> optionNames.stream().map(n -> p.getOptions().getOption(n)))
                     .collect(Collectors.groupingBy(
                         IOption::getName,
                         Collectors.collectingAndThen(
@@ -3598,15 +3587,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 //This overwrites the Edge value assigned above.
                 if (getCampaign().getCampaignOptions().useEdge()) {
                     double sumEdge = 0;
-                    int edge = 0;
-                    for (UUID pid : drivers) {
-                        Person p = getCampaign().getPerson(pid);
+                    int edge;
+                    for (Person p : drivers) {
                         sumEdge += p.getEdge();
                     }
                     //Again, don't count infantrymen twice
                     if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
-                        for (UUID pid : gunners) {
-                            Person p = getCampaign().getPerson(pid);
+                        for (Person p : gunners) {
                             sumEdge += p.getEdge();
                         }
                     }
@@ -3696,8 +3683,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         int nGunners = 0;
         int nCrew = 0;
 
-        for (UUID pid : drivers) {
-            Person p = getCampaign().getPerson(pid);
+        for (Person p : drivers) {
             if (p.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
@@ -3720,8 +3706,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 sumPiloting += p.getPilotingInjuryMod();
             }
         }
-        for (UUID pid : gunners) {
-            Person p = getCampaign().getPerson(pid);
+        for (Person p : gunners) {
             if (p.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
@@ -3738,28 +3723,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
 
-        for (UUID pid : vesselCrew) {
-            Person p = getCampaign().getPerson(pid);
-            if (null !=p && p.getHits() == 0) {
+        for (Person p : vesselCrew) {
+            if (p.getHits() == 0) {
                 nCrew++;
             }
         }
-        if (null != navigator) {
-            Person p = getCampaign().getPerson(navigator);
-            if (null !=p && p.getHits() == 0) {
-                nCrew++;
-            }
+        if ((getNavigator() != null) && (getNavigator().getHits() == 0)) {
+            nCrew++;
         }
         //Using the tech officer field for the secondary commander; if nobody assigned to the command
         //console we will flag the entity as using the console commander, which has the effect of limiting
         //the tank to a single commander. As the console commander is not counted against crew requirements,
         //we do not increase nCrew if present.
         if (entity instanceof Tank && ((Tank)entity).hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
-            Person p = null;
-            if (null != techOfficer) {
-                p = getCampaign().getPerson(techOfficer);
-            }
-            if (null == p || p.getHits() > 0) {
+            if ((techOfficer == null) || (techOfficer.getHits() > 0)) {
                 ((Tank)entity).setUsingConsoleCommander(true);
             }
         }
@@ -3988,17 +3965,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 String engineerGivenName = "Nobody";
                 String engineerSurname = "Nobody";
                 int bestRank = Integer.MIN_VALUE;
-                for (UUID pid : vesselCrew) {
-                    Person p = getCampaign().getPerson(pid);
-                    if (null == p) {
-                        continue;
-                    }
+                for (Person p : vesselCrew) {
                     if (engineer != null) {
                         //If the engineer used edge points, remove some from vessel crewmembers until all is paid for
                         if (engineer.getEdgeUsed() > 0) {
                             //Don't subtract an Edge if the individual has none left
                             if (p.getCurrentEdge() > 0) {
-                                p.setCurrentEdge(p.getCurrentEdge() - 1);
+                                p.changeCurrentEdge(-1);
                                 engineer.setEdgeUsed(engineer.getEdgeUsed() - 1);
                             }
                         }
@@ -4047,7 +4020,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
                     engineer.setEdgeUsed(sumEdgeUsed);
                     engineer.setCurrentEdge((sumEdge - sumEdgeUsed) / nCrew);
-                    engineer.setUnitId(this.getId());
+                    engineer.setUnit(this);
                 } else {
                     engineer = null;
                 }
@@ -4059,7 +4032,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             //change reference for any scheduled tasks
             for (Part p : getParts()) {
                 if (p.isBeingWorkedOn()) {
-                    p.setTeamId(engineer.getId());
+                    p.setTech(engineer);
                 }
             }
         } else {
@@ -4125,18 +4098,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean canTakeNavigator() {
-        return entity instanceof Jumpship && !(entity instanceof SpaceStation) && navigator == null;
+        return entity instanceof Jumpship && !(entity instanceof SpaceStation) && (navigator == null);
     }
 
     public boolean canTakeTechOfficer() {
-        return techOfficer == null &&
+        return (techOfficer == null) &&
                 (entity.getCrew().getCrewType().getTechPos() >= 0
                 //Use techOfficer field for secondary commander
                 || (entity instanceof Tank && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)));
     }
 
     public boolean canTakeTech() {
-        return tech == null && requiresMaintenance() && !isSelfCrewed();
+        return isUnmaintained() && !isSelfCrewed();
     }
 
     // TODO : Switch similar tables in person to use this one instead
@@ -4185,14 +4158,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addDriver(Person p, boolean useTransfers) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
-        drivers.add(p.getId());
-        p.setUnitId(getId());
+        drivers.add(p);
+        p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());        }
+            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+        }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
 
@@ -4201,9 +4177,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addGunner(Person p, boolean useTransfers) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
-        gunners.add(p.getId());
-        p.setUnitId(getId());
+        gunners.add(p);
+        p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
@@ -4218,9 +4196,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addVesselCrew(Person p, boolean useTransfers) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
-        vesselCrew.add(p.getId());
-        p.setUnitId(getId());
+        vesselCrew.add(p);
+        p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
@@ -4235,9 +4215,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void setNavigator(Person p, boolean useTransfers) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
-        navigator = p.getId();
-        p.setUnitId(getId());
+        navigator = p;
+        p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
@@ -4247,8 +4229,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
 
-    public boolean isTechOfficer(Person p) {
-        return null != techOfficer && techOfficer.equals(p.getId());
+    public boolean isTechOfficer(@Nullable Person p) {
+        return (techOfficer != null) && techOfficer.equals(p);
     }
 
     public void setTechOfficer(Person p) {
@@ -4256,9 +4238,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void setTechOfficer(Person p, boolean useTransfers) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
-        techOfficer = p.getId();
-        p.setUnitId(getId());
+        techOfficer = p;
+        p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
@@ -4269,25 +4253,24 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void setTech(Person p) {
+        Objects.requireNonNull(p);
+
         if (null != tech) {
-            MekHQ.getLogger().log(Unit.class, "setTech(Person)", LogLevel.WARNING,
-                String.format("New tech assigned %s without removing previous tech %s", p.getFullName(), tech));
+            MekHQ.getLogger().warning(String.format("New tech assigned %s without removing previous tech %s", p.getFullName(), tech));
         }
         ensurePersonIsRegistered(p);
-        tech = p.getId();
-        p.addTechUnitID(getId());
+        tech = p;
+        p.addTechUnit(this);
         ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
         MekHQ.triggerEvent(new PersonTechAssignmentEvent(p, this));
     }
 
     public void removeTech() {
         if (tech != null) {
-            Person p = getCampaign().getPerson(tech);
-            if (null != p) {
-                p.removeTechUnitId(getId());
-            }
+            Person originalTech = tech;
+            tech.removeTechUnit(this);
             tech = null;
-            MekHQ.triggerEvent(new PersonTechAssignmentEvent(p, this));
+            MekHQ.triggerEvent(new PersonTechAssignmentEvent(originalTech, null));
         }
     }
 
@@ -4295,8 +4278,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Objects.requireNonNull(p);
         if (null == getCampaign().getPerson(p.getId())) {
             getCampaign().recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), true,  false);
-            MekHQ.getLogger().log(Unit.class, "ensurePersonIsRegistered(Person)", LogLevel.WARNING,
-                String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
+            MekHQ.getLogger().warning(String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
         }
     }
 
@@ -4305,13 +4287,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void addPilotOrSoldier(Person p, boolean useTransfers) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
-        drivers.add(p.getId());
+        drivers.add(p);
         //Multi-crew cockpits should not set the pilot to the gunner position
         if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
-            gunners.add(p.getId());
+            gunners.add(p);
         }
-        p.setUnitId(getId());
+        p.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
             ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
@@ -4322,21 +4306,23 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void remove(Person p, boolean log) {
+        Objects.requireNonNull(p);
+
         ensurePersonIsRegistered(p);
-        if (p.getId().equals(tech)) {
+        if (p.equals(tech)) {
             removeTech();
         } else {
-            p.setUnitId(null);
-            drivers.remove(p.getId());
-            gunners.remove(p.getId());
-            vesselCrew.remove(p.getId());
-            if (p.getId().equals(navigator)) {
+            p.setUnit(null);
+            drivers.remove(p);
+            gunners.remove(p);
+            vesselCrew.remove(p);
+            if (p.equals(navigator)) {
                 navigator = null;
             }
-            if (p.getId().equals(techOfficer)) {
+            if (p.equals(techOfficer)) {
                 techOfficer = null;
             }
-            if ((null != engineer) && p.getId().equals(engineer.getId())) {
+            if (p.equals(engineer)) {
                 engineer = null;
             }
             resetPilotAndEntity();
@@ -4369,71 +4355,51 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public ArrayList<Person> getCrew() {
         ArrayList<Person> crew = new ArrayList<>();
-        for (UUID id : drivers) {
-            Person p = getCampaign().getPerson(id);
-            if (null != p) {
-                crew.add(p);
-            }
+        for (Person p : drivers) {
+            crew.add(p);
         }
         if (!usesSoloPilot() && !usesSoldiers()) {
-            for (UUID id : gunners) {
-                Person p = getCampaign().getPerson(id);
-                if (null != p) {
-                    crew.add(p);
-                }
-            }
-        }
-        for (UUID id : vesselCrew) {
-            Person p = getCampaign().getPerson(id);
-            if (null != p) {
+            for (Person p : gunners) {
                 crew.add(p);
             }
+        }
+        for (Person p : vesselCrew) {
+            crew.add(p);
         }
         if (navigator != null) {
-            Person p = getCampaign().getPerson(navigator);
-            if (null != p) {
-                crew.add(p);
-            }
+            crew.add(navigator);
         }
         if (techOfficer != null) {
-            Person p = getCampaign().getPerson(techOfficer);
-            if (null != p) {
-                crew.add(p);
-            }
+            crew.add(techOfficer);
         }
         return crew;
     }
 
-    public ArrayList<UUID> getDriverIDs() {
-        return drivers;
+    public List<Person> getDrivers() {
+        return Collections.unmodifiableList(drivers);
     }
 
-    public ArrayList<UUID> getGunnerIDs() {
-        return gunners;
+    public List<Person> getGunners() {
+        return Collections.unmodifiableList(gunners);
     }
 
-    public ArrayList<UUID> getVesselCrewIDs() {
-        return vesselCrew;
+    public List<Person> getVesselCrew() {
+        return Collections.unmodifiableList(vesselCrew);
     }
 
-    public UUID getTechOfficerID() {
+    public @Nullable Person getTechOfficer() {
         return techOfficer;
     }
 
-    public UUID getNavigatorID() {
+    public @Nullable Person getNavigator() {
         return navigator;
     }
 
-    public Person getTech() {
-        if (null != engineer) {
-            return engineer;
-        }
-        if (null != tech) {
-            return getCampaign().getPerson(tech);
-        }
-        return null;
+    public @Nullable Person getTech() {
+        return (getEngineer() != null) ? getEngineer() : tech;
     }
 
+    //region Mothballing/Activation
     /**
      * Gets a value indicating whether or not the unit is being mothballed
      * or activated.
@@ -4480,7 +4446,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.mothballed = b;
         // Tech gets removed either way bug [#488]
         if (null != tech) {
-            remove(getTech(), true);
+            remove(tech, true);
         }
         if (mothballed) {
             //remove any other personnel
@@ -4496,32 +4462,30 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     /**
      * Begins mothballing a unit.
-     * @param id The ID of the tech performing the mothball.
+     * @param mothballTech The tech performing the mothball.
      */
-    public void startMothballing(UUID id) {
-        startMothballing(id, false);
+    public void startMothballing(Person mothballTech) {
+        startMothballing(mothballTech, false);
     }
 
     /**
      * Begins mothballing a unit, optionally as a GM action.
-     * @param id The ID of the tech performing the mothball.
+     * @param mothballTech The tech performing the mothball.
      * @param isGM A value indicating if the mothball action should
      *             be performed immediately by the GM.
      */
-    public void startMothballing(UUID id, boolean isGM) {
-        if (!isMothballed()) {
+    public void startMothballing(@Nullable Person mothballTech, boolean isGM) {
+        if (!isMothballed() && MekHQ.getMekHQOptions().getSaveMothballState()) {
             mothballInfo = new MothballInfo(this);
         }
 
         //set this person as tech
-        if (!isSelfCrewed() && null != tech && !tech.equals(id)) {
-            if (null != getTech()) {
-                remove(getTech(), true);
-            }
+        if (!isSelfCrewed() && (tech != null) && !tech.equals(mothballTech)) {
+            remove(tech, true);
         }
-        tech = id;
+        tech = mothballTech;
 
-        //dont remove personnel yet, because self crewed units need their crews to mothball
+        //don't remove personnel yet, because self crewed units need their crews to mothball
         getCampaign().removeUnitFromForce(this);
 
         //clear any assigned tasks
@@ -4533,51 +4497,73 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             setMothballTime(getMothballOrActivationTime());
             getCampaign().mothball(this);
         } else {
-            getCampaign().completeMothball(this);
+            completeMothball();
             getCampaign().addReport(getHyperlinkedName() + " has been mothballed (GM)");
         }
     }
 
     /**
-     * Begins activating a unit which has been mothballed.
-     * @param id The ID of the tech performing the activation.
+     * Completes the mothballing of a unit.
      */
-    public void startActivating(UUID id) {
-        startActivating(id, false);
+    public void completeMothball() {
+        if (tech != null) {
+            remove(tech, false);
+        }
+
+        setMothballTime(0);
+        setMothballed(true);
+    }
+
+    /**
+     * Begins activating a unit which has been mothballed.
+     * @param activationTech The tech performing the activation.
+     */
+    public void startActivating(Person activationTech) {
+        startActivating(activationTech, false);
     }
 
     /**
      * Begins activating a unit which has been mothballed,
      * optionally as a GM action.
-     * @param id The ID of the tech performing the activation.
+     * @param activationTech The tech performing the activation.
      * @param isGM A value indicating if the activation action should
      *             be performed immediately by the GM.
      */
-    public void startActivating(UUID id, boolean isGM) {
+    public void startActivating(@Nullable Person activationTech, boolean isGM) {
         if (!isMothballed()) {
             return;
         }
 
-        // if we previously mothballed this unit, attempt to restore its pre-mothball state
-        if (mothballInfo != null) {
-            mothballInfo.restorePreMothballInfo(this, getCampaign());
-            mothballInfo = null;
+        // set this person as tech
+        if (!isSelfCrewed() && (tech != null) && !tech.equals(activationTech)) {
+            remove(tech, true);
         }
-
-        //set this person as tech
-        if (!isSelfCrewed() && null != tech && !tech.equals(id)) {
-            if (null != getTech()) {
-                remove(getTech(), true);
-            }
-        }
-        tech = id;
+        tech = activationTech;
 
         if (!isGM) {
             setMothballTime(getMothballOrActivationTime());
             getCampaign().activate(this);
         } else {
-            getCampaign().completeActivation(this);
+            completeActivation();
             getCampaign().addReport(getHyperlinkedName() + " has been activated (GM)");
+        }
+    }
+
+    /**
+     * Completes the activation of a unit.
+     */
+    public void completeActivation() {
+        if (getTech() != null) {
+            remove(getTech(), false);
+        }
+
+        setMothballTime(0);
+        setMothballed(false);
+
+        // if we previously mothballed this unit, attempt to restore its pre-mothball state
+        if (mothballInfo != null) {
+            mothballInfo.restorePreMothballInfo(this, getCampaign());
+            mothballInfo = null;
         }
     }
 
@@ -4589,8 +4575,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //set mothballing time
         if (getEntity() instanceof Infantry) {
             return TECH_WORK_DAY;
-        } else if (getEntity() instanceof Dropship || getEntity() instanceof Jumpship) {
-            return TECH_WORK_DAY * (int)Math.ceil(getEntity().getWeight()/500.0);
+        } else if ((getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship)) {
+            return TECH_WORK_DAY * (int) Math.ceil(getEntity().getWeight() / 500.0);
         } else if (isMothballed()) {
             return TECH_WORK_DAY;
         } else {
@@ -4608,54 +4594,41 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         setMothballTime(0);
 
-        // ...if we were activating, save our crew
-        if (isMothballed()) {
-            mothballInfo = new MothballInfo(this);
+        // ...if we were mothballing, restore our crew
+        if (!isMothballed()) {
+            mothballInfo.restorePreMothballInfo(this, getCampaign());
+            mothballInfo = null;
         }
 
         // reset our mothball status
         setMothballed(isMothballed());
     }
+    //endregion Mothballing/Activation
 
     public ArrayList<Person> getActiveCrew() {
         ArrayList<Person> crew = new ArrayList<>();
-        for (UUID id : drivers) {
-            Person p = getCampaign().getPerson(id);
-            if (null != p) {
+        for (Person p : drivers) {
+            if (p.getHits() > 0 && (entity instanceof Tank || entity instanceof Infantry)) {
+                continue;
+            }
+            crew.add(p);
+        }
+        if (!usesSoloPilot() && !usesSoldiers()) {
+            for (Person p : gunners) {
                 if (p.getHits() > 0 && (entity instanceof Tank || entity instanceof Infantry)) {
                     continue;
                 }
                 crew.add(p);
             }
         }
-        if (!usesSoloPilot() && !usesSoldiers()) {
-            for (UUID id : gunners) {
-                Person p = getCampaign().getPerson(id);
-                if (null != p) {
-                    if (p.getHits() > 0 && (entity instanceof Tank || entity instanceof Infantry)) {
-                        continue;
-                    }
-                    crew.add(p);
-                }
-            }
+        for (Person p : vesselCrew) {
+            crew.add(p);
         }
-        for (UUID id : vesselCrew) {
-            Person p = getCampaign().getPerson(id);
-            if (null != p) {
-                crew.add(p);
-            }
-        }
-        if (null != navigator) {
-            Person p = getCampaign().getPerson(navigator);
-            if (null != p) {
-                crew.add(p);
-            }
+        if (navigator != null) {
+            crew.add(navigator);
         }
         if (techOfficer != null) {
-            Person p = getCampaign().getPerson(techOfficer);
-            if (null != p) {
-                crew.add(p);
-            }
+                crew.add(techOfficer);
         }
         return crew;
     }
@@ -4665,32 +4638,21 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @return The number of marines aboard
      */
     public int getMarineCount() {
-        int count = 0;
-        for (UUID id : marines) {
-            Unit marine = campaign.getUnit(id);
-            if (marine != null) {
-                count += marine.getGunnerIDs().size();
-            }
-        }
-        return count;
+        return 0;
+        // TODO: implement Marines
+        // int count = 0;
+        // for (Person marine : marines) {
+        //    count += marine.getGunners().size();
+        // }
+        // return count;
     }
 
-    public boolean isDriver(Person person) {
-        for (UUID id : drivers) {
-            if (person.getId().equals(id)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean isDriver(@Nullable Person person) {
+        return drivers.contains(person);
     }
 
-    public boolean isGunner(Person person) {
-        for (UUID id : gunners) {
-            if (person.getId().equals(id)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean isGunner(@Nullable Person person) {
+        return gunners.contains(person);
     }
 
     /**
@@ -4703,13 +4665,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      *
      * @see {@link #getCommander()}
      */
-    public boolean isCommander(Person person) {
+    public boolean isCommander(@Nullable Person person) {
         Person commander = getCommander();
-        return (null != person) && (null != commander) && person.getId().equals(commander.getId());
+        return (commander != null) && commander.equals(person);
     }
 
-    public boolean isNavigator(Person person) {
-        return person.getId().equals(navigator);
+    public boolean isNavigator(@Nullable Person person) {
+        return (navigator != null) && navigator.equals(person);
     }
 
     public void setRefit(Refit r) {
@@ -4725,10 +4687,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public String getName() {
-        if (getFluffName() != null && !getFluffName().equals("")) {
+        if (!getFluffName().equals("")) {
             return entity.getShortName() + " - " + getFluffName();
+        } else {
+            return entity.getShortName();
         }
-        return entity.getShortName();
     }
 
     public String getHyperlinkedName() {
@@ -4744,49 +4707,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return false;
         }
         final Unit other = (Unit) obj;
-        return Objects.equals(id, other.id) && Objects.equals(getName(), other.getName());
+        return Objects.equals(id, other.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, getName());
+        return Objects.hash(id);
     }
 
     public Person getEngineer() {
         return engineer;
     }
 
-    public UUID getTechId() {
-        return tech;
-    }
-
     public int getOldId() {
         return oldId;
-    }
-
-    public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> peopleHash) {
-        for (int oid : oldDrivers) {
-            UUID nid = peopleHash.get(oid);
-            if (null != nid) {
-                drivers.add(peopleHash.get(oid));
-            }
-        }
-        for (int oid : oldGunners) {
-            UUID nid = peopleHash.get(oid);
-            if (null != nid) {
-                gunners.add(peopleHash.get(oid));
-            }
-        }
-        for (int oid : oldVesselCrew) {
-            UUID nid = peopleHash.get(oid);
-            if (null != nid) {
-                vesselCrew.add(peopleHash.get(oid));
-            }
-        }
-        navigator = peopleHash.get(oldNavigator);
-        if (null != refit) {
-            refit.fixIdReferences(uHash, peopleHash);
-        }
     }
 
     public Part getPartForEquipmentNum(int index, int loc) {
@@ -4799,12 +4733,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isEntityCamo() {
-        return (null != entity) && (null != entity.getCamoCategory()
-                && !entity.getCamoCategory().equals(IPlayer.NO_CAMO)
+        return (entity != null) && ((entity.getCamoCategory() != null)
+                && !Camouflage.NO_CAMOUFLAGE.equals(entity.getCamoCategory())
                 && !entity.getCamoCategory().isEmpty())
-                && (null != entity.getCamoFileName())
-                && (!Player.NO_CAMO.equals(entity.getCamoFileName()))
-                && !entity.getCamoFileName().isEmpty();
+                && ((entity.getCamoFileName() != null)
+                && !Camouflage.NO_CAMOUFLAGE.equals(entity.getCamoFileName())
+                && !entity.getCamoFileName().isEmpty());
     }
 
     public int getAvailability(int era) {
@@ -4994,6 +4928,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor;
     }
 
+    public boolean isUnmaintained() {
+        return requiresMaintenance() && (getTech() == null);
+    }
+
     public boolean isSelfCrewed() {
         return (getEntity() instanceof Dropship || getEntity() instanceof Jumpship
                 || getEntity() instanceof Infantry && !(getEntity() instanceof BattleArmor));
@@ -5001,7 +4939,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public boolean isUnderRepair() {
         for (Part p : getParts()) {
-            if (null != p.getTeamId()) {
+            if (null != p.getTech()) {
                 return true;
             }
         }
@@ -5016,6 +4954,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         lastMaintenanceReport = r;
     }
 
+
+    public int getDamageState() {
+        return getDamageState(getEntity());
+    }
+
     public static int getDamageState(Entity en) {
         return en.getDamageLevel(false);
     }
@@ -5028,14 +4971,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @return the name
      */
     public String getFluffName() {
-        return this.fluffName;
+        return fluffName;
     }
 
     /**
-     * @param name the name to set
+     * @param fluffName the name to set
      */
-    public void setFluffName(String name) {
-        this.fluffName = name;
+    public void setFluffName(String fluffName) {
+        this.fluffName = fluffName;
     }
 
     /**
@@ -5083,7 +5026,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public Money getSparePartsCost() {
-        final String METHOD_NAME = "getSparePartsCost()"; //$NON-NLS-1$
         Money partsCost = Money.zero();
 
         entity = getEntity();
@@ -5109,16 +5051,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsCost = partsCost.plus(6 * .002 * 10000);
             } else {
                 partsCost = partsCost.plus(entity.getWeight() * .002 * 10000);
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                        getName() + " is not a generic CI. Movement mode is "
-                        + entity.getMovementModeAsString());
+                MekHQ.getLogger().error(this, getName() + " is not a generic CI. Movement mode is " + entity.getMovementModeAsString());
             }
         } else {
-            // Only protomechs should fall here. Anything else needs to be logged
+            // Only ProtoMechs should fall here. Anything else needs to be logged
             if (!(entity instanceof Protomech)) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                        getName() + " has no Spare Parts value for unit type "
-                        + Entity.getEntityTypeName(entity.getEntityType()));
+                MekHQ.getLogger().error(this, getName() + " has no Spare Parts value for unit type " + Entity.getEntityTypeName(entity.getEntityType()));
             }
         }
 
@@ -5438,5 +5376,128 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     @Override
     public int calcYearAvailability(int year, boolean clan, int faction) {
         return getTechProgression(faction).calcYearAvailability(year, clan);
+    }
+
+    /**
+     * Represents an unresolved reference to a Unit from a Unit.
+     */
+    public static class UnitRef extends Unit {
+        public UnitRef(UUID id) {
+            setId(id);
+        }
+    }
+
+    /**
+     * Represents an unresolved reference to a Person from a Unit.
+     */
+    public static class UnitPersonRef extends Person {
+        private static final long serialVersionUID = 1L;
+
+        public UnitPersonRef(UUID id) {
+            super(id);
+        }
+    }
+
+    public void fixReferences(Campaign campaign) {
+        if (tech instanceof UnitPersonRef) {
+            UUID id = tech.getId();
+            tech = campaign.getPerson(id);
+            if (tech == null) {
+                MekHQ.getLogger().error(
+                    String.format("Unit %s ('%s') references missing tech %s",
+                        getId(), getName(), id));
+            }
+        }
+        for (int ii = drivers.size() - 1; ii >= 0; --ii) {
+            Person driver = drivers.get(ii);
+            if (driver instanceof UnitPersonRef) {
+                drivers.set(ii, campaign.getPerson(driver.getId()));
+                if (drivers.get(ii) == null) {
+                    MekHQ.getLogger().error(
+                        String.format("Unit %s ('%s') references missing driver %s",
+                            getId(), getName(), driver.getId()));
+                    drivers.remove(ii);
+                }
+            }
+        }
+        for (int ii = gunners.size() - 1; ii >= 0; --ii) {
+            Person gunner = gunners.get(ii);
+            if (gunner instanceof UnitPersonRef) {
+                gunners.set(ii, campaign.getPerson(gunner.getId()));
+                if (gunners.get(ii) == null) {
+                    MekHQ.getLogger().error(
+                        String.format("Unit %s ('%s') references missing gunner %s",
+                            getId(), getName(), gunner.getId()));
+                    gunners.remove(ii);
+                }
+            }
+        }
+        for (int ii = vesselCrew.size() - 1; ii >= 0; --ii) {
+            Person crew = vesselCrew.get(ii);
+            if (crew instanceof UnitPersonRef) {
+                vesselCrew.set(ii, campaign.getPerson(crew.getId()));
+                if (vesselCrew.get(ii) == null) {
+                    MekHQ.getLogger().error(
+                        String.format("Unit %s ('%s') references missing vessel crew %s",
+                            getId(), getName(), crew.getId()));
+                    vesselCrew.remove(ii);
+                }
+            }
+        }
+        if (engineer instanceof UnitPersonRef) {
+            UUID id = engineer.getId();
+            engineer = campaign.getPerson(id);
+            if (engineer == null) {
+                MekHQ.getLogger().error(
+                    String.format("Unit %s ('%s') references missing engineer %s",
+                        getId(), getName(), id));
+            }
+        }
+        if (navigator instanceof UnitPersonRef) {
+            UUID id = navigator.getId();
+            navigator = campaign.getPerson(id);
+            if (navigator == null) {
+                MekHQ.getLogger().error(
+                    String.format("Unit %s ('%s') references missing navigator %s",
+                        getId(), getName(), id));
+            }
+        }
+        if (mothballInfo != null) {
+            mothballInfo.fixReferences(campaign);
+        }
+
+        if ((transportShipAssignment != null)
+                && (transportShipAssignment.getTransportShip() instanceof UnitRef)) {
+            Unit transportShip = campaign.getHangar().getUnit(transportShipAssignment.getTransportShip().getId());
+            if (transportShip != null) {
+                transportShipAssignment =
+                        new TransportShipAssignment(transportShip, transportShipAssignment.getBayNumber());
+            } else {
+                MekHQ.getLogger().error(
+                    String.format("Unit %s ('%s') references missing transport ship %s",
+                        getId(), getName(), transportShipAssignment.getTransportShip().getId()));
+
+                transportShipAssignment = null;
+            }
+        }
+
+        if (!transportedUnits.isEmpty()) {
+            Set<Unit> newTransportedUnits = new HashSet<>();
+            for (Unit transportedUnit : transportedUnits) {
+                if (transportedUnit instanceof UnitRef) {
+                    Unit realUnit = campaign.getHangar().getUnit(transportedUnit.getId());
+                    if (realUnit != null) {
+                        newTransportedUnits.add(realUnit);
+                    } else {
+                        MekHQ.getLogger().error(
+                            String.format("Unit %s ('%s') references missing transported unit %s",
+                                getId(), getName(), transportedUnit.getId()));
+                    }
+                } else {
+                    newTransportedUnits.add(transportedUnit);
+                }
+            }
+            transportedUnits = newTransportedUnits;
+        }
     }
 }

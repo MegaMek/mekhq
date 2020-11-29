@@ -13,7 +13,7 @@ package mekhq;
 
 import java.awt.KeyboardFocusManager;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import megamek.client.Client;
 import megamek.client.CloseClientListener;
@@ -24,7 +24,6 @@ import megamek.common.IGame;
 import megamek.common.KeyBindParser;
 import megamek.common.QuirksHandler;
 import megamek.common.WeaponOrderHandler;
-import megamek.common.logging.LogLevel;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
@@ -32,6 +31,7 @@ import mekhq.campaign.unit.Unit;
 class GameThread extends Thread implements CloseClientListener {
     //region Variable Declarations
     protected String myname;
+    protected String password;
     protected Client client;
     protected ClientGUI swingGui;
     protected MegaMekController controller;
@@ -39,19 +39,24 @@ class GameThread extends Thread implements CloseClientListener {
     protected Campaign campaign;
     protected boolean started;
 
-    protected ArrayList<Unit> units;
+    protected List<Unit> units;
 
     protected volatile boolean stop = false;
     //endregion Variable Declarations
 
     //region Constructors
-    public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units) {
-        this(name, c, app, units, true);
+    public GameThread(String name, String password, Client c, MekHQ app, List<Unit> units) {
+        this(name, password, c, app, units, true);
     }
 
-    public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, boolean started) {
+    public GameThread(String name, Client c, MekHQ app, List<Unit> units, boolean started) {
+        this(name, "", c, app, units, started);
+    }
+
+    public GameThread(String name, String password, Client c, MekHQ app, List<Unit> units, boolean started) {
         super(name);
         myname = name.trim();
+        this.password = password;
         this.client = c;
         this.app = app;
         this.units = units;
@@ -82,9 +87,7 @@ class GameThread extends Thread implements CloseClientListener {
         try {
             client.connect();
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), "run()", LogLevel.ERROR,
-                    "MegaMek client failed to connect to server"); //$NON-NLS-1$
-            MekHQ.getLogger().error(getClass(), "run()", ex);
+            MekHQ.getLogger().error("MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -97,18 +100,18 @@ class GameThread extends Thread implements CloseClientListener {
             // phase
             for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error(getClass(), "run", "Thread in unknown stage" );
+                MekHQ.getLogger().error("Thread in unknown stage" );
             }
 
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-                MekHQ.getLogger().info(getClass(), "run","Thread in lounge" );
+                MekHQ.getLogger().info("Thread in lounge" );
                 client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
 
                 if (started) {
                     client.getGame().getOptions().loadOptions();
-                    client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    client.sendGameOptions(password, app.getCampaign().getGameOptionsVector());
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
                 for (Unit unit : units) {
@@ -120,8 +123,8 @@ class GameThread extends Thread implements CloseClientListener {
                     entity.setOwner(client.getLocalPlayer());
                     // Add Mek to game
                     client.sendAddEntity(entity);
-                    // Wait a few secs to not overuse bandwith
-                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    // Wait a few secs to not overuse bandwidth
+                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
 
                 client.sendPlayerInfo();
@@ -131,7 +134,7 @@ class GameThread extends Thread implements CloseClientListener {
                 Thread.sleep(50);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "run()", e);
+            MekHQ.getLogger().error(e);
         }
         finally {
             client.die();
@@ -145,6 +148,7 @@ class GameThread extends Thread implements CloseClientListener {
      * from megamek.client.CloseClientListener clientClosed() Thanks to MM for
      * adding the listener. And to MMNet for the poorly documented code change.
      */
+    @Override
     public void clientClosed() {
         requestStop();
         app.stopHost();
@@ -155,15 +159,13 @@ class GameThread extends Thread implements CloseClientListener {
         try {
             WeaponOrderHandler.saveWeaponOrderFile();
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "requestStop",
-                    "Error saving custom weapon orders!", e);
+            MekHQ.getLogger().error("Error saving custom weapon orders!", e);
         }
 
         try {
             QuirksHandler.saveCustomQuirksList();
         } catch (IOException e) {
-            MekHQ.getLogger().error(getClass(), "requestStop",
-                    "Error saving quirks override!", e);
+            MekHQ.getLogger().error("Error saving quirks override!", e);
         }
 
         stop = true;
@@ -180,10 +182,9 @@ class GameThread extends Thread implements CloseClientListener {
         System.gc();
     }
 
-    public void createController(){
+    public void createController() {
         controller = new MegaMekController();
-        KeyboardFocusManager kbfm =
-                KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        KeyboardFocusManager kbfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         kbfm.addKeyEventDispatcher(controller);
 
         KeyBindParser.parseKeyBindings(controller);

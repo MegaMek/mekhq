@@ -205,17 +205,12 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
-        String fileName = String.format(
-                "%s%s.%s", //$NON-NLS-1$
-                campaign.getName(),
+        String fileName = String.format("%s%s.%s", campaign.getName(),
                 campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)),
-                campaign.getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
+                MekHQ.getMekHQOptions().getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
 
-        Optional<File> value = GUI.fileDialogSave( frame,
-                "Save Campaign",
-                FileType.CPNX,
-                MekHQ.getCampaignsDirectory().getValue(),
-                fileName);
+        Optional<File> value = GUI.fileDialogSave(frame, "Save Campaign", FileType.CPNX,
+                MekHQ.getCampaignsDirectory().getValue(), fileName);
 
         value.ifPresent(x -> MekHQ.getCampaignsDirectory().setValue(x.getParent()));
         return value;

@@ -32,12 +32,12 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.Vector;
 
+import megamek.common.icons.AbstractIcon;
 import mekhq.gui.enums.LayeredForceIcon;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
@@ -59,12 +59,10 @@ public class Force implements Serializable {
     private static final long serialVersionUID = -3018542172119419401L;
 
     // pathway to force icon
-    public static final String ROOT_ICON = "-- General --";
     public static final String ROOT_LAYERED = "Layered";
-    public static final String ICON_NONE = "None";
     public static final int FORCE_NONE = -1;
     private String iconCategory = ROOT_LAYERED;
-    private String iconFileName = ICON_NONE;
+    private String iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
     private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
 
     private String name;
@@ -411,8 +409,6 @@ public class Force implements Serializable {
     }
 
     public static Force generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)";
-
         Force retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node idNameNode = attrs.getNamedItem("id");
@@ -455,8 +451,7 @@ public class Force implements Serializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.getLogger().log(Force.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error(Force.class, "Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -469,7 +464,7 @@ public class Force implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(Force.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Force.class, ex);
         }
 
         return retVal;

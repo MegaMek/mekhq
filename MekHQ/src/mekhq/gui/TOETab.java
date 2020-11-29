@@ -23,14 +23,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
-import javax.swing.DropMode;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTree;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.event.Subscribe;
@@ -84,7 +77,7 @@ public final class TOETab extends CampaignGuiTab {
         orgModel = new OrgTreeModel(getCampaign());
         orgTree = new JTree(orgModel);
         orgTree.addMouseListener(new TOEMouseAdapter(getCampaignGui()));
-        orgTree.setCellRenderer(new ForceRenderer(getIconPackage()));
+        orgTree.setCellRenderer(new ForceRenderer());
         orgTree.setRowHeight(60);
         orgTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         orgTree.addTreeSelectionListener(ev -> refreshForceView());
@@ -154,7 +147,7 @@ public final class TOETab extends CampaignGuiTab {
                         return d;
                     }
                 };
-                crewList.setCellRenderer(model.getRenderer(getIconPackage()));
+                crewList.setCellRenderer(model.getRenderer());
                 crewList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
                 crewList.setVisibleRowCount(1);
                 crewList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -174,22 +167,16 @@ public final class TOETab extends CampaignGuiTab {
                 }
                 scrollPerson.setPreferredSize(crewList.getPreferredScrollableViewportSize());
                 tabUnit.add(name, crewPanel);
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    scrollPerson.getVerticalScrollBar().setValue(0);
-                });
+                SwingUtilities.invokeLater(() -> scrollPerson.getVerticalScrollBar().setValue(0));
             }
-            final JScrollPane scrollUnit = new JScrollPane(new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));
+            final JScrollPane scrollUnit = new JScrollPane(new UnitViewPanel(u, getCampaign()));
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                scrollUnit.getVerticalScrollBar().setValue(0);
-            });
+            SwingUtilities.invokeLater(() -> scrollUnit.getVerticalScrollBar().setValue(0));
         } else if (node instanceof Force) {
-            final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign(), getIconPackage()));
+            final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign()));
             panForceView.add(scrollForce, BorderLayout.CENTER);
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                scrollForce.getVerticalScrollBar().setValue(0);
-            });
+            SwingUtilities.invokeLater(() -> scrollForce.getVerticalScrollBar().setValue(0));
         }
         panForceView.updateUI();
     }

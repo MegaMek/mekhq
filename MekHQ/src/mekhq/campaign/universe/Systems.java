@@ -52,7 +52,6 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 
 import megamek.common.EquipmentType;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -321,10 +320,8 @@ public class Systems {
     }
 
     private void generateSystems(String planetsPath, String defaultFilePath) throws DOMException, ParseException {
-        final String METHOD_NAME = "generateSystems()"; //NON-NLS-1$
 
-        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
-                "Starting load of system data from XML..."); //$NON-NLS-1$
+        MekHQ.getLogger().info(this, "Starting load of system data from XML...");
         long currentTime = System.currentTimeMillis();
         synchronized (LOADING_LOCK) {
             // Step 1: Initialize variables.
@@ -349,10 +346,10 @@ public class Systems {
             systemGrid.clear();
 
             // Step 2: Read the default file
-            try (FileInputStream fis = new FileInputStream(defaultFilePath)) { //$NON-NLS-1$
+            try (FileInputStream fis = new FileInputStream(defaultFilePath)) {
                 updateSystems(fis);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error(this, ex);
             }
 
             // Step 3: Load all the xml files within the planets subdirectory, if it exists
@@ -361,15 +358,13 @@ public class Systems {
             List<PlanetarySystem> toRemove = new ArrayList<>();
             for (PlanetarySystem system : systemList.values()) {
                 if ((null == system.getX()) || (null == system.getY())) {
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                            String.format("System \"%s\" is missing coordinates", system.getId())); //$NON-NLS-1$
+                    MekHQ.getLogger().error(this, String.format("System \"%s\" is missing coordinates", system.getId()));
                     toRemove.add(system);
                     continue;
                 }
                 //make sure the primary slot is not larger than the number of planets
                 if (system.getPrimaryPlanetPosition() > system.getPlanets().size()) {
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                            String.format("System \"%s\" has a primary slot greater than the number of planets", system.getId())); //$NON-NLS-1$
+                    MekHQ.getLogger().error(this, String.format("System \"%s\" has a primary slot greater than the number of planets", system.getId()));
                     toRemove.add(system);
                     continue;
                 }
@@ -384,20 +379,18 @@ public class Systems {
             }
             done();
         }
-        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
-                String.format(Locale.ROOT,
-                        "Loaded a total of %d systems in %.3fs.", //$NON-NLS-1$
-                        systemList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
+        MekHQ.getLogger().info(this, String.format(Locale.ROOT,
+                "Loaded a total of %d systems in %.3fs.",
+                systemList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
         // Planetary sanity check time!
         for (PlanetarySystem system : systemList.values()) {
             List<PlanetarySystem> veryCloseSystems = getNearbySystems(system, 1);
             if (veryCloseSystems.size() > 1) {
                 for (PlanetarySystem closeSystem : veryCloseSystems) {
                     if (!system.getId().equals(closeSystem.getId())) {
-                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING,
-                                String.format(Locale.ROOT,
-                                        "Extremely close systems detected. Data error? %s <-> %s: %.3f ly", //$NON-NLS-1$
-                                        system.getId(), closeSystem.getId(), system.getDistanceTo(closeSystem)));
+                        MekHQ.getLogger().warning(this, String.format(Locale.ROOT,
+                                "Extremely close systems detected. Data error? %s <-> %s: %.3f ly", //$NON-NLS-1$
+                                system.getId(), closeSystem.getId(), system.getDistanceTo(closeSystem)));
                     }
                 }
             }

@@ -106,11 +106,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         // Reset counts
         setTotalSkillLevels(BigDecimal.ZERO);
 
-        List<Unit> unitList = getCampaign().getCopyOfUnits();
-        for (Unit u : unitList) {
-            if (null == u) {
-                continue;
-            }
+        for (Unit u : getCampaign().getHangar().getUnits()) {
             if (u.isMothballed()) {
                 continue;
             }
@@ -173,8 +169,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             antiMek = gunnery + 1;
         }
 
-        BigDecimal skillLevel = BigDecimal.valueOf(gunnery)
-                                    .add(BigDecimal.valueOf(antiMek));
+        BigDecimal skillLevel = BigDecimal.valueOf(gunnery).add(BigDecimal.valueOf(antiMek));
 
         incrementSkillRatingCounts(getExperienceLevelName(skillLevel));
         setTotalSkillLevels(getTotalSkillLevels(false).add(skillLevel));
@@ -215,8 +210,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             skillLevel = skillLevel.add(BigDecimal.valueOf(piloting));
         } else {
             // Assume a piloting equal to Gunnery +1.
-            skillLevel = skillLevel.add(BigDecimal.valueOf(gunnery))
-                                   .add(BigDecimal.ONE);
+            skillLevel = skillLevel.add(BigDecimal.valueOf(gunnery)).add(BigDecimal.ONE);
         }
 
         incrementSkillRatingCounts(getExperienceLevelName(skillLevel));
@@ -235,7 +229,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         totalCombatUnits += getVeeCount();
         totalCombatUnits += getNumberBaSquads();
         totalCombatUnits += getInfantryUnitCount();
-        totalCombatUnits += getDropshipCount();
+        totalCombatUnits += getDropShipCount();
         totalCombatUnits += getSmallCraftCount();
         return totalCombatUnits;
     }
@@ -250,8 +244,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         // Count total units for transport
         getTotalCombatUnits();
 
-        List<Unit> unitList = getCampaign().getCopyOfUnits();
-        for (Unit u : unitList) {
+        for (Unit u : getCampaign().getHangar().getUnits()) {
             if (u == null) {
                 continue;
             }
@@ -366,9 +359,9 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         setBattleArmorCount(0);
         setInfantryCount(0);
         setFighterCount(0);
-        setDropshipCount(0);
+        setDropShipCount(0);
         setSmallCraftCount(0);
-        setJumpshipCount(0);
+        setJumpShipCount(0);
         setDockingCollarCount(0);
         clearCraftWithoutCrew();
 
@@ -381,6 +374,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     @Override
     protected int calculateUnitRatingScore() {
         int totalScore = getExperienceValue();
+        totalScore += getCampaign().getCampaignOptions().getManualUnitRatingModifier();
         totalScore += getCommanderValue();
         totalScore += getCombatRecordValue();
         totalScore += getTransportValue();
@@ -394,17 +388,17 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     public String getAverageExperience() {
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+        if (!hasUnits()) {
             return SkillType.getExperienceLevelName(-1);
         }
         switch (getExperienceValue()) {
-            case 0:
-                return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
             case 5:
-                return SkillType.getExperienceLevelName(SkillType.EXP_REGULAR);
+                return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
             case 10:
-                return SkillType.getExperienceLevelName(SkillType.EXP_VETERAN);
+                return SkillType.getExperienceLevelName(SkillType.EXP_REGULAR);
             case 20:
+                return SkillType.getExperienceLevelName(SkillType.EXP_VETERAN);
+            case 40:
                 return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
             default:
                 return SkillType.getExperienceLevelName(-1);
@@ -413,7 +407,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     protected String getExperienceLevelName(BigDecimal experience) {
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+        if (!hasUnits()) {
             return SkillType.getExperienceLevelName(-1);
         }
 
@@ -433,25 +427,22 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     public int getExperienceValue() {
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+        if (!hasUnits()) {
             return 0;
         }
-
         BigDecimal averageExp = calcAverageExperience();
         String level = getExperienceLevelName(averageExp);
         if (SkillType.getExperienceLevelName(-1).equalsIgnoreCase(level)) {
             return 0;
-        } else if (SkillType.getExperienceLevelName(SkillType.EXP_GREEN)
-                            .equalsIgnoreCase(level)) {
+        } else if (SkillType.getExperienceLevelName(SkillType.EXP_GREEN).equalsIgnoreCase(level)) {
             return 5;
-        } else if (SkillType.getExperienceLevelName(SkillType.EXP_REGULAR)
-                            .equalsIgnoreCase(level)) {
+        } else if (SkillType.getExperienceLevelName(SkillType.EXP_REGULAR).equalsIgnoreCase(level)) {
             return 10;
-        } else if (SkillType.getExperienceLevelName(SkillType.EXP_VETERAN)
-                            .equalsIgnoreCase(level)) {
+        } else if (SkillType.getExperienceLevelName(SkillType.EXP_VETERAN).equalsIgnoreCase(level)) {
             return 20;
+        } else {
+            return 40;
         }
-        return 40;
     }
 
     @Override
@@ -496,7 +487,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     public int getTransportValue() {
-        if (getTotalCombatUnits() == 0) {
+        if (!hasUnits()) {
             return 0;
         }
 
@@ -549,7 +540,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             totalValue -= 5;
         }
 
-        if (getDropshipCount() < 1) {
+        if (getDropShipCount() < 1) {
             totalValue -= 5;
         }
 
@@ -557,16 +548,16 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         // According to Campaign Ops, this will require tracking bay personnel
         // & passenger quarters.
 
-        if (getJumpshipCount() > 0) {
+        if (getJumpShipCount() > 0) {
             totalValue += 10;
         }
-        if (getWarshipCount() > 0) {
+        if (getWarShipCount() > 0) {
             totalValue += 10;
             if (getCampaign().getLocalDate().isAfter(LocalDate.of(2800, 1, 1))) {
                 totalValue += 5;
             }
         }
-        if ((getDropshipCount() > 0) && (getDockingCollarCount() >= getDropshipCount())) {
+        if ((getDropShipCount() > 0) && (getDockingCollarCount() >= getDropShipCount())) {
             totalValue += 5;
         }
 
@@ -669,18 +660,18 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private int calcLargeCraftSupportValue() {
-        boolean crewShortage = false;
-        for (Unit u : getCampaign().getCopyOfUnits()) {
-            if (u.getEntity() instanceof SmallCraft ||
-                u.getEntity() instanceof Jumpship) {
+        Unit unit = getCampaign().getHangar().findUnit(u -> {
+            if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
                 if (u.getActiveCrew().size() < u.getFullCrewSize()) {
-                    crewShortage = true;
-                    break;
+                    return true;
                 }
             }
-        }
+            return false;
+        });
 
-        return crewShortage ? -5 : 0;
+        // if we found a unit we have a crew shortage
+        // on at least one vessel in our fleet
+        return (unit != null) ? -5 : 0;
     }
 
     @Override
@@ -697,6 +688,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         return BigDecimal.ZERO;
     }
 
+    @Override
     public int getFinancialValue() {
         return getCampaign().getFinances().isInDebt() ? -10 : 0;
     }
@@ -720,12 +712,10 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     private String getExperienceDetails() {
         StringBuilder out = new StringBuilder();
-        out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Experience:",
-                                 getExperienceValue())).append("\n");
-        out.append(String.format("    %-" + SUBHEADER_LENGTH + "s %3s",
-                                 "Average Experience:",
-                                 getExperienceLevelName(calcAverageExperience())))
-           .append("\n");
+        out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Experience:", getExperienceValue()))
+                .append("\n")
+                .append(String.format("    %-" + SUBHEADER_LENGTH + "s %3s", "Average Experience:", getAverageExperience()))
+                .append("\n");
 
         final String TEMPLATE = "        #%-" + CATEGORY_LENGTH + "s %3d";
         Map<String, Integer> skillRatingCounts = getSkillRatingCounts();
@@ -802,11 +792,11 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                      " (plus " + excessHeavyVeeBays + " excess Heavy and " + excessSuperHeavyVeeBays + " excess Super Heavy)" +
                      "\n" + String.format(TEMPLATE, "Battle Armor Bays:", getBattleArmorCount() / 5, getBaBayCount()) +
                      "\n" + String.format(TEMPLATE, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()) +
-                     "\n" + String.format(TEMPLATE, "Docking Collars:", getDropshipCount(), getDockingCollarCount());
+                     "\n" + String.format(TEMPLATE, "Docking Collars:", getDropShipCount(), getDockingCollarCount());
 
         final String TEMPLATE_2 = "    %-" + CATEGORY_LENGTH + "s %3s";
-        out += "\n" + String.format(TEMPLATE_2, "Has JumpShips?", getJumpshipCount() > 0 ? "Yes" : "No");
-        out += "\n" + String.format(TEMPLATE_2, "Has WarShips?", getWarshipCount() > 0 ? "Yes" : "No");
+        out += "\n" + String.format(TEMPLATE_2, "Has JumpShips?", getJumpShipCount() > 0 ? "Yes" : "No");
+        out += "\n" + String.format(TEMPLATE_2, "Has WarShips?", getWarShipCount() > 0 ? "Yes" : "No");
 
         return out;
     }
@@ -865,9 +855,14 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         final String TEMPLATE = "%-" + HEADER_LENGTH + "s %s";
         initValues();
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(TEMPLATE, "Unit Reputation:",
-                                calculateUnitRatingScore()));
-        sb.append("\n").append("    Method: Campaign Operations\n\n");
+        sb.append(String.format(TEMPLATE, "Unit Reputation:", calculateUnitRatingScore()));
+        sb.append("\n").append("    Method: Campaign Operations\n");
+        if (getCampaign().getCampaignOptions().getManualUnitRatingModifier() != 0) {
+            sb.append("    Manual Modifier: ")
+                    .append(getCampaign().getCampaignOptions().getManualUnitRatingModifier())
+                    .append("\n");
+        }
+        sb.append("\n");
         sb.append(getExperienceDetails()).append("\n\n");
         sb.append(getCommanderDetails()).append("\n\n");
         sb.append(getCombatRecordDetails()).append("\n\n");

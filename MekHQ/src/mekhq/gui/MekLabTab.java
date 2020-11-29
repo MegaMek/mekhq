@@ -38,11 +38,9 @@ import javax.swing.JTabbedPane;
 
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import megamek.common.verifier.*;
 import megameklab.com.MegaMekLab;
 import megameklab.com.ui.EntitySource;
-import megameklab.com.ui.protomek.ProtomekBuildTab;
 import megameklab.com.ui.tabs.FluffTab;
 import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
@@ -96,8 +94,7 @@ public class MekLabTab extends CampaignGuiTab {
         entityVerifier = EntityVerifier.getInstance(new File("data/mechfiles/UnitVerifierOptions.xml"));
         new CConfig();
         UnitUtil.loadFonts();
-        MekHQ.getLogger().log(getClass(), "initTab()", LogLevel.INFO, //$NON-NLS-1$
-                "Starting MegaMekLab version: " + MegaMekLab.VERSION); //$NON-NLS-1$
+        MekHQ.getLogger().info(this, "Starting MegaMekLab version: " + MegaMekLab.VERSION);
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();
@@ -437,16 +434,14 @@ public class MekLabTab extends CampaignGuiTab {
             return new BattleArmorPanel((BattleArmor) en);
         } else if (en instanceof Infantry) {
             return new InfantryPanel((Infantry) en);
-        } else if (en instanceof Protomech)
+        } else if (en instanceof Protomech) {
             return new ProtomechPanel((Protomech) en);
-        return null;
+        } else {
+            return null;
+        }
     }
 
-    private abstract class EntityPanel extends JTabbedPane implements RefreshListener, EntitySource {
-
-        /**
-         *
-         */
+    private abstract static class EntityPanel extends JTabbedPane implements RefreshListener, EntitySource {
         private static final long serialVersionUID = 6886946112861955446L;
 
         @Override
@@ -456,10 +451,6 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     private class AeroPanel extends EntityPanel {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = 6894731868670529166L;
 
         private Aero entity;
@@ -569,7 +560,6 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
-            // TODO Auto-generated method stub
 
         }
 
@@ -589,16 +579,12 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     private class DropshipPanel extends EntityPanel {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = 4348862352101110686L;
 
         private SmallCraft entity;
         private megameklab.com.ui.aerospace.DropshipStructureTab structureTab;
         private megameklab.com.ui.Aero.tabs.EquipmentTab equipmentTab;
-        private megameklab.com.ui.Aero.tabs.BuildTab buildTab;
+        private megameklab.com.ui.aerospace.DropshipBuildTab buildTab;
         private megameklab.com.ui.tabs.TransportTab transportTab;
         private megameklab.com.ui.tabs.PreviewTab previewTab;
 
@@ -619,7 +605,7 @@ public class MekLabTab extends CampaignGuiTab {
             structureTab.setAsCustomization();
             previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
             equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab(this);
-            buildTab = new megameklab.com.ui.Aero.tabs.BuildTab(this, equipmentTab);
+            buildTab = new megameklab.com.ui.aerospace.DropshipBuildTab(this, equipmentTab);
             FluffTab fluffTab = new FluffTab(this);
             transportTab = new megameklab.com.ui.tabs.TransportTab(this);
             structureTab.addRefreshedListener(this);
@@ -707,7 +693,6 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
-            // TODO Auto-generated method stub
 
         }
 
@@ -727,10 +712,6 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     private class MekPanel extends EntityPanel {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = 6894731868670529166L;
 
         private Mech entity;
@@ -839,7 +820,6 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
-            // TODO Auto-generated method stub
 
         }
 
@@ -858,10 +838,6 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     private class TankPanel extends EntityPanel {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = 6894731868670529166L;
 
         private Tank entity;
@@ -970,7 +946,6 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
-            // TODO Auto-generated method stub
 
         }
 
@@ -1234,7 +1209,6 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
-            // TODO Auto-generated method stub
 
         }
 
@@ -1253,10 +1227,6 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     private class InfantryPanel extends EntityPanel {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = 6894731868670529166L;
 
         private Infantry entity;
@@ -1343,19 +1313,16 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void refreshSummary() {
-            // TODO Auto-generated method stub
 
         }
 
         @Override
         public void refreshEquipmentTable() {
-            // TODO Auto-generated method stub
 
         }
 
         @Override
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
-            // TODO Auto-generated method stub
 
         }
 
@@ -1374,7 +1341,6 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     private class ProtomechPanel extends EntityPanel {
-
         private static final long serialVersionUID = -4649180495358483182L;
 
         private Protomech entity;
@@ -1503,13 +1469,12 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     private class AdvancedAeroPanel extends EntityPanel {
-
         private static final long serialVersionUID = 4031380495472570820L;
 
         private Jumpship entity;
         private megameklab.com.ui.aerospace.AdvancedAeroStructureTab structureTab;
         private megameklab.com.ui.Aero.tabs.EquipmentTab equipmentTab;
-        private megameklab.com.ui.Aero.tabs.BuildTab buildTab;
+        private megameklab.com.ui.aerospace.DropshipBuildTab buildTab;
         private megameklab.com.ui.tabs.TransportTab transportTab;
         private megameklab.com.ui.tabs.PreviewTab previewTab;
 
@@ -1530,7 +1495,7 @@ public class MekLabTab extends CampaignGuiTab {
             structureTab.setAsCustomization();
             previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
             equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab(this);
-            buildTab = new megameklab.com.ui.Aero.tabs.BuildTab(this, equipmentTab);
+            buildTab = new megameklab.com.ui.aerospace.DropshipBuildTab(this, equipmentTab);
             transportTab = new megameklab.com.ui.tabs.TransportTab(this);
             FluffTab fluffTab = new FluffTab(this);
             structureTab.addRefreshedListener(this);
@@ -1633,7 +1598,5 @@ public class MekLabTab extends CampaignGuiTab {
         void setTechFaction(int techFaction) {
             structureTab.setTechFaction(techFaction);
         }
-
     }
-
 }

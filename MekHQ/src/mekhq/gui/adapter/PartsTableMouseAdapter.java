@@ -26,6 +26,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.service.MassRepairMassSalvageMode;
 
 public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionListener {
 
@@ -55,19 +56,13 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
         if (command.equalsIgnoreCase("SELL")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().sellPart(p, 1);
+                    gui.getCampaign().getQuartermaster().sellPart(p, 1);
                 }
             }
         } else if (command.equalsIgnoreCase("SELL_ALL")) {
             for (Part p : parts) {
                 if (null != p) {
-                    if (p instanceof AmmoStorage) {
-                        gui.getCampaign().sellAmmo((AmmoStorage) p, ((AmmoStorage) p).getShots());
-                    } else if (p instanceof Armor) {
-                        gui.getCampaign().sellArmor((Armor) p, ((Armor) p).getAmount());
-                    } else {
-                        gui.getCampaign().sellPart(p, p.getQuantity());
-                    }
+                    gui.getCampaign().getQuartermaster().sellPart(p);
                 }
             }
         } else if (command.equalsIgnoreCase("SELL_N")) {
@@ -86,7 +81,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                     return;
                 }
                 int q = pvcd.getValue();
-                gui.getCampaign().sellPart(selectedPart, q);
+                gui.getCampaign().getQuartermaster().sellPart(selectedPart, q);
             }
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
             double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
@@ -94,7 +89,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             for (Part p : parts) {
                 if (null != p) {
                     refundAmount = refundAmount.plus(p.getStickerPrice().multipliedBy(p.getQuantity()).multipliedBy(refund));
-                    gui.getCampaign().removePart(p);
+                    gui.getCampaign().getWarehouse().removePart(p);
                 }
             }
             gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
@@ -102,13 +97,13 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().arrivePart(p);
+                    gui.getCampaign().getQuartermaster().arrivePart(p);
                 }
             }
         } else if (command.equalsIgnoreCase("REMOVE")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().removePart(p);
+                    gui.getCampaign().getWarehouse().removePart(p);
                 }
             }
         } else if (command.contains("SET_QUALITY")) {
@@ -145,18 +140,18 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             }
         } else if (command.contains("MASS_REPAIR")) {
             MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(gui.getFrame(), true, gui,
-                    MassRepairSalvageDialog.MODE.WAREHOUSE);
+                    MassRepairMassSalvageMode.WAREHOUSE);
             dlg.setVisible(true);
         } else if (command.equalsIgnoreCase("DEPOD")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().depodPart(p, 1);
+                    gui.getCampaign().getQuartermaster().depodPart(p, 1);
                 }
             }
         } else if (command.equalsIgnoreCase("DEPOD_ALL")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().depodPart(p, p.getQuantity());
+                    gui.getCampaign().getQuartermaster().depodPart(p);
                 }
             }
         } else if (command.equalsIgnoreCase("DEPOD_N")) {
@@ -169,25 +164,25 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                     return;
                 }
                 int q = pvcd.getValue();
-                gui.getCampaign().depodPart(selectedPart, q);
+                gui.getCampaign().getQuartermaster().depodPart(selectedPart, q);
             }
         } else if(command.equalsIgnoreCase("BUY")) {
-        	for (Part p : parts) {
-        		if(null != p) {
-        			gui.getCampaign().getShoppingList().addShoppingItem(p.getAcquisitionWork(), 1, gui.getCampaign());
-        		}
-        	}
+            for (Part p : parts) {
+                if(null != p) {
+                    gui.getCampaign().getShoppingList().addShoppingItem(p.getAcquisitionWork(), 1, gui.getCampaign());
+                }
+            }
         } else if(command.equalsIgnoreCase("BUY_N")) {
-        	if(null != selectedPart) {
-        		PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(gui.getFrame(), true,
-        				"Buy How Much " + selectedPart.getName(), 1, 1);
-        		pvcd.setVisible(true);
-        		if(pvcd.getValue() < 1) {
-        			return;
-        		}
-        		int q = pvcd.getValue();
-        		gui.getCampaign().getShoppingList().addShoppingItem(selectedPart.getAcquisitionWork(), q, gui.getCampaign());
-        	}
+            if(null != selectedPart) {
+                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(gui.getFrame(), true,
+                        "Buy How Much " + selectedPart.getName(), 1, 1);
+                pvcd.setVisible(true);
+                if(pvcd.getValue() < 1) {
+                    return;
+                }
+                int q = pvcd.getValue();
+                gui.getCampaign().getShoppingList().addShoppingItem(selectedPart.getAcquisitionWork(), q, gui.getCampaign());
+            }
         }
     }
 
@@ -328,20 +323,20 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
 
             // also add the ability to order one or many parts, if we have at least one part selected
             if(rows.length > 0) {
-	            menu = new JMenu("Buy");
-	            menuItem = new JMenuItem("Buy Single Part of This Type");
-	        	menuItem.setActionCommand("BUY");
-	        	menuItem.addActionListener(this);
-	        	menu.add(menuItem);
+                menu = new JMenu("Buy");
+                menuItem = new JMenuItem("Buy Single Part of This Type");
+                menuItem.setActionCommand("BUY");
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
 
-	        	if(oneSelected) {
-		        	menuItem = new JMenuItem ("Buy # Parts of This Type...");
-		        	menuItem.setActionCommand("BUY_N");
-		        	menuItem.addActionListener(this);
-		        	menu.add(menuItem);
-	        	}
+                if(oneSelected) {
+                    menuItem = new JMenuItem ("Buy # Parts of This Type...");
+                    menuItem.setActionCommand("BUY_N");
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
 
-	        	popup.add(menu);
+                popup.add(menu);
             }
 
             if (oneSelected && part.needsFixing() && part.isPresent()) {

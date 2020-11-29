@@ -33,6 +33,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.TreePath;
 
 import megamek.common.util.StringUtil;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.gui.utilities.JMenuHelpers;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -40,6 +41,7 @@ import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
 import megamek.common.UnitType;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
@@ -53,6 +55,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CamoChoiceDialog;
@@ -237,7 +240,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 if (null != tech) {
                     if (singleForce.getTechID() != null) {
                         Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
-                        oldTech.clearTechUnitIDs();
+                        oldTech.clearTechUnits();
                         ServiceLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
                     }
                     singleForce.setTechID(tech.getId());
@@ -283,13 +286,10 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 } else {
                     //First, remove the units from any other Transport they might be on
                     for (Unit u : units) {
-                        for (UUID oldShipId : u.getTransportShipId().keySet()) {
-                            Unit oldShip = gui.getCampaign().getUnit(oldShipId);
-                            if (oldShip != null) {
-                                oldShip.unloadFromTransportShip(u);
-                                MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
-                                gui.getTOETab().refreshForceView();
-                            }
+                        if (u.hasTransportShipAssignment()) {
+                            Unit oldShip = u.getTransportShipAssignment().getTransportShip();
+                            oldShip.unloadFromTransportShip(u);
+                            MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
                         }
                     }
                     //now load the units
@@ -301,15 +301,13 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         }
         if (command.contains(UNASSIGN_FROM_SHIP)) {
             for (Unit u : units) {
-                for (UUID oldShipId : u.getTransportShipId().keySet()) {
-                    Unit oldShip = gui.getCampaign().getUnit(oldShipId);
-                    if (oldShip != null) {
-                       oldShip.unloadFromTransportShip(u);
-                        MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
-                        gui.getTOETab().refreshForceView();
-                    }
+                if (u.hasTransportShipAssignment()) {
+                    Unit oldShip = u.getTransportShipAssignment().getTransportShip();
+                    oldShip.unloadFromTransportShip(u);
+                    MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
                 }
             }
+            gui.getTOETab().refreshForceView();
         } else if (command.contains(TOEMouseAdapter.ADD_UNIT)) {
             if (null != singleForce) {
                 Unit u = gui.getCampaign().getUnit(UUID.fromString(target));
@@ -349,7 +347,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             if (null != singleForce) {
                 ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(), true,
                         singleForce.getIconCategory(), singleForce.getIconFileName(),
-                        singleForce.getIconMap(), gui.getIconPackage().getForceIcons(), true);
+                        singleForce.getIconMap(), MHQStaticDirectoryManager.getForceIcons(), true);
                 pcd.setVisible(true);
                 if (pcd.isChanged()) {
                     singleForce.setIconCategory(pcd.getCategory());
@@ -431,7 +429,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         } else if (command.contains(TOEMouseAdapter.REMOVE_LANCE_TECH)) {
             if (null != singleForce && singleForce.getTechID() != null) {
                 Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
-                oldTech.clearTechUnitIDs();
+                oldTech.clearTechUnits();
 
                 ServiceLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
 
@@ -484,16 +482,13 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 HashSet<Unit> extraUnits = new HashSet<>();
                 for (Unit unit : units) {
                     if (null != unit && null != scenario) {
-                        if (!unit.getTransportedUnits().isEmpty()) {
+                        if (unit.hasTransportedUnits()) {
                             // Prompt the player to also deploy any units transported by this one
                             int optionChoice = JOptionPane.showConfirmDialog(null, TOEMouseAdapter.LOAD_UNITS_DIALOG_TEXT,
                                     TOEMouseAdapter.LOAD_UNITS_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
                             if (optionChoice == JOptionPane.YES_OPTION) {
-                                for (UUID id : unit.getTransportedUnits()) {
-                                    Unit cargo = gui.getCampaign().getUnit(id);
-                                    if (cargo != null) {
-                                        extraUnits.add(cargo);
-                                    }
+                                for (Unit cargo : unit.getTransportedUnits()) {
+                                    extraUnits.add(cargo);
                                 }
                             }
                         }
@@ -610,7 +605,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             JMenuItem menuItem;
             JMenu menu;
             JTree tree = (JTree) e.getSource();
-            if (tree == null) {
+            if ((tree == null) || (tree.getSelectionPaths() == null)) {
                 return;
             }
             // this is a little tricky because we want to
@@ -827,41 +822,42 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     // Or Gun Emplacements!
                     // TODO: Or Robotic Systems!
                     JMenu unsorted = new JMenu("Unsorted");
-                    for (Unit u : gui.getCampaign().getUnits(true)) {
+
+                    HangarSorter.weightSorted().forEachUnit(gui.getCampaign().getHangar(), u -> {
                         String type = UnitType.getTypeName(u.getEntity().getUnitType());
                         String className = u.getEntity().getWeightClassName();
                         if (null != u.getCommander()) {
                             Person p = u.getCommander();
                             if (p.getStatus().isActive() && (u.getForceId() < 1) && u.isPresent()) {
-                                menuItem = new JMenuItem(p.getFullTitle() + ", " + u.getName());
-                                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
-                                menuItem.addActionListener(this);
-                                menuItem.setEnabled(u.isAvailable());
+                                JMenuItem menuItem0 = new JMenuItem(p.getFullTitle() + ", " + u.getName());
+                                menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
+                                menuItem0.addActionListener(this);
+                                menuItem0.setEnabled(u.isAvailable());
                                 if (null != weightClassForUnitType.get(type + "_" + className)) {
-                                    weightClassForUnitType.get(type + "_" + className).add(menuItem);
+                                    weightClassForUnitType.get(type + "_" + className).add(menuItem0);
                                     weightClassForUnitType.get(type + "_" + className).setEnabled(true);
                                 } else {
-                                    unsorted.add(menuItem);
+                                    unsorted.add(menuItem0);
                                 }
                                 unitTypeMenus.get(type).setEnabled(true);
                             }
                         }
                         if (u.getEntity() instanceof GunEmplacement) {
                             if (u.getForceId() < 1 && u.isPresent()) {
-                                menuItem = new JMenuItem("AutoTurret, " + u.getName());
-                                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
-                                menuItem.addActionListener(this);
-                                menuItem.setEnabled(u.isAvailable());
+                                JMenuItem menuItem0 = new JMenuItem("AutoTurret, " + u.getName());
+                                menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
+                                menuItem0.addActionListener(this);
+                                menuItem0.setEnabled(u.isAvailable());
                                 if (null != weightClassForUnitType.get(type + "_" + className)) {
-                                    weightClassForUnitType.get(type + "_" + className).add(menuItem);
+                                    weightClassForUnitType.get(type + "_" + className).add(menuItem0);
                                     weightClassForUnitType.get(type + "_" + className).setEnabled(true);
                                 } else {
-                                    unsorted.add(menuItem);
+                                    unsorted.add(menuItem0);
                                 }
                                 unitTypeMenus.get(type).setEnabled(true);
                             }
                         }
-                    }
+                    });
 
                     for (int i = 0; i < UnitType.SIZE; i++)
                     {
@@ -1008,12 +1004,12 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     //Only display the Assign to Ship command if your command has at least 1 valid transport
                     //and if your selection does not include a transport
                     if (!shipInSelection && !gui.getCampaign().getTransportShips().isEmpty()) {
-                        for (UUID id : gui.getCampaign().getTransportShips()) {
-                            Unit ship = gui.getCampaign().getUnit(id);
-                            if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
+                        for (Unit ship : gui.getCampaign().getTransportShips()) {
+                            if (ship.isSalvage() || (ship.getCommander() == null)) {
                                 continue;
                             }
 
+                            UUID id = ship.getId();
                             if (allUnitsSameType) {
                                 double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
                                 if (capacity > 0) {
@@ -1362,11 +1358,12 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         //is in a basic state that can accept units. Capacity gets checked once the action
                         //is submitted.
                         menu = new JMenu("Assign Unit to Transport Ship");
-                        for (UUID id : gui.getCampaign().getTransportShips()) {
-                            Unit ship = gui.getCampaign().getUnit(id);
-                            if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
+                        for (Unit ship : gui.getCampaign().getTransportShips()) {
+                            if (ship.isSalvage() || (ship.getCommander() == null)) {
                                 continue;
                             }
+
+                            UUID id = ship.getId();
                             if (allUnitsSameType) {
                                 double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
                                 if (capacity > 0) {
@@ -1526,7 +1523,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         }
 
         return new CamoChoiceDialog(gui.getFrame(), true, category, fileName,
-            gui.getCampaign().getColorIndex(), gui.getIconPackage().getCamos());
+            gui.getCampaign().getColorIndex());
     }
 
     /**
@@ -1547,16 +1544,15 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
      * Worker function to make sure transport assignment data gets cleared out when unit(s) are removed from the TO&E
      * @param currentUnit The unit currently being processed
      */
-    private void clearTransportAssignment(Unit currentUnit) {
+    private void clearTransportAssignment(@Nullable Unit currentUnit) {
         if (currentUnit != null) {
-            for (UUID oldShipId : currentUnit.getTransportShipId().keySet()) {
-                Unit oldShip = gui.getCampaign().getUnit(oldShipId);
-                if (oldShip != null) {
-                    oldShip.unloadFromTransportShip(currentUnit);
-                }
+            if (currentUnit.hasTransportShipAssignment()) {
+                currentUnit.getTransportShipAssignment()
+                        .getTransportShip()
+                        .unloadFromTransportShip(currentUnit);
             }
             // If the unit IS a transport, unassign all units from it
-            if (!currentUnit.getTransportedUnits().isEmpty()) {
+            if (currentUnit.hasTransportedUnits()) {
                 currentUnit.unloadTransportShip();
             }
         }

@@ -1,6 +1,5 @@
 package mekhq.campaign.universe;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,7 +9,6 @@ import java.util.TreeSet;
 
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.MechSummary;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.campaign.rating.IUnitRating;
 
@@ -31,7 +29,7 @@ public abstract class AbstractUnitGenerator {
      */
     private void initializeRatRatingMappings() {
         // TODO : Switch this with a call to a new IUnitRating array
-        if(ratRatingMappings == null) {
+        if (ratRatingMappings == null) {
             ratRatingMappings = new HashMap<>();
             ratRatingMappings.put(IUnitRating.DRAGOON_ASTAR, "A");
             ratRatingMappings.put(IUnitRating.DRAGOON_A, "A");
@@ -51,8 +49,7 @@ public abstract class AbstractUnitGenerator {
      * @return List of turrets
      */
     public List<MechSummary> generateTurrets(int num, int skill, int quality, int currentYear) {
-        final String METHOD_NAME = "generateTurrets(int, int, int, int)"; //$NON-NLS-1$
-        int ratYear = 2500;
+        int ratYear;
 
         // less dirty hack
         // we loop through the names of available turret RATs
@@ -63,15 +60,15 @@ public abstract class AbstractUnitGenerator {
         // This way, as long as the turret RAT names follow the above-described pattern, we can handle any number of them.
         initializeRatRatingMappings();
 
-        for(Iterator<String> rats = RandomUnitGenerator.getInstance().getRatList(); rats.hasNext();) {
+        for (Iterator<String> rats = RandomUnitGenerator.getInstance().getRatList(); rats.hasNext();) {
             String currentName = rats.next();
-            if(currentName.contains("Turrets")) {
+            if (currentName.contains("Turrets")) {
                 String turretQuality = currentName.substring(currentName.length() - 1);
                 int year = Integer.parseInt(currentName.replaceAll("\\D", ""));
 
                 turretRatYears.add(year);
 
-                if(!turretRatNames.containsKey(year)) {
+                if (!turretRatNames.containsKey(year)) {
                     turretRatNames.put(year, new HashMap<>());
                 }
 
@@ -83,10 +80,10 @@ public abstract class AbstractUnitGenerator {
         // RAT for the current or previous year, use the earliest available.
         // If there are no turret RATs, return an empty list
         if (turretRatYears.isEmpty()) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING, "No turrent RATs found."); //$NON-NLS-1$
+            MekHQ.getLogger().warning(this, "No turret RATs found.");
             return Collections.emptyList();
         } else if (currentYear < turretRatYears.first()) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING, "Earliest turret RAT is later than campaign year."); //$NON-NLS-1$
+            MekHQ.getLogger().warning(this, "Earliest turret RAT is later than campaign year.");
             ratYear = turretRatYears.first();
         } else {
             ratYear = turretRatYears.floor(currentYear);

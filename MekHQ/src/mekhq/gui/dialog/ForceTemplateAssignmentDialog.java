@@ -204,7 +204,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         currentScenario.addUnit(unit.getId(), templateList.getSelectedValue().getForceName());
         unit.setScenarioId(currentScenario.getId());
         MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario));
-        if (!unit.getTransportedUnits().isEmpty()) {
+        if (unit.hasTransportedUnits()) {
             // Prompt the player to also deploy any units transported by this one
             deployTransportedUnitsDialog(unit);
         }
@@ -229,7 +229,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
                 u.setScenarioId(currentScenario.getId());
                 // If your force includes transports with units assigned,
                 // prompt the player to also deploy any units transported by this one
-                if (!u.getTransportedUnits().isEmpty()) {
+                if (u.hasTransportedUnits()) {
                     deployTransportedUnitsDialog(u);
                 }
             }
@@ -249,14 +249,11 @@ public class ForceTemplateAssignmentDialog extends JDialog {
                 unit.getName() +  ForceTemplateAssignmentDialog.DEPLOY_TRANSPORTED_DIALOG_TEXT,
                 ForceTemplateAssignmentDialog.DEPLOY_TRANSPORTED_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
         if (optionChoice == JOptionPane.YES_OPTION) {
-            for (UUID id : unit.getTransportedUnits()) {
-                Unit cargo = unit.getCampaign().getUnit(id);
-                if (cargo != null) {
-                    currentScenario.removeUnit(cargo.getId());
-                    currentScenario.addUnit(cargo.getId(), templateList.getSelectedValue().getForceName());
-                    cargo.setScenarioId(currentScenario.getId());
-                    MekHQ.triggerEvent(new DeploymentChangedEvent(cargo, currentScenario));
-                }
+            for (Unit cargo : unit.getTransportedUnits()) {
+                currentScenario.removeUnit(cargo.getId());
+                currentScenario.addUnit(cargo.getId(), templateList.getSelectedValue().getForceName());
+                cargo.setScenarioId(currentScenario.getId());
+                MekHQ.triggerEvent(new DeploymentChangedEvent(cargo, currentScenario));
             }
         }
     }

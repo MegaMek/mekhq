@@ -1,5 +1,5 @@
 /*
- * FieldManualMercRevMrbcRating.java
+ * UnitRatingMethod.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
@@ -12,64 +12,77 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.rating;
 
+import megamek.common.util.EncodeControl;
+
+import java.util.ResourceBundle;
+
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
- * @version %Id%
  * @since 9/24/2013
  */
 public enum UnitRatingMethod {
-    CAMPAIGN_OPS("Campaign Ops", new String[]{"Taharqa", "Interstellar Ops"}),
-    FLD_MAN_MERCS_REV("FM: Mercenaries (rev)", new String[]{"FM: Mercenaries (rev)"});
+    //region Enum Declarations
+    NONE("UnitRatingMethod.NONE.text"),
+    CAMPAIGN_OPS("UnitRatingMethod.CAMPAIGN_OPS.text"),
+    FLD_MAN_MERCS_REV("UnitRatingMethod.FLD_MAN_MERCS_REV.text");
+    //endregion Enum Declarations
 
-    private final String description;
-    private final String[] legacyDescriptions; // Old 'Taharqa' and 'Interstellar Ops' rating methods renamed to Campaign Ops.
-    // This property exists for backwards compatibility.
+    //region Variable Declarations
+    private final String name;
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Rating",
+            new EncodeControl());
+    //endregion Variable Declarations
 
-    UnitRatingMethod(String description, String[] legacyDescriptions) {
-        this.description = description;
-        this.legacyDescriptions = legacyDescriptions;
+    //region Constructors
+    UnitRatingMethod(String name) {
+        this.name = resources.getString(name);
+    }
+    //endregion Constructors
+
+    //region Boolean Comparison Methods
+    public boolean isEnabled() {
+        return this != NONE;
     }
 
-    public String getDescription() {
-        return description;
+    public boolean isCampaignOperations() {
+        return this == CAMPAIGN_OPS;
     }
 
-    public String[] getLegacyDescriptions() {
-        return legacyDescriptions;
+    public boolean isFMMR() {
+        return this == FLD_MAN_MERCS_REV;
     }
+    //endregion Boolean Comparison Methods
 
-    public boolean hasLegacyDescription(String description) {
-        for (String s : getLegacyDescriptions()) {
-            if (s.equalsIgnoreCase(description)) {
-                return true;
-            }
+    //region File IO
+    public static UnitRatingMethod parseFromString(String text) {
+        try {
+            return valueOf(text);
+        } catch (Exception ignored) {
+
         }
-        return false;
-    }
 
-    public static String[] getUnitRatingMethodNames() {
-        String[] methods = new String[values().length];
-        for (int i = -0; i < values().length; i++) {
-            methods[i] = values()[i].getDescription();
+        switch (text) {
+            case "Campaign Ops":
+            case "Taharqa":
+            case "Interstellar Ops":
+                return CAMPAIGN_OPS;
+            case "FM: Mercenaries (rev)":
+            default:
+                return FLD_MAN_MERCS_REV;
         }
-        return methods;
     }
+    //endregion File IO
 
-    public static UnitRatingMethod getUnitRatingMethod(String description) {
-        for (UnitRatingMethod m : values()) {
-            if (m.getDescription().equalsIgnoreCase(description)
-                || m.hasLegacyDescription(description)) {
-                return m;
-            }
-        }
-        return null;
+    @Override
+    public String toString() {
+        return name;
     }
 }

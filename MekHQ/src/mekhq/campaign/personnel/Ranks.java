@@ -39,7 +39,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
@@ -73,7 +72,8 @@ public class Ranks {
     public static final int RS_OA		= 16;
     public static final int RS_FRR		= 17;
     public static final int RS_ARC      = 18;
-    public static final int RS_NUM		= 19;
+    public static final int RS_FSL  = 19;
+    public static final int RS_NUM		= 20;
 
     public static final int[] translateFactions = { /* 0 */ 0, /* 1 */ 1, /* 2 */ 4, /* 3 */ 5, /* 4 */ 6, /* 5 */ 8, /* 6 */ 9, /* 7 */ 12 };
 
@@ -120,11 +120,8 @@ public class Ranks {
     }
 
     public static void initializeRankSystems() {
-        final String METHOD_NAME = "initializeRankSystems()"; //$NON-NLS-1$
-
         rankSystems = new Hashtable<>();
-        MekHQ.getLogger().log(Ranks.class, METHOD_NAME, LogLevel.INFO,
-                "Starting load of Rank Systems from XML..."); //$NON-NLS-1$
+        MekHQ.getLogger().info(Ranks.class, "Starting load of Rank Systems from XML...");
         // Initialize variables.
         Document xmlDoc;
 
@@ -135,7 +132,7 @@ public class Ranks {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(Ranks.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Ranks.class, ex);
             return;
         }
 
@@ -170,8 +167,7 @@ public class Ranks {
                 }
             }
         }
-        MekHQ.getLogger().log(Ranks.class, METHOD_NAME, LogLevel.INFO,
-                "Done loading Rank Systems"); //$NON-NLS-1$
+        MekHQ.getLogger().info(Ranks.class, "Done loading Rank Systems");
     }
 
     public static Ranks getRanksFromSystem(int system) {
@@ -195,7 +191,7 @@ public class Ranks {
             case RS_CUSTOM:
                 return "Custom";
             case RS_SL:
-                return "Star League";
+                return "Second Star League";
             case RS_FS:
                 return "Federated Suns";
             case RS_FC:
@@ -230,6 +226,8 @@ public class Ranks {
                 return "Free Rasalhague Republic";
             case RS_ARC:
                 return "Aurigan Coalition";
+            case RS_FSL:
+                return "First Star League";
             default:
                 return "?";
         }
@@ -432,8 +430,6 @@ public class Ranks {
     }
 
     public static Ranks generateInstanceFromXML(Node wn, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
-
         Ranks retVal = new Ranks();
         boolean showMessage = false;
 
@@ -498,7 +494,7 @@ public class Ranks {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(Ranks.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Ranks.class, ex);
         }
 
         return retVal;

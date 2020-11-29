@@ -12,18 +12,16 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit;
 
 
 import java.io.PrintWriter;
-import java.util.UUID;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -45,7 +43,6 @@ import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -108,16 +105,16 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     }
 
     @Override
-    public UUID getTeamId() {
+    public Person getTech() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String getAcquisitionName() {
-    	// This cannot be hyperlinked name due to the fact that we have a null unit ID
-    	// Also, the field this goes into does not currently support html, and would need our listener attached
-    	//  - Dylan
+        // This cannot be hyperlinked name due to the fact that we have a null unit ID
+        // Also, the field this goes into does not currently support html, and would need our listener attached
+        //  - Dylan
         return getName();
     }
 
@@ -125,6 +122,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
      * @param quantity - the number of parts of this type
      * @return a string that gives a grammatical correct name based on the quantity
      */
+    @Override
     public String getQuantityName(int quantity) {
         String answer = "" + quantity + " " + getName();
         if(quantity > 1) {
@@ -135,22 +133,17 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public Object getNewEquipment() {
-        final String METHOD_NAME = "getNewEquipment()"; //$NON-NLS-1$
-
         String name = getEntity().getChassis() + " " + getEntity().getModel();
         name = name.trim();
         MechSummary summary = MechSummaryCache.getInstance().getMech(name);
         if(null == summary) {
-            //throw(new EntityLoadingException());
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Could not find a mech summary for " + name); //$NON-NLS-1$
+            MekHQ.getLogger().error(this, "Could not find a mech summary for " + name);
             return null;
         }
         try {
             return new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Could not load " + summary.getEntryName()); //$NON-NLS-1$
+            MekHQ.getLogger().error(this, "Could not load " + summary.getEntryName());
             return null;
         }
     }
@@ -163,23 +156,23 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public String getAcquisitionDisplayName() {
-    	return null;
+        return null;
     }
 
-	@Override
-	public String getAcquisitionExtraDesc() {
-    	return null;
-	}
+    @Override
+    public String getAcquisitionExtraDesc() {
+        return null;
+    }
 
-	@Override
+    @Override
     public String getAcquisitionBonus() {
-    	return null;
+        return null;
     }
 
-	@Override
-	public Part getAcquisitionPart() {
-		return null;
-	}
+    @Override
+    public Part getAcquisitionPart() {
+        return null;
+    }
 
     @Override
     public Unit getUnit() {
@@ -206,7 +199,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     @Override
     public String find(int transitDays) {
         //TODO: probably get a duplicate entity
-        if(getCampaign().buyUnit((Entity)getNewEquipment(), transitDays)) {
+        if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
             return "<font color='green'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
@@ -313,7 +306,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         //parts need to be initialized for this to work
         int avail = getAvailability();
         if (this.isExtinctIn(getCampaign().getGameYear())) {
-        	avail = EquipmentType.RATING_X;
+            avail = EquipmentType.RATING_X;
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
@@ -365,15 +358,13 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     }
 
     public static UnitOrder generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
-
         UnitOrder retVal = new UnitOrder();
         retVal.setCampaign(c);
 
         NodeList nl = wn.getChildNodes();
 
         try {
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("quantity")) {
@@ -386,7 +377,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().error(UnitOrder.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(UnitOrder.class, ex);
         }
 
         retVal.initializeParts(false);

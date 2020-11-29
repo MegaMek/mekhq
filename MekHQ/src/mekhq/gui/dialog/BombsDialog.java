@@ -25,7 +25,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -34,13 +33,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.client.ui.swing.BombChoicePanel;
+import megamek.common.AmmoType;
 import megamek.common.BombType;
 import megamek.common.EquipmentType;
 import megamek.common.IBomber;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
@@ -57,7 +56,7 @@ public class BombsDialog extends JDialog implements ActionListener {
     private BombChoicePanel bombPanel;
     private IBomber bomber;
     private Campaign campaign;
-    
+
     private int[] bombChoices;
     private int[] bombCatalog = new int[BombType.B_NUM];
     private int[] availBombs = new int[BombType.B_NUM];
@@ -71,7 +70,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         this.bomber = iBomber;
         this.campaign = campaign;
         bombChoices = bomber.getBombChoices();
-        
+
         initGUI();
         validate();
         pack();
@@ -82,19 +81,20 @@ public class BombsDialog extends JDialog implements ActionListener {
     private void initGUI() {
         //Using bombCatalog to store the part ID's of the bombs so don't have to keep full spare list in memory
         //and for ease of access later
-        List<Part> spareParts = campaign.getSpareParts();
-        for(Part spare : spareParts) {
-            if(spare instanceof AmmoStorage && ((EquipmentPart)spare).getType() instanceof BombType && spare.isPresent()) {
+        campaign.getWarehouse().forEachSparePart(spare -> {
+            if ((spare instanceof AmmoStorage)
+                    && (((EquipmentPart)spare).getType() instanceof BombType)
+                    && spare.isPresent()) {
                 int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage)spare).getType().getInternalName()));
                 bombCatalog[bombType] = spare.getId();
                 availBombs[bombType] = ((AmmoStorage)spare).getShots();
             }
-        }
-        
+        });
+
         for (int type = 0; type < BombType.B_NUM; type++) {
             typeMax[type] = availBombs[type] + bombChoices[type];
         }
-        
+
         bombPanel = new BombChoicePanel(bomber, campaign.getGameOptions().booleanOption("at2_nukes"),
                 true, typeMax);
 
@@ -134,7 +134,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         if (okayButton.equals(e.getSource())) {
             bombPanel.applyChoice();
             int[] newLoadout = bombPanel.getChoice();
-            
+
             //Get difference between starting bomb load and new bomb load
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if(bombChoices[type] != newLoadout[type]) {
@@ -143,25 +143,25 @@ public class BombsDialog extends JDialog implements ActionListener {
                     newLoadout[type] = 0;
                 }
             }
-            
+
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if (newLoadout[type] != 0) {
                     //IF there are bombs of this TYPE in the warehouse
                     if (bombCatalog[type] > 0) {
-                        AmmoStorage storedBombs = (AmmoStorage) campaign.getPart(bombCatalog[type]);
+                        AmmoStorage storedBombs = (AmmoStorage) campaign.getWarehouse().getPart(bombCatalog[type]);
                         storedBombs.changeShots(newLoadout[type]);
                         if(storedBombs.getShots() == 0) {
-                            campaign.removePart(storedBombs);
+                            campaign.getWarehouse().removePart(storedBombs);
                         }
                     //No bombs of this type in warehouse, add bombs
                     //In this case newLoadout should always be greater than 0, but check to be sure
                     } else if (bombCatalog[type] == 0 && newLoadout[type] > 0) {
-                        AmmoStorage excessBombs = new AmmoStorage(0, EquipmentType.get(BombType.getBombInternalName(type)), newLoadout[type], campaign);
-                        campaign.addPart(excessBombs, 0);
+                        AmmoStorage excessBombs = new AmmoStorage(0, (AmmoType) EquipmentType.get(BombType.getBombInternalName(type)), newLoadout[type], campaign);
+                        campaign.getQuartermaster().addPart(excessBombs, 0);
                     }
                 }
             }
-            
+
             setVisible(false);
         } else if (cancelButton.equals(e.getSource())) {
             setVisible(false);

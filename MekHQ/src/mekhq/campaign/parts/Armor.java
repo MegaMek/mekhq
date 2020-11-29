@@ -124,7 +124,7 @@ public class Armor extends Part implements IAcquisitionWork {
         String toReturn = "<html><font size='2'";
 
         String scheduled = "";
-        if (getTeamId() != null) {
+        if (getTech() != null) {
             scheduled = " (scheduled) ";
         }
 
@@ -228,8 +228,8 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof Armor
-                && Objects.equals(getRefitId(), part.getRefitId())
+        return (part instanceof Armor)
+                && Objects.equals(getRefitUnit(), part.getRefitUnit())
                 && isSameType((Armor)part);
     }
 
@@ -353,7 +353,7 @@ public class Armor extends Part implements IAcquisitionWork {
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
-        if(campaign.buyPart(newPart, transitDays)) {
+        if(campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
@@ -565,7 +565,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        Armor a = (Armor)campaign.findSparePart(part -> {
+        Armor a = (Armor) campaign.getWarehouse().findSparePart(part -> {
             return part instanceof Armor
                 && part.isPresent()
                 && !part.isReservedForRefit()
@@ -576,20 +576,20 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public void changeAmountAvailable(int amount) {
-        Armor a = (Armor)campaign.findSparePart(part -> {
-            return part instanceof Armor
+        Armor a = (Armor) campaign.getWarehouse().findSparePart(part -> {
+            return (part instanceof Armor)
                 && part.isPresent()
-                && Objects.equals(getRefitId(), part.getRefitId())
+                && Objects.equals(getRefitUnit(), part.getRefitUnit())
                 && isSameType((Armor)part);
         });
 
         if (null != a) {
             a.setAmount(a.getAmount() + amount);
             if (a.getAmount() <= 0) {
-                campaign.removePart(a);
+                campaign.getWarehouse().removePart(a);
             }
         } else if (amount > 0) {
-            campaign.addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
+            campaign.getQuartermaster().addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
         }
     }
 

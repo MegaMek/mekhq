@@ -18,14 +18,14 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.common.Crew;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Portrait;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.w3c.dom.Node;
@@ -35,6 +35,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -59,22 +60,24 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     //region Personal Information
     private Gender gender;
     private PersonnelStatus status;
+    private AbstractIcon portrait;
     private LocalDate birthday;
     private LocalDate dateOfDeath;
     private Genealogy genealogy;
     private String biography;
     //endregion Personal Information
-
-    //region Portraits
-    private String portraitCategory;
-    private String portraitFileName;
-    // runtime override portraits (not saved)
-    private transient String portraitCategoryOverride = null; // Potential Values are Crew.ROOT_PORTRAIT or null
-    private transient String portraitFileNameOverride = null; // Potential Values are Crew.PORTRAIT_NONE or null
-    //endregion Portraits
     //endregion Variable Declarations
 
     //region Constructors
+    /**
+     * AbstractPerson reference id constructor
+     *
+     * @param id the id of the person being referenced
+     */
+    protected AbstractPerson(UUID id) {
+        setId(id);
+    }
+
     /**
      * Primary AbstractPerson constructor, variables are initialized in the exact same order as they are
      * saved to the XML file
@@ -84,30 +87,26 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      * @param postNominal       the person's post-nominal
      */
     protected AbstractPerson(String preNominal, String givenName, String surname, String postNominal) {
-        id = UUID.randomUUID();
+        setId(UUID.randomUUID());
 
         //region Name
         this.preNominal = preNominal;
         this.givenName = givenName;
         this.surname = surname;
         this.postNominal = postNominal;
-        maidenName = null; // this is set to null to handle divorce cases
-        callsign = "";
+        setMaidenName(null); // this is set to null to handle divorce cases
+        setCallsign("");
         //endregion Name
 
         //region Personal Information
-        gender = Gender.MALE;
-        status = PersonnelStatus.ACTIVE;
-        birthday = null;
-        dateOfDeath = null;
+        setGender(Gender.MALE);
+        setStatus(PersonnelStatus.ACTIVE);
+        setPortrait(new Portrait());
+        setBirthday(LocalDate.now());
+        setDateOfDeath(null);
         genealogy = new Genealogy(getId());
-        biography = "";
+        setBiography("");
         //endregion Personal Information
-
-        //region Portraits
-        portraitCategory = Crew.ROOT_PORTRAIT;
-        portraitFileName = Crew.PORTRAIT_NONE;
-        //endregion Portraits
     }
     //endregion Constructors
 
@@ -307,6 +306,28 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     }
 
     /**
+     * @return the person's portrait
+     */
+    public AbstractIcon getPortrait() {
+        return portrait;
+    }
+
+    /**
+     * @param portrait the person's new portrait
+     */
+    public void setPortrait(AbstractIcon portrait) {
+        this.portrait = Objects.requireNonNull(portrait);
+    }
+
+    public String getPortraitCategory() {
+        return getPortrait().getCategory();
+    }
+
+    public String getPortraitFileName() {
+        return getPortrait().getFilename();
+    }
+
+    /**
      * @return the person's birthday
      */
     public LocalDate getBirthday() {
@@ -366,85 +387,6 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
         this.biography = biography;
     }
     //endregion Personal Information
-
-    //region Portraits
-    /**
-     * @return the person's current portrait category, which is either the override if the portrait
-     * category was not found during load or their current category
-     */
-    public String getPortraitCategory() {
-        return Utilities.nonNull(getPortraitCategoryOverrideDirect(), getPortraitCategoryDirect());
-    }
-
-    /**
-     * @return the person's current portrait category.This can ONLY be called by
-     * {@link AbstractPerson#getPortraitCategory()} or its overrides.
-     */
-    protected String getPortraitCategoryDirect() {
-        return portraitCategory;
-    }
-
-    /**
-     * @param portraitCategory the person's portrait category
-     */
-    public void setPortraitCategory(String portraitCategory) {
-        this.portraitCategory = portraitCategory;
-    }
-
-    /**
-     * @return the current portrait category override.This can ONLY be called by
-     * {@link AbstractPerson#getPortraitCategory()} or its overrides.
-     */
-    private @Nullable String getPortraitCategoryOverrideDirect() {
-        return portraitCategoryOverride;
-    }
-
-    /**
-     * This sets the person's Portrait Category Override to be equal to Crew.ROOT_PORTRAIT, which
-     * means that the portrait was not found
-     */
-    public void setPortraitCategoryOverride() {
-        this.portraitCategoryOverride = Crew.ROOT_PORTRAIT;
-    }
-
-    /**
-     * @return the person's current portrait file name
-     */
-    public String getPortraitFileName() {
-        return Utilities.nonNull(getPortraitFileNameOverrideDirect(), getPortraitFileNameDirect());
-    }
-
-    /**
-     * @return the person's current portrait file name.This can ONLY be called by
-     * {@link AbstractPerson#getPortraitFileName()} or its overrides.
-     */
-    protected String getPortraitFileNameDirect() {
-        return portraitFileName;
-    }
-
-    /**
-     * @param portraitFileName the person's portrait file name
-     */
-    public void setPortraitFileName(String portraitFileName) {
-        this.portraitFileName = portraitFileName;
-    }
-
-    /**
-     * @return the person's current portrait file name override.This can ONLY be called by
-     * {@link AbstractPerson#getPortraitFileName()} or its overrides.
-     */
-    private @Nullable String getPortraitFileNameOverrideDirect() {
-        return portraitFileNameOverride;
-    }
-
-    /**
-     * This sets the person's Portrait File Name to be equal to Crew.PORTRAIT_NONE, which
-     * means that the portrait was not found
-     */
-    public void setPortraitFileNameOverride() {
-        this.portraitFileNameOverride = Crew.PORTRAIT_NONE;
-    }
-    //endregion Portraits
     //endregion Getters/Setters
 
     //region Boolean Information Methods
@@ -505,6 +447,15 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "gender", getGender().name());
         // Always save a person's status, to make it easy to parse the personnel saved data
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "status", getStatus().name());
+
+        if (!getPortrait().hasDefaultCategory()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", getPortrait().getCategory());
+        }
+
+        if (!getPortrait().hasDefaultFilename()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", getPortrait().getFilename());
+        }
+
         if (getBirthday() != null) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "birthday",
                     MekHqXmlUtil.saveFormattedDate(getBirthday()));
@@ -523,16 +474,6 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "biography", getBiography());
         }
         //endregion Personal Information
-
-        //region Portraits
-        if (!getPortraitCategoryDirect().equals(Crew.ROOT_PORTRAIT)) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "portraitCategory", getPortraitCategoryDirect());
-        }
-
-        if (!getPortraitFileNameDirect().equals(Crew.PORTRAIT_NONE)) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "portraitFile", getPortraitFileNameDirect());
-        }
-        //endregion Portraits
     }
 
     /**
@@ -579,14 +520,13 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
                 } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
                     retVal.biography = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
-                    retVal.setPortraitCategory(wn2.getTextContent().trim());
+                    retVal.getPortrait().setCategory(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
-                    retVal.setPortraitFileName(wn2.getTextContent().trim());
+                    retVal.getPortrait().setFilename(wn2.getTextContent());
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(AbstractPerson.class, "generateInstanceFromXML",
-                    "Failed to load AbstractPerson, because of " + e.getMessage(), e);
+            MekHQ.getLogger().error("Failed to load AbstractPerson, because of " + e.getMessage(), e);
             retVal = null;
         }
 

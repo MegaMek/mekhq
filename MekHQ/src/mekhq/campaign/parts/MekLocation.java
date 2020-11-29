@@ -342,12 +342,12 @@ public class MekLocation extends Part {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
 			unit.getEntity().setLocationBlownOff(loc, false);
 			unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-			Part spare = campaign.checkForExistingSparePart(this);
+			Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
 			if(!salvage) {
-				campaign.removePart(this);
+				campaign.getWarehouse().removePart(this);
 			} else if(null != spare) {
 				spare.incrementQuantity();
-				campaign.removePart(this);
+				campaign.getWarehouse().removePart(this);
 			}
 			//if this is a head. check for life support and sensors
 			if(loc == Mech.LOC_HEAD) {
@@ -357,7 +357,7 @@ public class MekLocation extends Part {
 			if(loc != Mech.LOC_CT) {
 				Part missing = getMissingPart();
 				unit.addPart(missing);
-				campaign.addPart(missing, 0);
+				campaign.getQuartermaster().addPart(missing, 0);
 			}
 		}
 		setUnit(null);
@@ -711,7 +711,7 @@ public class MekLocation extends Part {
 		}
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
-		if (getTeamId() != null) {
+		if (getTech() != null) {
 			scheduled = " (scheduled) ";
 		}
 

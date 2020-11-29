@@ -1,20 +1,20 @@
 /*
  * LandingGear.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,7 +44,7 @@ import mekhq.campaign.personnel.SkillType;
 public class LandingGear extends Part {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -717866644605314883L;
 
@@ -76,15 +76,15 @@ public class LandingGear extends Part {
             } else if (unit.getEntity() instanceof LandAirMech) {
                 hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR);
             }
-            if(checkForDestruction 
-                    && hits > priorHits 
+            if(checkForDestruction
+                    && hits > priorHits
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         int time;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
@@ -146,17 +146,17 @@ public class LandingGear extends Part {
             } else if (unit.getEntity() instanceof LandAirMech) {
                 unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, 3);
             }
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
