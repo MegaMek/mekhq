@@ -131,7 +131,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @param relationshipType the relationship type between the two people
      * @param person the person to add
      */
-    public void addFamilyMember(FamilialRelationshipType relationshipType, Person person) {
+    public void addFamilyMember(FamilialRelationshipType relationshipType, @Nullable Person person) {
         if (person != null) {
             getFamily().putIfAbsent(relationshipType, new ArrayList<>());
             getFamily().get(relationshipType).add(person);

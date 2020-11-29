@@ -56,9 +56,9 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
      * @param reason the reason the person is a former spouse
      */
     public FormerSpouse(Person formerSpouse, LocalDate date, FormerSpouseReason reason) {
-        this.formerSpouse = Objects.requireNonNull(formerSpouse);
-        this.date = Objects.requireNonNull(date);
-        this.reason = Objects.requireNonNull(reason);
+        setFormerSpouse(formerSpouse);
+        setDate(date);
+        setReason(reason);
     }
     //endregion Constructors
 
@@ -110,7 +110,7 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "formerSpouse");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "id", formerSpouse.getId().toString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "id", formerSpouse.getId());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "date", MekHqXmlUtil.saveFormattedDate(date));
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "reason", reason.name());
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "formerSpouse");

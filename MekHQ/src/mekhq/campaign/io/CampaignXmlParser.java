@@ -1699,8 +1699,6 @@ public class CampaignXmlParser {
                 continue;
             }
 
-            //Then we migrate the Person
-
             // Finally, we migrate the individual person data
             Iterator<Person> people = ancestryMigrationMap.get(id).iterator();
             while (people.hasNext()) {

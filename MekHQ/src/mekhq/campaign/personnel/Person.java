@@ -351,7 +351,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         bloodname = "";
         biography = "";
         idleMonths = -1;
-        genealogy = new Genealogy(this);
+        setGenealogy(new Genealogy(this));
         tryingToMarry = true;
         tryingToConceive = true;
         dueDate = null;
@@ -1314,6 +1314,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return genealogy;
     }
 
+    public void setGenealogy(Genealogy genealogy) {
+        this.genealogy = genealogy;
+    }
+
     //region Pregnancy
     public boolean isTryingToConceive() {
         return tryingToConceive;
@@ -1930,7 +1934,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) { // legacy - 0.47.6 removal
                     Genealogy.loadFormerSpouses(retVal.getGenealogy(), wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
-                    retVal.genealogy = Genealogy.generateInstanceFromXML(wn2.getChildNodes());
+                    retVal.setGenealogy(Genealogy.generateInstanceFromXML(wn2.getChildNodes()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) {
                     retVal.tryingToMarry = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {

@@ -799,7 +799,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         int firsty = 0;
 
-        Person spouse = person.getGenealogy().getSpouse();
+        final Person spouse = person.getGenealogy().getSpouse();
         if (spouse != null) {
             JLabel lblSpouse1 = new JLabel(resourceMap.getString("lblSpouse1.text"));
             lblSpouse1.setName("lblSpouse1");
@@ -862,7 +862,7 @@ public class PersonViewPanel extends ScrollablePanel {
         }
 
         if (campaign.getCampaignOptions().getDisplayFamilyLevel().displayExtendedFamily()) {
-            List<Person> children = person.getGenealogy().getChildren();
+            final List<Person> children = person.getGenealogy().getChildren();
             if (!children.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
                 lblChildren1.setName("lblChildren1");
                 lblChildren1.setText(resourceMap.getString("lblChildren1.text"));
@@ -894,7 +894,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            List<Person> grandchildren = person.getGenealogy().getGrandchildren();
+            final List<Person> grandchildren = person.getGenealogy().getGrandchildren();
             if (!grandchildren.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayGrandparentsGrandchildren()) {
                 lblGrandchildren1.setName("lblGrandchildren1");
                 lblGrandchildren1.setText(resourceMap.getString("lblGrandchildren1.text"));
@@ -958,7 +958,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            List<Person> siblings = person.getGenealogy().getSiblings();
+            final List<Person> siblings = person.getGenealogy().getSiblings();
             if (!siblings.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
                 lblSiblings1.setName("lblSiblings1");
                 lblSiblings1.setText(resourceMap.getString("lblSiblings1.text"));
@@ -992,7 +992,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            List<Person> grandparents = person.getGenealogy().getGrandparents();
+            final List<Person> grandparents = person.getGenealogy().getGrandparents();
             if (!grandparents.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayGrandparentsGrandchildren()) {
                 lblGrandparents1.setName("lblGrandparents1");
                 lblGrandparents1.setText(resourceMap.getString("lblGrandparents1.text"));
@@ -1027,7 +1027,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            List<Person> auntsAndUncles = person.getGenealogy().getsAuntsAndUncles();
+            final List<Person> auntsAndUncles = person.getGenealogy().getsAuntsAndUncles();
             if (!auntsAndUncles.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayAuntsUnclesCousins()) {
                 lblAuntsOrUncles1.setName("lblAuntsOrUncles1");
                 lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text"));
@@ -1062,7 +1062,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            List<Person> cousins = person.getGenealogy().getCousins();
+            final List<Person> cousins = person.getGenealogy().getCousins();
             if (!cousins.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayAuntsUnclesCousins()) {
                 lblCousins1.setName("lblCousins1");
                 lblCousins1.setText(resourceMap.getString("lblCousins1.text"));
