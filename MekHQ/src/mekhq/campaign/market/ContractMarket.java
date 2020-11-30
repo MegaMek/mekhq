@@ -208,7 +208,7 @@ public class ContractMarket implements Serializable {
             } else {
                 MekHQ.getLogger().warning(
                         "Unable to find any factions around "
-                            + campaign.getCurrentSystem()
+                            + campaign.getCurrentSystem().getName(campaign.getLocalDate())
                             + " on "
                             + campaign.getLocalDate());
             }
