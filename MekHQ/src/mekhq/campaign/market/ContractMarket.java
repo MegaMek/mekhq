@@ -69,6 +69,12 @@ public class ContractMarket implements Serializable {
 	public final static int CLAUSE_TRANSPORT = 3;
 	public final static int CLAUSE_NUM = 4;
 
+    /**
+     * An arbitrary maximum number of attempts to find a random employer faction that
+     * is not a Mercenary.
+     */
+    private final static int MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER = 20;
+
 	private ContractMarketMethod method = ContractMarketMethod.ATB_MONTHLY;
 
 	private List<Contract> contracts;
@@ -311,10 +317,10 @@ public class ContractMarket implements Serializable {
 
 	private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod, int retries) {
         if (employer == null) {
-            MekHQ.getLogger().warning("Could not generate AtB Contract because there was no employer!");
+            MekHQ.getLogger().warning("Could not generate an AtB Contract because there was no employer!");
             return null;
         } else if (retries <= 0) {
-            MekHQ.getLogger().warning("Could not generate AtB Contract because we ran out of retries!");
+            MekHQ.getLogger().warning("Could not generate an AtB Contract because we ran out of retries!");
             return null;
         }
 
@@ -329,8 +335,16 @@ public class ContractMarket implements Serializable {
 
         if (employer.equals("MERC")) {
             contract.setMercSubcontract(true);
-            while (employer.equals("MERC")) {
+            for (int attempts = 0; attempts < MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER; ++attempts) {
                 employer = RandomFactionGenerator.getInstance().getEmployer();
+                if ((employer != null) && !employer.equals("MERC")) {
+                    break;
+                }
+            }
+
+            if ((employer == null) || employer.equals("MERC")) {
+                MekHQ.getLogger().warning("Could not generate an AtB Contract because we could not find a non-MERC employer!");
+                return null;
             }
         }
         contract.setEmployerCode(employer, campaign.getGameYear());
