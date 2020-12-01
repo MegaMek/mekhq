@@ -23,6 +23,9 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -334,10 +337,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return false;
     }
 
-    protected Money adjustCostsForCampaignOptions(Money cost) {
+    protected Money adjustCostsForCampaignOptions(@Nullable Money cost) {
         // if the part doesn't cost anything, no amount of multiplication will change it
-        if (cost.isZero()) {
-            return cost;
+        if ((cost == null) || cost.isZero()) {
+            return Money.zero();
         }
 
         if (getTechBase() == T_CLAN) {
@@ -778,7 +781,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         Part retVal = null;
         try {
             // Instantiate the correct child class, and call its parsing function.
-            retVal = (Part) Class.forName(className).newInstance();
+            retVal = (Part) Class.forName(className).getDeclaredConstructor().newInstance();
             retVal.loadFieldsFromXmlNode(wn);
 
             // Okay, now load Part-specific fields!
@@ -1083,7 +1086,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
      * performing overnight.
      * @param tech The team member.
      */
-    public void setReserveId(@Nullable Person tech) {
+    public void setReservedBy(@Nullable Person tech) {
         this.reservedBy = tech;
     }
 
@@ -1267,10 +1270,17 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return refitUnit;
     }
 
+    /**
+     * Gets a value indicating if the part is reserved for a refit.
+     */
     public boolean isReservedForRefit() {
         return refitUnit != null;
     }
 
+    /**
+     * Gets a value indicating if the part is reserved for an
+     * overnight replacement task.
+     */
     public boolean isReservedForReplacement() {
         return reservedBy != null;
     }
@@ -1283,22 +1293,24 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         usedForRefitPlanning = flag;
     }
 
+    /**
+     * Sets the number of days until the part arrives.
+     * @param days The number of days until the part arrives.
+     */
     public void setDaysToArrival(int days) {
-        daysToArrival = days;
+        daysToArrival = Math.max(days, 0);
     }
 
+    /**
+     * Gets the number of days until the part arrives.
+     */
     public int getDaysToArrival() {
         return daysToArrival;
     }
 
-    public boolean checkArrival() {
-        if (daysToArrival > 0) {
-            daysToArrival--;
-            return (daysToArrival == 0);
-        }
-        return false;
-    }
-
+    /**
+     * Gets a value indicating whether or not the part is present.
+     */
     public boolean isPresent() {
         return daysToArrival == 0;
     }
@@ -1323,38 +1335,46 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return true;
     }
 
+    /**
+     * Gets the number of parts on-hand.
+     */
     public int getQuantity() {
         return quantity;
     }
 
+    /**
+     * Increments the number of parts in stock by one.
+     */
     public void incrementQuantity() {
-        quantity++;
+        setQuantity(getQuantity() + 1);
     }
 
+    /**
+     * Decrements the number of parts in stock by one,
+     * and removes the part from the campaign if it
+     * reaches zero.
+     */
     public void decrementQuantity() {
-        quantity--;
-        if (quantity <= 0) {
+        setQuantity(getQuantity() - 1);
+    }
+
+    /**
+     * A method to set the number of parts en masse.
+     * @param number The new number of spares in the pile.
+     */
+    public void setQuantity(int number) {
+        quantity = Math.max(number, 0);
+        if (quantity == 0) {
             for (Part childPart : childParts) {
-                campaign.removePart(childPart);
+                campaign.getWarehouse().removePart(childPart);
             }
-            campaign.removePart(this);
+            campaign.getWarehouse().removePart(this);
         }
     }
 
     /**
-     * A method to set the number of parts en masse
-     * @param number The new number of spares in the pile
+     * Gets a value indicating whether or not this is a spare part.
      */
-    public void setQuantity(int number) {
-        quantity = number;
-        if (quantity <= 0) {
-            for (Part childPart : childParts) {
-                campaign.removePart(childPart);
-            }
-            campaign.removePart(this);
-        }
-    }
-
     public boolean isSpare() {
         return (unit == null)
             && (parentPart == null)
@@ -1443,32 +1463,67 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public abstract String getLocationName();
 
-    public void setParentPart(Part part) {
+    /**
+     * Sets the parent part.
+     * @param part The parent part.
+     */
+    public void setParentPart(@Nullable Part part) {
         parentPart = part;
     }
 
-    public Part getParentPart() {
+    /**
+     * Gets the parent part, or null if none exists.
+     */
+    public @Nullable Part getParentPart() {
         return parentPart;
     }
 
+    /**
+     * Gets a value indicating whether or not this part
+     * has a parent part.
+     */
     public boolean hasParentPart() {
         return parentPart != null;
     }
 
-    public ArrayList<Part> getChildParts() {
-        return childParts;
+    /**
+     * Gets a value indicating whether or not this part has child parts.
+     */
+    public boolean hasChildParts() {
+        return !childParts.isEmpty();
     }
 
-    public void addChildPart(Part child) {
-        childParts.add(child);
-        child.setParentPart(this);
+    /**
+     * Gets a list of child parts for this part.
+     */
+    public List<Part> getChildParts() {
+        return Collections.unmodifiableList(childParts);
     }
 
+    /**
+     * Adds a child part to this part.
+     * @param childPart The part to add as a child.
+     */
+    public void addChildPart(Part childPart) {
+        childParts.add(Objects.requireNonNull(childPart));
+        childPart.setParentPart(this);
+    }
+
+    /**
+     * Removes a child part from this part.
+     * @param childPart The child part to remove.
+     */
     public void removeChildPart(Part childPart) {
-        childPart.setParentPart(null);
-        childParts.remove(childPart);
+        Objects.requireNonNull(childPart);
+
+        if (childParts.remove(childPart)) {
+            childPart.setParentPart(null);
+        }
     }
 
+    /**
+     * Removes all child parts from this part.
+     */
     public void removeAllChildParts() {
         for (Part childPart : childParts) {
             childPart.setParentPart(null);
@@ -1786,7 +1841,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public void fixReferences(Campaign campaign) {
         if (replacementPart instanceof PartRef) {
             int id = replacementPart.getId();
-            replacementPart = campaign.getPart(id);
+            replacementPart = campaign.getWarehouse().getPart(id);
             if ((replacementPart == null) && (id > 0)) {
                 MekHQ.getLogger().error(
                     String.format("Part %d ('%s') references missing replacement part %d",
@@ -1796,7 +1851,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
         if (parentPart instanceof PartRef) {
             int id = parentPart.getId();
-            parentPart = campaign.getPart(id);
+            parentPart = campaign.getWarehouse().getPart(id);
             if ((parentPart == null) && (id > 0)) {
                 MekHQ.getLogger().error(
                     String.format("Part %d ('%s') references missing parent part %d",
@@ -1807,7 +1862,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         for (int ii = childParts.size() - 1; ii >= 0; --ii) {
             Part childPart = childParts.get(ii);
             if (childPart instanceof PartRef) {
-                Part realPart = campaign.getPart(childPart.getId());
+                Part realPart = campaign.getWarehouse().getPart(childPart.getId());
                 if (realPart != null) {
                     childParts.set(ii, realPart);
                 } else if (childPart.getId() > 0) {

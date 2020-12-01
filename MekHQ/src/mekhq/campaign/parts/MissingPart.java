@@ -135,7 +135,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         if(null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
-            campaign.addPart(actualReplacement, 0);
+            campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             remove(false);
             //assign the replacement part to the unit
@@ -145,7 +145,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 
     @Override
     public void remove(boolean salvage) {
-        campaign.removePart(this);
+        campaign.getWarehouse().removePart(this);
         if(null != unit) {
             unit.removePart(this);
         }
@@ -164,7 +164,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         }
 
         // don't just return with the first part if it is damaged
-        return campaign.streamSpareParts()
+        return campaign.getWarehouse().streamSpareParts()
             .filter(MissingPart::isAvailableAsReplacement)
             .reduce(null, (bestPart, part) -> {
                 if (isAcceptableReplacement(part, refit)) {
@@ -325,7 +325,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
-        if(campaign.buyPart(newPart, transitDays)) {
+        if(campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
@@ -406,12 +406,12 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         if ((null != replacement) && (null != getTech())) {
             if (replacement.getQuantity() > 1) {
                 Part actualReplacement = replacement.clone();
-                actualReplacement.setReserveId(getTech());
-                campaign.addPart(actualReplacement, 0);
+                actualReplacement.setReservedBy(getTech());
+                campaign.getQuartermaster().addPart(actualReplacement, 0);
                 setReplacementPart(actualReplacement);
                 replacement.decrementQuantity();
             } else {
-                replacement.setReserveId(getTech());
+                replacement.setReservedBy(getTech());
                 setReplacementPart(replacement);
             }
         }
@@ -422,12 +422,12 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         Part replacement = findReplacement(false);
         if (hasReplacementPart() && (null != replacement)) {
             setReplacementPart(null);
-            replacement.setReserveId(null);
+            replacement.setReservedBy(null);
             if (replacement.isSpare()) {
-                Part spare = campaign.checkForExistingSparePart(replacement);
+                Part spare = campaign.getWarehouse().checkForExistingSparePart(replacement);
                 if (null != spare) {
                     spare.incrementQuantity();
-                    campaign.removePart(replacement);
+                    campaign.getWarehouse().removePart(replacement);
                 }
             }
         }

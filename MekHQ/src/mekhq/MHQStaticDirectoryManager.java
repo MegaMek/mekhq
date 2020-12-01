@@ -23,9 +23,10 @@ import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.fileUtils.DirectoryItems;
+import megamek.common.util.fileUtils.ImageFileFactory;
 import mekhq.campaign.force.Force;
 import mekhq.gui.enums.LayeredForceIcon;
-import mekhq.gui.utilities.PortraitFileFactory;
+import mekhq.io.AwardFileFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -50,7 +51,6 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
     //endregion Constructors
 
-
     //region Initialization
     /**
      * This initialized all of the directories under this manager
@@ -73,7 +73,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             parseForceIconDirectory = false;
             try {
                 forceIconDirectory = new DirectoryItems(new File("data/images/force"),
-                        "", PortraitFileFactory.getInstance());
+                        "", new ImageFileFactory());
             } catch (Exception e) {
                 MegaMek.getLogger().error("Could not parse the force icon directory!", e);
             }
@@ -92,7 +92,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             parseAwardIconDirectory = false;
             try {
                 awardIconDirectory = new DirectoryItems(new File("data/images/awards"),
-                        "", PortraitFileFactory.getInstance());
+                        "", new AwardFileFactory());
             } catch (Exception e) {
                 MegaMek.getLogger().error("Could not parse the award icon directory!", e);
             }

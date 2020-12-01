@@ -102,7 +102,7 @@ public class StaticChecks {
      */
     public static boolean areAllUnitsTransported(Vector<Unit> units) {
         for (Unit unit : units) {
-            if (!unit.hasTransportShipId()) {
+            if (!unit.hasTransportShipAssignment()) {
                 return false;
             }
         }

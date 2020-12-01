@@ -100,7 +100,7 @@ public class CargoStatistics {
         int hv = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false);
         int protos = stats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
 
-        cargoTonnage += getCampaign().streamSpareParts().filter(p -> inTransit || p.isPresent())
+        cargoTonnage += getCampaign().getWarehouse().streamSpareParts().filter(p -> inTransit || p.isPresent())
                             .mapToDouble(p -> p.getQuantity() * p.getTonnage())
                             .sum();
 

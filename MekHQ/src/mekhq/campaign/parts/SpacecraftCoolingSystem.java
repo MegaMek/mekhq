@@ -154,7 +154,7 @@ public class SpacecraftCoolingSystem extends Part {
         if (unit != null && unit.getEntity() instanceof Aero) {
             //Spare part is usually 'this', but we're looking for spare heatsinks here...
             Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
-            Part spare = campaign.checkForExistingSparePart(spareHeatSink);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
            if (null != spare) {
                 spare.setQuantity(spare.getQuantity() - Math.min(sinksNeeded, 50));
                 ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() + Math.min(sinksNeeded, 50));
@@ -192,7 +192,7 @@ public class SpacecraftCoolingSystem extends Part {
         if (unit != null && unit.getEntity() instanceof Aero) {
             //Spare part is usually 'this', but we're looking for spare heatsinks here...
             Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
-            Part spare = campaign.checkForExistingSparePart(spareHeatSink);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
             //How many sinks are we trying to remove? It'll be between 0 and 50.
             int sinkBatch = Math.max(0, Math.min((currentSinks - engineSinks), 50));
             if(!salvage) {
@@ -204,7 +204,7 @@ public class SpacecraftCoolingSystem extends Part {
            } else {
                //Start a new collection, but make sure we don't pull them out of the engine
                spareHeatSink.setQuantity(Math.min(removeableSinks, sinkBatch));
-               campaign.addPart(spareHeatSink, 0);
+               campaign.getQuartermaster().addPart(spareHeatSink, 0);
            }
            ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
         }
@@ -223,7 +223,7 @@ public class SpacecraftCoolingSystem extends Part {
             return "All remaining heat sinks are built-in and cannot be salvaged.";
         }
         Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
-        Part spare = campaign.checkForExistingSparePart(spareHeatSink);
+        Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
         if (!isSalvaging()) {
             if (spare == null) {
                 return "No compatible heat sinks in warehouse!";

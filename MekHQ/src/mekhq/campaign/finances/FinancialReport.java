@@ -174,7 +174,7 @@ public class FinancialReport {
         });
 
         r.spareParts = r.spareParts.plus(
-            campaign.streamSpareParts()
+            campaign.getWarehouse().streamSpareParts()
                 .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
                 .collect(Collectors.toList()));
 

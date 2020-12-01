@@ -34,6 +34,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.common.*;
 import megamek.common.enums.Gender;
 import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Portrait;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.*;
@@ -166,6 +167,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private String maidenName;
     private String callsign;
     private Gender gender;
+    private AbstractIcon portrait;
 
     private int primaryRole;
     private int secondaryRole;
@@ -217,11 +219,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //days of rest
     private int idleMonths;
     private int daysToWaitForHealing;
-
-    //region portrait
-    private String portraitCategory;
-    private String portraitFile;
-    //endregion portrait
 
     // Our rank
     private int rank;
@@ -293,9 +290,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
-
     //region Reverse Compatibility
     // Unknown version
     private int oldId;
@@ -363,8 +357,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         tryingToConceive = true;
         dueDate = null;
         expectedDueDate = null;
-        portraitCategory = AbstractIcon.ROOT_CATEGORY;
-        portraitFile = AbstractIcon.DEFAULT_ICON_FILENAME;
+        setPortrait(new Portrait());
         xp = 0;
         daysToWaitForHealing = 0;
         gender = Gender.MALE;
@@ -690,20 +683,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
     //endregion Names
 
+    //region Portrait
+    public AbstractIcon getPortrait() {
+        return portrait;
+    }
+
+    public void setPortrait(AbstractIcon portrait) {
+        assert (portrait != null) : "Illegal assignment: cannot have a null AbstractIcon for a Portrait";
+        this.portrait = Objects.requireNonNull(portrait);
+    }
+
     public String getPortraitCategory() {
-        return portraitCategory;
+        return getPortrait().getCategory();
     }
 
     public String getPortraitFileName() {
-        return portraitFile;
-    }
-
-    public void setPortraitCategory(String s) {
-        this.portraitCategory = s;
-    }
-
-    public void setPortraitFileName(String s) {
-        this.portraitFile = s;
+        return getPortrait().getFilename();
     }
 
     //region Personnel Roles
@@ -1701,11 +1696,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "expectedDueDate",
                         MekHqXmlUtil.saveFormattedDate(expectedDueDate));
             }
-            if (!AbstractIcon.ROOT_CATEGORY.equals(portraitCategory)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", portraitCategory);
+            if (!getPortrait().hasDefaultCategory()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", getPortrait().getCategory());
             }
-            if (!AbstractIcon.DEFAULT_ICON_FILENAME.equals(portraitFile)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", portraitFile);
+            if (!getPortrait().hasDefaultFilename()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", getPortrait().getFilename());
             }
             // Always save the current XP
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", xp);
@@ -1948,9 +1943,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
                     retVal.expectedDueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
-                    retVal.setPortraitCategory(wn2.getTextContent());
+                    retVal.getPortrait().setCategory(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
-                    retVal.setPortraitFileName(wn2.getTextContent());
+                    retVal.getPortrait().setFilename(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
                     retVal.xp = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("nTasks")) {

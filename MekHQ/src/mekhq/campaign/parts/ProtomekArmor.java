@@ -123,7 +123,7 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        ProtomekArmor a = (ProtomekArmor)campaign.findSparePart(part -> {
+        ProtomekArmor a = (ProtomekArmor) campaign.getWarehouse().findSparePart(part -> {
             return part instanceof ProtomekArmor
                 && part.isPresent()
                 && !part.isReservedForRefit()
@@ -135,7 +135,7 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
     }
 
     public void changeAmountAvailable(int amount) {
-        ProtomekArmor a = (ProtomekArmor)campaign.findSparePart(part -> {
+        ProtomekArmor a = (ProtomekArmor) campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part)
                 && part.isPresent();
         });
@@ -143,10 +143,10 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
         if (null != a) {
             a.setAmount(a.getAmount() + amount);
             if (a.getAmount() <= 0) {
-                campaign.removePart(a);
+                campaign.getWarehouse().removePart(a);
             }
         } else if (amount > 0) {
-            campaign.addPart(new ProtomekArmor(getUnitTonnage(), type, amount, -1, isClanTechBase(), campaign), 0);
+            campaign.getQuartermaster().addPart(new ProtomekArmor(getUnitTonnage(), type, amount, -1, isClanTechBase(), campaign), 0);
         }
     }
 

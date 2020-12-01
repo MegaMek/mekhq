@@ -1,20 +1,20 @@
 /*
  * CombatInformationCenter.java
- * 
+ *
  * Copyright (C) 2019, MegaMek team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,7 +43,7 @@ import mekhq.campaign.personnel.SkillType;
 public class CombatInformationCenter extends Part {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 7069129053879581753L;
 
@@ -58,7 +58,7 @@ public class CombatInformationCenter extends Part {
         this.cost = cost;
         this.name = "Combat Information Center";
     }
-    
+
     public CombatInformationCenter clone() {
         CombatInformationCenter clone = new CombatInformationCenter(0, cost, campaign);
         clone.copyBaseData(this);
@@ -70,8 +70,8 @@ public class CombatInformationCenter extends Part {
         int priorHits = hits;
         if(null != unit && unit.getEntity() instanceof Aero) {
             hits = ((Aero)unit.getEntity()).getCICHits();
-            if(checkForDestruction 
-                    && hits > priorHits 
+            if(checkForDestruction
+                    && hits > priorHits
                     && (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
@@ -81,7 +81,7 @@ public class CombatInformationCenter extends Part {
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
@@ -109,7 +109,7 @@ public class CombatInformationCenter extends Part {
             //Test of proposed errata for repair time and difficulty
             if (hits == 1) {
                 return 1;
-            } 
+            }
             if (hits == 2) {
                 return 2;
             }
@@ -139,17 +139,17 @@ public class CombatInformationCenter extends Part {
     public void remove(boolean salvage) {
         if(null != unit && unit.getEntity() instanceof Aero) {
             ((Aero)unit.getEntity()).setCICHits(3);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -217,12 +217,12 @@ public class CombatInformationCenter extends Part {
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
-        
+
         for (int x=0; x<nl.getLength(); x++) {
-            Node wn2 = nl.item(x);        
+            Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("cost")) {
                 cost = Money.fromXmlString(wn2.getTextContent().trim());
-            } 
+            }
         }
     }
 

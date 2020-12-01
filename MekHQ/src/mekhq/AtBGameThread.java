@@ -202,7 +202,7 @@ public class AtBGameThread extends GameThread {
                     entity.setExternalIdAsString(unit.getId().toString());
                     // Set the owner
                     entity.setOwner(client.getLocalPlayer());
-                    if (!unit.getTransportedUnits().isEmpty()) {
+                    if (unit.hasTransportedUnits()) {
                         //Store this unit as a potential transport to load
                         scenario.getPlayerTransportLinkages().put(unit.getId(), new ArrayList<>());
                     }
@@ -242,19 +242,10 @@ public class AtBGameThread extends GameThread {
                 // Run through the units again. This time add transported units to the correct linkage,
                 // but only if the transport itself is in the game too.
                 for (Unit unit : units) {
-                    if (unit.hasTransportShipId()) {
-                        for (UUID trnId : unit.getTransportShipId().keySet()) {
-                            if (!scenario.getPlayerTransportLinkages().containsKey(trnId)) {
-                                continue;
-                            }
-
-                            scenario.addPlayerTransportRelationship(trnId, unit.getId());
-                            // Set these flags so we know what prompts to display later
-                            if (unit.getEntity().isAero()) {
-                                campaign.getUnit(trnId).setCarryingAero(true);
-                            } else {
-                                campaign.getUnit(trnId).setCarryingGround(true);
-                            }
+                    if (unit.hasTransportShipAssignment()) {
+                        Unit transportShip = unit.getTransportShipAssignment().getTransportShip();
+                        if (scenario.getPlayerTransportLinkages().containsKey(transportShip.getId())) {
+                            scenario.addPlayerTransportRelationship(transportShip.getId(), unit.getId());
                         }
                     }
                 }

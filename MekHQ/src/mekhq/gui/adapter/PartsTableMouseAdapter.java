@@ -56,19 +56,13 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
         if (command.equalsIgnoreCase("SELL")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().sellPart(p, 1);
+                    gui.getCampaign().getQuartermaster().sellPart(p, 1);
                 }
             }
         } else if (command.equalsIgnoreCase("SELL_ALL")) {
             for (Part p : parts) {
                 if (null != p) {
-                    if (p instanceof AmmoStorage) {
-                        gui.getCampaign().sellAmmo((AmmoStorage) p, ((AmmoStorage) p).getShots());
-                    } else if (p instanceof Armor) {
-                        gui.getCampaign().sellArmor((Armor) p, ((Armor) p).getAmount());
-                    } else {
-                        gui.getCampaign().sellPart(p, p.getQuantity());
-                    }
+                    gui.getCampaign().getQuartermaster().sellPart(p);
                 }
             }
         } else if (command.equalsIgnoreCase("SELL_N")) {
@@ -87,7 +81,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                     return;
                 }
                 int q = pvcd.getValue();
-                gui.getCampaign().sellPart(selectedPart, q);
+                gui.getCampaign().getQuartermaster().sellPart(selectedPart, q);
             }
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
             double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
@@ -95,7 +89,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             for (Part p : parts) {
                 if (null != p) {
                     refundAmount = refundAmount.plus(p.getStickerPrice().multipliedBy(p.getQuantity()).multipliedBy(refund));
-                    gui.getCampaign().removePart(p);
+                    gui.getCampaign().getWarehouse().removePart(p);
                 }
             }
             gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
@@ -103,13 +97,13 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().arrivePart(p);
+                    gui.getCampaign().getQuartermaster().arrivePart(p);
                 }
             }
         } else if (command.equalsIgnoreCase("REMOVE")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().removePart(p);
+                    gui.getCampaign().getWarehouse().removePart(p);
                 }
             }
         } else if (command.contains("SET_QUALITY")) {
@@ -151,13 +145,13 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
         } else if (command.equalsIgnoreCase("DEPOD")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().depodPart(p, 1);
+                    gui.getCampaign().getQuartermaster().depodPart(p, 1);
                 }
             }
         } else if (command.equalsIgnoreCase("DEPOD_ALL")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().depodPart(p, p.getQuantity());
+                    gui.getCampaign().getQuartermaster().depodPart(p);
                 }
             }
         } else if (command.equalsIgnoreCase("DEPOD_N")) {
@@ -170,7 +164,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                     return;
                 }
                 int q = pvcd.getValue();
-                gui.getCampaign().depodPart(selectedPart, q);
+                gui.getCampaign().getQuartermaster().depodPart(selectedPart, q);
             }
         } else if(command.equalsIgnoreCase("BUY")) {
             for (Part p : parts) {

@@ -112,16 +112,27 @@ jobs:
         path: mekhq/MekHQ/build/reports/
         
     #
-    # Put the releases up in a single zip file called:
-    #
-    #     releases-{{ matrix.os }}.zip
+    # Put the non-Windows Release in an artifact
     #
     # NB: Due to a GitHub Actions limitation we won't know
     #     what the filename is in order to display it somewhere.
     #
-    - name: Upload Releases
-      uses: actions/upload-artifact@v2-preview
+    - name: Upload Nix/Mac Releases
+      uses: actions/upload-artifact@v2
       if: matrix.os == 'ubuntu-latest'
       with:
-        name: releases-java${{ matrix.java }}
-        path: mekhq/MekHQ/build/distributions/
+        name: release-nix-mac-java${{ matrix.java }}
+        path: mekhq/MekHQ/build/distributions/*.tar
+
+    #
+    # Put the Windows Release in an artifact
+    #
+    # NB: Due to a GitHub Actions limitation we won't know
+    #     what the filename is in order to display it somewhere.
+    #
+    - name: Upload Windows Release
+      uses: actions/upload-artifact@v2
+      if: matrix.os == 'windows-latest'
+      with:
+        name: release-win-java${{ matrix.java }}
+        path: mekhq/MekHQ/build/distributions/*.zip

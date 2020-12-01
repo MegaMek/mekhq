@@ -30,14 +30,14 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
+import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooser;
+import megamek.client.ui.swing.dialog.imageChooser.PortraitChooser;
 import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.*;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
@@ -60,17 +60,17 @@ import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
 
 public class PersonnelTableMouseAdapter extends MouseInputAdapter implements ActionListener {
-    private static final String CMD_RANKSYSTEM = "RANKSYSTEM"; //$NON-NLS-1$
-    private static final String CMD_RANK = "RANK"; //$NON-NLS-1$
-    private static final String CMD_MANEI_DOMINI_RANK = "MD_RANK"; //$NON-NLS-1$
-    private static final String CMD_MANEI_DOMINI_CLASS = "MD_CLASS"; //$NON-NLS-1$
-    private static final String CMD_PRIMARY_ROLE = "PROLE"; //$NON-NLS-1$
-    private static final String CMD_SECONDARY_ROLE = "SROLE"; //$NON-NLS-1$
-    private static final String CMD_PRIMARY_DESIGNATOR = "DESIG_PRI"; //$NON-NLS-1$
-    private static final String CMD_SECONDARY_DESIGNATOR = "DESIG_SEC"; //$NON-NLS-1$
-    private static final String CMD_REMOVE_UNIT = "REMOVE_UNIT"; //$NON-NLS-1$
-    private static final String CMD_ADD_PILOT = "ADD_PILOT"; //$NON-NLS-1$
-    private static final String CMD_ADD_SOLDIER = "ADD_SOLDIER"; //$NON-NLS-1$
+    private static final String CMD_RANKSYSTEM = "RANKSYSTEM";
+    private static final String CMD_RANK = "RANK";
+    private static final String CMD_MANEI_DOMINI_RANK = "MD_RANK";
+    private static final String CMD_MANEI_DOMINI_CLASS = "MD_CLASS";
+    private static final String CMD_PRIMARY_ROLE = "PROLE";
+    private static final String CMD_SECONDARY_ROLE = "SROLE";
+    private static final String CMD_PRIMARY_DESIGNATOR = "DESIG_PRI";
+    private static final String CMD_SECONDARY_DESIGNATOR = "DESIG_SEC";
+    private static final String CMD_REMOVE_UNIT = "REMOVE_UNIT";
+    private static final String CMD_ADD_PILOT = "ADD_PILOT";
+    private static final String CMD_ADD_SOLDIER = "ADD_SOLDIER";
     private static final String CMD_ADD_DRIVER = "ADD_DRIVER"; //$NON-NLS-1$
     private static final String CMD_ADD_VESSEL_PILOT = "ADD_VESSEL_PILOT"; //$NON-NLS-1$
     private static final String CMD_ADD_GUNNER = "ADD_GUNNER"; //$NON-NLS-1$
@@ -254,7 +254,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     gui.getCampaign().personUpdated(person);
                     if (gui.getCampaign().getCampaignOptions().usePortraitForType(role)
                             && gui.getCampaign().getCampaignOptions().getAssignPortraitOnRoleChange()
-                            && AbstractIcon.DEFAULT_ICON_FILENAME.equals(person.getPortraitFileName())) {
+                            && person.getPortrait().hasDefaultFilename()) {
                         gui.getCampaign().assignRandomPortraitFor(person);
                     }
                 }
@@ -793,21 +793,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_EDIT_PORTRAIT: {
-                ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(),
-                        true, selectedPerson.getPortraitCategory(),
-                        selectedPerson.getPortraitFileName(),
-                        MHQStaticDirectoryManager.getPortraits());
-                pcd.setVisible(true);
-
-                final String category = pcd.getCategory();
-                final String fileName = pcd.getFileName();
-
-                for (Person person : people) {
-                    if (!(person.getPortraitCategory().equals(category)
-                            && person.getPortraitFileName().equals(fileName))) {
-                        person.setPortraitCategory(category);
-                        person.setPortraitFileName(fileName);
-                        gui.getCampaign().personUpdated(person);
+                AbstractIconChooser portraitDialog = new PortraitChooser(gui.getFrame(),
+                        selectedPerson.getPortrait());
+                int result = portraitDialog.showDialog();
+                if ((result == JOptionPane.OK_OPTION) && (portraitDialog.getSelectedItem() != null)) {
+                    for (Person person : people) {
+                        if (!person.getPortrait().equals(portraitDialog.getSelectedItem())) {
+                            person.setPortrait(portraitDialog.getSelectedItem());
+                            gui.getCampaign().personUpdated(person);
+                        }
                     }
                 }
                 break;

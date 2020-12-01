@@ -153,7 +153,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        BaArmor a = (BaArmor)campaign.findSparePart(part -> {
+        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> {
             return part instanceof BaArmor
                 && part.isPresent()
                 && !part.isReservedForRefit()
@@ -166,7 +166,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
 
     @Override
     public void changeAmountAvailable(int amount) {
-        BaArmor a = (BaArmor)campaign.findSparePart(part -> {
+        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part)
                 && part.isPresent();
         });
@@ -174,10 +174,10 @@ public class BaArmor extends Armor implements IAcquisitionWork {
         if(null != a) {
             a.setAmount(a.getAmount() + amount);
             if (a.getAmount() <= 0) {
-                campaign.removePart(a);
+                campaign.getWarehouse().removePart(a);
             }
         } else if(amount > 0) {
-            campaign.addPart(new BaArmor(getUnitTonnage(), amount, type, -1, isClanTechBase(), campaign), 0);
+            campaign.getQuartermaster().addPart(new BaArmor(getUnitTonnage(), amount, type, -1, isClanTechBase(), campaign), 0);
         }
     }
 }

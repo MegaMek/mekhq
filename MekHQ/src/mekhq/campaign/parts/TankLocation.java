@@ -190,12 +190,12 @@ public class TankLocation extends Part {
     public void remove(boolean salvage) {
         if(null != unit) {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
         }

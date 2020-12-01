@@ -140,7 +140,7 @@ public class BattleArmorSuit extends Part {
     public double getTonnage() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
-        if ((null == unit) && getChildParts().isEmpty()) {
+        if ((null == unit) && !hasChildParts()) {
             return alternateTon;
         }
         double tons = 0;
@@ -219,7 +219,7 @@ public class BattleArmorSuit extends Part {
         }
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded extra costs
-        if ((null == unit) && getChildParts().isEmpty()) {
+        if ((null == unit) && !hasChildParts()) {
             tons += alternateTon;
         }
         for (Part p : getChildParts()) {
@@ -234,8 +234,8 @@ public class BattleArmorSuit extends Part {
     public Money getStickerPrice() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
-        if ((null == unit) && getChildParts().isEmpty()) {
-            return alternateCost;
+        if ((null == unit) && !hasChildParts()) {
+            return (alternateCost != null) ? alternateCost : Money.zero();
         }
         Money cost = Money.zero();
         switch(weightClass) {
@@ -443,7 +443,7 @@ public class BattleArmorSuit extends Part {
                     BaArmor armorClone = (BaArmor)part.clone();
                     armorClone.setAmount(((BaArmor)part).getAmount());
                     armorClone.setParentPart(this);
-                    campaign.addPart(armorClone, 0);
+                    campaign.getQuartermaster().addPart(armorClone, 0);
                     addChildPart(armorClone);
                 }
             }
@@ -455,7 +455,7 @@ public class BattleArmorSuit extends Part {
             unit.getEntity().setLocationBlownOff(trooper, false);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
             trooper = 0;
             unit.removePart(this);
             //Taharqa: I am not sure why this runDiagnostic is here and I think its problematic
@@ -469,12 +469,12 @@ public class BattleArmorSuit extends Part {
         for(Part p : trooperParts) {
             p.remove(salvage);
         }
-        Part spare = campaign.checkForExistingSparePart(this);
+        Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
         if(!salvage) {
-            campaign.removePart(this);
+            campaign.getWarehouse().removePart(this);
         } else if(null != spare) {
             spare.incrementQuantity();
-            campaign.removePart(this);
+            campaign.getWarehouse().removePart(this);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -526,7 +526,7 @@ public class BattleArmorSuit extends Part {
         } else {
             int nEquip = 0;
             int armor = 0;
-            if (!getChildParts().isEmpty()) {
+            if (!hasChildParts()) {
                 for (Part p : getChildParts()) {
                     if (p instanceof BaArmor) {
                         armor = ((BaArmor)p).getAmount();
@@ -624,14 +624,14 @@ public class BattleArmorSuit extends Part {
                 if(part instanceof BattleArmorEquipmentPart && ((BattleArmorEquipmentPart)part).getTrooper() == BattleArmor.LOC_TROOPER_1) {
                     Part newEquip = part.clone();
                     newEquip.setParentPart(this);
-                    campaign.addPart(newEquip, 0);
+                    campaign.getQuartermaster().addPart(newEquip, 0);
                     addChildPart(newEquip);
                 }
                 else if(part instanceof BaArmor && ((BaArmor)part).getLocation() == BattleArmor.LOC_TROOPER_1) {
                     BaArmor armorClone = (BaArmor)part.clone();
                     armorClone.setAmount(newUnit.getEntity().getOArmor(BattleArmor.LOC_TROOPER_1));
                     armorClone.setParentPart(this);
-                    campaign.addPart(armorClone, 0);
+                    campaign.getQuartermaster().addPart(armorClone, 0);
                     addChildPart(armorClone);
                 }
             }
@@ -648,7 +648,7 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public void postProcessCampaignAddition() {
-        if (!isReplacement && getChildParts().isEmpty()) {
+        if (!isReplacement && !hasChildParts()) {
             addSubParts();
         }
     }
