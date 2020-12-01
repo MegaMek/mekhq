@@ -390,25 +390,19 @@ public class ContractMarket implements Serializable {
         if (contract.getSystem() == null) {
 		    MekHQ.getLogger().warning("Could not find contract location for "
 		                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode());
-			if (retries > 0) {
-				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
-			} else {
-				return null;
-			}
+			return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
 		}
 		JumpPath jp = null;
 		try {
 			jp = contract.getJumpPath(campaign);
 		} catch (NullPointerException ex) {
 			// could not calculate jump path; leave jp null
+            MekHQ.getLogger().warning("Could not calculate jump path to contract location: "
+		                    + contract.getSystem().getName(campaign.getLocalDate()), ex);
 		}
 
 		if (jp == null) {
-			if (retries > 0) {
-				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
-			} else {
-				return null;
-			}
+			return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
 		}
 
 		setAllyRating(contract, isAttacker, campaign.getGameYear());
