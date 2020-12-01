@@ -34,6 +34,7 @@ import org.w3c.dom.NodeList;
 
 import megamek.client.generator.RandomSkillsGenerator;
 import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
@@ -67,6 +68,12 @@ public class ContractMarket implements Serializable {
 	public final static int CLAUSE_SUPPORT = 2;
 	public final static int CLAUSE_TRANSPORT = 3;
 	public final static int CLAUSE_NUM = 4;
+
+    /**
+     * An arbitrary maximum number of attempts to find a random employer faction that
+     * is not a Mercenary.
+     */
+    private final static int MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER = 20;
 
 	private ContractMarketMethod method = ContractMarketMethod.ATB_MONTHLY;
 
@@ -182,7 +189,7 @@ public class ContractMarket implements Serializable {
                         inBackwater = false;
                     }
                 }
-            } else {
+            } else if (currentFactions.size() > 0) {
                 // Just one faction. Are there any others nearby?
                 Faction onlyFaction = currentFactions.iterator().next();
                 if (!onlyFaction.isPeriphery()) {
@@ -198,6 +205,12 @@ public class ContractMarket implements Serializable {
                         }
                     }
                 }
+            } else {
+                MekHQ.getLogger().warning(
+                        "Unable to find any factions around "
+                            + campaign.getCurrentSystem().getName(campaign.getLocalDate())
+                            + " on "
+                            + campaign.getLocalDate());
             }
 
             if (inBackwater) {
@@ -279,7 +292,7 @@ public class ContractMarket implements Serializable {
 	/* If no suitable planet can be found or no jump path to the planet can be calculated after
 	 * the indicated number of retries, this will return null.
 	 */
-	private AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
+	private @Nullable AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
 		if (campaign.getFactionCode().equals("MERC")) {
 			if (null == campaign.getRetainerEmployerCode()) {
 				int retries = 3;
@@ -298,11 +311,19 @@ public class ContractMarket implements Serializable {
 		}
 	}
 
-	private AtBContract generateAtBContract(Campaign campaign, String employer, int unitRatingMod) {
+	private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod) {
 		return generateAtBContract(campaign, employer, unitRatingMod, 3);
 	}
 
-	private AtBContract generateAtBContract(Campaign campaign, String employer, int unitRatingMod, int retries) {
+	private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod, int retries) {
+        if (employer == null) {
+            MekHQ.getLogger().warning("Could not generate an AtB Contract because there was no employer!");
+            return null;
+        } else if (retries <= 0) {
+            MekHQ.getLogger().warning("Could not generate an AtB Contract because we ran out of retries!");
+            return null;
+        }
+
         AtBContract contract = new AtBContract(employer
                 + "-"
                 + Contract.generateRandomContractName()
@@ -314,8 +335,16 @@ public class ContractMarket implements Serializable {
 
         if (employer.equals("MERC")) {
             contract.setMercSubcontract(true);
-            while (employer.equals("MERC")) {
+            for (int attempts = 0; attempts < MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER; ++attempts) {
                 employer = RandomFactionGenerator.getInstance().getEmployer();
+                if ((employer != null) && !employer.equals("MERC")) {
+                    break;
+                }
+            }
+
+            if ((employer == null) || employer.equals("MERC")) {
+                MekHQ.getLogger().warning("Could not generate an AtB Contract because we could not find a non-MERC employer!");
+                return null;
             }
         }
         contract.setEmployerCode(employer, campaign.getGameYear());
@@ -359,27 +388,21 @@ public class ContractMarket implements Serializable {
 			contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
 		}
         if (contract.getSystem() == null) {
-		    MekHQ.getLogger().warning(this, "Could not find contract location for "
+		    MekHQ.getLogger().warning("Could not find contract location for "
 		                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode());
-			if (retries > 0) {
-				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
-			} else {
-				return null;
-			}
+			return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
 		}
 		JumpPath jp = null;
 		try {
 			jp = contract.getJumpPath(campaign);
 		} catch (NullPointerException ex) {
 			// could not calculate jump path; leave jp null
+            MekHQ.getLogger().warning("Could not calculate jump path to contract location: "
+		                    + contract.getSystem().getName(campaign.getLocalDate()), ex);
 		}
 
 		if (jp == null) {
-			if (retries > 0) {
-				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
-			} else {
-				return null;
-			}
+			return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
 		}
 
 		setAllyRating(contract, isAttacker, campaign.getGameYear());
@@ -815,7 +838,6 @@ public class ContractMarket implements Serializable {
     }
 
     public static ContractMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node wn, Campaign c, Version version)"; //$NON-NLS-1$
         ContractMarket retVal = null;
 
         try {
@@ -868,7 +890,7 @@ public class ContractMarket implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(ContractMarket.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         return retVal;
