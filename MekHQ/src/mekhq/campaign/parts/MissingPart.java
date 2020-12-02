@@ -22,18 +22,14 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.UUID;
 
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 
 /**
@@ -41,7 +37,7 @@ import mekhq.campaign.work.WorkTime;
  * task needs to be performed
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class MissingPart extends Part implements Serializable, MekHqXmlSerializable, IPartWork, IAcquisitionWork {
+public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     /**
      *
@@ -132,13 +128,19 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
+        if (replacement != null) {
             Part actualReplacement = replacement.clone();
+
+            // Assign the replacement part to the unit
             unit.addPart(actualReplacement);
+
+            // Add the replacement part to the campaign (after adding to the unit)
             campaign.getQuartermaster().addPart(actualReplacement, 0);
+
             replacement.decrementQuantity();
+
             remove(false);
-            //assign the replacement part to the unit
+
             actualReplacement.updateConditionFromPart();
         }
     }
@@ -419,18 +421,19 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 
     @Override
     public void cancelReservation() {
-        Part replacement = findReplacement(false);
-        if (hasReplacementPart() && (null != replacement)) {
-            setReplacementPart(null);
-            replacement.setReservedBy(null);
-            if (replacement.isSpare()) {
-                Part spare = campaign.getWarehouse().checkForExistingSparePart(replacement);
-                if (null != spare) {
-                    spare.incrementQuantity();
-                    campaign.getWarehouse().removePart(replacement);
+        if (hasReplacementPart()) {
+            Part replacement = getReplacementPart();
+            if (replacement != null) {
+                replacement.setReservedBy(null);
+
+                // Only return the replacement part to the campaign if we have one
+                if (replacement.getQuantity() > 0) {
+                    campaign.getQuartermaster().addPart(replacement, 0);
                 }
             }
         }
+
+        setReplacementPart(null);
     }
 
     @Override
