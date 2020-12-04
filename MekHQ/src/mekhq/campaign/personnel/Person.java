@@ -912,7 +912,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
                 break;
             case PREGNANCY_COMPLICATIONS:
-                // The child might be able to be born, albeit into a world without their mother
+                // The child might be able to be born, albeit into a world without their mother.
+                // This can be manually set by males and for those who are not pregnant. This is
+                // purposeful, to allow for player customization, and thus we first check if someone
+                // is pregnant before having the birth
                 if (isPregnant()) {
                     int pregnancyWeek = getPregnancyWeek(campaign.getLocalDate());
                     double babyBornChance;
@@ -1369,9 +1372,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public int getPregnancyWeek(LocalDate today) {
-        return Math.toIntExact(ChronoUnit.WEEKS.between(today, getExpectedDueDate()
+        return Math.toIntExact(ChronoUnit.WEEKS.between(getExpectedDueDate()
                 .minus(PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS)
-                .plus(1, ChronoUnit.DAYS)));
+                .plus(1, ChronoUnit.DAYS), today));
     }
 
     public boolean isPregnant() {
