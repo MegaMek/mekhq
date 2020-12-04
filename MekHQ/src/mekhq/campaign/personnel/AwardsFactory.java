@@ -29,6 +29,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import mekhq.campaign.io.Migration.PersonMigrator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -95,9 +96,10 @@ public class AwardsFactory {
     /**
      * Generates a new award from an XML entry (when loading game, for example)
      * @param node xml node
+     * @param defaultSetMigration whether or not to check if the default set needs to be migrated
      * @return an award
      */
-    public Award generateNewFromXML(Node node) {
+    public Award generateNewFromXML(Node node, final boolean defaultSetMigration) {
         String name = null;
         String set = null;
         List<LocalDate> dates = new ArrayList<>();
@@ -111,14 +113,23 @@ public class AwardsFactory {
                 if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     dates.add(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    name = wn2.getTextContent();
+                    name = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("set")) {
-                    set = wn2.getTextContent();
+                    set = wn2.getTextContent().trim();
                 }
             }
         } catch (Exception ex) {
             // Doh!
             MekHQ.getLogger().error(ex);
+        }
+
+        if (defaultSetMigration && "Default Set".equalsIgnoreCase(set)) {
+            name = (name == null) ? "" : name;
+            String newName = PersonMigrator.awardDefaultSetMigrator(name);
+            if (newName != null) {
+                set = "standard";
+                name = newName;
+            }
         }
 
         Award award = generateNew(set, name);
