@@ -41,6 +41,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -96,6 +97,7 @@ public class WarehouseTest {
         // Create a mock part without an ID
         Part mockPart = mock(Part.class, RETURNS_DEEP_STUBS);
         when(mockPart.getId()).thenCallRealMethod();
+        when(mockPart.getChildParts()).thenReturn(Collections.emptyList());
         doCallRealMethod().when(mockPart).setId(anyInt());
 
         // Add the mock part to our warehouse
