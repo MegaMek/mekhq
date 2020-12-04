@@ -42,8 +42,6 @@ import mekhq.campaign.AwardSet;
  * @author Miguel Azevedo
  */
 public class AwardsFactory {
-    private static final String AWARDS_XML_ROOT_PATH = "data/universe/awards/";
-
     private static AwardsFactory instance = null;
 
     /**
@@ -100,8 +98,6 @@ public class AwardsFactory {
      * @return an award
      */
     public Award generateNewFromXML(Node node) {
-        final String METHOD_NAME = "generateNewFromXML(Node)"; //$NON-NLS-1$
-
         String name = null;
         String set = null;
         List<LocalDate> dates = new ArrayList<>();
@@ -122,7 +118,7 @@ public class AwardsFactory {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().error(AwardsFactory.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         Award award = generateNew(set, name);
@@ -134,7 +130,7 @@ public class AwardsFactory {
      * Generates the "blueprint" awards by reading the data from XML sources.
      */
     private void loadAwards() {
-        File dir = new File(AWARDS_XML_ROOT_PATH);
+        File dir = new File(MekHQ.getMekHQOptions().getAwardsDirectoryPath());
         File[] files = dir.listFiles((dir1, filename) -> filename.endsWith(".xml"));
 
         if (files == null) {
@@ -145,7 +141,7 @@ public class AwardsFactory {
             try (InputStream inputStream = new FileInputStream(file)) {
                 loadAwardsFromStream(inputStream, file.getName());
             } catch (IOException e) {
-                MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
+                MekHQ.getLogger().error(e);
             }
         }
     }
@@ -170,7 +166,7 @@ public class AwardsFactory {
             }
             awardsMap.put(currentSetName, tempAwardMap);
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", "Error loading XML for awards", e);
+            MekHQ.getLogger().error("Error loading XML for awards", e);
         }
     }
 }
