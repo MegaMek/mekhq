@@ -569,7 +569,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem menuSave = new JMenuItem(resourceMap.getString("menuSave.text")); // NOI18N
         menuSave.setMnemonic(KeyEvent.VK_S);
-        menuSave.addActionListener(this::menuSaveXmlActionPerformed);
+        menuSave.addActionListener(this::saveCampaign);
         menuFile.add(menuSave);
 
         JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
@@ -1276,16 +1276,16 @@ public class CampaignGUI extends JPanel {
         ssd.setVisible(true);
     }
 
-    private void menuSaveXmlActionPerformed(ActionEvent evt) {
-        MekHQ.getLogger().info(this, "Saving campaign...");
+    public boolean saveCampaign(ActionEvent evt) {
+        MekHQ.getLogger().info("Saving campaign...");
         // Choose a file...
         File file = selectSaveCampaignFile();
         if (file == null) {
             // I want a file, y'know!
-            return;
+            return false;
         }
 
-        saveCampaign(getFrame(), getCampaign(), file);
+        return saveCampaign(getFrame(), getCampaign(), file);
     }
 
     /**

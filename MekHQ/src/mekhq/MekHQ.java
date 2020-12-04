@@ -296,16 +296,27 @@ public class MekHQ implements GameListener {
     }
 
     public void exit() {
-        if (JOptionPane.showConfirmDialog(null,
-                "Do you really want to quit MekHQ?",
-                "Quit?",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-            if (null != campaigngui) {
-                campaigngui.getFrame().dispose();
-            }
-            getPreferences().saveToFile(PREFERENCES_FILE);
-            System.exit(0);
+        int savePrompt = JOptionPane.showConfirmDialog(null,
+                "Do you want to save the game before quitting MekHQ?",
+                "Save First?",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (savePrompt == JOptionPane.CANCEL_OPTION) {
+            return;
         }
+
+        if (savePrompt == JOptionPane.YES_OPTION) {
+            if (!getCampaigngui().saveCampaign(null)) {
+                // When the user did not actually save the game, don't close MM
+                return;
+            }
+        }
+
+        if (campaigngui != null) {
+            campaigngui.getFrame().dispose();
+        }
+        getPreferences().saveToFile(PREFERENCES_FILE);
+        System.exit(0);
     }
 
     public void showNewView() {
@@ -712,7 +723,7 @@ public class MekHQ implements GameListener {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getSource().equals(selectedTheme)) {
-                setLookAndFeel((String)evt.getNewValue());
+                setLookAndFeel((String) evt.getNewValue());
             }
         }
     }
