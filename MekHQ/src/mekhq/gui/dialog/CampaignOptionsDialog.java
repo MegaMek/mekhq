@@ -87,7 +87,7 @@ import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;

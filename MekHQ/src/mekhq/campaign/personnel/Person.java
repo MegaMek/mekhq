@@ -44,6 +44,9 @@ import mekhq.campaign.log.*;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankTranslator;
+import mekhq.campaign.personnel.ranks.Ranks;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
