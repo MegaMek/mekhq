@@ -69,6 +69,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Kill;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -79,8 +80,6 @@ import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mod.am.InjuryTypes;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
@@ -671,43 +670,14 @@ public class CampaignXmlParser {
                 System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
-        //try to stack as much as possible the parts in the warehouse that may be unstacked
-        //for a variety of reasons
-        List<Part> partsToRemove = new ArrayList<>();
-        List<Part> partsToKeep = new ArrayList<>();
-        for (Part part : retVal.getParts()) {
-            if (part.isSpare() && part.isPresent()) {
-                for (Part oPart : partsToKeep) {
-                    if (part.isSamePartTypeAndStatus(oPart)) {
-                        if (part instanceof Armor) {
-                            if (oPart instanceof Armor) {
-                                ((Armor) oPart).setAmount(((Armor) oPart).getAmount() + ((Armor) part).getAmount());
-                                partsToRemove.add(part);
-                                break;
-                            }
-                        } else if (part instanceof AmmoStorage) {
-                            if (oPart instanceof AmmoStorage) {
-                                ((AmmoStorage) oPart).changeShots(((AmmoStorage) part).getShots());
-                                partsToRemove.add(part);
-                                break;
-                            }
-                        } else {
-                            int q = part.getQuantity();
-                            while (q > 0) {
-                                oPart.incrementQuantity();
-                                q--;
-                            }
-                            partsToRemove.add(part);
-                            break;
-                        }
-                    }
-                }
-                partsToKeep.add(part);
-            }
+        // Build a new, clean warehouse from the current parts
+        Warehouse warehouse = new Warehouse();
+        for (Part part : retVal.getWarehouse().getParts()) {
+            warehouse.addPart(part, true);
         }
-        for (Part toRemove : partsToRemove) {
-            retVal.getWarehouse().removePart(toRemove);
-        }
+
+        // This will have aggregated all of the possible spare parts together
+        retVal.setWarehouse(warehouse);
 
         MekHQ.getLogger().info(String.format("[Campaign Load] Warehouse cleaned up in %dms",
                 System.currentTimeMillis() - timestamp));
