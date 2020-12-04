@@ -1,6 +1,25 @@
 VERSION HISTORY:
 ----------------
-0.47.12-SNAPSHOT 
+0.47.15-SNAPSHOT
++ Issue #2166: NRE in Money::plus/Money::minus
++ PR #2224: Add some basic Refit tests and fix an Armor location bug calculating armor during a refit
++ PR #2241: Fix bug where PartsStore may list INT_MAX as cost and tons for BA ammo
++ Fixing Male Soldier and Female ProtoMech Pilot Portrait Paths so they properly generate
++ Issue #2236: Making Unmaintained hangar color take priority over Damaged/Inoperable
++ Issue #2248: Fix various ContractMarket exceptions when operating at the bounds of MekHQ data
++ PR #2250: Fixing Load Last Save for .cpnx.gz files
++ Issue #1880: Fixed briefing text error for breakthrough (defender) scenarios
++ Issue #2231: Don't give back free parts when fixing a missing part
++ Issue #2254: Ransomed Unit now properly adds to Total Value Salvaged
+
+0.47.14 (2020-11-15 1930 UTC)
++ Issues #2217 #2219: Cannot save Campaign with Refits and cannot start new Refits
++ Issue #2220: Implementing AwardFileFactory to handle loading pngs that aren't handled by Toolkit
+
+0.47.13 (2020-11-09 1600 UTC) 
++ Issue #2213: Fix disastrous bug in AmmoStorage::ctor
+
+0.47.12 (2020-11-08 2230 UTC) 
 + Issue #1970: Workaround for single hex ecm causing smallcraft to be overweight
 + Issue #1079: Add refit time for moving a part between locations
 + PR #2117: Fixing New Personnel Market Report
@@ -17,6 +36,27 @@ VERSION HISTORY:
 + Issue #1723: Fixing Missing Personnel and Hangar Tab Selection Highlights
 + PR #2153: UnitRatingMethod: Add Disabled Case
 + Issue #1537: Fixing Null AmmoType NPE in Hangar Tab
++ Issue #2159: Fixing Soldier Filter Name
++ PR #2164: Fixing Historical Daily Log Disabled Message
++ Issue #2159: Personnel Filter Style for All Options
++ PR #2168: Properly implementing AtB edge assignment if MekHQ cannot assign an SPA
++ PR #2169: Fixing all and none portraits click when changing options preset
++ PR #2170: Support Edge is now properly reliant on Edge being enabled
++ PR #2173: Implementing sort order for SPAs in Campaign Options
++ PR #2174: Tabbed MekHQ Options Dialog
++ PR #2161: Improving Zipped Force Icon folders
++ PR #2162: Standardized Portrait Chooser
++ Issue #2188: Cannot assign salary to LAM Pilots or Vehicle Crew loading older CPNX files
++ Issue #2193: Unit Market: Units No Longer Reset to Open Market upon load
++ Data: Megamek Portrait Data Pack. Notes and licensing in Megamek contributors file which I will push
+  with the next Data work in Megamek.
++ Issue #2171: Implementing Campaign Option and Campaign Preset Versioning
++ Issue #2181: Personnel File CSV Export Toughness, Status, and Portrait Path
++ Issue #785: SLDF Ranks are Wrong
++ Issue #572: Random Portrait Fails to Properly Compare File Paths
++ Issue #564: AbstractIcon: Fixing Basic Info Portrait Scaling
++ Data: Adding a CampaignAnon 3.5 AtB preset.
+
 
 0.47.11 (2020-10-04 2100 UTC)
 + Issue #2029: AmmoBin from warehouse can rarely come with free ammo

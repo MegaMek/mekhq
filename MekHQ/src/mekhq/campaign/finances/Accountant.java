@@ -198,7 +198,7 @@ public class Accountant {
 
     public Money getTotalEquipmentValue() {
         Money unitsSellValue = getHangar().getUnitCosts(Unit::getSellValue);
-        return getCampaign().streamSpareParts().map(Part::getActualValue)
+        return getCampaign().getWarehouse().streamSpareParts().map(Part::getActualValue)
             .reduce(unitsSellValue, Money::plus);
     }
 

@@ -40,14 +40,15 @@ import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.MapSettings;
 import megamek.common.PlanetaryConditions;
-import megamek.common.Player;
 import megamek.common.UnitType;
+import megamek.common.icons.Camouflage;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -193,7 +194,7 @@ public class AtBGameThread extends GameThread {
                     entity.setExternalIdAsString(unit.getId().toString());
                     // Set the owner
                     entity.setOwner(client.getLocalPlayer());
-                    if (!unit.getTransportedUnits().isEmpty()) {
+                    if (unit.hasTransportedUnits()) {
                         //Store this unit as a potential transport to load
                         scenario.getPlayerTransportLinkages().put(unit.getId(), new ArrayList<>());
                     }
@@ -233,19 +234,10 @@ public class AtBGameThread extends GameThread {
                 // Run through the units again. This time add transported units to the correct linkage,
                 // but only if the transport itself is in the game too.
                 for (Unit unit : units) {
-                    if (unit.hasTransportShipId()) {
-                        for (UUID trnId : unit.getTransportShipId().keySet()) {
-                            if (!scenario.getPlayerTransportLinkages().containsKey(trnId)) {
-                                continue;
-                            }
-
-                            scenario.addPlayerTransportRelationship(trnId, unit.getId());
-                            // Set these flags so we know what prompts to display later
-                            if (unit.getEntity().isAero()) {
-                                campaign.getUnit(trnId).setCarryingAero(true);
-                            } else {
-                                campaign.getUnit(trnId).setCarryingGround(true);
-                            }
+                    if (unit.hasTransportShipAssignment()) {
+                        Unit transportShip = unit.getTransportShipAssignment().getTransportShip();
+                        if (scenario.getPlayerTransportLinkages().containsKey(transportShip.getId())) {
+                            scenario.addPlayerTransportRelationship(transportShip.getId(), unit.getId());
                         }
                     }
                 }
@@ -343,11 +335,16 @@ public class AtBGameThread extends GameThread {
                         // Now, send the load commands
                         if (loadFighters || loadGround) {
                             // List of technicians assigned to transported units. Several units can share a tech.
-                            Set<UUID> cargoTechs = new HashSet<>();
+                            Set<Person> cargoTechs = new HashSet<>();
                             for (UUID cargoId : scenario.getPlayerTransportLinkages().get(id)) {
-                                //Convert the list of Unit UUIDs to MM EntityIds
-                                toLoad.add(campaign.getUnit(cargoId).getEntity().getId());
-                                cargoTechs.add(campaign.getUnit(cargoId).getTech().getId());
+                                Unit unit = campaign.getUnit(cargoId);
+                                if (unit != null) {
+                                    //Convert the list of Unit UUIDs to MM EntityIds
+                                    toLoad.add(unit.getEntity().getId());
+                                    if (unit.getTech() != null) {
+                                        cargoTechs.add(unit.getTech());
+                                    }
+                                }
                             }
                             //Update the transport's passenger count with assigned techs
                             transport.getEntity().setNPassenger(transport.getEntity().getNPassenger() + (cargoTechs.size()));
@@ -396,7 +393,7 @@ public class AtBGameThread extends GameThread {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-                if (botForce.getCamoCategory().equals(Player.NO_CAMO)) {
+                if (Camouflage.NO_CAMOUFLAGE.equals(botForce.getCamoCategory())) {
                     if (botForce.getColorIndex() >= 0) {
                         botClient.getLocalPlayer().setColorIndex(botForce.getColorIndex());
                     }

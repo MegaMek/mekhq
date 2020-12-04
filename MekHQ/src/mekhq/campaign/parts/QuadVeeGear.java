@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package mekhq.campaign.parts;
 
@@ -17,17 +17,17 @@ import mekhq.campaign.Campaign;
 
 /**
  * Conversion gear for QuadVees
- * 
+ *
  * @author Neoancient
  *
  */
 public class QuadVeeGear extends Part {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -382649905317675957L;
-    
+
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
             .setTechRating(RATING_F)
             .setAvailability(RATING_X, RATING_X, RATING_X, RATING_F)
@@ -40,18 +40,18 @@ public class QuadVeeGear extends Part {
     public QuadVeeGear() {
         this(0, null);
     }
-    
+
     public QuadVeeGear(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Conversion Gear";
     }
-    
+
     public QuadVeeGear clone() {
         QuadVeeGear clone = new QuadVeeGear(0, campaign);
         clone.copyBaseData(this);
         return clone;
     }
-        
+
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if(null != unit) {
@@ -59,7 +59,7 @@ public class QuadVeeGear extends Part {
                         QuadVee.SYSTEM_CONVERSION_GEAR);
         }
     }
-    
+
     @Override
     public int getBaseTime() {
         // Using value for 'Mech "weapons and other equipment"
@@ -110,17 +110,17 @@ public class QuadVeeGear extends Part {
     public void remove(boolean salvage) {
         if(null != unit) {
             unit.damageSystem(CriticalSlot.TYPE_SYSTEM, QuadVee.SYSTEM_CONVERSION_GEAR, 4);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -183,7 +183,7 @@ public class QuadVeeGear extends Part {
     public TechAdvancement getTechAdvancement() {
         return TECH_ADVANCEMENT;
     }
-    
+
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof QuadVeeGear && part.unitTonnage == unitTonnage;

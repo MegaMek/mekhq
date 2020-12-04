@@ -1,20 +1,20 @@
 /*
  * KFBoom.java
- * 
+ *
  * Copyright (c) 2019 MegaMek Team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,7 +43,7 @@ import mekhq.campaign.personnel.SkillType;
 public class KfBoom extends Part {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -3211076278442082220L;
 
@@ -59,7 +59,7 @@ public class KfBoom extends Part {
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private int boomType = Dropship.BOOM_STANDARD;
-    
+
     public KfBoom() {
         this(0, null, Dropship.BOOM_STANDARD);
     }
@@ -89,10 +89,10 @@ public class KfBoom extends Part {
         if(null != unit && unit.getEntity() instanceof Dropship) {
              if(((Dropship)unit.getEntity()).isKFBoomDamaged()) {
                  hits = 1;
-             } else { 
+             } else {
                  hits = 0;
              }
-             if(checkForDestruction 
+             if(checkForDestruction
                      && hits > priorHits
                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                  remove(false);
@@ -100,7 +100,7 @@ public class KfBoom extends Part {
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         if(isSalvaging()) {
             return 3600;
@@ -135,17 +135,17 @@ public class KfBoom extends Part {
     public void remove(boolean salvage) {
         if(null != unit && unit.getEntity() instanceof Dropship) {
             ((Dropship)unit.getEntity()).setDamageKFBoom(true);
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);

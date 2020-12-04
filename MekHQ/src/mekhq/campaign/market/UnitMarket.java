@@ -281,23 +281,17 @@ public class UnitMarket implements Serializable {
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<unitMarket>");
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "unitMarket");
         for (MarketOffer o : offers) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<offer>");
-            pw1.println(MekHqXmlUtil.indentStr(indent + 2) +
-                    "<market>" + o.market + "</market>");
-            pw1.println(MekHqXmlUtil.indentStr(indent + 2) +
-                    "<unitType>" + o.unitType + "</unitType>");
-            pw1.println(MekHqXmlUtil.indentStr(indent + 2) +
-                    "<unitWeight>" + o.unitWeight + "</unitWeight>");
-            pw1.println(MekHqXmlUtil.indentStr(indent + 2) +
-                    "<unit>" + o.unit.getName() + "</unit>");
-            pw1.println(MekHqXmlUtil.indentStr(indent + 2) +
-                    "<pct>" + o.pct + "</pct>");
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</offer>");
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "offer");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "market", o.market.name());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "unitType", o.unitType);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "unitWeight", o.unitWeight);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "unit", o.unit.getName());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "pct", o.pct);
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "offer");
         }
-
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</unitMarket>");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "unitMarket");
     }
 
     public static UnitMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {

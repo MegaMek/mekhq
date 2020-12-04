@@ -270,8 +270,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     cgpd.setVisible(true);
                     gamePreset = cgpd.getSelectedPreset();
                 }
-                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true,
-                        campaign, app.getIconPackage());
+                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign);
                 if (gamePreset != null) {
                     optionsDialog.applyPreset(gamePreset);
                 }

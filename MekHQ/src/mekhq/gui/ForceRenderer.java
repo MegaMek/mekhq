@@ -19,7 +19,6 @@
 package mekhq.gui;
 
 import java.awt.*;
-import java.util.UUID;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -27,7 +26,6 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import megamek.client.ui.Messages;
-import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
 import mekhq.MHQStaticDirectoryManager;
@@ -129,13 +127,9 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 c3network = "<br><i>" + c3network + "</i>";
             }
 
-            if (u.hasTransportShipId()) {
-                for (UUID id : u.getTransportShipId().keySet()) {
-                    Unit ship = u.getCampaign().getUnit(id);
-                    if (ship != null) {
-                        transport.append("<br>" + "Transported by: ").append(ship.getName());
-                    }
-                }
+            if (u.hasTransportShipAssignment()) {
+                transport.append("<br>Transported by: ")
+                        .append(u.getTransportShipAssignment().getTransportShip().getName());
             }
             setText("<html>" + name + ", " + uname + c3network + transport + "</html>");
             if (!sel && u.isDeployed()) {
@@ -161,7 +155,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
     protected Icon getIcon(Object node) {
         if (node instanceof Unit) {
-            return getIconFrom((Unit) node);
+            final Person person = ((Unit) node).getCommander();
+            return (person == null) ? null : person.getPortrait().getImageIcon(58);
         } else if (node instanceof Force) {
             return getIconFrom((Force) node);
         } else {
@@ -169,49 +164,14 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         }
     }
 
-    @Deprecated // TODO : AbstractIcon - Portrait Icon - Swapover Required
-    protected Icon getIconFrom(Unit unit) {
-        Person person = unit.getCommander();
-        if (null == person) {
-            return null;
-        }
-        String category = person.getPortraitCategory();
-        String filename = person.getPortraitFileName();
-
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
-            category = "";
-        }
-
-        // Return a null if the unit has no selected portrait file.
-        if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
-            filename = "default.gif";
-        }
-        // Try to get the unit's portrait file.
-        Image portrait;
+    protected Icon getIconFrom(Force force) {
         try {
-            portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
-            if (null != portrait) {
-                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-            } else {
-                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", "default.gif");
-                if (null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-                }
-            }
-            return new ImageIcon(portrait);
+            return new ImageIcon(MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
+                    force.getIconFileName(), force.getIconMap())
+                    .getScaledInstance(58, -1, Image.SCALE_SMOOTH));
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
             return null;
         }
-    }
-
-    @Deprecated // TODO : AbstractIcon - Force Icon - Swapover Required
-    protected Icon getIconFrom(Force force) {
-        Image forceImage = MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
-                force.getIconFileName(), force.getIconMap());
-        if (null != forceImage) {
-            forceImage = forceImage.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-        }
-        return new ImageIcon(forceImage);
     }
 }

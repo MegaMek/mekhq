@@ -1,19 +1,19 @@
 /*
  * JumpshipDockingCollar.java
- * 
+ *
  * Copyright (c) 2019, MegaMek team
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,7 +43,7 @@ import mekhq.campaign.personnel.SkillType;
 public class JumpshipDockingCollar extends Part {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -7060162354112320241L;
 
@@ -60,7 +60,7 @@ public class JumpshipDockingCollar extends Part {
 
     private int collarType;
     private int collarNumber;
-    
+
     public JumpshipDockingCollar() {
         this(0, 0, null, Jumpship.COLLAR_STANDARD);
     }
@@ -96,10 +96,10 @@ public class JumpshipDockingCollar extends Part {
             DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
             if (collar != null && collar.isDamaged()) {
                 hits = 1;
-            } else { 
+            } else {
                 hits = 0;
             }
-            if (checkForDestruction 
+            if (checkForDestruction
                     && hits > priorHits
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
@@ -107,7 +107,7 @@ public class JumpshipDockingCollar extends Part {
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         if(isSalvaging()) {
             return 2880;
@@ -151,17 +151,17 @@ public class JumpshipDockingCollar extends Part {
             if (collar != null) {
                 collar.setDamaged(true);
             }
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);

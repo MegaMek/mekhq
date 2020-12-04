@@ -251,7 +251,7 @@ public class CampaignXmlParser {
                 String xn = wn.getNodeName();
 
                 if (xn.equalsIgnoreCase("campaignOptions")) {
-                    retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn));
+                    retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     retVal.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn));
                 } /* We don't need this since info is processed above in the first iteration...
@@ -329,21 +329,8 @@ public class CampaignXmlParser {
                     RankTranslator.translateRankSystem(retVal.getRanks().getOldRankSystem(), retVal.getFactionCode()));
         }
 
-        // if the version is earlier than 0.1.14, then we need to replace all
-        // the old integer
-        // ids of units and personnel with their UUIDs where they are
-        // referenced.
-        if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2
-                && version.getSnapshot() < 14) {
-            fixIdReferences(retVal);
-        }
-        // if the version is earlier than 0.1.16, then we need to run another
-        // fix to update
-        // the externalIds to match the Unit IDs.
-        if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2
-                && version.getSnapshot() < 16) {
-            fixIdReferencesB(retVal);
-        }
+        // Fixup any ghost kills
+        cleanupGhostKills(retVal);
 
         // adjust tech levels for version before 0.1.21
         if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2
@@ -379,13 +366,11 @@ public class CampaignXmlParser {
         timestamp = System.currentTimeMillis();
 
         // Process parts...
-        Map<Integer,Part> knownParts = new HashMap<>();
         List<Part> removeParts = new ArrayList<>();
         for (Part prt : retVal.getParts()) {
-            knownParts.put(prt.getId(), prt);
+            prt.fixReferences(retVal);
 
-            Unit u = retVal.getUnit(prt.getUnitId());
-            prt.setUnit(u);
+            Unit u = prt.getUnit();
             if (null != u) {
                 // get rid of any equipmentparts without locations or mounteds
                 if (prt instanceof EquipmentPart) {
@@ -496,8 +481,7 @@ public class CampaignXmlParser {
             }
         }
         for (Part prt : removeParts) {
-            retVal.removePart(prt);
-            knownParts.remove(prt.getId());
+            retVal.getWarehouse().removePart(prt);
         }
 
         MekHQ.getLogger().info(String.format("[Campaign Load] Parts processed in %dms",
@@ -517,12 +501,13 @@ public class CampaignXmlParser {
         retVal.getHangar().forEachUnit(unit -> {
             // Also, the unit should have its campaign set.
             unit.setCampaign(retVal);
+            unit.fixReferences(retVal);
 
             // reset the pilot and entity, to reflect newly assigned personnel
             unit.resetPilotAndEntity();
 
             if (null != unit.getRefit()) {
-                unit.getRefit().fixupPartReferences(knownParts);
+                unit.getRefit().fixReferences(retVal);
 
                 unit.getRefit().reCalc();
                 if (!unit.getRefit().isCustomJob()
@@ -563,7 +548,7 @@ public class CampaignXmlParser {
                     && (version.getMinorVersion() <= 2 ||
                             (version.getMinorVersion() <= 3 && version.getSnapshot() < 16))) {
                 for (Part p : unit.getParts()) {
-                    retVal.removePart(p);
+                    retVal.getWarehouse().removePart(p);
                 }
                 unit.resetParts();
                 if (version.getSnapshot() < 4) {
@@ -618,6 +603,14 @@ public class CampaignXmlParser {
                 System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
+        for (Person person : retVal.getPersonnel()) {
+            person.fixReferences(retVal);
+        }
+
+        MekHQ.getLogger().info(String.format("[Campaign Load] Personnel initialized in %dms",
+                System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
+
         retVal.reloadNews();
 
         MekHQ.getLogger().info(String.format("[Campaign Load] News loaded in %dms",
@@ -649,7 +642,7 @@ public class CampaignXmlParser {
 
         //unload any ammo bins in the warehouse
         List<AmmoBin> binsToUnload = new ArrayList<>();
-        retVal.forEachSparePart(prt -> {
+        retVal.getWarehouse().forEachSparePart(prt -> {
             if (prt instanceof AmmoBin && !prt.isReservedForRefit() && ((AmmoBin) prt).getShotsNeeded() == 0) {
                 binsToUnload.add((AmmoBin) prt);
             }
@@ -667,9 +660,9 @@ public class CampaignXmlParser {
         //is not refitting or is gone then unreserve
         for (Part part : retVal.getParts()) {
             if (part.isReservedForRefit()) {
-                Unit u = retVal.getUnit(part.getRefitId());
-                if (null == u || !u.isRefitting()) {
-                    part.setRefitId(null);
+                Unit u = part.getRefitUnit();
+                if ((null == u) || !u.isRefitting()) {
+                    part.setRefitUnit(null);
                 }
             }
         }
@@ -713,7 +706,7 @@ public class CampaignXmlParser {
             }
         }
         for (Part toRemove : partsToRemove) {
-            retVal.removePart(toRemove);
+            retVal.getWarehouse().removePart(toRemove);
         }
 
         MekHQ.getLogger().info(String.format("[Campaign Load] Warehouse cleaned up in %dms",
@@ -733,28 +726,23 @@ public class CampaignXmlParser {
     private void fixupUnitTechProblems(Campaign retVal) {
         // Cleanup problems with techs and units
         for (Person tech : retVal.getTechs()) {
-            for (UUID id : new ArrayList<>(tech.getTechUnitIDs())) {
-                Unit u = retVal.getUnit(id);
-
+            for (Unit u : new ArrayList<>(tech.getTechUnits())) {
                 String reason = null;
-                String unitDesc = id.toString();
-                if (null == u) {
-                    reason = "referenced missing unit";
-                    tech.removeTechUnitId(id);
-                } else if (null == u.getTechId()) {
+                String unitDesc = u.getId().toString();
+                if (null == u.getTech()) {
                     reason = "was not referenced by unit";
                     u.setTech(tech);
                 } else if (u.isMothballed()) {
                     reason = "referenced mothballed unit";
                     unitDesc = u.getName();
-                    tech.removeTechUnitId(id);
-                } else if (!tech.getId().equals(u.getTechId())) {
+                    tech.removeTechUnit(u);
+                } else if (u.getTech() != null && !tech.getId().equals(u.getTech().getId())) {
                     reason = String.format("referenced tech %s's maintained unit", u.getTech().getFullName());
                     unitDesc = u.getName();
-                    tech.removeTechUnitId(id);
+                    tech.removeTechUnit(u);
                 }
                 if (null != reason) {
-                    MekHQ.getLogger().warning(CampaignXmlParser.class, String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));
+                    MekHQ.getLogger().warning(String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));
                 }
             }
         }
@@ -981,33 +969,10 @@ public class CampaignXmlParser {
         }
     }
 
-    private static void fixIdReferences(Campaign retVal) {
-        // set up translation hashes
-        Map<Integer, UUID> uHash = new HashMap<>();
-        retVal.getHangar().forEachUnit(u -> uHash.put(u.getOldId(), u.getId()));
-
-        Map<Integer, UUID> pHash = new HashMap<>();
-        for (Person p : retVal.getPersonnel()) {
-            pHash.put(p.getOldId(), p.getId());
-        }
-
-        // ok now go through and fix
-        retVal.getHangar().forEachUnit(u -> u.fixIdReferences(uHash, pHash));
-
-        for (Person p : retVal.getPersonnel()) {
-            p.fixIdReferences(uHash, pHash);
-        }
-
-        retVal.getForces().fixIdReferences(uHash);
-
-        for (Part p : retVal.getParts()) {
-            p.fixIdReferences(uHash, pHash);
-        }
-
+    private static void cleanupGhostKills(Campaign retVal) {
         // check for kills with missing person references
         List<Kill> ghostKills = new ArrayList<>();
         for (Kill k : retVal.getKills()) {
-            k.fixIdReferences(pHash);
             if (null == k.getPilotId()) {
                 ghostKills.add(k);
             }
@@ -1018,19 +983,6 @@ public class CampaignXmlParser {
                 retVal.removeKill(k);
             }
         }
-    }
-
-    private static void fixIdReferencesB(Campaign retVal) {
-        retVal.getHangar().forEachUnit(u -> {
-            Entity en = u.getEntity();
-            en.setExternalIdAsString(u.getId().toString());
-
-            // If they have C3 or C3i we need to set their ID
-            if (en.hasC3() || en.hasC3i() || en.hasNavalC3()) {
-                en.setC3UUID();
-                en.setC3NetIdSelf();
-            }
-        });
     }
 
     private static void processFinances(Campaign retVal, Node wn) {
@@ -1524,12 +1476,12 @@ public class CampaignXmlParser {
                 p = null;
             }
 
-            if ((null != p) && (p.getUnitId() != null)
+            if ((null != p) && (p.getUnit() != null)
                     && ((version.getMinorVersion() < 43)
                             || ((version.getMinorVersion() == 43) && (version.getSnapshot() < 5)))
                     && ((p instanceof AmmoBin) || (p instanceof MissingAmmoBin))) {
-                Unit u = retVal.getUnit(p.getUnitId());
-                if ((null != u) && (u.getEntity().usesWeaponBays())) {
+                Unit u = p.getUnit();
+                if (u.getEntity().usesWeaponBays()) {
                     Mounted ammo;
                     if (p instanceof EquipmentPart) {
                         ammo = u.getEntity().getEquipment(((EquipmentPart) p).getEquipmentNum());
@@ -1562,7 +1514,7 @@ public class CampaignXmlParser {
 
         retVal.importParts(parts);
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, "Load Part Nodes Complete!");
+        MekHQ.getLogger().info("Load Part Nodes Complete!");
     }
 
     /**

@@ -145,7 +145,7 @@ public class Loot implements MekHqXmlSerializable {
             campaign.addNewUnit(e, false, 0);
         }
         for(Part p : parts) {
-            campaign.addPart(p, 0);
+            campaign.getQuartermaster().addPart(p, 0);
         }
     }
 

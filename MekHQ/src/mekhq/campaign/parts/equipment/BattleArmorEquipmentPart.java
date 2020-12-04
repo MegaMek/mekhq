@@ -117,7 +117,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
             //need to record this as missing for trooper on entity
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted && isModular()) {
@@ -135,7 +135,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
             }
         }
     	if(!salvage) {
-    		campaign.removePart(this);
+    		campaign.getWarehouse().removePart(this);
     	}
         setUnit(null);
         equipmentNum = -1;

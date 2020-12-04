@@ -1,20 +1,20 @@
 /*
  * AeroHeatSink.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,18 +45,18 @@ public class AeroHeatSink extends Part {
     private static final long serialVersionUID = -717866644605314883L;
 
     private int type;
-    
+
     static final TechAdvancement TA_SINGLE = EquipmentType.get("Heat Sink").getTechAdvancement();
     static final TechAdvancement TA_IS_DOUBLE = EquipmentType.get("ISDoubleHeatSink").getTechAdvancement();
     static final TechAdvancement TA_CLAN_DOUBLE = EquipmentType.get("CLDoubleHeatSink").getTechAdvancement();
-    
+
     //To differentiate Clan double heatsinks, which aren't defined in Aero
     public static final int CLAN_HEAT_DOUBLE = 2;
-    
+
     public AeroHeatSink() {
         this(0, Aero.HEAT_SINGLE, false, null);
     }
-    
+
     public AeroHeatSink(int tonnage, int type, boolean omniPodded, Campaign c) {
         super(tonnage, omniPodded, c);
         this.name = "Aero Heat Sink";
@@ -68,14 +68,14 @@ public class AeroHeatSink extends Part {
             this.name = "Aero Double Heat Sink";
         }
     }
-    
+
     @Override
     public AeroHeatSink clone() {
         AeroHeatSink clone = new AeroHeatSink(getUnitTonnage(), type, omniPodded, campaign);
         clone.copyBaseData(this);
         return clone;
     }
-        
+
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
@@ -96,15 +96,15 @@ public class AeroHeatSink extends Part {
             } else {
                 hits = 0;
             }
-            if(checkForDestruction 
-                    && hits > priorHits 
+            if(checkForDestruction
+                    && hits > priorHits
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
     }
-    
-    @Override 
+
+    @Override
     public int getBaseTime() {
         if (isOmniPodded()) {
             return 10;
@@ -112,7 +112,7 @@ public class AeroHeatSink extends Part {
         //New SO errata 6-2019
         return 20;
     }
-    
+
     @Override
     public int getDifficulty() {
         if(isSalvaging()) {
@@ -147,17 +147,17 @@ public class AeroHeatSink extends Part {
             if(hits == 0) {
                 ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks()-1);
             }
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -220,7 +220,7 @@ public class AeroHeatSink extends Part {
     public int getType() {
         return type;
     }
-    
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
@@ -234,10 +234,10 @@ public class AeroHeatSink extends Part {
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
-        
+
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            
+
             if (wn2.getNodeName().equalsIgnoreCase("type")) {
                 type = Integer.parseInt(wn2.getTextContent());
                 if(type == CLAN_HEAT_DOUBLE) {
@@ -245,11 +245,11 @@ public class AeroHeatSink extends Part {
                 }
                 if(type == Aero.HEAT_DOUBLE) {
                     this.name = "Aero Double Heat Sink";
-                } 
-            } 
+                }
+            }
         }
     }
-    
+
     @Override
     public boolean isRightTechType(String skillType) {
         return skillType.equals(SkillType.S_TECH_AERO);
@@ -270,7 +270,7 @@ public class AeroHeatSink extends Part {
         }
         return Entity.LOC_NONE;
     }
-    
+
     @Override
     public TechAdvancement getTechAdvancement() {
         if (type == Aero.HEAT_SINGLE) {

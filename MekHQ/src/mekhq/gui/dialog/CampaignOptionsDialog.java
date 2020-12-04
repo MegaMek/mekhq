@@ -63,14 +63,15 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
-import megamek.common.Player;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Camouflage;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
-import mekhq.IconPackage;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -492,7 +493,7 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
-    public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c, IconPackage icons) {
+    public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c) {
         super(parent, modal);
         this.campaign = c;
         //this is a hack but I have no idea what is going on here
@@ -552,8 +553,6 @@ public class CampaignOptionsDialog extends JDialog {
         useToughnessBox = new JCheckBox();
         useArtilleryBox = new JCheckBox();
         useAbilitiesBox = new JCheckBox();
-        useEdgeBox = new JCheckBox();
-        useSupportEdgeBox = new JCheckBox();
         useImplantsBox = new JCheckBox();
         useAdvancedMedicalBox = new JCheckBox();
         useDylansRandomXpBox = new JCheckBox();
@@ -1504,13 +1503,14 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(useAbilitiesBox, gridBagConstraints);
 
-        useEdgeBox.setText(resourceMap.getString("useEdgeBox.text"));
+        useEdgeBox = new JCheckBox(resourceMap.getString("useEdgeBox.text"));
         useEdgeBox.setToolTipText(resourceMap.getString("useEdgeBox.toolTipText"));
         useEdgeBox.setName("useEdgeBox");
+        useEdgeBox.addActionListener(evt -> useSupportEdgeBox.setEnabled(useEdgeBox.isSelected()));
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(useEdgeBox, gridBagConstraints);
 
-        useSupportEdgeBox.setText(resourceMap.getString("useSupportEdgeBox.text"));
+        useSupportEdgeBox = new JCheckBox(resourceMap.getString("useSupportEdgeBox.text"));
         useSupportEdgeBox.setToolTipText(resourceMap.getString("useSupportEdgeBox.toolTipText"));
         useSupportEdgeBox.setName("useSupportEdgeBox");
         gridBagConstraints.gridy = ++gridy;
@@ -2816,28 +2816,7 @@ public class CampaignOptionsDialog extends JDialog {
         btnAddSPA = new JButton("Add Another Special Ability");
         btnAddSPA.addActionListener(evt -> btnAddSPA());
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panSpecialAbilities.add(btnAddSPA, gridBagConstraints);
-        btnAddSPA.setEnabled(!getUnusedSPA().isEmpty());
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-
-        for (String name : spaNames) {
-            panSpecialAbilities.add(new SpecialAbilityPanel(getCurrentSPA().get(name), this), gridBagConstraints);
-            gridBagConstraints.gridy++;
-        }
+        recreateSPAPanel(!getUnusedSPA().isEmpty());
 
         JScrollPane scrSPA = new JScrollPane(panSpecialAbilities);
         scrSPA.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -4430,7 +4409,9 @@ public class CampaignOptionsDialog extends JDialog {
         useToughnessBox.setSelected(options.useToughness());
         useArtilleryBox.setSelected(options.useArtillery());
         useAbilitiesBox.setSelected(options.useAbilities());
-        useEdgeBox.setSelected(options.useEdge());
+        if (useEdgeBox.isSelected() != options.useEdge()) {
+            useEdgeBox.doClick();
+        }
         useSupportEdgeBox.setSelected(options.useSupportEdge());
         useImplantsBox.setSelected(options.useImplants());
         altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
@@ -4610,9 +4591,11 @@ public class CampaignOptionsDialog extends JDialog {
                 allSelected = false;
             }
         }
-        if (allSelected && !allPortraitsBox.isSelected()) {
+        if (allSelected != allPortraitsBox.isSelected()) {
             allPortraitsBox.doClick();
-        } else if (noneSelected && !noPortraitsBox.isSelected()) {
+        }
+
+        if (noneSelected != noPortraitsBox.isSelected()) {
             noPortraitsBox.doClick();
         }
 
@@ -4819,7 +4802,7 @@ public class CampaignOptionsDialog extends JDialog {
         // Then save it out to that file.
         try (FileOutputStream fos = new FileOutputStream(file);
              PrintWriter pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
-            preset.writeToXml(pw, 0);
+            preset.writeToXml(pw, 1);
             pw.flush();
             MekHQ.getLogger().info("Campaign options saved to " + file);
         } catch (Exception ex) {
@@ -5022,7 +5005,7 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.getGameOptions().getOption("pilot_advantages").setValue(useAbilitiesBox.isSelected());
         options.setEdge(useEdgeBox.isSelected());
         campaign.getGameOptions().getOption("edge").setValue(useEdgeBox.isSelected());
-        options.setSupportEdge(useSupportEdgeBox.isSelected());
+        options.setSupportEdge(useEdgeBox.isSelected() && useSupportEdgeBox.isSelected());
         options.setImplants(useImplantsBox.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
@@ -5348,10 +5331,13 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weighty = 1.0;
 
-        for (String title : getCurrentSPA().keySet()) {
-            panSpecialAbilities.add(new SpecialAbilityPanel(getCurrentSPA().get(title), this), gridBagConstraints);
+        NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+        getCurrentSPA().values().stream().sorted((o1, o2) ->
+                naturalOrderComparator.compare(o1.getDisplayName(), o2.getDisplayName())
+        ).forEach(spa -> {
+            panSpecialAbilities.add(new SpecialAbilityPanel(spa, this), gridBagConstraints);
             gridBagConstraints.gridy++;
-        }
+        });
         panSpecialAbilities.revalidate();
         panSpecialAbilities.repaint();
     }
@@ -5361,7 +5347,7 @@ public class CampaignOptionsDialog extends JDialog {
             return;
         }
 
-        if (Player.NO_CAMO.equals(camoCategory)) {
+        if (Camouflage.NO_CAMOUFLAGE.equals(camoCategory)) {
             int colorInd = colorIndex;
             if (colorInd == -1) {
                 colorInd = 0;
@@ -5377,7 +5363,7 @@ public class CampaignOptionsDialog extends JDialog {
         // Try to get the camo file.
         try {
             // Translate the root camo directory name.
-            if (Player.ROOT_CAMO.equals(camoCategory)) {
+            if (AbstractIcon.ROOT_CATEGORY.equals(camoCategory)) {
                 camoCategory = "";
             }
             Image camo = (Image) MHQStaticDirectoryManager.getCamouflage().getItem(camoCategory, camoFileName);
@@ -5392,7 +5378,7 @@ public class CampaignOptionsDialog extends JDialog {
                     + "data/images/camo folder.",
                     "Missing Camo File",
                     JOptionPane.WARNING_MESSAGE);
-            camoCategory = Player.NO_CAMO;
+            camoCategory = Camouflage.NO_CAMOUFLAGE;
             colorIndex = 0;
             setCamoIcon();
         }
@@ -5403,7 +5389,7 @@ public class CampaignOptionsDialog extends JDialog {
             return;
         }
 
-        if (Campaign.ICON_NONE.equals(iconFileName)) {
+        if (AbstractIcon.DEFAULT_ICON_FILENAME.equals(iconFileName)) {
             btnIcon.setIcon(null);
             btnIcon.setText("None");
             return;
@@ -5412,14 +5398,14 @@ public class CampaignOptionsDialog extends JDialog {
         // Try to get the root file.
         try {
             // Translate the root icon directory name.
-            if (Campaign.ROOT_ICON.equals(iconCategory)) {
-                iconCategory = ""; //$NON-NLS-1$
+            if (AbstractIcon.ROOT_CATEGORY.equals(iconCategory)) {
+                iconCategory = "";
             }
             Image icon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem(iconCategory, iconFileName);
             icon = icon.getScaledInstance(75, -1, Image.SCALE_DEFAULT);
             btnIcon.setIcon(new ImageIcon(icon));
         } catch (Exception err) {
-            iconFileName = Campaign.ICON_NONE;
+            iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
             setForceIcon();
         }
     }

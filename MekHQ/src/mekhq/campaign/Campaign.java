@@ -27,12 +27,11 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Camouflage;
 import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
@@ -49,6 +48,7 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
+import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 
@@ -80,10 +80,7 @@ import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.OvertimeModeEvent;
-import mekhq.campaign.event.PartArrivedEvent;
 import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.PartNewEvent;
-import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonNewEvent;
@@ -173,9 +170,9 @@ public class Campaign implements Serializable, ITechManager {
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
     // and more still - we're tracking DropShips and WarShips in a separate set so that we can assign units to transports
     private Hangar units = new Hangar();
-    private Set<UUID> transportShips = new HashSet<>();
+    private Set<Unit> transportShips = new HashSet<>();
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
-    private TreeMap<Integer, Part> parts = new TreeMap<>();
+    private Warehouse parts = new Warehouse();
     private TreeMap<Integer, Force> forceIds = new TreeMap<>();
     private TreeMap<Integer, Mission> missions = new TreeMap<>();
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
@@ -188,7 +185,6 @@ public class Campaign implements Serializable, ITechManager {
     private int astechPoolOvertime;
     private int medicPool;
 
-    private int lastPartId;
     private int lastForceId;
     private int lastMissionId;
     private int lastScenarioId;
@@ -225,15 +221,13 @@ public class Campaign implements Serializable, ITechManager {
     private boolean gmMode;
     private transient boolean overviewLoadingValue = true;
 
-    private String camoCategory = Player.NO_CAMO;
+    private String camoCategory = Camouflage.NO_CAMOUFLAGE;
     private String camoFileName = null;
     private int colorIndex = 0;
 
     //unit icon
-    public static final String ROOT_ICON = "-- General --";
-    public static final String ICON_NONE = "None";
-    private String iconCategory = ROOT_ICON;
-    private String iconFileName = ICON_NONE;
+    private String iconCategory = AbstractIcon.ROOT_CATEGORY;
+    private String iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
 
     private Finances finances;
 
@@ -243,7 +237,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private PartsStore partsStore;
 
-    private ArrayList<String> customs;
+    private List<String> customs;
 
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
@@ -265,6 +259,7 @@ public class Campaign implements Serializable, ITechManager {
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
     private CampaignSummary campaignSummary;
+    private final Quartermaster quartermaster;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
 
@@ -319,6 +314,7 @@ public class Campaign implements Serializable, ITechManager {
         autosaveService = new AutosaveService();
         hasActiveContract = false;
         campaignSummary = new CampaignSummary(this);
+        quartermaster = new Quartermaster(this);
     }
 
     /**
@@ -965,6 +961,8 @@ public class Campaign implements Serializable, ITechManager {
      * @param u A {@link Unit} to import into the campaign.
      */
     public void importUnit(Unit u) {
+        Objects.requireNonNull(u);
+
         MekHQ.getLogger().debug("Importing unit: (" + u.getId() + "): " + u.getName());
 
         getHangar().addUnit(u);
@@ -975,7 +973,7 @@ public class Campaign implements Serializable, ITechManager {
         //Jumpships and space stations are intentionally ignored at present, because this functionality is being
         //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
         if ((u.getEntity() instanceof Dropship) || (u.getEntity() instanceof Warship)) {
-            addTransportShip(u.getId());
+            addTransportShip(u);
         }
 
         // Assign an entity ID to our new unit
@@ -989,23 +987,29 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * Adds an entry to the list of transit-capable transport ships. We'll use this
      * to look for empty bays that ground units can be assigned to
-     * @param id - The unique ID of the ship we want to add to this Set
+     * @param unit - The ship we want to add to this Set
      */
-    public void addTransportShip(UUID id) {
-        MekHQ.getLogger().debug("Adding DropShip/WarShip: " + id);
+    public void addTransportShip(Unit unit) {
+        MekHQ.getLogger().debug("Adding DropShip/WarShip: " + unit.getId());
 
-        transportShips.add(id);
+        transportShips.add(Objects.requireNonNull(unit));
     }
 
     /**
      * Deletes an entry from the list of transit-capable transport ships. This gets updated when
      * the ship is removed from the campaign for one reason or another
-     * @param id - The unique ID of the ship we want to remove from this Set
+     * @param unit - The ship we want to remove from this Set
      */
-    public void removeTransportShip(UUID id) {
-        MekHQ.getLogger().debug("Removing DropShip/WarShip: " + id);
-
-        transportShips.remove(id);
+    public void removeTransportShip(Unit unit) {
+        // If we remove a transport ship from the campaign,
+        // we need to remove any transported units from it
+        if (transportShips.remove(unit)
+                && unit.hasTransportedUnits()) {
+            List<Unit> transportedUnits = new ArrayList<>(unit.getTransportedUnits());
+            for (Unit transportedUnit : transportedUnits) {
+                unit.removeTransportedUnit(transportedUnit);
+            }
+        }
     }
 
     /**
@@ -1029,7 +1033,7 @@ public class Campaign implements Serializable, ITechManager {
         // now lets grab the parts from the test unit and set them up with this unit
         for (Part p : tu.getParts()) {
             unit.addPart(p);
-            addPart(p, 0);
+            getQuartermaster().addPart(p, 0);
         }
 
         unit.resetPilotAndEntity();
@@ -1046,7 +1050,6 @@ public class Campaign implements Serializable, ITechManager {
 
         checkDuplicateNamesDuringAdd(unit.getEntity());
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
-
     }
 
     /**
@@ -1071,7 +1074,7 @@ public class Campaign implements Serializable, ITechManager {
         //Jumpships and space stations are intentionally ignored at present, because this functionality is being
         //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
         if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Warship)) {
-            addTransportShip(id);
+            addTransportShip(unit);
         }
 
         unit.initializeParts(true);
@@ -1577,107 +1580,6 @@ public class Campaign implements Serializable, ITechManager {
         return service;
     }
 
-    public void addPart(Part p, int transitDays) {
-        if ((p.getUnit() != null) && (p.getUnit() instanceof TestUnit)) {
-            // if this is a test unit, then we won't add the part, so there
-            return;
-        }
-        p.setDaysToArrival(transitDays);
-        p.setBrandNew(false);
-        //need to add ID here in case post-processing part stuff needs it
-        //we will set the id back one if we don't end up adding this part
-        int id = lastPartId + 1;
-        p.setId(id);
-        //be careful in using this next line
-        p.postProcessCampaignAddition();
-        // don't add missing parts if they don't have units or units with not id
-        if (p instanceof MissingPart
-                && (null == p.getUnit() || null == p.getUnitId())) {
-            p.setId(-1);
-            return;
-        }
-        if ((null == p.getUnit()) && !p.hasParentPart()
-                && !p.isReservedForRefit() && !p.isReservedForReplacement()) {
-            Part spare = checkForExistingSparePart(p);
-            if (null != spare) {
-                if (p instanceof Armor) {
-                    if (spare instanceof Armor) {
-                        ((Armor) spare).setAmount(((Armor) spare).getAmount()
-                                + ((Armor) p).getAmount());
-                        MekHQ.triggerEvent(new PartChangedEvent(spare));
-                        p.setId(-1);
-                        return;
-                    }
-                } else if (p instanceof AmmoStorage) {
-                    if (spare instanceof AmmoStorage) {
-                        ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
-                                .getShots());
-                        MekHQ.triggerEvent(new PartChangedEvent(spare));
-                        p.setId(-1);
-                        return;
-                    }
-                } else {
-                    spare.incrementQuantity();
-                    MekHQ.triggerEvent(new PartChangedEvent(spare));
-                    p.setId(-1);
-                    return;
-                }
-            }
-        }
-        parts.put(id, p);
-        lastPartId = id;
-        MekHQ.triggerEvent(new PartNewEvent(p));
-    }
-
-    /**
-     * This is similar to addPart, but we just check to see if this part can be added to an existing part, without actually
-     * adding it to the campaign (because its already there). Should be called up when a part goes from 1 daysToArrival to
-     * zero.
-     *
-     * @param p
-     */
-    public void arrivePart(Part p) {
-        if (null != p.getUnit()) {
-            return;
-        }
-        p.setDaysToArrival(0);
-        addReport(p.getArrivalReport());
-        Part spare = p.isReservedForRefit() ? null : checkForExistingSparePart(p);
-        if (null != spare) {
-            int quantity = p.getQuantity();
-            if (p instanceof Armor) {
-                if (spare instanceof Armor) {
-                    while (quantity > 0) {
-                        ((Armor) spare).setAmount(((Armor) spare).getAmount()
-                                + ((Armor) p).getAmount());
-                        quantity--;
-                    }
-                    removePart(p);
-                }
-            } else if (p instanceof AmmoStorage) {
-                if (spare instanceof AmmoStorage) {
-                    while (quantity > 0) {
-                        ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
-                                .getShots());
-                        quantity--;
-                    }
-                    removePart(p);
-                }
-            } else {
-                while (quantity > 0) {
-                    spare.incrementQuantity();
-                    quantity--;
-                }
-                removePart(p);
-            }
-            MekHQ.triggerEvent(new PartArrivedEvent(spare));
-        } else {
-            MekHQ.triggerEvent(new PartArrivedEvent(p));
-        }
-    }
-
-
-
     /**
      * Imports a collection of parts into the campaign.
      *
@@ -1685,84 +1587,40 @@ public class Campaign implements Serializable, ITechManager {
      *                 to import into the campaign.
      */
     public void importParts(Collection<Part> newParts) {
+        Objects.requireNonNull(newParts);
+
         for (Part p : newParts) {
+            if ((p instanceof MissingPart) && (null == p.getUnit())) {
+                // Let's not import missing parts without a valid unit.
+                continue;
+            }
+
+            // Track this part as part of our Campaign
             p.setCampaign(this);
-            addPartWithoutId(p);
-        }
 
-        for (Part p : newParts) {
-            p.fixupPartReferences(parts);
-        }
-    }
-
-    public void addPartWithoutId(Part p) {
-        if (p instanceof MissingPart && null == p.getUnitId()) {
-            // we shouldn't have spare missing parts. I think their existence is
-            // a relic.
-            return;
-        }
-
-        // Update the lastPartId we've seen to avoid overwriting a part,
-        // which may occur if a replacement ID is assigned
-        lastPartId = Math.max(lastPartId, p.getId());
-
-        // go ahead and check for existing parts because some version weren't
-        // properly collecting parts
-        Part mergedWith = null;
-        if (!(p instanceof MissingPart) && (null == p.getUnitId())
-                && !p.isReservedForRefit() && !p.isReservedForReplacement()) {
-            Part spare = checkForExistingSparePart(p);
-            if (null != spare) {
-                if (p instanceof Armor) {
-                    if (spare instanceof Armor) {
-                        ((Armor) spare).setAmount(((Armor) spare).getAmount()
-                                + ((Armor) p).getAmount());
-                        mergedWith = spare;
-                    }
-                } else if (p instanceof AmmoStorage) {
-                    if (spare instanceof AmmoStorage) {
-                        ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
-                                .getShots());
-                        mergedWith = spare;
-                    }
-                } else {
-                    spare.incrementQuantity();
-                    mergedWith = spare;
-                }
-            }
-        }
-
-        // If we weren't merged we are being added
-        if (null == mergedWith) {
-            parts.put(p.getId(), p);
-            MekHQ.triggerEvent(new PartNewEvent(p));
-        } else {
-            // Go through each unit and its refits to see if the new armor should be updated
-            // CAW: I believe all other parts on a refit have a unit assigned to them.
-            if (mergedWith instanceof Armor) {
-                for (Unit u : getUnits()) {
-                    Refit r = u.getRefit();
-                    // If there is a refit and this part matches the new armor, update the armor entry
-                    if (null != r) {
-                        if (r.getNewArmorSupplies() == p) {
-                            MekHQ.getLogger().info(
-                                String.format("%s (%d) was merged with %s (%d) used in a refit for %s", p.getName(),
-                                    p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
-                            Armor mergedArmor = (Armor) mergedWith;
-                            r.setNewArmorSupplies(mergedArmor);
-                        }
-                    }
-                }
-            }
-            MekHQ.triggerEvent(new PartRemovedEvent(p));
+            // Add the part to the campaign, but do not
+            // merge it with any existing parts
+            parts.addPart(p, false);
         }
     }
 
     /**
-     * @return an <code>ArrayList</code> of SupportTeams in the campaign
+     * Gets the Warehouse which stores parts.
      */
+    public Warehouse getWarehouse() {
+        return parts;
+    }
+
+    public Quartermaster getQuartermaster() {
+        return quartermaster;
+    }
+
+    /**
+     * @return A collection of parts in the Warehouse.
+     */
+    @Deprecated
     public Collection<Part> getParts() {
-        return parts.values();
+        return parts.getParts();
     }
 
     private int getQuantity(Part p) {
@@ -1772,7 +1630,7 @@ public class Campaign implements Serializable, ITechManager {
         if (p instanceof AmmoStorage) {
             return ((AmmoStorage) p).getShots();
         }
-        return ((p.getUnit() != null) || (p.getUnitId() != null)) ? 1 : p.getQuantity();
+        return (p.getUnit() != null) ? 1 : p.getQuantity();
     }
 
     private PartInUse getPartInUse(Part p) {
@@ -1796,7 +1654,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private void updatePartInUseData(PartInUse piu, Part p) {
-        if ((p.getUnit() != null) || (p.getUnitId() != null) || (p instanceof MissingPart)) {
+        if ((p.getUnit() != null) || (p instanceof MissingPart)) {
             piu.setUseCount(piu.getUseCount() + getQuantity(p));
         } else {
             if (p.isPresent()) {
@@ -1813,12 +1671,12 @@ public class Campaign implements Serializable, ITechManager {
         piu.setStoreCount(0);
         piu.setTransferCount(0);
         piu.setPlannedCount(0);
-        for (Part p : getParts()) {
+        getWarehouse().forEachPart(p -> {
             PartInUse newPiu = getPartInUse(p);
             if (piu.equals(newPiu)) {
                 updatePartInUseData(piu, p);
             }
-        }
+        });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             PartInUse newPiu = getPartInUse((Part) maybePart);
             if (piu.equals(newPiu)) {
@@ -1832,18 +1690,18 @@ public class Campaign implements Serializable, ITechManager {
     public Set<PartInUse> getPartsInUse() {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<>();
-        for (Part p : getParts()) {
+        getWarehouse().forEachPart(p -> {
             PartInUse piu = getPartInUse(p);
             if (null == piu) {
-                continue;
+                return;
             }
-            if ( inUse.containsKey(piu) ) {
+            if (inUse.containsKey(piu)) {
                 piu = inUse.get(piu);
             } else {
                 inUse.put(piu, piu);
             }
             updatePartInUseData(piu, p);
-        }
+        });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             if (!(maybePart instanceof Part)) {
                 continue;
@@ -1865,8 +1723,9 @@ public class Campaign implements Serializable, ITechManager {
         return inUse.keySet();
     }
 
+    @Deprecated
     public Part getPart(int id) {
-        return parts.get(id);
+        return parts.getPart(id);
     }
 
     public Force getForce(int id) {
@@ -2061,8 +1920,10 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public boolean isWorkingOnRefit(Person p) {
+        Objects.requireNonNull(p);
+
         Unit unit = getHangar().findUnit(u ->
-            u.isRefitting() && Objects.equals(p.getId(), u.getRefit().getTeamId()));
+            u.isRefitting() && p.equals(u.getRefit().getTech()));
         return unit != null;
     }
 
@@ -2100,9 +1961,9 @@ public class Campaign implements Serializable, ITechManager {
         int xpGained = 0;
         //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
         if (getCampaignOptions().useSupportEdge()
-                && (doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL))) {
-            if (roll == 2  && doctor.getCurrentEdge() > 0 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
-                doctor.setCurrentEdge(doctor.getCurrentEdge() - 1);
+                && doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL)) {
+            if ((roll == 2) && (doctor.getCurrentEdge() > 0) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
+                doctor.changeCurrentEdge(-1);
                 roll = Compute.d6(2);
                 report += medWork.fail() + "\n" + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
                         + " rolls " + roll + ":";
@@ -2110,7 +1971,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         if (roll >= target.getValue()) {
             report = report + medWork.succeed();
-            Unit u = getHangar().getUnit(medWork.getUnitId());
+            Unit u = medWork.getUnit();
             if (null != u) {
                 u.resetPilotAndEntity();
             }
@@ -2581,12 +2442,10 @@ public class Campaign implements Serializable, ITechManager {
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ":";
         //Edge reroll, if applicable
-        if (roll < target.getValue()
-                && getCampaignOptions().useSupportEdge()
-                && null != person
+        if (getCampaignOptions().useSupportEdge() && (roll < target.getValue()) && (person != null)
                 && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
-                && person.getCurrentEdge() > 0) {
-            person.setCurrentEdge(person.getCurrentEdge() - 1);
+                && (person.getCurrentEdge() > 0)) {
+            person.changeCurrentEdge(-1);
             roll = Compute.d6(2);
             report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
         }
@@ -2749,9 +2608,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void refit(Refit r) {
-        Person tech = r.getUnit().getEngineer() == null?
-                getPerson(r.getTeamId()) : r.getUnit().getEngineer();
-        if (null == tech) {
+        Person tech = (r.getUnit().getEngineer() == null) ? r.getTech() : r.getUnit().getEngineer();
+        if (tech == null) {
             addReport("No tech is assigned to refit " + r.getOriginalEntity().getShortName() + ". Refit cancelled.");
             r.cancel();
             return;
@@ -2783,21 +2641,18 @@ public class Campaign implements Serializable, ITechManager {
                     wrongType = " <b>Warning: wrong tech type for this refit.</b>";
                 }
                 report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ": ";
-                if (roll < target.getValue() && getCampaignOptions().useSupportEdge()
+                if (getCampaignOptions().useSupportEdge() && (roll < target.getValue())
                         && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT)
-                        && tech.getCurrentEdge() > 0) {
-                    tech.setCurrentEdge(tech.getCurrentEdge() - 1);
-                    if (tech.isRightTechTypeFor(r)) {
-                        roll = Compute.d6(2);
-                    } else {
-                        roll = Utilities.roll3d6();
-                    }
+                        && (tech.getCurrentEdge() > 0)) {
+                    tech.changeCurrentEdge(-1);
+                    roll = tech.isRightTechTypeFor(r) ? Compute.d6(2) : Utilities.roll3d6();
                     // This is needed to update the edge values of individual crewmen
                     if (tech.isEngineer()) {
                         tech.setEdgeUsed(tech.getEdgeUsed() - 1);
                     }
                     report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
                 }
+
                 if (roll >= target.getValue()) {
                     report += r.succeed();
                 } else {
@@ -2818,9 +2673,17 @@ public class Campaign implements Serializable, ITechManager {
         // get a new cloned part to work with and decrement original
         Part repairable = part.clone();
         part.decrementQuantity();
+
         fixPart(repairable, tech);
         if (!(repairable instanceof OmniPod)) {
-            addPart(repairable, 0);
+            getQuartermaster().addPart(repairable, 0);
+        }
+
+        // If there is at least one remaining unit of the part
+        // then we need to notify interested parties that we have
+        // changed the quantity of the spare part.
+        if (part.getQuantity() > 0) {
+            MekHQ.triggerEvent(new PartChangedEvent(part));
         }
 
         return repairable;
@@ -2837,7 +2700,7 @@ public class Campaign implements Serializable, ITechManager {
         String report = "";
         String action = " fix ";
 
-        // TODO: this should really be a method on the part
+        // TODO: this should really be a method on its own class
         if (partWork instanceof AmmoBin) {
             action = " reload ";
         }
@@ -2922,7 +2785,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (partWork.getShorthandedMod() < helpMod) {
                     partWork.setShorthandedMod(helpMod);
                 }
-                partWork.setTeamId(tech.getId());
+                partWork.setTech(tech);
                 partWork.reservePart();
                 report += " - <b>Not enough time, the remainder of the task";
                 if (null != partWork.getUnit()) {
@@ -2934,7 +2797,7 @@ public class Campaign implements Serializable, ITechManager {
                     report += " cannot be finished because there was no time left after maintenance tasks.</b>";
                     partWork.resetTimeSpent();
                     partWork.resetOvertime();
-                    partWork.setTeamId(null);
+                    partWork.setTech(null);
                     partWork.cancelReservation();
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
@@ -2968,19 +2831,17 @@ public class Campaign implements Serializable, ITechManager {
         //if we fail and would break a part, here's a chance to use Edge for a reroll...
         if (getCampaignOptions().useSupportEdge()
                 && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)
-                && tech.getCurrentEdge() > 0
-                && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+                && (tech.getCurrentEdge() > 0)
+                && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
             if ((getCampaignOptions().isDestroyByMargin()
-                    && getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll))
-                    || (!getCampaignOptions().isDestroyByMargin() && (tech.getExperienceLevel(false) == SkillType.EXP_ELITE //if an elite, primary tech and destroy by margin is NOT on
-                                    || tech.getPrimaryRole() == Person.T_SPACE_CREW)) // For vessel crews
-                            && roll < target.getValue()) {
-                tech.setCurrentEdge(tech.getCurrentEdge() - 1);
-                if (tech.isRightTechTypeFor(partWork)) {
-                    roll = Compute.d6(2);
-                } else {
-                    roll = Utilities.roll3d6();
-                }
+                    && (getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll)))
+                    || (!getCampaignOptions().isDestroyByMargin()
+                            //if an elite, primary tech and destroy by margin is NOT on
+                            && ((tech.getExperienceLevel(false) == SkillType.EXP_ELITE)
+                                    || (tech.getPrimaryRole() == Person.T_SPACE_CREW))) // For vessel crews
+                    && (roll < target.getValue())) {
+                tech.changeCurrentEdge(-1);
+                roll = tech.isRightTechTypeFor(partWork) ? Compute.d6(2) : Utilities.roll3d6();
                 //This is needed to update the edge values of individual crewmen
                 if (tech.isEngineer()) {
                     tech.setEdgeUsed(tech.getEdgeUsed() + 1);
@@ -2988,6 +2849,7 @@ public class Campaign implements Serializable, ITechManager {
                 report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " + roll + ":";
             }
         }
+
         if (roll >= target.getValue()) {
             report = report + partWork.succeed();
             if (getCampaignOptions().payForRepairs()
@@ -3011,8 +2873,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         } else {
             int modePenalty = partWork.getMode().expReduction;
-            int effectiveSkillLvl = tech.getSkillForWorkingOn(partWork)
-                    .getExperienceLevel() - modePenalty;
+            int effectiveSkillLvl = tech.getSkillForWorkingOn(partWork).getExperienceLevel() - modePenalty;
             if (getCampaignOptions().isDestroyByMargin()) {
                 if (getCampaignOptions().getDestroyMargin() > (target.getValue() - roll)) {
                     // not destroyed - set the effective level as low as
@@ -3036,7 +2897,7 @@ public class Campaign implements Serializable, ITechManager {
         report += wrongType;
         partWork.resetTimeSpent();
         partWork.resetOvertime();
-        partWork.setTeamId(null);
+        partWork.setTech(null);
         partWork.cancelReservation();
         MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(report);
@@ -3327,7 +3188,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 } else if (p.checkNaturalHealing(15)) {
                     addReport(p.getHyperlinkedFullTitle() + " heals naturally!");
-                    Unit u = getHangar().getUnit(p.getUnitId());
+                    Unit u = p.getUnit();
                     if (u != null) {
                         u.resetPilotAndEntity();
                     }
@@ -3336,7 +3197,7 @@ public class Campaign implements Serializable, ITechManager {
             // TODO Advanced Medical needs to go away from here later on
             if (getCampaignOptions().useAdvancedMedical()) {
                 InjuryUtil.resolveDailyHealing(this, p);
-                Unit u = getHangar().getUnit(p.getUnitId());
+                Unit u = p.getUnit();
                 if (u != null) {
                     u.resetPilotAndEntity();
                 }
@@ -3383,11 +3244,9 @@ public class Campaign implements Serializable, ITechManager {
 
     public void processNewDayUnits() {
         // need to loop through units twice, the first time to do all maintenance and
-        // the second
-        // time to do whatever else. Otherwise, maintenance minutes might get sucked up
-        // by other
-        // stuff. This is also a good place to ensure that a unit's engineer gets reset
-        // and updated.
+        // the second time to do whatever else. Otherwise, maintenance minutes might
+        // get sucked up by other stuff. This is also a good place to ensure that a
+        // unit's engineer gets reset and updated.
         for (Unit u : getUnits()) {
             u.resetEngineer();
             if (null != u.getEngineer()) {
@@ -3399,63 +3258,63 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // need to check for assigned tasks in two steps to avoid
-        // concurrent mod problems
-        ArrayList<Integer> assignedPartIds = new ArrayList<>();
-        ArrayList<Integer> arrivedPartIds = new ArrayList<>();
-        for (Part part : getParts()) {
+        // concurrent modification problems
+        List<Part> assignedParts = new ArrayList<>();
+        List<Part> arrivedParts = new ArrayList<>();
+        getWarehouse().forEachPart(part -> {
             if (part instanceof Refit) {
-                continue;
+                return;
             }
-            if (part.getTeamId() != null) {
-                assignedPartIds.add(part.getId());
+
+            if (part.getTech() != null) {
+                assignedParts.add(part);
             }
-            if (part.checkArrival()) {
-                arrivedPartIds.add(part.getId());
+
+            // If the part is currently in-transit...
+            if (!part.isPresent()) {
+                // ... decrement the number of days until it arrives...
+                part.setDaysToArrival(part.getDaysToArrival() - 1);
+
+                if (part.isPresent()) {
+                    // ... and mark the part as arrived if it is now here.
+                    arrivedParts.add(part);
+                }
             }
-        }
+        });
 
         // arrive parts before attempting refit or parts will not get reserved that day
-        for (int pid : arrivedPartIds) {
-            Part part = getPart(pid);
-            if (null != part) {
-                arrivePart(part);
-            }
+        for (Part part : arrivedParts) {
+            getQuartermaster().arrivePart(part);
         }
 
         // finish up any overnight assigned tasks
-        for (int pid : assignedPartIds) {
-            Part part = getPart(pid);
-            if (null != part) {
-                Person tech;
-                if ((part.getUnit() != null) && (part.getUnit().getEngineer() != null)) {
-                    tech = part.getUnit().getEngineer();
+        for (Part part : assignedParts) {
+            Person tech;
+            if ((part.getUnit() != null) && (part.getUnit().getEngineer() != null)) {
+                tech = part.getUnit().getEngineer();
+            } else {
+                tech = part.getTech();
+            }
+
+            if (null != tech) {
+                if (null != tech.getSkillForWorkingOn(part)) {
+                    fixPart(part, tech);
                 } else {
-                    tech = getPerson(part.getTeamId());
+                    addReport(String.format(
+                            "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
+                            tech.getHyperlinkedFullTitle(), part.getName()));
+                    part.setTech(null);
                 }
-                if (null != tech) {
-                    if (null != tech.getSkillForWorkingOn(part)) {
-                        fixPart(part, tech);
-                    } else {
-                        addReport(String.format(
-                                "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
-                                tech.getHyperlinkedFullTitle(), part.getName()));
-                        part.setTeamId(null);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null,
-                            "Could not find tech for part: " + part.getName() + " on unit: "
-                                    + part.getUnit().getHyperlinkedName(),
-                            "Invalid Auto-continue", JOptionPane.ERROR_MESSAGE);
-                }
-                // check to see if this part can now be combined with other
-                // spare parts
-                if (part.isSpare()) {
-                    Part spare = checkForExistingSparePart(part);
-                    if (null != spare) {
-                        spare.incrementQuantity();
-                        removePart(part);
-                    }
-                }
+            } else {
+                JOptionPane.showMessageDialog(null,
+                        "Could not find tech for part: " + part.getName() + " on unit: "
+                                + part.getUnit().getHyperlinkedName(),
+                        "Invalid Auto-continue", JOptionPane.ERROR_MESSAGE);
+            }
+
+            // check to see if this part can now be combined with other spare parts
+            if (part.isSpare() && (part.getQuantity() > 0)) {
+                getQuartermaster().addPart(part, 0);
             }
         }
 
@@ -3605,7 +3464,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // remove all parts for this unit as well
         for (Part p : unit.getParts()) {
-            removePart(p);
+            getWarehouse().removePart(p);
         }
 
         // remove any personnel from this unit
@@ -3621,8 +3480,15 @@ public class Campaign implements Serializable, ITechManager {
         // remove unit from any forces
         removeUnitFromForce(unit);
 
-        //If this is a ship, remove it from the list of potential transports
-        removeTransportShip(id);
+        // If this is a ship, remove it from the list of potential transports
+        removeTransportShip(unit);
+
+        // If this unit was assigned to a transport ship, remove it from the transport
+        if (unit.hasTransportShipAssignment()) {
+            unit.getTransportShipAssignment()
+                    .getTransportShip()
+                    .unloadFromTransportShip(unit);
+        }
 
         // finally remove the unit
         getHangar().removeUnit(unit.getId());
@@ -3645,7 +3511,7 @@ public class Campaign implements Serializable, ITechManager {
 
         person.getGenealogy().clearGenealogy(this);
 
-        Unit u = getHangar().getUnit(person.getUnitId());
+        Unit u = person.getUnit();
         if (null != u) {
             u.remove(person, true);
         }
@@ -3745,16 +3611,16 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
         getHangar().forEachUnit(u -> {
-            if (tech.getId().equals(u.getTechId())) {
+            if (tech.equals(u.getTech())) {
                 u.removeTech();
             }
-            if (u.getRefit() != null && tech.getId().equals(u.getRefit().getTeamId())) {
-                u.getRefit().setTeamId(null);
+            if ((u.getRefit() != null) && tech.equals(u.getRefit().getTech())) {
+                u.getRefit().setTech(null);
             }
         });
         for (Part p : getParts()) {
-            if (tech.getId().equals(p.getTeamId())) {
-                p.setTeamId(null);
+            if (tech.equals(p.getTech())) {
+                p.setTech(null);
             }
         }
         for (Force f : forceIds.values()) {
@@ -3789,19 +3655,6 @@ public class Campaign implements Serializable, ITechManager {
 
         missions.remove(id);
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
-    }
-
-    public void removePart(Part part) {
-        if (null != part.getUnit() && part.getUnit() instanceof TestUnit) {
-            // if this is a test unit, then we won't remove the part because its not there
-            return;
-        }
-        parts.remove(part.getId());
-        //remove child parts as well
-        for (Part childPart : part.getChildParts()) {
-            removePart(childPart);
-        }
-        MekHQ.triggerEvent(new PartRemovedEvent(part));
     }
 
     public void removeKill(Kill k) {
@@ -3892,7 +3745,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Force getForceFor(Person p) {
-        Unit u = getHangar().getUnit(p.getUnitId());
+        Unit u = p.getUnit();
         if (u != null) {
             return getForceFor(u);
         } else if (p.isTech()) {
@@ -3909,8 +3762,8 @@ public class Campaign implements Serializable, ITechManager {
     public void restore() {
         // if we fail to restore equipment parts then remove them
         // and possibly re-initialize and diagnose unit
-        ArrayList<Part> partsToRemove = new ArrayList<>();
-        ArrayList<UUID> unitsToCheck = new ArrayList<>();
+        List<Part> partsToRemove = new ArrayList<>();
+        Set<Unit> unitsToCheck = new HashSet<>();
 
         for (Part part : getParts()) {
             if (part instanceof EquipmentPart) {
@@ -3928,10 +3781,10 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         for (Part remove : partsToRemove) {
-            if (null != remove.getUnitId() && !unitsToCheck.contains(remove.getUnitId())) {
-                unitsToCheck.add(remove.getUnitId());
+            if (remove.getUnit() != null) {
+                unitsToCheck.add(remove.getUnit());
             }
-            removePart(remove);
+            getWarehouse().removePart(remove);
         }
 
         for (Unit unit : getUnits()) {
@@ -3943,19 +3796,16 @@ public class Campaign implements Serializable, ITechManager {
                 // Aerospace parts have changed after 0.45.4. Reinitialize parts for Small Craft and up
                 if (unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)
                         || unit.getEntity().hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)) {
-                    unitsToCheck.add(unit.getId());
+                    unitsToCheck.add(unit);
                 }
             }
 
             unit.resetEngineer();
         }
 
-        for (UUID uid : unitsToCheck) {
-            Unit u = getHangar().getUnit(uid);
-            if (null != u) {
-                u.initializeParts(true);
-                u.runDiagnostic(false);
-            }
+        for (Unit u : unitsToCheck) {
+            u.initializeParts(true);
+            u.runDiagnostic(false);
         }
 
         shoppingList.restore();
@@ -4128,6 +3978,10 @@ public class Campaign implements Serializable, ITechManager {
         return camoFileName;
     }
 
+    public AbstractIcon getCamouflage() {
+        return new Camouflage(getCamoCategory(), getCamoFileName());
+    }
+
     public int getColorIndex() {
         return colorIndex;
     }
@@ -4152,56 +4006,6 @@ public class Campaign implements Serializable, ITechManager {
         this.iconFileName = s;
     }
 
-    public ArrayList<Part> getSpareParts() {
-        ArrayList<Part> spares = new ArrayList<>();
-        for (Part part : getParts()) {
-            if (part.isSpare()) {
-                spares.add(part);
-            }
-        }
-        return spares;
-    }
-
-    /**
-     * Executes a method for each spare part in the campaign.
-     *
-     * @param consumer The method to apply to each spare part
-     *                 in the campaign.
-     */
-    public void forEachSparePart(Consumer<Part> consumer) {
-        for (Part part : getParts()) {
-            if (part.isSpare()) {
-                consumer.accept(part);
-            }
-        }
-    }
-
-    /**
-     * Finds the first spare part matching a predicate.
-     *
-     * @param predicate The predicate to use when searching
-     *                  for a suitable spare part.
-     * @return A matching spare {@link Part} or {@code null}
-     *         if no suitable match was found.
-     */
-    @Nullable
-    public Part findSparePart(Predicate<Part> predicate) {
-        for (Part part : parts.values()) {
-            if (part.isSpare() && predicate.test(part)) {
-                return part;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Streams the spare parts in the campaign.
-     * @return A stream of spare parts in the campaign.
-     */
-    public Stream<Part> streamSpareParts() {
-        return parts.values().stream().filter(Part::isSpare);
-    }
-
     public void addFunds(Money quantity) {
         addFunds(quantity, "Rich Uncle", Transaction.C_MISC);
     }
@@ -4222,162 +4026,6 @@ public class Campaign implements Serializable, ITechManager {
         return getFunds().isGreaterOrEqualThan(cost);
     }
 
-    public boolean buyUnit(Entity en, int days) {
-        Money cost = new Unit(en, this).getBuyCost();
-        if (campaignOptions.payForUnits()) {
-            if (finances.debit(cost, Transaction.C_UNIT,
-                    "Purchased " + en.getShortName(), getLocalDate())) {
-                addNewUnit(en, false, days);
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            addNewUnit(en, false, days);
-            return true;
-        }
-    }
-
-    public void sellUnit(UUID id) {
-        Unit unit = getHangar().getUnit(id);
-        Money sellValue = unit.getSellValue();
-        finances.credit(sellValue, Transaction.C_UNIT_SALE,
-                "Sale of " + unit.getName(), getLocalDate());
-        removeUnit(id);
-        MekHQ.triggerEvent(new UnitRemovedEvent(unit));
-    }
-
-    public void sellPart(Part part, int quantity) {
-        if (part instanceof AmmoStorage) {
-            sellAmmo((AmmoStorage) part, quantity);
-            return;
-        }
-        if (part instanceof Armor) {
-            sellArmor((Armor) part, quantity);
-            return;
-        }
-        Money cost = part.getActualValue().multipliedBy(quantity);
-        String plural = "";
-        if (quantity > 1) {
-            plural = "s";
-        }
-        finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + quantity
-                + " " + part.getName() + plural, getLocalDate());
-        while (quantity > 0 && part.getQuantity() > 0) {
-            part.decrementQuantity();
-            quantity--;
-        }
-        MekHQ.triggerEvent(new PartRemovedEvent(part));
-    }
-
-    public void sellAmmo(AmmoStorage ammo, int shots) {
-        shots = Math.min(shots, ammo.getShots());
-        boolean sellingAllAmmo = shots == ammo.getShots();
-
-        Money cost = Money.zero();
-        if (ammo.getShots() > 0) {
-            cost = ammo.getActualValue().multipliedBy(shots).dividedBy(ammo.getShots());
-        }
-
-        finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + shots
-                + " " + ammo.getName(), getLocalDate());
-        if (sellingAllAmmo) {
-            ammo.decrementQuantity();
-        } else {
-            ammo.changeShots(-1 * shots);
-        }
-        MekHQ.triggerEvent(new PartRemovedEvent(ammo));
-    }
-
-    public void sellArmor(Armor armor, int points) {
-        points = Math.min(points, armor.getAmount());
-        boolean sellingAllArmor = points == armor.getAmount();
-        double proportion = ((double) points / armor.getAmount());
-        if (sellingAllArmor) {
-            // to avoid rounding error
-            proportion = 1.0;
-        }
-        Money cost = armor.getActualValue().multipliedBy(proportion);
-        finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + points
-                + " " + armor.getName(), getLocalDate());
-        if (sellingAllArmor) {
-            armor.decrementQuantity();
-        } else {
-            armor.changeAmountAvailable(-1 * points);
-        }
-        MekHQ.triggerEvent(new PartRemovedEvent(armor));
-    }
-
-    public void depodPart(Part part, int quantity) {
-        Part unpodded = part.clone();
-        unpodded.setOmniPodded(false);
-        OmniPod pod = new OmniPod(unpodded, this);
-        while (quantity > 0 && part.getQuantity() > 0) {
-            addPart(unpodded.clone(), 0);
-            addPart(pod.clone(), 0);
-            part.decrementQuantity();
-            quantity--;
-        }
-        MekHQ.triggerEvent(new PartRemovedEvent(part));
-        MekHQ.triggerEvent(new PartRemovedEvent(pod));
-        MekHQ.triggerEvent(new PartRemovedEvent(unpodded));
-    }
-
-    public boolean buyRefurbishment(Part part) {
-        if (getCampaignOptions().payForParts()) {
-            return finances.debit(part.getStickerPrice(), Transaction.C_EQUIP, "Purchase of " + part.getName(), getLocalDate());
-        } else {
-            return true;
-        }
-    }
-
-    public boolean buyPart(Part part, int transitDays) {
-        return buyPart(part, 1, transitDays);
-    }
-
-    public boolean buyPart(Part part, double multiplier, int transitDays) {
-        if (getCampaignOptions().payForParts()) {
-            if (finances.debit(part.getStickerPrice().multipliedBy(multiplier),
-                    Transaction.C_EQUIP, "Purchase of " + part.getName(), getLocalDate())) {
-                if (part instanceof Refit) {
-                    ((Refit) part).addRefitKitParts(transitDays);
-                } else {
-                    addPart(part, transitDays);
-                }
-                MekHQ.triggerEvent(new PartNewEvent(part));
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            if (part instanceof Refit) {
-                ((Refit) part).addRefitKitParts(transitDays);
-            } else {
-                addPart(part, transitDays);
-            }
-            MekHQ.triggerEvent(new PartNewEvent(part));
-            return true;
-        }
-    }
-
-    public static Entity getBrandNewUndamagedEntity(String entityShortName) {
-        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(entityShortName);
-        if (mechSummary == null) {
-            return null;
-        }
-
-        MechFileParser mechFileParser = null;
-        try {
-            mechFileParser = new MechFileParser(mechSummary.getSourceFile());
-        } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().error(Campaign.class, "getBrandNewUndamagedEntity(String)", ex);
-        }
-        if (mechFileParser == null) {
-            return null;
-        }
-
-        return mechFileParser.getEntity();
-    }
 
     public CampaignOptions getCampaignOptions() {
         return campaignOptions;
@@ -4427,7 +4075,6 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colorIndex", colorIndex);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastPartId", lastPartId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastForceId", lastForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastMissionId", lastMissionId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastScenarioId", lastScenarioId);
@@ -4491,7 +4138,7 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "specialAbilities");
         rskillPrefs.writeToXml(pw1, indent);
         // parts is the biggest so it goes last
-        writeMapToXml(pw1, indent, "parts", parts); // Parts
+        parts.writeToXml(pw1, indent, "parts"); // Parts
 
         writeGameOptions(pw1);
 
@@ -4722,36 +4369,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public Accountant getAccountant() {
         return new Accountant(this);
-    }
-
-    public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid) {
-        return getPartsNeedingServiceFor(uid, false);
-    }
-
-    public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid, boolean onlyNotBeingWorkedOn) {
-        if (null == uid) {
-            return new ArrayList<>();
-        }
-        Unit u = getHangar().getUnit(uid);
-        if (u != null) {
-            if (u.isSalvage() || !u.isRepairable()) {
-                return u.getSalvageableParts(onlyNotBeingWorkedOn);
-            } else {
-                return u.getPartsNeedingFixing(onlyNotBeingWorkedOn);
-            }
-        }
-        return new ArrayList<>();
-    }
-
-    public ArrayList<IAcquisitionWork> getAcquisitionsForUnit(UUID uid) {
-        if (null == uid) {
-            return new ArrayList<>();
-        }
-        Unit u = getHangar().getUnit(uid);
-        if (u != null) {
-            return u.getPartsNeeded();
-        }
-        return new ArrayList<>();
     }
 
     /**
@@ -5176,7 +4793,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void personUpdated(Person p) {
-        Unit u = getHangar().getUnit(p.getUnitId());
+        Unit u = p.getUnit();
         if (null != u) {
             u.resetPilotAndEntity();
         }
@@ -5190,8 +4807,7 @@ public class Campaign implements Serializable, ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "This unit is not currently available!");
         }
-        if (partWork.getTeamId() != null
-                && !partWork.getTeamId().equals(tech.getId())) {
+        if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "Already being worked on by another team");
         }
@@ -5921,120 +5537,6 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
-    /**
-     * Hires a full complement of personnel for a given unit.
-     * @param uid The unique identifier of the unit.
-     */
-    public void hirePersonnelFor(UUID uid) {
-        hirePersonnelFor(uid, false);
-    }
-
-    /**
-     * Hires or adds a full complement of personnel for a given unit.
-     * @param uid The unique identifier of the unit.
-     * @param isGM A value indicating whether or not this action is undertaken
-     *             by a GM and should bypass any costs associated.
-     */
-    public void hirePersonnelFor(UUID uid, boolean isGM) {
-        Unit unit = getHangar().getUnit(uid);
-        if (null == unit) {
-            return;
-        }
-
-        while (unit.canTakeMoreDrivers()) {
-            Person p = null;
-            if (unit.getEntity() instanceof LandAirMech) {
-                p = newPerson(Person.T_MECHWARRIOR, Person.T_AERO_PILOT);
-            } else if (unit.getEntity() instanceof Mech) {
-                p = newPerson(Person.T_MECHWARRIOR);
-            } else if (unit.getEntity() instanceof SmallCraft
-                    || unit.getEntity() instanceof Jumpship) {
-                p = newPerson(Person.T_SPACE_PILOT);
-            } else if (unit.getEntity() instanceof ConvFighter) {
-                p = newPerson(Person.T_CONV_PILOT);
-            } else if (unit.getEntity() instanceof Aero) {
-                p = newPerson(Person.T_AERO_PILOT);
-            } else if (unit.getEntity() instanceof Tank) {
-                switch (unit.getEntity().getMovementMode()) {
-                    case VTOL:
-                        p = newPerson(Person.T_VTOL_PILOT);
-                        break;
-                    case NAVAL:
-                    case HYDROFOIL:
-                    case SUBMARINE:
-                        p = newPerson(Person.T_NVEE_DRIVER);
-                        break;
-                    default:
-                        p = newPerson(Person.T_GVEE_DRIVER);
-                }
-            } else if (unit.getEntity() instanceof Protomech) {
-                p = newPerson(Person.T_PROTO_PILOT);
-            } else if (unit.getEntity() instanceof BattleArmor) {
-                p = newPerson(Person.T_BA);
-            } else if (unit.getEntity() instanceof Infantry) {
-                p = newPerson(Person.T_INFANTRY);
-            }
-            if (null == p) {
-                break;
-            }
-
-            if (!recruitPerson(p, isGM)) {
-                return;
-            }
-
-            if (unit.usesSoloPilot() || unit.usesSoldiers()) {
-                unit.addPilotOrSoldier(p);
-            } else {
-                unit.addDriver(p);
-            }
-        }
-
-        while (unit.canTakeMoreGunners()) {
-            Person p = null;
-            if (unit.getEntity() instanceof Tank) {
-                p = newPerson(Person.T_VEE_GUNNER);
-            } else if (unit.getEntity() instanceof SmallCraft
-                    || unit.getEntity() instanceof Jumpship) {
-                p = newPerson(Person.T_SPACE_GUNNER);
-            } else if (unit.getEntity() instanceof Mech) {
-                p = newPerson(Person.T_MECHWARRIOR);
-            }
-            if (!recruitPerson(p, isGM)) {
-                return;
-            }
-            unit.addGunner(p);
-        }
-        while (unit.canTakeMoreVesselCrew()) {
-            Person p = newPerson(unit.getEntity().isSupportVehicle() ? Person.T_VEHICLE_CREW : Person.T_SPACE_CREW);
-            if (!recruitPerson(p, isGM)) {
-                return;
-            }
-            unit.addVesselCrew(p);
-        }
-        if (unit.canTakeNavigator()) {
-            Person p = newPerson(Person.T_NAVIGATOR);
-            if (!recruitPerson(p, isGM)) {
-                return;
-            }
-            unit.setNavigator(p);
-        }
-        if (unit.canTakeTechOfficer()) {
-            Person p;
-            //For vehicle command console we will default to gunner
-            if (unit.getEntity() instanceof Tank) {
-                p = newPerson(Person.T_VEE_GUNNER);
-            } else {
-                p = newPerson(Person.T_MECHWARRIOR);
-            }
-            if (!recruitPerson(p, isGM)) {
-                return;
-            }
-            unit.setTechOfficer(p);
-        }
-        unit.resetPilotAndEntity();
-        unit.runDiagnostic(false);
-    }
-
     public String getUnitRatingText() {
         return getUnitRating().getUnitRating();
     }
@@ -6091,101 +5593,16 @@ public class Campaign implements Serializable, ITechManager {
         p.addLogEntry(entry);
     }
 
-    //region Portraits
-    private List<String> getPossibleRandomPortraits (List<String> existingPortraits, String subDir ) {
-        List<String> possiblePortraits = new ArrayList<>();
-        Iterator<String> categories = MHQStaticDirectoryManager.getPortraits().getCategoryNames();
-        while (categories.hasNext()) {
-            String category = categories.next();
-            if (category.endsWith(subDir)) {
-                Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
-                while (names.hasNext()) {
-                    String name = names.next();
-                    String location = category + ":" + name;
-                    if (existingPortraits.contains(location)) {
-                        continue;
-                    }
-                    possiblePortraits.add(location);
-                }
-            }
-        }
-        return possiblePortraits;
-    }
-
+    /**
+     * Assigns a random portrait to a {@link Person}.
+     * @param p The {@link Person} who should receive a randomized portrait.
+     */
     public void assignRandomPortraitFor(Person p) {
-        // first create a list of existing portrait strings, so we can check for
-        // duplicates
-        List<String> existingPortraits = new ArrayList<>();
-        for (Person existingPerson : this.getPersonnel()) {
-            existingPortraits.add(existingPerson.getPortraitCategory() + ":"
-                    + existingPerson.getPortraitFileName());
-        }
-
-        List<String> possiblePortraits;
-
-        // Will search for portraits in the /gender/primaryrole folder first,
-        // and if none are found then /gender/rolegroup, then /gender/combat or
-        // /gender/support, then in /gender.
-        String searchCat_Gender = "";
-        if (p.getGender().isFemale()) {
-            searchCat_Gender += "Female/";
-        } else {
-            searchCat_Gender += "Male/";
-        }
-        String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), true) + "/";
-        String searchCat_RoleGroup = "";
-        String searchCat_CombatSupport = "";
-        if (p.getPrimaryRole() == Person.T_ADMIN_COM
-                || p.getPrimaryRole() == Person.T_ADMIN_HR
-                || p.getPrimaryRole() == Person.T_ADMIN_LOG
-                || p.getPrimaryRole() == Person.T_ADMIN_TRA) {
-            searchCat_RoleGroup = "Admin/";
-        }
-        if (p.getPrimaryRole() == Person.T_MECHANIC
-                || p.getPrimaryRole() == Person.T_AERO_TECH
-                || p.getPrimaryRole() == Person.T_MECH_TECH
-                || p.getPrimaryRole() == Person.T_BA_TECH) {
-            searchCat_RoleGroup = "Tech/";
-        }
-        if (p.getPrimaryRole() == Person.T_MEDIC
-                || p.getPrimaryRole() == Person.T_DOCTOR) {
-            searchCat_RoleGroup = "Medical/";
-        }
-        if (p.getPrimaryRole() == Person.T_SPACE_CREW
-                || p.getPrimaryRole() == Person.T_SPACE_GUNNER
-                || p.getPrimaryRole() == Person.T_SPACE_PILOT
-                || p.getPrimaryRole() == Person.T_NAVIGATOR) {
-            searchCat_RoleGroup = "Vessel Crew/";
-        }
-
-        if (p.hasPrimarySupportRole(true)) {
-            searchCat_CombatSupport = "Support/";
-        } else {
-            searchCat_CombatSupport = "Combat/";
-        }
-
-        possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchCat_Gender + searchCat_Role);
-
-        if (possiblePortraits.isEmpty() && !searchCat_RoleGroup.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchCat_Gender + searchCat_RoleGroup);
-        }
-        if (possiblePortraits.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchCat_Gender + searchCat_CombatSupport);
-        }
-        if (possiblePortraits.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchCat_Gender);
-        }
-        if (!possiblePortraits.isEmpty()) {
-            String chosenPortrait = possiblePortraits.get(Compute.randomInt(possiblePortraits.size()));
-            String[] temp = chosenPortrait.split(":");
-            if (temp.length != 2) {
-                return;
-            }
-            p.setPortraitCategory(temp[0]);
-            p.setPortraitFileName(temp[1]);
+        AbstractIcon portrait = RandomPortraitGenerator.generate(getPersonnel(), p);
+        if (!portrait.isDefault()) {
+            p.setPortrait(portrait);
         }
     }
-    //endregion Portraits
 
     /**
      * Assigns a random origin to a {@link Person}.
@@ -6280,18 +5697,6 @@ public class Campaign implements Serializable, ITechManager {
         // TODO: still a lot of stuff to do here, but oh well
         entity.setOwner(player);
         entity.setGame(game);
-    }
-
-    public Part checkForExistingSparePart(Part part) {
-        for (Part spare : parts.values()) {
-            if (!spare.isSpare() || spare.getId() == part.getId()) {
-                continue;
-            }
-            if (part.isSamePartTypeAndStatus(spare)) {
-                return spare;
-            }
-        }
-        return null;
     }
 
     public void refreshNetworks() {
@@ -6882,8 +6287,8 @@ public class Campaign implements Serializable, ITechManager {
      * Returns our list of potential transport ships
      * @return
      */
-    public Set<UUID> getTransportShips() {
-        return transportShips;
+    public Set<Unit> getTransportShips() {
+        return Collections.unmodifiableSet(transportShips);
     }
 
     public void doMaintenance(Unit u) {
@@ -7235,9 +6640,9 @@ public class Campaign implements Serializable, ITechManager {
                                     // TODO : Fix this so we aren't using a hack that just assumes IS2
                                     p.setOriginalUnitTech(Person.TECH_IS2);
                                 }
-                                if ((null != p.getUnitId()) && (null != getHangar().getUnit(p.getUnitId()))
-                                        && ms.getName().equals(getHangar().getUnit(p.getUnitId()).getEntity().getShortNameRaw())) {
-                                    p.setOriginalUnitId(p.getUnitId());
+                                if ((null != p.getUnit())
+                                        && ms.getName().equals(p.getUnit().getEntity().getShortNameRaw())) {
+                                    p.setOriginalUnitId(p.getUnit().getId());
                                 }
                             }
                         }

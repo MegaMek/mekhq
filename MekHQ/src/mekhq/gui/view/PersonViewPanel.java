@@ -46,7 +46,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.FormerSpouse;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 
-import megamek.common.Crew;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -411,7 +410,6 @@ public class PersonViewPanel extends ScrollablePanel {
      *         error loading it.
      */
     public JPanel setPortrait() {
-
         JPanel pnlPortrait = new JPanel();
 
         // Panel portrait will include the person picture and the ribbons
@@ -419,36 +417,9 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlPortrait.setLayout(new GridBagLayout());
 
         JLabel lblPortrait = new JLabel();
-        lblPortrait.setName("lblPortrait"); // NOI18N
+        lblPortrait.setName("lblPortrait");
 
-        String category = person.getPortraitCategory();
-        String filename = person.getPortraitFileName();
-
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
-            category = ""; //$NON-NLS-1$
-        }
-
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
-            filename = "default.gif"; //$NON-NLS-1$
-        }
-
-        // Try to get the player's portrait file.
-        Image portrait;
-        try {
-            portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
-            if (null != portrait) {
-                portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
-            } else {
-                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", "default.gif");
-                if (null != portrait) {
-                    portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
-                }
-            }
-            lblPortrait.setIcon(new ImageIcon(portrait));
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-        }
+        lblPortrait.setIcon(person.getPortrait().getImageIcon(100));
 
         GridBagConstraints gbc_lblPortrait = new GridBagConstraints();
         gbc_lblPortrait.gridx = 0;
@@ -1292,14 +1263,10 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 lblEdgeAvail2.setName("lblEdgeAvail2");
                 lblEdgeAvail2.setText(Integer.toString(person.getCurrentEdge()));
-                gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
-                gridBagConstraints.gridy = firsty;
                 gridBagConstraints.gridwidth = 1;
                 gridBagConstraints.weightx = 1.0;
                 gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                gridBagConstraints.fill = GridBagConstraints.NONE;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlSkills.add(lblEdgeAvail2, gridBagConstraints);
             }
             firsty++;

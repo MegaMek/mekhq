@@ -19,7 +19,9 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -27,12 +29,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 /**
  * Storage for infantry weapon ammo. The AmmoType is a placeholder and distinguishes between
  * standard and inferno munitions, but does not distinguish the type of weapon.
  */
 public class InfantryAmmoStorage extends AmmoStorage {
+
+    private static final long serialVersionUID = 930316771091252049L;
 
     private InfantryWeapon weaponType;
 
@@ -41,8 +46,8 @@ public class InfantryAmmoStorage extends AmmoStorage {
         this(0, null, 0, null, null);
     }
 
-    public InfantryAmmoStorage(int tonnage, EquipmentType et, int shots,
-                               InfantryWeapon weaponType, Campaign c) {
+    public InfantryAmmoStorage(int tonnage, @Nullable AmmoType et, int shots,
+            @Nullable InfantryWeapon weaponType, @Nullable Campaign c) {
         super(tonnage, et, shots, c);
         this.weaponType = weaponType;
     }
@@ -56,6 +61,8 @@ public class InfantryAmmoStorage extends AmmoStorage {
             } else {
                 this.name = weaponType.getShortName() + " Ammo";
             }
+        } else {
+            MekHQ.getLogger().error("InfantryAmmoStorage does not have a weapon type!");
         }
     }
 
@@ -67,21 +74,20 @@ public class InfantryAmmoStorage extends AmmoStorage {
     }
 
     public InfantryAmmoStorage clone() {
-        InfantryAmmoStorage storage = new InfantryAmmoStorage(0, getType(), shots, weaponType, campaign);
+        InfantryAmmoStorage storage = new InfantryAmmoStorage(0, getType(), getShots(), getWeaponType(), getCampaign());
         storage.copyBaseData(this);
-        storage.munition = this.munition;
         return storage;
     }
 
 
     @Override
     public double getTonnage() {
-        return weaponType.getAmmoWeight() * getShots() / weaponType.getShots();
+        return getWeaponType().getAmmoWeight() * getShots() / getWeaponType().getShots();
     }
 
     @Override
     public Money getStickerPrice() {
-        return Money.of(weaponType.getAmmoCost() * (double) getShots() / weaponType.getShots());
+        return Money.of(getWeaponType().getAmmoCost() * (double) getShots() / getWeaponType().getShots());
     }
 
     @Override
@@ -92,8 +98,8 @@ public class InfantryAmmoStorage extends AmmoStorage {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof InfantryAmmoStorage)
-                && (getType() == ((InfantryAmmoStorage) part).getType())
-                && (getWeaponType() == ((InfantryAmmoStorage) part).getWeaponType());
+                && isSameAmmoType(getType(), ((InfantryAmmoStorage) part).getType())
+                && Objects.equals(getWeaponType(), ((InfantryAmmoStorage) part).getWeaponType());
     }
 
     @Override
@@ -116,7 +122,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return weaponType.getTechAdvancement();
+        return getWeaponType().getTechAdvancement();
     }
 
     /**
@@ -124,34 +130,34 @@ public class InfantryAmmoStorage extends AmmoStorage {
      * Useful as a predicate for campaign.findSparePart()
      */
     public static boolean isRightAmmo(Part part, AmmoType curType, WeaponType weaponType) {
-        return part instanceof InfantryAmmoStorage
+        return (part instanceof InfantryAmmoStorage)
                 && part.isPresent()
-                && (((InfantryAmmoStorage) part).getType()).equals(curType)
-                && curType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType()
+                && isSameAmmoType(curType, ((InfantryAmmoStorage) part).getType())
                 && (((InfantryAmmoStorage) part).getWeaponType()).equals(weaponType);
     }
 
     public void changeAmountAvailable(int amount, final AmmoType curType) {
-        InfantryAmmoStorage a = (InfantryAmmoStorage) campaign.findSparePart(part ->
-                isRightAmmo(part, curType, weaponType));
+        InfantryAmmoStorage a = (InfantryAmmoStorage) campaign.getWarehouse().findSparePart(part ->
+                isRightAmmo(part, curType, getWeaponType()));
 
         if (null != a) {
             a.changeShots(amount);
             if (a.getShots() <= 0) {
-                campaign.removePart(a);
+                campaign.getWarehouse().removePart(a);
             }
         } else if (amount > 0) {
-            campaign.addPart(new InfantryAmmoStorage(1, curType, amount, weaponType, campaign), 0);
+            campaign.getQuartermaster().addPart(new InfantryAmmoStorage(1, curType, amount, getWeaponType(), campaign), 0);
         }
     }
 
     @Override
     public String getAcquisitionExtraDesc() {
-        return weaponType.getShots() + " shots (1 clip)";
+        return getWeaponType().getShots() + " shots (1 clip)";
     }
 
-    public Part getNewPart() {
-        return new InfantryAmmoStorage(1, type, weaponType.getShots(),
-                weaponType, campaign);
+    @Override
+    public InfantryAmmoStorage getNewPart() {
+        return new InfantryAmmoStorage(1, getType(), getWeaponType().getShots(),
+                getWeaponType(), campaign);
     }
 }

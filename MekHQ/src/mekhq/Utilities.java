@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq;
 
@@ -64,6 +64,7 @@ import javax.swing.table.TableModel;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.enums.Gender;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
@@ -979,9 +980,8 @@ public class Utilities {
             }
 
             // Only created crew can be assigned a portrait, so this is safe to put in here
-            if (!Crew.PORTRAIT_NONE.equals(oldCrew.getPortraitFileName(crewIndex))) {
-                p.setPortraitCategory(oldCrew.getPortraitCategory(crewIndex));
-                p.setPortraitFileName(oldCrew.getPortraitFileName(crewIndex));
+            if (!AbstractIcon.DEFAULT_ICON_FILENAME.equals(oldCrew.getPortraitFileName(crewIndex))) {
+                p.setPortrait(oldCrew.getPortrait(crewIndex));
             }
         }
     }
@@ -1078,11 +1078,19 @@ public class Utilities {
     }
 
     public static Money[] readMoneyArray(Node node) {
+        return readMoneyArray(node, 0);
+    }
+
+    public static Money[] readMoneyArray(Node node, int minimumSize) {
         String[] values = node.getTextContent().split(",");
-        Money[] result = new Money[values.length];
+        Money[] result = new Money[Math.max(values.length, minimumSize)];
 
         for (int i = 0; i < values.length; i++) {
             result[i] = Money.fromXmlString(values[i]);
+        }
+
+        for (int i = values.length; i < result.length; i++) {
+            result[i] = Money.zero();
         }
 
         return result;
@@ -1195,7 +1203,7 @@ public class Utilities {
                                 bin.updateConditionFromPart();
                                 // Unload bin before munition change
                                 bin.unload();
-                                bin.changeMunition(m.getType());
+                                bin.changeMunition((AmmoType) m.getType());
                                 found = true;
                                 break;
                             }
@@ -1388,8 +1396,8 @@ public class Utilities {
             csvPrinter.close();
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
-        } catch(Exception ioe) {
-            MekHQ.getLogger().error(Utilities.class, "Error exporting JTable");
+        } catch (Exception ioe) {
+            MekHQ.getLogger().error("Error exporting JTable", ioe);
             report = "Error exporting JTable. See log for details.";
         }
         return report;

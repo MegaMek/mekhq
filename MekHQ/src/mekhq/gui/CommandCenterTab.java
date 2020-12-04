@@ -22,10 +22,10 @@ import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.MechSummaryCache;
 import megamek.common.event.Subscribe;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.event.*;
 import mekhq.campaign.report.*;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
@@ -444,17 +444,18 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * set the icon for the unit if it exits in the icon panel
      */
     public void setIcon() {
+        // TODO : AbstractIcon : Swap me over
         lblIcon.setIcon(null);
 
         String category = getCampaign().getIconCategory();
         String filename = getCampaign().getIconFileName();
 
-        if (Campaign.ROOT_ICON.equals(category)) {
+        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
             category = "";
         }
 
         // Return a null if the player has selected no icon file.
-        if ((null != category) && (null != filename) && !Campaign.ICON_NONE.equals(filename)) {
+        if ((null != category) && (null != filename) && !AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
             // Try to get the icon file.
             Image icon;
             try {

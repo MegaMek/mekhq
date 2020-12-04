@@ -70,7 +70,7 @@ public class MissingBayDoor extends MissingPart {
         if(null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
-            campaign.addPart(actualReplacement, 0);
+            campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             remove(false);
             if (null != parentPart) {

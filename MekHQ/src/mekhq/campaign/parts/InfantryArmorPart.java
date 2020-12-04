@@ -142,16 +142,16 @@ public class InfantryArmorPart extends Part {
     @Override
     public void remove(boolean salvage) {
         if(null != unit) {
-            Part spare = campaign.checkForExistingSparePart(this);
+            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 int number = quantity;
                 while(number > 0) {
                     spare.incrementQuantity();
                     number--;
                 }
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
         }

@@ -305,7 +305,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupPartList() {
         partList = new JList<>();
         DefaultListModel<Part> partListModel = new DefaultListModel<>();
-        List<Part> parts = sourceCampaign.getSpareParts();
+        List<Part> parts = sourceCampaign.getWarehouse().getSpareParts();
         parts.sort(Comparator.comparing(Part::getName));
 
         for (Part part : parts) {
@@ -414,10 +414,8 @@ public class CampaignExportWizard extends JDialog {
         }
 
         for (Person person : personList.getSelectedValuesList()) {
-            if (person.getUnitId() != null) {
-                Unit unit = sourceCampaign.getUnit(person.getUnitId());
-
-                unitList.setSelectedValue(unit, false);
+            if (person.getUnit() != null) {
+                unitList.setSelectedValue(person.getUnit(), false);
                 selectedIndices.add(unitList.getSelectedIndex());
             }
         }
@@ -528,10 +526,9 @@ public class CampaignExportWizard extends JDialog {
             destinationCampaign.importUnit(unit);
 
             // Reset any transport assignments, as the export may not contain all transports and cargo units
-            if (unit.hasTransportShipId()) {
-                unit.getTransportShipId().clear();
-            }
-            if (!unit.getTransportedUnits().isEmpty()) {
+            unit.setTransportShipAssignment(null);
+
+            if (unit.hasTransportedUnits()) {
                 unit.unloadTransportShip();
             }
 
@@ -567,19 +564,19 @@ public class CampaignExportWizard extends JDialog {
             newPart.setCampaign(destinationCampaign);
             if (newPart instanceof AmmoStorage) {
                 ((AmmoStorage) newPart).setShots(partCount.count);
-                destinationCampaign.addPart(newPart, 0);
+                destinationCampaign.getQuartermaster().addPart(newPart, 0);
             } else if (newPart instanceof Armor) {
                 ((Armor) newPart).setAmount(partCount.count);
-                destinationCampaign.addPart(newPart, 0);
+                destinationCampaign.getQuartermaster().addPart(newPart, 0);
             } else {
                 // a work-around due to weirdness in "checkForExistingSparePart" -
                 // it comes back as null if the part we're looking for is there but has the same ID,
                 // which is likely to happen when exporting to a brand new campaign
                 newPart.setId(-1);
-                Part existingPart = destinationCampaign.checkForExistingSparePart(newPart);
+                Part existingPart = destinationCampaign.getWarehouse().checkForExistingSparePart(newPart);
                 if (existingPart == null) {
                     // addpart doesn't allow adding multiple parts, so we update it afterwards
-                    destinationCampaign.addPart(newPart, 0);
+                    destinationCampaign.getQuartermaster().addPart(newPart, 0);
                     newPart.setQuantity(partCount.count);
                 } else {
                     existingPart.setQuantity(existingPart.getQuantity() + partCount.count);
@@ -615,20 +612,20 @@ public class CampaignExportWizard extends JDialog {
                     sourceAmmo.changeShots(-partCount.count);
 
                     if (sourceAmmo.getShots() <= 0) {
-                        sourceCampaign.removePart(partCount.part);
+                        sourceCampaign.getWarehouse().removePart(partCount.part);
                     }
                 } else if (partCount.part instanceof Armor) {
                     Armor sourceArmor = (Armor) partCount.part;
                     sourceArmor.setAmount(sourceArmor.getAmount() - partCount.count);
 
                     if (sourceArmor.getAmount() <= 0) {
-                        sourceCampaign.removePart(partCount.part);
+                        sourceCampaign.getWarehouse().removePart(partCount.part);
                     }
                 } else {
                     partCount.part.setQuantity(partCount.part.getQuantity() - partCount.count);
 
                     if (partCount.part.getQuantity() <= 0) {
-                        sourceCampaign.removePart(partCount.part);
+                        sourceCampaign.getWarehouse().removePart(partCount.part);
                     }
                 }
             }

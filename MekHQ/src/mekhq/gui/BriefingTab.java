@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2020 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -436,7 +436,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     private void deleteMission() {
         Mission mission = getCampaign().getMission(selectedMission);
-        MekHQ.getLogger().debug(this, "Attempting to Delete Mission, Mission ID: " + mission.getId());
+        MekHQ.getLogger().debug("Attempting to Delete Mission, Mission ID: " + mission.getId());
         if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this mission?", "Delete mission?",
                 JOptionPane.YES_NO_OPTION)) {
             return;
@@ -831,9 +831,9 @@ public final class BriefingTab extends CampaignGuiTab {
         selectedScenario = scenario.getId();
         if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
             scrollScenarioView.setViewportView(
-                    new AtBScenarioViewPanel((AtBScenario) scenario, getCampaign(), getIconPackage(), getFrame()));
+                    new AtBScenarioViewPanel((AtBScenario) scenario, getCampaign(), getFrame()));
         } else {
-            scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, getCampaign(), getIconPackage()));
+            scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, getCampaign()));
         }
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere

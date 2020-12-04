@@ -22,8 +22,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-import java.util.LinkedHashMap;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -34,7 +32,6 @@ import javax.swing.border.LineBorder;
 
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.PlayerColors;
-import megamek.common.Crew;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
@@ -157,74 +154,16 @@ public class BasicInfo extends JPanel {
     }
 
     protected void setPortrait(Person p) {
-        String category = p.getPortraitCategory();
-        String filename = p.getPortraitFileName();
-
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename)) {
-            return;
-        }
-
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
-            category = "";
-        }
-
-        if (Crew.PORTRAIT_NONE.equals(filename)) {
-            filename = "default.gif";
-        }
-
-        // Try to get the player's portrait file.
-        Image portrait;
-        try {
-            portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
-            if (null == portrait) {
-                // the image could not be found so switch to default one
-                p.setPortraitCategoryOverride(Crew.ROOT_PORTRAIT);
-                category = "";
-                p.setPortraitFileNameOverride(Crew.PORTRAIT_NONE);
-                filename = "default.gif";
-                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
-            }
-            // make sure no images are longer than 72 pixels
-            if (null != portrait) {
-                portrait = portrait.getScaledInstance(-1, 58, Image.SCALE_SMOOTH);
-                setImage(portrait);
-            }
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-        }
+        setImage(p.getPortrait().getImage(54));
     }
 
     protected Image getImageFor(Force force) {
-        String category = force.getIconCategory();
-        String filename = force.getIconFileName();
-        LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
-
-        if (Crew.ROOT_PORTRAIT.equals(category)) {
-            category = "";
-        }
-
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename)
-                || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
-            filename = "empty.png";
-        }
-
-        // Try to get the player's portrait file.
-        Image portrait;
         try {
-            portrait = MHQStaticDirectoryManager.buildForceIcon(category, filename, iconMap);
-            if (null != portrait) {
-                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-            } else {
-                portrait = (Image) MHQStaticDirectoryManager.getForceIcons().getItem("", "empty.png");
-                if (null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-                }
-            }
-            return portrait;
+            return MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
+                    force.getIconFileName(), force.getIconMap())
+                    .getScaledInstance(54, -1, Image.SCALE_SMOOTH);
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            MekHQ.getLogger().error("Failed to build force icon", e);
             return null;
         }
     }

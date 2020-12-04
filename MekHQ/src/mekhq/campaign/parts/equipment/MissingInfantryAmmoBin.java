@@ -19,10 +19,13 @@
 
 package mekhq.campaign.parts.equipment;
 
+import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
+import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
@@ -54,8 +57,8 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
      * @param omniPodded  Whether the weapon is pod-mounted on an omnivehicle
      * @param c           The campaign instance
      */
-    public MissingInfantryAmmoBin(int tonnage, EquipmentType ammoType, int equipNum, InfantryWeapon weaponType,
-                                  double size, boolean omniPodded, Campaign c) {
+    public MissingInfantryAmmoBin(int tonnage, @Nullable AmmoType ammoType, int equipNum,
+            @Nullable InfantryWeapon weaponType, double size, boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, ammoType, equipNum, false, omniPodded, c);
         this.weaponType = weaponType;
         this.size = size;
@@ -67,10 +70,14 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
     @Override
     public void restore() {
         super.restore();
-        name = weaponType.getName() + " Ammo Bin";
+        if (getWeaponType() != null) {
+            name = getWeaponType().getName() + " Ammo Bin";
+        } else {
+            MekHQ.getLogger().error("MissingInfantryAmmoBin does not have a weapon type!");
+        }
     }
 
-    public InfantryWeapon getWeaponType() {
+    public @Nullable InfantryWeapon getWeaponType() {
         return weaponType;
     }
 
@@ -110,7 +117,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         if (part instanceof InfantryAmmoBin) {
             InfantryAmmoBin bin = (InfantryAmmoBin) part;
-            return type.equals(bin.getType()) && weaponType.equals(bin.getWeaponType())
+            return getType().equals(bin.getType()) && getWeaponType().equals(bin.getWeaponType())
                     && (bin.getFullShots() == getFullShots());
         }
         return false;
@@ -118,18 +125,18 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
 
     @Override
     protected int getFullShots() {
-        return weaponType.getShots() * (int) size;
+        return getWeaponType().getShots() * (int) size;
     }
 
     @Override
     public Part getNewPart() {
-        return new InfantryAmmoBin(getUnitTonnage(), type, -1, getFullShots(),
-                weaponType, size, omniPodded, campaign);
+        return new InfantryAmmoBin(getUnitTonnage(), getType(), -1, getFullShots(),
+                getWeaponType(), size, omniPodded, campaign);
     }
 
     @Override
     public void writeToXmlEnd(PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "weaponType", weaponType.getInternalName());
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "weaponType", getWeaponType().getInternalName());
         super.writeToXmlEnd(pw, indent);
     }
 

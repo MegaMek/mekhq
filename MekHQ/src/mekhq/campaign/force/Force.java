@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.Vector;
 
+import megamek.common.icons.AbstractIcon;
 import mekhq.gui.enums.LayeredForceIcon;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -58,12 +59,10 @@ public class Force implements Serializable {
     private static final long serialVersionUID = -3018542172119419401L;
 
     // pathway to force icon
-    public static final String ROOT_ICON = "-- General --";
     public static final String ROOT_LAYERED = "Layered";
-    public static final String ICON_NONE = "None";
     public static final int FORCE_NONE = -1;
     private String iconCategory = ROOT_LAYERED;
-    private String iconFileName = ICON_NONE;
+    private String iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
     private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
 
     private String name;
