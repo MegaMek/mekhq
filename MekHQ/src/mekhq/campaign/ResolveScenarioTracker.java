@@ -1572,6 +1572,9 @@ public class ResolveScenarioTracker {
                 getCampaign().addReport(unitRansoms.toAmountAndNameString()
                         + " has been credited to your account from unit ransoms following "
                         + getScenario().getName() + ".");
+                if (isContract) {
+                    ((Contract) mission).addSalvageByUnit(unitRansoms);
+                }
             }
         }
 
