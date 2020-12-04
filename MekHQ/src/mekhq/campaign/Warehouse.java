@@ -150,6 +150,8 @@ public class Warehouse {
         if (didRemove) {
             // Remove child parts as well
             for (Part childPart : part.getChildParts()) {
+                part.removeChildPart(childPart);
+
                 removePart(childPart);
             }
         }
