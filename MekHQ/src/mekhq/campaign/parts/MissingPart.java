@@ -152,6 +152,10 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             unit.removePart(this);
         }
         setUnit(null);
+
+        // Grab a reference to our parent part so that we don't accidentally NRE
+        // when we remove the parent part reference.
+        Part parentPart = getParentPart();
         if (null != parentPart) {
             parentPart.removeChildPart(this);
         }
