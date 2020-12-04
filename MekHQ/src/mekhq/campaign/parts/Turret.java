@@ -137,15 +137,15 @@ public class Turret extends TankLocation {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if(!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
             ((Tank)unit.getEntity()).unlockTurret();
         }
         setUnit(null);

@@ -27,6 +27,7 @@ import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
@@ -47,13 +48,18 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         this(0, null, -1, false, false, null);
     }
 
-    public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot,
-                          boolean omniPodded, Campaign c) {
+    public MissingAmmoBin(int tonnage, @Nullable AmmoType et, int equipNum, boolean singleShot,
+                          boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, et, equipNum, c, 1.0, 1.0, omniPodded);
         this.oneShot = singleShot;
         if (null != name) {
             this.name += " Bin";
         }
+    }
+
+    @Override
+    public AmmoType getType() {
+        return (AmmoType) super.getType();
     }
 
     /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
@@ -87,7 +93,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         if (null != replacement) {
             Part actualReplacement = getActualReplacement((AmmoBin) replacement);
             unit.addPart(actualReplacement);
-            campaign.addPart(actualReplacement, 0);
+            campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             ((EquipmentPart) actualReplacement).setEquipmentNum(equipmentNum);
             remove(false);
@@ -108,11 +114,10 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if ((part instanceof AmmoBin)
-                && !(part instanceof LargeCraftAmmoBin)) {
+        if ((part instanceof AmmoBin) && !(part instanceof LargeCraftAmmoBin)) {
             EquipmentPart eqpart = (EquipmentPart) part;
             EquipmentType et = eqpart.getType();
-            return type.equals(et) && ((AmmoBin) part).getFullShots() == getFullShots();
+            return getType().equals(et) && (((AmmoBin) part).getFullShots() == getFullShots());
         }
         return false;
     }
@@ -122,16 +127,12 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     protected int getFullShots() {
-        int fullShots = ((AmmoType) type).getShots();
-        if (oneShot) {
-            fullShots = 1;
-        }
-        return fullShots;
+        return oneShot ? 1 : getType().getShots();
     }
 
     @Override
     public Part getNewPart() {
-        return new AmmoBin(getUnitTonnage(), type, -1, getFullShots(), oneShot, omniPodded, campaign);
+        return new AmmoBin(getUnitTonnage(), getType(), -1, getFullShots(), oneShot, omniPodded, campaign);
     }
 
     @Override

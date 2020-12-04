@@ -87,6 +87,7 @@ public class ProtomekArmActuator extends Part {
                 && getUnitTonnage() == part.getUnitTonnage();
     }
 
+    @Override
     public int getLocation() {
         return location;
     }
@@ -144,15 +145,15 @@ public class ProtomekArmActuator extends Part {
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location, h);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
-                campaign.removePart(this);
-            } else if(null != spare) {
+                campaign.getWarehouse().removePart(this);
+            } else if (null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);

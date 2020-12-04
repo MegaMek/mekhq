@@ -129,6 +129,7 @@ public class MissingMekLocation extends MissingPart {
         return 3;
     }
 
+    @Override
     public double getTonnage() {
         //TODO: how much should this weigh?
         return 0;
@@ -255,14 +256,13 @@ public class MissingMekLocation extends MissingPart {
     @Override
     public Part getNewPart() {
        /* int cockpitType = -1;
-        if(null != unit) {
-            cockpitType = ((Mech)unit.getEntity()).getCockpitType();
+        if (null != unit) {
+            cockpitType = ((Mech) unit.getEntity()).getCockpitType();
         }*/
         boolean lifeSupport = (loc == Mech.LOC_HEAD);
         boolean sensors = (loc == Mech.LOC_HEAD);
-        Part nPart = new MekLocation(loc, getUnitTonnage(), structureType, clan,
+        return new MekLocation(loc, getUnitTonnage(), structureType, clan,
                 tsm, forQuad, sensors, lifeSupport, campaign);
-        return nPart;
     }
 
     @Override
@@ -278,13 +278,13 @@ public class MissingMekLocation extends MissingPart {
         if (null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
-            campaign.addPart(actualReplacement, 0);
+            campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             //TODO: if this is a mech head, check to see if it had components
-            if(loc == Mech.LOC_HEAD && actualReplacement instanceof MekLocation) {
-                updateHeadComponents((MekLocation)actualReplacement);
-                ((MekLocation)actualReplacement).setSensors(false);
-                ((MekLocation)actualReplacement).setLifeSupport(false);
+            if ((loc == Mech.LOC_HEAD) && (actualReplacement instanceof MekLocation)) {
+                updateHeadComponents((MekLocation) actualReplacement);
+                ((MekLocation) actualReplacement).setSensors(false);
+                ((MekLocation) actualReplacement).setLifeSupport(false);
             }
             //fix shoulders and hips
             if (loc == Mech.LOC_RARM || loc == Mech.LOC_LARM) {
@@ -311,29 +311,29 @@ public class MissingMekLocation extends MissingPart {
             if (null == missingLifeSupport && p instanceof MissingMekLifeSupport) {
                 missingLifeSupport = (MissingMekLifeSupport) p;
             }
-            if (null != missingSensor && null != missingLifeSupport) {
+            if ((null != missingSensor) && (null != missingLifeSupport)) {
                 break;
             }
         }
         Part newPart;
-        if (part.hasSensors() && null != missingSensor) {
+        if(part.hasSensors() && null != missingSensor) {
             newPart = missingSensor.getNewPart();
             unit.addPart(newPart);
-            campaign.addPart(newPart, 0);
+            campaign.getQuartermaster().addPart(newPart, 0);
             missingSensor.remove(false);
             newPart.updateConditionFromPart();
         }
-        /*if(part.hasCockpit() && null != missingCockpit) {
+        /*if (part.hasCockpit() && null != missingCockpit) {
             newPart = missingCockpit.getNewPart();
             unit.addPart(newPart);
-            campaign.addPart(newPart);
+            campaign.getQuartermaster().addPart(newPart);
             missingCockpit.remove(false);
             newPart.updateConditionFromPart();
         }*/
         if (part.hasLifeSupport() && null != missingLifeSupport) {
             newPart = missingLifeSupport.getNewPart();
             unit.addPart(newPart);
-            campaign.addPart(newPart, 0);
+            campaign.getQuartermaster().addPart(newPart, 0);
             missingLifeSupport.remove(false);
             newPart.updateConditionFromPart();
         }

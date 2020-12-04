@@ -122,13 +122,13 @@ public class MekLocation extends Part {
             break;
         case(Mech.LOC_LARM):
             this.name = "Mech Left Arm";
-            if(forQuad) {
+            if (forQuad) {
                 this.name = "Mech Front Left Leg";
             }
             break;
         case(Mech.LOC_RARM):
             this.name = "Mech Right Arm";
-            if(forQuad) {
+            if (forQuad) {
                 this.name = "Mech Front Right Leg";
             }
             break;
@@ -345,10 +345,10 @@ public class MekLocation extends Part {
             unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             //if this is a head. check for life support and sensors
             if (loc == Mech.LOC_HEAD) {
@@ -358,7 +358,7 @@ public class MekLocation extends Part {
             if (loc != Mech.LOC_CT) {
                 Part missing = getMissingPart();
                 unit.addPart(missing);
-                campaign.addPart(missing, 0);
+                campaign.getQuartermaster().addPart(missing, 0);
             }
         }
         setUnit(null);

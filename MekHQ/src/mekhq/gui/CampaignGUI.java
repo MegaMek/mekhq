@@ -2639,10 +2639,6 @@ public class CampaignGUI extends JPanel {
         return frame;
     }
 
-    public CampaignGUI getCampaignGUI() {
-        return this;
-    }
-
     public int getTabIndexByName(String tabTitle) {
         int retVal = -1;
         for (int i = 0; i < tabMain.getTabCount(); i++) {

@@ -71,10 +71,11 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                                 .getAcquisition(row);
                         Object equipment = acquisition.getNewEquipment();
                         if (equipment instanceof Part) {
-                            if (gui.getCampaign().buyPart(
-                                    (Part) equipment,
-                                    gui.getCampaign().calculatePartTransitTime(
-                                            0))) {
+                            if (gui.getCampaign()
+                                    .getQuartermaster()
+                                    .buyPart(
+                                            (Part) equipment,
+                                            gui.getCampaign().calculatePartTransitTime(0))) {
                                 gui.getCampaign()
                                         .addReport(
                                                 "<font color='Green'><b>"
@@ -91,10 +92,11 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                                                         + "</b></font>");
                             }
                         } else if (equipment instanceof Entity) {
-                            if (gui.getCampaign().buyUnit(
-                                    (Entity) equipment,
-                                    gui.getCampaign().calculatePartTransitTime(
-                                            0))) {
+                            if (gui.getCampaign()
+                                    .getQuartermaster()
+                                    .buyUnit(
+                                            (Entity) equipment,
+                                            gui.getCampaign().calculatePartTransitTime(0))) {
                                 gui.getCampaign()
                                         .addReport(
                                                 "<font color='Green'><b>"
@@ -123,6 +125,7 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                                     .getNewEquipment();
                             if (equipment instanceof Part) {
                                 if (gui.getCampaign()
+                                        .getQuartermaster()
                                         .buyPart(
                                                 (Part) equipment,
                                                 gui.getCampaign()
@@ -145,6 +148,7 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                                 }
                             } else if (equipment instanceof Entity) {
                                 if (gui.getCampaign()
+                                        .getQuartermaster()
                                         .buyUnit(
                                                 (Entity) equipment,
                                                 gui.getCampaign()
@@ -188,6 +192,7 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                                     .getNewEquipment();
                             if (equipment instanceof Part) {
                                 if (gui.getCampaign()
+                                        .getQuartermaster()
                                         .buyPart(
                                                 (Part) equipment,
                                                 gui.getCampaign()
@@ -211,6 +216,7 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                                 }
                             } else if (equipment instanceof Entity) {
                                 if (gui.getCampaign()
+                                        .getQuartermaster()
                                         .buyUnit(
                                                 (Entity) equipment,
                                                 gui.getCampaign()
@@ -249,6 +255,7 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                                         .getNewEquipment();
                                 if (equipment instanceof Part) {
                                     if (gui.getCampaign()
+                                            .getQuartermaster()
                                             .buyPart(
                                                     (Part) equipment,
                                                     gui.getCampaign()
@@ -272,6 +279,7 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                                     }
                                 } else if (equipment instanceof Entity) {
                                     if (gui.getCampaign()
+                                            .getQuartermaster()
                                             .buyUnit(
                                                     (Entity) equipment,
                                                     gui.getCampaign()

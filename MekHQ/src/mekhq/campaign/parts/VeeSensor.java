@@ -73,7 +73,7 @@ public class VeeSensor extends Part {
     @Override
     public void fix() {
         super.fix();
-        if (null != unit && unit.getEntity() instanceof Tank) {
+        if ((null != unit) && (unit.getEntity() instanceof Tank)) {
             ((Tank) unit.getEntity()).setSensorHits(0);
         }
     }
@@ -89,15 +89,15 @@ public class VeeSensor extends Part {
             ((Tank) unit.getEntity()).setSensorHits(4);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -105,12 +105,11 @@ public class VeeSensor extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if (null != unit && unit.getEntity() instanceof Tank) {
+        if ((null != unit) && (unit.getEntity() instanceof Tank)) {
             int priorHits = hits;
             hits = ((Tank) unit.getEntity()).getSensorHits();
-            if (checkForDestruction
-                    && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+            if (checkForDestruction && (hits > priorHits)
+                    && (Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget())) {
                 remove(false);
             }
         }
@@ -118,10 +117,7 @@ public class VeeSensor extends Part {
 
     @Override
     public int getBaseTime() {
-        if (isSalvaging()) {
-            return 260;
-        }
-        return 75;
+        return isSalvaging() ? 260 : 75;
     }
 
     @Override
@@ -136,7 +132,7 @@ public class VeeSensor extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if (null != unit && unit.getEntity() instanceof Tank) {
+        if ((null != unit) && (unit.getEntity() instanceof Tank)) {
             ((Tank) unit.getEntity()).setSensorHits(hits);
         }
     }
@@ -148,13 +144,11 @@ public class VeeSensor extends Part {
 
     @Override
     public double getTonnage() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public Money getStickerPrice() {
-        // TODO Auto-generated method stub
         return Money.zero();
     }
 
@@ -165,7 +159,6 @@ public class VeeSensor extends Part {
 
     @Override
     public String getLocationName() {
-        // TODO Auto-generated method stub
         return null;
     }
 

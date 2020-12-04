@@ -72,7 +72,8 @@ public class Ranks {
     public static final int RS_OA		= 16;
     public static final int RS_FRR		= 17;
     public static final int RS_ARC      = 18;
-    public static final int RS_NUM		= 19;
+    public static final int RS_FSL  = 19;
+    public static final int RS_NUM		= 20;
 
     public static final int[] translateFactions = { /* 0 */ 0, /* 1 */ 1, /* 2 */ 4, /* 3 */ 5, /* 4 */ 6, /* 5 */ 8, /* 6 */ 9, /* 7 */ 12 };
 
@@ -190,7 +191,7 @@ public class Ranks {
             case RS_CUSTOM:
                 return "Custom";
             case RS_SL:
-                return "Star League";
+                return "Second Star League";
             case RS_FS:
                 return "Federated Suns";
             case RS_FC:
@@ -225,6 +226,8 @@ public class Ranks {
                 return "Free Rasalhague Republic";
             case RS_ARC:
                 return "Aurigan Coalition";
+            case RS_FSL:
+                return "First Star League";
             default:
                 return "?";
         }

@@ -34,7 +34,6 @@ import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooser;
 import megamek.client.ui.swing.dialog.imageChooser.PortraitChooser;
 import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.*;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
@@ -255,7 +254,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     gui.getCampaign().personUpdated(person);
                     if (gui.getCampaign().getCampaignOptions().usePortraitForType(role)
                             && gui.getCampaign().getCampaignOptions().getAssignPortraitOnRoleChange()
-                            && AbstractIcon.DEFAULT_ICON_FILENAME.equals(person.getPortraitFileName())) {
+                            && person.getPortrait().hasDefaultFilename()) {
                         gui.getCampaign().assignRandomPortraitFor(person);
                     }
                 }

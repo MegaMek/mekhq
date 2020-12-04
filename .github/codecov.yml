@@ -1,0 +1,10 @@
+#
+# CodeCov.io Configuration
+# https://docs.codecov.io/docs/codecovyml-reference
+#
+
+#
+# https://docs.codecov.io/docs/fixing-paths
+#
+fixes:
+  - "mekhq/::"        # reduce root e.g., "before/path/" => "path/"

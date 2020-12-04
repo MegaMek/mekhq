@@ -1203,7 +1203,7 @@ public class Utilities {
                                 bin.updateConditionFromPart();
                                 // Unload bin before munition change
                                 bin.unload();
-                                bin.changeMunition(m.getType());
+                                bin.changeMunition((AmmoType) m.getType());
                                 found = true;
                                 break;
                             }

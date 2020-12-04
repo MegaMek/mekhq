@@ -175,9 +175,9 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             Image camo;
             if ((selectedEntity.getCamoCategory() != null)
                     && !Camouflage.NO_CAMOUFLAGE.equals(selectedEntity.getCamoCategory())) {
-                camo = MHQStaticDirectoryManager.getEntityCamoImage(selectedEntity);
+                camo = selectedEntity.getCamouflage().getImage();
             } else {
-                camo = MHQStaticDirectoryManager.getCamoImage(campaign.getCamoCategory(), campaign.getCamoFileName());
+                camo = campaign.getCamouflage().getImage();
             }
 
             // This seems unnecessary as the CamoManager will return an image for a playercolor

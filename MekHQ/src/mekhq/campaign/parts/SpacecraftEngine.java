@@ -43,10 +43,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
-<<<<<<< HEAD
-=======
- *
->>>>>>> upstream/master
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SpacecraftEngine extends Part {
@@ -195,15 +191,15 @@ public class SpacecraftEngine extends Part {
 
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
                 spare.incrementQuantity();
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -220,10 +216,8 @@ public class SpacecraftEngine extends Part {
             }
             if (engineHits >= engineCrits) {
                 remove(false);
-            } else if (engineHits > 0) {
-                hits = engineHits;
             } else {
-                hits = 0;
+                hits = Math.max(engineHits, 0);
             }
         }
     }
@@ -251,7 +245,7 @@ public class SpacecraftEngine extends Part {
             time = 300;
             //Light Damage
             if (hits > 0 && hits < 3) {
-                time *= (1 * hits);
+                time *= hits;
             //Moderate damage
             } else if (hits > 2 && hits < 5) {
                 time *= (2 * hits);

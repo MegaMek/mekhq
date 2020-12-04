@@ -156,6 +156,40 @@ public class Warehouse {
     }
 
     /**
+     * Removes one or more parts from the warehouse.
+     * @param part The part to remove.
+     * @param quantity The amount of the part to remove.
+     * @return A value indicating whether or not the part was removed.
+     */
+    public boolean removePart(Part part, int quantity) {
+        Objects.requireNonNull(part);
+
+        // Only allow removing spare parts.
+        if (!part.isSpare()) {
+            return false;
+        }
+
+        if (part instanceof AmmoStorage) {
+            return removeAmmo((AmmoStorage) part, quantity);
+        } else if (part instanceof Armor) {
+            return removeArmor((Armor) part, quantity);
+        }
+
+        if (quantity >= part.getQuantity()) {
+            removePart(part);
+        } else {
+            while (quantity > 0) {
+                part.decrementQuantity();
+                quantity--;
+            }
+
+            MekHQ.triggerEvent(new PartChangedEvent(part));
+        }
+
+        return true;
+    }
+
+    /**
      * Merges a part with an existing part, if possible.
      * @param part The part to try and merge with an existing part.
      * @return The part itself, or the spare part the part was merged with.
@@ -257,6 +291,49 @@ public class Warehouse {
      */
     public Stream<Part> streamSpareParts() {
         return getParts().stream().filter(Part::isSpare);
+    }
+
+    /**
+     * Adds ammo to the warehouse.
+     * @param ammo Ammo in the warehouse.
+     * @param shots The amount of ammo to add to the warehouse.
+     */
+    public void addAmmo(AmmoStorage ammo, int shots) {
+        Objects.requireNonNull(ammo);
+
+        ammo.changeShots(shots);
+        MekHQ.triggerEvent(new PartChangedEvent(ammo));
+    }
+
+    /**
+     * Removes ammo from the warehouse.
+     * @param ammo Ammo in the warehouse.
+     * @param shots The amount of ammo to remove from the warehouse.
+     */
+    public boolean removeAmmo(AmmoStorage ammo, int shots) {
+        Objects.requireNonNull(ammo);
+
+        if (shots >= ammo.getShots()) {
+            removePart(ammo);
+        } else {
+            ammo.changeShots(-shots);
+            MekHQ.triggerEvent(new PartChangedEvent(ammo));
+        }
+
+        return true;
+    }
+
+    public boolean removeArmor(Armor armor, int points) {
+        Objects.requireNonNull(armor);
+
+        if (points >= armor.getAmount()) {
+            removePart(armor);
+        } else {
+            armor.changeAmountAvailable(-points);
+            MekHQ.triggerEvent(new PartChangedEvent(armor));
+        }
+
+        return true;
     }
 
     public void writeToXml(PrintWriter pw1, int indent, String tag) {

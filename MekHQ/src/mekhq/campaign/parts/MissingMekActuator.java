@@ -118,7 +118,7 @@ public class MissingMekActuator extends MissingPart {
         if (null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
-            campaign.addPart(actualReplacement, 0);
+            campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             ((MekActuator) actualReplacement).setLocation(location);
             remove(false);
@@ -130,24 +130,24 @@ public class MissingMekActuator extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         if (part instanceof MekActuator) {
-            MekActuator actuator = (MekActuator)part;
+            MekActuator actuator = (MekActuator) part;
             return actuator.getType() == type && getUnitTonnage() == actuator.getUnitTonnage();
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override
     public String checkFixable() {
         if (null == unit) {
              return null;
-        } else if (unit.isLocationBreached(location)) {
-            return unit.getEntity().getLocationName(location) + " is breached.";
-        } else if (unit.isLocationDestroyed(location)) {
-            return unit.getEntity().getLocationName(location) + " is destroyed.";
-        } else {
-            return null;
         }
+        if (unit.isLocationBreached(location)) {
+            return unit.getEntity().getLocationName(location) + " is breached.";
+        }
+        if (unit.isLocationDestroyed(location)) {
+            return unit.getEntity().getLocationName(location) + " is destroyed.";
+        }
+        return null;
     }
 
     @Override

@@ -159,11 +159,11 @@ public class KFChargingSystem extends Part {
             //All the BT lore says you can't jump while carrying around another KF Drive, therefore
             //you can't salvage and keep this in the warehouse, just remove/scrap and replace it
             //See SO p130 for reference
-            campaign.removePart(this);
+            campaign.getWarehouse().removePart(this);
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0);
         }
         setUnit(null);
         updateConditionFromEntity(false);

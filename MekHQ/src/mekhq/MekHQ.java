@@ -97,7 +97,6 @@ public class MekHQ implements GameListener {
     // TODO : So it should be backed down to 1 for releases...
     // TODO : It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
     public static int VERBOSITY_LEVEL = 5;
-    public static final String CAMPAIGN_DIRECTORY = "./campaigns/";
     public static final String PREFERENCES_FILE = "mmconf/mekhq.preferences";
     public static final String PRESET_DIR = "./mmconf/mhqPresets/";
     public static final String DEFAULT_LOG_FILE_NAME = "mekhqlog.txt";

@@ -1,6 +1,25 @@
 VERSION HISTORY:
 ----------------
-0.47.12-SNAPSHOT 
+0.47.15-SNAPSHOT
++ Issue #2166: NRE in Money::plus/Money::minus
++ PR #2224: Add some basic Refit tests and fix an Armor location bug calculating armor during a refit
++ PR #2241: Fix bug where PartsStore may list INT_MAX as cost and tons for BA ammo
++ Fixing Male Soldier and Female ProtoMech Pilot Portrait Paths so they properly generate
++ Issue #2236: Making Unmaintained hangar color take priority over Damaged/Inoperable
++ Issue #2248: Fix various ContractMarket exceptions when operating at the bounds of MekHQ data
++ PR #2250: Fixing Load Last Save for .cpnx.gz files
++ Issue #1880: Fixed briefing text error for breakthrough (defender) scenarios
++ Issue #2231: Don't give back free parts when fixing a missing part
++ Issue #2254: Ransomed Unit now properly adds to Total Value Salvaged
+
+0.47.14 (2020-11-15 1930 UTC)
++ Issues #2217 #2219: Cannot save Campaign with Refits and cannot start new Refits
++ Issue #2220: Implementing AwardFileFactory to handle loading pngs that aren't handled by Toolkit
+
+0.47.13 (2020-11-09 1600 UTC) 
++ Issue #2213: Fix disastrous bug in AmmoStorage::ctor
+
+0.47.12 (2020-11-08 2230 UTC) 
 + Issue #1970: Workaround for single hex ecm causing smallcraft to be overweight
 + Issue #1079: Add refit time for moving a part between locations
 + PR #2117: Fixing New Personnel Market Report
@@ -33,6 +52,10 @@ VERSION HISTORY:
   with the next Data work in Megamek.
 + Issue #2171: Implementing Campaign Option and Campaign Preset Versioning
 + Issue #2181: Personnel File CSV Export Toughness, Status, and Portrait Path
++ Issue #785: SLDF Ranks are Wrong
++ Issue #572: Random Portrait Fails to Properly Compare File Paths
++ Issue #564: AbstractIcon: Fixing Basic Info Portrait Scaling
++ Data: Adding a CampaignAnon 3.5 AtB preset.
 
 
 0.47.11 (2020-10-04 2100 UTC)

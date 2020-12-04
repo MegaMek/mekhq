@@ -5389,7 +5389,7 @@ public class CampaignOptionsDialog extends JDialog {
             return;
         }
 
-        if (Campaign.ICON_NONE.equals(iconFileName)) {
+        if (AbstractIcon.DEFAULT_ICON_FILENAME.equals(iconFileName)) {
             btnIcon.setIcon(null);
             btnIcon.setText("None");
             return;
@@ -5398,14 +5398,14 @@ public class CampaignOptionsDialog extends JDialog {
         // Try to get the root file.
         try {
             // Translate the root icon directory name.
-            if (Campaign.ROOT_ICON.equals(iconCategory)) {
-                iconCategory = ""; //$NON-NLS-1$
+            if (AbstractIcon.ROOT_CATEGORY.equals(iconCategory)) {
+                iconCategory = "";
             }
             Image icon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem(iconCategory, iconFileName);
             icon = icon.getScaledInstance(75, -1, Image.SCALE_DEFAULT);
             btnIcon.setIcon(new ImageIcon(icon));
         } catch (Exception err) {
-            iconFileName = Campaign.ICON_NONE;
+            iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
             setForceIcon();
         }
     }
