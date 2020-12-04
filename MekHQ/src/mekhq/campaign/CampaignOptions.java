@@ -3948,7 +3948,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
                 retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
-                retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2));
+                retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
             }
         }
 

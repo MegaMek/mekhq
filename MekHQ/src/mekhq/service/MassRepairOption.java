@@ -20,6 +20,7 @@ package mekhq.service;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Version;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import org.w3c.dom.Node;
@@ -118,7 +119,7 @@ public class MassRepairOption {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "massRepairOption");
     }
 
-    public static List<MassRepairOption> parseListFromXML(Node wn2) {
+    public static List<MassRepairOption> parseListFromXML(Node wn2, Version version) {
         List<MassRepairOption> massRepairOptions = new ArrayList<>();
         NodeList mroList = wn2.getChildNodes();
         List<PartRepairType> partRepairTypes = PartRepairType.getMRMSValidTypes();
@@ -133,9 +134,8 @@ public class MassRepairOption {
             try {
                 MassRepairOption mro = parseFromXML(mroNode);
 
-                // This fixes a migration issue from 0.47.10 to 0.47.11, and will need to be implemented
-                // properly in future.
-                if (mro.getType() == PartRepairType.HEAT_SINK) {
+                // This fixes a migration issue from 0.47.10 to 0.47.11
+                if (version.isBetween("0.47.10", "0.47.15") && (mro.getType() == PartRepairType.HEAT_SINK)) {
                     mro.setType(PartRepairType.POD_SPACE);
                 }
 
@@ -152,7 +152,7 @@ public class MassRepairOption {
         return massRepairOptions;
     }
 
-    public static MassRepairOption parseFromXML(Node mroNode) {
+    private static MassRepairOption parseFromXML(Node mroNode) {
         MassRepairOption mro = new MassRepairOption(PartRepairType.UNKNOWN_LOCATION);
 
         NodeList mroItemList = mroNode.getChildNodes();
