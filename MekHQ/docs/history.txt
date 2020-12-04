@@ -10,6 +10,7 @@ VERSION HISTORY:
 + PR #2250: Fixing Load Last Save for .cpnx.gz files
 + Issue #1880: Fixed briefing text error for breakthrough (defender) scenarios
 + Issue #2231: Don't give back free parts when fixing a missing part
++ Issue #2254: Ransomed Unit now properly adds to Total Value Salvaged
 
 0.47.14 (2020-11-15 1930 UTC)
 + Issues #2217 #2219: Cannot save Campaign with Refits and cannot start new Refits
