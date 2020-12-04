@@ -792,11 +792,11 @@ public class WarehouseTest {
         assertEquals(mockUnitArmor, addedPart);
 
         // Spare
-        AmmoStorage mockSpareAmmo = createMockAmmoStorage(mockCampaign, getAmmoType(""), 20);
+        AmmoStorage mockSpareAmmo = createMockAmmoStorage(mockCampaign, getAmmoType("ISAC5 Ammo"), 20);
         addedPart = warehouse.addPart(mockSpareAmmo, true);
         assertEquals(mockSpareAmmo, addedPart);
 
-        AmmoStorage mockRefitAmmo = createMockAmmoStorage(mockCampaign, getAmmoType(""), 20);
+        AmmoStorage mockRefitAmmo = createMockAmmoStorage(mockCampaign, getAmmoType("ISAC5 Ammo"), 20);
         mockRefitAmmo.setRefitUnit(createMockUnit());
         addedPart = warehouse.addPart(mockRefitAmmo, true);
         assertEquals(mockRefitAmmo, addedPart);
@@ -865,11 +865,11 @@ public class WarehouseTest {
         assertEquals(mockUnitArmor, addedPart);
 
         // Spare
-        AmmoStorage mockSpareAmmo = createMockAmmoStorage(mockCampaign, getAmmoType(""), 20);
+        AmmoStorage mockSpareAmmo = createMockAmmoStorage(mockCampaign, getAmmoType("ISAC5 Ammo"), 20);
         addedPart = warehouse.addPart(mockSpareAmmo, true);
         assertEquals(mockSpareAmmo, addedPart);
 
-        AmmoStorage mockRefitAmmo = createMockAmmoStorage(mockCampaign, getAmmoType(""), 20);
+        AmmoStorage mockRefitAmmo = createMockAmmoStorage(mockCampaign, getAmmoType("ISAC5 Ammo"), 20);
         mockRefitAmmo.setRefitUnit(createMockUnit());
         addedPart = warehouse.addPart(mockRefitAmmo, true);
         assertEquals(mockRefitAmmo, addedPart);
@@ -932,12 +932,12 @@ public class WarehouseTest {
         assertNull(warehouse.findSparePart(spare -> spare.getId() == mockUnitArmor.getId()));
 
         // Spare
-        AmmoStorage mockSpareAmmo = createMockAmmoStorage(mockCampaign, getAmmoType(""), 20);
+        AmmoStorage mockSpareAmmo = createMockAmmoStorage(mockCampaign, getAmmoType("ISAC5 Ammo"), 20);
         addedPart = warehouse.addPart(mockSpareAmmo, true);
         assertEquals(mockSpareAmmo, addedPart);
         assertEquals(mockSpareAmmo, warehouse.findSparePart(spare -> spare.getId() == mockSpareAmmo.getId()));
 
-        AmmoStorage mockRefitAmmo = createMockAmmoStorage(mockCampaign, getAmmoType(""), 20);
+        AmmoStorage mockRefitAmmo = createMockAmmoStorage(mockCampaign, getAmmoType("ISAC5 Ammo"), 20);
         mockRefitAmmo.setRefitUnit(createMockUnit());
         addedPart = warehouse.addPart(mockRefitAmmo, true);
         assertEquals(mockRefitAmmo, addedPart);

@@ -1,6 +1,4 @@
 /*
- * StripUnitActionTest.java
- *
  * Copyright (C) 2020 MegaMek team
  *
  * This file is part of MekHQ.
@@ -32,6 +30,7 @@ import org.mockito.ArgumentCaptor;
 
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -124,6 +123,8 @@ public class PartTest {
     @Test
     public void decrementQuantity() {
         Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Part part = new MekLocation();
         part.setCampaign(mockCampaign);
 
@@ -143,12 +144,14 @@ public class PartTest {
         assertEquals(0, part.getQuantity());
 
         // ...which means we should have removed the part.
-        verify(mockCampaign, times(1)).removePart(eq(part));
+        verify(mockWarehouse, times(1)).removePart(eq(part));
     }
 
     @Test
     public void decrementQuantityDoesNotGoNegative() {
         Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Part part = new MekLocation();
         part.setCampaign(mockCampaign);
 
@@ -168,6 +171,8 @@ public class PartTest {
     @Test
     public void decrementQuantityZeroRemovesChildParts() {
         Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Part part = new MekLocation();
         part.setCampaign(mockCampaign);
 
@@ -183,7 +188,7 @@ public class PartTest {
         part.decrementQuantity();
 
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
-        verify(mockCampaign, times(3)).removePart(partCaptor.capture());
+        verify(mockWarehouse, times(3)).removePart(partCaptor.capture());
 
         List<Part> removedParts = partCaptor.getAllValues();
         assertTrue(removedParts.contains(childPart0));
@@ -194,6 +199,8 @@ public class PartTest {
     @Test
     public void setQuantity() {
         Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Part part = new MekLocation();
         part.setCampaign(mockCampaign);
 
@@ -208,12 +215,14 @@ public class PartTest {
         assertEquals(0, part.getQuantity());
 
         // ...which means we should have removed the part.
-        verify(mockCampaign, times(1)).removePart(eq(part));
+        verify(mockWarehouse, times(1)).removePart(eq(part));
     }
 
     @Test
     public void setNegativeQuantity() {
         Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Part part = new MekLocation();
         part.setCampaign(mockCampaign);
 
@@ -228,12 +237,14 @@ public class PartTest {
         assertEquals(0, part.getQuantity());
 
         // ...which means we should have removed the part.
-        verify(mockCampaign, times(1)).removePart(eq(part));
+        verify(mockWarehouse, times(1)).removePart(eq(part));
     }
 
     @Test
     public void setQuantityZeroRemovesChildParts() {
         Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         Part part = new MekLocation();
         part.setCampaign(mockCampaign);
 
@@ -247,7 +258,7 @@ public class PartTest {
         part.setQuantity(0);
 
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
-        verify(mockCampaign, times(3)).removePart(partCaptor.capture());
+        verify(mockWarehouse, times(3)).removePart(partCaptor.capture());
 
         List<Part> removedParts = partCaptor.getAllValues();
         assertTrue(removedParts.contains(childPart0));

@@ -159,19 +159,19 @@ public class KFHeliumTank extends Part {
                 //See SO p130 for reference
                 Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
                 if(!salvage) {
-                    campaign.removePart(this);
+                    campaign.getWarehouse().removePart(this);
                 } else if (null != spare) {
                     spare.incrementQuantity();
-                    campaign.removePart(this);
+                    campaign.getWarehouse().removePart(this);
                 } else {
                     //Start a new collection
-                    campaign.addPart(this, 0);
+                    campaign.getQuartermaster().addPart(this, 0);
                 }
-                campaign.removePart(this);
+                campaign.getWarehouse().removePart(this);
                 unit.removePart(this);
                 Part missing = getMissingPart();
                 unit.addPart(missing);
-                campaign.addPart(missing, 0);
+                campaign.getQuartermaster().addPart(missing, 0);
             }
         }
         setUnit(null);

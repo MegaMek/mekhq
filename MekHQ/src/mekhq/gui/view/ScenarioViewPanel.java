@@ -1,7 +1,7 @@
 /*
  * AtBScenarioViewPanel.java
  *
- * Copyright (C) 2016 MegaMek team
+ * Copyright (C) 2016-2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,17 +12,16 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.view;
 
 import java.awt.Component;
 import java.awt.Image;
-import java.util.LinkedHashMap;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -35,13 +34,9 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import megamek.common.icons.AbstractIcon;
-import megamek.common.icons.Portrait;
-import mekhq.IconPackage;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.Loot;
@@ -58,7 +53,6 @@ public class ScenarioViewPanel extends ScrollablePanel {
     private Scenario scenario;
     private Campaign campaign;
     private ForceStub forces;
-    private IconPackage icons;
 
     private javax.swing.JPanel pnlStats;
     private javax.swing.JTextPane txtDesc;
@@ -68,11 +62,10 @@ public class ScenarioViewPanel extends ScrollablePanel {
 
     private StubTreeModel forceModel;
 
-    public ScenarioViewPanel(Scenario s, Campaign c, IconPackage i) {
+    public ScenarioViewPanel(Scenario s, Campaign c) {
         this.scenario = s;
         this.campaign = c;
-        this.icons = i;
-        if(s.isCurrent()) {
+        if (s.isCurrent()) {
             this.forces = new ForceStub(s.getForces(campaign), campaign);
         } else {
             this.forces = s.getForceStub();
@@ -120,7 +113,7 @@ public class ScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(forceTree, gridBagConstraints);
 
-        if(null != scenario.getReport() && !scenario.getReport().isEmpty()) {
+        if (null != scenario.getReport() && !scenario.getReport().isEmpty()) {
             txtReport.setName("txtReport");
             txtReport.setEditable(false);
             txtReport.setContentType("text/html");
@@ -161,7 +154,7 @@ public class ScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus, gridBagConstraints);
 
-        if(null != scenario.getDescription() && !scenario.getDescription().isEmpty()) {
+        if (null != scenario.getDescription() && !scenario.getDescription().isEmpty()) {
             txtDesc.setName("txtDesc");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
@@ -178,7 +171,7 @@ public class ScenarioViewPanel extends ScrollablePanel {
             pnlStats.add(txtDesc, gridBagConstraints);
         }
 
-        if(scenario.getLoot().size() > 0) {
+        if (scenario.getLoot().size() > 0) {
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 3;
@@ -190,7 +183,7 @@ public class ScenarioViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             pnlStats.add(new JLabel("<html><b>Potential Rewards:</b></html>"), gridBagConstraints);
 
-            for(Loot loot : scenario.getLoot()) {
+            for (Loot loot : scenario.getLoot()) {
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy++;
                 gridBagConstraints.gridwidth = 2;
@@ -279,7 +272,6 @@ public class ScenarioViewPanel extends ScrollablePanel {
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
                                                       boolean expanded, boolean leaf, int row,
                                                       boolean hasFocus) {
-
             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             //setOpaque(true);
             setIcon(getIcon(value));
@@ -289,7 +281,7 @@ public class ScenarioViewPanel extends ScrollablePanel {
 
         protected Icon getIcon(Object node) {
             if (node instanceof UnitStub) {
-                return getIconFrom((UnitStub) node);
+                return ((UnitStub) node).getPortrait().getImageIcon(50);
             } else if (node instanceof ForceStub) {
                 return getIconFrom((ForceStub) node);
             } else {
@@ -297,65 +289,11 @@ public class ScenarioViewPanel extends ScrollablePanel {
             }
         }
 
-        protected Icon getIconFrom(UnitStub unit) {
-            String category = unit.getPortraitCategory();
-            String filename = unit.getPortraitFileName();
-
-            if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-                category = "";
-            }
-
-            // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == filename) || AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
-                filename = Portrait.DEFAULT_PORTRAIT_FILENAME;
-            }
-            // Try to get the player's portrait file.
-            Image portrait;
-            try {
-                portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem(category, filename);
-                if (null != portrait) {
-                    portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
-                } else {
-                    portrait = (Image) MHQStaticDirectoryManager.getPortraits().getItem("", Portrait.DEFAULT_PORTRAIT_FILENAME);
-                    if (null != portrait) {
-                        portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
-                    }
-                }
-                return new ImageIcon(portrait);
-            } catch (Exception e) {
-                MekHQ.getLogger().error(e);
-                return null;
-            }
-        }
-
         protected Icon getIconFrom(ForceStub force) {
-            String category = force.getIconCategory();
-            String filename = force.getIconFileName();
-            LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
-
-            if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-                category = "";
-            }
-
-            // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == filename)
-                    || (AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
-                filename = "empty.png";
-            }
-
-            // Try to get the player's portrait file.
-            Image portrait;
             try {
-                portrait = MHQStaticDirectoryManager.buildForceIcon(category, filename, iconMap);
-                if (null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-                } else {
-                    portrait = (Image) MHQStaticDirectoryManager.getForceIcons().getItem("", "empty.png");
-                    if (null != portrait) {
-                        portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-                    }
-                }
-                return new ImageIcon(portrait);
+                return new ImageIcon(MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
+                        force.getIconFileName(), force.getIconMap())
+                        .getScaledInstance(58, -1, Image.SCALE_SMOOTH));
             } catch (Exception e) {
                 MekHQ.getLogger().error(e);
                 return null;

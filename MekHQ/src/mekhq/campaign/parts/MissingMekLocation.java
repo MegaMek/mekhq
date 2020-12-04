@@ -285,7 +285,7 @@ public class MissingMekLocation extends MissingPart {
 		if(null != replacement) {
 			Part actualReplacement = replacement.clone();
 			unit.addPart(actualReplacement);
-			campaign.addPart(actualReplacement, 0);
+			campaign.getQuartermaster().addPart(actualReplacement, 0);
 			replacement.decrementQuantity();
 			//TODO: if this is a mech head, check to see if it had components
             if(loc == Mech.LOC_HEAD && actualReplacement instanceof MekLocation) {
@@ -327,21 +327,21 @@ public class MissingMekLocation extends MissingPart {
 	    if(part.hasSensors() && null != missingSensor) {
 	        newPart = missingSensor.getNewPart();
 	        unit.addPart(newPart);
-	        campaign.addPart(newPart, 0);
+	        campaign.getQuartermaster().addPart(newPart, 0);
 	        missingSensor.remove(false);
 	        newPart.updateConditionFromPart();
 	    }
 	    /*if(part.hasCockpit() && null != missingCockpit) {
             newPart = missingCockpit.getNewPart();
             unit.addPart(newPart);
-            campaign.addPart(newPart);
+            campaign.getQuartermaster().addPart(newPart);
             missingCockpit.remove(false);
             newPart.updateConditionFromPart();
         }*/
 	    if(part.hasLifeSupport() && null != missingLifeSupport) {
             newPart = missingLifeSupport.getNewPart();
             unit.addPart(newPart);
-            campaign.addPart(newPart, 0);
+            campaign.getQuartermaster().addPart(newPart, 0);
             missingLifeSupport.remove(false);
             newPart.updateConditionFromPart();
         }
