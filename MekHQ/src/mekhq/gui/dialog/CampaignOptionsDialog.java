@@ -269,7 +269,6 @@ public class CampaignOptionsDialog extends JDialog {
     private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
     private JCheckBox chkDetermineFatherAtBirth;
     private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
-    private JCheckBox chkUseRandomDeaths;
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     //Salary
     private JSpinner spnSalaryCommission;
@@ -1795,11 +1794,6 @@ public class CampaignOptionsDialog extends JDialog {
         pnlDisplayFamilyLevel.setToolTipText(resourceMap.getString("displayFamilyLevel.toolTipText"));
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(pnlDisplayFamilyLevel, gridBagConstraints);
-
-        chkUseRandomDeaths = new JCheckBox(resourceMap.getString("useRandomDeaths.text"));
-        chkUseRandomDeaths.setToolTipText(resourceMap.getString("useRandomDeaths.toolTipText"));
-        gridBagConstraints.gridy = ++gridy;
-        panFamily.add(chkUseRandomDeaths, gridBagConstraints);
 
         chkKeepMarriedNameUponSpouseDeath = new JCheckBox(resourceMap.getString("keepMarriedNameUponSpouseDeath.text"));
         gridBagConstraints.gridy = ++gridy;
@@ -4456,7 +4450,6 @@ public class CampaignOptionsDialog extends JDialog {
         comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
         chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
         comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
-        chkUseRandomDeaths.setSelected(options.useRandomDeaths());
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
 
         //Salary
@@ -5052,7 +5045,6 @@ public class CampaignOptionsDialog extends JDialog {
         options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
         options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
         options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
-        options.setUseRandomDeaths(chkUseRandomDeaths.isSelected());
         options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
         //Salary
         options.setSalaryCommissionMultiplier((Double) spnSalaryCommission.getModel().getValue());
