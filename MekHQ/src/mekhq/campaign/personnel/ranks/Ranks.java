@@ -34,6 +34,7 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.io.Migration.PersonMigrator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -53,27 +54,27 @@ import mekhq.gui.model.RankTableModel;
  */
 public class Ranks {
     // Rank Faction Codes
-    public static final int RS_SL		= 0;
-    public static final int RS_FS		= 1;
-    public static final int RS_FC		= 2;
-    public static final int RS_LC		= 3;
-    public static final int RS_LA		= 4;
-    public static final int RS_FWL		= 5;
-    public static final int RS_CC		= 6;
-    public static final int RS_CCWH		= 7;
-    public static final int RS_DC		= 8;
-    public static final int RS_CL		= 9;
-    public static final int RS_COM		= 10;
-    public static final int RS_WOB		= 11;
-    public static final int RS_CUSTOM	= 12;
-    public static final int RS_MOC		= 13;
-    public static final int RS_TC		= 14;
-    public static final int RS_MH		= 15;
-    public static final int RS_OA		= 16;
-    public static final int RS_FRR		= 17;
+    public static final int RS_SL       = 0;
+    public static final int RS_FS       = 1;
+    public static final int RS_FC       = 2;
+    public static final int RS_LC       = 3;
+    public static final int RS_LA       = 4;
+    public static final int RS_FWL      = 5;
+    public static final int RS_CC       = 6;
+    public static final int RS_CCWH     = 7;
+    public static final int RS_DC       = 8;
+    public static final int RS_CL       = 9;
+    public static final int RS_COM      = 10;
+    public static final int RS_WOB      = 11;
+    public static final int RS_CUSTOM   = 12;
+    public static final int RS_MOC      = 13;
+    public static final int RS_TC       = 14;
+    public static final int RS_MH       = 15;
+    public static final int RS_OA       = 16;
+    public static final int RS_FRR      = 17;
     public static final int RS_ARC      = 18;
-    public static final int RS_FSL  = 19;
-    public static final int RS_NUM		= 20;
+    public static final int RS_FSL      = 19;
+    public static final int RS_NUM      = 20;
 
     public static final int[] translateFactions = { /* 0 */ 0, /* 1 */ 1, /* 2 */ 4, /* 3 */ 5, /* 4 */ 6, /* 5 */ 8, /* 6 */ 9, /* 7 */ 12 };
 
@@ -94,34 +95,36 @@ public class Ranks {
     public static final int RC_NUM	= 51; // Same as RO_MAX+1
 
     // Rank Profession Codes
-    public static final int RPROF_MW	= 0;
-    public static final int RPROF_ASF	= 1;
-    public static final int RPROF_VEE	= 2;
-    public static final int RPROF_NAVAL	= 3;
-    public static final int RPROF_INF	= 4;
-    public static final int RPROF_TECH	= 5;
-    public static final int RPROF_NUM	= 6;
+    public static final int RPROF_MW    = 0;
+    public static final int RPROF_ASF   = 1;
+    public static final int RPROF_VEE   = 2;
+    public static final int RPROF_NAVAL = 3;
+    public static final int RPROF_INF   = 4;
+    public static final int RPROF_TECH  = 5;
+    public static final int RPROF_NUM   = 6;
 
     private static Hashtable<Integer, Ranks> rankSystems;
     @SuppressWarnings("unused") // FIXME
     private static final int[] officerCut = {/*SLDF*/7,/*AFFS*/6,/*AFFC*/8,/*LCAF*/14,/*LAAF*/11,/*FWLM*/9,/*CCAF*/5,/*CCWH*/2,/*DCMD*/9,/*Clan*/3,/*COM*/2,/*WOB*/2};
 
     private int rankSystem;
+    private String rankSystemName;
     private int oldRankSystem = -1;
     private List<Rank> ranks;
 
     public Ranks() {
-        this(RS_SL);
+        this(RS_SL, "Second Star League");
     }
 
-    public Ranks(int system) {
+    public Ranks(int system, String rankSystemName) {
         rankSystem = system;
+        this.rankSystemName = rankSystemName;
         useRankSystem(rankSystem);
     }
 
     public static void initializeRankSystems() {
         rankSystems = new Hashtable<>();
-        MekHQ.getLogger().info(Ranks.class, "Starting load of Rank Systems from XML...");
+        MekHQ.getLogger().info("Starting load of Rank Systems from XML...");
         // Initialize variables.
         Document xmlDoc;
 
@@ -132,7 +135,7 @@ public class Ranks {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(Ranks.class, ex);
+            MekHQ.getLogger().error(ex);
             return;
         }
 
@@ -140,7 +143,7 @@ public class Ranks {
         NodeList nl = ranksEle.getChildNodes();
 
         // Get rid of empty text nodes and adjacent text nodes...
-        // Stupid weird parsing of XML.  At least this cleans it up.
+        // Stupid weird parsing of XML. At least this cleans it up.
         ranksEle.normalize();
 
         // Okay, lets iterate through the children, eh?
@@ -148,7 +151,7 @@ public class Ranks {
             Node wn = nl.item(x);
             Ranks value;
 
-            if (wn.getParentNode() != ranksEle) {
+            if (!wn.getParentNode().equals(ranksEle)) {
                 continue;
             }
 
@@ -156,18 +159,16 @@ public class Ranks {
 
             if (xc == Node.ELEMENT_NODE) {
                 // This is what we really care about.
-                // All the meat of our document is in this node type, at this
-                // level.
+                // All the meat of our document is in this node type, at this level.
                 // Okay, so what element is it?
-                String xn = wn.getNodeName();
-
-                if (xn.equalsIgnoreCase("rankSystem")) {
+                if (wn.getNodeName().equalsIgnoreCase("rankSystem")) {
+                    // Starting to generate rankSystem
                     value = generateInstanceFromXML(wn, null);
                     rankSystems.put(value.getRankSystem(), value);
                 }
             }
         }
-        MekHQ.getLogger().info(Ranks.class, "Done loading Rank Systems");
+        MekHQ.getLogger().info("Done loading Rank Systems");
     }
 
     public static Ranks getRanksFromSystem(int system) {
@@ -178,59 +179,20 @@ public class Ranks {
         return rankSystem;
     }
 
+    public String getRankSystemName() {
+        return rankSystemName;
+    }
+
+    public void setRankSystemName(String rankSystemName) {
+        this.rankSystemName = rankSystemName;
+    }
+
     public int getOldRankSystem() {
         return oldRankSystem;
     }
 
     public void setOldRankSystem(int old) {
         oldRankSystem = old;
-    }
-
-    public static String getRankSystemName(int system) {
-        switch (system) {
-            case RS_CUSTOM:
-                return "Custom";
-            case RS_SL:
-                return "Second Star League";
-            case RS_FS:
-                return "Federated Suns";
-            case RS_FC:
-                return "Federated Commonwealth";
-            case RS_LC:
-                return "Lyran Commonwealth";
-            case RS_LA:
-                return "Lyran Alliance";
-            case RS_FWL:
-                return "Free Worlds League";
-            case RS_CC:
-                return "Capellan Confederation";
-            case RS_CCWH:
-                return "Capellan Confederation Warrior House";
-            case RS_DC:
-                return "Draconis Combine";
-            case RS_CL:
-                return "Clan";
-            case RS_COM:
-                return "Comstar";
-            case RS_WOB:
-                return "Word of Blake";
-            case RS_MOC:
-                return "Magistry of Canopus";
-            case RS_MH:
-                return "Marian Hegemony";
-            case RS_TC:
-                return "Taurian Concordat";
-            case RS_OA:
-                return "Outworld's Alliance";
-            case RS_FRR:
-                return "Free Rasalhague Republic";
-            case RS_ARC:
-                return "Aurigan Coalition";
-            case RS_FSL:
-                return "First Star League";
-            default:
-                return "?";
-        }
     }
 
     public int getRankNumericFromNameAndProfession(int profession, String name) {
@@ -412,21 +374,20 @@ public class Ranks {
     }
 
     public void writeToXml(PrintWriter pw1, int indent, boolean saveAll) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<rankSystem>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)+"<!-- "+getRankSystemName(rankSystem)+" -->");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<system>"
-                +rankSystem
-                +"</system>");
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "rankSystem");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "systemId", getRankSystem());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "systemName", getRankSystemName());
+
         // Only write out the ranks if we're using a custom system
-        if (rankSystem == RS_CUSTOM || saveAll) {
+        if ((rankSystem == RS_CUSTOM) || saveAll) {
             for (int i = 0; i < ranks.size(); i++) {
                 Rank r = ranks.get(i);
-                r.writeToXml(pw1, indent+1);
+                r.writeToXml(pw1, indent);
                 pw1.println(getRankPostTag(i));
             }
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</rankSystem>");
+
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "rankSystem");
     }
 
     public static Ranks generateInstanceFromXML(Node wn, Version version) {
@@ -442,36 +403,47 @@ public class Ranks {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("system") || wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
-                    retVal.rankSystem = Integer.parseInt(wn2.getTextContent());
+                if (wn2.getNodeName().equalsIgnoreCase("system")
+                        || wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
+                    retVal.rankSystem = Integer.parseInt(wn2.getTextContent().trim());
 
                     // If this is an older version from before the full blown rank system with
                     // professions, we need to translate it to match the new constants
-                    if (version != null && version.isLowerThan("0.3.4-r1782")) {
+                    if ((version != null) && version.isLowerThan("0.3.4-r1782")) {
                         // Translate the rank system
-                        if (retVal.rankSystem == RankTranslator.RT_SL) {
+                        if (retVal.rankSystem == 0) {
                             String change = (String) JOptionPane.showInputDialog(
                                     null,
                                     "Due to an error in previous versions of MekHQ this value may not be correct."
-                                    + "\nPlease select the correct rank system and click OK.",
+                                            + "\nPlease select the correct rank system and click OK.",
                                     "Select Correct Rank System",
                                     JOptionPane.QUESTION_MESSAGE,
                                     null,
-                                    RankTranslator.oldRankNames,
-                                    RankTranslator.oldRankNames[0]);
-                            retVal.rankSystem = Arrays.asList(RankTranslator.oldRankNames).indexOf(change);
+                                    PersonMigrator.oldRankNames,
+                                    PersonMigrator.oldRankNames[0]);
+                            retVal.rankSystem = Arrays.asList(PersonMigrator.oldRankNames).indexOf(change);
                         }
                         retVal.oldRankSystem = retVal.rankSystem;
                         retVal.rankSystem = Ranks.translateFactions[retVal.rankSystem];
-                    } else if (version != null && retVal.rankSystem != RS_CUSTOM) {
+                    } else if ((version != null) && (retVal.rankSystem != RS_CUSTOM)) {
                         retVal = Ranks.getRanksFromSystem(retVal.rankSystem);
                     }
+
+                    retVal.setRankSystemName(PersonMigrator.migrateRankSystemName(retVal.getRankSystem()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("systemId")) {
+                    retVal.rankSystem = Integer.parseInt(wn2.getTextContent().trim());
+                    if ((version != null) && (retVal.rankSystem != RS_CUSTOM)) {
+                        retVal = Ranks.getRanksFromSystem(retVal.rankSystem);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("systemName")) {
+                    retVal.setRankSystemName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                     // If we're parsing from the XML or using custom ranks, then parse the rank sub-nodes
-                    if (retVal.oldRankSystem == RankTranslator.RT_CUSTOM) {
+                    if (retVal.oldRankSystem == 7) {
                         showMessage = true;
                     }
-                    if (version == null || retVal.rankSystem == RS_CUSTOM) {
+
+                    if ((version == null) || (retVal.rankSystem == RS_CUSTOM)) {
                         retVal.ranks.add(Rank.generateInstanceFromXML(wn2));
                     } else {
                         // Otherwise... use the default ranks for this system
@@ -482,6 +454,7 @@ public class Ranks {
                     }
                 }
             }
+
             if (showMessage) {
                 JOptionPane.showConfirmDialog(
                         null,
@@ -494,7 +467,7 @@ public class Ranks {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(Ranks.class, ex);
+            MekHQ.getLogger().error(ex);
         }
 
         return retVal;
@@ -536,5 +509,10 @@ public class Ranks {
             double payMult = (Double)row.get(RankTableModel.COL_PAYMULT);
             ranks.add(new Rank(names, officer, payMult));
         }
+    }
+
+    @Override
+    public String toString() {
+        return rankSystemName;
     }
 }

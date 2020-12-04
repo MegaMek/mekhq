@@ -53,6 +53,7 @@ import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.preferences.JWindowPreference;
@@ -162,6 +163,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             }
             RandomNameGenerator.getInstance();
             RandomCallsignGenerator.getInstance();
+            Ranks.initializeRankSystems();
             //endregion Progress 0
 
             //region Progress 1

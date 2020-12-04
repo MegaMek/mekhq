@@ -3101,11 +3101,11 @@ public class CampaignOptionsDialog extends JDialog {
 
         DefaultComboBoxModel<String> rankModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < Ranks.RS_NUM; i++) {
-            rankModel.addElement(Ranks.getRankSystemName(i));
+            rankModel.addElement(Ranks.getRanksFromSystem(i).getRankSystemName());
         }
         comboRanks.setModel(rankModel);
         comboRanks.setSelectedIndex(campaign.getRanks().getRankSystem());
-        comboRanks.setName("comboRanks"); // NOI18N
+        comboRanks.setName("comboRanks");
         comboRanks.setActionCommand("fillRanks");
         comboRanks.addActionListener(evt -> {
             if (evt.getActionCommand().equals("fillRanks")) {
@@ -4272,7 +4272,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void fillRankInfo() {
-        Ranks ranks = new Ranks(comboRanks.getSelectedIndex());
+        Ranks ranks = Ranks.getRanksFromSystem(comboRanks.getSelectedIndex());
         ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
         TableColumn column;
         for (int i = 0; i < RankTableModel.COL_NUM; i++) {

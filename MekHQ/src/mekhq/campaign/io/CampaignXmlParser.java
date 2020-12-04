@@ -34,6 +34,7 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
@@ -98,7 +99,6 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.ranks.RankTranslator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.personnel.SkillType;
@@ -325,7 +325,7 @@ public class CampaignXmlParser {
         // the rank system.
         if (version.isLowerThan("0.3.4-r1782")) {
             retVal.setRankSystem(
-                    RankTranslator.translateRankSystem(retVal.getRanks().getOldRankSystem(), retVal.getFactionCode()));
+                    PersonMigrator.translateRankSystem(retVal.getRanks().getOldRankSystem(), retVal.getFactionCode()));
         }
 
         // Fixup any ghost kills
@@ -891,7 +891,7 @@ public class CampaignXmlParser {
             retVal.getRanks().setRanksFromList(rankNames, officerCut);
         }
         if (rankSystem != -1) {
-            retVal.setRanks(new Ranks(rankSystem));
+            retVal.setRanks(Ranks.getRanksFromSystem(rankSystem));
             retVal.getRanks().setOldRankSystem(rankSystem);
         }
 
