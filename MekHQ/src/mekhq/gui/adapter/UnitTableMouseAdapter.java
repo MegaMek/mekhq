@@ -977,18 +977,25 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 if (allUnitsAreRepairable && allAvailableIgnoreRefit) {
                     menu = new JMenu("Customize");
 
+                    // TODO : Should I be able to refit BA?
+                    if (allSameModel && allAvailable
+                            && ((unit.getEntity() instanceof Mech)
+                            || (unit.getEntity() instanceof Tank)
+                            || (unit.getEntity() instanceof Aero)
+                            || ((unit.getEntity() instanceof Infantry)))) {
+                        menuItem = new JMenuItem(unit.getEntity().isOmni() ? "Choose configuration..."
+                                : "Choose Refit Kit...");
+                        menuItem.setActionCommand(COMMAND_REFIT_KIT);
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
+                    }
+
                     if (allSameModel && allAvailable
                             && ((unit.getEntity() instanceof Mech)
                             || (unit.getEntity() instanceof Tank)
                             || (unit.getEntity() instanceof Aero)
                             || ((unit.getEntity() instanceof Infantry)
                             || (unit.getEntity() instanceof Protomech)))) {
-                        menuItem = new JMenuItem(unit.getEntity().isOmni() ? "Choose configuration..."
-                                : "Choose Refit Kit...");
-                        menuItem.setActionCommand(COMMAND_REFIT_KIT);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-
                         menuItem = new JMenuItem("Refurbish Unit");
                         menuItem.setActionCommand(COMMAND_REFURBISH);
                         menuItem.addActionListener(this);
