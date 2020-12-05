@@ -116,22 +116,22 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
     private static final String CMD_ACQUIRE_WEAPON_SPECIALIST = "WSPECIALIST"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_RANGEMASTER = "RANGEMASTER"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_HUMANTRO = "HUMANTRO"; //$NON-NLS-1$
-    private static final String CMD_ACQUIRE_ABILITY = "ABILITY"; //$NON-NLS-1$
-    private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE"; //$NON-NLS-1$
-    private static final String CMD_IMPROVE = "IMPROVE"; //$NON-NLS-1$
-    private static final String CMD_ADD_SPOUSE = "SPOUSE"; //$NON-NLS-1$
-    private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE"; //$NON-NLS-1$
-    private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY"; //$NON-NLS-1$
-    private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE"; //$NON-NLS-1$
-    private static final String CMD_ADD_TECH = "ADD_TECH"; //$NON-NLS-1$
+    private static final String CMD_ACQUIRE_ABILITY = "ABILITY";
+    private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE";
+    private static final String CMD_IMPROVE = "IMPROVE";
+    private static final String CMD_ADD_SPOUSE = "SPOUSE";
+    private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
+    private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
+    private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE";
+    private static final String CMD_ADD_TECH = "ADD_TECH";
 
-    private static final String CMD_IMPRISON = "IMPRISON"; //$NON-NLS-1$
-    private static final String CMD_FREE = "FREE"; //$NON-NLS-1$
-    private static final String CMD_RECRUIT = "RECRUIT"; //$NON-NLS-1$
+    private static final String CMD_IMPRISON = "IMPRISON";
+    private static final String CMD_FREE = "FREE";
+    private static final String CMD_RECRUIT = "RECRUIT";
     private static final String CMD_RANSOM = "RANSOM";
 
-    private static final String SEPARATOR = "@"; //$NON-NLS-1$
-    private static final String HYPHEN = "-"; //$NON-NLS-1$
+    private static final String SEPARATOR = "@";
+    private static final String HYPHEN = "-";
     private static final String TRUE = String.valueOf(true);
     private static final String FALSE = String.valueOf(false);
 
@@ -474,16 +474,20 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_ADD_PREGNANCY: {
-                if (selectedPerson.getGender().isFemale()) {
-                    selectedPerson.addPregnancy(gui.getCampaign());
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                for (Person person : people) {
+                    if (person.canProcreate(gui.getCampaign())) {
+                        person.addPregnancy(gui.getCampaign());
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
                 }
                 break;
             }
             case CMD_REMOVE_PREGNANCY: {
-                if (selectedPerson.isPregnant()) {
-                    selectedPerson.removePregnancy();
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                for (Person person : people) {
+                    if (person.isPregnant()) {
+                        person.removePregnancy();
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
                 }
                 break;
             }
@@ -2669,20 +2673,20 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     }
                 }
 
-                if (oneSelected) {
-                    if (person.canProcreate(gui.getCampaign())) {
-                        menuItem = new JMenuItem(resourceMap.getString("addPregnancy.text"));
-                        menuItem.setActionCommand(CMD_ADD_PREGNANCY);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    } else if (person.isPregnant()) {
-                        menuItem = new JMenuItem(resourceMap.getString("removePregnancy.text"));
-                        menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
+                if (StaticChecks.anyCanBePregnant(gui.getCampaign(), selected)) {
+                    menuItem = new JMenuItem(resourceMap.getString("addPregnancy.text"));
+                    menuItem.setActionCommand(CMD_ADD_PREGNANCY);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
                 }
-                popup.add(menu);
+
+                if (StaticChecks.anyPregnant(selected)) {
+                    menuItem = new JMenuItem(resourceMap.getString("removePregnancy.text"));
+                    menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
             //endregion GM Menu
 
