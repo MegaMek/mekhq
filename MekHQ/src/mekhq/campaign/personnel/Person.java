@@ -2134,6 +2134,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("awards")) {
+                    final boolean defaultSetMigrationRequired = version.isLowerThan("0.47.15");
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
 
@@ -2148,7 +2149,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                             continue;
                         }
 
-                        retVal.awardController.addAwardFromXml(AwardsFactory.getInstance().generateNewFromXML(wn3));
+                        retVal.getAwardController().addAwardFromXml(AwardsFactory.getInstance()
+                                .generateNewFromXML(wn3, defaultSetMigrationRequired));
                     }
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("injuries")) {
