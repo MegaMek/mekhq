@@ -27,11 +27,12 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -278,6 +279,53 @@ public class AmmoStorageTest {
         // a different munition type.
         assertFalse(ammoStorage.isSamePartType(otherAmmoStorage));
         assertFalse(otherAmmoStorage.isSamePartType(ammoStorage));
+    }
+
+    @Test
+    public void isSameAmmoTypeTest() {
+        AmmoType ammoType = getAmmoType("ISAC5 Ammo");
+        Campaign mockCampaign = mock(Campaign.class);
+
+        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, ammoType.getShots(), mockCampaign);
+
+        // We're the same as ourselves.
+        assertTrue(ammoStorage.isSameAmmoType(ammoType));
+
+        // Create an ammo type with some different munitions available
+        AmmoType isSRM2Ammo = getAmmoType("ISSRM2 Ammo");
+        assertFalse(ammoStorage.isSameAmmoType(isSRM2Ammo));
+
+        ammoStorage = new AmmoStorage(0, isSRM2Ammo, isSRM2Ammo.getShots(), mockCampaign);
+
+        // And ensure they're not the same as the same type of ammo, just
+        // a different munition type.
+        AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
+        assertFalse(ammoStorage.isSameAmmoType(isSRM2InfernoAmmo));
+    }
+
+    @Test
+    public void isSameAmmoTypeFullHalfTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        // Create Full and Half bins
+        Map<String, String> fullAndHalfs = new HashMap<>();
+        fullAndHalfs.put("IS Ammo MG - Full", "IS Machine Gun Ammo - Half");
+        fullAndHalfs.put("Clan Machine Gun Ammo - Full", "Clan Machine Gun Ammo - Half");
+        fullAndHalfs.put("IS Light Machine Gun Ammo - Full", "IS Light Machine Gun Ammo - Half");
+        fullAndHalfs.put("Clan Light Machine Gun Ammo - Full", "Clan Light Machine Gun Ammo - Half");
+        fullAndHalfs.put("IS Heavy Machine Gun Ammo - Full", "IS Heavy Machine Gun Ammo - Half");
+        fullAndHalfs.put("Clan Heavy Machine Gun Ammo - Full", "Clan Heavy Machine Gun Ammo - Half");
+        fullAndHalfs.put("IS Ammo Nail/Rivet - Full", "IS Ammo Nail/Rivet - Half");
+        for (Map.Entry<String, String> pair : fullAndHalfs.entrySet()) {
+            AmmoType fullType = getAmmoType(pair.getKey());
+            AmmoType halfType = getAmmoType(pair.getValue());
+
+            AmmoStorage full = new AmmoStorage(0, fullType, fullType.getShots(), mockCampaign);
+            assertTrue(full.isSameAmmoType(halfType));
+
+            AmmoStorage half = new AmmoStorage(0, halfType, halfType.getShots(), mockCampaign);
+            assertTrue(half.isSameAmmoType(fullType));
+        }
     }
 
     @Test
