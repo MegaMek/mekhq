@@ -330,7 +330,9 @@ public class LargeCraftAmmoBin extends AmmoBin {
             for (Part p : unit.getParts()) {
                 if (p instanceof LargeCraftAmmoBin) {
                     final LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
-                    if ((getBayEqNum() == bin.getBayEqNum()) && getType().equals(bin.getType())) {
+                    if ((getBayEqNum() == bin.getBayEqNum())
+                            && getType().equalsAmmoTypeOnly(bin.getType())
+                            && (getType().getRackSize() == bin.getType().getRackSize())) {
                         space += bin.getUnusedCapacity();
                     }
                 }

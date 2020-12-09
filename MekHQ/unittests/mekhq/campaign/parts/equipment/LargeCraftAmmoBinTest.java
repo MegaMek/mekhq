@@ -430,7 +430,7 @@ public class LargeCraftAmmoBinTest {
         // Setup another bin that isn't a match.
         LargeCraftAmmoBin otherBin = mock(LargeCraftAmmoBin.class);
         when(otherBin.getBayEqNum()).thenReturn(bayNum);
-        when(otherBin.getType()).thenReturn(getAmmoType("ISLRM20 Artemis-capable Ammo"));
+        when(otherBin.getType()).thenReturn(getAmmoType("ISLRM15 Ammo"));
 
         Unit unit = mock(Unit.class);
         when(unit.getParts()).thenReturn(Arrays.asList(new Part[] { ammoBin, otherBin, }));
@@ -465,7 +465,7 @@ public class LargeCraftAmmoBinTest {
         // Setup another bin that isn't a match.
         LargeCraftAmmoBin otherBin = mock(LargeCraftAmmoBin.class);
         when(otherBin.getBayEqNum()).thenReturn(bayNum);
-        when(otherBin.getType()).thenReturn(getAmmoType("ISLRM20 Artemis-capable Ammo"));
+        when(otherBin.getType()).thenReturn(getAmmoType("ISLRM15 Ammo"));
 
         Unit unit = mock(Unit.class);
         when(unit.getParts()).thenReturn(Arrays.asList(new Part[] { ammoBin, otherBin, }));
