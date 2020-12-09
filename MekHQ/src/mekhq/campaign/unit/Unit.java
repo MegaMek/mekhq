@@ -3263,42 +3263,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
     }
 
-    /**
-     * Adds a new zero-capacity ammo bin to the bay as part of an ammo swap. If the bay has a zeroed-out
-     * bin, sets the ammo type on that one and returns it instead of creating a new one.
-     *
-     * @param etype The type of ammo being changed to
-     * @param bay   The weapon bay where the ammo is located
-     * @return      The new ammo bin part
-     */
-    public LargeCraftAmmoBin addBayAmmoBin(AmmoType etype, Mounted bay) {
-        for (Part p : getParts()) {
-            if (p instanceof LargeCraftAmmoBin) {
-                final LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
-                if ((bin.getCapacity() == 0) && (bin.getBay() == bay)) {
-                    bin.changeMunition(etype);
-                    bin.updateConditionFromPart();
-                    return bin;
-                }
-            }
-        }
-        try {
-            Mounted m = entity.addEquipment(etype, bay.getLocation(), bay.isRearMounted(), 0);
-            int anum = entity.getEquipmentNum(m);
-            bay.addAmmoToBay(anum);
-            LargeCraftAmmoBin bin = new LargeCraftAmmoBin((int) entity.getWeight(), etype, anum,
-                    0, 0, getCampaign());
-            addPart(bin);
-            getCampaign().getQuartermaster().addPart(bin, 0);
-            return bin;
-        } catch (LocationFullException ex) {
-            MekHQ.getLogger().error(Unit.class, "Location full exception attempting to add " + etype.getDesc() + " to unit " + getName());
-            MekHQ.getLogger().error(Unit.class, ex);
-            return null;
-        }
-
-    }
-
     public List<Part> getParts() {
         return parts;
     }
