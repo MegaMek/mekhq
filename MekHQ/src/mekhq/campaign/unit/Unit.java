@@ -3226,43 +3226,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
     }
 
-    /**
-     * Checks for additional ammo bins and adds the appropriate part.
-     *
-     * Large craft can combine all the ammo of a single type into a single bin. Switching the munition type
-     * of one or more tons of ammo can require the addition of an ammo bin and can change the ammo bin
-     * capacity.
-     */
-    public void adjustLargeCraftAmmo() {
-        Map<Integer,Part> ammoParts = new HashMap<>();
-        List<Part> toAdd = new ArrayList<>();
-        for (Part p : parts) {
-            if (p instanceof LargeCraftAmmoBin) {
-                ammoParts.put(((LargeCraftAmmoBin) p).getEquipmentNum(), p);
-            }
-        }
-        for (Mounted m : entity.getAmmo()) {
-            assert(m.getType() instanceof AmmoType);
-
-            int eqNum = entity.getEquipmentNum(m);
-            Part part = ammoParts.get(eqNum);
-            if (null == part) {
-                part = new LargeCraftAmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqNum,
-                        m.getOriginalShots() - m.getBaseShotsLeft(), m.getAmmoCapacity(), getCampaign());
-                ((LargeCraftAmmoBin) part).setBay(entity.getBayByAmmo(m));
-                toAdd.add(part);
-            } else {
-                part.updateConditionFromEntity(false);
-                // Reset the name
-                ((LargeCraftAmmoBin) part).changeMunition((AmmoType) m.getType());
-            }
-        }
-        for (Part p : toAdd) {
-            addPart(p);
-            getCampaign().getQuartermaster().addPart(p, 0);
-        }
-    }
-
     public List<Part> getParts() {
         return parts;
     }

@@ -34,6 +34,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
@@ -99,7 +100,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
         // Actually apply the ammo change
         mainPanel.apply();
         // Rebuild bin parts as necessary
-        unit.adjustLargeCraftAmmo();
+        new AdjustLargeCraftAmmoAction().execute(unit.getCampaign(), unit);
         // Update the parts and set the number of shots needed based on the current size and the number
         // of shots stored.
         for (Part p : unit.getParts()) {
