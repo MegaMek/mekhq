@@ -50,6 +50,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
     private int bayEqNum = -1;
 
     transient private Mounted bay;
+    transient private double ammoTonnage;
 
     public LargeCraftAmmoBin() {
         this(0, null, -1, 0, 0, null);
@@ -59,6 +60,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
             @Nullable Campaign c) {
         super(tonnage, et, equipNum, shotsNeeded, false, false, c);
         this.size = capacity;
+        this.ammoTonnage = (et != null) ? et.getTonnage(null) : 1.0;
     }
 
     @Override
@@ -131,7 +133,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     public double getTonnage() {
-        return getCurrentShots() * getType().getTonnage(null) / getType().getShots();
+        return getCapacity();
     }
 
     /**
@@ -145,12 +147,12 @@ public class LargeCraftAmmoBin extends AmmoBin {
      * Gets the unused capacity of the bay, in tons.
      */
     public double getUnusedCapacity() {
-        return getCapacity() - Math.ceil(getCurrentShots() * getType().getTonnage(null) / getType().getShots());
+        return getCapacity() - Math.ceil(getCurrentShots() * ammoTonnage / getType().getShots());
     }
 
     @Override
     public int getFullShots() {
-        return (int) Math.floor(getCapacity() * getType().getShots() / getType().getTonnage(null));
+        return (int) Math.floor(getCapacity() * getType().getShots() / ammoTonnage);
     }
 
     @Override
@@ -191,6 +193,15 @@ public class LargeCraftAmmoBin extends AmmoBin {
         }
 
         super.loadFieldsFromXmlNode(wn);
+    }
+
+    @Override
+    public void restore() {
+        super.restore();
+
+        if (getType() != null) {
+            ammoTonnage = getType().getTonnage(null);
+        }
     }
 
     @Override
@@ -287,7 +298,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
                     || getType().hasFlag(AmmoType.F_SCREEN)) {
                 return 60;
             }
-            return (int) Math.ceil(15 * getType().getTonnage(null));
+            return (int) Math.ceil(15 * ammoTonnage);
         }
     }
 
@@ -314,7 +325,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
     @Override
     public boolean needsFixing() {
         return (shotsNeeded < 0)
-                || ((shotsNeeded > 0) && (type.getTonnage(null) <= Math.ceil(bayAvailableCapacity())));
+                || ((shotsNeeded > 0) && (ammoTonnage <= Math.ceil(bayAvailableCapacity())));
     }
 
     /**
