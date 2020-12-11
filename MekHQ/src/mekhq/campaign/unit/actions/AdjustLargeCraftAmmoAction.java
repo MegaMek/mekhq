@@ -19,9 +19,7 @@
 
 package mekhq.campaign.unit.actions;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import megamek.common.AmmoType;
@@ -54,7 +52,6 @@ public class AdjustLargeCraftAmmoAction implements IUnitAction {
             }
         }
 
-        List<Part> toAdd = new ArrayList<>();
         for (Mounted m : unit.getEntity().getAmmo()) {
             assert(m.getType() instanceof AmmoType);
 
@@ -63,17 +60,19 @@ public class AdjustLargeCraftAmmoAction implements IUnitAction {
             if (null == part) {
                 part = new LargeCraftAmmoBin((int) unit.getEntity().getWeight(), (AmmoType) m.getType(), eqNum,
                         m.getOriginalShots() - m.getBaseShotsLeft(), m.getSize(), campaign);
+
+                // Add the part to the unit
+                unit.addPart(part);
+
+                // Add the part to the bay (NOTE: must be on a unit first)
                 part.setBay(unit.getEntity().getBayByAmmo(m));
-                toAdd.add(part);
+
+                // Add the part to the Campaign
+                campaign.getQuartermaster().addPart(part, 0);
             } else {
                 // Reset the AmmoType
                 part.changeMunition((AmmoType) m.getType());
             }
-        }
-
-        for (Part p : toAdd) {
-            unit.addPart(p);
-            campaign.getQuartermaster().addPart(p, 0);
         }
     }
 }
