@@ -98,6 +98,17 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     @Override
+    public void reservePart() {
+        // No need to reserve a part for a missing AmmoBin, they're free.
+    }
+
+    @Override
+    public void cancelReservation() {
+        // We do not need to return a replacement part, they're free/fake
+        setReplacementPart(null); // CAW: clears out anything from a prior version
+    }
+
+    @Override
     public void fix() {
         AmmoBin replacement = getNewPart();
         unit.addPart(replacement);
