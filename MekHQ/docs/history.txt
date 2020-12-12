@@ -14,6 +14,9 @@ VERSION HISTORY:
 + Issues #2255 and #2258: Fix Warehouse::removePart StackOverflowException with child parts and NRE with BayDoor/Cubicle parts
 + PR #2259: Adding Pregnancy Complications Personnel Status
 + PR #2261: Improved Awards Migration
++ PR #2271: Improve CPNX load perf with transport linkages in AtB scenarios
++ PR #2272: Ensure GM Acquire Instantly acquires the correct quantity
++ PR #2274: When loading Campaigns ensure more exceptions are caught and logged properly
 
 0.47.14 (2020-11-15 1930 UTC)
 + Issues #2217 #2219: Cannot save Campaign with Refits and cannot start new Refits
