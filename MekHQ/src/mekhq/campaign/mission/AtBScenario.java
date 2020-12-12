@@ -39,6 +39,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
+import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.*;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
@@ -710,10 +711,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
                 if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
                     en.setCamoCategory(Camouflage.NO_CAMOUFLAGE);
-                    en.setCamoFileName(IPlayer.colorNames[getContract(campaign).getAllyColorIndex()]);
+                    en.setCamoFileName(PlayerColors.COLOR_NAMES[getContract(campaign).getAllyColorIndex()]);
                 }
             } else {
-                MekHQ.getLogger().error(AtBScenario.class, "Entity for player-controlled allies is null");
+                MekHQ.getLogger().error("Entity for player-controlled allies is null");
             }
         }
 
@@ -727,7 +728,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 allyEntities.add(en);
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
             } else {
-                MekHQ.getLogger().error(AtBScenario.class, "Entity for ally bot is null");
+                MekHQ.getLogger().error("Entity for ally bot is null");
             }
         }
 
