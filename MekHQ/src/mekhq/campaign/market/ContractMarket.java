@@ -891,7 +891,15 @@ public class ContractMarket implements Serializable {
             // Or the listed name doesn't exist.
             // Doh!
             MekHQ.getLogger().error(ex);
-        }
+		}
+		
+		// Restore any parent contract references
+		for (Contract contract : retVal.contracts) {
+			if (contract instanceof AtBContract) {
+				final AtBContract atbContract = (AtBContract) contract;
+				atbContract.restore(c);
+			}
+		}
 
         return retVal;
     }
