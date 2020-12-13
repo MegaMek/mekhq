@@ -1628,7 +1628,7 @@ public class AtBContract extends Contract implements Serializable {
     /**
      * Represents a reference to another AtBContract.
      */
-    private static class AtBContractRef extends AtBContract {
+    protected static class AtBContractRef extends AtBContract {
         private static final long serialVersionUID = 1L;
 
         public AtBContractRef(int id) {
