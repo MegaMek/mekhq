@@ -292,14 +292,14 @@ public class UnitTableModel extends DataTableModel {
                     applyColors(MekHQ.getMekHQOptions().getMothballing());
                 } else if (u.isMothballed()) {
                     applyColors(MekHQ.getMekHQOptions().getMothballed());
+                } else if (u.isUnmaintained()) {
+                    applyColors(MekHQ.getMekHQOptions().getUnmaintained());
                 } else if (!u.isRepairable()) {
                     applyColors(MekHQ.getMekHQOptions().getNotRepairable());
                 } else if (!u.isFunctional()) {
                     applyColors(MekHQ.getMekHQOptions().getNonFunctional());
                 } else if (u.hasPartsNeedingFixing()) {
                     applyColors(MekHQ.getMekHQOptions().getNeedsPartsFixed());
-                } else if (u.isUnmaintained()) {
-                    applyColors(MekHQ.getMekHQOptions().getUnmaintained());
                 } else if (u.getActiveCrew().size() < u.getFullCrewSize()) {
                     applyColors(MekHQ.getMekHQOptions().getUncrewed());
                 } else {

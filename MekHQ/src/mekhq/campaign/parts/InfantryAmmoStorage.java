@@ -74,21 +74,20 @@ public class InfantryAmmoStorage extends AmmoStorage {
     }
 
     public InfantryAmmoStorage clone() {
-        InfantryAmmoStorage storage = new InfantryAmmoStorage(0, getType(), shots, weaponType, campaign);
+        InfantryAmmoStorage storage = new InfantryAmmoStorage(0, getType(), getShots(), getWeaponType(), getCampaign());
         storage.copyBaseData(this);
-        storage.munition = this.munition;
         return storage;
     }
 
 
     @Override
     public double getTonnage() {
-        return weaponType.getAmmoWeight() * getShots() / weaponType.getShots();
+        return getWeaponType().getAmmoWeight() * getShots() / getWeaponType().getShots();
     }
 
     @Override
     public Money getStickerPrice() {
-        return Money.of(weaponType.getAmmoCost() * (double) getShots() / weaponType.getShots());
+        return Money.of(getWeaponType().getAmmoCost() * (double) getShots() / getWeaponType().getShots());
     }
 
     @Override
@@ -99,8 +98,24 @@ public class InfantryAmmoStorage extends AmmoStorage {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof InfantryAmmoStorage)
-                && Objects.equals(getType(), ((InfantryAmmoStorage) part).getType())
-                && Objects.equals(getWeaponType(), ((InfantryAmmoStorage) part).getWeaponType());
+                && isSameAmmoType(((InfantryAmmoStorage) part).getType(), ((InfantryAmmoStorage) part).getWeaponType());
+    }
+
+    /**
+     * Gets a value indicating whether or not the {@code AmmoType} for the {@code InfantryWeapon}
+     * is the same as this instance.
+     * @param ammoType The {@code AmmoType}.
+     * @param weaponType The {@code InfantryWeapon} carrying the ammo.
+     */
+    public boolean isSameAmmoType(AmmoType ammoType, InfantryWeapon weaponType) {
+        return isSameAmmoType(ammoType)
+                && Objects.equals(getWeaponType(), weaponType);
+    }
+
+    @Override
+    public boolean isCompatibleAmmo(AmmoType otherAmmoType) {
+        // Cannot change between infantry ammo types
+        return false;
     }
 
     @Override
@@ -123,42 +138,17 @@ public class InfantryAmmoStorage extends AmmoStorage {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return weaponType.getTechAdvancement();
-    }
-
-    /**
-     * Boolean function that determines if the given part is of the correct ammo.
-     * Useful as a predicate for campaign.findSparePart()
-     */
-    public static boolean isRightAmmo(Part part, AmmoType curType, WeaponType weaponType) {
-        return part instanceof InfantryAmmoStorage
-                && part.isPresent()
-                && (((InfantryAmmoStorage) part).getType()).equals(curType)
-                && curType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType()
-                && (((InfantryAmmoStorage) part).getWeaponType()).equals(weaponType);
-    }
-
-    public void changeAmountAvailable(int amount, final AmmoType curType) {
-        InfantryAmmoStorage a = (InfantryAmmoStorage) campaign.getWarehouse().findSparePart(part ->
-                isRightAmmo(part, curType, weaponType));
-
-        if (null != a) {
-            a.changeShots(amount);
-            if (a.getShots() <= 0) {
-                campaign.getWarehouse().removePart(a);
-            }
-        } else if (amount > 0) {
-            campaign.getQuartermaster().addPart(new InfantryAmmoStorage(1, curType, amount, weaponType, campaign), 0);
-        }
+        return getWeaponType().getTechAdvancement();
     }
 
     @Override
     public String getAcquisitionExtraDesc() {
-        return weaponType.getShots() + " shots (1 clip)";
+        return getWeaponType().getShots() + " shots (1 clip)";
     }
 
-    public Part getNewPart() {
-        return new InfantryAmmoStorage(1, getType(), weaponType.getShots(),
-                weaponType, campaign);
+    @Override
+    public InfantryAmmoStorage getNewPart() {
+        return new InfantryAmmoStorage(1, getType(), getWeaponType().getShots(),
+                getWeaponType(), campaign);
     }
 }

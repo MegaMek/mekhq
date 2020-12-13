@@ -1,6 +1,26 @@
 VERSION HISTORY:
 ----------------
-0.47.14-SNAPSHOT
+0.47.15-SNAPSHOT
++ Issue #2166: NRE in Money::plus/Money::minus
++ PR #2224: Add some basic Refit tests and fix an Armor location bug calculating armor during a refit
++ PR #2241: Fix bug where PartsStore may list INT_MAX as cost and tons for BA ammo
++ Fixing Male Soldier and Female ProtoMech Pilot Portrait Paths so they properly generate
++ Issue #2236: Making Unmaintained hangar color take priority over Damaged/Inoperable
++ Issue #2248: Fix various ContractMarket exceptions when operating at the bounds of MekHQ data
++ PR #2250: Fixing Load Last Save for .cpnx.gz files
++ Issue #1880: Fixed briefing text error for breakthrough (defender) scenarios
++ Issue #2231: Don't give back free parts when fixing a missing part
++ Issue #2254: Ransomed Unit now properly adds to Total Value Salvaged
++ Issues #2255 and #2258: Fix Warehouse::removePart StackOverflowException with child parts and NRE with BayDoor/Cubicle parts
++ PR #2259: Adding Pregnancy Complications Personnel Status
++ PR #2261: Improved Awards Migration
++ PR #2271: Improve CPNX load perf with transport linkages in AtB scenarios
++ PR #2272: Ensure GM Acquire Instantly acquires the correct quantity
++ PR #2274: When loading Campaigns ensure more exceptions are caught and logged properly
++ Issue #2278: Ensure skill prefs are saved to the campaign on creation
++ Issues #1151, 1219, 1687, 1807, 2142, 2243, 2253, 2267, 2268, 2276: Refactor adding and removing ammo from the Campaign
+
+0.47.14 (2020-11-15 1930 UTC)
 + Issues #2217 #2219: Cannot save Campaign with Refits and cannot start new Refits
 + Issue #2220: Implementing AwardFileFactory to handle loading pngs that aren't handled by Toolkit
 

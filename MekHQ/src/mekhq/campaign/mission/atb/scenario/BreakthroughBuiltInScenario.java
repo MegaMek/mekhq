@@ -114,7 +114,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
                 botForce.setDestinationEdge(getEnemyHome());
             }
         } catch (PrincessException e) {
-            MekHQ.getLogger().error(getClass(), "setExtraMissionForces", e);
+            MekHQ.getLogger().error(e);
         }
 
         addBotForce(botForce);
@@ -133,7 +133,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
                 ? CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 66,
                         OffBoardDirection.getOpposite(OffBoardDirection.translateBoardStart(getStart())))
                 : CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 50,
-                        OffBoardDirection.getOpposite(OffBoardDirection.translateBoardStart(getEnemyHome())));
+                        OffBoardDirection.translateBoardStart(getEnemyHome()));
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
                 this);
 
