@@ -98,8 +98,24 @@ public class InfantryAmmoStorage extends AmmoStorage {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof InfantryAmmoStorage)
-                && isSameAmmoType(getType(), ((InfantryAmmoStorage) part).getType())
-                && Objects.equals(getWeaponType(), ((InfantryAmmoStorage) part).getWeaponType());
+                && isSameAmmoType(((InfantryAmmoStorage) part).getType(), ((InfantryAmmoStorage) part).getWeaponType());
+    }
+
+    /**
+     * Gets a value indicating whether or not the {@code AmmoType} for the {@code InfantryWeapon}
+     * is the same as this instance.
+     * @param ammoType The {@code AmmoType}.
+     * @param weaponType The {@code InfantryWeapon} carrying the ammo.
+     */
+    public boolean isSameAmmoType(AmmoType ammoType, InfantryWeapon weaponType) {
+        return isSameAmmoType(ammoType)
+                && Objects.equals(getWeaponType(), weaponType);
+    }
+
+    @Override
+    public boolean isCompatibleAmmo(AmmoType otherAmmoType) {
+        // Cannot change between infantry ammo types
+        return false;
     }
 
     @Override
@@ -123,31 +139,6 @@ public class InfantryAmmoStorage extends AmmoStorage {
     @Override
     public TechAdvancement getTechAdvancement() {
         return getWeaponType().getTechAdvancement();
-    }
-
-    /**
-     * Boolean function that determines if the given part is of the correct ammo.
-     * Useful as a predicate for campaign.findSparePart()
-     */
-    public static boolean isRightAmmo(Part part, AmmoType curType, WeaponType weaponType) {
-        return (part instanceof InfantryAmmoStorage)
-                && part.isPresent()
-                && isSameAmmoType(curType, ((InfantryAmmoStorage) part).getType())
-                && (((InfantryAmmoStorage) part).getWeaponType()).equals(weaponType);
-    }
-
-    public void changeAmountAvailable(int amount, final AmmoType curType) {
-        InfantryAmmoStorage a = (InfantryAmmoStorage) campaign.getWarehouse().findSparePart(part ->
-                isRightAmmo(part, curType, getWeaponType()));
-
-        if (null != a) {
-            a.changeShots(amount);
-            if (a.getShots() <= 0) {
-                campaign.getWarehouse().removePart(a);
-            }
-        } else if (amount > 0) {
-            campaign.getQuartermaster().addPart(new InfantryAmmoStorage(1, curType, amount, getWeaponType(), campaign), 0);
-        }
     }
 
     @Override

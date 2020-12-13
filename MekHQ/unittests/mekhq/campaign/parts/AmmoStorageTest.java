@@ -21,16 +21,18 @@ package mekhq.campaign.parts;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static mekhq.campaign.parts.AmmoUtilities.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,12 +40,9 @@ import org.xml.sax.SAXException;
 
 import megamek.common.AmmoType;
 import megamek.common.BombType;
-import megamek.common.EquipmentType;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -63,7 +62,6 @@ public class AmmoStorageTest {
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, ammoType.getShots(), mockCampaign);
 
         assertEquals(ammoType, ammoStorage.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(ammoType, ammoStorage.getType()));
         assertEquals(ammoType.getShots(), ammoStorage.getShots());
         assertEquals(1.0, ammoStorage.getTonnage(), 0.001);
     }
@@ -90,7 +88,6 @@ public class AmmoStorageTest {
         assertNotNull(clone);
 
         assertEquals(ammoStorage.getType(), clone.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), clone.getType()));
         assertEquals(ammoStorage.getBuyCost(), clone.getBuyCost());
         assertEquals(ammoStorage.getCurrentValue(), clone.getCurrentValue());
         assertEquals(ammoStorage.getShots(), clone.getShots());
@@ -109,7 +106,6 @@ public class AmmoStorageTest {
 
         // ... and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), newAmmoStorage.getType()));
         assertEquals(ammoStorage.getBuyCost(), newAmmoStorage.getBuyCost());
 
         // ... except for the number of shots, which should be instead
@@ -130,7 +126,6 @@ public class AmmoStorageTest {
 
         // ... and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), newAmmoStorage.getType()));
         assertEquals(ammoStorage.getBuyCost(), newAmmoStorage.getBuyCost());
 
         // ... except for the number of shots, which should be instead
@@ -158,7 +153,6 @@ public class AmmoStorageTest {
 
         // ... and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), newAmmoStorage.getType()));
         assertEquals(ammoStorage.getBuyCost(), newAmmoStorage.getBuyCost());
 
         // ... except for the number of shots, which should be instead
@@ -174,7 +168,6 @@ public class AmmoStorageTest {
 
         // ... and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), newAmmoStorage.getType()));
         assertEquals(ammoStorage.getBuyCost(), newAmmoStorage.getBuyCost());
 
         // ... except for the number of shots, which should be instead
@@ -289,6 +282,53 @@ public class AmmoStorageTest {
     }
 
     @Test
+    public void isSameAmmoTypeTest() {
+        AmmoType ammoType = getAmmoType("ISAC5 Ammo");
+        Campaign mockCampaign = mock(Campaign.class);
+
+        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, ammoType.getShots(), mockCampaign);
+
+        // We're the same as ourselves.
+        assertTrue(ammoStorage.isSameAmmoType(ammoType));
+
+        // Create an ammo type with some different munitions available
+        AmmoType isSRM2Ammo = getAmmoType("ISSRM2 Ammo");
+        assertFalse(ammoStorage.isSameAmmoType(isSRM2Ammo));
+
+        ammoStorage = new AmmoStorage(0, isSRM2Ammo, isSRM2Ammo.getShots(), mockCampaign);
+
+        // And ensure they're not the same as the same type of ammo, just
+        // a different munition type.
+        AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
+        assertFalse(ammoStorage.isSameAmmoType(isSRM2InfernoAmmo));
+    }
+
+    @Test
+    public void isSameAmmoTypeFullHalfTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        // Create Full and Half bins
+        Map<String, String> fullAndHalfs = new HashMap<>();
+        fullAndHalfs.put("IS Ammo MG - Full", "IS Machine Gun Ammo - Half");
+        fullAndHalfs.put("Clan Machine Gun Ammo - Full", "Clan Machine Gun Ammo - Half");
+        fullAndHalfs.put("IS Light Machine Gun Ammo - Full", "IS Light Machine Gun Ammo - Half");
+        fullAndHalfs.put("Clan Light Machine Gun Ammo - Full", "Clan Light Machine Gun Ammo - Half");
+        fullAndHalfs.put("IS Heavy Machine Gun Ammo - Full", "IS Heavy Machine Gun Ammo - Half");
+        fullAndHalfs.put("Clan Heavy Machine Gun Ammo - Full", "Clan Heavy Machine Gun Ammo - Half");
+        fullAndHalfs.put("IS Ammo Nail/Rivet - Full", "IS Ammo Nail/Rivet - Half");
+        for (Map.Entry<String, String> pair : fullAndHalfs.entrySet()) {
+            AmmoType fullType = getAmmoType(pair.getKey());
+            AmmoType halfType = getAmmoType(pair.getValue());
+
+            AmmoStorage full = new AmmoStorage(0, fullType, fullType.getShots(), mockCampaign);
+            assertTrue(full.isSameAmmoType(halfType));
+
+            AmmoStorage half = new AmmoStorage(0, halfType, halfType.getShots(), mockCampaign);
+            assertTrue(half.isSameAmmoType(fullType));
+        }
+    }
+
+    @Test
     public void getTonnageTest() {
         AmmoType isAC5Ammo = getAmmoType("ISAC5 Ammo");
         Campaign mockCampaign = mock(Campaign.class);
@@ -349,7 +389,6 @@ public class AmmoStorageTest {
         Campaign mockCampaign = mock(Campaign.class);
         AmmoStorage ammoStorage = new AmmoStorage(0, isSRM2InfernoAmmo, 3 * isSRM2InfernoAmmo.getShots(), mockCampaign);
         ammoStorage.setId(25);
-        ammoStorage.setEquipmentNum(42);
 
         // Write the AmmoStorage XML
         StringWriter sw = new StringWriter();
@@ -380,7 +419,6 @@ public class AmmoStorageTest {
         assertEquals(ammoStorage.getId(), deserialized.getId());
         assertEquals(ammoStorage.getEquipmentNum(), deserialized.getEquipmentNum());
         assertEquals(ammoStorage.getType(), deserialized.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), deserialized.getType()));
         assertEquals(ammoStorage.getShots(), deserialized.getShots());
     }
 
@@ -390,7 +428,6 @@ public class AmmoStorageTest {
         Campaign mockCampaign = mock(Campaign.class);
         AmmoStorage ammoStorage = new AmmoStorage(0, infernoBomb, 3 * infernoBomb.getShots(), mockCampaign);
         ammoStorage.setId(25);
-        ammoStorage.setEquipmentNum(42);
 
         // Write the AmmoStorage XML
         StringWriter sw = new StringWriter();
@@ -421,396 +458,6 @@ public class AmmoStorageTest {
         assertEquals(ammoStorage.getId(), deserialized.getId());
         assertEquals(ammoStorage.getEquipmentNum(), deserialized.getEquipmentNum());
         assertEquals(ammoStorage.getType(), deserialized.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(ammoStorage.getType(), deserialized.getType()));
         assertEquals(ammoStorage.getShots(), deserialized.getShots());
-    }
-
-    @Test
-    public void changeAmountAvailableNoneFound() {
-        Campaign mockCampaign = mock(Campaign.class);
-
-        // Setup an empty warehouse
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-
-        // And a basic quartermaster
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
-        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
-
-        AmmoType ammoType = getAmmoType("ISSRM4 Ammo");
-        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 0, mockCampaign);
-
-        // Add shots to the Campaign when we don't have any spare ammo of that type...
-        int addedShots = 100;
-        ammoStorage.changeAmountAvailable(addedShots, ammoType);
-
-        // ... which should result in more ammo being added to the campaign.
-        AmmoStorage added = null;
-        for (Part part : warehouse.getParts()) {
-            // Only one part in the campaign.
-            assertTrue(part instanceof AmmoStorage);
-            added = (AmmoStorage) part;
-            break;
-        }
-
-        assertNotNull(added);
-        assertTrue(added.isSpare());
-        assertTrue(added.isPresent());
-        assertEquals(ammoType, added.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(ammoType, added.getType()));
-        assertEquals(addedShots, added.getShots());
-    }
-
-    @Test
-    public void changeAmountAvailableNoneFoundBecauseCurrentlyInTransit() {
-        Campaign mockCampaign = mock(Campaign.class);
-
-        AmmoType ammoType = getAmmoType("ISSRM4 Ammo");
-
-        // Setup a warehouse with ammo in transit
-        Warehouse warehouse = new Warehouse();
-        AmmoStorage inTransit = new AmmoStorage(0, ammoType, 0, mockCampaign);
-        inTransit.setDaysToArrival(10);
-        warehouse.addPart(inTransit);
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-
-        // And a basic quartermaster
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
-        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
-
-        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 0, mockCampaign);
-
-        // Add shots to the Campaign when we don't have any spare ammo of that type present...
-        int addedShots = 100;
-        ammoStorage.changeAmountAvailable(addedShots, ammoType);
-
-        // ... which should result in more ammo being added to the campaign.
-        AmmoStorage added = null;
-        for (Part part : warehouse.getParts()) {
-            if (part.isPresent()) {
-                // Only one part present in the campaign.
-                assertTrue(part instanceof AmmoStorage);
-                added = (AmmoStorage) part;
-            } else {
-                // The other part should be our in transit part
-                assertEquals(inTransit, part);
-            }
-        }
-
-        assertNotNull(added);
-        assertTrue(added.isSpare());
-        assertTrue(added.isPresent());
-        assertEquals(ammoType, added.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(ammoType, added.getType()));
-        assertEquals(addedShots, added.getShots());
-    }
-
-    @Test
-    public void changeAmountAvailableNoneFoundBecauseWrongMunitionType() {
-        Campaign mockCampaign = mock(Campaign.class);
-
-        // Setup a warehouse with ammo in transit
-        Warehouse warehouse = new Warehouse();
-        AmmoType otherAmmoType = getAmmoType("ISSRM4 Inferno Ammo");
-        AmmoStorage otherAmmo = new AmmoStorage(0, otherAmmoType, 20, mockCampaign);
-        warehouse.addPart(otherAmmo);
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-
-        // And a basic quartermaster
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
-        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
-
-        AmmoType ammoType = getAmmoType("ISSRM4 Ammo");
-        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 0, mockCampaign);
-
-        // Add shots to the Campaign when we don't have any spare ammo of that type present...
-        int addedShots = 100;
-        ammoStorage.changeAmountAvailable(addedShots, ammoType);
-
-        // ... which should result in more ammo being added to the campaign.
-        AmmoStorage added = null;
-        for (Part part : warehouse.getParts()) {
-            if (part.getId() != otherAmmo.getId()) {
-                // Only one other part should be in the campaign.
-                assertNull(added);
-                assertTrue(part instanceof AmmoStorage);
-                added = (AmmoStorage) part;
-            } else {
-                // The other part should be our part of another type
-                assertEquals(otherAmmo, part);
-            }
-        }
-
-        assertNotNull(added);
-        assertTrue(added.isSpare());
-        assertTrue(added.isPresent());
-        assertEquals(ammoType, added.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(ammoType, added.getType()));
-        assertEquals(addedShots, added.getShots());
-    }
-
-    @Test
-    public void changeAmountAvailableIncreaseFound() {
-        Campaign mockCampaign = mock(Campaign.class);
-
-        AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
-
-        // Setup a warehouse with ammo in transit
-        Warehouse warehouse = new Warehouse();
-        int originalShots = 1;
-        AmmoStorage existing = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
-        warehouse.addPart(existing);
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-
-        // And a basic quartermaster
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
-        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
-
-        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 0, mockCampaign);
-
-        // Add shots to the Campaign when we have spare ammo of that type present...
-        int addedShots = 100;
-        ammoStorage.changeAmountAvailable(addedShots, ammoType);
-
-        // ... which should result in the existing ammo count increasing in the campaign.
-        AmmoStorage updated = null;
-        for (Part part : warehouse.getParts()) {
-            // Only one part present in the campaign.
-            assertTrue(part instanceof AmmoStorage);
-            updated = (AmmoStorage) part;
-            break;
-        }
-
-        assertNotNull(updated);
-        assertEquals(updated.getId(), existing.getId());
-        assertEquals(existing.getType(), updated.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(existing.getType(), updated.getType()));
-        assertEquals(originalShots + addedShots, updated.getShots());
-    }
-
-    @Test
-    public void changeAmountAvailableDecreaseNoneFound() {
-        Campaign mockCampaign = mock(Campaign.class);
-
-        // Setup an empty warehouse
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-
-        // And a basic quartermaster
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
-        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
-
-        AmmoType ammoType = getAmmoType("ISSRM4 Ammo");
-        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 0, mockCampaign);
-
-        // Add shots to the Campaign when we don't have any spare ammo of that type...
-        int removedShots = -100;
-        ammoStorage.changeAmountAvailable(removedShots, ammoType);
-
-        // ... which should result in nothing happening.
-        assertTrue(warehouse.getParts().isEmpty());
-    }
-
-    @Test
-    public void changeAmountAvailableDecreaseNoneFoundBecauseCurrentlyInTransit() {
-        Campaign mockCampaign = mock(Campaign.class);
-
-        AmmoType ammoType = getAmmoType("ISSRM4 Ammo");
-
-        // Setup a warehouse with ammo in transit
-        Warehouse warehouse = new Warehouse();
-        int originalShots = 100;
-        AmmoStorage inTransit = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
-        inTransit.setDaysToArrival(10);
-        warehouse.addPart(inTransit);
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-
-        // And a basic quartermaster
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
-        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
-
-        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 0, mockCampaign);
-
-        // Try to remove shots from the Campaign when we don't have any spare ammo of that type present...
-        int removedShots = -100;
-        ammoStorage.changeAmountAvailable(removedShots, ammoType);
-
-        // ... which should result in nothing changing.
-        AmmoStorage existing = null;
-        for (Part part : warehouse.getParts()) {
-            // Only one part in the campaign.
-            assertTrue(part instanceof AmmoStorage);
-            existing = (AmmoStorage) part;
-            break;
-        }
-
-        assertNotNull(existing);
-        assertEquals(inTransit.getId(), existing.getId());
-        assertEquals(inTransit.getDaysToArrival(), existing.getDaysToArrival());
-        assertEquals(ammoType, existing.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(ammoType, existing.getType()));
-        assertEquals(originalShots, existing.getShots());
-    }
-
-    @Test
-    public void changeAmountAvailableDecreaseFound() {
-        Campaign mockCampaign = mock(Campaign.class);
-
-        AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
-
-        // Setup a warehouse with ammo in transit
-        Warehouse warehouse = new Warehouse();
-        int originalShots = 100;
-        AmmoStorage existing = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
-        warehouse.addPart(existing);
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-
-        // And a basic quartermaster
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
-        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
-
-        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 0, mockCampaign);
-
-        // Remove shots from the Campaign when we have spare ammo of that type present...
-        int removedShots = -50;
-        ammoStorage.changeAmountAvailable(removedShots, ammoType);
-
-        // ... which should result in the existing ammo count decreasing in the campaign.
-        AmmoStorage updated = null;
-        for (Part part : warehouse.getParts()) {
-            // Only one part in the campaign.
-            assertNull(updated);
-            assertTrue(part instanceof AmmoStorage);
-            updated = (AmmoStorage) part;
-        }
-
-        assertNotNull(updated);
-        assertEquals(updated.getId(), existing.getId());
-        assertEquals(existing.getType(), updated.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(existing.getType(), updated.getType()));
-        assertEquals(originalShots + removedShots, updated.getShots());
-    }
-
-    @Test
-    public void changeAmountAvailableDecreaseAll() {
-        Campaign mockCampaign = mock(Campaign.class);
-
-        AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
-
-        // Setup a warehouse with ammo in transit
-        Warehouse warehouse = new Warehouse();
-        int originalShots = 100;
-        AmmoStorage existing = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
-        warehouse.addPart(existing);
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-
-        // And a basic quartermaster
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
-        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
-
-        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 0, mockCampaign);
-
-        // Remove all the shots from the Campaign when we have spare ammo of that type present...
-        ammoStorage.changeAmountAvailable(-originalShots, ammoType);
-
-        // ... which should result in the existing ammo being removed from the campaign.
-        assertTrue(warehouse.getParts().isEmpty());
-    }
-
-    @Test
-    public void changeAmountAvailableDecreaseWayMoreThanAll() {
-        Campaign mockCampaign = mock(Campaign.class);
-
-        AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
-
-        // Setup a warehouse with ammo in transit
-        Warehouse warehouse = new Warehouse();
-        int originalShots = 100;
-        AmmoStorage existing = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
-        warehouse.addPart(existing);
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-
-        // And a basic quartermaster
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
-        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
-
-        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 0, mockCampaign);
-
-        // Remove way more than the number shots from the Campaign when we have
-        // spare ammo of that type present...
-        ammoStorage.changeAmountAvailable(-(10 * originalShots), ammoType);
-
-        // ... which should result in the existing ammo being removed from the campaign,
-        // and not some weird situation where some part is there with negative or zero
-        // rounds of ammo present.
-        assertTrue(warehouse.getParts().isEmpty());
-    }
-
-    @Ignore("Fixed in PR 2229")
-    @Test
-    public void changeAmountAvailableBombDecreaseNoneFound() {
-        Campaign mockCampaign = mock(Campaign.class);
-
-        // Setup a warehouse with some other bomb type
-        Warehouse warehouse = new Warehouse();
-        BombType torpedoBomb = getBombType("TorpedoBomb");
-        int originalShots = 2;
-        AmmoStorage otherAmmoStorage = new AmmoStorage(0, torpedoBomb, originalShots, mockCampaign);
-        warehouse.addPart(otherAmmoStorage);
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-
-        // And a basic quartermaster
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
-        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
-
-        BombType ammoType = getBombType("ThunderBomb");
-        AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 0, mockCampaign);
-
-        // Remove shots from the Campaign when we have a bomb, but it doesn't match
-        int removedShots = -100;
-        ammoStorage.changeAmountAvailable(removedShots, ammoType);
-
-        // ... which should result in nothing changing.
-        AmmoStorage existing = null;
-        for (Part part : warehouse.getParts()) {
-            // Only one part in the campaign.
-            assertTrue(part instanceof AmmoStorage);
-            existing = (AmmoStorage) part;
-            break;
-        }
-
-        assertNotNull(existing);
-        assertEquals(otherAmmoStorage.getId(), existing.getId());
-        assertEquals(ammoType, existing.getType());
-        assertTrue(AmmoStorage.isSameAmmoType(torpedoBomb, existing.getType()));
-        assertEquals(originalShots, existing.getShots());
-    }
-
-    /**
-     * Gets an AmmoType by name (performing any initialization required
-     * on the MM side).
-     * @param name The lookup name for the AmmoType.
-     * @return The ammo type for the given name.
-     */
-    private synchronized static AmmoType getAmmoType(String name) {
-        EquipmentType equipmentType = EquipmentType.get(name);
-        assertNotNull(equipmentType);
-        assertTrue(equipmentType instanceof AmmoType);
-
-        return (AmmoType) equipmentType;
-    }
-
-    /**
-     * Gets a BombType by name (performing any initialization required
-     * on the MM side).
-     * @param name The lookup name for the BombType.
-     * @return The bomb type for the given name.
-     */
-    private synchronized static BombType getBombType(String name) {
-        EquipmentType equipmentType = EquipmentType.get(name);
-        assertNotNull(equipmentType);
-        assertTrue(equipmentType instanceof BombType);
-
-        return (BombType) equipmentType;
     }
 }
