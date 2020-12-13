@@ -1380,7 +1380,7 @@ public class CampaignXmlParser {
         // After replacing parts, go back through and remove more broken parts
         for (Part prt : retVal.getWarehouse().getParts()) {
             // deal with the Weapon as Heat Sink problem from earlier versions
-            if (prt instanceof HeatSink && !prt.getName().contains("Heat Sink")) {
+            if ((prt instanceof HeatSink) && !prt.getName().contains("Heat Sink")) {
                 removeParts.add(prt);
                 continue;
             }
@@ -1409,21 +1409,21 @@ public class CampaignXmlParser {
                 if (prt instanceof MissingEquipmentPart) {
                     Mounted m = u.getEntity().getEquipment(
                             ((MissingEquipmentPart) prt).getEquipmentNum());
-                    if (null == m || m.getLocation() == Entity.LOC_NONE) {
+                    if ((null == m) || (m.getLocation() == Entity.LOC_NONE)) {
                         removeParts.add(prt);
                         continue;
                     }
                 }
 
                 //if the type is a BayWeapon, remove
-                if (prt instanceof EquipmentPart
-                        && ((EquipmentPart) prt).getType() instanceof BayWeapon) {
+                if ((prt instanceof EquipmentPart)
+                        && (((EquipmentPart) prt).getType() instanceof BayWeapon)) {
                     removeParts.add(prt);
                     continue;
                 }
 
-                if (prt instanceof MissingEquipmentPart
-                        && ((MissingEquipmentPart) prt).getType() instanceof BayWeapon) {
+                if ((prt instanceof MissingEquipmentPart)
+                        && (((MissingEquipmentPart) prt).getType() instanceof BayWeapon)) {
                     removeParts.add(prt);
                     continue;
                 }
@@ -1446,13 +1446,13 @@ public class CampaignXmlParser {
 
             // deal with true values for sensor and life support on non-Mech
             // heads
-            if (prt instanceof MekLocation
-                    && ((MekLocation) prt).getLoc() != Mech.LOC_HEAD) {
+            if ((prt instanceof MekLocation)
+                    && (((MekLocation) prt).getLoc() != Mech.LOC_HEAD)) {
                 ((MekLocation) prt).setSensors(false);
                 ((MekLocation) prt).setLifeSupport(false);
             }
 
-            if (version.getMinorVersion() < 3 && !prt.needsFixing()
+            if ((version.getMinorVersion() < 3) && !prt.needsFixing()
                     && !prt.isSalvaging()) {
                 // repaired parts were not getting experience properly reset
                 prt.setSkillMin(SkillType.EXP_GREEN);
@@ -1473,24 +1473,24 @@ public class CampaignXmlParser {
             }
 
             // old versions didnt distinguish tank engines
-            if (prt instanceof EnginePart && prt.getName().contains("Vehicle")) {
+            if ((prt instanceof EnginePart) && prt.getName().contains("Vehicle")) {
                 boolean isHover = null != u
                         && u.getEntity().getMovementMode() == EntityMovementMode.HOVER && u.getEntity() instanceof Tank;
                 ((EnginePart) prt).fixTankFlag(isHover);
             }
 
             // clan flag might not have been properly set in early versions
-            if (prt instanceof EnginePart && prt.getName().contains("(Clan")
-                    && prt.getTechBase() != Part.T_CLAN) {
+            if ((prt instanceof EnginePart) && prt.getName().contains("(Clan")
+                    && (prt.getTechBase() != Part.T_CLAN)) {
                 ((EnginePart) prt).fixClanFlag();
             }
-            if (prt instanceof MissingEnginePart && null != u
-                    && u.getEntity() instanceof Tank) {
+            if ((prt instanceof MissingEnginePart) && (null != u)
+                    && (u.getEntity() instanceof Tank)) {
                 boolean isHover = u.getEntity().getMovementMode() == EntityMovementMode.HOVER;
                 ((MissingEnginePart) prt).fixTankFlag(isHover);
             }
-            if (prt instanceof MissingEnginePart
-                    && prt.getName().contains("(Clan") && prt.getTechBase() != Part.T_CLAN) {
+            if ((prt instanceof MissingEnginePart)
+                    && prt.getName().contains("(Clan") && (prt.getTechBase() != Part.T_CLAN)) {
                 ((MissingEnginePart) prt).fixClanFlag();
             }
 

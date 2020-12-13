@@ -785,7 +785,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
             if (oPart instanceof AmmoBin) {
                 int remainingShots = ((AmmoBin)oPart).getFullShots() - ((AmmoBin)oPart).getShotsNeeded();
-                AmmoType type = ((AmmoBin)oPart).getType();
+                AmmoType type = ((AmmoBin) oPart).getType();
                 if (remainingShots > 0) {
                     if (oPart instanceof LargeCraftAmmoBin) {
                         if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE) || type.hasFlag(AmmoType.F_SCREEN)) {

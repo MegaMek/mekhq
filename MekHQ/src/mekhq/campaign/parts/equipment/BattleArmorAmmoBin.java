@@ -125,7 +125,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
             mounted.setDestroyed(false);
             mounted.setRepairable(true);
             getUnit().repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
-            mounted.setShotsLeft(getFullShots() - shotsNeeded/getNumTroopers());
+            mounted.setShotsLeft(getFullShots() - (shotsNeeded / getNumTroopers()));
         }
     }
 
