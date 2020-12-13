@@ -1194,10 +1194,7 @@ public class AtBContract extends Contract implements Serializable {
                 +nextWeekBattleTypeMod
                 +"</nextWeekBattleTypeMod>");
         if (parentContract != null) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    + "<parentContractId>"
-                    + parentContract.getId()
-                    + "</parentContractId>");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "parentContractId", parentContract.getId());
         }
 
         if (null != specialEventScenarioDate) {
