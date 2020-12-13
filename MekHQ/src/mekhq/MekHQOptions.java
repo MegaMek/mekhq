@@ -69,22 +69,6 @@ public final class MekHQOptions {
     }
 
     //region Colours
-    public Color getIconButtonForeground() {
-        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.ICON_BUTTON_FOREGROUND, Color.BLACK.getRGB()));
-    }
-
-    public void setIconButtonForeground(Color value) {
-        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.ICON_BUTTON_FOREGROUND, value.getRGB());
-    }
-
-    public Color getIconButtonBackground() {
-        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.ICON_BUTTON_BACKGROUND, Color.LIGHT_GRAY.getRGB()));
-    }
-
-    public void setIconButtonBackground(Color value) {
-        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.ICON_BUTTON_BACKGROUND, value.getRGB());
-    }
-
     public Color getDeployedForeground() {
         return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.DEPLOYED_FOREGROUND, Color.BLACK.getRGB()));
     }

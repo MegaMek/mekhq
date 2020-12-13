@@ -30,8 +30,6 @@ public final class MekHqConstants {
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history, also used as a limit in the UI
 
     //region Colours
-    public static final String ICON_BUTTON_FOREGROUND = "iconButtonForeground";
-    public static final String ICON_BUTTON_BACKGROUND = "iconButtonBackground";
     public static final String DEPLOYED_FOREGROUND = "deployedForeground";
     public static final String DEPLOYED_BACKGROUND = "deployedBackground";
     public static final String BELOW_CONTRACT_MINIMUM_FOREGROUND = "belowContractMinimumForeground";
