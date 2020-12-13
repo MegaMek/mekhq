@@ -24,7 +24,6 @@ import java.io.PrintWriter;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
-import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.annotations.Nullable;
@@ -88,38 +87,49 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     @Override
-    public void fix() {
-        Part replacement = findReplacement(false);
-        if (null != replacement) {
-            Part actualReplacement = getActualReplacement((AmmoBin) replacement);
-            unit.addPart(actualReplacement);
-            campaign.getQuartermaster().addPart(actualReplacement, 0);
-            replacement.decrementQuantity();
-            ((EquipmentPart) actualReplacement).setEquipmentNum(equipmentNum);
-            remove(false);
-            //assign the replacement part to the unit
-            actualReplacement.updateConditionFromPart();
-        }
+    public boolean hasReplacementPart() {
+        return true;
     }
 
-    protected Part getActualReplacement(AmmoBin found) {
-        //Check to see if munition types are different
-        if (getType().equals(found.getType())) {
-            return found.clone();
-        } else {
-            return new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(),
-                    getFullShots(), isOneShot(), isOmniPodded(), campaign);
-        }
+    @Override
+    public Part getReplacementPart() {
+        return getNewPart();
+    }
+
+    @Override
+    public void reservePart() {
+        // No need to reserve a part for a missing AmmoBin, they're free.
+    }
+
+    @Override
+    public void cancelReservation() {
+        // We do not need to return a replacement part, they're free/fake
+        setReplacementPart(null); // CAW: clears out anything from a prior version
+    }
+
+    @Override
+    public void fix() {
+        AmmoBin replacement = getNewPart();
+        unit.addPart(replacement);
+        campaign.getQuartermaster().addPart(replacement, 0);
+
+        remove(false);
+
+        // Add the replacement part to the unit
+        replacement.setEquipmentNum(getEquipmentNum());
+        replacement.updateConditionFromPart();
     }
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if ((part instanceof AmmoBin) && !(part instanceof LargeCraftAmmoBin)) {
-            EquipmentPart eqpart = (EquipmentPart) part;
-            EquipmentType et = eqpart.getType();
-            return getType().equals(et) && (((AmmoBin) part).getFullShots() == getFullShots());
-        }
-        return false;
+        return (part instanceof AmmoBin)
+                // Do not try to replace a MissingAmmoBin with anything other
+                // than an AmmoBin. Subclasses should use a similar check, which
+                // breaks Composability to a degree but in this case we've used
+                // subclasses where they're not truly composable.
+                && (part.getClass() == AmmoBin.class)
+                && getType().equals(((AmmoBin) part).getType())
+                && (isOneShot() == ((AmmoBin) part).isOneShot());
     }
 
     public boolean isOneShot() {
@@ -131,50 +141,32 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     @Override
-    public Part getNewPart() {
+    public AmmoBin getNewPart() {
         return new AmmoBin(getUnitTonnage(), getType(), -1, getFullShots(), oneShot, omniPodded, campaign);
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<equipmentNum>"
-                +equipmentNum
-                +"</equipmentNum>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<typeName>"
-                +MekHqXmlUtil.escape(typeName)
-                +"</typeName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<daysToWait>"
-                +daysToWait
-                +"</daysToWait>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<oneShot>"
-                +oneShot
-                +"</oneShot>");
-        writeToXmlEnd(pw1, indent);
+    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
+        if (oneShot) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "oneShot", oneShot);
+        }
+
+        super.writeToXmlEnd(pw1, indent);
     }
 
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
-        super.loadFieldsFromXmlNode(wn);
+
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
-                equipmentNum = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
-                typeName = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
-                daysToWait = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
+            if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
                 oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
             }
         }
-        restore();
+
+        super.loadFieldsFromXmlNode(wn);
     }
 
     @Override

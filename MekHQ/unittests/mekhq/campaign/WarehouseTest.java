@@ -40,6 +40,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -95,6 +97,7 @@ public class WarehouseTest {
         // Create a mock part without an ID
         Part mockPart = mock(Part.class, RETURNS_DEEP_STUBS);
         when(mockPart.getId()).thenCallRealMethod();
+        when(mockPart.getChildParts()).thenReturn(Collections.emptyList());
         doCallRealMethod().when(mockPart).setId(anyInt());
 
         // Add the mock part to our warehouse
@@ -267,6 +270,49 @@ public class WarehouseTest {
                             .count());
 
             // And the three events should correlate to the child parts being removed
+            assertNotNull(eventSpy.findEvent(PartRemovedEvent.class, e -> mockParentPart == e.getPart()));
+            for (Part mockChildPart : mockChildParts) {
+                assertNotNull(eventSpy.findEvent(PartRemovedEvent.class, e -> mockChildPart == e.getPart()));
+            }
+        }
+    }
+
+    @Test
+    public void testWarehouseRemoveRecursiveChildParts() {
+        Warehouse warehouse = new Warehouse();
+
+        // Add a parent part to the warehouse
+        Part mockParentPart = createMockPart(1);
+        warehouse.addPart(mockParentPart);
+
+        // Create child parts for the parent part
+        List<Part> mockChildParts = new ArrayList<>();
+        mockChildParts.add(createMockPart(2));
+        mockChildParts.add(createMockPart(3));
+        Part mockRecursiveChildPart = createMockPart(4);
+        when(mockRecursiveChildPart.getChildParts()).thenReturn(Arrays.asList(new Part[] { mockParentPart }));
+        mockChildParts.add(mockRecursiveChildPart);
+        when(mockParentPart.getChildParts()).thenReturn(mockChildParts);
+
+        for (Part mockChildPart : mockChildParts) {
+            when(mockChildPart.getParentPart()).thenReturn(mockParentPart);
+            when(mockChildPart.hasParentPart()).thenReturn(true);
+
+            warehouse.addPart(mockChildPart);
+        }
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            // Ensure we can then remove the part
+            assertTrue(warehouse.removePart(mockParentPart));
+
+            // There should be four events where we removed parts
+            assertEquals(4,
+                    eventSpy.getEvents()
+                            .stream()
+                            .filter(e -> e instanceof PartRemovedEvent)
+                            .count());
+
+            // And the four events should correlate to the child parts being removed
             assertNotNull(eventSpy.findEvent(PartRemovedEvent.class, e -> mockParentPart == e.getPart()));
             for (Part mockChildPart : mockChildParts) {
                 assertNotNull(eventSpy.findEvent(PartRemovedEvent.class, e -> mockChildPart == e.getPart()));

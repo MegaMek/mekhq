@@ -35,10 +35,6 @@ import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.Vector;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-
 import megamek.common.*;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
@@ -1837,9 +1833,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("transportLinkages")) {
                 try {
-                    loadTransportLinkages(wn2);
+                    transportLinkages = loadTransportLinkages(wn2);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(this, "Error loading transport linkages in scenario", e);
+                    MekHQ.getLogger().error("Error loading transport linkages in scenario", e);
                 }
             }
         }
@@ -1856,15 +1852,36 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         survivalBonus.removeAll(toRemove);
     }
 
-    private void loadTransportLinkages(Node wn) throws XPathExpressionException {
-        XPath xp = MekHqXmlUtil.getXPathInstance();
-        NodeList transportIDs = (NodeList) xp.evaluate("transportLinkage/transportID", wn, XPathConstants.NODESET);
-        NodeList transporteeIDs = (NodeList) xp.evaluate("transportLinkage/transportedUnits", wn, XPathConstants.NODESET);
+    private static Map<String, List<String>> loadTransportLinkages(Node wn) {
+        NodeList nl = wn.getChildNodes();
 
-        for (int x = 0; x < transportIDs.getLength(); x++) {
-            String transportID = transportIDs.item(x).getTextContent();
-            List<String> transportedUnitIDs = Arrays.asList(transporteeIDs.item(x).getTextContent().split(","));
+        Map<String, List<String>> transportLinkages = new HashMap<>();
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            if (wn2.getNodeName().equalsIgnoreCase("transportLinkage")) {
+                loadTransportLinkage(wn2, transportLinkages);
+            }
+        }
 
+        return transportLinkages;
+    }
+
+    private static void loadTransportLinkage(Node wn, Map<String, List<String>> transportLinkages) {
+        NodeList nl = wn.getChildNodes();
+
+        String transportID = null;
+        List<String> transportedUnitIDs = null;
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+
+            if (wn2.getNodeName().equalsIgnoreCase("transportID")) {
+                transportID = wn2.getTextContent().trim();
+            } else if (wn2.getNodeName().equalsIgnoreCase("transportedUnits")) {
+                transportedUnitIDs = Arrays.asList(wn2.getTextContent().split(","));
+            }
+        }
+
+        if ((transportID != null) && (transportedUnitIDs != null)) {
             transportLinkages.put(transportID, transportedUnitIDs);
         }
     }

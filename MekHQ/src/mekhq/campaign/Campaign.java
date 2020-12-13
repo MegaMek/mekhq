@@ -1611,6 +1611,14 @@ public class Campaign implements Serializable, ITechManager {
         return parts;
     }
 
+    /**
+     * Sets the Warehouse which stores parts for the campaign.
+     * @param warehouse The warehouse in which to store parts.
+     */
+    public void setWarehouse(Warehouse warehouse) {
+        parts = Objects.requireNonNull(warehouse);
+    }
+
     public Quartermaster getQuartermaster() {
         return quartermaster;
     }

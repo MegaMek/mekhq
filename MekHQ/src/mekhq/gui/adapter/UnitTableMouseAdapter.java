@@ -70,6 +70,7 @@ import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.campaign.unit.actions.ShowUnitBvAction;
 import mekhq.campaign.unit.actions.StripUnitAction;
+import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.MekLabTab;
@@ -96,7 +97,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     public static final String COMMAND_CHANGE_SITE = "CHANGE_SITE";
     // Ammo Swap Commands
     public static final String COMMAND_LC_SWAP_AMMO = "LC_SWAP_AMMO";
-    public static final String COMMAND_SWAP_AMMO = "SWAP_AMMO";
     public static final String COMMAND_SMALL_SV_SWAP_AMMO = "SMALL_SV_SWAP_AMMO";
     // Repair Commands
     public static final String COMMAND_REPAIR = "REPAIR";
@@ -271,17 +271,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (!dialog.wasCanceled()) {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
-        } else if (command.contains(COMMAND_SWAP_AMMO)) { // Single Unit only
-            String[] fields = command.split(":");
-            int selAmmoId = Integer.parseInt(fields[1]);
-            Part part = gui.getCampaign().getWarehouse().getPart(selAmmoId);
-            if (!(part instanceof AmmoBin)) {
-                return;
-            }
-            AmmoBin ammo = (AmmoBin) part;
-            AmmoType atype = (AmmoType) EquipmentType.get(fields[2]);
-            ammo.changeMunition(atype);
-            MekHQ.triggerEvent(new UnitChangedEvent(part.getUnit()));
         } else if (command.contains(COMMAND_CHANGE_SITE)) {
             int selected = Integer.parseInt(command.split(":")[1]);
             for (Unit unit : units) {
@@ -757,20 +746,19 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         }
                     } else {
                         menu = new JMenu("Swap ammo");
-                        JMenu ammoMenu;
                         for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
-                            ammoMenu = new JMenu(ammo.getType().getDesc());
-                            AmmoType curType = (AmmoType) ammo.getType();
+                            JMenu ammoMenu = new JMenu(ammo.getType().getDesc());
+                            AmmoType curType = ammo.getType();
                             for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType,
                                     gui.getCampaign().getCampaignOptions().getTechLevel())) {
                                 cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                                // Identity Comparison is required, not .equals
-                                if (atype == curType) {
+                                if (atype.equals(curType)) {
                                     cbMenuItem.setSelected(true);
                                 } else {
-                                    cbMenuItem.setActionCommand(COMMAND_SWAP_AMMO + ":" + ammo.getId()
-                                            + ":" + atype.getInternalName());
-                                    cbMenuItem.addActionListener(this);
+                                    cbMenuItem.addActionListener(evt -> {
+                                        IUnitAction swapAmmoTypeAction = new SwapAmmoTypeAction(ammo, atype);
+                                        swapAmmoTypeAction.execute(gui.getCampaign(), unit);
+                                    });
                                 }
                                 ammoMenu.add(cbMenuItem);
                             }

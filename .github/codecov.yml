@@ -8,3 +8,10 @@
 #
 fixes:
   - "mekhq/::"        # reduce root e.g., "before/path/" => "path/"
+
+github_checks:
+  #
+  # https://docs.codecov.io/docs/github-checks-beta#disabling-github-checks-patch-annotations-via-yaml
+  #
+  annotations: false
+ 

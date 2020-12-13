@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
-import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
@@ -152,6 +151,10 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             unit.removePart(this);
         }
         setUnit(null);
+
+        // Grab a reference to our parent part so that we don't accidentally NRE
+        // when we remove the parent part reference.
+        Part parentPart = getParentPart();
         if (null != parentPart) {
             parentPart.removeChildPart(this);
         }
@@ -344,18 +347,6 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public String failToFind() {
         return "<font color='red'><b> part not found</b>.</font>";
-    }
-
-    @Override
-    public void writeToXmlBegin(PrintWriter pw1, int indent) {
-        super.writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<daysToWait>"
-                +daysToWait
-                +"</daysToWait>");
-        if (hasReplacementPart()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "replacementId", getReplacementPart().getId());
-        }
     }
 
     @Override
