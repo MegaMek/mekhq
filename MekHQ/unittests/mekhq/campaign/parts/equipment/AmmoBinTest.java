@@ -619,8 +619,7 @@ public class AmmoBinTest {
         assertEquals(isSRM2InfernoAmmo, ammoBin.getType());
         assertTrue(ammoBin.needsFixing());
 
-        // TODO: determine if this should be uncommented
-        // assertEquals(isSRM2InfernoAmmo.getShots(), ammoBin.getShotsNeeded());
+        assertEquals(isSRM2InfernoAmmo.getShots(), ammoBin.getShotsNeeded());
     }
 
     @Test

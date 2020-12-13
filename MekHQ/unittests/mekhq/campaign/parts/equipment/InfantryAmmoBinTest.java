@@ -439,8 +439,7 @@ public class InfantryAmmoBinTest {
 
         assertEquals(infernoAmmoType, ammoBin.getType());
 
-        // TODO: determine if this should be uncommented
-        // assertEquals(infernoAmmoType.getShots(), ammoBin.getShotsNeeded());
+        assertEquals(infernoAmmoType.getShots() * clips, ammoBin.getShotsNeeded());
     }
 
     @Test

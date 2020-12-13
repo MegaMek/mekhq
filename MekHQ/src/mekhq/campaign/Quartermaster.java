@@ -251,10 +251,8 @@ public class Quartermaster {
      */
     private @Nullable AmmoStorage findSpareAmmo(AmmoType ammoType) {
         return (AmmoStorage) getWarehouse().findSparePart(part -> {
-            if (!isAvailableAsSpareAmmo(part)) {
-                return false;
-            }
-            return ((AmmoStorage) part).isSameAmmoType(ammoType);
+            return isAvailableAsSpareAmmo(part)
+                    && ((AmmoStorage) part).isSameAmmoType(ammoType);
         });
     }
 
@@ -389,7 +387,6 @@ public class Quartermaster {
         InfantryAmmoStorage ammoStorage = findSpareAmmo(ammoType, infantryWeapon);
 
         int shotsRemoved = removeAmmo(ammoStorage, shotsNeeded);
-        shotsNeeded -= shotsRemoved;
 
         // Inform the caller how many shots we actually removed for them.
         return shotsRemoved;

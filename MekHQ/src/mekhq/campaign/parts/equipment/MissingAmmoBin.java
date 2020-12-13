@@ -138,11 +138,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     protected int getFullShots() {
-        if (oneShot) {
-            return 1;
-        }
-
-        return getType().getShots();
+        return oneShot ? 1 : getType().getShots();
     }
 
     @Override
