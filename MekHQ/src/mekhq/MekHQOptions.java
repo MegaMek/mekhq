@@ -68,6 +68,45 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.HISTORICAL_DAILY_LOG, value);
     }
 
+    //region Expanded MekHQ Display Options
+    //region Command Center Display
+    public boolean getCommandCenterUseUnitMarket() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
+    }
+
+    public void setCommandCenterUseUnitMarket(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, value);
+    }
+
+    public boolean getCommandCenterMRMS() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_MRMS, false);
+    }
+
+    public void setCommandCenterMRMS(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_MRMS, value);
+    }
+    //endregion Command Center Display
+
+    //region Personnel Tab Display Options
+    public PersonnelFilterStyle getPersonnelFilterStyle() {
+        return PersonnelFilterStyle.valueOf(userPreferences.node(MekHqConstants.DISPLAY_NODE)
+                .get(MekHqConstants.PERSONNEL_FILTER_STYLE, "STANDARD"));
+    }
+
+    public void setPersonnelFilterStyle(PersonnelFilterStyle value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).put(MekHqConstants.PERSONNEL_FILTER_STYLE, value.name());
+    }
+
+    public boolean getPersonnelFilterOnPrimaryRole() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, false);
+    }
+
+    public void setPersonnelFilterOnPrimaryRole(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, value);
+    }
+    //endregion Personnel Tab Display Options
+    //endregion Expanded MekHQ Display Options
+
     //region Colours
     public Color getDeployedForeground() {
         return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.DEPLOYED_FOREGROUND, Color.BLACK.getRGB()));
@@ -315,45 +354,6 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.PAID_RETIREMENT_BACKGROUND, value.getRGB());
     }
     //endregion Colours
-
-    //region Expanded MekHQ Display Options
-    //region Command Center Display
-    public boolean getCommandCenterUseUnitMarket() {
-        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
-    }
-
-    public void setCommandCenterUseUnitMarket(boolean value) {
-        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, value);
-    }
-
-    public boolean getCommandCenterMRMS() {
-        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_MRMS, false);
-    }
-
-    public void setCommandCenterMRMS(boolean value) {
-        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.COMMAND_CENTER_MRMS, value);
-    }
-    //endregion Command Center Display
-
-    //region Personnel Tab Display Options
-    public PersonnelFilterStyle getPersonnelFilterStyle() {
-        return PersonnelFilterStyle.valueOf(userPreferences.node(MekHqConstants.DISPLAY_NODE)
-                .get(MekHqConstants.PERSONNEL_FILTER_STYLE, "STANDARD"));
-    }
-
-    public void setPersonnelFilterStyle(PersonnelFilterStyle value) {
-        userPreferences.node(MekHqConstants.DISPLAY_NODE).put(MekHqConstants.PERSONNEL_FILTER_STYLE, value.name());
-    }
-
-    public boolean getPersonnelFilterOnPrimaryRole() {
-        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, false);
-    }
-
-    public void setPersonnelFilterOnPrimaryRole(boolean value) {
-        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, value);
-    }
-    //endregion Personnel Tab Display Options
-    //endregion Expanded MekHQ Display Options
     //endregion Display
 
     //region Autosave

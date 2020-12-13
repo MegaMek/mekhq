@@ -29,6 +29,16 @@ public final class MekHqConstants {
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history, also used as a limit in the UI
 
+    //region Command Center
+    public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
+    public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
+    //endregion Command Center
+
+    //region Personnel Tab Display Options
+    public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
+    public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
+    //endregion Personnel Tab Display Options
+
     //region Colours
     public static final String DEPLOYED_FOREGROUND = "deployedForeground";
     public static final String DEPLOYED_BACKGROUND = "deployedBackground";
@@ -38,9 +48,9 @@ public final class MekHqConstants {
     public static final String IN_TRANSIT_BACKGROUND = "inTransitBackground";
     public static final String REFITTING_FOREGROUND = "refittingForeground";
     public static final String REFITTING_BACKGROUND = "refittingBackground";
-    public static final String MOTHBALLING_FOREGROUND = "mothballingBackground";
+    public static final String MOTHBALLING_FOREGROUND = "mothballingForeground";
     public static final String MOTHBALLING_BACKGROUND = "mothballingBackground";
-    public static final String MOTHBALLED_FOREGROUND = "mothballedBackground";
+    public static final String MOTHBALLED_FOREGROUND = "mothballedForeground";
     public static final String MOTHBALLED_BACKGROUND = "mothballedBackground";
     public static final String NOT_REPAIRABLE_FOREGROUND = "notRepairableForeground";
     public static final String NOT_REPAIRABLE_BACKGROUND = "notRepairableBackground";
@@ -61,16 +71,6 @@ public final class MekHqConstants {
     public static final String PAID_RETIREMENT_FOREGROUND = "paidRetirementForeground";
     public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
     //endregion Colours
-
-    //region Command Center
-    public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
-    public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
-    //endregion Command Center
-
-    //region Personnel Tab Display Options
-    public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
-    public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
-    //endregion Personnel Tab Display Options
     //endregion Display
 
     //region Autosave
