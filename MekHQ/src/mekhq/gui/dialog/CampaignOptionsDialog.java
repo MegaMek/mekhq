@@ -4982,6 +4982,7 @@ public class CampaignOptionsDialog extends JDialog {
         rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_REGULAR, (Integer) spnAbilReg.getModel().getValue());
         rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_VETERAN, (Integer) spnAbilVet.getModel().getValue());
         rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer) spnAbilElite.getModel().getValue());
+        campaign.setRandomSkillPreferences(rSkillPrefs);
 
         for (int i = 0; i < phenotypeSpinners.length; i++) {
             options.setPhenotypeProbability(i, (Integer) phenotypeSpinners[i].getValue());
