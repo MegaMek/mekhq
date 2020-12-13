@@ -29,7 +29,42 @@ public final class MekHqConstants {
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history, also used as a limit in the UI
 
-    // region Command Center
+    //region Colours
+    public static final String ICON_BUTTON_FOREGROUND = "iconButtonForeground";
+    public static final String ICON_BUTTON_BACKGROUND = "iconButtonBackground";
+    public static final String DEPLOYED_FOREGROUND = "deployedForeground";
+    public static final String DEPLOYED_BACKGROUND = "deployedBackground";
+    public static final String BELOW_CONTRACT_MINIMUM_FOREGROUND = "belowContractMinimumForeground";
+    public static final String BELOW_CONTRACT_MINIMUM_BACKGROUND = "belowContractMinimumBackground";
+    public static final String IN_TRANSIT_FOREGROUND = "inTransitForeground";
+    public static final String IN_TRANSIT_BACKGROUND = "inTransitBackground";
+    public static final String REFITTING_FOREGROUND = "refittingForeground";
+    public static final String REFITTING_BACKGROUND = "refittingBackground";
+    public static final String MOTHBALLING_FOREGROUND = "mothballingBackground";
+    public static final String MOTHBALLING_BACKGROUND = "mothballingBackground";
+    public static final String MOTHBALLED_FOREGROUND = "mothballedBackground";
+    public static final String MOTHBALLED_BACKGROUND = "mothballedBackground";
+    public static final String NOT_REPAIRABLE_FOREGROUND = "notRepairableForeground";
+    public static final String NOT_REPAIRABLE_BACKGROUND = "notRepairableBackground";
+    public static final String NON_FUNCTIONAL_FOREGROUND = "nonFunctionalForeground";
+    public static final String NON_FUNCTIONAL_BACKGROUND = "nonFunctionalBackground";
+    public static final String NEEDS_PARTS_FIXED_FOREGROUND = "needsPartsFixedForeground";
+    public static final String NEEDS_PARTS_FIXED_BACKGROUND = "needsPartsFixedBackground";
+    public static final String UNMAINTAINED_FOREGROUND = "unmaintainedForeground";
+    public static final String UNMAINTAINED_BACKGROUND = "unmaintainedBackground";
+    public static final String UNCREWED_FOREGROUND = "uncrewedForeground";
+    public static final String UNCREWED_BACKGROUND = "uncrewedBackground";
+    public static final String LOAN_OVERDUE_FOREGROUND = "loanOverdueForeground";
+    public static final String LOAN_OVERDUE_BACKGROUND = "loanOverdueBackground";
+    public static final String INJURED_FOREGROUND = "injuredForeground";
+    public static final String INJURED_BACKGROUND = "injuredBackground";
+    public static final String HEALED_INJURIES_FOREGROUND = "healedInjuriesForeground";
+    public static final String HEALED_INJURIES_BACKGROUND = "healedInjuriesBackground";
+    public static final String PAID_RETIREMENT_FOREGROUND = "paidRetirementForeground";
+    public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
+    //endregion Colours
+
+    //region Command Center
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
     //endregion Command Center

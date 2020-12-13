@@ -393,8 +393,8 @@ public class RetirementTableModel extends AbstractTableModel {
             if (!isSelected) {
                 if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
                     campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                    MekHQ.getMekHQOptions().getPaidRetirement().getColor().ifPresent(this::setBackground);
-                    MekHQ.getMekHQOptions().getPaidRetirement().getAlternateColor().ifPresent(this::setForeground);
+                    setForeground(MekHQ.getMekHQOptions().getPaidRetirementForeground());
+                    setBackground(MekHQ.getMekHQOptions().getPaidRetirementBackground());
                 }
             }
             return this;
@@ -468,10 +468,10 @@ public class RetirementTableModel extends AbstractTableModel {
 
             MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
             if (!isSelected) {
-                if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
-                        campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                    MekHQ.getMekHQOptions().getPaidRetirement().getColor().ifPresent(this::setBackground);
-                    MekHQ.getMekHQOptions().getPaidRetirement().getAlternateColor().ifPresent(this::setForeground);
+                if ((campaign.getRetirementDefectionTracker().getPayout(p.getId()) != null)
+                        && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
+                    setForeground(MekHQ.getMekHQOptions().getPaidRetirementForeground());
+                    setBackground(MekHQ.getMekHQOptions().getPaidRetirementBackground());
                 }
             }
 

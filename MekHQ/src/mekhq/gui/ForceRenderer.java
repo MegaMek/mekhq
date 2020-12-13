@@ -135,14 +135,14 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
             setText("<html>" + name + ", " + uname + c3network + transport + "</html>");
             if (!sel && u.isDeployed()) {
-                MekHQ.getMekHQOptions().getDeployed().getColor().ifPresent(this::setBackground);
-                MekHQ.getMekHQOptions().getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
+                setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
         } else if (value instanceof Force) {
             if (!sel && ((Force) value).isDeployed()) {
-                MekHQ.getMekHQOptions().getDeployed().getColor().ifPresent(this::setBackground);
-                MekHQ.getMekHQOptions().getDeployed().getAlternateColor().ifPresent(this::setForeground);
+                setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
+                setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
         } else {

@@ -172,8 +172,8 @@ public class LoanTableModel extends DataTableModel {
                 setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
                 if (loan.isOverdue()) {
-                    MekHQ.getMekHQOptions().getLoanOverdue().getColor().ifPresent(this::setBackground);
-                    MekHQ.getMekHQOptions().getLoanOverdue().getAlternateColor().ifPresent(this::setForeground);
+                    setForeground(MekHQ.getMekHQOptions().getLoanOverdueForeground());
+                    setBackground(MekHQ.getMekHQOptions().getLoanOverdueBackground());
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                 }
