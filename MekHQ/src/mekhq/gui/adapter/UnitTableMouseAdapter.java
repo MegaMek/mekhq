@@ -470,8 +470,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 boolean needsCheck = true;
                 while (unit.isAvailable() && needsCheck) {
                     needsCheck = false;
-                    for (int x = 0; x < unit.getParts().size(); x++) {
-                        Part part = unit.getParts().get(x);
+                    List<Part> parts = new ArrayList<>(unit.getParts());
+                    for (Part part : parts) {
                         if (part instanceof MissingPart) {
                             //Make sure we restore both left and right thrusters
                             if (part instanceof MissingThrusters) {
