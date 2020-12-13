@@ -51,7 +51,7 @@ public class RestoreUnitAction implements IUnitAction {
                         }
                     }
                     // We magically acquire a replacement part, then fix the missing one.
-                    part.getCampaign().getQuartermaster().addPart(((MissingPart) part).getNewPart(), 0);
+                    campaign.getQuartermaster().addPart(((MissingPart) part).getNewPart(), 0);
                     part.fix();
                     part.resetTimeSpent();
                     part.resetOvertime();
