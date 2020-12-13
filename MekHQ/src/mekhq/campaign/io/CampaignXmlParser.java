@@ -77,6 +77,7 @@ import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mod.am.InjuryTypes;
@@ -1263,7 +1264,7 @@ public class CampaignXmlParser {
     }
 
     private static void processMissionNodes(Campaign retVal, Node wn, Version version) {
-        MekHQ.getLogger().info(CampaignXmlParser.class, "Loading Mission Nodes from XML...");
+        MekHQ.getLogger().info("Loading Mission Nodes from XML...");
 
         NodeList wList = wn.getChildNodes();
 
@@ -1279,7 +1280,7 @@ public class CampaignXmlParser {
             if (!wn2.getNodeName().equalsIgnoreCase("mission")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.getLogger().info(CampaignXmlParser.class, "Unknown node type not loaded in Mission nodes: " + wn2.getNodeName());
+                MekHQ.getLogger().warning("Unknown node type not loaded in Mission nodes: " + wn2.getNodeName());
                 continue;
             }
 
@@ -1290,7 +1291,15 @@ public class CampaignXmlParser {
             }
         }
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, "Load Mission Nodes Complete!");
+        // Restore references on AtBContracts
+        for (Mission m : retVal.getMissions()) {
+            if (m instanceof AtBContract) {
+                final AtBContract atbContract = (AtBContract) m;
+                atbContract.restore(retVal);
+            }
+        }
+
+        MekHQ.getLogger().info("Load Mission Nodes Complete!");
     }
 
     private static String checkUnits(Node wn) {
