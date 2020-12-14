@@ -32,17 +32,18 @@ import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.AmmoType;
-import megamek.common.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.IUnitAction;
+import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.model.UnitTableModel;
+import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
 import mekhq.service.MassRepairService;
 
@@ -94,18 +95,6 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             if (!dialog.wasCanceled()) {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
-        } else if (command.contains("SWAP_AMMO")) {
-            String sel = command.split(":")[1];
-            int selAmmoId = Integer.parseInt(sel);
-            Part part = gui.getCampaign().getPart(selAmmoId);
-            if (!(part instanceof AmmoBin)) {
-                return;
-            }
-            AmmoBin ammo = (AmmoBin) part;
-            sel = command.split(":")[2];
-            AmmoType etype = (AmmoType) EquipmentType.get(sel);
-            ammo.changeMunition(etype);
-            MekHQ.triggerEvent(new UnitChangedEvent(part.getUnit()));
         } else if (command.contains("CHANGE_SITE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
@@ -219,31 +208,27 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                     JMenu ammoMenu;
                     for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
                         ammoMenu = new JMenu(ammo.getType().getDesc());
-                        AmmoType curType = (AmmoType) ammo.getType();
+                        AmmoType curType = ammo.getType();
                         for (AmmoType atype : Utilities.getMunitionsFor(unit
                                 .getEntity(), curType, gui.getCampaign()
                                 .getCampaignOptions().getTechLevel())) {
                             cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                            if (atype.equals(curType)
-                            		&& atype.getMunitionType() == curType.getMunitionType()) {
+                            if (atype.equals(curType)) {
                                 cbMenuItem.setSelected(true);
                             } else {
-                                cbMenuItem.setActionCommand("SWAP_AMMO:"
-                                        + ammo.getId() + ":"
-                                        + atype.getInternalName());
-                                cbMenuItem.addActionListener(this);
+                                cbMenuItem.addActionListener(evt -> {
+                                    IUnitAction swapAmmoTypeAction = new SwapAmmoTypeAction(ammo, atype);
+                                    swapAmmoTypeAction.execute(gui.getCampaign(), unit);
+                                });
                             }
                             ammoMenu.add(cbMenuItem);
                             i++;
                         }
-                        if (menu.getItemCount() > 20) {
-                            MenuScroller.setScrollerFor(menu, 20);
-                        }
-                        menu.add(ammoMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(menu, ammoMenu);
                     }
                 }
                 menu.setEnabled(unit.isAvailable());
-                popup.add(menu);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu);
                 // Salvage / Repair
                 if (unit.isSalvage()) {
                     menuItem = new JMenuItem("Repair");

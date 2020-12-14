@@ -29,6 +29,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.IPlayer;
 import megamek.common.MechSummaryCache;
 import megamek.common.enums.Gender;
@@ -506,7 +507,7 @@ public class AtBDynamicScenarioFactory {
 
                     if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
                         en.setCamoCategory(Camouflage.NO_CAMOUFLAGE);
-                        en.setCamoFileName(IPlayer.colorNames[scenario.getContract(campaign).getAllyColorIndex()]);
+                        en.setCamoFileName(PlayerColors.COLOR_NAMES[scenario.getContract(campaign).getAllyColorIndex()]);
                     }
                 }
 
