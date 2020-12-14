@@ -20,6 +20,8 @@ VERSION HISTORY:
 + Issue #2278: Ensure skill prefs are saved to the campaign on creation
 + Issues #1151, 1219, 1687, 1807, 2142, 2243, 2253, 2267, 2268, 2276: Refactor adding and removing ammo from the Campaign
 + Issue #2280: GM Restore skips parts
++ PR #2286: Don't reload unit data if nothing changed on disk when reading Campaigns
++ Issue #2287: Prisoner Filter Should Include Bondsmen
 
 0.47.14 (2020-11-15 1930 UTC)
 + Issues #2217 #2219: Cannot save Campaign with Refits and cannot start new Refits
