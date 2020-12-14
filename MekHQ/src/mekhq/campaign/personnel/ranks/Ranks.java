@@ -407,25 +407,7 @@ public class Ranks {
                         || wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
                     retVal.rankSystem = Integer.parseInt(wn2.getTextContent().trim());
 
-                    // If this is an older version from before the full blown rank system with
-                    // professions, we need to translate it to match the new constants
-                    if ((version != null) && version.isLowerThan("0.3.4-r1782")) {
-                        // Translate the rank system
-                        if (retVal.rankSystem == 0) {
-                            String change = (String) JOptionPane.showInputDialog(
-                                    null,
-                                    "Due to an error in previous versions of MekHQ this value may not be correct."
-                                            + "\nPlease select the correct rank system and click OK.",
-                                    "Select Correct Rank System",
-                                    JOptionPane.QUESTION_MESSAGE,
-                                    null,
-                                    PersonMigrator.oldRankNames,
-                                    PersonMigrator.oldRankNames[0]);
-                            retVal.rankSystem = Arrays.asList(PersonMigrator.oldRankNames).indexOf(change);
-                        }
-                        retVal.oldRankSystem = retVal.rankSystem;
-                        retVal.rankSystem = Ranks.translateFactions[retVal.rankSystem];
-                    } else if ((version != null) && (retVal.rankSystem != RS_CUSTOM)) {
+                    if ((version != null) && (retVal.rankSystem != RS_CUSTOM)) {
                         retVal = Ranks.getRanksFromSystem(retVal.rankSystem);
                     }
 

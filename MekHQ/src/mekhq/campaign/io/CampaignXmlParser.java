@@ -330,13 +330,6 @@ public class CampaignXmlParser {
         // Campaign object...
         // We need to do a post-process pass to restore a number of references.
 
-        // If the version is earlier than 0.3.4 r1782, then we need to translate
-        // the rank system.
-        if (version.isLowerThan("0.3.4-r1782")) {
-            retVal.setRankSystem(
-                    PersonMigrator.translateRankSystem(retVal.getRanks().getOldRankSystem(), retVal.getFactionCode()));
-        }
-
         // Fixup any ghost kills
         cleanupGhostKills(retVal);
 
