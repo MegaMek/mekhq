@@ -19,9 +19,8 @@
 package mekhq.campaign.io.Migration;
 
 public class PersonMigrator {
-
     /**
-     * This migrates awards from the Default Set of pre-0.47.6 to the newer standard
+     * This migrates awards from the Default Set of pre-0.47.6 to the newer standard following 0.47.14
      * @param text the previous award name
      * @return the new award name
      */
@@ -71,6 +70,58 @@ public class PersonMigrator {
                 return text;
             default:
                 return null;
+        }
+    }
+
+    /**
+     * This migrates the rank system name to the data file as per changes made in 0.47.15
+     * @param system the system id of the loaded rank system
+     * @return the name of the system
+     */
+    public static String migrateRankSystemName(int system) {
+        switch (system) {
+            case 0:
+                return "Second Star League";
+            case 1:
+                return "Federated Suns";
+            case 2:
+                return "Federated Commonwealth";
+            case 3:
+                return "Lyran Commonwealth";
+            case 4:
+                return "Lyran Alliance";
+            case 5:
+                return "Free Worlds League";
+            case 6:
+                return "Capellan Confederation";
+            case 7:
+                return "Capellan Confederation Warrior House";
+            case 8:
+                return "Draconis Combine";
+            case 9:
+                return "Clan";
+            case 10:
+                return "ComStar";
+            case 11:
+                return "Word of Blake";
+            case 12:
+                return "Custom";
+            case 13:
+                return "Magistracy of Canopus";
+            case 14:
+                return "Taurian Concordat";
+            case 15:
+                return "Marian Hegemony";
+            case 16:
+                return "Outworlds Alliance";
+            case 17:
+                return "Free Rasalhague Republic";
+            case 18:
+                return "Aurigan Coalition";
+            case 19:
+                return "First Star League";
+            default:
+                return "?";
         }
     }
 }

@@ -34,6 +34,7 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
@@ -99,8 +100,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.RankTranslator;
-import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -331,13 +331,6 @@ public class CampaignXmlParser {
         // Okay, after we've gone through all the nodes and constructed the
         // Campaign object...
         // We need to do a post-process pass to restore a number of references.
-
-        // If the version is earlier than 0.3.4 r1782, then we need to translate
-        // the rank system.
-        if (version.isLowerThan("0.3.4-r1782")) {
-            retVal.setRankSystem(
-                    RankTranslator.translateRankSystem(retVal.getRanks().getOldRankSystem(), retVal.getFactionCode()));
-        }
 
         // Fixup any ghost kills
         cleanupGhostKills(retVal);
@@ -786,7 +779,7 @@ public class CampaignXmlParser {
             retVal.getRanks().setRanksFromList(rankNames, officerCut);
         }
         if (rankSystem != -1) {
-            retVal.setRanks(new Ranks(rankSystem));
+            retVal.setRanks(Ranks.getRanksFromSystem(rankSystem));
             retVal.getRanks().setOldRankSystem(rankSystem);
         }
 

@@ -50,6 +50,8 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -1207,8 +1209,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 if (system == Ranks.RS_CUSTOM) {
                     continue;
                 }
-                cbMenuItem = new JCheckBoxMenuItem(
-                        Ranks.getRankSystemName(system));
+                cbMenuItem = new JCheckBoxMenuItem(Ranks.getRanksFromSystem(system).getRankSystemName());
                 cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, String.valueOf(system)));
                 cbMenuItem.addActionListener(this);
                 cbMenuItem.setEnabled(true);

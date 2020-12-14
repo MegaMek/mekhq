@@ -29,7 +29,7 @@ import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.view.PersonViewPanel;
