@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
-import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooser;
-import megamek.client.ui.swing.dialog.imageChooser.PortraitChooser;
+import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooserDialog;
+import megamek.client.ui.swing.dialog.imageChooser.PortraitChooserDialog;
 import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.*;
 import megamek.common.options.IOption;
@@ -793,7 +793,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_EDIT_PORTRAIT: {
-                AbstractIconChooser portraitDialog = new PortraitChooser(gui.getFrame(),
+                AbstractIconChooserDialog portraitDialog = new PortraitChooserDialog(gui.getFrame(),
                         selectedPerson.getPortrait());
                 int result = portraitDialog.showDialog();
                 if ((result == JOptionPane.OK_OPTION) && (portraitDialog.getSelectedItem() != null)) {
