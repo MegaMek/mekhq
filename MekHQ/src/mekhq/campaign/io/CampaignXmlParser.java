@@ -34,6 +34,7 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
@@ -77,6 +78,7 @@ import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mod.am.InjuryTypes;
@@ -98,8 +100,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.RankTranslator;
-import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -298,6 +299,7 @@ public class CampaignXmlParser {
                     retVal.setPersonnelMarket(PersonnelMarket.generateInstanceFromXML(wn, retVal, version));
                     foundPersonnelMarket = true;
                 } else if (xn.equalsIgnoreCase("contractMarket")) {
+                    // CAW: implicit DEPENDS-ON to the <missions> node
                     retVal.setContractMarket(ContractMarket.generateInstanceFromXML(wn, retVal, version));
                     foundContractMarket = true;
                 } else if (xn.equalsIgnoreCase("unitMarket")) {
@@ -329,13 +331,6 @@ public class CampaignXmlParser {
         // Okay, after we've gone through all the nodes and constructed the
         // Campaign object...
         // We need to do a post-process pass to restore a number of references.
-
-        // If the version is earlier than 0.3.4 r1782, then we need to translate
-        // the rank system.
-        if (version.isLowerThan("0.3.4-r1782")) {
-            retVal.setRankSystem(
-                    RankTranslator.translateRankSystem(retVal.getRanks().getOldRankSystem(), retVal.getFactionCode()));
-        }
 
         // Fixup any ghost kills
         cleanupGhostKills(retVal);
@@ -784,7 +779,7 @@ public class CampaignXmlParser {
             retVal.getRanks().setRanksFromList(rankNames, officerCut);
         }
         if (rankSystem != -1) {
-            retVal.setRanks(new Ranks(rankSystem));
+            retVal.setRanks(Ranks.getRanksFromSystem(rankSystem));
             retVal.getRanks().setOldRankSystem(rankSystem);
         }
 
@@ -1165,7 +1160,7 @@ public class CampaignXmlParser {
     }
 
     private static void processMissionNodes(Campaign retVal, Node wn, Version version) {
-        MekHQ.getLogger().info(CampaignXmlParser.class, "Loading Mission Nodes from XML...");
+        MekHQ.getLogger().info("Loading Mission Nodes from XML...");
 
         NodeList wList = wn.getChildNodes();
 
@@ -1181,7 +1176,7 @@ public class CampaignXmlParser {
             if (!wn2.getNodeName().equalsIgnoreCase("mission")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.getLogger().info(CampaignXmlParser.class, "Unknown node type not loaded in Mission nodes: " + wn2.getNodeName());
+                MekHQ.getLogger().warning("Unknown node type not loaded in Mission nodes: " + wn2.getNodeName());
                 continue;
             }
 
@@ -1192,7 +1187,15 @@ public class CampaignXmlParser {
             }
         }
 
-        MekHQ.getLogger().info(CampaignXmlParser.class, "Load Mission Nodes Complete!");
+        // Restore references on AtBContracts
+        for (Mission m : retVal.getMissions()) {
+            if (m instanceof AtBContract) {
+                final AtBContract atbContract = (AtBContract) m;
+                atbContract.restore(retVal);
+            }
+        }
+
+        MekHQ.getLogger().info("Load Mission Nodes Complete!");
     }
 
     private static String checkUnits(Node wn) {

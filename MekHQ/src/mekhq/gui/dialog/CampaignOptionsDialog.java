@@ -87,7 +87,7 @@ import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
@@ -2572,7 +2572,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         DefaultComboBoxModel<String> rankModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < Ranks.RS_NUM; i++) {
-            rankModel.addElement(Ranks.getRankSystemName(i));
+            rankModel.addElement(Ranks.getRanksFromSystem(i).getRankSystemName());
         }
         comboRanks.setModel(rankModel);
         comboRanks.setSelectedIndex(campaign.getRanks().getRankSystem());
@@ -4550,7 +4550,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void fillRankInfo() {
-        Ranks ranks = new Ranks(comboRanks.getSelectedIndex());
+        Ranks ranks = Ranks.getRanksFromSystem(comboRanks.getSelectedIndex());
         ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
         TableColumn column;
         for (int i = 0; i < RankTableModel.COL_NUM; i++) {

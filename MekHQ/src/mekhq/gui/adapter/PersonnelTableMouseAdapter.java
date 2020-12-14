@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
-import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooser;
-import megamek.client.ui.swing.dialog.imageChooser.PortraitChooser;
+import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooserDialog;
+import megamek.client.ui.swing.dialog.imageChooser.PortraitChooserDialog;
 import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.*;
 import megamek.common.options.IOption;
@@ -50,6 +50,8 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -793,7 +795,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_EDIT_PORTRAIT: {
-                AbstractIconChooser portraitDialog = new PortraitChooser(gui.getFrame(),
+                AbstractIconChooserDialog portraitDialog = new PortraitChooserDialog(gui.getFrame(),
                         selectedPerson.getPortrait());
                 int result = portraitDialog.showDialog();
                 if ((result == JOptionPane.OK_OPTION) && (portraitDialog.getSelectedItem() != null)) {
@@ -1207,8 +1209,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 if (system == Ranks.RS_CUSTOM) {
                     continue;
                 }
-                cbMenuItem = new JCheckBoxMenuItem(
-                        Ranks.getRankSystemName(system));
+                cbMenuItem = new JCheckBoxMenuItem(Ranks.getRanksFromSystem(system).getRankSystemName());
                 cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, String.valueOf(system)));
                 cbMenuItem.addActionListener(this);
                 cbMenuItem.setEnabled(true);

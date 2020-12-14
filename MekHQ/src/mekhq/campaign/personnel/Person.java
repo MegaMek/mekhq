@@ -44,6 +44,8 @@ import mekhq.campaign.log.*;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.Ranks;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1992,19 +1994,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.gender = Gender.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                    if (version.isLowerThan("0.3.4-r1782")) {
-                        RankTranslator rt = new RankTranslator(c);
-                        try {
-                            retVal.rank = rt.getNewRank(c.getRanks().getOldRankSystem(),
-                                    Integer.parseInt(wn2.getTextContent()));
-                        } catch (ArrayIndexOutOfBoundsException e) {
-                            // Do nothing
-                        }
-                    } else {
-                        retVal.rank = Integer.parseInt(wn2.getTextContent());
-                    }
+                    retVal.rank = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
-                    retVal.rankLevel = Integer.parseInt(wn2.getTextContent());
+                    retVal.rankLevel = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
                     retVal.setRankSystem(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiRank")) {
@@ -2469,7 +2461,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (rankSystem == -1) {
             ranks = null;
         } else {
-            ranks = new Ranks(rankSystem);
+            ranks = Ranks.getRanksFromSystem(rankSystem);
         }
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
@@ -2478,7 +2470,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (rankSystem != -1) {
             // Null protection
             if (ranks == null) {
-                ranks = new Ranks(rankSystem);
+                ranks = Ranks.getRanksFromSystem(rankSystem);
             }
             return ranks;
         }

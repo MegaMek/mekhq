@@ -48,6 +48,8 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 
@@ -285,7 +287,6 @@ public class Campaign implements Serializable, ITechManager {
         factionCode = "MERC";
         techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
-        Ranks.initializeRankSystems();
         ranks = Ranks.getRanksFromSystem(Ranks.RS_SL);
         forces = new Force(name);
         forceIds.put(0, forces);
@@ -4157,7 +4158,9 @@ public class Campaign implements Serializable, ITechManager {
 
         // Against the Bot
         if (getCampaignOptions().getUseAtB()) {
+            // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
             contractMarket.writeToXml(pw1, indent);
+
             unitMarket.writeToXml(pw1, indent);
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colorIndex", colorIndex);
             if (lances.size() > 0)   {
