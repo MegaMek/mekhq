@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-0.47.15-SNAPSHOT
+0.47.15 (RC1) (2020-12-14 2330 UTC)
 + Issue #2166: NRE in Money::plus/Money::minus
 + PR #2224: Add some basic Refit tests and fix an Armor location bug calculating armor during a refit
 + PR #2241: Fix bug where PartsStore may list INT_MAX as cost and tons for BA ammo
