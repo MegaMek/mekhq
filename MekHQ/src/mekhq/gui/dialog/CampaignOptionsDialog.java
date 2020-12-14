@@ -247,6 +247,8 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkRandomizeOrigin;
     private JCheckBox chkRandomizeDependentsOrigin;
     private JSpinner spnOriginSearchRadius;
+    private JCheckBox chkOriginExtraRandom;
+    private JSpinner spnOriginDistanceScale;
 
     //Medical
     private JCheckBox useAdvancedMedicalBox;
@@ -3954,6 +3956,12 @@ public class CampaignOptionsDialog extends JDialog {
 
         spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(50, 10, 250, 10));
 
+        chkOriginExtraRandom = new JCheckBox(resources.getString("lblOriginExtraRandom.text"));
+
+        JLabel lblOriginDistanceScale = new JLabel(resources.getString("lblOriginDistanceScale.text"));
+
+        spnOriginDistanceScale = new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1 ));
+
         // Layout the Panel
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("panPersonnelRandomization.text")));
@@ -3971,6 +3979,10 @@ public class CampaignOptionsDialog extends JDialog {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblOriginSearchRadius)
                                 .addComponent(spnOriginSearchRadius, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkOriginExtraRandom)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblOriginDistanceScale)
+                                .addComponent(spnOriginDistanceScale, GroupLayout.Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -3981,6 +3993,10 @@ public class CampaignOptionsDialog extends JDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblOriginSearchRadius)
                                 .addComponent(spnOriginSearchRadius))
+                        .addComponent(chkOriginExtraRandom)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblOriginDistanceScale)
+                                .addComponent(spnOriginDistanceScale))
         );
 
         return panel;
@@ -4691,6 +4707,8 @@ public class CampaignOptionsDialog extends JDialog {
         chkRandomizeOrigin.setSelected(options.randomizeOrigin());
         chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
         spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
+        chkOriginExtraRandom.setSelected(options.isOriginExtraRandom());
+        spnOriginDistanceScale.setValue(options.getOriginDistanceScale());
 
         //Medical
         useAdvancedMedicalBox.setSelected(options.useAdvancedMedical());
@@ -5134,26 +5152,26 @@ public class CampaignOptionsDialog extends JDialog {
         options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
         options.setQuirks(useQuirksBox.isSelected());
         campaign.getGameOptions().getOption("stratops_quirks").setValue(useQuirksBox.isSelected());
-        options.setClanPriceModifier((Double) spnClanPriceModifier.getModel().getValue());
+        options.setClanPriceModifier((Double) spnClanPriceModifier.getValue());
         for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
-            options.setUsedPartsValue((Double) spnUsedPartsValue[i].getModel().getValue(), i);
+            options.setUsedPartsValue((Double) spnUsedPartsValue[i].getValue(), i);
         }
-        options.setDamagedPartsValue((Double) spnDamagedPartsValue.getModel().getValue());
-        options.setCanceledOrderReimbursement((Double) spnOrderRefund.getModel().getValue());
+        options.setDamagedPartsValue((Double) spnDamagedPartsValue.getValue());
+        options.setCanceledOrderReimbursement((Double) spnOrderRefund.getValue());
         options.setUnitRatingMethod((UnitRatingMethod) unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((Integer) manualUnitRatingModifier.getValue());
         options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
         options.setDestroyByMargin(useDamageMargin.isSelected());
-        options.setDestroyMargin((Integer) spnDamageMargin.getModel().getValue());
-        options.setDestroyPartTarget((Integer) spnDestroyPartTarget.getModel().getValue());
+        options.setDestroyMargin((Integer) spnDamageMargin.getValue());
+        options.setDestroyPartTarget((Integer) spnDestroyPartTarget.getValue());
         options.setUseAeroSystemHits(useAeroSystemHitsBox.isSelected());
         options.setCheckMaintenance(checkMaintenance.isSelected());
         options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
         options.setReverseQualityNames(reverseQualityNames.isSelected());
         options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
         options.setLogMaintenance(logMaintenance.isSelected());
-        options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getModel().getValue());
-        options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getModel().getValue());
+        options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getValue());
+        options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getValue());
         options.setPayForParts(payForPartsBox.isSelected());
         options.setPayForRepairs(payForRepairsBox.isSelected());
         options.setPayForUnits(payForUnitsBox.isSelected());
@@ -5175,57 +5193,57 @@ public class CampaignOptionsDialog extends JDialog {
         options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
 
         options.setEquipmentContractBase(btnContractEquipment.isSelected());
-        options.setEquipmentContractPercent((Double) spnEquipPercent.getModel().getValue());
-        options.setDropshipContractPercent((Double) spnDropshipPercent.getModel().getValue());
-        options.setJumpshipContractPercent((Double) spnJumpshipPercent.getModel().getValue());
-        options.setWarshipContractPercent((Double) spnWarshipPercent.getModel().getValue());
+        options.setEquipmentContractPercent((Double) spnEquipPercent.getValue());
+        options.setDropshipContractPercent((Double) spnDropshipPercent.getValue());
+        options.setJumpshipContractPercent((Double) spnJumpshipPercent.getValue());
+        options.setWarshipContractPercent((Double) spnWarshipPercent.getValue());
         options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());
         options.setBLCSaleValue(chkBLCSaleValue.isSelected());
         options.setOverageRepaymentInFinalPayment(chkOverageRepaymentInFinalPayment.isSelected());
 
-        options.setWaitingPeriod((Integer) spnAcquireWaitingPeriod.getModel().getValue());
+        options.setWaitingPeriod((Integer) spnAcquireWaitingPeriod.getValue());
         options.setAcquisitionSkill((String) choiceAcquireSkill.getSelectedItem());
         options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
-        options.setClanAcquisitionPenalty((Integer) spnAcquireClanPenalty.getModel().getValue());
-        options.setIsAcquisitionPenalty((Integer) spnAcquireIsPenalty.getModel().getValue());
+        options.setClanAcquisitionPenalty((Integer) spnAcquireClanPenalty.getValue());
+        options.setIsAcquisitionPenalty((Integer) spnAcquireIsPenalty.getValue());
         options.setMaxAcquisitions(Integer.parseInt(txtMaxAcquisitions.getText()));
 
-        options.setNDiceTransitTime((Integer) spnNDiceTransitTime.getModel().getValue());
-        options.setConstantTransitTime((Integer) spnConstantTransitTime.getModel().getValue());
+        options.setNDiceTransitTime((Integer) spnNDiceTransitTime.getValue());
+        options.setConstantTransitTime((Integer) spnConstantTransitTime.getValue());
         options.setUnitTransitTime(choiceTransitTimeUnits.getSelectedIndex());
-        options.setAcquireMosBonus((Integer) spnAcquireMosBonus.getModel().getValue());
-        options.setAcquireMinimumTime((Integer) spnAcquireMinimum.getModel().getValue());
+        options.setAcquireMosBonus((Integer) spnAcquireMosBonus.getValue());
+        options.setAcquireMinimumTime((Integer) spnAcquireMinimum.getValue());
         options.setAcquireMinimumTimeUnit(choiceAcquireMinimumUnit.getSelectedIndex());
         options.setAcquireMosUnit(choiceAcquireMosUnits.getSelectedIndex());
         options.setPlanetaryAcquisition(usePlanetaryAcquisitions.isSelected());
         options.setDisallowClanPartsFromIS(disallowClanPartsFromIS.isSelected());
         options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
         options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
-        options.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getModel().getValue());
-        options.setPenaltyClanPartsFroIS((int) spnPenaltyClanPartsFromIS.getModel().getValue());
+        options.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getValue());
+        options.setPenaltyClanPartsFroIS((int) spnPenaltyClanPartsFromIS.getValue());
         options.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedIndex());
         for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
-            options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getModel().getValue(), i);
-            options.setPlanetIndustryAcquisitionBonus((int) spnPlanetAcquireIndustryBonus[i].getModel().getValue(), i);
-            options.setPlanetOutputAcquisitionBonus((int) spnPlanetAcquireOutputBonus[i].getModel().getValue(), i);
+            options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getValue(), i);
+            options.setPlanetIndustryAcquisitionBonus((int) spnPlanetAcquireIndustryBonus[i].getValue(), i);
+            options.setPlanetOutputAcquisitionBonus((int) spnPlanetAcquireOutputBonus[i].getValue(), i);
 
         }
 
-        options.setScenarioXP((Integer) spnScenarioXP.getModel().getValue());
-        options.setKillsForXP((Integer) spnKills.getModel().getValue());
-        options.setKillXPAward((Integer) spnKillXP.getModel().getValue());
+        options.setScenarioXP((Integer) spnScenarioXP.getValue());
+        options.setKillsForXP((Integer) spnKills.getValue());
+        options.setKillXPAward((Integer) spnKillXP.getValue());
 
-        options.setTaskXP((Integer) spnTaskXP.getModel().getValue());
-        options.setNTasksXP((Integer) spnNTasksXP.getModel().getValue());
-        options.setSuccessXP((Integer) spnSuccessXP.getModel().getValue());
-        options.setMistakeXP((Integer) spnMistakeXP.getModel().getValue());
-        options.setIdleXP((Integer) spnIdleXP.getModel().getValue());
-        options.setMonthsIdleXP((Integer) spnMonthsIdleXP.getModel().getValue());
-        options.setContractNegotiationXP((Integer) spnContractNegotiationXP.getModel().getValue());
-        options.setAdminXP((Integer) spnAdminWeeklyXP.getModel().getValue());
-        options.setAdminXPPeriod((Integer) spnAdminWeeklyXPPeriod.getModel().getValue());
-        options.setEdgeCost((Integer) spnEdgeCost.getModel().getValue());
-        options.setTargetIdleXP((Integer) spnTargetIdleXP.getModel().getValue());
+        options.setTaskXP((Integer) spnTaskXP.getValue());
+        options.setNTasksXP((Integer) spnNTasksXP.getValue());
+        options.setSuccessXP((Integer) spnSuccessXP.getValue());
+        options.setMistakeXP((Integer) spnMistakeXP.getValue());
+        options.setIdleXP((Integer) spnIdleXP.getValue());
+        options.setMonthsIdleXP((Integer) spnMonthsIdleXP.getValue());
+        options.setContractNegotiationXP((Integer) spnContractNegotiationXP.getValue());
+        options.setAdminXP((Integer) spnAdminWeeklyXP.getValue());
+        options.setAdminXPPeriod((Integer) spnAdminWeeklyXPPeriod.getValue());
+        options.setEdgeCost((Integer) spnEdgeCost.getValue());
+        options.setTargetIdleXP((Integer) spnTargetIdleXP.getValue());
 
         options.setLimitByYear(limitByYearBox.isSelected());
         options.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());
@@ -5242,26 +5260,26 @@ public class CampaignOptionsDialog extends JDialog {
         options.setTechLevel(choiceTechLevel.getSelectedIndex());
         campaign.getGameOptions().getOption("techlevel").setValue((String)choiceTechLevel.getSelectedItem());
 
-        rSkillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getModel().getValue());
+        rSkillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getValue());
         for (int i = 0; i < Person.T_NUM; i++) {
-            rSkillPrefs.setRecruitBonus(i, (Integer) spnTypeRecruitBonus[i].getModel().getValue());
+            rSkillPrefs.setRecruitBonus(i, (Integer) spnTypeRecruitBonus[i].getValue());
         }
         rSkillPrefs.setRandomizeSkill(chkExtraRandom.isSelected());
-        rSkillPrefs.setAntiMekProb((Integer) spnProbAntiMek.getModel().getValue());
-        rSkillPrefs.setArtilleryProb((Integer) spnArtyProb.getModel().getValue());
-        rSkillPrefs.setArtilleryBonus((Integer) spnArtyBonus.getModel().getValue());
-        rSkillPrefs.setSecondSkillProb((Integer) spnSecondProb.getModel().getValue());
-        rSkillPrefs.setSecondSkillBonus((Integer) spnSecondBonus.getModel().getValue());
-        rSkillPrefs.setTacticsMod(SkillType.EXP_GREEN, (Integer) spnTacticsGreen.getModel().getValue());
-        rSkillPrefs.setTacticsMod(SkillType.EXP_REGULAR, (Integer) spnTacticsReg.getModel().getValue());
-        rSkillPrefs.setTacticsMod(SkillType.EXP_VETERAN, (Integer) spnTacticsVet.getModel().getValue());
-        rSkillPrefs.setTacticsMod(SkillType.EXP_ELITE, (Integer) spnTacticsElite.getModel().getValue());
-        rSkillPrefs.setCombatSmallArmsBonus((Integer) spnCombatSA.getModel().getValue());
-        rSkillPrefs.setSupportSmallArmsBonus((Integer) spnSupportSA.getModel().getValue());
-        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_GREEN, (Integer) spnAbilGreen.getModel().getValue());
-        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_REGULAR, (Integer) spnAbilReg.getModel().getValue());
-        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_VETERAN, (Integer) spnAbilVet.getModel().getValue());
-        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer) spnAbilElite.getModel().getValue());
+        rSkillPrefs.setAntiMekProb((Integer) spnProbAntiMek.getValue());
+        rSkillPrefs.setArtilleryProb((Integer) spnArtyProb.getValue());
+        rSkillPrefs.setArtilleryBonus((Integer) spnArtyBonus.getValue());
+        rSkillPrefs.setSecondSkillProb((Integer) spnSecondProb.getValue());
+        rSkillPrefs.setSecondSkillBonus((Integer) spnSecondBonus.getValue());
+        rSkillPrefs.setTacticsMod(SkillType.EXP_GREEN, (Integer) spnTacticsGreen.getValue());
+        rSkillPrefs.setTacticsMod(SkillType.EXP_REGULAR, (Integer) spnTacticsReg.getValue());
+        rSkillPrefs.setTacticsMod(SkillType.EXP_VETERAN, (Integer) spnTacticsVet.getValue());
+        rSkillPrefs.setTacticsMod(SkillType.EXP_ELITE, (Integer) spnTacticsElite.getValue());
+        rSkillPrefs.setCombatSmallArmsBonus((Integer) spnCombatSA.getValue());
+        rSkillPrefs.setSupportSmallArmsBonus((Integer) spnSupportSA.getValue());
+        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_GREEN, (Integer) spnAbilGreen.getValue());
+        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_REGULAR, (Integer) spnAbilReg.getValue());
+        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_VETERAN, (Integer) spnAbilVet.getValue());
+        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer) spnAbilElite.getValue());
         campaign.setRandomSkillPreferences(rSkillPrefs);
 
         for (int i = 0; i < phenotypeSpinners.length; i++) {
@@ -5301,15 +5319,17 @@ public class CampaignOptionsDialog extends JDialog {
         options.setUseDylansRandomXP(useDylansRandomXpBox.isSelected());
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
         options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
-        options.setOriginSearchRadius((Integer)spnOriginSearchRadius.getModel().getValue());
+        options.setOriginSearchRadius((Integer) spnOriginSearchRadius.getValue());
+        options.setOriginExtraRandom(chkOriginExtraRandom.isSelected());
+        options.setOriginDistanceScale((Double) spnOriginDistanceScale.getValue());
 
         //Medical
         options.setUseAdvancedMedical(useAdvancedMedicalBox.isSelected());
         //we need to reset healing time options through the campaign because we may need to
         //loop through personnel to make adjustments
-        campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getModel().getValue(),
-                (Integer) spnNaturalHealWaitingPeriod.getModel().getValue());
-        options.setMinimumHitsForVees((Integer) spnMinimumHitsForVees.getModel().getValue());
+        campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getValue(),
+                (Integer) spnNaturalHealWaitingPeriod.getValue());
+        options.setMinimumHitsForVees((Integer) spnMinimumHitsForVees.getValue());
         options.setUseRandomHitsForVees(useRandomHitsForVees.isSelected());
         options.setTougherHealing(useTougherHealing.isSelected());
 
@@ -5318,35 +5338,35 @@ public class CampaignOptionsDialog extends JDialog {
 
         //Marriage
         options.setUseManualMarriages(chkUseManualMarriages.isSelected());
-        options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getModel().getValue());
-        options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
+        options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getValue());
+        options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getValue());
         options.setLogMarriageNameChange(chkLogMarriageNameChange.isSelected());
         options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
-        options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue() / 100.0);
-        options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());
+        options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getValue() / 100.0);
+        options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getValue());
         for (int i = 0; i < spnRandomMarriageSurnameWeights.length; i++) {
-            int val = (int) Math.round(((Double) spnRandomMarriageSurnameWeights[i].getModel().getValue()) * 10);
+            int val = (int) Math.round(((Double) spnRandomMarriageSurnameWeights[i].getValue()) * 10);
             options.setRandomMarriageSurnameWeight(i, val);
         }
         options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
-        options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getModel().getValue() / 100.0);
+        options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getValue() / 100.0);
 
         //Procreation
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
-        options.setChanceProcreation((Double) spnChanceProcreation.getModel().getValue() / 100.0);
+        options.setChanceProcreation((Double) spnChanceProcreation.getValue() / 100.0);
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
-        options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getModel().getValue() / 100.0);
+        options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getValue() / 100.0);
         options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
         options.setLogConception(chkLogConception.isSelected());
         options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
         options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
 
         //Salary
-        options.setSalaryCommissionMultiplier((Double) spnSalaryCommission.getModel().getValue());
-        options.setSalaryEnlistedMultiplier((Double) spnSalaryEnlisted.getModel().getValue());
-        options.setSalaryAntiMekMultiplier((Double) spnSalaryAntiMek.getModel().getValue());
+        options.setSalaryCommissionMultiplier((Double) spnSalaryCommission.getValue());
+        options.setSalaryEnlistedMultiplier((Double) spnSalaryEnlisted.getValue());
+        options.setSalaryAntiMekMultiplier((Double) spnSalaryAntiMek.getValue());
         for (int i = 0; i < spnSalaryXp.length; i++) {
-            options.setSalaryXpMultiplier((Double) spnSalaryXp[i].getModel().getValue(), i);
+            options.setSalaryXpMultiplier((Double) spnSalaryXp[i].getValue(), i);
         }
         for (int i = 1; i < Person.T_NUM; i++) {
             try {
@@ -5475,19 +5495,19 @@ public class CampaignOptionsDialog extends JDialog {
         for (String skillName : SkillType.getSkillList()) {
             SkillType type = SkillType.getType(skillName);
             if (null != hashSkillTargets.get(skillName)) {
-                type.setTarget((Integer) hashSkillTargets.get(skillName).getModel().getValue());
+                type.setTarget((Integer) hashSkillTargets.get(skillName).getValue());
             }
             if (null != hashGreenSkill.get(skillName)) {
-                type.setGreenLevel((Integer) hashGreenSkill.get(skillName).getModel().getValue());
+                type.setGreenLevel((Integer) hashGreenSkill.get(skillName).getValue());
             }
             if (null != hashRegSkill.get(skillName)) {
-                type.setRegularLevel((Integer) hashRegSkill.get(skillName).getModel().getValue());
+                type.setRegularLevel((Integer) hashRegSkill.get(skillName).getValue());
             }
             if (null != hashVetSkill.get(skillName)) {
-                type.setVeteranLevel((Integer) hashVetSkill.get(skillName).getModel().getValue());
+                type.setVeteranLevel((Integer) hashVetSkill.get(skillName).getValue());
             }
             if (null != hashEliteSkill.get(skillName)) {
-                type.setEliteLevel((Integer) hashEliteSkill.get(skillName).getModel().getValue());
+                type.setEliteLevel((Integer) hashEliteSkill.get(skillName).getValue());
             }
         }
     }
