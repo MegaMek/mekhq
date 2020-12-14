@@ -22,6 +22,9 @@ VERSION HISTORY:
 + Issue #2280: GM Restore skips parts
 + PR #2286: Don't reload unit data if nothing changed on disk when reading Campaigns
 + Issue #2287: Prisoner Filter Should Include Bondsmen
++ Issue #2141: Subcontracts don't reference parent contract after campaign load
++ Issue #1587: Basic Bulk Customization
++ Issue #2200: Moving Rank System Name to Data
 
 0.47.14 (2020-11-15 1930 UTC)
 + Issues #2217 #2219: Cannot save Campaign with Refits and cannot start new Refits
