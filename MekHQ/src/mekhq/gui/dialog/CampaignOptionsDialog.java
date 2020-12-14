@@ -3957,10 +3957,13 @@ public class CampaignOptionsDialog extends JDialog {
         spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(50, 10, 250, 10));
 
         chkOriginExtraRandom = new JCheckBox(resources.getString("lblOriginExtraRandom.text"));
+        chkOriginExtraRandom.setToolTipText(resources.getString("lblOriginExtraRandom.toolTipText"));
 
         JLabel lblOriginDistanceScale = new JLabel(resources.getString("lblOriginDistanceScale.text"));
+        lblOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
 
         spnOriginDistanceScale = new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1 ));
+        spnOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
 
         // Layout the Panel
         JPanel panel = new JPanel();
