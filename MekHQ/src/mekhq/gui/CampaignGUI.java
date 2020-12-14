@@ -2727,12 +2727,12 @@ public class CampaignGUI extends JPanel {
 
     private void setCampaignOptionsFromGameOptions() {
         getCampaign().getCampaignOptions().setUseTactics(getCampaign().getGameOptions().getOption("command_init").booleanValue());
-        getCampaign().getCampaignOptions().setInitBonus(getCampaign().getGameOptions().getOption("individual_initiative").booleanValue());
-        getCampaign().getCampaignOptions().setToughness(getCampaign().getGameOptions().getOption("toughness").booleanValue());
-        getCampaign().getCampaignOptions().setArtillery(getCampaign().getGameOptions().getOption("artillery_skill").booleanValue());
-        getCampaign().getCampaignOptions().setAbilities(getCampaign().getGameOptions().getOption("pilot_advantages").booleanValue());
-        getCampaign().getCampaignOptions().setEdge(getCampaign().getGameOptions().getOption("edge").booleanValue());
-        getCampaign().getCampaignOptions().setImplants(getCampaign().getGameOptions().getOption("manei_domini").booleanValue());
+        getCampaign().getCampaignOptions().setUseInitBonus(getCampaign().getGameOptions().getOption("individual_initiative").booleanValue());
+        getCampaign().getCampaignOptions().setUseToughness(getCampaign().getGameOptions().getOption("toughness").booleanValue());
+        getCampaign().getCampaignOptions().setUseArtillery(getCampaign().getGameOptions().getOption("artillery_skill").booleanValue());
+        getCampaign().getCampaignOptions().setUseAbilities(getCampaign().getGameOptions().getOption("pilot_advantages").booleanValue());
+        getCampaign().getCampaignOptions().setUseEdge(getCampaign().getGameOptions().getOption("edge").booleanValue());
+        getCampaign().getCampaignOptions().setUseImplants(getCampaign().getGameOptions().getOption("manei_domini").booleanValue());
         getCampaign().getCampaignOptions().setQuirks(getCampaign().getGameOptions().getOption("stratops_quirks").booleanValue());
         getCampaign().getCampaignOptions().setAllowCanonOnly(getCampaign().getGameOptions().getOption("canon_only").booleanValue());
         getCampaign().getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getCampaign().getGameOptions().getOption("techlevel").stringValue()));

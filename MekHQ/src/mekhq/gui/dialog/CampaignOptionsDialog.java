@@ -232,6 +232,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox useImplantsBox;
     private JCheckBox altQualityAveragingCheckBox;
     private JCheckBox chkUseTransfers;
+
     //Expanded Personnel
     private JCheckBox chkUseTimeInService;
     private JComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
@@ -240,11 +241,13 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUseRetirementDateTracking;
     private JCheckBox chkTrackTotalEarnings;
     private JCheckBox chkShowOriginFaction;
+
     //Personnel Randomization
     private JCheckBox useDylansRandomXpBox;
     private JCheckBox chkRandomizeOrigin;
     private JCheckBox chkRandomizeDependentsOrigin;
     private JSpinner spnOriginSearchRadius;
+
     //Medical
     private JCheckBox useAdvancedMedicalBox;
     private JSpinner spnHealWaitingPeriod;
@@ -252,8 +255,10 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner spnMinimumHitsForVees;
     private JCheckBox useRandomHitsForVees;
     private JCheckBox useTougherHealing;
+
     //Family
     private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
+
     //Marriage
     private JCheckBox chkUseManualMarriages;
     private JSpinner spnMinimumMarriageAge;
@@ -265,6 +270,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JSpinner[] spnRandomMarriageSurnameWeights;
     private JCheckBox chkUseRandomSameSexMarriages;
     private JSpinner spnChanceRandomSameSexMarriages;
+
     //Procreation
     private JCheckBox chkUseUnofficialProcreation;
     private JSpinner spnChanceProcreation;
@@ -274,18 +280,21 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkLogConception;
     private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
     private JCheckBox chkDetermineFatherAtBirth;
+
     //Salary
     private JSpinner spnSalaryCommission;
     private JSpinner spnSalaryEnlisted;
     private JSpinner spnSalaryAntiMek;
     private JSpinner[] spnSalaryXp;
     private JSpinner[] spnSalaryBase;
+
     //Prisoners
     private JComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
     private JComboBox<PrisonerStatus> comboPrisonerStatus;
     private JCheckBox chkPrisonerBabyStatus;
     private JCheckBox chkAtBPrisonerDefection;
     private JCheckBox chkAtBPrisonerRansom;
+
     //Death
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     //endregion Personnel Tab
@@ -4678,7 +4687,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkShowOriginFaction.setSelected(options.showOriginFaction());
 
         //Personnel Randomization
-        useDylansRandomXpBox.setSelected(options.useDylansRandomXp());
+        useDylansRandomXpBox.setSelected(options.useDylansRandomXP());
         chkRandomizeOrigin.setSelected(options.randomizeOrigin());
         chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
         spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
@@ -5263,18 +5272,18 @@ public class CampaignOptionsDialog extends JDialog {
         //General Personnel
         options.setUseTactics(useTacticsBox.isSelected());
         campaign.getGameOptions().getOption("command_init").setValue(useTacticsBox.isSelected());
-        options.setInitBonus(useInitBonusBox.isSelected());
+        options.setUseInitBonus(useInitBonusBox.isSelected());
         campaign.getGameOptions().getOption("individual_initiative").setValue(useInitBonusBox.isSelected());
-        options.setToughness(useToughnessBox.isSelected());
+        options.setUseToughness(useToughnessBox.isSelected());
         campaign.getGameOptions().getOption("toughness").setValue(useToughnessBox.isSelected());
-        options.setArtillery(useArtilleryBox.isSelected());
+        options.setUseArtillery(useArtilleryBox.isSelected());
         campaign.getGameOptions().getOption("artillery_skill").setValue(useArtilleryBox.isSelected());
-        options.setAbilities(useAbilitiesBox.isSelected());
+        options.setUseAbilities(useAbilitiesBox.isSelected());
         campaign.getGameOptions().getOption("pilot_advantages").setValue(useAbilitiesBox.isSelected());
-        options.setEdge(useEdgeBox.isSelected());
+        options.setUseEdge(useEdgeBox.isSelected());
         campaign.getGameOptions().getOption("edge").setValue(useEdgeBox.isSelected());
-        options.setSupportEdge(useEdgeBox.isSelected() && useSupportEdgeBox.isSelected());
-        options.setImplants(useImplantsBox.isSelected());
+        options.setUseSupportEdge(useEdgeBox.isSelected() && useSupportEdgeBox.isSelected());
+        options.setUseImplants(useImplantsBox.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
@@ -5289,13 +5298,13 @@ public class CampaignOptionsDialog extends JDialog {
         options.setShowOriginFaction(chkShowOriginFaction.isSelected());
 
         //Personnel Randomization
-        options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
+        options.setUseDylansRandomXP(useDylansRandomXpBox.isSelected());
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
         options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
         options.setOriginSearchRadius((Integer)spnOriginSearchRadius.getModel().getValue());
 
         //Medical
-        options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
+        options.setUseAdvancedMedical(useAdvancedMedicalBox.isSelected());
         //we need to reset healing time options through the campaign because we may need to
         //loop through personnel to make adjustments
         campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getModel().getValue(),

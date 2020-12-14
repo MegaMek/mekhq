@@ -181,6 +181,7 @@ public class CampaignOptions implements Serializable {
     //endregion Tech Limits Tab
 
     //region Personnel Tab
+    // General Personnel
     private boolean useTactics;
     private boolean useInitBonus;
     private boolean useToughness;
@@ -190,14 +191,9 @@ public class CampaignOptions implements Serializable {
     private boolean useSupportEdge;
     private boolean useImplants;
     private boolean altQualityAveraging;
-    private boolean useAdvancedMedical; // Unofficial
-    private boolean useDylansRandomXp; // Unofficial
-    private int healWaitingPeriod;
-    private int naturalHealingWaitingPeriod;
-    private int minimumHitsForVees;
-    private boolean useRandomHitsForVees;
-    private boolean tougherHealing;
     private boolean useTransfers;
+
+    // Expanded Personnel Information
     private boolean useTimeInService;
     private TimeInDisplayFormat timeInServiceDisplayFormat;
     private boolean useTimeInRank;
@@ -205,23 +201,39 @@ public class CampaignOptions implements Serializable {
     private boolean useRetirementDateTracking;
     private boolean trackTotalEarnings;
     private boolean showOriginFaction;
+
+    // Personnel Randomization
+    private boolean useDylansRandomXP; // Unofficial
     private boolean randomizeOrigin;
     private boolean randomizeDependentOrigin;
     private int originSearchRadius;
     private boolean isOriginExtraRandom;
     private double originDistanceScale;
 
-    //family
+    // Medical
+    private boolean useAdvancedMedical; // Unofficial
+    private int healWaitingPeriod;
+    private int naturalHealingWaitingPeriod;
+    private int minimumHitsForVees;
+    private boolean useRandomHitsForVees;
+    private boolean tougherHealing;
+
+    // Family
+    private FamilialRelationshipDisplayLevel displayFamilyLevel;
+
+    // Marriage
+    private boolean useManualMarriages;
     private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
     private boolean logMarriageNameChange;
-    private boolean useManualMarriages;
     private boolean useRandomMarriages;
     private double chanceRandomMarriages;
     private int marriageAgeRange;
     private int[] randomMarriageSurnameWeights;
     private boolean useRandomSameSexMarriages;
     private double chanceRandomSameSexMarriages;
+
+    // Procreation
     private boolean useUnofficialProcreation;
     private double chanceProcreation;
     private boolean useUnofficialProcreationNoRelationship;
@@ -230,22 +242,23 @@ public class CampaignOptions implements Serializable {
     private boolean logConception;
     private BabySurnameStyle babySurnameStyle;
     private boolean determineFatherAtBirth;
-    private FamilialRelationshipDisplayLevel displayFamilyLevel;
-    private boolean keepMarriedNameUponSpouseDeath;
 
-    //salary
+    // Salary
     private double salaryCommissionMultiplier;
     private double salaryEnlistedMultiplier;
     private double salaryAntiMekMultiplier;
     private double[] salaryXpMultiplier;
     private Money[] salaryTypeBase;
 
-    //Prisoners
+    // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
     private PrisonerStatus defaultPrisonerStatus;
     private boolean prisonerBabyStatus;
     private boolean useAtBPrisonerDefection;
     private boolean useAtBPrisonerRansom;
+
+    // Death
+    private boolean keepMarriedNameUponSpouseDeath;
     //endregion Personnel Tab
 
     //region Finance tab
@@ -510,6 +523,7 @@ public class CampaignOptions implements Serializable {
         //endregion Tech Limits Tab
 
         //region Personnel Tab
+        // General Personnel
         useTactics = false;
         useInitBonus = false;
         useToughness = false;
@@ -519,14 +533,9 @@ public class CampaignOptions implements Serializable {
         useSupportEdge = false;
         useImplants = false;
         altQualityAveraging = false;
-        useAdvancedMedical = false;
-        useDylansRandomXp = false;
-        healWaitingPeriod = 1;
-        naturalHealingWaitingPeriod = 15;
-        minimumHitsForVees = 1;
-        useRandomHitsForVees = false;
-        tougherHealing = false;
         useTransfers = true;
+
+        // Expanded Personnel Information
         useTimeInService = false;
         timeInServiceDisplayFormat = TimeInDisplayFormat.YEARS;
         useTimeInRank = false;
@@ -534,17 +543,31 @@ public class CampaignOptions implements Serializable {
         useRetirementDateTracking = false;
         trackTotalEarnings = false;
         showOriginFaction = true;
+
+        // Personnel Randomization
+        useDylansRandomXP = false;
         randomizeOrigin = false;
         randomizeDependentOrigin = false;
         originSearchRadius = 45;
         isOriginExtraRandom = false;
         originDistanceScale = 0.6;
 
-        //Family
+        // Medical
+        useAdvancedMedical = false;
+        healWaitingPeriod = 1;
+        naturalHealingWaitingPeriod = 15;
+        minimumHitsForVees = 1;
+        useRandomHitsForVees = false;
+        tougherHealing = false;
+
+        // Family
+        displayFamilyLevel = FamilialRelationshipDisplayLevel.SPOUSE;
+
+        // Marriage
+        useManualMarriages = true;
         minimumMarriageAge = 16;
         checkMutualAncestorsDepth = 4;
         logMarriageNameChange = false;
-        useManualMarriages = true;
         useRandomMarriages = false;
         chanceRandomMarriages = 0.00025;
         marriageAgeRange = 10;
@@ -564,6 +587,8 @@ public class CampaignOptions implements Serializable {
         randomMarriageSurnameWeights[Marriage.FEMALE.getWeightsNumber()] = 160;
         useRandomSameSexMarriages = false;
         chanceRandomSameSexMarriages = 0.00002;
+
+        // Procreation
         useUnofficialProcreation = false;
         chanceProcreation = 0.0005;
         useUnofficialProcreationNoRelationship = false;
@@ -572,13 +597,11 @@ public class CampaignOptions implements Serializable {
         logConception = false;
         babySurnameStyle = BabySurnameStyle.MOTHERS;
         determineFatherAtBirth = false;
-        displayFamilyLevel = FamilialRelationshipDisplayLevel.SPOUSE;
-        keepMarriedNameUponSpouseDeath = true;
 
-        //Salary
-        salaryAntiMekMultiplier = 1.5;
-        salaryEnlistedMultiplier = 1.0;
+        // Salary
         salaryCommissionMultiplier = 1.2;
+        salaryEnlistedMultiplier = 1.0;
+        salaryAntiMekMultiplier = 1.5;
         salaryXpMultiplier = new double[5];
         salaryXpMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
         salaryXpMultiplier[SkillType.EXP_GREEN] = 0.6;
@@ -615,12 +638,15 @@ public class CampaignOptions implements Serializable {
         salaryTypeBase[Person.T_LAM_PILOT] = Money.of(1500);
         salaryTypeBase[Person.T_VEHICLE_CREW] = Money.of(900);
 
-        //Prisoner
+        // Prisoners
         prisonerCaptureStyle = PrisonerCaptureStyle.TAHARQA;
         defaultPrisonerStatus = PrisonerStatus.PRISONER;
         prisonerBabyStatus = true;
         useAtBPrisonerDefection = false;
         useAtBPrisonerRansom = false;
+
+        // Death
+        keepMarriedNameUponSpouseDeath = true;
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -885,6 +911,7 @@ public class CampaignOptions implements Serializable {
     //endregion Supplies and Acquisitions Tab
 
     //region Personnel Tab
+    //region General Personnel
     public boolean useTactics() {
         return useTactics;
     }
@@ -897,15 +924,15 @@ public class CampaignOptions implements Serializable {
         return useInitBonus;
     }
 
-    public void setInitBonus(boolean b) {
-        this.useInitBonus = b;
+    public void setUseInitBonus(boolean useInitBonus) {
+        this.useInitBonus = useInitBonus;
     }
 
     public boolean useToughness() {
         return useToughness;
     }
 
-    public void setToughness(boolean b) {
+    public void setUseToughness(boolean b) {
         this.useToughness = b;
     }
 
@@ -913,7 +940,7 @@ public class CampaignOptions implements Serializable {
         return useArtillery;
     }
 
-    public void setArtillery(boolean b) {
+    public void setUseArtillery(boolean b) {
         this.useArtillery = b;
     }
 
@@ -921,7 +948,7 @@ public class CampaignOptions implements Serializable {
         return useAbilities;
     }
 
-    public void setAbilities(boolean b) {
+    public void setUseAbilities(boolean b) {
         this.useAbilities = b;
     }
 
@@ -929,7 +956,7 @@ public class CampaignOptions implements Serializable {
         return useEdge;
     }
 
-    public void setEdge(boolean b) {
+    public void setUseEdge(boolean b) {
         this.useEdge = b;
     }
 
@@ -937,7 +964,7 @@ public class CampaignOptions implements Serializable {
         return useSupportEdge;
     }
 
-    public void setSupportEdge(boolean b) {
+    public void setUseSupportEdge(boolean b) {
         useSupportEdge = b;
     }
 
@@ -945,7 +972,7 @@ public class CampaignOptions implements Serializable {
         return useImplants;
     }
 
-    public void setImplants(boolean b) {
+    public void setUseImplants(boolean b) {
         this.useImplants = b;
     }
 
@@ -957,62 +984,6 @@ public class CampaignOptions implements Serializable {
         this.altQualityAveraging = altQualityAveraging;
     }
 
-    public boolean useAdvancedMedical() {
-        return useAdvancedMedical;
-    }
-
-    public void setAdvancedMedical(boolean b) {
-        this.useAdvancedMedical = b;
-    }
-
-    public boolean useDylansRandomXp() {
-        return useDylansRandomXp;
-    }
-
-    public void setDylansRandomXp(boolean b) {
-        this.useDylansRandomXp = b;
-    }
-
-    public int getHealingWaitingPeriod() {
-        return healWaitingPeriod;
-    }
-
-    public void setHealingWaitingPeriod(int d) {
-        healWaitingPeriod = d;
-    }
-
-    public int getNaturalHealingWaitingPeriod() {
-        return naturalHealingWaitingPeriod;
-    }
-
-    public void setNaturalHealingWaitingPeriod(int d) {
-        naturalHealingWaitingPeriod = d;
-    }
-
-    public int getMinimumHitsForVees() {
-        return minimumHitsForVees;
-    }
-
-    public void setMinimumHitsForVees(int d) {
-        minimumHitsForVees = d;
-    }
-
-    public boolean useRandomHitsForVees() {
-        return useRandomHitsForVees;
-    }
-
-    public void setUseRandomHitsForVees(boolean b) {
-        useRandomHitsForVees = b;
-    }
-
-    public boolean useTougherHealing() {
-        return tougherHealing;
-    }
-
-    public void setTougherHealing(boolean b) {
-        tougherHealing = b;
-    }
-
     public boolean useTransfers() {
         return useTransfers;
     }
@@ -1020,7 +991,9 @@ public class CampaignOptions implements Serializable {
     public void setUseTransfers(boolean b) {
         useTransfers = b;
     }
+    //endregion General Personnel
 
+    //region Expanded Personnel Information
     /**
      * @return whether or not to use time in service
      */
@@ -1120,7 +1093,16 @@ public class CampaignOptions implements Serializable {
     public void setShowOriginFaction(boolean b) {
         showOriginFaction = b;
     }
+    //endregion Expanded Personnel Information
 
+    //region Personnel Randomization
+    public boolean useDylansRandomXP() {
+        return useDylansRandomXP;
+    }
+
+    public void setUseDylansRandomXP(boolean b) {
+        this.useDylansRandomXP = b;
+    }
     /**
      * Gets a value indicating whether or not to randomize the
      * origin of personnel.
@@ -1203,8 +1185,89 @@ public class CampaignOptions implements Serializable {
     public void setOriginDistanceScale(double v) {
         originDistanceScale = v;
     }
+    //endregion Personnel Randomization
 
-    //region family
+    //region Medical
+    public boolean useAdvancedMedical() {
+        return useAdvancedMedical;
+    }
+
+    public void setUseAdvancedMedical(boolean b) {
+        this.useAdvancedMedical = b;
+    }
+
+    public int getHealingWaitingPeriod() {
+        return healWaitingPeriod;
+    }
+
+    public void setHealingWaitingPeriod(int d) {
+        healWaitingPeriod = d;
+    }
+
+    public int getNaturalHealingWaitingPeriod() {
+        return naturalHealingWaitingPeriod;
+    }
+
+    public void setNaturalHealingWaitingPeriod(int d) {
+        naturalHealingWaitingPeriod = d;
+    }
+
+    public int getMinimumHitsForVees() {
+        return minimumHitsForVees;
+    }
+
+    public void setMinimumHitsForVees(int d) {
+        minimumHitsForVees = d;
+    }
+
+    public boolean useRandomHitsForVees() {
+        return useRandomHitsForVees;
+    }
+
+    public void setUseRandomHitsForVees(boolean b) {
+        useRandomHitsForVees = b;
+    }
+
+    public boolean useTougherHealing() {
+        return tougherHealing;
+    }
+
+    public void setTougherHealing(boolean b) {
+        tougherHealing = b;
+    }
+    //endregion Medical
+
+    //region Family
+    /**
+     * @return the level of familial relation to display
+     */
+    public FamilialRelationshipDisplayLevel getDisplayFamilyLevel() {
+        return displayFamilyLevel;
+    }
+
+    /**
+     * @param displayFamilyLevel the level of familial relation to display
+     */
+    public void setDisplayFamilyLevel(FamilialRelationshipDisplayLevel displayFamilyLevel) {
+        this.displayFamilyLevel = displayFamilyLevel;
+    }
+    //endregion Family
+
+    //region Marriage
+    /**
+     * @return whether or not to use manual marriages
+     */
+    public boolean useManualMarriages() {
+        return useManualMarriages;
+    }
+
+    /**
+     * @param useManualMarriages whether or not to use manual marriages
+     */
+    public void setUseManualMarriages(boolean useManualMarriages) {
+        this.useManualMarriages = useManualMarriages;
+    }
+
     /**
      * @return the minimum age a person can get married at
      */
@@ -1247,20 +1310,6 @@ public class CampaignOptions implements Serializable {
      */
     public void setLogMarriageNameChange(boolean b) {
         logMarriageNameChange = b;
-    }
-
-    /**
-     * @return whether or not to use manual marriages
-     */
-    public boolean useManualMarriages() {
-        return useManualMarriages;
-    }
-
-    /**
-     * @param useManualMarriages whether or not to use manual marriages
-     */
-    public void setUseManualMarriages(boolean useManualMarriages) {
-        this.useManualMarriages = useManualMarriages;
     }
 
     /**
@@ -1342,10 +1391,10 @@ public class CampaignOptions implements Serializable {
     }
 
     /**
-     * @param b whether or not to use random same sex marriages
+     * @param useRandomSameSexMarriages whether or not to use random same sex marriages
      */
-    public void setUseRandomSameSexMarriages(boolean b) {
-        useRandomSameSexMarriages = b;
+    public void setUseRandomSameSexMarriages(boolean useRandomSameSexMarriages) {
+        this.useRandomSameSexMarriages = useRandomSameSexMarriages;
     }
 
     /**
@@ -1358,12 +1407,14 @@ public class CampaignOptions implements Serializable {
 
     /**
      * This sets the decimal chance (between 0 and 1) of a random same sex marriage occurring
-     * @param b the chance, with a value between 0 and 1
+     * @param chanceRandomSameSexMarriages the chance, with a value between 0 and 1
      */
-    public void setChanceRandomSameSexMarriages(double b) {
-        chanceRandomSameSexMarriages = b;
+    public void setChanceRandomSameSexMarriages(double chanceRandomSameSexMarriages) {
+        this.chanceRandomSameSexMarriages = chanceRandomSameSexMarriages;
     }
+    //endregion Marriage
 
+    //region Procreation
     /**
      * @return whether or not to use unofficial procreation
      */
@@ -1479,37 +1530,9 @@ public class CampaignOptions implements Serializable {
     public void setDetermineFatherAtBirth(boolean determineFatherAtBirth) {
         this.determineFatherAtBirth = determineFatherAtBirth;
     }
+    //endregion Procreation
 
-    /**
-     * @return the level of familial relation to display
-     */
-    public FamilialRelationshipDisplayLevel getDisplayFamilyLevel() {
-        return displayFamilyLevel;
-    }
-
-    /**
-     * @param displayFamilyLevel the level of familial relation to display
-     */
-    public void setDisplayFamilyLevel(FamilialRelationshipDisplayLevel displayFamilyLevel) {
-        this.displayFamilyLevel = displayFamilyLevel;
-    }
-
-    /**
-     * @return whether to keep ones married name upon spouse death or not
-     */
-    public boolean getKeepMarriedNameUponSpouseDeath() {
-        return keepMarriedNameUponSpouseDeath;
-    }
-
-    /**
-     * @param b whether to keep ones married name upon spouse death or not
-     */
-    public void setKeepMarriedNameUponSpouseDeath(boolean b) {
-        keepMarriedNameUponSpouseDeath = b;
-    }
-    //endregion family
-
-    //region salary
+    //region Salary
     public double getSalaryCommissionMultiplier() {
         return salaryCommissionMultiplier;
     }
@@ -1535,32 +1558,23 @@ public class CampaignOptions implements Serializable {
     }
 
     public double getSalaryXpMultiplier(int xp) {
-        if (xp < 0 || xp >= salaryXpMultiplier.length) {
-            return 1.0;
-        }
-        return salaryXpMultiplier[xp];
+        return ((xp < 0) || (xp >= salaryXpMultiplier.length)) ? 1.0 : salaryXpMultiplier[xp];
     }
 
     public void setSalaryXpMultiplier(double d, int xp) {
-        if (xp < 0 || xp >= salaryXpMultiplier.length) {
+        if ((xp < 0) || (xp >= salaryXpMultiplier.length)) {
             return;
         }
         this.salaryXpMultiplier[xp] = d;
     }
 
     public double getBaseSalary(int type) {
-        if ((type < 0) || (type >= salaryTypeBase.length)) {
-            return 0.0;
-        }
-
-        return salaryTypeBase[type].getAmount().doubleValue();
+        return ((type < 0) || (type >= salaryTypeBase.length)) ? 0.0
+                : salaryTypeBase[type].getAmount().doubleValue();
     }
 
     public Money getBaseSalaryMoney(int type) {
-        if (type < 0 || type >= salaryTypeBase.length) {
-            return Money.zero();
-        }
-        return salaryTypeBase[type];
+        return ((type < 0) || (type >= salaryTypeBase.length)) ? Money.zero() : salaryTypeBase[type];
     }
 
     public void setBaseSalary(int type, double base) {
@@ -1570,7 +1584,7 @@ public class CampaignOptions implements Serializable {
 
         this.salaryTypeBase[type] = Money.of(base);
     }
-    //endregion salary
+    //endregion Salary
 
     //region Prisoners
     public PrisonerCaptureStyle getPrisonerCaptureStyle() {
@@ -1613,6 +1627,22 @@ public class CampaignOptions implements Serializable {
         this.useAtBPrisonerRansom = useAtBPrisonerRansom;
     }
     //endregion Prisoners
+
+    //region Death
+    /**
+     * @return whether to keep ones married name upon spouse death or not
+     */
+    public boolean getKeepMarriedNameUponSpouseDeath() {
+        return keepMarriedNameUponSpouseDeath;
+    }
+
+    /**
+     * @param b whether to keep ones married name upon spouse death or not
+     */
+    public void setKeepMarriedNameUponSpouseDeath(boolean b) {
+        keepMarriedNameUponSpouseDeath = b;
+    }
+    //endregion Death
     //endregion Personnel Tab
 
     //region Finances Tab
@@ -3060,23 +3090,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignedTechFirst", assignedTechFirst);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "resetToFirstTech", resetToFirstTech);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTactics", useTactics);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useInitBonus", useInitBonus);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useToughness", useToughness);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useArtillery", useArtillery);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAbilities", useAbilities);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEdge", useEdge);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useSupportEdge", useSupportEdge);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useImplants", useImplants);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "altQualityAveraging", altQualityAveraging);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAdvancedMedical", useAdvancedMedical);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useDylansRandomXp", useDylansRandomXp);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQuirks", useQuirks);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showOriginFaction", showOriginFaction);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "randomizeOrigin", randomizeOrigin);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "randomizeDependentOrigin", randomizeDependentOrigin);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originSearchRadius", originSearchRadius);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "isOriginExtraRandom", isOriginExtraRandom);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "scenarioXP", scenarioXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "killsForXP", killsForXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "killXPAward", killXPAward);
@@ -3128,8 +3142,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "overageRepaymentInFinalPayment", overageRepaymentInFinalPayment);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanAcquisitionPenalty", clanAcquisitionPenalty);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "isAcquisitionPenalty", isAcquisitionPenalty);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "healWaitingPeriod", healWaitingPeriod);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "naturalHealingWaitingPeriod", naturalHealingWaitingPeriod);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyByMargin", destroyByMargin);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyMargin", destroyMargin);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyPartTarget", destroyPartTarget);
@@ -3140,44 +3152,97 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "reverseQualityNames", reverseQualityNames);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficalMaintenance", useUnofficialMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMaintenance", checkMaintenance);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomHitsForVees", useRandomHitsForVees);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumHitsForVees", minimumHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
 
         //region Personnel Tab
-        //region family
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMarriageNameChange", logMarriageNameChange);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useManualMarriages", useManualMarriages);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomMarriages", useRandomMarriages);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomMarriages", chanceRandomMarriages);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageAgeRange", marriageAgeRange);
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                + "<randomMarriageSurnameWeights>"
-                + StringUtils.join(randomMarriageSurnameWeights, ',')
-                + "</randomMarriageSurnameWeights>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomSameSexMarriages", useRandomSameSexMarriages);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomSameSexMarriages", chanceRandomSameSexMarriages);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreation", useUnofficialProcreation);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreation", chanceProcreation);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreationNoRelationship", chanceProcreationNoRelationship);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayTrueDueDate", displayTrueDueDate);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "determineFatherAtBirth", determineFatherAtBirth);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "keepMarriedNameUponSpouseDeath", keepMarriedNameUponSpouseDeath);
-        //endregion family
+        //region General Personnel
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, ++indent, "useTactics", useTactics());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useInitBonus", useInitBonus());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useToughness", useToughness());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useArtillery", useArtillery());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAbilities", useAbilities());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useEdge", useEdge());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useSupportEdge", useSupportEdge());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useImplants", useImplants());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "altQualityAveraging", useAltQualityAveraging());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useTransfers", useTransfers());
+        //endregion General Personnel
+
+        //region Expanded Personnel Information
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useTimeInService", getUseTimeInService());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "timeInServiceDisplayFormat", getTimeInServiceDisplayFormat().name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useTimeInRank", getUseTimeInRank());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useRetirementDateTracking", useRetirementDateTracking());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "trackTotalEarnings", trackTotalEarnings());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "showOriginFaction", showOriginFaction());
+        //endregion Expanded Personnel Information
+
+        //region Personnel Randomization
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useDylansRandomXp", useDylansRandomXP());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "randomizeOrigin", randomizeOrigin());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "randomizeDependentOrigin", getRandomizeDependentOrigin());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "originSearchRadius", getOriginSearchRadius());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "isOriginExtraRandom", isOriginExtraRandom());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "originDistanceScale", getOriginDistanceScale());
+        //endregion Personnel Randomization
+
+        //region Medical
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAdvancedMedical", useAdvancedMedical());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "healWaitingPeriod", getHealingWaitingPeriod());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "naturalHealingWaitingPeriod", getNaturalHealingWaitingPeriod());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "minimumHitsForVees", getMinimumHitsForVees());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useRandomHitsForVees", useRandomHitsForVees());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "tougherHealing", useTougherHealing());
+        //endregion Medical
+
+        //region Family
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "displayFamilyLevel", getDisplayFamilyLevel().name());
+        //endregion Family
+
+        //region Marriage
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useManualMarriages", useManualMarriages());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "minimumMarriageAge", getMinimumMarriageAge());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "checkMutualAncestorsDepth", checkMutualAncestorsDepth());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "logMarriageNameChange", logMarriageNameChange());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useRandomMarriages", useRandomMarriages());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "chanceRandomMarriages", getChanceRandomMarriages());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "marriageAgeRange", getMarriageAgeRange());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomMarriageSurnameWeights", getRandomMarriageSurnameWeights());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useRandomSameSexMarriages", useRandomSameSexMarriages());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "chanceRandomSameSexMarriages", getChanceRandomSameSexMarriages());
+        //endregion Marriage
+
+        //region Procreation
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useUnofficialProcreation", useUnofficialProcreation());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "chanceProcreation", getChanceProcreation());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "chanceProcreationNoRelationship", getChanceProcreationNoRelationship());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "displayTrueDueDate", getDisplayTrueDueDate());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "logConception", logConception());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "babySurnameStyle", getBabySurnameStyle().name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "determineFatherAtBirth", determineFatherAtBirth());
+        //endregion Procreation
+
+        //region Salary
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryXpMultiplier", salaryXpMultiplier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salaryTypeBase", Utilities.printMoneyArray(salaryTypeBase));
+        //endregion Salary
 
         //region Prisoners
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerCaptureStyle", prisonerCaptureStyle.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerBabyStatus", prisonerBabyStatus);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBPrisonerDefection", useAtBPrisonerDefection);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBPrisonerRansom", useAtBPrisonerRansom);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "prisonerCaptureStyle", getPrisonerCaptureStyle().name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "defaultPrisonerStatus", getDefaultPrisonerStatus().name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "prisonerBabyStatus", getPrisonerBabyStatus());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAtBPrisonerDefection", useAtBPrisonerDefection());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAtBPrisonerRansom", useAtBPrisonerRansom());
         //endregion Prisoners
+
+        //region Death
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent--, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
+        //endregion Death
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -3210,13 +3275,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "canceledOrderReimbursement", canceledOrderReimbursement);
         //endregion Finances Tab
 
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInService", useTimeInService);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "timeInServiceDisplayFormat", timeInServiceDisplayFormat.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInRank", useTimeInRank);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "timeInRankDisplayFormat", timeInRankDisplayFormat.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRetirementDateTracking", useRetirementDateTracking);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackTotalEarnings", trackTotalEarnings);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketName", personnelMarketName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
                                        personnelMarketRandomEliteRemoval);
@@ -3230,14 +3288,10 @@ public class CampaignOptions implements Serializable {
                                        personnelMarketRandomUltraGreenRemoval);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketReportRefresh", personnelMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketDylansWeight", personnelMarketDylansWeight);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salaryEnlistedMultiplier", salaryEnlistedMultiplier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salaryCommissionMultiplier", salaryCommissionMultiplier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salaryAntiMekMultiplier", salaryAntiMekMultiplier);
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<phenotypeProbabilities>"
                 + StringUtils.join(phenotypeProbabilities, ',')
                 + "</phenotypeProbabilities>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tougherHealing", tougherHealing);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtB", useAtB);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAero", useAero);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useVehicles", useVehicles);
@@ -3322,15 +3376,6 @@ public class CampaignOptions implements Serializable {
                 + StringUtils.join(planetOutputAcquisitionBonus, ',')
                 + "</planetOutputAcquisitionBonus>");
 
-        pw1.println(MekHqXmlUtil.indentStr(indent)
-                    + "<salaryTypeBase>"
-                    + Utilities.printMoneyArray(salaryTypeBase)
-                    + "</salaryTypeBase>");
-        pw1.println(MekHqXmlUtil.indentStr(indent)
-                    + "<salaryXpMultiplier>"
-                    + StringUtils.join(salaryXpMultiplier, ',')
-                    + "</salaryXpMultiplier>");
-
 
         // cannot use StringUtils.join for a boolean array, so we are using this instead
         StringBuilder csv = new StringBuilder();
@@ -3402,42 +3447,8 @@ public class CampaignOptions implements Serializable {
                 retVal.assignedTechFirst = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("resetToFirstTech")) {
                 retVal.resetToFirstTech = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
-                retVal.useTactics = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useInitBonus")) {
-                retVal.useInitBonus = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useToughness")) {
-                retVal.useToughness = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
-                retVal.useArtillery = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAbilities")) {
-                retVal.useAbilities = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
-                retVal.useEdge = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useSupportEdge")) {
-                retVal.useSupportEdge = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
-                retVal.useImplants = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("altQualityAveraging")) {
-                retVal.altQualityAveraging = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAdvancedMedical")) {
-                retVal.useAdvancedMedical = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXp")) {
-                retVal.useDylansRandomXp = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
                 retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("showOriginFaction")) {
-                retVal.showOriginFaction = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) {
-                retVal.randomizeOrigin = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) {
-                retVal.randomizeDependentOrigin = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) {
-                retVal.originSearchRadius = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("isOriginExtraRandom")) {
-                retVal.isOriginExtraRandom = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) {
-                retVal.originDistanceScale = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
                 retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("killsForXP")) {
@@ -3468,10 +3479,6 @@ public class CampaignOptions implements Serializable {
                 retVal.edgeCost = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
                 retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("healWaitingPeriod")) {
-                retVal.healWaitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("naturalHealingWaitingPeriod")) {
-                retVal.naturalHealingWaitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSkill")) {
                 retVal.acquisitionSkill = wn2.getTextContent().trim();
             } else if (wn2.getNodeName().equalsIgnoreCase("nDiceTransitTime")) {
@@ -3586,27 +3593,100 @@ public class CampaignOptions implements Serializable {
                 retVal.destroyPartTarget = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAeroSystemHits")) {
                 retVal.useAeroSystemHits = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees")) {
-                retVal.minimumHitsForVees = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
                 retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
 
             //region Personnel Tab
+            //region General Personnel
+            } else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
+                retVal.setUseTactics(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useInitBonus")) {
+                retVal.setUseInitBonus(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useToughness")) {
+                retVal.setUseToughness(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
+                retVal.setUseArtillery(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAbilities")) {
+                retVal.setUseAbilities(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
+                retVal.setUseEdge(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useSupportEdge")) {
+                retVal.setUseSupportEdge(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
+                retVal.setUseImplants(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("altQualityAveraging")) {
+                retVal.setAltQualityAveraging(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
+                retVal.setUseTransfers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            //endregion General Personnel
+
+            //region Expanded Personnel Information
+            } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {
+                retVal.setUseTimeInService(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("timeInServiceDisplayFormat")) {
+                retVal.setTimeInServiceDisplayFormat(TimeInDisplayFormat.valueOf(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInRank")) {
+                retVal.setUseTimeInRank(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("timeInRankDisplayFormat")) {
+                retVal.setTimeInRankDisplayFormat(TimeInDisplayFormat.valueOf(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
+                retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
+                retVal.setTrackTotalEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("showOriginFaction")) {
+                retVal.setShowOriginFaction(Boolean.parseBoolean(wn2.getTextContent()));
+            //endregion Expanded Personnel Information
+
+            //region Personnel Randomization
+            } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXp")) {
+                retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) {
+                retVal.setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) {
+                retVal.setRandomizeDependentOrigin(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) {
+                retVal.setOriginSearchRadius(Integer.parseInt(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("isOriginExtraRandom")) {
+                retVal.setOriginExtraRandom(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) {
+                retVal.setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
+            //endregion Personnel Randomization
+
+            //region Medical
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAdvancedMedical")) {
+                retVal.setUseAdvancedMedical(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("healWaitingPeriod")) {
+                retVal.setHealingWaitingPeriod(Integer.parseInt(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("naturalHealingWaitingPeriod")) {
+                retVal.setNaturalHealingWaitingPeriod(Integer.parseInt(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
+                retVal.setUseRandomHitsForVees(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees")) {
+                retVal.setMinimumHitsForVees(Integer.parseInt(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
+                retVal.setTougherHealing(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            //endregion Medical
+
             //region Family
-            } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
-                retVal.minimumMarriageAge = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
-                retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) {
-                retVal.logMarriageNameChange = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
+                retVal.setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
+            //endregion Family
+
+            //region Marriage
             } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {
                 retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
+                retVal.setMinimumMarriageAge(Integer.parseInt(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
+                retVal.setCheckMutualAncestorsDepth(Integer.parseInt(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) {
+                retVal.setLogMarriageNameChange(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
-                retVal.useRandomMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.setUseRandomMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
-                retVal.chanceRandomMarriages = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.setChanceRandomMarriages(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) {
-                retVal.marriageAgeRange = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.setMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) {
                 String[] values = wn2.getTextContent().split(",");
                 if (values.length == 13) {
@@ -3619,30 +3699,47 @@ public class CampaignOptions implements Serializable {
                     MekHQ.getLogger().error("Unknown length of randomMarriageSurnameWeights");
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
-                retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.setUseRandomSameSexMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) {
-                retVal.chanceRandomSameSexMarriages = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.setChanceRandomSameSexMarriages(Double.parseDouble(wn2.getTextContent().trim()));
+            //endregion Marriage
+
+            //region Procreation
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation")) {
-                retVal.useUnofficialProcreation = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.setUseUnofficialProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) {
-                retVal.chanceProcreation = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.setChanceProcreation(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship")) {
-                retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.setUseUnofficialProcreationNoRelationship(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
-                retVal.chanceProcreationNoRelationship = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.setChanceProcreationNoRelationship(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("displayTrueDueDate")) {
-                retVal.displayTrueDueDate = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.setDisplayTrueDueDate(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
-                retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.setLogConception(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
                 retVal.setBabySurnameStyle(BabySurnameStyle.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
                 retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
-                retVal.setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
-                retVal.keepMarriedNameUponSpouseDeath = Boolean.parseBoolean(wn2.getTextContent().trim());
-            //endregion Family
+            //endregion Procreation
+
+            //region Salary
+            } else if (wn2.getNodeName().equalsIgnoreCase("salaryCommissionMultiplier")) {
+                retVal.setSalaryCommissionMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("salaryEnlistedMultiplier")) {
+                retVal.setSalaryEnlistedMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
+                retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
+                String[] values = wn2.getTextContent().split(",");
+                for (int i = 0; i < values.length; i++) {
+                    retVal.salaryXpMultiplier[i] = Double.parseDouble(values[i]);
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
+                // CAW: we need at least the correct number of salaries as are expected in this version,
+                //      otherwise we'll not be able to set a salary for a role.
+                retVal.salaryTypeBase = Utilities.readMoneyArray(wn2, Person.T_NUM);
+            //endregion Salary
 
             //region Prisoners
             } else if (wn2.getNodeName().equalsIgnoreCase("prisonerCaptureStyle")) {
@@ -3664,6 +3761,11 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtBPrisonerRansom")) {
                 retVal.setUseAtBPrisonerRansom(Boolean.parseBoolean(wn2.getTextContent().trim()));
             //endregion Prisoners
+
+            //region Death
+            } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
+                retVal.setKeepMarriedNameUponSpouseDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            //endregion Death
             //endregion Personnel Tab
 
             //region Finances Tab
@@ -3723,27 +3825,6 @@ public class CampaignOptions implements Serializable {
                 retVal.canceledOrderReimbursement = Double.parseDouble(wn2.getTextContent().trim());
             //endregion Finances Tab
 
-            } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
-                retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {
-                retVal.useTimeInService = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("timeInServiceDisplayFormat")) {
-                retVal.timeInServiceDisplayFormat = TimeInDisplayFormat.valueOf(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInRank")) {
-                retVal.useTimeInRank = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("timeInRankDisplayFormat")) {
-                retVal.timeInRankDisplayFormat = TimeInDisplayFormat.valueOf(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
-                retVal.useRetirementDateTracking = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
-                retVal.trackTotalEarnings = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) { // Legacy
-                retVal.setPrisonerCaptureStyle(Boolean.parseBoolean(wn2.getTextContent().trim())
-                        ? PrisonerCaptureStyle.TAHARQA : PrisonerCaptureStyle.NONE);
-            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
-                retVal.useRandomHitsForVees = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
-                retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
                 retVal.personnelMarketName = wn2.getTextContent().trim();
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
@@ -3760,21 +3841,6 @@ public class CampaignOptions implements Serializable {
                 retVal.personnelMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketDylansWeight")) {
                 retVal.personnelMarketDylansWeight = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("salaryCommissionMultiplier")) {
-                retVal.salaryCommissionMultiplier = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("salaryEnlistedMultiplier")) {
-                retVal.salaryEnlistedMultiplier = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
-                retVal.salaryAntiMekMultiplier = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
-                // CAW: we need at least the correct number of salaries as are expected in this version,
-                //      otherwise we'll not be able to set a salary for a role.
-                retVal.salaryTypeBase = Utilities.readMoneyArray(wn2, Person.T_NUM);
-            } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
-                String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.salaryXpMultiplier[i] = Double.parseDouble(values[i]);
-                }
             } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
@@ -3788,8 +3854,6 @@ public class CampaignOptions implements Serializable {
                 retVal.phenotypeProbabilities[Phenotype.AEROSPACE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) {
                 retVal.phenotypeProbabilities[Phenotype.VEHICLE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
-                retVal.tougherHealing = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
                 retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtBUnitMarket")) {
@@ -3848,13 +3912,6 @@ public class CampaignOptions implements Serializable {
                 retVal.setPlayerControlsAttachedUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("searchRadius")) {
                 retVal.searchRadius = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
-                double intensity = Double.parseDouble(wn2.getTextContent().trim());
-
-                retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
-                retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
-                retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
-                retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
             } else if (wn2.getNodeName().equalsIgnoreCase("atbBattleChance")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
@@ -3895,18 +3952,10 @@ public class CampaignOptions implements Serializable {
                 retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceNumUnits")) {
                 retVal.limitLanceNumUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
-                if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
-                    retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.ATB);
-                    retVal.setUseAtBPrisonerDefection(true);
-                    retVal.setUseAtBPrisonerRansom(true);
-                }
             } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
                 retVal.contractMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
                 retVal.unitMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
-                MekHQ.getMekHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforLocalUnits")) {
                 retVal.allowOpforLocalUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforAeros")) {
@@ -3915,8 +3964,6 @@ public class CampaignOptions implements Serializable {
                 retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
                 retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
-                MekHQ.getMekHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
                 retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
@@ -3943,6 +3990,31 @@ public class CampaignOptions implements Serializable {
                 retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
                 retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2));
+
+            //region Legacy
+            // Removed in 0.47.*
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
+                if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
+                    retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.ATB);
+                    retVal.setUseAtBPrisonerDefection(true);
+                    retVal.setUseAtBPrisonerRansom(true);
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
+                double intensity = Double.parseDouble(wn2.getTextContent().trim());
+
+                retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
+                retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
+                retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
+                retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
+                retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) { // Legacy
+                retVal.setPrisonerCaptureStyle(Boolean.parseBoolean(wn2.getTextContent().trim())
+                        ? PrisonerCaptureStyle.TAHARQA : PrisonerCaptureStyle.NONE);
+            } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
+                MekHQ.getMekHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
+                MekHQ.getMekHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
             }
         }
 
