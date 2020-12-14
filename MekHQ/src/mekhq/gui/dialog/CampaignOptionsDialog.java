@@ -221,6 +221,7 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Tech Limits Tab
 
     //region Personnel Tab
+    //General Personnel
     private JCheckBox useTacticsBox;
     private JCheckBox useInitBonusBox;
     private JCheckBox useToughnessBox;
@@ -230,14 +231,8 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox useSupportEdgeBox;
     private JCheckBox useImplantsBox;
     private JCheckBox altQualityAveragingCheckBox;
-    private JCheckBox useAdvancedMedicalBox;
-    private JCheckBox useDylansRandomXpBox;
-    private JSpinner spnHealWaitingPeriod;
-    private JSpinner spnNaturalHealWaitingPeriod;
-    private JSpinner spnMinimumHitsForVees;
-    private JCheckBox useRandomHitsForVees;
-    private JCheckBox useTougherHealing;
     private JCheckBox chkUseTransfers;
+    //Expanded Personnel
     private JCheckBox chkUseTimeInService;
     private JComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
     private JCheckBox chkUseTimeInRank;
@@ -245,20 +240,32 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUseRetirementDateTracking;
     private JCheckBox chkTrackTotalEarnings;
     private JCheckBox chkShowOriginFaction;
+    //Personnel Randomization
+    private JCheckBox useDylansRandomXpBox;
     private JCheckBox chkRandomizeOrigin;
     private JCheckBox chkRandomizeDependentsOrigin;
     private JSpinner spnOriginSearchRadius;
+    //Medical
+    private JCheckBox useAdvancedMedicalBox;
+    private JSpinner spnHealWaitingPeriod;
+    private JSpinner spnNaturalHealWaitingPeriod;
+    private JSpinner spnMinimumHitsForVees;
+    private JCheckBox useRandomHitsForVees;
+    private JCheckBox useTougherHealing;
     //Family
+    private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
+    //Marriage
+    private JCheckBox chkUseManualMarriages;
     private JSpinner spnMinimumMarriageAge;
     private JSpinner spnCheckMutualAncestorsDepth;
     private JCheckBox chkLogMarriageNameChange;
-    private JCheckBox chkUseManualMarriages;
     private JCheckBox chkUseRandomMarriages;
     private JSpinner spnChanceRandomMarriages;
     private JSpinner spnMarriageAgeRange;
     private JSpinner[] spnRandomMarriageSurnameWeights;
     private JCheckBox chkUseRandomSameSexMarriages;
     private JSpinner spnChanceRandomSameSexMarriages;
+    //Procreation
     private JCheckBox chkUseUnofficialProcreation;
     private JSpinner spnChanceProcreation;
     private JCheckBox chkUseUnofficialProcreationNoRelationship;
@@ -267,8 +274,6 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkLogConception;
     private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
     private JCheckBox chkDetermineFatherAtBirth;
-    private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
-    private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     //Salary
     private JSpinner spnSalaryCommission;
     private JSpinner spnSalaryEnlisted;
@@ -281,6 +286,8 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkPrisonerBabyStatus;
     private JCheckBox chkAtBPrisonerDefection;
     private JCheckBox chkAtBPrisonerRansom;
+    //Death
+    private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     //endregion Personnel Tab
 
     //region Finances Tab
@@ -4647,6 +4654,7 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Tech Limits Tab
 
         //region Personnel Tab
+        //General Personnel
         useTacticsBox.setSelected(options.useTactics());
         useInitBonusBox.setSelected(options.useInitBonus());
         useToughnessBox.setSelected(options.useToughness());
@@ -4658,14 +4666,9 @@ public class CampaignOptionsDialog extends JDialog {
         useSupportEdgeBox.setSelected(options.useSupportEdge());
         useImplantsBox.setSelected(options.useImplants());
         altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
-        useAdvancedMedicalBox.setSelected(options.useAdvancedMedical());
-        useDylansRandomXpBox.setSelected(options.useDylansRandomXp());
-        spnHealWaitingPeriod.setValue(options.getHealingWaitingPeriod());
-        spnNaturalHealWaitingPeriod.setValue(options.getNaturalHealingWaitingPeriod());
-        spnMinimumHitsForVees.setValue(options.getMinimumHitsForVees());
-        useRandomHitsForVees.setSelected(options.useRandomHitsForVees());
-        useTougherHealing.setSelected(options.useTougherHealing());
         chkUseTransfers.setSelected(options.useTransfers());
+
+        //Expanded Personnel Information
         chkUseTimeInService.setSelected(options.getUseTimeInService());
         comboTimeInServiceDisplayFormat.setSelectedItem(options.getTimeInServiceDisplayFormat());
         chkUseTimeInRank.setSelected(options.getUseTimeInRank());
@@ -4673,15 +4676,29 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseRetirementDateTracking.setSelected(options.useRetirementDateTracking());
         chkTrackTotalEarnings.setSelected(options.trackTotalEarnings());
         chkShowOriginFaction.setSelected(options.showOriginFaction());
+
+        //Personnel Randomization
+        useDylansRandomXpBox.setSelected(options.useDylansRandomXp());
         chkRandomizeOrigin.setSelected(options.randomizeOrigin());
         chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
         spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
 
+        //Medical
+        useAdvancedMedicalBox.setSelected(options.useAdvancedMedical());
+        spnHealWaitingPeriod.setValue(options.getHealingWaitingPeriod());
+        spnNaturalHealWaitingPeriod.setValue(options.getNaturalHealingWaitingPeriod());
+        spnMinimumHitsForVees.setValue(options.getMinimumHitsForVees());
+        useRandomHitsForVees.setSelected(options.useRandomHitsForVees());
+        useTougherHealing.setSelected(options.useTougherHealing());
+
         //Family
+        comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
+
+        //Marriage
+        chkUseManualMarriages.setSelected(options.useManualMarriages());
         spnMinimumMarriageAge.setValue(options.getMinimumMarriageAge());
         spnCheckMutualAncestorsDepth.setValue(options.checkMutualAncestorsDepth());
         chkLogMarriageNameChange.setSelected(options.logMarriageNameChange());
-        chkUseManualMarriages.setSelected(options.useManualMarriages());
         chkUseRandomMarriages.setSelected(options.useRandomMarriages());
         spnChanceRandomMarriages.setValue(options.getChanceRandomMarriages() * 100.0);
         spnMarriageAgeRange.setValue(options.getMarriageAgeRange());
@@ -4690,6 +4707,8 @@ public class CampaignOptionsDialog extends JDialog {
         }
         chkUseRandomSameSexMarriages.setSelected(options.useRandomSameSexMarriages());
         spnChanceRandomSameSexMarriages.setValue(options.getChanceRandomSameSexMarriages() * 100.0);
+
+        //Procreation
         if (chkUseUnofficialProcreation.isSelected() != options.useUnofficialProcreation()) {
             chkUseUnofficialProcreation.doClick();
         }
@@ -4702,8 +4721,6 @@ public class CampaignOptionsDialog extends JDialog {
         chkLogConception.setSelected(options.logConception());
         comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
         chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
-        comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
-        chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
 
         //Salary
         spnSalaryCommission.setValue(options.getSalaryCommissionMultiplier());
@@ -4722,6 +4739,9 @@ public class CampaignOptionsDialog extends JDialog {
         chkPrisonerBabyStatus.setSelected(options.getPrisonerBabyStatus());
         chkAtBPrisonerDefection.setSelected(options.useAtBPrisonerDefection());
         chkAtBPrisonerRansom.setSelected(options.useAtBPrisonerRansom());
+
+        //Death
+        chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -5114,8 +5134,6 @@ public class CampaignOptionsDialog extends JDialog {
         options.setUnitRatingMethod((UnitRatingMethod) unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((Integer) manualUnitRatingModifier.getValue());
         options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
-        options.setUseTactics(useTacticsBox.isSelected());
-        campaign.getGameOptions().getOption("command_init").setValue(useTacticsBox.isSelected());
         options.setDestroyByMargin(useDamageMargin.isSelected());
         options.setDestroyMargin((Integer) spnDamageMargin.getModel().getValue());
         options.setDestroyPartTarget((Integer) spnDestroyPartTarget.getModel().getValue());
@@ -5241,6 +5259,9 @@ public class CampaignOptionsDialog extends JDialog {
         }
 
         //region Personnel Tab
+        //General Personnel
+        options.setUseTactics(useTacticsBox.isSelected());
+        campaign.getGameOptions().getOption("command_init").setValue(useTacticsBox.isSelected());
         options.setInitBonus(useInitBonusBox.isSelected());
         campaign.getGameOptions().getOption("individual_initiative").setValue(useInitBonusBox.isSelected());
         options.setToughness(useToughnessBox.isSelected());
@@ -5255,16 +5276,9 @@ public class CampaignOptionsDialog extends JDialog {
         options.setImplants(useImplantsBox.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
-        options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
-        options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
-        //we need to reset healing time options through the campaign because we may need to
-        //loop through personnel to make adjustments
-        campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getModel().getValue(),
-                (Integer) spnNaturalHealWaitingPeriod.getModel().getValue());
-        options.setMinimumHitsForVees((Integer) spnMinimumHitsForVees.getModel().getValue());
-        options.setUseRandomHitsForVees(useRandomHitsForVees.isSelected());
-        options.setTougherHealing(useTougherHealing.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
+
+        //Expanded Personnel Information
         options.setUseTimeInService(chkUseTimeInService.isSelected());
         options.setTimeInServiceDisplayFormat((TimeInDisplayFormat) comboTimeInServiceDisplayFormat.getSelectedItem());
         options.setUseTimeInRank(chkUseTimeInRank.isSelected());
@@ -5272,14 +5286,31 @@ public class CampaignOptionsDialog extends JDialog {
         options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
         options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
         options.setShowOriginFaction(chkShowOriginFaction.isSelected());
+
+        //Personnel Randomization
+        options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
         options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
         options.setOriginSearchRadius((Integer)spnOriginSearchRadius.getModel().getValue());
+
+        //Medical
+        options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
+        //we need to reset healing time options through the campaign because we may need to
+        //loop through personnel to make adjustments
+        campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getModel().getValue(),
+                (Integer) spnNaturalHealWaitingPeriod.getModel().getValue());
+        options.setMinimumHitsForVees((Integer) spnMinimumHitsForVees.getModel().getValue());
+        options.setUseRandomHitsForVees(useRandomHitsForVees.isSelected());
+        options.setTougherHealing(useTougherHealing.isSelected());
+
         //Family
+        options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
+
+        //Marriage
+        options.setUseManualMarriages(chkUseManualMarriages.isSelected());
         options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getModel().getValue());
         options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
         options.setLogMarriageNameChange(chkLogMarriageNameChange.isSelected());
-        options.setUseManualMarriages(chkUseManualMarriages.isSelected());
         options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
         options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue() / 100.0);
         options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());
@@ -5289,6 +5320,8 @@ public class CampaignOptionsDialog extends JDialog {
         }
         options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
         options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getModel().getValue() / 100.0);
+
+        //Procreation
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
         options.setChanceProcreation((Double) spnChanceProcreation.getModel().getValue() / 100.0);
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
@@ -5297,8 +5330,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setLogConception(chkLogConception.isSelected());
         options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
         options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
-        options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
-        options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
+
         //Salary
         options.setSalaryCommissionMultiplier((Double) spnSalaryCommission.getModel().getValue());
         options.setSalaryEnlistedMultiplier((Double) spnSalaryEnlisted.getModel().getValue());
@@ -5311,12 +5343,16 @@ public class CampaignOptionsDialog extends JDialog {
                 options.setBaseSalary(i, (double) spnSalaryBase[i].getValue());
             } catch (Exception ignored) { }
         }
+
         //Prisoners
         options.setPrisonerCaptureStyle((PrisonerCaptureStyle) comboPrisonerCaptureStyle.getSelectedItem());
         options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
         options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
         options.setUseAtBPrisonerDefection(chkAtBPrisonerDefection.isSelected());
         options.setUseAtBPrisonerRansom(chkAtBPrisonerRansom.isSelected());
+
+        //Death
+        options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
         //endregion Personnel Tab
 
         //start SPA
