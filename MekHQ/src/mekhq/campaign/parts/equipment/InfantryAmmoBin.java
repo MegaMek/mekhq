@@ -55,13 +55,14 @@ public class InfantryAmmoBin extends AmmoBin {
      * @param equipNum    The equipment index on the unit
      * @param shots       The number of shots of ammo needed to refill the bin
      * @param weaponType  The weapon this ammo is for
+     * @param clips       The number of clips of ammo
      * @param omniPodded  Whether the weapon is pod-mounted on an omnivehicle
      * @param c           The campaign instance
      */
     public InfantryAmmoBin(int tonnage, @Nullable AmmoType ammoType, int equipNum, int shots,
-            @Nullable InfantryWeapon weaponType, double size, boolean omniPodded, @Nullable Campaign c) {
+            @Nullable InfantryWeapon weaponType, int clips, boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, ammoType, equipNum, shots, false, omniPodded, c);
-        this.size = size;
+        this.size = clips;
         if (weaponType != null) {
             this.weaponType = weaponType;
             name = weaponType.getName() + " Ammo Bin";
@@ -71,6 +72,7 @@ public class InfantryAmmoBin extends AmmoBin {
     @Override
     public void restore() {
         super.restore();
+
         name = weaponType.getName() + " Ammo Bin";
     }
 
@@ -81,12 +83,18 @@ public class InfantryAmmoBin extends AmmoBin {
         return weaponType;
     }
 
+    /**
+     * Gets the number of clips stored in this ammo bin.
+     */
+    public int getClips() {
+        return (int) getSize();
+    }
+
     @Override
     public InfantryAmmoBin clone() {
         InfantryAmmoBin clone = new InfantryAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded,
-                weaponType, size, omniPodded, campaign);
+                getWeaponType(), getClips(), omniPodded, campaign);
         clone.copyBaseData(this);
-        clone.munition = this.munition;
         return clone;
     }
 
@@ -102,12 +110,12 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public int getLocation() {
-        if (unit != null) {
-            Mounted m = unit.getEntity().getEquipment(equipmentNum);
-            while (m.getLinkedBy() != null) {
-                m = m.getLinkedBy();
+        Mounted mounted = getMounted();
+        if (mounted != null) {
+            while (mounted.getLinkedBy() != null) {
+                mounted = mounted.getLinkedBy();
             }
-            return m.getLocation();
+            return mounted.getLocation();
         }
         return Entity.LOC_NONE;
     }
@@ -119,7 +127,7 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public int getFullShots() {
-        return getWeaponType().getShots() * (int) getSize();
+        return getWeaponType().getShots() * getClips();
     }
 
     /**
@@ -135,12 +143,48 @@ public class InfantryAmmoBin extends AmmoBin {
         // Wait until loading/unloading to change the full number of shots on the Entity.
     }
 
+    /**
+     * Sets the number of shots needed in the {@code InfantryAmmoBin}.
+     *
+     * NB: this can be negative if the capacity has changed.
+     *
+     * @param shots The number of shots needed.
+     */
+    @Override
+    public void setShotsNeeded(int shots) {
+        this.shotsNeeded = shots;
+    }
+
     @Override
     public void loadBin() {
+        Mounted mounted = getMounted();
+
+        // Check if we have too much ammo in the bin ...
+        if (shotsNeeded < 0) {
+            // ... and if so, unload the bin first.
+            unload();
+        }
+
         super.loadBin();
-        if (unit != null) {
-            Mounted mount = unit.getEntity().getEquipment(getEquipmentNum());
-            mount.setOriginalShots(getFullShots());
+
+        if (mounted != null) {
+            mounted.setOriginalShots(getFullShots());
+        }
+    }
+
+    @Override
+    protected int requisitionAmmo(AmmoType ammoType, int shotsNeeded) {
+        Objects.requireNonNull(ammoType);
+
+        return getCampaign().getQuartermaster().removeAmmo(ammoType, getWeaponType(), shotsNeeded);
+    }
+
+    @Override
+    protected void returnAmmo(AmmoType ammoType, int shotsUnloaded) {
+        Objects.requireNonNull(ammoType);
+
+        if (shotsUnloaded > 0) {
+            getCampaign().getQuartermaster().addAmmo(ammoType, getWeaponType(), shotsUnloaded);
         }
     }
 
@@ -157,15 +201,17 @@ public class InfantryAmmoBin extends AmmoBin {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         super.updateConditionFromEntity(checkForDestruction);
-        if (unit != null) {
-            Mounted mount = unit.getEntity().getEquipment(getEquipmentNum());
-            shotsNeeded = mount.getOriginalShots() - mount.getBaseShotsLeft();
+
+        Mounted mounted = getMounted();
+        if (mounted != null) {
+            shotsNeeded = mounted.getOriginalShots() - mounted.getBaseShotsLeft();
         }
     }
 
     @Override
     public void writeToXmlEnd(PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "weaponType", getWeaponType().getInternalName());
+
         super.writeToXmlEnd(pw, indent);
     }
 
@@ -179,6 +225,8 @@ public class InfantryAmmoBin extends AmmoBin {
                 this.weaponType = (InfantryWeapon) EquipmentType.get(wn.getTextContent().trim());
             }
         }
+
+        super.loadFieldsFromXmlNode(node);
     }
 
     @Override
@@ -190,21 +238,22 @@ public class InfantryAmmoBin extends AmmoBin {
         if ((partner != null) && (partner.getShotsNeeded() < 0)) {
             partner.loadBin();
         }
+
         loadBin();
     }
 
     @Override
-    public MissingPart getMissingPart() {
-        return new MissingInfantryAmmoBin(getUnitTonnage(), getType(), equipmentNum, getWeaponType(),
-                size, omniPodded, campaign);
+    public MissingInfantryAmmoBin getMissingPart() {
+        return new MissingInfantryAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), getWeaponType(),
+                getClips(), omniPodded, campaign);
     }
 
     @Override
     public boolean isSamePartType(Part part) {
         return  (part instanceof InfantryAmmoBin)
-                && super.isSamePartType(part)
+                && getType().equals(((InfantryAmmoBin) part).getType())
                 && Objects.equals(getWeaponType(), ((InfantryAmmoBin) part).getWeaponType())
-                && size == ((InfantryAmmoBin) part).size;
+                && getClips() == ((InfantryAmmoBin) part).getClips();
     }
 
     @Override
@@ -217,32 +266,8 @@ public class InfantryAmmoBin extends AmmoBin {
     }
 
     @Override
-    public void changeAmountAvailable(int amount, final AmmoType curType) {
-        InfantryAmmoStorage a = (InfantryAmmoStorage) campaign.getWarehouse().findSparePart(part ->
-            InfantryAmmoStorage.isRightAmmo(part, getType(), getWeaponType()));
-
-        if (a != null) {
-            a.changeShots(amount);
-            if (a.getShots() <= 0) {
-                campaign.getWarehouse().removePart(a);
-            }
-        } else if (amount > 0) {
-            campaign.getQuartermaster().addPart(new InfantryAmmoStorage(1, curType, amount, getWeaponType(), campaign), 0);
-        }
-    }
-
-    @Override
-    public boolean isCompatibleAmmo(AmmoType a1, AmmoType a2) {
-        return false;
-    }
-
     public int getAmountAvailable() {
-        final AmmoType thisType = getType();
-        return campaign.getWarehouse().streamSpareParts()
-            .filter(part -> part instanceof InfantryAmmoStorage && part.isPresent()
-                    && InfantryAmmoStorage.isRightAmmo(part, thisType, getWeaponType()))
-            .mapToInt(part -> ((InfantryAmmoStorage) part).getShots())
-            .sum();
+        return getCampaign().getQuartermaster().getAmmoAvailable(getType(), getWeaponType());
     }
 
     /**
@@ -250,13 +275,14 @@ public class InfantryAmmoBin extends AmmoBin {
      * @return The other bin for the same weapon, or null if there isn't one.
      */
     public @Nullable InfantryAmmoBin findPartnerBin() {
-        if (unit != null) {
-            Mounted mount = unit.getEntity().getEquipment(getEquipmentNum());
+        Mounted mounted = getMounted();
+        if (mounted != null) {
             int index = -1;
-            if (mount.getLinked() != null) {
-                index = unit.getEntity().getEquipmentNum(mount.getLinked());
-            } else if (mount.getLinkedBy().getType() instanceof AmmoType) {
-                index = unit.getEntity().getEquipmentNum(mount.getLinkedBy());
+            if (mounted.getLinked() != null) {
+                index = unit.getEntity().getEquipmentNum(mounted.getLinked());
+            } else if ((mounted.getLinkedBy() != null)
+                    && (mounted.getLinkedBy().getType() instanceof AmmoType)) {
+                index = unit.getEntity().getEquipmentNum(mounted.getLinkedBy());
             }
             for (Part part : unit.getParts()) {
                 if ((part instanceof InfantryAmmoBin) && (((InfantryAmmoBin) part).getEquipmentNum() == index)) {
@@ -277,9 +303,9 @@ public class InfantryAmmoBin extends AmmoBin {
         return getWeaponType().getShots() + " shots (1 clip)";
     }
 
-    public Part getNewPart() {
-        return new InfantryAmmoStorage(1, getType(), getWeaponType().getShots() * (int) getSize(),
-                getWeaponType(), campaign);
+    @Override
+    public InfantryAmmoStorage getNewPart() {
+        return new InfantryAmmoStorage(1, getType(), getFullShots(), getWeaponType(), getCampaign());
     }
 
     @Override

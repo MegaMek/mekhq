@@ -914,6 +914,37 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MedicalLogger.diedOfOldAge(this, campaign.getLocalDate());
                 ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
                 break;
+            case PREGNANCY_COMPLICATIONS:
+                // The child might be able to be born, albeit into a world without their mother.
+                // This can be manually set by males and for those who are not pregnant. This is
+                // purposeful, to allow for player customization, and thus we first check if someone
+                // is pregnant before having the birth
+                if (isPregnant()) {
+                    int pregnancyWeek = getPregnancyWeek(campaign.getLocalDate());
+                    double babyBornChance;
+                    if (pregnancyWeek > 35) {
+                        babyBornChance = 0.99;
+                    } else if (pregnancyWeek > 29) {
+                        babyBornChance = 0.95;
+                    } else if (pregnancyWeek > 25) {
+                        babyBornChance = 0.9;
+                    } else if (pregnancyWeek == 25) {
+                        babyBornChance = 0.8;
+                    } else if (pregnancyWeek == 24) {
+                        babyBornChance = 0.5;
+                    } else if (pregnancyWeek == 23) {
+                        babyBornChance = 0.25;
+                    } else {
+                        babyBornChance = 0;
+                    }
+
+                    if (Compute.randomFloat() < babyBornChance) {
+                        birth(campaign);
+                    }
+                }
+                MedicalLogger.diedFromPregnancyComplications(this, campaign.getLocalDate());
+                ServiceLogger.passedAway(this, campaign.getLocalDate(), status.toString());
+                break;
         }
 
         setStatus(status);
@@ -1341,6 +1372,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setExpectedDueDate(LocalDate expectedDueDate) {
         this.expectedDueDate = expectedDueDate;
+    }
+
+    public int getPregnancyWeek(LocalDate today) {
+        return Math.toIntExact(ChronoUnit.WEEKS.between(getExpectedDueDate()
+                .minus(PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS)
+                .plus(1, ChronoUnit.DAYS), today));
     }
 
     public boolean isPregnant() {
@@ -2099,6 +2136,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("awards")) {
+                    final boolean defaultSetMigrationRequired = version.isLowerThan("0.47.15");
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
 
@@ -2113,7 +2151,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                             continue;
                         }
 
-                        retVal.awardController.addAwardFromXml(AwardsFactory.getInstance().generateNewFromXML(wn3));
+                        retVal.getAwardController().addAwardFromXml(AwardsFactory.getInstance()
+                                .generateNewFromXML(wn3, defaultSetMigrationRequired));
                     }
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("injuries")) {
