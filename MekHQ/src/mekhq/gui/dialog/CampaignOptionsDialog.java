@@ -4014,7 +4014,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         // Layout the Panel
         JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("panPrisoners.text")));
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("panMedical.text")));
         GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
