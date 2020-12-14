@@ -133,7 +133,7 @@ public class CampaignXmlParser {
      * @throws NullEntityException Thrown when an entity is referenced but cannot be loaded or found
      */
     public Campaign parse() throws CampaignXmlParseException, NullEntityException {
-        MekHQ.getLogger().info(CampaignXmlParser.class, "Starting load of campaign file from XML...");
+        MekHQ.getLogger().info("Starting load of campaign file from XML...");
         // Initialize variables.
         Campaign retVal = new Campaign();
         retVal.setApp(app);
@@ -147,7 +147,7 @@ public class CampaignXmlParser {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(CampaignXmlParser.class, ex);
+            MekHQ.getLogger().error(ex);
 
             throw new CampaignXmlParseException(ex);
         }
@@ -160,6 +160,11 @@ public class CampaignXmlParser {
         campaignEle.normalize();
 
         Version version = new Version(campaignEle.getAttribute("version"));
+
+        // Indiciates whether or not new units were written to disk while
+        // loading the Campaign file. If so, we need to kick back off loading
+        // all of the unit data from disk.
+        boolean reloadUnitData = false;
 
         // we need to iterate through three times, the first time to collect
         // any custom units that might not be written yet
@@ -186,7 +191,7 @@ public class CampaignXmlParser {
                         throw new CampaignXmlParseException(e);
                     }
                 } else if (xn.equalsIgnoreCase("custom")) {
-                    processCustom(retVal, wn);
+                    reloadUnitData |= processCustom(retVal, wn);
                 }
             } else {
                 // If it's a text node or attribute or whatever at this level,
@@ -195,7 +200,11 @@ public class CampaignXmlParser {
                 continue;
             }
         }
-        MechSummaryCache.getInstance().loadMechData();
+
+        // Only reload unit data if we updated files on disk
+        if (reloadUnitData) {
+            MechSummaryCache.getInstance().loadMechData();
+        }
 
         // the second time to check for any null entities
         for (int x = 0; x < nl.getLength(); x++) {
@@ -1068,7 +1077,14 @@ public class CampaignXmlParser {
         MekHQ.getLogger().info(CampaignXmlParser.class, "Load Game Option Nodes Complete!");
     }
 
-    private static void processCustom(Campaign retVal, Node wn) {
+    /**
+     * Processes a custom unit in a campaign.
+     * @param retVal The {@see Campaign} being parsed.
+     * @param wn The current XML element representing a custom unit.
+     * @return A value indicating whether or not a new custom unit
+     *         file was added to disk.
+     */
+    private static boolean processCustom(Campaign retVal, Node wn) {
         String sCustomsDir = "data" + File.separator + "mechfiles"
                 + File.separator + "customs";
         String sCustomsDirCampaign = sCustomsDir + File.separator + retVal.getName();
@@ -1113,15 +1129,15 @@ public class CampaignXmlParser {
                     + name + ".mtf";
             if ((new File(fileName)).exists()
                     || (new File(fileNameCampaign)).exists()) {
-                return;
+                return false;
             }
-            MekHQ.getLogger().info(CampaignXmlParser.class, "Loading Custom unit from XML...");
+            MekHQ.getLogger().info("Loading Custom unit from XML...");
             try (OutputStream out = new FileOutputStream(fileNameCampaign);
                  PrintStream p = new PrintStream(out)) {
                 p.println(mtf);
-                MekHQ.getLogger().info(CampaignXmlParser.class, "Loaded Custom unit!");
+                MekHQ.getLogger().info("Loaded Custom unit!");
             } catch (Exception ex) {
-                MekHQ.getLogger().error(CampaignXmlParser.class, ex);
+                MekHQ.getLogger().error(ex);
             }
         }
         if ((name != null) && (blk != null)) {
@@ -1132,18 +1148,20 @@ public class CampaignXmlParser {
                     + name + ".blk";
             if ((new File(fileName)).exists()
                     || (new File(fileNameCampaign)).exists()) {
-                return;
+                return false;
             }
-            MekHQ.getLogger().info(CampaignXmlParser.class, "Loading Custom unit from XML...");
+            MekHQ.getLogger().info("Loading Custom unit from XML...");
 
             try (FileOutputStream out = new FileOutputStream(fileNameCampaign);
                  PrintStream p = new PrintStream(out)) {
                 p.println(blk);
-                MekHQ.getLogger().info(CampaignXmlParser.class, "Loaded Custom unit!");
+                MekHQ.getLogger().info("Loaded Custom unit!");
             } catch (Exception ex) {
-                MekHQ.getLogger().error(CampaignXmlParser.class, ex);
+                MekHQ.getLogger().error(ex);
             }
         }
+
+        return true;
     }
 
     private static void processMissionNodes(Campaign retVal, Node wn, Version version) {
