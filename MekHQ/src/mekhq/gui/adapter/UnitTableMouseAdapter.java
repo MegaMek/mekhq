@@ -55,9 +55,6 @@ import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.MissingThrusters;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -69,8 +66,10 @@ import mekhq.campaign.unit.actions.CancelMothballUnitAction;
 import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
+import mekhq.campaign.unit.actions.RestoreUnitAction;
 import mekhq.campaign.unit.actions.ShowUnitBvAction;
 import mekhq.campaign.unit.actions.StripUnitAction;
+import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.MekLabTab;
@@ -97,7 +96,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     public static final String COMMAND_CHANGE_SITE = "CHANGE_SITE";
     // Ammo Swap Commands
     public static final String COMMAND_LC_SWAP_AMMO = "LC_SWAP_AMMO";
-    public static final String COMMAND_SWAP_AMMO = "SWAP_AMMO";
     public static final String COMMAND_SMALL_SV_SWAP_AMMO = "SMALL_SV_SWAP_AMMO";
     // Repair Commands
     public static final String COMMAND_REPAIR = "REPAIR";
@@ -272,17 +270,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (!dialog.wasCanceled()) {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
-        } else if (command.contains(COMMAND_SWAP_AMMO)) { // Single Unit only
-            String[] fields = command.split(":");
-            int selAmmoId = Integer.parseInt(fields[1]);
-            Part part = gui.getCampaign().getWarehouse().getPart(selAmmoId);
-            if (!(part instanceof AmmoBin)) {
-                return;
-            }
-            AmmoBin ammo = (AmmoBin) part;
-            AmmoType atype = (AmmoType) EquipmentType.get(fields[2]);
-            ammo.changeMunition(atype);
-            MekHQ.triggerEvent(new UnitChangedEvent(part.getUnit()));
         } else if (command.contains(COMMAND_CHANGE_SITE)) {
             int selected = Integer.parseInt(command.split(":")[1]);
             for (Unit unit : units) {
@@ -494,77 +481,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             IUnitAction showUnitBvAction = new ShowUnitBvAction();
             showUnitBvAction.execute(gui.getCampaign(), selectedUnit);
         } else if (command.equals(COMMAND_RESTORE_UNIT)) {
-            for (Unit unit : units) {
-                unit.setSalvage(false);
-
-                boolean needsCheck = true;
-                while (unit.isAvailable() && needsCheck) {
-                    needsCheck = false;
-                    for (int x = 0; x < unit.getParts().size(); x++) {
-                        Part part = unit.getParts().get(x);
-                        if (part instanceof MissingPart) {
-                            //Make sure we restore both left and right thrusters
-                            if (part instanceof MissingThrusters) {
-                                if (((Aero) unit.getEntity()).getLeftThrustHits() > 0) {
-                                    ((MissingThrusters) part).setLeftThrusters(true);
-                                }
-                            }
-                            // We magically acquire a replacement part, then fix the missing one.
-                            part.getCampaign().getQuartermaster().addPart(((MissingPart) part).getNewPart(), 0);
-                            part.fix();
-                            part.resetTimeSpent();
-                            part.resetOvertime();
-                            part.setTech(null);
-                            part.cancelReservation();
-                            part.remove(false);
-                            needsCheck = true;
-                        } else {
-                            if (part.needsFixing()) {
-                                needsCheck = true;
-                                part.fix();
-                            } else {
-                                part.resetRepairSettings();
-                            }
-                            part.resetTimeSpent();
-                            part.resetOvertime();
-                            part.setTech(null);
-                            part.cancelReservation();
-                        }
-
-                        // replace damaged armor and reload ammo bins after fixing their respective locations
-                        if (part instanceof Armor) {
-                            final Armor armor = (Armor) part;
-                            armor.setAmount(armor.getTotalAmount());
-                        } else if (part instanceof AmmoBin) {
-                            final AmmoBin ammoBin = (AmmoBin) part;
-
-                            // we magically find the ammo we need, then load the bin
-                            // we only want to get the amount of ammo the bin actually needs
-                            if (ammoBin.getShotsNeeded() > 0) {
-                                ammoBin.setShotsNeeded(0);
-                                ammoBin.updateConditionFromPart();
-                            }
-                        }
-
-                    }
-
-                    // TODO: Make this less painful. We just want to fix hips and shoulders.
-                    Entity entity = unit.getEntity();
-                    if (entity instanceof Mech) {
-                        for (int loc : new int[] {
-                            Mech.LOC_CLEG, Mech.LOC_LLEG, Mech.LOC_RLEG, Mech.LOC_LARM, Mech.LOC_RARM}) {
-                            int numberOfCriticals = entity.getNumberOfCriticals(loc);
-                            for (int crit = 0; crit < numberOfCriticals; ++ crit) {
-                                CriticalSlot slot = entity.getCritical(loc, crit);
-                                if (null != slot) {
-                                    slot.setHit(false);
-                                    slot.setDestroyed(false);
-                                }
-                            }
-                        }
-                    }
-                }
-                MekHQ.triggerEvent(new UnitChangedEvent(unit));
+            IUnitAction restoreUnitAction = new RestoreUnitAction();
+            for (Unit u : units) {
+                restoreUnitAction.execute(gui.getCampaign(), u);
             }
         } else if (command.equals(COMMAND_STRIP_UNIT)) {
             IUnitAction stripUnitAction = new StripUnitAction();
@@ -808,20 +727,19 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         }
                     } else {
                         menu = new JMenu("Swap ammo");
-                        JMenu ammoMenu;
                         for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
-                            ammoMenu = new JMenu(ammo.getType().getDesc());
+                            JMenu ammoMenu = new JMenu(ammo.getType().getDesc());
                             AmmoType curType = ammo.getType();
                             for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType,
                                     gui.getCampaign().getCampaignOptions().getTechLevel())) {
                                 cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                                // Identity Comparison is required, not .equals
-                                if (atype == curType) {
+                                if (atype.equals(curType)) {
                                     cbMenuItem.setSelected(true);
                                 } else {
-                                    cbMenuItem.setActionCommand(COMMAND_SWAP_AMMO + ":" + ammo.getId()
-                                            + ":" + atype.getInternalName());
-                                    cbMenuItem.addActionListener(this);
+                                    cbMenuItem.addActionListener(evt -> {
+                                        IUnitAction swapAmmoTypeAction = new SwapAmmoTypeAction(ammo, atype);
+                                        swapAmmoTypeAction.execute(gui.getCampaign(), unit);
+                                    });
                                 }
                                 ammoMenu.add(cbMenuItem);
                             }

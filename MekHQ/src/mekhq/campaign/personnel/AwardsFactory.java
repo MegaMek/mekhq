@@ -29,6 +29,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import mekhq.campaign.io.Migration.PersonMigrator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -42,8 +43,6 @@ import mekhq.campaign.AwardSet;
  * @author Miguel Azevedo
  */
 public class AwardsFactory {
-    private static final String AWARDS_XML_ROOT_PATH = "data/universe/awards/";
-
     private static AwardsFactory instance = null;
 
     /**
@@ -97,11 +96,10 @@ public class AwardsFactory {
     /**
      * Generates a new award from an XML entry (when loading game, for example)
      * @param node xml node
+     * @param defaultSetMigration whether or not to check if the default set needs to be migrated
      * @return an award
      */
-    public Award generateNewFromXML(Node node) {
-        final String METHOD_NAME = "generateNewFromXML(Node)"; //$NON-NLS-1$
-
+    public Award generateNewFromXML(Node node, final boolean defaultSetMigration) {
         String name = null;
         String set = null;
         List<LocalDate> dates = new ArrayList<>();
@@ -115,14 +113,23 @@ public class AwardsFactory {
                 if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     dates.add(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    name = wn2.getTextContent();
+                    name = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("set")) {
-                    set = wn2.getTextContent();
+                    set = wn2.getTextContent().trim();
                 }
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().error(AwardsFactory.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
+        }
+
+        if (defaultSetMigration && "Default Set".equalsIgnoreCase(set)) {
+            name = (name == null) ? "" : name;
+            String newName = PersonMigrator.awardDefaultSetMigrator(name);
+            if (newName != null) {
+                set = "standard";
+                name = newName;
+            }
         }
 
         Award award = generateNew(set, name);
@@ -134,7 +141,7 @@ public class AwardsFactory {
      * Generates the "blueprint" awards by reading the data from XML sources.
      */
     private void loadAwards() {
-        File dir = new File(AWARDS_XML_ROOT_PATH);
+        File dir = new File(MekHQ.getMekHQOptions().getAwardsDirectoryPath());
         File[] files = dir.listFiles((dir1, filename) -> filename.endsWith(".xml"));
 
         if (files == null) {
@@ -145,7 +152,7 @@ public class AwardsFactory {
             try (InputStream inputStream = new FileInputStream(file)) {
                 loadAwardsFromStream(inputStream, file.getName());
             } catch (IOException e) {
-                MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
+                MekHQ.getLogger().error(e);
             }
         }
     }
@@ -170,7 +177,7 @@ public class AwardsFactory {
             }
             awardsMap.put(currentSetName, tempAwardMap);
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", "Error loading XML for awards", e);
+            MekHQ.getLogger().error("Error loading XML for awards", e);
         }
     }
 }

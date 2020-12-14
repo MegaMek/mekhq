@@ -90,11 +90,9 @@ public class EquipmentPart extends Part {
             this.name = type.getName(size);
             this.typeName = type.getInternalName();
         }
-        if (equipNum != -1) {
-            this.equipmentNum = equipNum;
-        } else {
-            equipmentNum = -1;
-        }
+
+        this.equipmentNum = equipNum;
+
         if (null != type) {
             try {
                 equipTonnage = type.getTonnage(null, size);
@@ -218,7 +216,8 @@ public class EquipmentPart extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        if (null != unit) {
+        Unit unit = getUnit();
+        if (unit != null) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
             if (null != mounted) {
                 mounted.setHit(true);
@@ -226,28 +225,25 @@ public class EquipmentPart extends Part {
                 mounted.setRepairable(false);
                 unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
             }
-            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if (!salvage) {
-                campaign.getWarehouse().removePart(this);
-            } else if (null != spare) {
-                int number = quantity;
-                while (number > 0) {
-                    spare.incrementQuantity();
-                    number--;
-                }
-                campaign.getWarehouse().removePart(this);
-            }
-            unit.removePart(this);
+
             Part missing = getMissingPart();
             if (null != missing) {
                 unit.addPart(missing);
+                campaign.getQuartermaster().addPart(missing, 0);
             }
-            campaign.getQuartermaster().addPart(missing, 0);
+
+            unit.removePart(this);
+            setUnit(null);
+            setEquipmentNum(-1);
+
+            if (!salvage) {
+                campaign.getWarehouse().removePart(this);
+            } else {
+                // Now that we're a spare part, add us back into the campaign
+                // to merge us with any other parts of the same type
+                campaign.getQuartermaster().addPart(this, 0);
+            }
         }
-        checkWeaponBay();
-        setUnit(null);
-        updateConditionFromEntity(false);
-        equipmentNum = -1;
     }
 
     @Override

@@ -210,7 +210,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         camoModel.reset();
         camoModel.setCategory(category);
         if (Camouflage.NO_CAMOUFLAGE.equals(category)) {
-            for (String color : Player.colorNames) {
+            for (String color : PlayerColors.COLOR_NAMES) {
                 camoModel.addCamo(color);
             }
         } else {
