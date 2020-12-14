@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -24,21 +24,15 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.ResourceBundle;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -56,23 +50,21 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.CampaignGUI;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
 /**
- *
  * @author  Taharqa
  */
-public class ChooseRefitDialog extends javax.swing.JDialog {
+public class ChooseRefitDialog extends JDialog {
+    //region Variable Declarations
     private static final long serialVersionUID = -8038099101234445018L;
     private Campaign campaign;
     private Unit unit;
     private RefitTableModel refitModel;
-    private CampaignGUI gui;
 
-    private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnOK;
+    private JButton btnClose;
+    private JButton btnOK;
     private JTable refitTable;
     private JScrollPane scrRefitTable;
     private JList<String> lstShopping;
@@ -82,22 +74,26 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
     private JScrollPane scrOldUnit;
     private JScrollPane scrNewUnit;
 
+    private boolean confirmed = false;
+    //endregion Variable Declarations
+
+    //region Constructors
     /** Creates new form EditPersonnelLogDialog */
-    public ChooseRefitDialog(java.awt.Frame parent, boolean modal, Campaign c, Unit u, CampaignGUI gui) {
+    public ChooseRefitDialog(JFrame parent, boolean modal, Campaign c, Unit unit) {
         super(parent, modal);
         campaign = c;
-        unit = u;
-        this.gui = gui;
+        this.unit = unit;
         populateRefits();
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
+    //endregion Constructors
 
+    //region Initialization
     private void initComponents() {
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseRefitDialog", new EncodeControl()); //$NON-NLS-1$
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseRefitDialog", new EncodeControl());
 
         setTitle(resourceMap.getString("title.text") + " " + unit.getName());
 
@@ -105,7 +101,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
         getContentPane().setLayout(new GridBagLayout());
 
         refitTable = new JTable(refitModel);
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < RefitTableModel.N_COL; i++) {
             column = refitTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(refitModel.getColumnWidth(i));
@@ -114,14 +110,8 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
         refitTable.setIntercellSpacing(new Dimension(0, 0));
         refitTable.setShowGrid(false);
         refitTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        refitTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        refitTableValueChanged();
-                    }
-                });
-        TableRowSorter<RefitTableModel> refitSorter = new TableRowSorter<RefitTableModel>(refitModel);
+        refitTable.getSelectionModel().addListSelectionListener(evt -> refitTableValueChanged());
+        TableRowSorter<RefitTableModel> refitSorter = new TableRowSorter<>(refitModel);
         refitSorter.setComparator(RefitTableModel.COL_CLASS, new ClassSorter());
         refitSorter.setComparator(RefitTableModel.COL_COST, new FormattedNumberSorter());
         refitTable.setRowSorter(refitSorter);
@@ -165,11 +155,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
         scrOldUnit = new JScrollPane(txtOldUnit);
         scrOldUnit.setMinimumSize(new java.awt.Dimension(300, 400));
         scrOldUnit.setPreferredSize(new java.awt.Dimension(300, 400));
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                scrOldUnit.getVerticalScrollBar().setValue(0);
-            }
-        });
+        javax.swing.SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -194,13 +180,9 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
         getContentPane().add(scrNewUnit, gridBagConstraints);
 
         JPanel panBtn = new JPanel(new GridBagLayout());
-        btnOK = new JButton(resourceMap.getString("btnOK.text")); // NOI18N
+        btnOK = new JButton(resourceMap.getString("btnOK.text"));
         btnOK.setEnabled(false);
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                beginRefit();
-            }
-        });
+        btnOK.addActionListener(evt -> confirm());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -210,12 +192,8 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panBtn.add(btnOK, gridBagConstraints);
 
-        btnClose = new JButton(resourceMap.getString("btnClose.text")); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancel();
-            }
-        });
+        btnClose = new JButton(resourceMap.getString("btnClose.text"));
+        btnClose.addActionListener(evt -> cancel());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -245,19 +223,24 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
+    //endregion Initialization
 
-    private void beginRefit() {
+    private void confirm() {
+        confirmed = getSelectedRefit() != null;
         setVisible(false);
-        gui.refitUnit(getSelectedRefit(), false);
     }
 
     private void cancel() {
         setVisible(false);
     }
 
-    private Refit getSelectedRefit() {
+    public boolean isConfirmed() {
+        return confirmed;
+    }
+
+    public Refit getSelectedRefit() {
         int selectedRow = refitTable.getSelectedRow();
-        if(selectedRow < 0) {
+        if (selectedRow < 0) {
             return null;
         }
         return refitModel.getRefitAt(refitTable.convertRowIndexToModel(selectedRow));
@@ -265,42 +248,38 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 
     private void refitTableValueChanged() {
         Refit r = getSelectedRefit();
-        if(null == r) {
+        if (null == r) {
             scrShoppingList.setViewportView(null);
             txtNewUnit.setText("");
             btnOK.setEnabled(false);
             return;
         }
         btnOK.setEnabled(true);
-        lstShopping = new JList<String>(r.getShoppingListDescription());
+        lstShopping = new JList<>(r.getShoppingListDescription());
         scrShoppingList.setViewportView(lstShopping);
         MechView mv = new MechView(r.getNewEntity(), false, true);
         txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadout() + "</div>");
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                scrNewUnit.getVerticalScrollBar().setValue(0);
-            }
-        });
+        SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
     }
 
 
     private void populateRefits() {
-        ArrayList<Refit> refits = new ArrayList<Refit>();
-        for(String model : Utilities.getAllVariants(unit.getEntity(), campaign)) {
+        List<Refit> refits = new ArrayList<>();
+        for (String model : Utilities.getAllVariants(unit.getEntity(), campaign)) {
             MechSummary summary = MechSummaryCache.getInstance().getMech(unit.getEntity().getChassis() + " " + model);
-            if(null == summary) {
+            if (null == summary) {
                 continue;
             }
             try {
                 Entity refitEn = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-                if(null != refitEn) {
+                if (null != refitEn) {
                     Refit r = new Refit(unit, refitEn, false, false);
-                    if(null == r.checkFixable()) {
+                    if (null == r.checkFixable()) {
                         refits.add(r);
                     }
                 }
             } catch (EntityLoadingException ex) {
-                MekHQ.getLogger().error(getClass(), "populateRefits()", ex); //$NON-NLS-1$
+                MekHQ.getLogger().error(ex);
             }
         }
         refitModel = new RefitTableModel(refits);
@@ -313,33 +292,34 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
         private static final long serialVersionUID = 534443424190075264L;
 
         protected String[] columnNames;
-        protected ArrayList<Refit> data;
+        protected List<Refit> data;
 
-        public final static int COL_MODEL    =   0;
-        public final static int COL_CLASS    =   1;
-        public final static int COL_BV       =   2;
-        public final static int COL_TIME     =   3;
-        public final static int COL_NPART    =   4;
-        public final static int COL_TARGET   =   5;
-        public final static int COL_COST     =   6;
+        public final static int COL_MODEL = 0;
+        public final static int COL_CLASS = 1;
+        public final static int COL_BV = 2;
+        public final static int COL_TIME = 3;
+        public final static int COL_NPART = 4;
+        public final static int COL_TARGET = 5;
+        public final static int COL_COST = 6;
+        public final static int N_COL = 7;
 
-        public final static int N_COL          = 7;
-
-        public RefitTableModel(ArrayList<Refit> refits) {
+        public RefitTableModel(List<Refit> refits) {
             data = refits;
         }
 
+        @Override
         public int getRowCount() {
             return data.size();
         }
 
+        @Override
         public int getColumnCount() {
             return N_COL;
         }
 
         @Override
         public String getColumnName(int column) {
-            switch(column) {
+            switch (column) {
                 case COL_MODEL:
                     return "Model";
                 case COL_CLASS:
@@ -359,35 +339,30 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
             }
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
-            Refit r;
-            if(data.isEmpty()) {
+            if (data.isEmpty()) {
                 return "";
-            } else {
-                r = (Refit)data.get(row);
             }
-            if(col == COL_MODEL) {
+            Refit r = data.get(row);
+
+            if (col == COL_MODEL) {
                 return r.getNewEntity().getModel();
-            }
-            if(col == COL_CLASS) {
+            } else if (col == COL_CLASS) {
                 return r.getRefitClassName();
-            }
-            if(col == COL_BV) {
+            } else if (col == COL_BV) {
                 return r.getNewEntity().calculateBattleValue(true, true);
-            }
-            if(col == COL_TIME) {
+            } else if (col == COL_TIME) {
                 return r.getTime();
-            }
-            if(col == COL_NPART) {
+            } else if (col == COL_NPART) {
                 return r.getShoppingList().size();
-            }
-            if(col == COL_COST) {
+            } else if (col == COL_COST) {
                 return r.getCost().toAmountAndSymbolString();
-            }
-            if(col == COL_TARGET) {
+            } else if (col == COL_TARGET) {
                 return campaign.getTargetForAcquisition(r, campaign.getLogisticsPerson(), false).getValueAsString();
+            } else {
+                return "?";
             }
-            return "?";
         }
 
         @Override
@@ -401,11 +376,11 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
         }
 
         public Refit getRefitAt(int row) {
-            return (Refit) data.get(row);
+            return data.get(row);
         }
 
-         public int getColumnWidth(int c) {
-                switch(c) {
+        public int getColumnWidth(int c) {
+            switch (c) {
                 case COL_MODEL:
                     return 75;
                 case COL_CLASS:
@@ -414,70 +389,69 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
                     return 40;
                 default:
                     return 10;
-                }
-         }
-
-         public int getAlignment(int col) {
-             switch(col) {
-             case COL_MODEL:
-             case COL_CLASS:
-                 return SwingConstants.LEFT;
-             default:
-                 return SwingConstants.RIGHT;
-             }
-         }
-
-         public String getTooltip(int row, int col) {
-             Refit r;
-             if(data.isEmpty()) {
-                 return "";
-             } else {
-                 r = (Refit)data.get(row);
-             }
-             switch(col) {
-             case COL_TARGET:
-                 return campaign.getTargetForAcquisition(r, campaign.getLogisticsPerson(), false).getDesc();
-             default:
-                 return null;
-             }
-         }
-
-         //fill table with values
-         public void setData(ArrayList<Refit> refits) {
-             data = refits;
-             fireTableDataChanged();
-         }
-
-         public RefitTableModel.Renderer getRenderer() {
-             return new RefitTableModel.Renderer();
-         }
-
-         public class Renderer extends DefaultTableCellRenderer {
-
-            private static final long serialVersionUID = -6655108546652975061L;
-
-            public Component getTableCellRendererComponent(JTable table,
-                    Object value, boolean isSelected, boolean hasFocus,
-                    int row, int column) {
-                super.getTableCellRendererComponent(table, value, isSelected,
-                        hasFocus, row, column);
-                setOpaque(true);
-                int actualCol = table.convertColumnIndexToModel(column);
-                int actualRow = table.convertRowIndexToModel(row);
-                setHorizontalAlignment(getAlignment(actualCol));
-                setToolTipText(getTooltip(actualRow, actualCol));
-
-                return this;
             }
+        }
 
-         }
+        public int getAlignment(int col) {
+            switch (col) {
+                case COL_MODEL:
+                case COL_CLASS:
+                    return SwingConstants.LEFT;
+                default:
+                    return SwingConstants.RIGHT;
+            }
+        }
+
+        public String getTooltip(int row, int col) {
+            Refit r;
+            if (data.isEmpty()) {
+                return "";
+            } else {
+                r = data.get(row);
+            }
+            switch (col) {
+                case COL_TARGET:
+                    return campaign.getTargetForAcquisition(r, campaign.getLogisticsPerson(), false).getDesc();
+                default:
+                    return null;
+            }
+        }
+
+        //fill table with values
+        public void setData(ArrayList<Refit> refits) {
+            data = refits;
+            fireTableDataChanged();
+        }
+
+        public RefitTableModel.Renderer getRenderer() {
+            return new RefitTableModel.Renderer();
+        }
+
+        public class Renderer extends DefaultTableCellRenderer {
+           private static final long serialVersionUID = -6655108546652975061L;
+
+           @Override
+           public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                          boolean hasFocus, int row, int column) {
+               super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+               setOpaque(true);
+               int actualCol = table.convertColumnIndexToModel(column);
+               int actualRow = table.convertRowIndexToModel(row);
+               setHorizontalAlignment(getAlignment(actualCol));
+               setToolTipText(getTooltip(actualRow, actualCol));
+
+               return this;
+           }
+        }
     }
 
     /**
      * A comparator for numbers that have been formatted with DecimalFormat
      * @author Jay Lawson
      */
-    public static class FormattedNumberSorter implements Comparator<String> {
+    public static class FormattedNumberSorter implements Comparator<String>, Serializable {
+        private static final long serialVersionUID = -4601820227474345024L;
+
         @Override
         public int compare(String s0, String s1) {
             //lets find the weight class integer for each name
@@ -486,13 +460,13 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
             try {
                 l0 = format.parse(s0).intValue();
             } catch (ParseException e) {
-                MekHQ.getLogger().error(getClass(), "compare", e);
+                MekHQ.getLogger().error(e);
             }
             int l1 = 0;
             try {
                 l1 = format.parse(s1).intValue();
             } catch (ParseException e) {
-                MekHQ.getLogger().error(getClass(), "compare", e);
+                MekHQ.getLogger().error(e);
             }
             return ((Comparable<Integer>) l0).compareTo(l1);
         }
@@ -501,9 +475,10 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
     /**
      * A comparator for refit classes
      * @author Jay Lawson
-     *
      */
-    public static class ClassSorter implements Comparator<String> {
+    public static class ClassSorter implements Comparator<String>, Serializable {
+        private static final long serialVersionUID = 2167705123391527024L;
+
         @Override
         public int compare(String s0, String s1) {
             int r0 = Refit.NO_CHANGE;
@@ -523,6 +498,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
             } else if (s0.contains("Class F")) {
                 r0 = Refit.CLASS_F;
             }
+
             if (s1.contains("Omni")) {
                 r1 = Refit.CLASS_OMNI;
             } else if (s1.contains("Class A")) {
