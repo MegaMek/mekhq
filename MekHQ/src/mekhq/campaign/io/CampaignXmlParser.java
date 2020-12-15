@@ -594,7 +594,6 @@ public class CampaignXmlParser {
 
         String rankNames = null;
         int officerCut = 0;
-        int rankSystem = -1;
 
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
@@ -727,10 +726,6 @@ public class CampaignXmlParser {
         if (null != rankNames) {
             //backwards compatibility
             retVal.getRanks().setRanksFromList(rankNames, officerCut);
-        }
-        if (rankSystem != -1) {
-            retVal.setRanks(Ranks.getRanksFromSystem(rankSystem));
-            retVal.getRanks().setOldRankSystem(rankSystem);
         }
 
         // TODO: this could probably be better
