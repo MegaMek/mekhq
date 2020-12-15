@@ -28,6 +28,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
+import megamek.common.Mech;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
@@ -75,6 +76,23 @@ public class MissingLandingGear extends MissingPart {
 
     @Override
     public String checkFixable() {
+        if ((unit != null) && (unit.getEntity() instanceof LandAirMech)) {
+            // Landing Gear is installed in the CT and both Side Torsos,
+            // make sure they're not missing.
+            for (Part part : unit.getParts()) {
+                if (part instanceof MissingMekLocation) {
+                    // The CT cannot be scrapped, so that check is elided.
+                    switch (part.getLocation()) {
+                        case Mech.LOC_LT:
+                            return "Cannot reinstall landing gear with a missing Left Torso.";
+                        case Mech.LOC_RT:
+                            return "Cannot reinstall landing gear with a missing Right Torso.";
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
         return null;
     }
 
