@@ -34,7 +34,6 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
@@ -44,7 +43,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.BattleArmor;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EquipmentType;
@@ -105,7 +103,6 @@ import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -335,13 +332,6 @@ public class CampaignXmlParser {
         // Fixup any ghost kills
         cleanupGhostKills(retVal);
 
-        // adjust tech levels for version before 0.1.21
-        if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2
-                && version.getSnapshot() < 21) {
-            retVal.getCampaignOptions().setTechLevel(retVal.getCampaignOptions()
-                    .getTechLevel() + 1);
-        }
-
         long timestamp = System.currentTimeMillis();
 
         // loop through forces to set force id
@@ -426,22 +416,6 @@ public class CampaignXmlParser {
                 // force, so check to make sure they aren't already here
                 if (!s.isAssigned(unit, retVal)) {
                     s.addUnit(unit.getId());
-                }
-            }
-
-            //get rid of BA parts before 0.3.4
-            if (unit.getEntity() instanceof BattleArmor
-                    && version.getMajorVersion() == 0
-                    && (version.getMinorVersion() <= 2 ||
-                            (version.getMinorVersion() <= 3 && version.getSnapshot() < 16))) {
-                for (Part p : unit.getParts()) {
-                    retVal.getWarehouse().removePart(p);
-                }
-                unit.resetParts();
-                if (version.getSnapshot() < 4) {
-                    for (int loc = 0; loc < unit.getEntity().locations(); loc++) {
-                        unit.getEntity().setInternal(0, loc);
-                    }
                 }
             }
         });
@@ -707,12 +681,7 @@ public class CampaignXmlParser {
                         }
                     }
                 } else if (xn.equalsIgnoreCase("faction")) {
-                    if (version.getMajorVersion() == 0
-                            && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.setFactionCode(Faction.getFactionCode(Integer.parseInt(wn.getTextContent())));
-                    } else {
-                        retVal.setFactionCode(wn.getTextContent());
-                    }
+                    retVal.setFactionCode(wn.getTextContent());
                     retVal.updateTechFactionCode();
                 } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
                     retVal.setRetainerEmployerCode(wn.getTextContent());
@@ -721,33 +690,14 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("rankNames")) {
                     rankNames = wn.getTextContent().trim();
                 } else if (xn.equalsIgnoreCase("ranks") || xn.equalsIgnoreCase("rankSystem")) {
-                    if (version.isLowerThan("0.3.4-r1645")) {
-                        rankSystem = Integer.parseInt(wn.getTextContent().trim());
-                    } else {
-                        Ranks r = Ranks.generateInstanceFromXML(wn, version);
-                        if (r != null) {
-                            retVal.setRanks(r);
-                        }
+                    Ranks r = Ranks.generateInstanceFromXML(wn, version);
+                    if (r != null) {
+                        retVal.setRanks(r);
                     }
                 } else if (xn.equalsIgnoreCase("gmMode")) {
                     retVal.setGMMode(Boolean.parseBoolean(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("showOverview")) {
                     retVal.setOverviewLoadingValue(Boolean.parseBoolean(wn.getTextContent().trim()));
-                /* CAW: Not used anymore as the Campaign tracks this internally via TreeMap's.
-                } else if (xn.equalsIgnoreCase("lastPartId")) {
-                    retVal.setLastPartId(Integer.parseInt(wn.getTextContent()
-                            .trim()));
-                } else if (xn.equalsIgnoreCase("lastForceId")) {
-                    retVal.setLastForceId(Integer.parseInt(wn.getTextContent()
-                            .trim()));
-                } else if (xn.equalsIgnoreCase("lastTeamId")) {
-                    retVal.setLastTeamId(Integer.parseInt(wn.getTextContent()
-                            .trim()));
-                } else if (xn.equalsIgnoreCase("lastMissionId")) {
-                    retVal.setLastMissionId(Integer.parseInt(wn.getTextContent()
-                            .trim()));
-                } else if (xn.equalsIgnoreCase("lastScenarioId")) {
-                    retVal.setLastScenarioId(Integer.parseInt(wn.getTextContent().trim()));*/
                 } else if (xn.equalsIgnoreCase("name")) {
                     String val = wn.getTextContent().trim();
 
@@ -1471,12 +1421,6 @@ public class CampaignXmlParser {
                     && (((MekLocation) prt).getLoc() != Mech.LOC_HEAD)) {
                 ((MekLocation) prt).setSensors(false);
                 ((MekLocation) prt).setLifeSupport(false);
-            }
-
-            if ((version.getMinorVersion() < 3) && !prt.needsFixing()
-                    && !prt.isSalvaging()) {
-                // repaired parts were not getting experience properly reset
-                prt.setSkillMin(SkillType.EXP_GREEN);
             }
 
             if (prt instanceof MissingPart) {

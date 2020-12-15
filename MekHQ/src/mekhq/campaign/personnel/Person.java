@@ -292,10 +292,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
 
-    //region Reverse Compatibility
-    // Unknown version
-    private int oldId;
-    //endregion Reverse Compatibility
     //endregion Variable Declarations
 
     //region Constructors
@@ -1960,11 +1956,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
                     retVal.idleMonths = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        retVal.id = UUID.fromString(wn2.getTextContent());
-                    }
+                    retVal.id = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) { // legacy - 0.47.6 removal
                     CampaignXmlParser.addToAncestryMigrationMap(UUID.fromString(wn2.getTextContent().trim()), retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) { // legacy - 0.47.6 removal
@@ -2181,72 +2173,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (version.isLowerThan("0.47.5") && (retVal.getExpectedDueDate() == null)
                     && (retVal.getDueDate() != null)) {
                 retVal.setExpectedDueDate(retVal.getDueDate());
-            }
-
-            //versions before 0.3.4 did not have proper clan phenotypes
-            if (version.isLowerThan("0.3.4") && c.getFaction().isClan()) {
-                //assume personnel are clan and trueborn if the right role
-                retVal.setClanner(true);
-                switch (retVal.getPrimaryRole()) {
-                    case Person.T_MECHWARRIOR:
-                        retVal.setPhenotype(Phenotype.MECHWARRIOR);
-                        break;
-                    case Person.T_AERO_PILOT:
-                    case Person.T_CONV_PILOT:
-                        retVal.setPhenotype(Phenotype.AEROSPACE);
-                        break;
-                    case Person.T_BA:
-                        retVal.setPhenotype(Phenotype.ELEMENTAL);
-                        break;
-                    case Person.T_VEE_GUNNER:
-                    case Person.T_GVEE_DRIVER:
-                    case Person.T_NVEE_DRIVER:
-                    case Person.T_VTOL_PILOT:
-                        retVal.setPhenotype(Phenotype.VEHICLE);
-                        break;
-                    case Person.T_PROTO_PILOT:
-                        retVal.setPhenotype(Phenotype.PROTOMECH);
-                        break;
-                    default:
-                        retVal.setPhenotype(Phenotype.NONE);
-                        break;
-                }
-            }
-
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {
-                if (retVal.primaryRole > T_INFANTRY) {
-                    retVal.primaryRole += 4;
-
-                }
-                if (retVal.secondaryRole > T_INFANTRY) {
-                    retVal.secondaryRole += 4;
-                }
-            }
-
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() == 2) {
-                //adjust for conventional fighter pilots
-                if (retVal.primaryRole >= T_CONV_PILOT) {
-                    retVal.primaryRole += 1;
-                }
-                if (retVal.secondaryRole >= T_CONV_PILOT) {
-                    retVal.secondaryRole += 1;
-                }
-            }
-
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() == 3 && version.getSnapshot() < 1) {
-                //adjust for conventional fighter pilots
-                if (retVal.primaryRole == T_CONV_PILOT && retVal.hasSkill(SkillType.S_PILOT_SPACE) && !retVal.hasSkill(SkillType.S_PILOT_JET)) {
-                    retVal.primaryRole += 1;
-                }
-                if (retVal.secondaryRole == T_CONV_PILOT && retVal.hasSkill(SkillType.S_PILOT_SPACE) && !retVal.hasSkill(SkillType.S_PILOT_JET)) {
-                    retVal.secondaryRole += 1;
-                }
-                if (retVal.primaryRole == T_AERO_PILOT && !retVal.hasSkill(SkillType.S_PILOT_SPACE) && retVal.hasSkill(SkillType.S_PILOT_JET)) {
-                    retVal.primaryRole += 8;
-                }
-                if (retVal.secondaryRole == T_AERO_PILOT && !retVal.hasSkill(SkillType.S_PILOT_SPACE) && retVal.hasSkill(SkillType.S_PILOT_JET)) {
-                    retVal.secondaryRole += 8;
-                }
             }
 
             if ((null != advantages) && (advantages.trim().length() > 0)) {
@@ -3576,10 +3502,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         for (Skill s : skills.getSkills()) {
             s.updateType();
         }
-    }
-
-    public int getOldId() {
-        return oldId;
     }
 
     public int getNTasks() {
