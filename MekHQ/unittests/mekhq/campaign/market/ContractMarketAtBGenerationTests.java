@@ -54,13 +54,13 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(Parameterized.class)
-public class ContractMarketTest {
+public class ContractMarketAtBGenerationTests {
 
     private final int gameYear;
     private final int unitRating;
     private final boolean isClanEnemy;
 
-    public ContractMarketTest(int gameYear, int unitRating, boolean isClanEnemy) {
+    public ContractMarketAtBGenerationTests(int gameYear, int unitRating, boolean isClanEnemy) {
         this.gameYear = gameYear;
         this.unitRating = unitRating;
         this.isClanEnemy = isClanEnemy;
