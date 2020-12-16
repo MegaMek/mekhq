@@ -25,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.StringJoiner;
@@ -424,7 +423,6 @@ public class Ranks {
                     if (retVal.oldRankSystem == 7) {
                         showMessage = true;
                     }
-
                     if ((version == null) || (retVal.rankSystem == RS_CUSTOM)) {
                         retVal.ranks.add(Rank.generateInstanceFromXML(wn2));
                     } else {

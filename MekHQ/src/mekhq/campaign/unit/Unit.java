@@ -87,7 +87,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private int site;
     private boolean salvaged;
     private UUID id;
-    private int oldId;
     private String fluffName;
     // This is the large craft assigned to transport this unit
     private TransportShipAssignment transportShipAssignment;
@@ -1870,11 +1869,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Unit retVal = new Unit();
         NamedNodeMap attrs = wn.getAttributes();
         Node idNode = attrs.getNamedItem("id");
-        if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-            retVal.oldId = Integer.parseInt(idNode.getTextContent());
-        } else {
-            retVal.id = UUID.fromString(idNode.getTextContent());
-        }
+
+        retVal.id = UUID.fromString(idNode.getTextContent());
 
         //Temp storage for used bay capacities
         boolean needsBayInitialization = true;
@@ -4644,10 +4640,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public Person getEngineer() {
         return engineer;
-    }
-
-    public int getOldId() {
-        return oldId;
     }
 
     public Part getPartForEquipmentNum(int index, int loc) {
