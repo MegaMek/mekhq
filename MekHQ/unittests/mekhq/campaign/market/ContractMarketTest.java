@@ -92,6 +92,12 @@ public class ContractMarketTest {
         doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
         doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
 
+        Faction pirates = mock(Faction.class);
+        doReturn(pirates).when(factions).getFaction(eq("PIR"));
+
+        Faction rebels = mock(Faction.class);
+        doReturn(rebels).when(factions).getFaction(eq("REB"));
+
         Systems systems = mock(Systems.class);
         Systems.setInstance(systems);
 
@@ -134,6 +140,407 @@ public class ContractMarketTest {
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
+    }
+
+    @Test
+    public void addMercWithoutRetainerMinorPowerAtBContractSucceeds() {
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
+        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+
+        Accountant accountant = mock(Accountant.class);
+        when(accountant.getContractBase()).thenReturn(Money.of(1));
+        when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
+        when(campaign.getAccountant()).thenReturn(accountant);
+
+        Hangar hangar = mock(Hangar.class);
+        doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
+        when(campaign.getHangar()).thenReturn(hangar);
+
+        Force forces = mock(Force.class);
+        doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
+        when(campaign.getForces()).thenReturn(forces);
+
+        Factions factions = mock(Factions.class);
+        Factions.setInstance(factions);
+
+        String employer = "EMPLOYER";
+        String employerFullName = "Contract Employer";
+        Faction employerFaction = mock(Faction.class);
+        when(employerFaction.getShortName()).thenReturn(employer);
+        doReturn(employerFullName).when(employerFaction).getFullName(anyInt());
+        doReturn(employerFaction).when(factions).getFaction(eq(employer));
+
+        String enemy = "ENEMY";
+        String enemyFullName = "Contract Enemy";
+        Faction enemyFaction = mock(Faction.class);
+        when(enemyFaction.getShortName()).thenReturn(enemy);
+        doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
+        doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
+
+        Faction pirates = mock(Faction.class);
+        doReturn(pirates).when(factions).getFaction(eq("PIR"));
+
+        Faction rebels = mock(Faction.class);
+        doReturn(rebels).when(factions).getFaction(eq("REB"));
+
+        Systems systems = mock(Systems.class);
+        Systems.setInstance(systems);
+
+        String current = "CURRENT";
+        PlanetarySystem currentSystem = mock(PlanetarySystem.class);
+        when(currentSystem.getId()).thenReturn(current);
+        when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+        doReturn(currentSystem).when(systems).getSystemById(eq(current));
+        doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
+
+        CurrentLocation currentLocation = mock(CurrentLocation.class);
+        when(campaign.getLocation()).thenReturn(currentLocation);
+
+        String missionTarget = "TARGET";
+        PlanetarySystem targetSystem = mock(PlanetarySystem.class);
+        when(targetSystem.getId()).thenReturn(missionTarget);
+        doReturn(targetSystem).when(systems).getSystemById(eq(missionTarget));
+        doReturn(targetSystem).when(campaign).getSystemByName(eq(missionTarget));
+
+        RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
+        RandomFactionGenerator.setInstance(rfg);
+        when(rfg.getEmployer()).thenReturn(employer);
+        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+
+        FactionHints hints = mock(FactionHints.class);
+        doReturn(false).when(hints).isISMajorPower(eq(employerFaction));
+        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        doReturn(false).when(hints).isNeutral(eq(employerFaction));
+        doReturn(false).when(hints).isNeutral(eq(enemyFaction));
+        when(rfg.getFactionHints()).thenReturn(hints);
+
+        JumpPath jumpPath = mock(JumpPath.class);
+        when(jumpPath.getJumps()).thenReturn(1);
+        doReturn(10.0).when(jumpPath).getTotalTime(any(), anyDouble());
+        doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
+        doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
+
+        ContractMarket market = new ContractMarket();
+
+        AtBContract contract = market.addAtBContract(campaign);
+        assertNotNull(contract);
+    }
+
+    @Test
+    public void addMercWithoutRetainerEmployerNeutralAtBContractSucceeds() {
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
+        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+
+        Accountant accountant = mock(Accountant.class);
+        when(accountant.getContractBase()).thenReturn(Money.of(1));
+        when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
+        when(campaign.getAccountant()).thenReturn(accountant);
+
+        Hangar hangar = mock(Hangar.class);
+        doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
+        when(campaign.getHangar()).thenReturn(hangar);
+
+        Force forces = mock(Force.class);
+        doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
+        when(campaign.getForces()).thenReturn(forces);
+
+        Factions factions = mock(Factions.class);
+        Factions.setInstance(factions);
+
+        String employer = "EMPLOYER";
+        String employerFullName = "Contract Employer";
+        Faction employerFaction = mock(Faction.class);
+        when(employerFaction.getShortName()).thenReturn(employer);
+        doReturn(employerFullName).when(employerFaction).getFullName(anyInt());
+        doReturn(employerFaction).when(factions).getFaction(eq(employer));
+
+        String enemy = "ENEMY";
+        String enemyFullName = "Contract Enemy";
+        Faction enemyFaction = mock(Faction.class);
+        when(enemyFaction.getShortName()).thenReturn(enemy);
+        doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
+        doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
+
+        Faction pirates = mock(Faction.class);
+        doReturn(pirates).when(factions).getFaction(eq("PIR"));
+
+        Faction rebels = mock(Faction.class);
+        doReturn(rebels).when(factions).getFaction(eq("REB"));
+
+        Systems systems = mock(Systems.class);
+        Systems.setInstance(systems);
+
+        String current = "CURRENT";
+        PlanetarySystem currentSystem = mock(PlanetarySystem.class);
+        when(currentSystem.getId()).thenReturn(current);
+        when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+        doReturn(currentSystem).when(systems).getSystemById(eq(current));
+        doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
+
+        CurrentLocation currentLocation = mock(CurrentLocation.class);
+        when(campaign.getLocation()).thenReturn(currentLocation);
+
+        String missionTarget = "TARGET";
+        PlanetarySystem targetSystem = mock(PlanetarySystem.class);
+        when(targetSystem.getId()).thenReturn(missionTarget);
+        doReturn(targetSystem).when(systems).getSystemById(eq(missionTarget));
+        doReturn(targetSystem).when(campaign).getSystemByName(eq(missionTarget));
+
+        RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
+        RandomFactionGenerator.setInstance(rfg);
+        when(rfg.getEmployer()).thenReturn(employer);
+        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+
+        FactionHints hints = mock(FactionHints.class);
+        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
+        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        doReturn(true).when(hints).isNeutral(eq(employerFaction));
+        doReturn(false).when(hints).isNeutral(eq(enemyFaction));
+        when(rfg.getFactionHints()).thenReturn(hints);
+
+        JumpPath jumpPath = mock(JumpPath.class);
+        when(jumpPath.getJumps()).thenReturn(1);
+        doReturn(10.0).when(jumpPath).getTotalTime(any(), anyDouble());
+        doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
+        doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
+
+        ContractMarket market = new ContractMarket();
+
+        AtBContract contract = market.addAtBContract(campaign);
+        assertNotNull(contract);
+    }
+
+    @Test
+    public void addMercWithoutRetainerEmployerNeutralAtWarAtBContractSucceeds() {
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
+        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+
+        Accountant accountant = mock(Accountant.class);
+        when(accountant.getContractBase()).thenReturn(Money.of(1));
+        when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
+        when(campaign.getAccountant()).thenReturn(accountant);
+
+        Hangar hangar = mock(Hangar.class);
+        doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
+        when(campaign.getHangar()).thenReturn(hangar);
+
+        Force forces = mock(Force.class);
+        doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
+        when(campaign.getForces()).thenReturn(forces);
+
+        Factions factions = mock(Factions.class);
+        Factions.setInstance(factions);
+
+        String employer = "EMPLOYER";
+        String employerFullName = "Contract Employer";
+        Faction employerFaction = mock(Faction.class);
+        when(employerFaction.getShortName()).thenReturn(employer);
+        doReturn(employerFullName).when(employerFaction).getFullName(anyInt());
+        doReturn(employerFaction).when(factions).getFaction(eq(employer));
+
+        String enemy = "ENEMY";
+        String enemyFullName = "Contract Enemy";
+        Faction enemyFaction = mock(Faction.class);
+        when(enemyFaction.getShortName()).thenReturn(enemy);
+        doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
+        doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
+
+        Faction pirates = mock(Faction.class);
+        doReturn(pirates).when(factions).getFaction(eq("PIR"));
+
+        Faction rebels = mock(Faction.class);
+        doReturn(rebels).when(factions).getFaction(eq("REB"));
+
+        Systems systems = mock(Systems.class);
+        Systems.setInstance(systems);
+
+        String current = "CURRENT";
+        PlanetarySystem currentSystem = mock(PlanetarySystem.class);
+        when(currentSystem.getId()).thenReturn(current);
+        when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+        doReturn(currentSystem).when(systems).getSystemById(eq(current));
+        doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
+
+        CurrentLocation currentLocation = mock(CurrentLocation.class);
+        when(campaign.getLocation()).thenReturn(currentLocation);
+
+        String missionTarget = "TARGET";
+        PlanetarySystem targetSystem = mock(PlanetarySystem.class);
+        when(targetSystem.getId()).thenReturn(missionTarget);
+        doReturn(targetSystem).when(systems).getSystemById(eq(missionTarget));
+        doReturn(targetSystem).when(campaign).getSystemByName(eq(missionTarget));
+
+        RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
+        RandomFactionGenerator.setInstance(rfg);
+        when(rfg.getEmployer()).thenReturn(employer);
+        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+
+        FactionHints hints = mock(FactionHints.class);
+        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
+        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        doReturn(true).when(hints).isNeutral(eq(employerFaction));
+        doReturn(false).when(hints).isNeutral(eq(enemyFaction));
+        doReturn(true).when(hints).isAtWarWith(eq(employerFaction), eq(enemyFaction), any());
+        when(rfg.getFactionHints()).thenReturn(hints);
+
+        JumpPath jumpPath = mock(JumpPath.class);
+        when(jumpPath.getJumps()).thenReturn(1);
+        doReturn(10.0).when(jumpPath).getTotalTime(any(), anyDouble());
+        doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
+        doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
+
+        ContractMarket market = new ContractMarket();
+
+        AtBContract contract = market.addAtBContract(campaign);
+        assertNotNull(contract);
+    }
+
+    @Test
+    public void mercEmployerRetries() {
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
+        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+
+        Accountant accountant = mock(Accountant.class);
+        when(accountant.getContractBase()).thenReturn(Money.of(1));
+        when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
+        when(campaign.getAccountant()).thenReturn(accountant);
+
+        Hangar hangar = mock(Hangar.class);
+        doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
+        when(campaign.getHangar()).thenReturn(hangar);
+
+        Force forces = mock(Force.class);
+        doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
+        when(campaign.getForces()).thenReturn(forces);
+
+        Factions factions = mock(Factions.class);
+        Factions.setInstance(factions);
+
+        String employer = "EMPLOYER";
+        String employerFullName = "Contract Employer";
+        Faction employerFaction = mock(Faction.class);
+        when(employerFaction.getShortName()).thenReturn(employer);
+        doReturn(employerFullName).when(employerFaction).getFullName(anyInt());
+        doReturn(employerFaction).when(factions).getFaction(eq(employer));
+
+        String enemy = "ENEMY";
+        String enemyFullName = "Contract Enemy";
+        Faction enemyFaction = mock(Faction.class);
+        when(enemyFaction.getShortName()).thenReturn(enemy);
+        doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
+        doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
+        
+        Faction pirates = mock(Faction.class);
+        doReturn(pirates).when(factions).getFaction(eq("PIR"));
+
+        Faction rebels = mock(Faction.class);
+        doReturn(rebels).when(factions).getFaction(eq("REB"));
+
+        Systems systems = mock(Systems.class);
+        Systems.setInstance(systems);
+
+        String current = "CURRENT";
+        PlanetarySystem currentSystem = mock(PlanetarySystem.class);
+        when(currentSystem.getId()).thenReturn(current);
+        when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+        doReturn(currentSystem).when(systems).getSystemById(eq(current));
+        doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
+
+        CurrentLocation currentLocation = mock(CurrentLocation.class);
+        when(campaign.getLocation()).thenReturn(currentLocation);
+
+        String missionTarget = "TARGET";
+        PlanetarySystem targetSystem = mock(PlanetarySystem.class);
+        when(targetSystem.getId()).thenReturn(missionTarget);
+        doReturn(targetSystem).when(systems).getSystemById(eq(missionTarget));
+        doReturn(targetSystem).when(campaign).getSystemByName(eq(missionTarget));
+
+        RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
+        RandomFactionGenerator.setInstance(rfg);
+        // Return "MERC" the first time to coerce a retry
+        when(rfg.getEmployer()).thenReturn("MERC").thenReturn(employer);
+        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+
+        FactionHints hints = mock(FactionHints.class);
+        doReturn(true).when(hints).isISMajorPower(eq(employerFaction));
+        doReturn(true).when(hints).isISMajorPower(eq(enemyFaction));
+        doReturn(false).when(hints).isNeutral(eq(employerFaction));
+        doReturn(false).when(hints).isNeutral(eq(enemyFaction));
+        when(rfg.getFactionHints()).thenReturn(hints);
+
+        JumpPath jumpPath = mock(JumpPath.class);
+        when(jumpPath.getJumps()).thenReturn(1);
+        doReturn(10.0).when(jumpPath).getTotalTime(any(), anyDouble());
+        doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
+        doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
+
+        ContractMarket market = new ContractMarket();
+
+        AtBContract contract = market.addAtBContract(campaign);
+        assertNotNull(contract);
+        assertTrue(contract.isMercSubcontract());
+    }
+
+    @Test
+    public void mercEmployerRetriesFail() {
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+
+        Factions factions = mock(Factions.class);
+        Factions.setInstance(factions);
+
+        RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
+        RandomFactionGenerator.setInstance(rfg);
+        // Return "MERC" every time
+        when(rfg.getEmployer()).thenReturn("MERC");
+
+        ContractMarket market = new ContractMarket();
+
+        AtBContract contract = market.addAtBContract(campaign);
+        assertNull(contract);
     }
 
     @After
