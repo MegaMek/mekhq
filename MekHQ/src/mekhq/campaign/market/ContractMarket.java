@@ -70,6 +70,11 @@ public class ContractMarket implements Serializable {
     public final static int CLAUSE_NUM = 4;
 
     /**
+     * An arbitrary maximum number of attempts to generate a contract.
+     */
+    private final static int MAXIMUM_GENERATION_RETRIES = 3;
+
+    /**
      * An arbitrary maximum number of attempts to find a random employer faction that
      * is not a Mercenary.
      */
@@ -295,24 +300,25 @@ public class ContractMarket implements Serializable {
     private @Nullable AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
         if (campaign.getFactionCode().equals("MERC")) {
             if (null == campaign.getRetainerEmployerCode()) {
-                int retries = 3;
+                int retries = MAXIMUM_GENERATION_RETRIES;
                 AtBContract retVal = null;
                 while ((retries > 0) && (retVal == null)) {
+                    // Send only 1 retry down because we're handling retries in our loop
                     retVal = generateAtBContract(campaign, RandomFactionGenerator.getInstance().getEmployer(),
-                            unitRatingMod, 0);
+                            unitRatingMod, 1);
                     retries--;
                 }
                 return retVal;
             } else {
-                return generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod, 3);
+                return generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod);
             }
         } else {
-            return generateAtBContract(campaign, campaign.getFactionCode(), unitRatingMod, 3);
+            return generateAtBContract(campaign, campaign.getFactionCode(), unitRatingMod);
         }
     }
 
     private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod) {
-        return generateAtBContract(campaign, employer, unitRatingMod, 3);
+        return generateAtBContract(campaign, employer, unitRatingMod, MAXIMUM_GENERATION_RETRIES);
     }
 
     private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod, int retries) {
