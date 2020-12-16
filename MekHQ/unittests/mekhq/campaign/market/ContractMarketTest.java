@@ -39,23 +39,55 @@ import mekhq.campaign.universe.Systems;
 
 import org.junit.After;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+@RunWith(Parameterized.class)
 public class ContractMarketTest {
+
+    private final int gameYear;
+    private final int unitRating;
+    private final boolean isClanEnemy;
+
+    public ContractMarketTest(int gameYear, int unitRating, boolean isClanEnemy) {
+        this.gameYear = gameYear;
+        this.unitRating = unitRating;
+        this.isClanEnemy = isClanEnemy;
+    }
+
+    @Parameters(name = "Run {index}: gameYear={0}, unitRating={1}, isClanEnemy={2}")
+    public static Iterable<Object[]> data() throws Throwable {
+        List<Integer> gameYears = Arrays.asList(new Integer[] { 2750, 3025, 3055, 3067, 3120 });
+        
+        List<Object[]> parameters = new ArrayList<>();
+        for (int gameYear : gameYears) {
+            for (int rating = IUnitRating.DRAGOON_F; rating <= IUnitRating.DRAGOON_ASTAR; ++rating) {
+                parameters.add(new Object[] { gameYear, rating, false });
+                parameters.add(new Object[] { gameYear, rating, true });
+            }
+        }
+        return parameters;
+    }
+
     @Test
     public void addMercWithoutRetainerAtBContractSucceeds() {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
-        when(campaign.getGameYear()).thenReturn(3025);
+        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(gameYear, 1, 1));
+        when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.getVariableContractLength()).thenReturn(false);
@@ -90,6 +122,7 @@ public class ContractMarketTest {
         String enemyFullName = "Contract Enemy";
         Faction enemyFaction = mock(Faction.class);
         when(enemyFaction.getShortName()).thenReturn(enemy);
+        when(enemyFaction.isClan()).thenReturn(isClanEnemy);
         doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
         doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
 
@@ -148,9 +181,9 @@ public class ContractMarketTest {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
-        when(campaign.getGameYear()).thenReturn(3025);
+        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(gameYear, 1, 1));
+        when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.getVariableContractLength()).thenReturn(false);
@@ -185,6 +218,7 @@ public class ContractMarketTest {
         String enemyFullName = "Contract Enemy";
         Faction enemyFaction = mock(Faction.class);
         when(enemyFaction.getShortName()).thenReturn(enemy);
+        when(enemyFaction.isClan()).thenReturn(isClanEnemy);
         doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
         doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
 
@@ -243,9 +277,9 @@ public class ContractMarketTest {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
-        when(campaign.getGameYear()).thenReturn(3025);
+        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(gameYear, 1, 1));
+        when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.getVariableContractLength()).thenReturn(false);
@@ -280,6 +314,7 @@ public class ContractMarketTest {
         String enemyFullName = "Contract Enemy";
         Faction enemyFaction = mock(Faction.class);
         when(enemyFaction.getShortName()).thenReturn(enemy);
+        when(enemyFaction.isClan()).thenReturn(isClanEnemy);
         doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
         doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
 
@@ -338,9 +373,9 @@ public class ContractMarketTest {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
-        when(campaign.getGameYear()).thenReturn(3025);
+        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(gameYear, 1, 1));
+        when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.getVariableContractLength()).thenReturn(false);
@@ -375,6 +410,7 @@ public class ContractMarketTest {
         String enemyFullName = "Contract Enemy";
         Faction enemyFaction = mock(Faction.class);
         when(enemyFaction.getShortName()).thenReturn(enemy);
+        when(enemyFaction.isClan()).thenReturn(isClanEnemy);
         doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
         doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
 
@@ -434,9 +470,9 @@ public class ContractMarketTest {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
-        when(campaign.getGameYear()).thenReturn(3025);
+        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(gameYear, 1, 1));
+        when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.getVariableContractLength()).thenReturn(false);
@@ -471,6 +507,7 @@ public class ContractMarketTest {
         String enemyFullName = "Contract Enemy";
         Faction enemyFaction = mock(Faction.class);
         when(enemyFaction.getShortName()).thenReturn(enemy);
+        when(enemyFaction.isClan()).thenReturn(isClanEnemy);
         doReturn(enemyFullName).when(employerFaction).getFullName(anyInt());
         doReturn(enemyFaction).when(factions).getFaction(eq(enemy));
         
@@ -531,9 +568,9 @@ public class ContractMarketTest {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
-        when(campaign.getGameYear()).thenReturn(3025);
+        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(gameYear, 1, 1));
+        when(campaign.getGameYear()).thenReturn(gameYear);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
