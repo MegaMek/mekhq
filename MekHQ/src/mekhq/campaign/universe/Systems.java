@@ -104,12 +104,6 @@ public class Systems {
         if (systems == null) {
             systems = new Systems();
         }
-        if (!systems.initialized && !systems.initializing) {
-            systems.initializing = true;
-            systems.loader = new Thread(() -> systems.initialize(), "Planet Loader");
-            systems.loader.setPriority(Thread.NORM_PRIORITY - 1);
-            systems.loader.start();
-        }
         return systems;
     }
 
@@ -131,6 +125,15 @@ public class Systems {
     private boolean initializing = false;
 
     private Systems() {}
+
+    public void initialize() {
+        if (!initialized && !initializing) {
+            initializing = true;
+            loader = new Thread(() -> systems.initializeInternal(), "Planet Loader");
+            loader.setPriority(Thread.NORM_PRIORITY - 1);
+            loader.start();
+        }
+    }
 
     private Set<PlanetarySystem> getSystemGrid(int x, int y) {
         if (!systemGrid.containsKey(x)) {
@@ -264,11 +267,11 @@ public class Systems {
 
 // Data loading methods
 
-    private void initialize() {
+    private void initializeInternal() {
         try {
             generateSystems();
         } catch (ParseException e) {
-            MekHQ.getLogger().error(getClass(), "initialize()", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -541,14 +544,14 @@ public class Systems {
 
     public static void reload(boolean waitForFinish) {
         systems = null;
-        getInstance();
+        getInstance().initialize();
         if (waitForFinish) {
             try {
                 while (!systems.isInitialized()) {
                     Thread.sleep(10);
                 }
             } catch (InterruptedException iex) {
-                MekHQ.getLogger().error(Systems.class, "reload(boolean)", iex); //$NON-NLS-1$
+                MekHQ.getLogger().error(iex); //$NON-NLS-1$
             }
         }
     }

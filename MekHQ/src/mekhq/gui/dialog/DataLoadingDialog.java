@@ -143,6 +143,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             //Load values needed for CampaignOptionsDialog
             RATManager.populateCollectionNames();
 
+            // Initialize the systems
+            Systems.getInstance().initialize();
             while (!Systems.getInstance().isInitialized()) {
                 try {
                     Thread.sleep(50);
