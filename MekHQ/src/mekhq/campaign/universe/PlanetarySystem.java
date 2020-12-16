@@ -205,7 +205,7 @@ public class PlanetarySystem implements Serializable {
         //ignore cases where abandoned (ABN) is given in addition
         //to real factions
         if (factions.size() > 1) {
-        	factions.remove(Faction.getFaction("ABN"));
+        	factions.remove(Factions.getInstance().getFaction("ABN"));
         }
         return factions;
     }

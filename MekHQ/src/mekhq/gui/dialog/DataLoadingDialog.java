@@ -56,7 +56,7 @@ import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
@@ -134,7 +134,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             //Initialize progress property.
             setProgress(0);
 
-            Faction.generateFactions();
+            Factions.setInstance(Factions.generateFactions());
 
             CurrencyManager.getInstance().loadCurrencies();
 

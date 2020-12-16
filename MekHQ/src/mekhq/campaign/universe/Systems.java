@@ -81,7 +81,7 @@ public class Systems {
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(Systems.class, "<init>", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -96,7 +96,7 @@ public class Systems {
             planetMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             planetUnmarshaller = jContext.createUnmarshaller();
         } catch (Exception e) {
-            MekHQ.getLogger().error(Systems.class, "Systems", e);
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -111,6 +111,10 @@ public class Systems {
             systems.loader.start();
         }
         return systems;
+    }
+
+    public static void setInstance(Systems instance) {
+        systems = instance;
     }
 
     private ConcurrentMap<String, PlanetarySystem> systemList = new ConcurrentHashMap<>();

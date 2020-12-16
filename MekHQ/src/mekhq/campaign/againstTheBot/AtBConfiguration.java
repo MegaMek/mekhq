@@ -54,6 +54,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 
 /**
  * @author Neoancient
@@ -291,7 +292,7 @@ public class AtBConfiguration implements Serializable {
 
     public static String getParentFactionType(String factionCode) {
         String org = AtBConfiguration.ORG_IS;
-        Faction faction = Faction.getFaction(factionCode);
+        Faction faction = Factions.getInstance().getFaction(factionCode);
 
         if (faction.isComStar()) {
             org = AtBConfiguration.ORG_CS;

@@ -84,6 +84,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -664,7 +665,7 @@ public class InterstellarMapPanel extends JPanel {
                 }
 
                 Map<Faction, String> capitals = new HashMap<>();
-                for (Faction faction : Faction.getFactions()) {
+                for (Faction faction : Factions.getInstance().getFactions()) {
                     capitals.put(faction, faction.getStartingPlanet(campaign.getLocalDate()));
                 }
 

@@ -33,7 +33,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.model.SortedComboBoxModel;
 
 /**
@@ -79,7 +79,7 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
 		HashMap<String, String> map = new HashMap<String, String>();
 		HashSet<String> collisions = new HashSet<String>();
 		for (String key : list) {
-			String fullName = Faction.getFaction(key).getFullName(year);
+			String fullName = Factions.getInstance().getFaction(key).getFullName(year);
 			if (map.containsValue(fullName)) {
 				collisions.add(fullName);
 			}

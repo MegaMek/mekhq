@@ -63,6 +63,7 @@ import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 
 /**
@@ -343,7 +344,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         secondaryDesignator = ROMDesignation.NONE;
         commander = false;
         dependent = false;
-        originFaction = Faction.getFaction(factionCode);
+        originFaction = Factions.getInstance().getFaction(factionCode);
         originPlanet = null;
         clan = originFaction.isClan();
         phenotype = Phenotype.NONE;
@@ -1928,7 +1929,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) {
                     retVal.dependent = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-                    retVal.originFaction = Faction.getFaction(wn2.getTextContent().trim());
+                    retVal.originFaction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
                     String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
                     String planetId = wn2.getTextContent().trim();

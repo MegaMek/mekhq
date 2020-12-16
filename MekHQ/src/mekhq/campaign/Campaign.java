@@ -138,6 +138,7 @@ import mekhq.campaign.universe.DefaultFactionSelector;
 import mekhq.campaign.universe.DefaultPlanetSelector;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.News;
 import mekhq.campaign.universe.NewsItem;
@@ -3898,7 +3899,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Faction getFaction() {
-        return Faction.getFaction(factionCode);
+        return Factions.getInstance().getFaction(factionCode);
     }
 
     public String getFactionName() {

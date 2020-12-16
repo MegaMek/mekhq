@@ -99,6 +99,7 @@ import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
@@ -638,8 +639,8 @@ public class CampaignOptionsDialog extends JDialog {
         panGeneral.add(lblFaction, gridBagConstraints);
 
         factionModel = new SortedComboBoxModel<>();
-        for (String sName : Faction.getChoosableFactionCodes()) {
-            Faction f = Faction.getFaction(sName);
+        for (String sName : Factions.getInstance().getChoosableFactionCodes()) {
+            Faction f = Factions.getInstance().getFaction(sName);
             if (f.validIn(date.getYear())) {
                 factionModel.addElement(f.getFullName(date.getYear()));
             }
@@ -4822,7 +4823,7 @@ public class CampaignOptionsDialog extends JDialog {
         GameOptions gameOpts = campaign.getGameOptions();
         int campaignYear = campaign.getGameYear();
         gameOpts.getOption("year").setValue(campaignYear);
-        campaign.setFactionCode(Faction.getFactionFromFullNameAndYear
+        campaign.setFactionCode(Factions.getInstance().getFactionFromFullNameAndYear
                 (String.valueOf(comboFaction.getSelectedItem()), date.getYear()).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
             RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
@@ -5212,8 +5213,8 @@ public class CampaignOptionsDialog extends JDialog {
             date = dc.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
             factionModel = new SortedComboBoxModel<>();
-            for (String sname : Faction.getChoosableFactionCodes()) {
-                Faction f = Faction.getFaction(sname);
+            for (String sname : Factions.getInstance().getChoosableFactionCodes()) {
+                Faction f = Factions.getInstance().getFaction(sname);
                 if (f.validIn(date.getYear())) {
                     factionModel.addElement(f.getFullName(date.getYear()));
                 }

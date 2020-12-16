@@ -160,7 +160,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             }
         });
 
-        Faction mercenaries = Faction.getFaction("MERC");
+        Faction mercenaries = Factions.getInstance().getFaction("MERC");
         TreeMap<Double, Faction> factions = new TreeMap<>();
         if (weights.isEmpty()) {
             // If we have no valid factions, we can always
@@ -218,7 +218,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         Set<Faction> enemies = new HashSet<>();
         for (Contract contract : campaign.getActiveContracts()) {
             if (contract instanceof AtBContract) {
-                enemies.add(Faction.getFaction(((AtBContract)contract).getEnemyCode()));
+                enemies.add(Factions.getInstance().getFaction(((AtBContract)contract).getEnemyCode()));
             }
         }
         return enemies;
