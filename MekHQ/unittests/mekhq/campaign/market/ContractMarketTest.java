@@ -54,7 +54,8 @@ public class ContractMarketTest {
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
-        when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+        when(campaign.getGameYear()).thenReturn(3025);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.getVariableContractLength()).thenReturn(false);
@@ -148,7 +149,8 @@ public class ContractMarketTest {
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
-        when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+        when(campaign.getGameYear()).thenReturn(3025);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.getVariableContractLength()).thenReturn(false);
@@ -242,7 +244,8 @@ public class ContractMarketTest {
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
-        when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+        when(campaign.getGameYear()).thenReturn(3025);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.getVariableContractLength()).thenReturn(false);
@@ -336,7 +339,8 @@ public class ContractMarketTest {
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
-        when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+        when(campaign.getGameYear()).thenReturn(3025);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.getVariableContractLength()).thenReturn(false);
@@ -431,7 +435,8 @@ public class ContractMarketTest {
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
-        when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+        when(campaign.getGameYear()).thenReturn(3025);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.getVariableContractLength()).thenReturn(false);
@@ -527,7 +532,8 @@ public class ContractMarketTest {
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getUnitRatingMod()).thenReturn(IUnitRating.DRAGOON_C);
-        when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+        when(campaign.getGameYear()).thenReturn(3025);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
