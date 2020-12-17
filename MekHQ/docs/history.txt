@@ -3,6 +3,7 @@ VERSION HISTORY:
 0.47.16 (RC2)-SNAPSHOT
 + PR #2289: Drop support for migrating Campaigns older than v0.41.24 (2016-10-06 03:15 UTC)
 + Issue #2283: Ensure contracts are generated with the correct number of retries
++ Data: Adding Missing images.
 
 0.47.15 (RC1) (2020-12-14 2330 UTC)
 + Issue #2166: NRE in Money::plus/Money::minus
