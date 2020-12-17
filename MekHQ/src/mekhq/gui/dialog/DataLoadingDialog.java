@@ -27,6 +27,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
@@ -38,6 +39,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.DOMException;
+import org.xml.sax.SAXException;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomCallsignGenerator;
@@ -129,12 +134,13 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         private boolean cancelled = false;
 
         @Override
-        public Campaign doInBackground() throws IOException, CampaignXmlParseException, NullEntityException {
+        public Campaign doInBackground() throws IOException, CampaignXmlParseException, NullEntityException,
+                DOMException, ParseException, SAXException, ParserConfigurationException {
             //region Progress 0
             //Initialize progress property.
             setProgress(0);
 
-            Factions.setInstance(Factions.generateFactions());
+            Factions.setInstance(Factions.loadDefault());
 
             CurrencyManager.getInstance().loadCurrencies();
 
@@ -144,13 +150,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             RATManager.populateCollectionNames();
 
             // Initialize the systems
-            Systems.getInstance().initialize();
-            while (!Systems.getInstance().isInitialized()) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignored) {
-                }
-            }
+            Systems.setInstance(Systems.loadDefault());
 
             RandomNameGenerator.getInstance();
             RandomCallsignGenerator.getInstance();

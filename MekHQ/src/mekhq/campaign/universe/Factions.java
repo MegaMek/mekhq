@@ -20,6 +20,7 @@
 package mekhq.campaign.universe;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,12 +31,14 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
@@ -68,7 +71,7 @@ public class Factions {
         return instance;
     }
 
-    public static void setInstance(Factions instance) {
+    public static void setInstance(@Nullable Factions instance) {
         Factions.instance = instance;
     }
 
@@ -79,7 +82,7 @@ public class Factions {
     public void setRATGenerator(RATGenerator ratGenerator) {
         this.ratGenerator = Objects.requireNonNull(ratGenerator);
     }
-    
+
     public List<String> getChoosableFactionCodes() {
         return choosableFactionCodes;
     }
@@ -123,8 +126,9 @@ public class Factions {
     }
 
     /**
-     * Helper function that gets the faction record for the specified faction, or a fallback general faction record.
-     * Useful for RAT generator activity.
+     * Helper function that gets the faction record for the specified faction, or a
+     * fallback general faction record. Useful for RAT generator activity.
+     * 
      * @param faction The faction whose MegaMek faction record to retrieve.
      * @return Found faction record or null.
      */
@@ -155,22 +159,47 @@ public class Factions {
         return (null != f) ? f.getShortName() : "IND";
     }
 
-    public static @Nullable Factions generateFactions() throws DOMException {
+    /**
+     * Loads the default Factions data.
+     * 
+     * @throws DOMException
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws SAXException
+     */
+    public static Factions loadDefault() 
+            throws DOMException, SAXException, IOException, ParserConfigurationException {
         MekHQ.getLogger().info("Starting load of faction data from XML...");
 
+        Factions factions = load("data/universe/factions.xml");
+
+        MekHQ.getLogger().info("Loaded a total of " + factions.factions.size() + " factions");
+
+        return factions;
+    }
+
+    /**
+     * Loads Factions data from a file.
+     * 
+     * @param factionsPath The path to the XML file containing Factions data.
+     * 
+     * @throws DOMException
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws SAXException
+     */
+    public static Factions load(String factionsPath)
+            throws DOMException, SAXException, IOException, ParserConfigurationException {
         Factions retVal = new Factions();
 
         Document xmlDoc;
 
-        try (FileInputStream fis = new FileInputStream("data/universe/factions.xml")) {
+        try (FileInputStream fis = new FileInputStream(factionsPath)) {
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
-            return null;
         }
 
         Element factionEle = xmlDoc.getDocumentElement();
@@ -221,8 +250,6 @@ public class Factions {
                 }
             }
         }
-
-        MekHQ.getLogger().info("Loaded a total of " + retVal.factions.size() + " factions");
 
         return retVal;
     }
