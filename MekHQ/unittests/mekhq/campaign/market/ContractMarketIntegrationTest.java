@@ -37,9 +37,12 @@ import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
 import megamek.common.Bay;
+import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.CrewType;
 import megamek.common.EquipmentType;
+import megamek.common.MMRandom;
+import megamek.common.MMRoll;
 import megamek.common.Mech;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -163,25 +166,45 @@ public class ContractMarketIntegrationTest {
 
         ContractMarket market = new ContractMarket();
 
-        // TODO: find a way to mock MMRandom
+        java.security.SecureRandom realRng = new java.security.SecureRandom();
+        MMRandom rng = mock(MMRandom.class);
+        // Override and ensure we are guaranteed a sub-contract
+        MMRoll roll1d6 = mock(MMRoll.class);
+        when(roll1d6.getIntValue()).thenReturn(6);
+        doReturn(roll1d6).when(rng).d6();
+        doReturn(roll1d6).when(rng).d6(eq(1));
+        MMRoll roll2d6 = mock(MMRoll.class);
+        when(roll2d6.getIntValue()).thenReturn(12);
+        doReturn(roll2d6).when(rng).d6(eq(2));
+        // Keep the rest random
+        doAnswer(inv -> {
+            int max = inv.getArgument(0);
+            return realRng.nextInt(max);
+        }).when(rng).randomInt(anyInt());
 
-        // Simulate two years of contract generation to get a sub contract ...
-        boolean foundContract = false;
-        for (int ii = 0; ii < 24; ++ii) {
-            market.generateContractOffers(campaign, true);
+        try {
+            Compute.setRNG(rng);
 
-            // ... and hopefully, one of these should get us a sub-contract! 3 of 12 chance.
-            for (Contract c : market.getContracts()) {
-                foundContract |= (c instanceof AtBContract)
-                                        && (((AtBContract) c).getParentContract() == existing);
+            // Simulate three months of contract generation to get a sub contract ...
+            boolean foundContract = false;
+            for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ++ii) {
+                market.generateContractOffers(campaign, true);
+
+                // ... and hopefully, one of these should get us a sub-contract! 3 of 12 chance.
+                for (Contract c : market.getContracts()) {
+                    foundContract |= (c instanceof AtBContract)
+                                            && (((AtBContract) c).getParentContract() == existing);
+                }
+
+                if (foundContract) {
+                    break;
+                }
             }
 
-            if (foundContract) {
-                break;
-            }
+            assertTrue(foundContract);
+        } finally {
+            Compute.setRNG(MMRandom.R_DEFAULT);
         }
-
-        assertTrue(foundContract);
     }
     
     @Test
