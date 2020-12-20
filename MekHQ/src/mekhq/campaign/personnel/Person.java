@@ -358,7 +358,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         setPortrait(new Portrait());
         xp = 0;
         daysToWaitForHealing = 0;
-        gender = Gender.MALE;
+        setGender(Gender.MALE);
         rank = 0;
         rankLevel = 0;
         rankSystem = -1;
@@ -1743,7 +1743,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWaitForHealing", daysToWaitForHealing);
             }
             // Always save the person's gender, as it would otherwise get confusing fast
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", gender.name());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", getGender().name());
             // Always save a person's rank
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rank", rank);
             if (rankLevel != 0) {
@@ -1984,7 +1984,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
                     retVal.hits = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
-                    retVal.gender = Gender.parseFromString(wn2.getTextContent().trim());
+                    retVal.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                     retVal.rank = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
