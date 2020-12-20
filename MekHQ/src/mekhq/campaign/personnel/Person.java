@@ -2376,10 +2376,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setRankSystem(int system) {
         rankSystem = (system == campaign.getRanks().getRankSystem()) ? -1 : system;
-
-        // Set the ranks too
         ranks = (rankSystem == -1) ? null : Ranks.getRanksFromSystem(rankSystem);
-
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
@@ -2395,7 +2392,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public Rank getRank() {
-        return ((rankSystem == -1) ? campaign.getRanks() : Ranks.getRanksFromSystem(rankSystem)).getRank(rank);
+        final Ranks system = (rankSystem == -1) ? campaign.getRanks() : Ranks.getRanksFromSystem(rankSystem);
+        return Objects.requireNonNull(system, "Error: Failed to get a valid rank system").getRank(rank);
     }
 
     public String getRankName() {
