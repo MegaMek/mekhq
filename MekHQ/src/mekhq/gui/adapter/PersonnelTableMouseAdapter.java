@@ -1209,7 +1209,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 if (system == Ranks.RS_CUSTOM) {
                     continue;
                 }
-                cbMenuItem = new JCheckBoxMenuItem(Ranks.getRanksFromSystem(system).getRankSystemName());
+                final Ranks ranks = Ranks.getRanksFromSystem(system);
+                if (ranks == null) {
+                    continue;
+                }
+                cbMenuItem = new JCheckBoxMenuItem(ranks.getRankSystemName());
                 cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, String.valueOf(system)));
                 cbMenuItem.addActionListener(this);
                 cbMenuItem.setEnabled(true);
