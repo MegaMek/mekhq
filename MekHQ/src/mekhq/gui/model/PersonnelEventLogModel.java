@@ -51,7 +51,7 @@ public class PersonnelEventLogModel extends DataTableModel {
     public PersonnelEventLogModel() {
         data = new ArrayList<LogEntry>();
         dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMekHQOptions()
-                .getDisplayFormattedDate(LocalDate.now())) + 10;
+                .getDisplayFormattedDate(LocalDate.now())) + 15;
     }
 
     @Override
