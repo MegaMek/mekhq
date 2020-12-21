@@ -66,7 +66,7 @@ public class ScenarioTableMouseAdapter extends MouseInputAdapter {
             if (row < 0) {
                 return;
             }
-            Scenario scenario = scenarioModel.getScenario(row);
+            Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
             JMenuItem menuItem;
             JMenu menu;
 
