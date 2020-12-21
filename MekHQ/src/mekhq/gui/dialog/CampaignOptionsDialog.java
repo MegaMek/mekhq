@@ -3095,7 +3095,10 @@ public class CampaignOptionsDialog extends JDialog {
 
         DefaultComboBoxModel<String> rankModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < Ranks.RS_NUM; i++) {
-            rankModel.addElement(Ranks.getRanksFromSystem(i).getRankSystemName());
+            final Ranks ranks = Ranks.getRanksFromSystem(i);
+            if (ranks != null) {
+                rankModel.addElement(ranks.getRankSystemName());
+            }
         }
         comboRanks.setModel(rankModel);
         comboRanks.setSelectedIndex(campaign.getRanks().getRankSystem());
@@ -4266,15 +4269,17 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void fillRankInfo() {
-        Ranks ranks = Ranks.getRanksFromSystem(comboRanks.getSelectedIndex());
-        ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
-        TableColumn column;
-        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-            column = tableRanks.getColumnModel().getColumn(i);
-            column.setPreferredWidth(ranksModel.getColumnWidth(i));
-            column.setCellRenderer(ranksModel.getRenderer());
-            if (i == RankTableModel.COL_PAYMULT) {
-                column.setCellEditor(new SpinnerEditor());
+        final Ranks ranks = Ranks.getRanksFromSystem(comboRanks.getSelectedIndex());
+        if (ranks != null) {
+            ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
+            TableColumn column;
+            for (int i = 0; i < RankTableModel.COL_NUM; i++) {
+                column = tableRanks.getColumnModel().getColumn(i);
+                column.setPreferredWidth(ranksModel.getColumnWidth(i));
+                column.setCellRenderer(ranksModel.getRenderer());
+                if (i == RankTableModel.COL_PAYMULT) {
+                    column.setCellEditor(new SpinnerEditor());
+                }
             }
         }
     }
