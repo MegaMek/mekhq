@@ -6,6 +6,7 @@ VERSION HISTORY:
 + Data: Adding Missing images.
 + Issues #2296 and #2299: Support older campaign dropship and jumpship ammo bin sizes in XML file
 + PR #2302: Fixing Log Display Spacing
++ Issue #2295: Expanding null protections for rank systems and adding defaults
 
 0.47.15 (RC1) (2020-12-14 2330 UTC)
 + Issue #2166: NRE in Money::plus/Money::minus
