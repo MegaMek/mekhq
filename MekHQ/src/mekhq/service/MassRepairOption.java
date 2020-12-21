@@ -20,7 +20,8 @@ package mekhq.service;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.parts.Part;
+import mekhq.Version;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -31,25 +32,22 @@ import java.util.List;
 
 public class MassRepairOption {
     //region Variable Declarations
-    private int type;
+    private PartRepairType type;
     private boolean active;
     private int skillMin;
     private int skillMax;
     private int bthMin;
     private int bthMax;
 
-    public static final int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO,
-            Part.REPAIR_PART_TYPE.WEAPON, Part.REPAIR_PART_TYPE.GENERAL_LOCATION, Part.REPAIR_PART_TYPE.ENGINE,
-            Part.REPAIR_PART_TYPE.GYRO, Part.REPAIR_PART_TYPE.ACTUATOR, Part.REPAIR_PART_TYPE.ELECTRONICS,
-            Part.REPAIR_PART_TYPE.POD_SPACE, Part.REPAIR_PART_TYPE.GENERAL };
+    private static final int DEFAULT_BTH = 4;
     //endregion Variable Declarations
 
     //region Constructors
-    public MassRepairOption(int type) {
-        this (type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, 4, 4);
+    public MassRepairOption(PartRepairType type) {
+        this (type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, DEFAULT_BTH, DEFAULT_BTH);
     }
 
-    public MassRepairOption(int type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
+    public MassRepairOption(PartRepairType type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
         this.type = type;
         this.active = active;
         this.skillMin = skillMin;
@@ -60,11 +58,11 @@ public class MassRepairOption {
     //endregion Constructors
 
     //region Getters/Setters
-    public int getType() {
+    public PartRepairType getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(PartRepairType type) {
         this.type = type;
     }
 
@@ -112,7 +110,7 @@ public class MassRepairOption {
     //region File IO
     public void writeToXML(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "massRepairOption");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "type", getType());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "type", getType().name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "active", isActive() ? 1 : 0);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "skillMin", getSkillMin());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "skillMax", getSkillMax());
@@ -121,9 +119,10 @@ public class MassRepairOption {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "massRepairOption");
     }
 
-    public static List<MassRepairOption> parseListFromXML(Node wn2) {
+    public static List<MassRepairOption> parseListFromXML(Node wn2, Version version) {
         List<MassRepairOption> massRepairOptions = new ArrayList<>();
         NodeList mroList = wn2.getChildNodes();
+        List<PartRepairType> partRepairTypes = PartRepairType.getMRMSValidTypes();
 
         for (int mroIdx = 0; mroIdx < mroList.getLength(); mroIdx++) {
             Node mroNode = mroList.item(mroIdx);
@@ -134,7 +133,13 @@ public class MassRepairOption {
 
             try {
                 MassRepairOption mro = parseFromXML(mroNode);
-                if ((mro.getType() == -1) || (mro.getType() >= VALID_REPAIR_TYPES.length)) {
+
+                // This fixes a migration issue from 0.47.10 to 0.47.11
+                if (version.isBetween("0.47.10", "0.47.15") && (mro.getType() == PartRepairType.HEAT_SINK)) {
+                    mro.setType(PartRepairType.POD_SPACE);
+                }
+
+                if ((mro.getType() == PartRepairType.UNKNOWN_LOCATION) || !partRepairTypes.contains(mro.getType())) {
                     MekHQ.getLogger().error("Attempted to load MassRepairOption with illegal type id of " + mro.getType());
                 } else {
                     massRepairOptions.add(mro);
@@ -147,8 +152,8 @@ public class MassRepairOption {
         return massRepairOptions;
     }
 
-    public static MassRepairOption parseFromXML(Node mroNode) {
-        MassRepairOption mro = new MassRepairOption(-1);
+    private static MassRepairOption parseFromXML(Node mroNode) {
+        MassRepairOption mro = new MassRepairOption(PartRepairType.UNKNOWN_LOCATION);
 
         NodeList mroItemList = mroNode.getChildNodes();
         for (int mroItemIdx = 0; mroItemIdx < mroItemList.getLength(); mroItemIdx++) {
@@ -159,7 +164,7 @@ public class MassRepairOption {
             }
 
             if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
-                mro.setType(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                mro.setType(PartRepairType.parseFromString(mroItemNode.getTextContent().trim()));
             } else if (mroItemNode.getNodeName().equalsIgnoreCase("active")) {
                 mro.setActive(Integer.parseInt(mroItemNode.getTextContent().trim()) == 1);
             } else if (mroItemNode.getNodeName().equalsIgnoreCase("skillMin")) {
@@ -172,7 +177,7 @@ public class MassRepairOption {
                 mro.setBthMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
             }
 
-            MekHQ.getLogger().debug(String.format("massRepairOption %d.%s\n\t%s",
+            MekHQ.getLogger().debug(String.format("massRepairOption %s.%s\n\t%s",
                     mro.getType(), mroItemNode.getNodeName(), mroItemNode.getTextContent()));
         }
 
