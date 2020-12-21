@@ -404,8 +404,23 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return toReturn;
     }
 
+    /**
+     * Gets the number of hits on the part.
+     */
     public int getHits() {
         return hits;
+    }
+
+    /**
+     * Sets the number of hits on the part.
+     * 
+     * NOTE: It is the caller's responsibilty to update the condition
+     * of the part and any attached unit.
+     * 
+     * @param hits The number of hits on the part.
+     */
+    public void setHits(int hits) {
+        this.hits = Math.max(hits, 0);
     }
 
     public String getDesc() {
@@ -1074,7 +1089,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     @Override
     public void fix() {
-        hits = 0;
+        setHits(0);
         resetRepairSettings();
     }
 
@@ -1396,7 +1411,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public void doMaintenanceDamage(int d) {
-        hits += d;
+        setHits(getHits() + d);
         updateConditionFromPart();
         updateConditionFromEntity(false);
     }
