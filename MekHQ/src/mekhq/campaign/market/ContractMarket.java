@@ -46,9 +46,6 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.stratcon.StratconContractDefinition;
-import mekhq.campaign.stratcon.StratconContractInitializer;
-import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -397,22 +394,17 @@ public class ContractMarket implements Serializable {
             contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
         }
         if (contract.getSystem() == null) {
-		    MekHQ.getLogger().warning("Could not find contract location for "
-		                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode());
-			if (retries > 0) {
-				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
-			} else {
-				return null;
-			}
-		}
-		JumpPath jp = null;
-		try {
-			jp = contract.getJumpPath(campaign);
-		} catch (NullPointerException ex) {
-			// could not calculate jump path; leave jp null
             MekHQ.getLogger().warning("Could not find contract location for "
                             + contract.getEmployerCode() + " vs. " + contract.getEnemyCode());
             return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
+        }
+        JumpPath jp = null;
+        try {
+            jp = contract.getJumpPath(campaign);
+        } catch (NullPointerException ex) {
+            // could not calculate jump path; leave jp null
+            MekHQ.getLogger().warning("Could not calculate jump path to contract location: "
+                            + contract.getSystem().getName(campaign.getLocalDate()), ex);
         }
 
         if (jp == null) {
@@ -436,6 +428,12 @@ public class ContractMarket implements Serializable {
 
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
+
+        //Ralgith had a version of this then the PR got added. Commenting this Out.
+/*        contract.setName(Faction.getFaction(employer).getShortName() + "-" + String.format("%1$tY%1$tm", contract.getStartDate())
+                         + "-" + AtBContract.missionTypeNames[contract.getMissionType()]
+                         + "-" + Faction.getFaction(contract.getEnemyCode()).getShortName()
+                         + "-" + contract.getLength());*/
 
         return contract;
     }
