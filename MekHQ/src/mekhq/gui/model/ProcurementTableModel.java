@@ -80,6 +80,7 @@ public class ProcurementTableModel extends DataTableModel {
         getNewEquipmentAt(row).ifPresent(getCampaign().getShoppingList()::removeItem);
     }
 
+    @Override
     public Object getValueAt(final int row, final int col) {
         if (data.isEmpty()) {
             return "";
@@ -206,6 +207,7 @@ public class ProcurementTableModel extends DataTableModel {
 
         private static final long serialVersionUID = 9054581142945717303L;
 
+        @Override
         public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
