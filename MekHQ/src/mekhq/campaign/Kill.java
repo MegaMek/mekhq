@@ -24,7 +24,6 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.UUID;
 
 import org.w3c.dom.Node;
@@ -45,9 +44,6 @@ public class Kill implements Serializable {
     private LocalDate date;
     private String killed;
     private String killer;
-
-    //reverse compatibility
-    private int oldPilotId = -1;
 
     public Kill() {
     }
@@ -92,8 +88,6 @@ public class Kill implements Serializable {
     }
 
     public static Kill generateInstanceFromXML(Node wn, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)";
-
         Kill retVal = null;
         try {
             retVal = new Kill();
@@ -104,13 +98,9 @@ public class Kill implements Serializable {
                 if (wn2.getNodeName().equalsIgnoreCase("killed")) {
                     retVal.killed = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
-                    if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldPilotId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        retVal.pilotId = UUID.fromString(wn2.getTextContent());
-                    }
+                    retVal.pilotId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("killer")) {
-                    retVal.killer = (wn2.getTextContent());
+                    retVal.killer = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 }
@@ -119,22 +109,18 @@ public class Kill implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(Kill.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
         return retVal;
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "kill");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "pilotId", pilotId.toString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "pilotId", pilotId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "killed", killed);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "killer", killer);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "date", MekHqXmlUtil.saveFormattedDate(date));
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "kill");
-    }
-
-    public void fixIdReferences(Map<Integer, UUID> pHash) {
-        pilotId = pHash.get(oldPilotId);
     }
 
     @Override

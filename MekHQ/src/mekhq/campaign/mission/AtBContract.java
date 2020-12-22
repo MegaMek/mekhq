@@ -1199,6 +1199,9 @@ public class AtBContract extends Contract implements Serializable {
                 +"<nextWeekBattleTypeMod>"
                 +nextWeekBattleTypeMod
                 +"</nextWeekBattleTypeMod>");
+        if (parentContract != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "parentContractId", parentContract.getId());
+        }
 
         if (null != specialEventScenarioDate) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "specialEventScenarioDate",
@@ -1283,6 +1286,31 @@ public class AtBContract extends Contract implements Serializable {
                 stratconCampaignState = StratconCampaignState.Deserialize(wn2);
                 stratconCampaignState.setContract(this);
                 this.setStratconCampaignState(stratconCampaignState);
+            } else if (wn2.getNodeName().equalsIgnoreCase("parentContractId")) {
+                parentContract = new AtBContractRef(Integer.parseInt(wn2.getTextContent()));
+            }
+        }
+    }
+
+    /**
+     * Restores any references to other contracts.
+     * @param c The Campaign which holds this contract.
+     */
+    public void restore(Campaign c) {
+        if (parentContract != null) {
+            Mission m = c.getMission(parentContract.getId());
+            if (m != null) {
+                if (m instanceof AtBContract) {
+                    setParentContract((AtBContract) m);
+                } else {
+                    MekHQ.getLogger().warning(String.format("Parent Contract reference #%d is not an AtBContract for contract %s",
+                            parentContract.getId(), getName()));
+                    setParentContract(null);
+                }
+            } else {
+                MekHQ.getLogger().warning(String.format("Parent Contract #%d reference was not found for contract %s",
+                        parentContract.getId(), getName()));
+                setParentContract(null);
             }
         }
     }
@@ -1620,6 +1648,17 @@ public class AtBContract extends Contract implements Serializable {
         retVal.setEnemyBotName(c.getEnemyBotName());
 
         return retVal;
+    }
+
+    /**
+     * Represents a reference to another AtBContract.
+     */
+    protected static class AtBContractRef extends AtBContract {
+        private static final long serialVersionUID = 1L;
+
+        public AtBContractRef(int id) {
+            setId(id);
+        }
     }
 
 }

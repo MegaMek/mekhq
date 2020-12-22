@@ -2,7 +2,7 @@
  * StartUpGUI.java
  *
  * Copyright (c) 2010 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2019 The MekHQ Team.
+ * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -13,13 +13,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import java.awt.BorderLayout;
@@ -43,7 +42,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.gui.dialog.DataLoadingDialog;
 
-public class StartUpGUI extends javax.swing.JPanel {
+public class StartUpGUI extends JPanel {
     private static final long serialVersionUID = 8376874926997734492L;
     private MekHQ app;
     private File lastSave;
@@ -53,9 +52,9 @@ public class StartUpGUI extends javax.swing.JPanel {
 
     public StartUpGUI(MekHQ app) {
         this.app = app;
-        lastSave = Utilities.lastFileModified(
-                MekHQ.CAMPAIGN_DIRECTORY,
-                (dir, name) -> name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml"));
+        lastSave = Utilities.lastFileModified(MekHQ.getCampaignsDirectory().getValue(),
+                (dir, name) -> (name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml"))
+                        || name.toLowerCase().endsWith(".cpnx.gz"));
 
         initComponents();
     }
@@ -63,7 +62,7 @@ public class StartUpGUI extends javax.swing.JPanel {
     private void initComponents() {
         frame = new JFrame("MekHQ");
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.StartUpDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.StartUpDialog", new EncodeControl());
 
         // initialize splash image
         double maxWidth = app.calculateMaxScreenWidth();
@@ -74,7 +73,7 @@ public class StartUpGUI extends javax.swing.JPanel {
         tracker.addImage(imgSplash, 0);
         try {
             tracker.waitForID(0);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
             // really should never come here
         }
 
@@ -99,7 +98,7 @@ public class StartUpGUI extends javax.swing.JPanel {
         btnLoadGame.setMaximumSize(new Dimension(buttonWidth, 25));
         btnLoadGame.addActionListener(evt -> {
             File f = selectLoadCampaignFile();
-            if(null != f) {
+            if (null != f) {
                 loadCampaign(f);
             }
         });
@@ -109,7 +108,7 @@ public class StartUpGUI extends javax.swing.JPanel {
         btnLastSave.setPreferredSize(new Dimension(buttonWidth, 25));
         btnLastSave.setMaximumSize(new Dimension(buttonWidth, 25));
         btnLastSave.addActionListener(evt -> loadCampaign(lastSave));
-        if(null == lastSave) {
+        if (null == lastSave) {
             btnLastSave.setEnabled(false);
         }
 
@@ -123,13 +122,13 @@ public class StartUpGUI extends javax.swing.JPanel {
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setOpaque(false);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(btnNewGame);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(btnLoadGame);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(btnLastSave);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(btnQuit);
         add(buttonPanel, BorderLayout.PAGE_END);
 
@@ -140,8 +139,8 @@ public class StartUpGUI extends javax.swing.JPanel {
         // Determine the new location of the window
         int w = frame.getSize().width;
         int h = frame.getSize().height;
-        int x = (dim.width-w)/2;
-        int y = (dim.height-h)/2;
+        int x = (dim.width - w) / 2;
+        int y = (dim.height - h) / 2;
 
         // Move the window
         frame.setLocation(x, y);

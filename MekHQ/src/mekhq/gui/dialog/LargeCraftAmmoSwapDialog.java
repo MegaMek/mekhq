@@ -29,12 +29,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.client.ui.swing.BayMunitionsChoicePanel;
-import megamek.common.AmmoType;
 import megamek.common.Mounted;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
@@ -100,7 +100,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
         // Actually apply the ammo change
         mainPanel.apply();
         // Rebuild bin parts as necessary
-        unit.adjustLargeCraftAmmo();
+        new AdjustLargeCraftAmmoAction().execute(unit.getCampaign(), unit);
         // Update the parts and set the number of shots needed based on the current size and the number
         // of shots stored.
         for (Part p : unit.getParts()) {
@@ -116,7 +116,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
                     shotsToChange = oldShots;
                 }
                 if (shotsToChange > 0) {
-                    bin.changeAmountAvailable(shotsToChange, (AmmoType) bin.getType());
+                    unit.getCampaign().getQuartermaster().addAmmo(bin.getType(), shotsToChange);
                 }
                 if (shotsByBay.containsKey(bin.getBay())) {
                     Map<String,Integer> oldAmmo = shotsByBay.get(bin.getBay());

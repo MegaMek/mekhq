@@ -87,7 +87,7 @@ import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
@@ -269,7 +269,6 @@ public class CampaignOptionsDialog extends JDialog {
     private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
     private JCheckBox chkDetermineFatherAtBirth;
     private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
-    private JCheckBox chkUseRandomDeaths;
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     //Salary
     private JSpinner spnSalaryCommission;
@@ -1796,11 +1795,6 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(pnlDisplayFamilyLevel, gridBagConstraints);
 
-        chkUseRandomDeaths = new JCheckBox(resourceMap.getString("useRandomDeaths.text"));
-        chkUseRandomDeaths.setToolTipText(resourceMap.getString("useRandomDeaths.toolTipText"));
-        gridBagConstraints.gridy = ++gridy;
-        panFamily.add(chkUseRandomDeaths, gridBagConstraints);
-
         chkKeepMarriedNameUponSpouseDeath = new JCheckBox(resourceMap.getString("keepMarriedNameUponSpouseDeath.text"));
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(chkKeepMarriedNameUponSpouseDeath, gridBagConstraints);
@@ -3101,11 +3095,14 @@ public class CampaignOptionsDialog extends JDialog {
 
         DefaultComboBoxModel<String> rankModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < Ranks.RS_NUM; i++) {
-            rankModel.addElement(Ranks.getRankSystemName(i));
+            final Ranks ranks = Ranks.getRanksFromSystem(i);
+            if (ranks != null) {
+                rankModel.addElement(ranks.getRankSystemName());
+            }
         }
         comboRanks.setModel(rankModel);
         comboRanks.setSelectedIndex(campaign.getRanks().getRankSystem());
-        comboRanks.setName("comboRanks"); // NOI18N
+        comboRanks.setName("comboRanks");
         comboRanks.setActionCommand("fillRanks");
         comboRanks.addActionListener(evt -> {
             if (evt.getActionCommand().equals("fillRanks")) {
@@ -4272,15 +4269,17 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void fillRankInfo() {
-        Ranks ranks = new Ranks(comboRanks.getSelectedIndex());
-        ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
-        TableColumn column;
-        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-            column = tableRanks.getColumnModel().getColumn(i);
-            column.setPreferredWidth(ranksModel.getColumnWidth(i));
-            column.setCellRenderer(ranksModel.getRenderer());
-            if (i == RankTableModel.COL_PAYMULT) {
-                column.setCellEditor(new SpinnerEditor());
+        final Ranks ranks = Ranks.getRanksFromSystem(comboRanks.getSelectedIndex());
+        if (ranks != null) {
+            ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
+            TableColumn column;
+            for (int i = 0; i < RankTableModel.COL_NUM; i++) {
+                column = tableRanks.getColumnModel().getColumn(i);
+                column.setPreferredWidth(ranksModel.getColumnWidth(i));
+                column.setCellRenderer(ranksModel.getRenderer());
+                if (i == RankTableModel.COL_PAYMULT) {
+                    column.setCellEditor(new SpinnerEditor());
+                }
             }
         }
     }
@@ -4456,7 +4455,6 @@ public class CampaignOptionsDialog extends JDialog {
         comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
         chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
         comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
-        chkUseRandomDeaths.setSelected(options.useRandomDeaths());
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
 
         //Salary
@@ -4989,6 +4987,7 @@ public class CampaignOptionsDialog extends JDialog {
         rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_REGULAR, (Integer) spnAbilReg.getModel().getValue());
         rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_VETERAN, (Integer) spnAbilVet.getModel().getValue());
         rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer) spnAbilElite.getModel().getValue());
+        campaign.setRandomSkillPreferences(rSkillPrefs);
 
         for (int i = 0; i < phenotypeSpinners.length; i++) {
             options.setPhenotypeProbability(i, (Integer) phenotypeSpinners[i].getValue());
@@ -5052,7 +5051,6 @@ public class CampaignOptionsDialog extends JDialog {
         options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
         options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
         options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
-        options.setUseRandomDeaths(chkUseRandomDeaths.isSelected());
         options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
         //Salary
         options.setSalaryCommissionMultiplier((Double) spnSalaryCommission.getModel().getValue());

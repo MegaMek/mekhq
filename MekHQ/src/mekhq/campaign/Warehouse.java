@@ -147,9 +147,14 @@ public class Warehouse {
         // Clear the part's ID
         part.setId(-1);
 
-        // Remove child parts as well
-        for (Part childPart : part.getChildParts()) {
-            removePart(childPart);
+        if (didRemove && !part.getChildParts().isEmpty()) {
+            // Remove child parts as well
+            List<Part> childParts = new ArrayList<>(part.getChildParts());
+            for (Part childPart : childParts) {
+                part.removeChildPart(childPart);
+
+                removePart(childPart);
+            }
         }
 
         return didRemove;

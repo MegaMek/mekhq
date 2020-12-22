@@ -48,6 +48,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -69,6 +70,8 @@ public class RefitTest {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster mockQuartermaster = mock(Quartermaster.class);
+        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
@@ -102,6 +105,8 @@ public class RefitTest {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster mockQuartermaster = mock(Quartermaster.class);
+        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
@@ -178,6 +183,8 @@ public class RefitTest {
         when(mockCampaign.getEntities()).thenReturn(new ArrayList<>());
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster mockQuartermaster = mock(Quartermaster.class);
+        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
@@ -289,6 +296,8 @@ public class RefitTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster mockQuartermaster = mock(Quartermaster.class);
+        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getJavelinJVN10N();
@@ -368,6 +377,8 @@ public class RefitTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster mockQuartermaster = mock(Quartermaster.class);
+        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
         Person mockTech = mock(Person.class);
         UUID techId = UUID.randomUUID();
         when(mockTech.getId()).thenReturn(techId);
@@ -484,6 +495,8 @@ public class RefitTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster mockQuartermaster = mock(Quartermaster.class);
+        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getFleaFLE4();
@@ -587,6 +600,8 @@ public class RefitTest {
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         doReturn(null).when(mockWarehouse).findSparePart(any());
+        Quartermaster mockQuartermaster = mock(Quartermaster.class);
+        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
         Person mockTech = mock(Person.class);
         UUID techId = UUID.randomUUID();
         when(mockTech.getId()).thenReturn(techId);

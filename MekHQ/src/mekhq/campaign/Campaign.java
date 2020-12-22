@@ -48,6 +48,8 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 
@@ -290,7 +292,6 @@ public class Campaign implements Serializable, ITechManager {
         factionCode = "MERC";
         techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
-        Ranks.initializeRankSystems();
         ranks = Ranks.getRanksFromSystem(Ranks.RS_SL);
         forces = new Force(name);
         forceIds.put(0, forces);
@@ -1647,6 +1648,14 @@ public class Campaign implements Serializable, ITechManager {
      */
     public Warehouse getWarehouse() {
         return parts;
+    }
+
+    /**
+     * Sets the Warehouse which stores parts for the campaign.
+     * @param warehouse The warehouse in which to store parts.
+     */
+    public void setWarehouse(Warehouse warehouse) {
+        parts = Objects.requireNonNull(warehouse);
     }
 
     public Quartermaster getQuartermaster() {
@@ -3352,16 +3361,9 @@ public class Campaign implements Serializable, ITechManager {
                         "Invalid Auto-continue", JOptionPane.ERROR_MESSAGE);
             }
 
-            // check to see if this part can now be combined with other
-            // spare parts
-            if (part.isSpare()) {
-                Part spare = getWarehouse().checkForExistingSparePart(part);
-                if (null != spare) {
-                    spare.incrementQuantity();
-                    getWarehouse().removePart(part);
-
-                    MekHQ.triggerEvent(new PartChangedEvent(spare));
-                }
+            // check to see if this part can now be combined with other spare parts
+            if (part.isSpare() && (part.getQuantity() > 0)) {
+                getQuartermaster().addPart(part, 0);
             }
         }
 
@@ -4194,7 +4196,9 @@ public class Campaign implements Serializable, ITechManager {
 
         // Against the Bot
         if (getCampaignOptions().getUseAtB()) {
+            // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
             contractMarket.writeToXml(pw1, indent);
+
             unitMarket.writeToXml(pw1, indent);
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colorIndex", colorIndex);
             if (lances.size() > 0)   {

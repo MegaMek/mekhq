@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -51,8 +52,10 @@ import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.preferences.JWindowPreference;
@@ -65,7 +68,6 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private Task task;
     private MekHQ app;
     private JFrame frame;
-    private Campaign campaign;
     private File fileCampaign;
     private ResourceBundle resourceMap;
 
@@ -120,63 +122,48 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         preferences.manage(new JWindowPreference(this));
     }
 
-    class Task extends SwingWorker<Void, Void> {
+    class Task extends SwingWorker<Campaign, Campaign> {
         /*
          * Main task. Executed in background thread.
          */
         private boolean cancelled = false;
 
         @Override
-        public Void doInBackground() {
+        public Campaign doInBackground() throws IOException, CampaignXmlParseException, NullEntityException {
             //region Progress 0
             //Initialize progress property.
             setProgress(0);
-            try {
-                Faction.generateFactions();
-            } catch (Exception e) {
-                MekHQ.getLogger().error(e);
-            }
-            try {
-                CurrencyManager.getInstance().loadCurrencies();
-            } catch (Exception e) {
-                MekHQ.getLogger().error(e);
-            }
-            try {
-                Bloodname.loadBloodnameData();
-            } catch (Exception e) {
-                MekHQ.getLogger().error(e);
-            }
-            try {
-                //Load values needed for CampaignOptionsDialog
-                RATManager.populateCollectionNames();
-            } catch (Exception e) {
-                MekHQ.getLogger().error(e);
-            }
+
+            Faction.generateFactions();
+
+            CurrencyManager.getInstance().loadCurrencies();
+
+            Bloodname.loadBloodnameData();
+
+            //Load values needed for CampaignOptionsDialog
+            RATManager.populateCollectionNames();
+
             while (!Systems.getInstance().isInitialized()) {
-                //Sleep for up to one second.
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException ignored) {
-
                 }
             }
+
             RandomNameGenerator.getInstance();
             RandomCallsignGenerator.getInstance();
+            Ranks.initializeRankSystems();
             //endregion Progress 0
 
             //region Progress 1
             setProgress(1);
-            try {
-                QuirksHandler.initQuirksList();
-            } catch (IOException e) {
-                MekHQ.getLogger().error(e);
-            }
+
+            QuirksHandler.initQuirksList();
+
             while (!MechSummaryCache.getInstance().isInitialized()) {
-                //Sleep for up to one second.
                 try {
                     Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    MekHQ.getLogger().error(e);
+                } catch (InterruptedException ignored) {
                 }
             }
             //endregion Progress 1
@@ -190,61 +177,24 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             //region Progress 3
             setProgress(3);
             
+            Campaign campaign;
             boolean newCampaign = false;
             if (fileCampaign == null) {
-                try {
-                    newCampaign = true;
-                    campaign = new Campaign();
-                     // TODO: Make this depending on campaign options
-                    InjuryTypes.registerAll();
-                    campaign.setApp(app);
-                } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
-                }
+                newCampaign = true;
+                campaign = new Campaign();
+
+                // TODO: Make this depending on campaign options
+                InjuryTypes.registerAll();
+                campaign.setApp(app);
             } else {
-                MekHQ.getLogger().info("Loading campaign file from XML...");
+                MekHQ.getLogger().info(String.format("Loading campaign file from XML %s", fileCampaign));
 
                 // And then load the campaign object from it.
-                FileInputStream fis;
-
-                try {
-                    fis = new FileInputStream(fileCampaign);
+                try (FileInputStream fis = new FileInputStream(fileCampaign)) {
                     campaign = CampaignFactory.newInstance(app).createCampaign(fis);
                     // Restores all transient attributes from serialized objects
                     campaign.restore();
                     campaign.cleanUp();
-                    fis.close();
-                } catch (NullEntityException e) {
-                    JOptionPane.showMessageDialog(null,
-                            "The following units could not be loaded by the campaign:\n "
-                                    + e.getError() + "\n\nPlease be sure to copy over any custom units "
-                                    + "before starting a new version of MekHQ.\nIf you believe the units "
-                                    + "listed are not customs, then try deleting the file data/mechfiles/units.cache "
-                                    + "and restarting MekHQ.\nIt is also possible that unit chassi "
-                                    + "and model names have changed across versions of MegaMek. "
-                                    + "You can check this by opening up MegaMek and searching for the units. "
-                                    + "Chassis and models can be edited in your MekHQ save file with a text editor.",
-                            "Unit Loading Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    cancelled = true;
-                    cancel(true);
-                } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
-                    JOptionPane.showMessageDialog(null,
-                            "The campaign file could not be loaded. \nPlease check the log file for details.",
-                            "Campaign Loading Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    cancelled = true;
-                    cancel(true);
-                } catch (OutOfMemoryError e) {
-                    JOptionPane.showMessageDialog(null,
-                            "MekHQ ran out of memory attempting to load the campaign file. "
-                                    + "\nTry increasing the memory allocated to MekHQ and reloading. "
-                                    + "\nSee the FAQ at http://megamek.org for details.",
-                            "Not Enough Memory",
-                            JOptionPane.ERROR_MESSAGE);
-                    cancelled = true;
-                    cancel(true);
                 }
             }
             //endregion Progress 3
@@ -295,7 +245,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             }
             //endregion Progress 4
 
-            return null;
+            return campaign;
         }
 
         /*
@@ -303,8 +253,50 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
          */
         @Override
         public void done() {
+            Campaign campaign = null;
+            try {
+                campaign = get();
+            } catch (InterruptedException e) {
+                cancelled = true;
+                cancel(true);
+            } catch (ExecutionException e) {
+                MekHQ.getLogger().error(e.getCause());
+                if (e.getCause() instanceof NullEntityException) {
+                    NullEntityException nee = (NullEntityException) e.getCause();
+                    JOptionPane.showMessageDialog(null,
+                            "The following units could not be loaded by the campaign:\n "
+                                    + nee.getError() + "\n\nPlease be sure to copy over any custom units "
+                                    + "before starting a new version of MekHQ.\nIf you believe the units "
+                                    + "listed are not customs, then try deleting the file data/mechfiles/units.cache "
+                                    + "and restarting MekHQ.\nIt is also possible that unit chassi "
+                                    + "and model names have changed across versions of MegaMek. "
+                                    + "You can check this by opening up MegaMek and searching for the units. "
+                                    + "Chassis and models can be edited in your MekHQ save file with a text editor.",
+                            "Unit Loading Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    cancelled = true;
+                    cancel(true);
+                } else if (e.getCause() instanceof OutOfMemoryError) {
+                    JOptionPane.showMessageDialog(null,
+                    "MekHQ ran out of memory attempting to load the campaign file. "
+                            + "\nTry increasing the memory allocated to MekHQ and reloading. "
+                            + "\nSee the FAQ at http://megamek.org for details.",
+                    "Not Enough Memory",
+                    JOptionPane.ERROR_MESSAGE);
+                    cancelled = true;
+                    cancel(true);
+                } else {
+                    JOptionPane.showMessageDialog(null,
+                            "The campaign file could not be loaded. \nPlease check the log file for details.",
+                            "Campaign Loading Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    cancelled = true;
+                    cancel(true);
+                }
+            }
+
             setVisible(false);
-            if (!cancelled) {
+            if (!cancelled && (campaign != null)) {
                 app.setCampaign(campaign);
                 app.getCampaignController().setHost(campaign.getId());
                 frame.setVisible(false);
