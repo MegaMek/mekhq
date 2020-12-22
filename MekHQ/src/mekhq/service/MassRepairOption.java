@@ -135,7 +135,7 @@ public class MassRepairOption {
                 MassRepairOption mro = parseFromXML(mroNode);
 
                 // This fixes a migration issue from 0.47.10 to 0.47.11
-                if (version.isBetween("0.47.10", "0.47.15") && (mro.getType() == PartRepairType.HEAT_SINK)) {
+                if (version.isBetween("0.47.10", "0.47.16") && (mro.getType() == PartRepairType.HEAT_SINK)) {
                     mro.setType(PartRepairType.POD_SPACE);
                 }
 
