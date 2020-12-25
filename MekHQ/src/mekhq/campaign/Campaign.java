@@ -1648,11 +1648,14 @@ public class Campaign implements Serializable, ITechManager {
         if (p instanceof StructuralIntegrity) {
             return null;
         }
+        // Skip out on "not armor" (as in 0 point armer on men or field guns)
+        if ((p instanceof Armor) && ((Armor) p).getType() == EquipmentType.T_ARMOR_UNKNOWN) {
+            return null;
+        }
         // Makes no sense buying those separately from the chasis
         if((p instanceof EquipmentPart)
                 && ((EquipmentPart) p).getType() != null
-                && (((EquipmentPart) p).getType().hasFlag(MiscType.F_CHASSIS_MODIFICATION)))
-        {
+                && (((EquipmentPart) p).getType().hasFlag(MiscType.F_CHASSIS_MODIFICATION))) {
             return null;
         }
         // Replace a "missing" part with a corresponding "new" one.

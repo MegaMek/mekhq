@@ -10,6 +10,9 @@ VERSION HISTORY:
 + PR #2303: Fixing Gender assignment on Generation
 + Issue #2270: Scenarios Respect Sort Order
 + Issue #2297: Ensure shots needed is converted properly between ammo types
++ Issue #2310: Avoid procurement popup exceptions due to race condition
++ Issue #2298: Do not display unknown armor types in the Parts In Use report
++ PR #2308: Add EquipmentPart unit tests and fix minor bugs
 
 0.47.15 (RC1) (2020-12-14 2330 UTC)
 + Issue #2166: NRE in Money::plus/Money::minus
