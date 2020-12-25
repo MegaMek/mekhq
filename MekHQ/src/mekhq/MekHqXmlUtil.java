@@ -146,15 +146,11 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             retVal.append("\" c3UUID=\"").append(tgtEnt.getC3UUIDAsString());
         }
 
-         if ((null != tgtEnt.getCamoCategory())
-                 && !Camouflage.NO_CAMOUFLAGE.equals(tgtEnt.getCamoCategory())
-                 && !tgtEnt.getCamoCategory().isEmpty()) {
+         if (!tgtEnt.getCamouflage().hasDefaultCategory()) {
              retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamoCategory()));
          }
 
-         if ((null != tgtEnt.getCamoFileName())
-                 && !Camouflage.NO_CAMOUFLAGE.equals(tgtEnt.getCamoFileName())
-                 && !tgtEnt.getCamoFileName().isEmpty()) {
+         if (!tgtEnt.getCamouflage().hasDefaultFilename()) {
              retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamoFileName()));
          }
 

@@ -30,6 +30,7 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
+import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.EncodeControl;
@@ -222,9 +223,9 @@ public class Campaign implements Serializable, ITechManager {
     private boolean gmMode;
     private transient boolean overviewLoadingValue = true;
 
-    private String camoCategory = Camouflage.NO_CAMOUFLAGE;
-    private String camoFileName = null;
-    private int colorIndex = 0;
+    private String camoCategory = Camouflage.COLOUR_CAMOUFLAGE;
+    private String camoFileName = PlayerColour.BLUE.name();
+    private PlayerColour colour = PlayerColour.BLUE;
 
     //unit icon
     private String iconCategory = AbstractIcon.ROOT_CATEGORY;
@@ -3993,12 +3994,12 @@ public class Campaign implements Serializable, ITechManager {
         return new Camouflage(getCamoCategory(), getCamoFileName());
     }
 
-    public int getColorIndex() {
-        return colorIndex;
+    public PlayerColour getColour() {
+        return colour;
     }
 
-    public void setColorIndex(int index) {
-        colorIndex = index;
+    public void setColour(PlayerColour colour) {
+        this.colour = colour;
     }
 
     public String getIconCategory() {
@@ -4032,11 +4033,6 @@ public class Campaign implements Serializable, ITechManager {
         String quantityString = quantity.toAmountAndSymbolString();
         addReport("Funds added : " + quantityString + " (" + description + ")");
     }
-
-    public boolean hasEnoughFunds(Money cost) {
-        return getFunds().isGreaterOrEqualThan(cost);
-    }
-
 
     public CampaignOptions getCampaignOptions() {
         return campaignOptions;
@@ -4085,7 +4081,7 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "camoFileName", camoFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colorIndex", colorIndex);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colour", getColour().name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastForceId", lastForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastMissionId", lastMissionId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastScenarioId", lastScenarioId);
@@ -4162,7 +4158,6 @@ public class Campaign implements Serializable, ITechManager {
             contractMarket.writeToXml(pw1, indent);
 
             unitMarket.writeToXml(pw1, indent);
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colorIndex", colorIndex);
             if (lances.size() > 0)   {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "lances");
                 for (Lance l : lances.values()) {
@@ -4284,7 +4279,7 @@ public class Campaign implements Serializable, ITechManager {
             try {
                 mechFileParser = new MechFileParser(ms.getSourceFile());
             } catch (EntityLoadingException ex) {
-                MekHQ.getLogger().error(Campaign.class, "writeCustoms(PrintWriter)", ex);
+                MekHQ.getLogger().error(ex);
             }
             if (mechFileParser == null) {
                 continue;

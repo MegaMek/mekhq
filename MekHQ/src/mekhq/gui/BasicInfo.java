@@ -30,13 +30,10 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
-import megamek.client.ui.swing.tileset.EntityImage;
-import megamek.client.ui.swing.util.PlayerColors;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.Unit;
 
 /**
  * An extension of JPanel that is intended to be used for visual table renderers
@@ -126,31 +123,6 @@ public class BasicInfo extends JPanel {
         } else {
             lblLoad.setText("");
         }
-    }
-
-    protected Image getImageFor(Unit u) {
-        if (null == MHQStaticDirectoryManager.getMechTileset()) {
-            return null;
-        }
-        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
-        if (null == base) {
-            return null;
-        }
-        int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
-        EntityImage entityImage = new EntityImage(base, tint, getCamo(u), this, u.getEntity());
-        return entityImage.loadPreviewImage();
-    }
-
-    protected Image getCamo(Unit unit) {
-        // Try to get the player's camo file.
-        Image camo = null;
-        try {
-            camo = (Image) MHQStaticDirectoryManager.getCamouflage()
-                    .getItem(unit.getCamoCategory(), unit.getCamoFileName());
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-        }
-        return camo;
     }
 
     protected void setPortrait(Person p) {

@@ -34,6 +34,7 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.client.ui.swing.util.PlayerColour;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
@@ -626,8 +627,10 @@ public class CampaignXmlParser {
                     } else {
                         retVal.setCamoFileName(val);
                     }
-                } else if (xn.equalsIgnoreCase("colorIndex")) {
-                    retVal.setColorIndex(Integer.parseInt(wn.getTextContent().trim()));
+                } else if (xn.equalsIgnoreCase("colour")) {
+                    retVal.setColour(PlayerColour.parseFromString(wn.getTextContent().trim()));
+                } else if (xn.equalsIgnoreCase("colorIndex")) { // Legacy - 0.47.15 removal
+                    retVal.setColour(PlayerColour.parseFromString(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("iconCategory")) {
                     String val = wn.getTextContent().trim();
 

@@ -29,7 +29,6 @@ import javax.swing.JLabel;
 
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.FluffImageHelper;
-import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Entity;
 import megamek.common.MechView;
 import megamek.common.TechConstants;
@@ -325,8 +324,7 @@ public class UnitViewPanel extends ScrollablePanel {
             return null;
         }
         Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
-        int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
-        EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c, u.getEntity());
+        EntityImage entityImage = new EntityImage(base, u.getCampaign().getColour(), getCamo(u), c, u.getEntity());
         return entityImage.loadPreviewImage();
     }
 

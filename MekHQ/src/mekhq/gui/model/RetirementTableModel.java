@@ -436,7 +436,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     }
                     desc += "<br>" + u.getStatus() + "";
                     setText(desc);
-                    Image mekImage = getImageFor(u);
+                    Image mekImage = u.getImage(this);
                     if (null != mekImage) {
                         setImage(mekImage);
                     } else {
