@@ -286,6 +286,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
      * @return The {@code Mounted} or {@code null} if no valid
      *         piece of equipment exists on the {@code Unit}.
      */
+    @Override
     protected @Nullable Mounted getMounted() {
         if ((getUnit() != null) && (getUnit().getEntity() != null)) {
             Mounted mounted = getUnit().getEntity().getEquipment(getEquipmentNum());
