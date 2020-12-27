@@ -40,21 +40,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.SimpleTechLevel;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
@@ -1552,74 +1548,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             sb.append(unit);
         }
         return sb.toString();
-    }
-
-    public static String[] findPartImage(IPartWork part) {
-        String imgBase = null;
-        PartRepairType repairType = IPartWork.findCorrectRepairType(part);
-
-        switch (repairType) {
-            case ARMOR:
-                imgBase = "armor";
-                break;
-            case AMMO:
-                imgBase = "ammo";
-                break;
-            case ACTUATOR:
-                imgBase = "actuator";
-                break;
-            case ENGINE:
-                imgBase = "engine";
-                break;
-            case ELECTRONICS:
-                imgBase = "electronics";
-                break;
-            case HEAT_SINK:
-                imgBase = "heatsink";
-                break;
-            case WEAPON:
-                EquipmentType equipmentType = null;
-
-                if (part instanceof EquipmentPart) {
-                    equipmentType = ((EquipmentPart) part).getType();
-                } else if (part instanceof MissingEquipmentPart) {
-                    equipmentType = ((MissingEquipmentPart) part).getType();
-                }
-
-                if (equipmentType != null) {
-                    if (equipmentType.hasFlag(WeaponType.F_LASER)) {
-                        imgBase = "laser";
-                    } else if (equipmentType.hasFlag(WeaponType.F_MISSILE)) {
-                        imgBase = "missile";
-                    } else if (equipmentType.hasFlag(WeaponType.F_BALLISTIC)) {
-                        imgBase = "ballistic";
-                    } else if (equipmentType.hasFlag(WeaponType.F_ARTILLERY)) {
-                        imgBase = "artillery";
-                    }
-                }
-
-                break;
-            case MEK_LOCATION:
-            case POD_SPACE:
-                imgBase = "location_mek";
-                break;
-            case PHYSICAL_WEAPON:
-                imgBase = "melee";
-                break;
-            default:
-                break;
-        }
-
-        if (imgBase == null) {
-            imgBase = "equipment";
-        }
-
-
-        String[] imgData = new String[2];
-        imgData[0] = "data/images/misc/repair/";
-        imgData[1] = imgBase;
-
-        return imgData;
     }
 
     public abstract ITechnology getTechAdvancement();

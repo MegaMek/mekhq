@@ -38,6 +38,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.RepairTab;
 import mekhq.gui.preferences.JWindowPreference;
+import mekhq.gui.utilities.PartWorkImageSelector;
 import mekhq.preferences.PreferencesNode;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
@@ -399,7 +400,7 @@ public class AcquisitionsDialog extends JDialog {
             Insets insetsOriginal = gbcMain.insets;
 
             // Set image
-            String[] imgData = Part.findPartImage(part);
+            String[] imgData = PartWorkImageSelector.findPartImage(part);
             String imgPath = imgData[0] + imgData[1] + ".png";
 
             Image imgTool = getToolkit().getImage(imgPath);
