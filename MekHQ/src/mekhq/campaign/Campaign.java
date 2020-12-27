@@ -3993,7 +3993,7 @@ public class Campaign implements Serializable, ITechManager {
         return camoFileName;
     }
 
-    public AbstractIcon getCamouflage() {
+    public Camouflage getCamouflage() {
         return new Camouflage(getCamoCategory(), getCamoFileName());
     }
 
@@ -4002,7 +4002,11 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void setColour(PlayerColour colour) {
+        Objects.requireNonNull(colour, "Colour cannot be set to null");
         this.colour = colour;
+        if (getCamouflage().isColourCamouflage()) {
+            setCamoFileName(colour.name());
+        }
     }
 
     public String getIconCategory() {

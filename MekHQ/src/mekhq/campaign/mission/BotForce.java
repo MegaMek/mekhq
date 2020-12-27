@@ -149,6 +149,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.start = start;
     }
 
+    public Camouflage getCamouflage() {
+        return new Camouflage(getCamoCategory(), getCamoFileName());
+    }
+
     public String getCamoCategory() {
         return camoCategory;
     }
@@ -170,7 +174,11 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     }
 
     public void setColour(PlayerColour colour) {
+        Objects.requireNonNull(colour, "Colour cannot be set to null");
         this.colour = colour;
+        if (getCamouflage().isColourCamouflage()) {
+            setCamoFileName(colour.name());
+        }
     }
 
     public int getTotalBV() {
