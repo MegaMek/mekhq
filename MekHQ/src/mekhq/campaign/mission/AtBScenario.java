@@ -1805,7 +1805,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 try {
                     bf.setFieldsFromXmlNode(wn2);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(this, "Error loading allied unit in scenario", e);
+                    MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                     bf = null;
                 }
                 if (null != bf) {
@@ -1839,7 +1839,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
          * remove the entry from the list of entities that give survival bonuses
          * to avoid an critical error that prevents battle resolution.
          */
-        ArrayList<UUID> toRemove = new ArrayList<UUID>();
+        ArrayList<UUID> toRemove = new ArrayList<>();
         for (UUID uid : survivalBonus) {
             if (!entityIds.containsKey(uid)) {
                 toRemove.add(uid);

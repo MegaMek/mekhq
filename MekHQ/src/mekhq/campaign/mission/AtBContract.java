@@ -1233,6 +1233,10 @@ public class AtBContract extends Contract implements Serializable {
                 setAllyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("allyColorIndex")) { // Legacy - 0.47.15 removal
                 setAllyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
+                if (Camouflage.NO_CAMOUFLAGE.equals(getAllyCamoCategory())) {
+                    setAllyCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
+                    setAllyCamoFileName(getAllyColour().name());
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("enemyCamoCategory")) {
                 enemyCamoCategory = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("enemyCamoFileName")) {
@@ -1241,6 +1245,10 @@ public class AtBContract extends Contract implements Serializable {
                 setEnemyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("enemyColorIndex")) { // Legacy - 0.47.15 removal
                 setEnemyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
+                if (Camouflage.NO_CAMOUFLAGE.equals(getEnemyCamoCategory())) {
+                    setEnemyCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
+                    setEnemyCamoFileName(getEnemyColour().name());
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("requiredLances")) {
                 requiredLances = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("moraleLevel")) {

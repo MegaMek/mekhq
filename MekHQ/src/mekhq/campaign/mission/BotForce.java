@@ -250,10 +250,14 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                 camoCategory = MekHqXmlUtil.unEscape(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("camoFileName")) {
                 camoFileName = MekHqXmlUtil.unEscape(wn2.getTextContent());
-            } else if (wn2.getTextContent().equalsIgnoreCase("colour")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("colour")) {
                 setColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("colorIndex")) { // Legacy - 0.47.15 removal
                 setColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
+                if (Camouflage.NO_CAMOUFLAGE.equals(getCamoCategory())) {
+                    setCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
+                    setCamoFileName(getColour().name());
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("entities")) {
                 NodeList nl2 = wn2.getChildNodes();
                 for (int i = 0; i < nl2.getLength(); i++) {
