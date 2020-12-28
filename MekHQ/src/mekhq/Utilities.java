@@ -1169,13 +1169,15 @@ public class Utilities {
                 eqnum = ((MissingEquipmentPart) part).getEquipmentNum();
                 etype = ((MissingEquipmentPart) part).getType();
             }
-            if (null != etype) {
+            if (etype != null) {
                 Mounted mounted = unit.getEntity().getEquipment(eqnum);
                 if (equipNums.contains(eqnum)
+                        && (mounted != null)
                         && etype.equals(mounted.getType())) {
                     equipNums.remove((Integer) eqnum);
                 } else if ((part instanceof AmmoBin)
                         && (etype instanceof AmmoType)
+                        && (mounted != null)
                         && (mounted.getType() instanceof AmmoType)) {
                     // Handle AmmoBins which had their AmmoType changed
                     // but did not get reloaded yet.
