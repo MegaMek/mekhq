@@ -149,6 +149,7 @@ public class MekLocationTest {
     public void cannotSalvageCT() {
         Campaign mockCampaign = mock(Campaign.class);
         Unit unit = mock(Unit.class);
+        when(unit.isSalvage()).thenReturn(true);
         Mech entity = mock(Mech.class);
         when(entity.getWeight()).thenReturn(65.0);
         when(unit.getEntity()).thenReturn(entity);
@@ -157,6 +158,11 @@ public class MekLocationTest {
         centerTorso.setUnit(unit);
 
         assertFalse(centerTorso.isSalvaging());
+
+        MekLocation otherLocation = new MekLocation(Mech.LOC_HEAD, 100, 0, false, false, false, false, false, mockCampaign);
+        otherLocation.setUnit(unit);
+
+        assertTrue(otherLocation.isSalvaging());
     }
 
     @Test
