@@ -368,6 +368,121 @@ public class MekLocationTest {
     }
 
     @Test
+    public void updateConditionFromEntityTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(entity.getWeight()).thenReturn(100.0);
+        doReturn(1).when(entity).getInternalForReal(anyInt());
+        doReturn(1).when(entity).getOInternal(anyInt());
+        when(unit.getEntity()).thenReturn(entity);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL, 
+                true, true, true, true, true, mockCampaign);
+
+        assertFalse(mekLocation.isBlownOff());
+        assertFalse(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        // No unit is a no-op
+        mekLocation.updateConditionFromEntity(false);
+        assertFalse(mekLocation.isBlownOff());
+        assertFalse(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        mekLocation.updateConditionFromEntity(true);
+        assertFalse(mekLocation.isBlownOff());
+        assertFalse(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        // Add the location to a unit
+        mekLocation.setUnit(unit);
+
+        // Blow everything off but our location
+        doReturn(true).when(entity).isLocationBlownOff(anyInt());
+        doReturn(false).when(entity).isLocationBlownOff(eq(location));
+
+        mekLocation.updateConditionFromEntity(false);
+        assertFalse(mekLocation.isBlownOff());
+        assertFalse(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        mekLocation.updateConditionFromEntity(true);
+        assertFalse(mekLocation.isBlownOff());
+        assertFalse(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        // Blow off our location
+        doReturn(true).when(entity).isLocationBlownOff(eq(location));
+
+        mekLocation.updateConditionFromEntity(false);
+        assertTrue(mekLocation.isBlownOff());
+        assertFalse(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        mekLocation.updateConditionFromEntity(true);
+        assertTrue(mekLocation.isBlownOff());
+        assertFalse(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        // Breach everything but our location
+        doReturn(true).when(unit).isLocationBreached(anyInt());
+        doReturn(false).when(unit).isLocationBreached(eq(location));
+
+        mekLocation.updateConditionFromEntity(false);
+        assertTrue(mekLocation.isBlownOff());
+        assertFalse(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        mekLocation.updateConditionFromEntity(true);
+        assertTrue(mekLocation.isBlownOff());
+        assertFalse(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        // Breach our location
+        doReturn(true).when(unit).isLocationBreached(eq(location));
+
+        mekLocation.updateConditionFromEntity(false);
+        assertTrue(mekLocation.isBlownOff());
+        assertTrue(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        mekLocation.updateConditionFromEntity(true);
+        assertTrue(mekLocation.isBlownOff());
+        assertTrue(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        // Destroy every location but ours
+        doReturn(0).when(entity).getInternalForReal(anyInt());
+        doReturn(1).when(entity).getInternalForReal(eq(location));
+
+        mekLocation.updateConditionFromEntity(false);
+        assertTrue(mekLocation.isBlownOff());
+        assertTrue(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        mekLocation.updateConditionFromEntity(true);
+        assertTrue(mekLocation.isBlownOff());
+        assertTrue(mekLocation.isBreached());
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+
+        // Damage our location
+        doReturn(1).when(entity).getInternalForReal(eq(location));
+        doReturn(2).when(entity).getOInternal(eq(location));
+
+        mekLocation.updateConditionFromEntity(false);
+        assertTrue(mekLocation.isBlownOff());
+        assertTrue(mekLocation.isBreached());
+        assertEquals(1 / 2.0, mekLocation.getPercent(), 0.001);
+
+        mekLocation.updateConditionFromEntity(true);
+        assertTrue(mekLocation.isBlownOff());
+        assertTrue(mekLocation.isBreached());
+        assertEquals(1 / 2.0, mekLocation.getPercent(), 0.001);
+    }
+
+    @Test
     public void lamTorsoRemovableOnlyWithMissingAvionicsAndLandingGear() {
         Campaign mockCampaign = mock(Campaign.class);
         Unit unit = mock(Unit.class);

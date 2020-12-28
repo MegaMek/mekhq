@@ -223,6 +223,14 @@ public class MekLocation extends Part {
         return percent;
     }
 
+    /**
+     * Sets the percent armor remaining.
+     * @param percent The percent armor remaining, expressed as a fraction.
+     */
+    protected void setPercent(double percent) {
+        this.percent = Math.max(0.0, Math.min(percent, 1.0));
+    }
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
@@ -315,7 +323,7 @@ public class MekLocation extends Part {
                 }
             }
         } else if (isBreached()) {
-            breached = false;
+            setBreached(false);
             if (null != unit) {
                 unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
                 for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
@@ -332,7 +340,7 @@ public class MekLocation extends Part {
                 }
             }
         } else {
-            percent = 1.0;
+            setPercent(1.0);
             if (null != unit) {
                 unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
             }
@@ -346,8 +354,8 @@ public class MekLocation extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        blownOff = false;
-        breached = false;
+        setBlownOff(false);
+        setBreached(false);
         if (null != unit) {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
             unit.getEntity().setLocationBlownOff(loc, false);
@@ -377,10 +385,10 @@ public class MekLocation extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
-            blownOff = unit.getEntity().isLocationBlownOff(loc);
-            breached = unit.isLocationBreached(loc);
-            percent = ((double) unit.getEntity().getInternalForReal(loc)) / ((double) unit.getEntity().getOInternal(loc));
-            if (percent <= 0.0) {
+            setBlownOff(unit.getEntity().isLocationBlownOff(loc));
+            setBreached(unit.isLocationBreached(loc));
+            setPercent(unit.getEntity().getInternalForReal(loc) / ((double) unit.getEntity().getOInternal(loc)));
+            if (getPercent() <= 0.0) {
                 remove(false);
             }
         }
@@ -429,6 +437,7 @@ public class MekLocation extends Part {
     private int getRepairOrSalvageTime() {
         // StratOps p184 Master Repair Table
         // NOTE: MissingMekLocation handles destroyed locations
+        final double percent = getPercent();
         if (percent < 0.25) {
             return 270;
         } else if (percent < 0.5) {
@@ -481,6 +490,7 @@ public class MekLocation extends Part {
     private int getRepairOrSalvageDifficulty() {
         // StrapOps p184 Master Repair Table
         // NOTE: MissingMekLocation handles destroyed locations
+        final double percent = getPercent();
         if (percent < 0.25) {
             return 2;
         } else if (percent < 0.5) {
@@ -493,18 +503,40 @@ public class MekLocation extends Part {
         }
     }
 
+    /**
+     * Gets a value indicating whether or not this location is breached.
+     */
     public boolean isBreached() {
-        return breached;
+        return (getUnit() != null) && breached;
     }
 
+    /**
+     * Sets a value indicating whether or not the location is breached.
+     * @param breached A value indicating whether or not the location is breached.
+     */
+    protected void setBreached(boolean breached) {
+        this.breached = breached;
+    }
+
+    /**
+     * Gets a value indicating whether or not this location is blown off.
+     */
     public boolean isBlownOff() {
-        return blownOff;
+        return (getUnit() != null) && blownOff;
+    }
+
+    /**
+     * Sets a value indicating whether or not the location is blown off.
+     * @param blownOff A value indicating whether or not the location is blown off.
+     */
+    protected void setBlownOff(boolean blownOff) {
+        this.blownOff = blownOff;
     }
 
     @Override
     public boolean needsFixing() {
-        return percent < 1.0 || breached || blownOff
-                || (unit != null && unit.hasBadHipOrShoulder(loc));
+        return (getPercent() < 1.0) || isBreached() || isBlownOff()
+                || (getUnit() == null) || getUnit().hasBadHipOrShoulder(getLoc());
     }
 
     @Override
@@ -523,14 +555,14 @@ public class MekLocation extends Part {
                 } else if (isBreached()) {
                     toReturn += " (Breached)";
                 } else {
-                    toReturn += " (" + Math.round(100*percent) + "%)";
+                    toReturn += " (" + Math.round(100 * getPercent()) + "%)";
                 }
             }
             return toReturn;
         }
         toReturn += getUnitTonnage() + " tons";
         if (includeRepairDetails) {
-            toReturn += " (" + Math.round(100*percent) + "%)";
+            toReturn += " (" + Math.round(100 * getPercent()) + "%)";
         }
         if (loc == Mech.LOC_HEAD) {
             StringJoiner components = new StringJoiner(", ");
@@ -550,7 +582,7 @@ public class MekLocation extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
-            unit.getEntity().setInternal((int)Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
+            unit.getEntity().setInternal((int)Math.round(getPercent() * unit.getEntity().getOInternal(loc)), loc);
             //TODO: we need to cycle through slots and remove crits on non-hittable ones
             //We shouldn't have to do this, these slots should not be hit in MM
             for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
