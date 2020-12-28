@@ -17,6 +17,7 @@ VERSION HISTORY:
 + Issue #2317: Ensure Person::idleMonths defaults to 0
 + PR #2324: Restrict removing, salvaging, or scrapping certain locations with avionics and landing gear on LAMs
 + Issues #2325 #2328: Do not throw NPE on missing equipment when unscrambling equipment numbers
++ PR #2330: Fix capitalization of MechWarrior portrait folder
 
 0.47.15 (RC1) (2020-12-14 2330 UTC)
 + Issue #2166: NRE in Money::plus/Money::minus
