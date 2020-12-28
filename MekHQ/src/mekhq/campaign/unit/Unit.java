@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import megamek.client.ui.swing.tileset.EntityImage;
@@ -3228,6 +3229,21 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public List<Part> getParts() {
         return parts;
+    }
+
+    /**
+     * Find a part on a unit.
+     * @param predicate A predicate to apply to each part on the unit.
+     * @return The first part which matched the predicate, otherwise null.
+     */
+    public @Nullable Part findPart(Predicate<Part> predicate) {
+        for (Part part : parts) {
+            if (predicate.test(part)) {
+                return part;
+            }
+        }
+
+        return null;
     }
 
     public void setParts(ArrayList<Part> newParts) {

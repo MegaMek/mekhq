@@ -349,7 +349,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
-        idleMonths = -1;
         genealogy = new Genealogy(getId());
         tryingToMarry = true;
         tryingToConceive = true;

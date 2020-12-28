@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
@@ -241,10 +242,29 @@ public class MissingMekLocation extends MissingPart {
             }
 
             //certain other specific crits need to be left out (uggh, must be a better way to do this!)
-            if (slot.getType() == CriticalSlot.TYPE_SYSTEM
-                    && (slot.getIndex() == Mech.ACTUATOR_HIP
-                          || slot.getIndex() == Mech.ACTUATOR_SHOULDER)) {
-                continue;
+            if (slot.getType() == CriticalSlot.TYPE_SYSTEM) {
+                // Skip Hip and Shoulder actuators
+                if ((slot.getIndex() == Mech.ACTUATOR_HIP
+                        || slot.getIndex() == Mech.ACTUATOR_SHOULDER)) {
+                    continue;
+                }
+                if (unit.getEntity() instanceof LandAirMech) {
+                    // Skip Landing Gear if already gone
+                    if (slot.getIndex() == LandAirMech.LAM_LANDING_GEAR) {
+                        if (unit.findPart(p -> p instanceof MissingLandingGear) != null) {
+                            continue;
+                        } else {
+                            return "Landing gear in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
+                        }
+                    // Skip Avionics if already gone
+                    } else if (slot.getIndex() == LandAirMech.LAM_AVIONICS) {
+                        if (unit.findPart(p -> p instanceof MissingAvionics) != null) {
+                            continue;
+                        } else {
+                            return "Avionics in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
+                        }
+                    }
+                }
             }
             if (slot.isRepairable()) {
                 return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
@@ -353,7 +373,6 @@ public class MissingMekLocation extends MissingPart {
     public TechAdvancement getTechAdvancement() {
         return EquipmentType.getStructureTechAdvancement(structureType, clan);
     }
-
 
     @Override
     public PartRepairType getMassRepairOptionType() {

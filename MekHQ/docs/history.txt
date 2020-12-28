@@ -13,6 +13,10 @@ VERSION HISTORY:
 + Issue #2310: Avoid procurement popup exceptions due to race condition
 + Issue #2298: Do not display unknown armor types in the Parts In Use report
 + PR #2308: Add EquipmentPart unit tests and fix minor bugs
++ Issue #2266: For LAMs check Landing Gear and Avionics when considering repairable slots
++ Issue #2317: Ensure Person::idleMonths defaults to 0
++ PR #2324: Restrict removing, salvaging, or scrapping certain locations with avionics and landing gear on LAMs
++ Issues #2325 #2328: Do not throw NPE on missing equipment when unscrambling equipment numbers
 
 0.47.15 (RC1) (2020-12-14 2330 UTC)
 + Issue #2166: NRE in Money::plus/Money::minus
