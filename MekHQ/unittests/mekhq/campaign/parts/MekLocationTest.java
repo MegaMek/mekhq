@@ -138,6 +138,7 @@ public class MekLocationTest {
         Unit unit = mock(Unit.class);
         Mech entity = mock(Mech.class);
         when(entity.getWeight()).thenReturn(65.0);
+        when(unit.getEntity()).thenReturn(entity);
 
         MekLocation centerTorso = new MekLocation(Mech.LOC_CT, 1, 0, false, false, false, false, false, mockCampaign);
         centerTorso.setUnit(unit);
@@ -151,6 +152,7 @@ public class MekLocationTest {
         Unit unit = mock(Unit.class);
         Mech entity = mock(Mech.class);
         when(entity.getWeight()).thenReturn(65.0);
+        when(unit.getEntity()).thenReturn(entity);
 
         int location = Mech.LOC_RT;
         MekLocation torso = new MekLocation(location, 1, 0, false, false, false, false, false, mockCampaign);
