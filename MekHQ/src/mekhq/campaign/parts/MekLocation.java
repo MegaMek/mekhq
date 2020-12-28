@@ -191,18 +191,27 @@ public class MekLocation extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof MekLocation
-                && getLoc() == ((MekLocation) part).getLoc()
-                && getUnitTonnage() == part.getUnitTonnage()
-                && isTsm() == ((MekLocation) part).isTsm()
-                && getStructureType() == ((MekLocation) part).getStructureType()
+        return (part instanceof MekLocation)
+                && isSamePartType((MekLocation) part);
+    }
+
+    /**
+     * Gets a value indicating whether or not {@code other} is the same
+     * type of {@code MekLocation}.
+     * @param other A different {@code MekLocation}.
+     */
+    public boolean isSamePartType(MekLocation other) {
+        return (getLoc() == other.getLoc())
+                && (getUnitTonnage() == other.getUnitTonnage())
+                && (isTsm() == other.isTsm())
+                && (getStructureType() == other.getStructureType())
                 && ((getStructureType() != EquipmentType.T_STRUCTURE_ENDO_STEEL)
-                        || (isClan() == part.isClan()))
-                && (!isArm() || forQuad == ((MekLocation) part).forQuad)
+                        || (isClan() == other.isClan()))
+                && (!isArm() || forQuad() == other.forQuad())
                 // Sensors and life support only matter if we're comparing two parts in the warehouse.
-                && ((getUnit() != null) || (part.getUnit() != null)
-                        || (hasSensors() == ((MekLocation) part).hasSensors()
-                        && hasLifeSupport() == ((MekLocation) part).hasLifeSupport()));
+                && ((getUnit() != null) || (other.getUnit() != null)
+                        || (hasSensors() == other.hasSensors()
+                                && hasLifeSupport() == other.hasLifeSupport()));
     }
 
     @Override

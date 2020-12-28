@@ -37,6 +37,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import megamek.common.CriticalSlot;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.LandAirMech;
 import megamek.common.Mech;
@@ -181,6 +182,138 @@ public class MekLocationTest {
 
         // Now we're on a bad hip or shoulder
         assertTrue(torso.onBadHipOrShoulder());
+    }
+
+    @Test
+    public void isSamePartTypeTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        int location = Mech.LOC_LLEG, otherLocation = Mech.LOC_HEAD;
+        int tonnage = 70;
+        int structureType = EquipmentType.T_STRUCTURE_ENDO_STEEL,
+                otherStructureType = EquipmentType.T_STRUCTURE_REINFORCED;
+        boolean isClan = true;
+        boolean hasTSM = true;
+        boolean isQuad = true;
+        boolean hasSensors = true;
+        boolean hasLifeSupport = true;
+        MekLocation mekLocation = new MekLocation(location, tonnage, structureType, isClan, 
+                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+
+        assertTrue(mekLocation.isSamePartType(mekLocation));
+
+        // Same as our clone
+        Part other = mekLocation.clone();
+        assertTrue(mekLocation.isSamePartType(other));
+        assertTrue(other.isSamePartType(mekLocation));
+
+        // Same if structure type is not Endo Steel and we're clan vs not clan
+        mekLocation = new MekLocation(location, tonnage, EquipmentType.T_STRUCTURE_INDUSTRIAL, isClan, 
+                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+        other = new MekLocation(location, tonnage, EquipmentType.T_STRUCTURE_INDUSTRIAL, !isClan, 
+            hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+        assertTrue(mekLocation.isSamePartType(other));
+        assertTrue(other.isSamePartType(mekLocation));
+
+        // Clan and IS Endo Steel differ
+        mekLocation = new MekLocation(location, tonnage, EquipmentType.T_STRUCTURE_ENDO_STEEL, isClan, 
+                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+        other = new MekLocation(location, tonnage, EquipmentType.T_STRUCTURE_ENDO_STEEL, !isClan, 
+            hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+        assertFalse(mekLocation.isSamePartType(other));
+        assertFalse(other.isSamePartType(mekLocation));
+
+        // Restore the original setup
+        mekLocation = new MekLocation(location, tonnage, structureType, isClan, 
+                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+
+        // Different locations
+        other = new MekLocation(otherLocation, tonnage, structureType, isClan, 
+            hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+        assertFalse(mekLocation.isSamePartType(other));
+        assertFalse(other.isSamePartType(mekLocation));
+
+        // Different tonnage
+        other = new MekLocation(location, tonnage + 10, structureType, isClan, 
+                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+        assertFalse(mekLocation.isSamePartType(other));
+        assertFalse(other.isSamePartType(mekLocation));
+
+        // Different structure
+        other = new MekLocation(location, tonnage, otherStructureType, isClan, 
+                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+        assertFalse(mekLocation.isSamePartType(other));
+        assertFalse(other.isSamePartType(mekLocation));
+
+        // Different TSM
+        other = new MekLocation(location, tonnage, structureType, isClan, 
+                !hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+        assertFalse(mekLocation.isSamePartType(other));
+        assertFalse(other.isSamePartType(mekLocation));
+
+        // Arms for quads must match on quad status, but others do not
+        mekLocation = new MekLocation(Mech.LOC_RARM, tonnage, structureType, isClan, 
+                hasTSM, true, hasSensors, hasLifeSupport, mockCampaign);
+        other = new MekLocation(Mech.LOC_LARM, tonnage, structureType, isClan, 
+                hasTSM, true, hasSensors, hasLifeSupport, mockCampaign);
+        assertFalse(mekLocation.isSamePartType(other));
+        assertFalse(other.isSamePartType(mekLocation));
+
+        mekLocation = new MekLocation(Mech.LOC_LARM, tonnage, structureType, isClan, 
+                hasTSM, true, hasSensors, hasLifeSupport, mockCampaign);
+        other = new MekLocation(Mech.LOC_LARM, tonnage, structureType, isClan, 
+                hasTSM, true, hasSensors, hasLifeSupport, mockCampaign);
+        assertTrue(mekLocation.isSamePartType(other));
+        assertTrue(other.isSamePartType(mekLocation));
+
+        mekLocation = new MekLocation(Mech.LOC_LARM, tonnage, structureType, isClan, 
+                hasTSM, false, hasSensors, hasLifeSupport, mockCampaign);
+        other = new MekLocation(Mech.LOC_LARM, tonnage, structureType, isClan, 
+                hasTSM, false, hasSensors, hasLifeSupport, mockCampaign);
+        assertTrue(mekLocation.isSamePartType(other));
+        assertTrue(other.isSamePartType(mekLocation));
+
+        mekLocation = new MekLocation(location, tonnage, structureType, isClan, 
+                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+        other = new MekLocation(location, tonnage, structureType, isClan, 
+                hasTSM, !isQuad, hasSensors, hasLifeSupport, mockCampaign);
+        assertTrue(mekLocation.isSamePartType(other));
+        assertTrue(other.isSamePartType(mekLocation));
+
+        // Restore the original setup
+        mekLocation = new MekLocation(location, tonnage, structureType, isClan, 
+                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+
+        // Different Sensors (off unit)
+        other = new MekLocation(location, tonnage, structureType, isClan, 
+                hasTSM, isQuad, !hasSensors, hasLifeSupport, mockCampaign);
+        assertFalse(mekLocation.isSamePartType(other));
+        assertFalse(other.isSamePartType(mekLocation));
+
+        // Different Life Support (off unit)
+        other = new MekLocation(location, tonnage, structureType, isClan, 
+                hasTSM, isQuad, hasSensors, !hasLifeSupport, mockCampaign);
+        assertFalse(mekLocation.isSamePartType(other));
+        assertFalse(other.isSamePartType(mekLocation));
+
+        // Put the location on a unit
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(entity.getWeight()).thenReturn((double) tonnage);
+        when(unit.getEntity()).thenReturn(entity);
+        mekLocation.setUnit(unit);
+
+        // Different Sensors (on unit)
+        other = new MekLocation(location, tonnage, structureType, isClan, 
+                hasTSM, isQuad, !hasSensors, hasLifeSupport, mockCampaign);
+        assertTrue(mekLocation.isSamePartType(other));
+        assertTrue(other.isSamePartType(mekLocation));
+
+        // Different Life Support (on unit)
+        other = new MekLocation(location, tonnage, structureType, isClan, 
+                hasTSM, isQuad, hasSensors, !hasLifeSupport, mockCampaign);
+        assertTrue(mekLocation.isSamePartType(other));
+        assertTrue(other.isSamePartType(mekLocation));
     }
     
     @Test
