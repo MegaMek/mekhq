@@ -33,10 +33,12 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
+import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -576,46 +578,7 @@ public class MekLocation extends Part {
                 return "cannot replace head on destroyed unit";
             }
         } else if (isSalvaging()) {
-            //dont allow salvaging of bad shoulder/hip limbs
-            if (onBadHipOrShoulder()) {
-                return "You cannot salvage a limb with a busted hip/shoulder. You must scrap it instead.";
-            }
-             //cant salvage torsos until arms and legs are gone
-            String limbName = " arm ";
-            if (forQuad) {
-                limbName = " front leg ";
-            }
-            if (unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && !unit.getEntity().isLocationBad(Mech.LOC_RARM)) {
-                return "must salvage/scrap right" + limbName + "first";
-            }
-            if (unit.getEntity() instanceof Mech && loc == Mech.LOC_LT && !unit.getEntity().isLocationBad(Mech.LOC_LARM)) {
-                return "must salvage/scrap left" + limbName + "first";
-            }
-            //check for armor
-            if (unit.getEntity().getArmorForReal(loc, false) > 0
-                    || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmorForReal(loc, true) > 0 )) {
-                return "must salvage armor in this location first";
-            }
-            //you can only salvage a location that has nothing left on it
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-                // ignore empty & non-hittable slots
-                if ((slot == null) || !slot.isEverHittable()) {
-                    continue;
-                }
-
-                //certain other specific crits need to be left out (uggh, must be a better way to do this!)
-                if (slot.getType() == CriticalSlot.TYPE_SYSTEM
-                        && (slot.getIndex() == Mech.ACTUATOR_HIP
-                              || slot.getIndex() == Mech.ACTUATOR_SHOULDER
-                              || slot.getIndex() == Mech.SYSTEM_LIFE_SUPPORT
-                              || slot.getIndex() == Mech.SYSTEM_SENSORS)) {
-                    continue;
-                }
-                if (slot.isRepairable()) {
-                    return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
-                }
-            }
+            return checkSalvagable();
         } else if (!isBreached() && !isBlownOff()) {
             //check for damaged hips and shoulders
             for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
@@ -637,6 +600,78 @@ public class MekLocation extends Part {
                 }
             }
         }
+        return null;
+    }
+
+    /**
+     * Gets a string indicating why the location is not salvagable, or {@code null} if
+     * the location can be salvaged.
+     */
+    public @Nullable String checkSalvagable() {
+        if (!isSalvaging()) {
+            return null;
+        }
+
+        //dont allow salvaging of bad shoulder/hip limbs
+        if (onBadHipOrShoulder()) {
+            return "You cannot salvage a limb with a busted hip/shoulder. You must scrap it instead.";
+        }
+        //cant salvage torsos until arms and legs are gone
+        String limbName = " arm ";
+        if (forQuad) {
+            limbName = " front leg ";
+        }
+        if (unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && !unit.getEntity().isLocationBad(Mech.LOC_RARM)) {
+            return "must salvage/scrap right" + limbName + "first";
+        }
+        if (unit.getEntity() instanceof Mech && loc == Mech.LOC_LT && !unit.getEntity().isLocationBad(Mech.LOC_LARM)) {
+            return "must salvage/scrap left" + limbName + "first";
+        }
+        //check for armor
+        if (unit.getEntity().getArmorForReal(loc, false) > 0
+                || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmorForReal(loc, true) > 0 )) {
+            return "must salvage armor in this location first";
+        }
+        //you can only salvage a location that has nothing left on it
+        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+            // ignore empty & non-hittable slots
+            if ((slot == null) || !slot.isEverHittable()) {
+                continue;
+            }
+
+            //certain other specific crits need to be left out (uggh, must be a better way to do this!)
+            if (slot.getType() == CriticalSlot.TYPE_SYSTEM
+                    && (slot.getIndex() == Mech.ACTUATOR_HIP
+                        || slot.getIndex() == Mech.ACTUATOR_SHOULDER
+                        || slot.getIndex() == Mech.SYSTEM_LIFE_SUPPORT
+                        || slot.getIndex() == Mech.SYSTEM_SENSORS)) {
+                continue;
+            }
+
+            if (unit.getEntity() instanceof LandAirMech) {
+                // Skip Landing Gear if already gone
+                if (slot.getIndex() == LandAirMech.LAM_LANDING_GEAR) {
+                    if (unit.findPart(p -> p instanceof MissingLandingGear) != null) {
+                        continue;
+                    } else {
+                        return "Landing gear in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                    }
+                // Skip Avionics if already gone
+                } else if (slot.getIndex() == LandAirMech.LAM_AVIONICS) {
+                    if (unit.findPart(p -> p instanceof MissingAvionics) != null) {
+                        continue;
+                    } else {
+                        return "Avionics in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                    }
+                }
+            }
+
+            if (slot.isRepairable()) {
+                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+            }
+        }
+
         return null;
     }
 
@@ -685,6 +720,25 @@ public class MekLocation extends Part {
                           || slot.getIndex() == Mech.ACTUATOR_SHOULDER)) {
                 continue;
             }
+
+            if (unit.getEntity() instanceof LandAirMech) {
+                // Skip Landing Gear if already gone
+                if (slot.getIndex() == LandAirMech.LAM_LANDING_GEAR) {
+                    if (unit.findPart(p -> p instanceof MissingLandingGear) != null) {
+                        continue;
+                    } else {
+                        return "Landing gear in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                    }
+                // Skip Avionics if already gone
+                } else if (slot.getIndex() == LandAirMech.LAM_AVIONICS) {
+                    if (unit.findPart(p -> p instanceof MissingAvionics) != null) {
+                        continue;
+                    } else {
+                        return "Avionics in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                    }
+                }
+            }
+
             if (slot.isRepairable()) {
                 return "You must first remove all equipment from this location before you scrap it";
             }
