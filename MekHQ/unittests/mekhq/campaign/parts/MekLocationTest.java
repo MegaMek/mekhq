@@ -681,9 +681,11 @@ public class MekLocationTest {
         // Must scrap a limb with a bad hip or shoulder
         doReturn(true).when(unit).hasBadHipOrShoulder(eq(location));
         assertNotNull(mekLocation.checkSalvagable());
+        assertNotNull(mekLocation.checkFixable());
 
         doReturn(false).when(unit).hasBadHipOrShoulder(eq(location));
         assertNull(mekLocation.checkSalvagable());
+        assertNull(mekLocation.checkFixable());
     }
     
     @Test
@@ -703,9 +705,11 @@ public class MekLocationTest {
         // Cannot salvage a torso if the attached arm is Okay
         doReturn(false).when(entity).isLocationBad(eq(Mech.LOC_RARM));
         assertNotNull(mekLocation.checkSalvagable());
+        assertNotNull(mekLocation.checkFixable());
 
         doReturn(true).when(entity).isLocationBad(eq(Mech.LOC_RARM));
         assertNull(mekLocation.checkSalvagable());
+        assertNull(mekLocation.checkFixable());
 
         location = Mech.LOC_LT;
         mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
@@ -714,9 +718,42 @@ public class MekLocationTest {
         // Cannot salvage a torso if the attached arm is Okay
         doReturn(false).when(entity).isLocationBad(eq(Mech.LOC_LARM));
         assertNotNull(mekLocation.checkSalvagable());
+        assertNotNull(mekLocation.checkFixable());
 
         doReturn(true).when(entity).isLocationBad(eq(Mech.LOC_LARM));
         assertNull(mekLocation.checkSalvagable());
+        assertNull(mekLocation.checkFixable());
+    }
+
+    @Test
+    public void checkSalvagableArmorStillPresentTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+        when(unit.isSalvage()).thenReturn(true);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // No armor
+        assertNull(mekLocation.checkSalvagable());
+        assertNull(mekLocation.checkFixable());
+
+        // Some armor, for real.
+        doReturn(1).when(entity).getArmorForReal(eq(location), anyBoolean());
+        assertNotNull(mekLocation.checkSalvagable());
+        assertNotNull(mekLocation.checkFixable());
+
+        // Some rear armor
+        doReturn(0).when(entity).getArmorForReal(eq(location), eq(false));
+        doReturn(true).when(entity).hasRearArmor(eq(location));
+        doReturn(1).when(entity).getArmorForReal(eq(location), eq(true));
+        assertNotNull(mekLocation.checkSalvagable());
+        assertNotNull(mekLocation.checkFixable());
     }
 
     @Test
