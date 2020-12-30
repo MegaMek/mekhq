@@ -483,6 +483,243 @@ public class MekLocationTest {
     }
 
     @Test
+    public void checkFixableNoUnitTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        MekLocation torso = new MekLocation(Mech.LOC_RT, 30, 0, false, false, false, false, false, mockCampaign);
+        assertNull(torso.checkFixable());
+    }
+
+    @Test
+    public void checkFixableBlownOffTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(entity.getWeight()).thenReturn(100.0);
+        when(unit.getEntity()).thenReturn(entity);
+
+        // Everything but the CT is busted
+        doReturn(true).when(unit).isLocationDestroyed(anyInt());
+        doReturn(false).when(unit).isLocationDestroyed(eq(Mech.LOC_CT));
+
+        // Destroyed leg can be repaired even if everything else is gone
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL, 
+                true, true, true, true, true, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBlownOff(true);
+        assertNull(mekLocation.checkFixable());
+        location = Mech.LOC_RLEG;
+        mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL, 
+                true, true, true, true, true, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBlownOff(true);
+        assertNull(mekLocation.checkFixable());
+
+        // Destroyed head can be repaired even if everything else is gone
+        location = Mech.LOC_HEAD;
+        mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL, 
+                true, true, true, true, true, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBlownOff(true);
+        assertNull(mekLocation.checkFixable());
+
+        // Destroyed torsos can be repaired
+        location = Mech.LOC_RT;
+        mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL, 
+                true, true, true, true, true, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBlownOff(true);
+        assertNull(mekLocation.checkFixable());
+        location = Mech.LOC_LT;
+        mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL, 
+                true, true, true, true, true, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBlownOff(true);
+        assertNull(mekLocation.checkFixable());
+
+        // Arms cannot without their respective torsos
+        location = Mech.LOC_RARM;
+        mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL, 
+                true, true, true, true, true, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBlownOff(true);
+        assertNotNull(mekLocation.checkFixable());
+
+        // Fix the RT ...
+        doReturn(false).when(unit).isLocationDestroyed(eq(Mech.LOC_RT));
+
+        // ... now the RARM can be fixed.
+        assertNull(mekLocation.checkFixable());
+
+        location = Mech.LOC_LARM;
+        mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL, 
+                true, true, true, true, true, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBlownOff(true);
+        assertNotNull(mekLocation.checkFixable());
+
+        // Fix the LT ...
+        doReturn(false).when(unit).isLocationDestroyed(eq(Mech.LOC_LT));
+
+        // ... now the LARM can be fixed.
+        assertNull(mekLocation.checkFixable());
+    }
+
+    @Test
+    public void checkFixableBustedHipTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // 4 critical
+        doReturn(4).when(entity).getNumberOfCriticals(eq(location));
+        // Null slot
+        doReturn(null).when(entity).getCritical(eq(location), eq(0));
+        // Not hittable slot
+        CriticalSlot notHittable = mock(CriticalSlot.class);
+        when(notHittable.isEverHittable()).thenReturn(false);
+        doReturn(notHittable).when(entity).getCritical(eq(location), eq(1));
+        // Not a hip
+        CriticalSlot notAHip = mock(CriticalSlot.class);
+        when(notAHip.isEverHittable()).thenReturn(true);
+        when(notAHip.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
+        when(notAHip.getIndex()).thenReturn(Mech.ACTUATOR_FOOT);
+        doReturn(notAHip).when(entity).getCritical(eq(location), eq(2));
+        // The Hip
+        CriticalSlot mockHip = mock(CriticalSlot.class);
+        when(mockHip.isEverHittable()).thenReturn(true);
+        when(mockHip.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
+        when(mockHip.getIndex()).thenReturn(Mech.ACTUATOR_HIP);
+        doReturn(mockHip).when(entity).getCritical(eq(location), eq(3));
+
+        // Hip is fine
+        assertNull(mekLocation.checkFixable());
+
+        // Hip is not fine
+        when(mockHip.isDestroyed()).thenReturn(true);
+        assertNotNull(mekLocation.checkFixable());
+    }
+
+    @Test
+    public void checkFixableBustedShoulderTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+
+        int location = Mech.LOC_RARM;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // 4 critical
+        doReturn(4).when(entity).getNumberOfCriticals(eq(location));
+        // Null slot
+        doReturn(null).when(entity).getCritical(eq(location), eq(0));
+        // Not hittable slot
+        CriticalSlot notHittable = mock(CriticalSlot.class);
+        when(notHittable.isEverHittable()).thenReturn(false);
+        doReturn(notHittable).when(entity).getCritical(eq(location), eq(1));
+        // Not a shoulder
+        CriticalSlot notAShoulder = mock(CriticalSlot.class);
+        when(notAShoulder.isEverHittable()).thenReturn(true);
+        when(notAShoulder.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
+        when(notAShoulder.getIndex()).thenReturn(Mech.ACTUATOR_HAND);
+        doReturn(notAShoulder).when(entity).getCritical(eq(location), eq(2));
+        // The shoulder
+        CriticalSlot mockShoulder = mock(CriticalSlot.class);
+        when(mockShoulder.isEverHittable()).thenReturn(true);
+        when(mockShoulder.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
+        when(mockShoulder.getIndex()).thenReturn(Mech.ACTUATOR_SHOULDER);
+        doReturn(mockShoulder).when(entity).getCritical(eq(location), eq(3));
+
+        // Shoulder is fine
+        assertNull(mekLocation.checkFixable());
+
+        // Shoulder is not fine
+        when(mockShoulder.isDestroyed()).thenReturn(true);
+        assertNotNull(mekLocation.checkFixable());
+    }
+
+    @Test
+    public void checkSalvagableNotSalvagingTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+
+        MekLocation mekLocation = new MekLocation(Mech.LOC_RARM, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        assertNull(mekLocation.checkSalvagable());
+    }
+
+    @Test
+    public void checkSalvagableBadHipShoulderTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+        when(unit.isSalvage()).thenReturn(true);
+
+        int location = Mech.LOC_RARM;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // Must scrap a limb with a bad hip or shoulder
+        doReturn(true).when(unit).hasBadHipOrShoulder(eq(location));
+        assertNotNull(mekLocation.checkSalvagable());
+
+        doReturn(false).when(unit).hasBadHipOrShoulder(eq(location));
+        assertNull(mekLocation.checkSalvagable());
+    }
+    
+    @Test
+    public void checkSalvagableTorsoWithArmsIntactTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+        when(unit.isSalvage()).thenReturn(true);
+
+        int location = Mech.LOC_RT;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // Cannot salvage a torso if the attached arm is Okay
+        doReturn(false).when(entity).isLocationBad(eq(Mech.LOC_RARM));
+        assertNotNull(mekLocation.checkSalvagable());
+
+        doReturn(true).when(entity).isLocationBad(eq(Mech.LOC_RARM));
+        assertNull(mekLocation.checkSalvagable());
+
+        location = Mech.LOC_LT;
+        mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // Cannot salvage a torso if the attached arm is Okay
+        doReturn(false).when(entity).isLocationBad(eq(Mech.LOC_LARM));
+        assertNotNull(mekLocation.checkSalvagable());
+
+        doReturn(true).when(entity).isLocationBad(eq(Mech.LOC_LARM));
+        assertNull(mekLocation.checkSalvagable());
+    }
+
+    @Test
     public void lamTorsoRemovableOnlyWithMissingAvionicsAndLandingGear() {
         Campaign mockCampaign = mock(Campaign.class);
         Unit unit = mock(Unit.class);
