@@ -1561,7 +1561,7 @@ public class Refit extends Part implements IAcquisitionWork {
         String fileNameCampaign;
         try {
             if (newEntity instanceof Mech) {
-                //if this file already exists then don't overwrite it or we will end up with a bunch of copies
+                // if this file already exists then don't overwrite it or we will end up with a bunch of copies
                 String fileOutName = sCustomsDir + File.separator + fileName + ".mtf";
                 fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
                 if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
@@ -1572,7 +1572,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     p.println(((Mech) newEntity).getMtf());
                 }
             } else {
-                //if this file already exists then don't overwrite it or we will end up with a bunch of copies
+                // if this file already exists then don't overwrite it or we will end up with a bunch of copies
                 String fileOutName = sCustomsDir + File.separator + fileName + ".blk";
                 fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
                 if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
@@ -1590,8 +1590,8 @@ public class Refit extends Part implements IAcquisitionWork {
         try {
             MechSummaryCache.getInstance().loadMechData();
 
-            //I need to change the new entity to the one from the mtf file now, so that equip
-            //numbers will match
+            // I need to change the new entity to the one from the mtf file now, so that equipment numbers will match
+
             MechSummary summary = MechSummaryCache.getInstance().getMech(newEntity.getChassis() + " " + newEntity.getModel());
             if (null == summary) {
                 throw new EntityLoadingException(String.format("Could not load %s %s from the mech cache",
