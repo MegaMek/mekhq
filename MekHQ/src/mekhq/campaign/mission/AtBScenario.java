@@ -58,7 +58,7 @@ import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -1037,7 +1037,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     private void addLance(List<Entity> list, String faction, int skill, int quality, int weightClass,
             int maxWeight, Campaign campaign, int arrivalTurn) {
-        if (Faction.getFaction(faction).isClan()) {
+        if (Factions.getInstance().getFaction(faction).isClan()) {
             addStar(list, faction, skill, quality, weightClass, maxWeight, campaign, arrivalTurn);
             return;
         }

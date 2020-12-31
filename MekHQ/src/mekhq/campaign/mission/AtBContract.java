@@ -54,6 +54,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
 /**
@@ -341,7 +342,7 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     public static boolean isMinorPower(String fName) {
-        Faction faction = Faction.getFaction(fName);
+        Faction faction = Factions.getInstance().getFaction(fName);
         if (null != faction) {
             return !RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(faction) &&
                     !faction.isClan();
@@ -398,7 +399,7 @@ public class AtBContract extends Contract implements Serializable {
                 break;
         }
 
-        Faction employer = Faction.getFaction(employerCode);
+        Faction employer = Factions.getInstance().getFaction(employerCode);
         if ((null != employer)
                 && (RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(employer)
                 || employer.isClan())) {
@@ -495,7 +496,7 @@ public class AtBContract extends Contract implements Serializable {
                 isMinorPower(enemyCode) ||
                 enemyCode.equals("MERC")) {
             mod -= 1;
-        } else if (Faction.getFaction(enemyCode).isClan()) {
+        } else if (Factions.getInstance().getFaction(enemyCode).isClan()) {
             mod += 2;
         }
 
@@ -1022,8 +1023,8 @@ public class AtBContract extends Contract implements Serializable {
     public boolean contractExtended (Campaign campaign) {
         if ((getMissionType() != MT_PIRATEHUNTING) && (getMissionType() != MT_RIOTDUTY)) {
             String warName = RandomFactionGenerator.getInstance()
-                    .getFactionHints().getCurrentWar(Faction.getFaction(getEmployerCode()),
-                    Faction.getFaction(getEnemyCode()), campaign.getLocalDate());
+                    .getFactionHints().getCurrentWar(Factions.getInstance().getFaction(getEmployerCode()),
+                    Factions.getInstance().getFaction(getEnemyCode()), campaign.getLocalDate());
             if (null != warName) {
                 int extension = 0;
                 int roll = Compute.d6();
@@ -1320,9 +1321,9 @@ public class AtBContract extends Contract implements Serializable {
     public String getEmployerName(int year) {
         if (mercSubcontract) {
             return "Mercenary (" +
-                    Faction.getFaction(employerCode).getFullName(year) + ")";
+                    Factions.getInstance().getFaction(employerCode).getFullName(year) + ")";
         }
-        return Faction.getFaction(employerCode).getFullName(year);
+        return Factions.getInstance().getFaction(employerCode).getFullName(year);
     }
 
     public String getEnemyCode() {
@@ -1330,7 +1331,7 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     public String getEnemyName(int year) {
-        return Faction.getFaction(enemyCode).getFullName(year);
+        return Factions.getInstance().getFaction(enemyCode).getFullName(year);
     }
 
     public void setEnemyCode(String enemyCode) {
@@ -1573,7 +1574,7 @@ public class AtBContract extends Contract implements Serializable {
                 missionType = MT_PLANETARYASSAULT;
             }
         }
-        Faction f = Faction.getFactionFromFullNameAndYear(c.getEmployer(), campaign.getGameYear());
+        Faction f = Factions.getInstance().getFactionFromFullNameAndYear(c.getEmployer(), campaign.getGameYear());
         if (null == f) {
             employerCode = "IND";
         } else {

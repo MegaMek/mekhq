@@ -38,7 +38,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
@@ -559,8 +559,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         cbEmployer.removeAllItems();
         cbEnemy.removeAllItems();
         if (allFactions) {
-            cbEmployer.addFactionEntries(Faction.getFactionList(),	campaign.getGameYear());
-            cbEnemy.addFactionEntries(Faction.getFactionList(),	campaign.getGameYear());
+            cbEmployer.addFactionEntries(Factions.getInstance().getFactionList(), campaign.getGameYear());
+            cbEnemy.addFactionEntries(Factions.getInstance().getFactionList(), campaign.getGameYear());
         } else {
             cbEmployer.addFactionEntries(currentFactions, campaign.getGameYear());
             cbEnemy.addFactionEntries(currentFactions, campaign.getGameYear());

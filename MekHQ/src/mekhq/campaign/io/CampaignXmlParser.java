@@ -1518,8 +1518,6 @@ public class CampaignXmlParser {
     }
 
     private static void updatePlanetaryEventsFromXML(Node wn) {
-        Systems.reload(true);
-
         List<Planet.PlanetaryEvent> events;
         Map<Integer, List<Planet.PlanetaryEvent>> eventsMap = new HashMap<>();
 

@@ -26,6 +26,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 
 import org.joda.money.CurrencyUnitDataProvider;
@@ -170,7 +171,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             for (Contract contract : this.campaign.getActiveContracts()) {
                 if (contract instanceof AtBContract) {
                     Currency currency = possibleCurrencies.getOrDefault(
-                            Faction.getFaction(((AtBContract)contract).getEmployerCode()).getCurrencyCode(),
+                            Factions.getInstance().getFaction(((AtBContract)contract).getEmployerCode()).getCurrencyCode(),
                             null);
 
                     if (currency != null) {
@@ -253,7 +254,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
                     // Adjust the currency start and end dates if needed by the
                     // start/end dates of the factions that use it
-                    for (Faction faction : Faction.getFactions()) {
+                    for (Faction faction : Factions.getInstance().getFactions()) {
                         if (faction.getCurrencyCode().equals(code)) {
                             if (faction.getStartYear() < startYear) {
                                 startYear = faction.getStartYear();
