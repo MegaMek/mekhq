@@ -3268,8 +3268,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return ammo;
     }
 
-    public AbstractIcon getCamouflage() {
+    public Camouflage getCamouflage() {
         return (entity == null) ? new Camouflage() : entity.getCamouflage();
+    }
+
+    public Camouflage getCamouflageOrElse(Camouflage camouflage) {
+        return getCamouflage().hasDefaultCategory() ? camouflage : getCamouflage();
     }
 
     public String getCamoCategory() {
