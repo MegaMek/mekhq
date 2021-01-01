@@ -21,16 +21,20 @@
  */
 package mekhq.campaign.unit;
 
+import java.awt.*;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.ServiceLogger;
@@ -3264,8 +3268,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return ammo;
     }
 
-    public AbstractIcon getCamouflage() {
-        return new Camouflage(getCamoCategory(), getCamoFileName());
+    public Camouflage getCamouflage() {
+        return (entity == null) ? new Camouflage() : entity.getCamouflage();
+    }
+
+    public Camouflage getCamouflageOrElse(Camouflage camouflage) {
+        return getCamouflage().hasDefaultCategory() ? camouflage : getCamouflage();
     }
 
     public String getCamoCategory() {
@@ -3300,6 +3308,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
 
         return fileName;
+    }
+
+    public Image getImage(Component component) {
+        if (MHQStaticDirectoryManager.getMechTileset() == null) {
+            return null;
+        }
+        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
+        return new EntityImage(base, getCampaign().getColour(),
+                (getCamouflage().isDefault() ? getCampaign().getCamouflage() : getCamouflage()).getImage(),
+                component, getEntity()).loadPreviewImage();
     }
 
     /**
@@ -4668,12 +4686,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isEntityCamo() {
-        return (entity != null) && ((entity.getCamoCategory() != null)
-                && !Camouflage.NO_CAMOUFLAGE.equals(entity.getCamoCategory())
-                && !entity.getCamoCategory().isEmpty())
-                && ((entity.getCamoFileName() != null)
-                && !Camouflage.NO_CAMOUFLAGE.equals(entity.getCamoFileName())
-                && !entity.getCamoFileName().isEmpty());
+        return !getCamouflage().hasDefaultCategory();
     }
 
     public int getAvailability(int era) {
