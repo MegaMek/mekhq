@@ -76,11 +76,6 @@ public class ShoppingList implements MekHqXmlSerializable {
     public ShoppingList(List<IAcquisitionWork> shoppingList) {
         setShoppingList(shoppingList);
     }
-
-    public ShoppingList(IAcquisitionWork item) {
-        setShoppingList(new ArrayList<>());
-        getShoppingList().add(item);
-    }
     //endregion Constructors
 
     //region Getters/Setters
@@ -142,8 +137,6 @@ public class ShoppingList implements MekHqXmlSerializable {
             newWork.incrementQuantity();
             quantity--;
         }
-        ShoppingList shortList = new ShoppingList(newWork);
-        shortList = campaign.goShopping(shortList);
 
         if (newWork.getQuantity() > 0) {
             // if using planetary acquisition check with low verbosity, check to see if nothing was found
