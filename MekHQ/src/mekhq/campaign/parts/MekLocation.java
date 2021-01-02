@@ -384,10 +384,10 @@ public class MekLocation extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if (null != unit) {
-            setBlownOff(unit.getEntity().isLocationBlownOff(loc));
-            setBreached(unit.isLocationBreached(loc));
-            setPercent(unit.getEntity().getInternalForReal(loc) / ((double) unit.getEntity().getOInternal(loc)));
+        if (getUnit() != null) {
+            setBlownOff(getUnit().getEntity().isLocationBlownOff(getLoc()));
+            setBreached(getUnit().isLocationBreached(getLoc()));
+            setPercent(getUnit().getEntity().getInternalForReal(getLoc()) / ((double) getUnit().getEntity().getOInternal(getLoc())));
             if (getPercent() <= 0.0) {
                 remove(false);
             }
@@ -880,10 +880,11 @@ public class MekLocation extends Part {
 
      @Override
      public void doMaintenanceDamage(int d) {
-         int points = unit.getEntity().getInternal(loc);
-         points = Math.max(points -d, 1);
-         unit.getEntity().setInternal(points, loc);
-         updateConditionFromEntity(false);
+        if ((getUnit() != null) && (d > 0)) {
+            int points = getUnit().getEntity().getInternal(getLoc());
+            getUnit().getEntity().setInternal(Math.max(points - d, 1), getLoc());
+            updateConditionFromEntity(false);
+        }
      }
 
     @Override

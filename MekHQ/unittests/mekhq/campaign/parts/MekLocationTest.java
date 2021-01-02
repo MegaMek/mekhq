@@ -1241,4 +1241,53 @@ public class MekLocationTest {
         assertNull(head.checkSalvagable());
         assertNull(head.checkScrappable());
     }
+
+    @Test
+    public void doMaintenanceDamageTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        
+        // not on unit
+        mekLocation.doMaintenanceDamage(100);
+
+        // No change.
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+        
+        // On unit
+        mekLocation.setUnit(unit);
+
+        // Setup getInternalForReal to return the correct calculation
+        doAnswer(inv -> {
+            int armor = inv.getArgument(0);
+            doReturn(armor).when(entity).getInternalForReal(eq(location));
+            return null;
+        }).when(entity).setInternal(anyInt(), eq(location));
+        int startingArmor = 10;
+        doReturn(startingArmor).when(entity).getOInternal(eq(location));
+
+        // No damage
+        mekLocation.doMaintenanceDamage(0);
+        verify(entity, times(0)).setInternal(anyInt(), eq(location));
+
+        // Some damage
+        doReturn(startingArmor).when(entity).getInternal(eq(location));
+        int damage = 3;
+
+        mekLocation.doMaintenanceDamage(damage);
+
+        verify(entity, times(1)).setInternal(eq(startingArmor - damage), eq(location));
+
+        // More than enough damage (but will never destroy the location)
+        damage = startingArmor;
+
+        mekLocation.doMaintenanceDamage(damage);
+
+        verify(entity, times(1)).setInternal(eq(1), eq(location));
+    }
 }
