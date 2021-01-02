@@ -26,6 +26,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.function.Predicate;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -45,6 +47,8 @@ import megamek.common.Mounted;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Quartermaster;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.unit.Unit;
 
 public class MekLocationTest {
@@ -1289,5 +1293,271 @@ public class MekLocationTest {
         mekLocation.doMaintenanceDamage(damage);
 
         verify(entity, times(1)).setInternal(eq(1), eq(location));
+    }
+
+    @Test
+    public void removeRestoresBlownOffTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+
+        // Removal
+        mekLocation.setBlownOff(true);
+        mekLocation.remove(false);
+        assertFalse(mekLocation.isBlownOff());
+
+        // Salvage
+        mekLocation.setBlownOff(true);
+        mekLocation.remove(true);
+        assertFalse(mekLocation.isBlownOff());
+    }
+
+    @Test
+    public void removeRestoresBreachedTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+
+        // Removal
+        mekLocation.setBreached(true);
+        mekLocation.remove(false);
+        assertFalse(mekLocation.isBreached());
+
+        // Salvage
+        mekLocation.setBreached(true);
+        mekLocation.remove(true);
+        assertFalse(mekLocation.isBreached());
+    }
+    
+    @Test
+    public void removeSimpleTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+        Unit unit = mock(Unit.class);
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            part.setUnit(unit);
+            return null;
+        }).when(unit).addPart(any());
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setId(25);
+        mekLocation.setUnit(unit);
+
+        warehouse.addPart(mekLocation);
+
+        mekLocation.remove(false);
+
+        assertFalse(mekLocation.getId() > 0);
+        assertNull(mekLocation.getUnit());
+        assertFalse(warehouse.getParts().contains(mekLocation));
+
+        // Only one part!
+        MissingMekLocation missingPart = null;
+        for (Part part : warehouse.getParts()) {
+            assertTrue(part instanceof MissingMekLocation);
+            assertNull(missingPart);
+            missingPart = (MissingMekLocation) part;
+        }
+
+        assertEquals(location, missingPart.getLocation());
+    }
+
+    @Test
+    public void removeHeadWithoutComponentsTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+        Unit unit = mock(Unit.class);
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            part.setUnit(unit);
+            return null;
+        }).when(unit).addPart(any());
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_HEAD;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setId(25);
+        mekLocation.setUnit(unit);
+
+        warehouse.addPart(mekLocation);
+
+        mekLocation.remove(false);
+
+        // No head components, so they don't get these
+        assertFalse(mekLocation.hasSensors());
+        assertFalse(mekLocation.hasLifeSupport());
+    }
+
+    @Test
+    public void removeHeadWithSensorComponentTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+        Unit unit = mock(Unit.class);
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            part.setUnit(unit);
+            return null;
+        }).when(unit).addPart(any());
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_HEAD;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setId(25);
+        mekLocation.setUnit(unit);
+
+        warehouse.addPart(mekLocation);
+
+        // Unit has sensors in the head
+        MekSensor sensors = mock(MekSensor.class);
+        when(unit.getParts()).thenReturn(Collections.singletonList(sensors));
+
+        mekLocation.remove(false);
+
+        // Has sensors but no life support
+        assertTrue(mekLocation.hasSensors());
+        assertFalse(mekLocation.hasLifeSupport());
+
+        verify(sensors, times(1)).remove(eq(false));
+    }
+
+    @Test
+    public void removeHeadWithLifeSupportComponentTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+        Unit unit = mock(Unit.class);
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            part.setUnit(unit);
+            return null;
+        }).when(unit).addPart(any());
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_HEAD;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setId(25);
+        mekLocation.setUnit(unit);
+
+        warehouse.addPart(mekLocation);
+
+        // Unit has life support in the head
+        MekLifeSupport lifeSupport = mock(MekLifeSupport.class);
+        when(unit.getParts()).thenReturn(Collections.singletonList(lifeSupport));
+
+        mekLocation.remove(false);
+
+        // Has life support but no sensors
+        assertFalse(mekLocation.hasSensors());
+        assertTrue(mekLocation.hasLifeSupport());
+
+        verify(lifeSupport, times(1)).remove(eq(false));
+    }
+    
+    @Test
+    public void removeHeadWithComponentsTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+        Unit unit = mock(Unit.class);
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            part.setUnit(unit);
+            return null;
+        }).when(unit).addPart(any());
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_HEAD;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setId(25);
+        mekLocation.setUnit(unit);
+
+        warehouse.addPart(mekLocation);
+
+        // Unit has components in the head
+        MekSensor sensors = mock(MekSensor.class);
+        MekLifeSupport lifeSupport = mock(MekLifeSupport.class);
+        when(unit.getParts()).thenReturn(Arrays.asList(sensors, lifeSupport));
+
+        mekLocation.remove(false);
+
+        // Has both sensors and life support
+        assertTrue(mekLocation.hasSensors());
+        assertTrue(mekLocation.hasLifeSupport());
+
+        verify(sensors, times(1)).remove(eq(false));
+        verify(lifeSupport, times(1)).remove(eq(false));
+    }
+        
+    @Test
+    public void removeSimpleSalvageTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+        Unit unit = mock(Unit.class);
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            part.setUnit(unit);
+            return null;
+        }).when(unit).addPart(any());
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setId(25);
+        mekLocation.setUnit(unit);
+
+        warehouse.addPart(mekLocation);
+
+        mekLocation.remove(true);
+
+        assertTrue(mekLocation.getId() > 0);
+        assertNull(mekLocation.getUnit());
+        assertTrue(mekLocation.isSpare());
+        assertTrue(warehouse.getParts().contains(mekLocation));
+
+        // Two parts
+        MissingMekLocation missingPart = null;
+        for (Part part : warehouse.getParts()) {
+            if (part instanceof MissingMekLocation) {
+                assertNull(missingPart);
+                missingPart = (MissingMekLocation) part;
+            } else {
+                assertEquals(mekLocation, part);
+            }
+        }
+
+        assertEquals(location, missingPart.getLocation());
     }
 }

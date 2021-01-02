@@ -43,6 +43,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
 
 /**
@@ -356,30 +357,39 @@ public class MekLocation extends Part {
     public void remove(boolean salvage) {
         setBlownOff(false);
         setBreached(false);
-        if (null != unit) {
-            unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
-            unit.getEntity().setLocationBlownOff(loc, false);
-            unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-            Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if (!salvage) {
-                campaign.getWarehouse().removePart(this);
-            } else if (null != spare) {
-                spare.incrementQuantity();
-                campaign.getWarehouse().removePart(this);
-            }
-            //if this is a head. check for life support and sensors
-            if (loc == Mech.LOC_HEAD) {
+
+        final Unit unit = getUnit();
+        if (unit != null) {
+            unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, getLoc());
+            unit.getEntity().setLocationBlownOff(getLoc(), false);
+            unit.getEntity().setLocationStatus(getLoc(), ILocationExposureStatus.NORMAL, true);
+
+            // If this is a head. check for life support and sensors
+            if (getLoc() == Mech.LOC_HEAD) {
                 removeHeadComponents();
             }
+
             unit.removePart(this);
-            if (loc != Mech.LOC_CT) {
+            setUnit(null);
+
+            if (salvage) {
+                // Return this part to the warehouse as a spare
+                getCampaign().getWarehouse().addPart(this);
+            } else {
+                // Remove this part from the campaign
+                getCampaign().getWarehouse().removePart(this);
+            }
+
+            if (getLoc() != Mech.LOC_CT) {
                 Part missing = getMissingPart();
+                assert(missing != null);
+
                 unit.addPart(missing);
                 campaign.getQuartermaster().addPart(missing, 0);
+
+                missing.updateConditionFromEntity(false);
             }
         }
-        setUnit(null);
-        updateConditionFromEntity(false);
     }
 
     @Override
