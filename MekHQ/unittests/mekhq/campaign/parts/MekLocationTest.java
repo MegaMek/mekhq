@@ -41,6 +41,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.LandAirMech;
 import megamek.common.Mech;
+import megamek.common.Mounted;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
@@ -480,6 +481,80 @@ public class MekLocationTest {
         assertTrue(mekLocation.isBlownOff());
         assertTrue(mekLocation.isBreached());
         assertEquals(1 / 2.0, mekLocation.getPercent(), 0.001);
+    }
+
+    @Test
+    public void updateConditionFromPartUpdatesEntityArmorTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(entity.getWeight()).thenReturn(100.0);
+        int totalArmor = 100;
+        doReturn(totalArmor).when(entity).getOInternal(anyInt());
+        when(unit.getEntity()).thenReturn(entity);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL, 
+                true, true, true, true, true, mockCampaign);
+
+        // not on unit
+        mekLocation.updateConditionFromPart();
+
+        // assign to unit
+        mekLocation.setUnit(unit);
+
+        // 100% armor
+        mekLocation.updateConditionFromPart();
+
+        verify(entity, times(1)).getOInternal(eq(location));
+        verify(entity, times(1)).setInternal(eq(totalArmor), eq(location));
+
+        // 50% armor
+        mekLocation.setPercent(0.5);
+        mekLocation.updateConditionFromPart();
+        verify(entity, times(1)).setInternal(eq(totalArmor / 2), eq(location));
+
+        // 1% armor
+        mekLocation.setPercent(0.01);
+        mekLocation.updateConditionFromPart();
+        verify(entity, times(1)).setInternal(eq(totalArmor / 100), eq(location));
+    }
+
+    @Test
+    public void updateConditionFromPartRestoresNotHittableCriticalSlotsTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(entity.getWeight()).thenReturn(100.0);
+        int totalArmor = 100;
+        doReturn(totalArmor).when(entity).getOInternal(anyInt());
+        when(unit.getEntity()).thenReturn(entity);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL, 
+                true, true, true, true, true, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        doReturn(3).when(entity).getNumberOfCriticals(eq(location));
+        CriticalSlot hittable = mock(CriticalSlot.class);
+        when(hittable.isEverHittable()).thenReturn(true);
+        doReturn(hittable).when(entity).getCritical(eq(location), eq(0));
+        CriticalSlot notHittable = mock(CriticalSlot.class);
+        doReturn(notHittable).when(entity).getCritical(eq(location), eq(1));
+        Mounted mount = mock(Mounted.class);
+        when(notHittable.getMount()).thenReturn(mount);
+        doReturn(null).when(entity).getCritical(eq(location), eq(2));
+
+        mekLocation.updateConditionFromPart();
+
+        verify(notHittable, times(1)).setDestroyed(eq(false));
+        verify(notHittable, times(1)).setHit(eq(false));
+        verify(notHittable, times(1)).setRepairable(eq(true));
+        verify(notHittable, times(1)).setMissing(eq(false));
+        verify(mount, times(1)).setHit(false);
+        verify(mount, times(1)).setDestroyed(false);
+        verify(mount, times(1)).setMissing(false);
+        verify(mount, times(1)).setRepairable(true);
     }
 
     @Test
