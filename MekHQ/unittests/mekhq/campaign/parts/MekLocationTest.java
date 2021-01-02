@@ -851,21 +851,21 @@ public class MekLocationTest {
         assertNull(mekLocation.checkFixable());
 
         // Some armor, for real.
-        doReturn(1).when(entity).getArmor(eq(location), anyBoolean());
+        doReturn(1).when(entity).getArmorForReal(eq(location), anyBoolean());
         assertNotNull(mekLocation.checkSalvagable());
         assertNotNull(mekLocation.checkFixable());
 
         // Some rear armor
-        doReturn(0).when(entity).getArmor(eq(location), eq(false));
+        doReturn(0).when(entity).getArmorForReal(eq(location), eq(false));
         doReturn(true).when(entity).hasRearArmor(eq(location));
-        doReturn(1).when(entity).getArmor(eq(location), eq(true));
+        doReturn(1).when(entity).getArmorForReal(eq(location), eq(true));
         assertNotNull(mekLocation.checkSalvagable());
         assertNotNull(mekLocation.checkFixable());
 
         // No rear armor
-        doReturn(0).when(entity).getArmor(eq(location), eq(false));
+        doReturn(0).when(entity).getArmorForReal(eq(location), eq(false));
         doReturn(true).when(entity).hasRearArmor(eq(location));
-        doReturn(0).when(entity).getArmor(eq(location), eq(true));
+        doReturn(0).when(entity).getArmorForReal(eq(location), eq(true));
         assertNull(mekLocation.checkSalvagable());
         assertNull(mekLocation.checkFixable());
     }
@@ -1034,19 +1034,19 @@ public class MekLocationTest {
         assertNull(mekLocation.checkScrappable());
 
         // Some armor, for real.
-        doReturn(1).when(entity).getArmor(eq(location), anyBoolean());
+        doReturn(1).when(entity).getArmorForReal(eq(location), anyBoolean());
         assertNotNull(mekLocation.checkScrappable());
 
         // Some rear armor
-        doReturn(0).when(entity).getArmor(eq(location), eq(false));
+        doReturn(0).when(entity).getArmorForReal(eq(location), eq(false));
         doReturn(true).when(entity).hasRearArmor(eq(location));
-        doReturn(1).when(entity).getArmor(eq(location), eq(true));
+        doReturn(1).when(entity).getArmorForReal(eq(location), eq(true));
         assertNotNull(mekLocation.checkScrappable());
 
         // No rear armor
-        doReturn(0).when(entity).getArmor(eq(location), eq(false));
+        doReturn(0).when(entity).getArmorForReal(eq(location), eq(false));
         doReturn(true).when(entity).hasRearArmor(eq(location));
-        doReturn(0).when(entity).getArmor(eq(location), eq(true));
+        doReturn(0).when(entity).getArmorForReal(eq(location), eq(true));
         assertNull(mekLocation.checkScrappable());
     }
 

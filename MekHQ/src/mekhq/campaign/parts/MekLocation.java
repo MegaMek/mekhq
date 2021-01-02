@@ -664,8 +664,8 @@ public class MekLocation extends Part {
             return "must salvage/scrap left" + limbName + "first";
         }
         //check for armor
-        if (unit.getEntity().getArmor(loc, false) > 0
-                || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) > 0 )) {
+        if (unit.getEntity().getArmorForReal(loc, false) > 0
+                || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmorForReal(loc, true) > 0 )) {
             return "must salvage armor in this location first";
         }
         //you can only salvage a location that has nothing left on it
@@ -741,8 +741,8 @@ public class MekLocation extends Part {
             return "You must first remove the left " + limbName + " before you scrap the left torso";
         }
         //check for armor
-        if (unit.getEntity().getArmor(loc, false) > 0
-                || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) > 0 )) {
+        if (unit.getEntity().getArmorForReal(loc, false) > 0
+                || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmorForReal(loc, true) > 0 )) {
             return "You must first remove the armor from this location before you scrap it";
         }
         //you can only salvage a location that has nothing left on it
