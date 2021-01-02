@@ -604,41 +604,28 @@ public class MekLocation extends Part {
 
     @Override
     public String checkFixable() {
-        if (null == unit) {
+        if (unit == null) {
             return null;
         }
+
         if (isBlownOff() && !isSalvaging()) {
             if (loc == Mech.LOC_LARM && unit.isLocationDestroyed(Mech.LOC_LT)) {
                 return "must replace left torso first";
             } else if (loc == Mech.LOC_RARM && unit.isLocationDestroyed(Mech.LOC_RT)) {
                 return "must replace right torso first";
             } else if (unit.isLocationDestroyed(Mech.LOC_CT)) {
-                //we shouldnt get here
-                return "cannot replace head on destroyed unit";
+                // we shouldnt get here
+                return "cannot repair part on destroyed unit";
             }
         } else if (isSalvaging()) {
             return checkSalvagable();
         } else if (!isBreached() && !isBlownOff()) {
-            //check for damaged hips and shoulders
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-                if ((slot == null) || !slot.isEverHittable()) {
-                    continue;
-                }
-                if (slot.getType() == CriticalSlot.TYPE_SYSTEM
-                        && slot.getIndex() == Mech.ACTUATOR_HIP
-                        && slot.isDestroyed()) {
-                    return "You cannot repair a leg with a damaged hip. This leg must be scrapped and replaced instead.";
-
-                }
-                if (slot.getType() == CriticalSlot.TYPE_SYSTEM
-                        && slot.getIndex() == Mech.ACTUATOR_SHOULDER
-                        && slot.isDestroyed()) {
-                    return "You cannot repair an arm with a damaged shoulder. This arm must be scrapped and replaced instead.";
-
-                }
+            // check for damaged hips and shoulders
+            if (onBadHipOrShoulder()) {
+                return "You cannot repair a limb with a busted hip/shoulder. You must scrap and replace it instead.";
             }
         }
+
         return null;
     }
 
@@ -843,7 +830,7 @@ public class MekLocation extends Part {
 
     @Override
     public boolean onBadHipOrShoulder() {
-        return null != unit && unit.hasBadHipOrShoulder(loc);
+        return (getUnit() != null) && getUnit().hasBadHipOrShoulder(getLoc());
     }
 
     @Override

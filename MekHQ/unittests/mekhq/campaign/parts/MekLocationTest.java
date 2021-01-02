@@ -566,49 +566,7 @@ public class MekLocationTest {
     }
 
     @Test
-    public void checkFixableBustedHipTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Unit unit = mock(Unit.class);
-        Entity entity = mock(Entity.class);
-        when(unit.getEntity()).thenReturn(entity);
-        when(entity.getWeight()).thenReturn(30.0);
-        doCallRealMethod().when(entity).getLocationName(any());
-
-        int location = Mech.LOC_LLEG;
-        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
-        mekLocation.setUnit(unit);
-
-        // 4 critical
-        doReturn(4).when(entity).getNumberOfCriticals(eq(location));
-        // Null slot
-        doReturn(null).when(entity).getCritical(eq(location), eq(0));
-        // Not hittable slot
-        CriticalSlot notHittable = mock(CriticalSlot.class);
-        when(notHittable.isEverHittable()).thenReturn(false);
-        doReturn(notHittable).when(entity).getCritical(eq(location), eq(1));
-        // Not a hip
-        CriticalSlot notAHip = mock(CriticalSlot.class);
-        when(notAHip.isEverHittable()).thenReturn(true);
-        when(notAHip.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
-        when(notAHip.getIndex()).thenReturn(Mech.ACTUATOR_FOOT);
-        doReturn(notAHip).when(entity).getCritical(eq(location), eq(2));
-        // The Hip
-        CriticalSlot mockHip = mock(CriticalSlot.class);
-        when(mockHip.isEverHittable()).thenReturn(true);
-        when(mockHip.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
-        when(mockHip.getIndex()).thenReturn(Mech.ACTUATOR_HIP);
-        doReturn(mockHip).when(entity).getCritical(eq(location), eq(3));
-
-        // Hip is fine
-        assertNull(mekLocation.checkFixable());
-
-        // Hip is not fine
-        when(mockHip.isDestroyed()).thenReturn(true);
-        assertNotNull(mekLocation.checkFixable());
-    }
-
-    @Test
-    public void checkFixableBustedShoulderTest() {
+    public void checkFixableBustedHipOrShoulderTest() {
         Campaign mockCampaign = mock(Campaign.class);
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -620,32 +578,14 @@ public class MekLocationTest {
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
-        // 4 critical
-        doReturn(4).when(entity).getNumberOfCriticals(eq(location));
-        // Null slot
-        doReturn(null).when(entity).getCritical(eq(location), eq(0));
-        // Not hittable slot
-        CriticalSlot notHittable = mock(CriticalSlot.class);
-        when(notHittable.isEverHittable()).thenReturn(false);
-        doReturn(notHittable).when(entity).getCritical(eq(location), eq(1));
-        // Not a shoulder
-        CriticalSlot notAShoulder = mock(CriticalSlot.class);
-        when(notAShoulder.isEverHittable()).thenReturn(true);
-        when(notAShoulder.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
-        when(notAShoulder.getIndex()).thenReturn(Mech.ACTUATOR_HAND);
-        doReturn(notAShoulder).when(entity).getCritical(eq(location), eq(2));
-        // The shoulder
-        CriticalSlot mockShoulder = mock(CriticalSlot.class);
-        when(mockShoulder.isEverHittable()).thenReturn(true);
-        when(mockShoulder.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
-        when(mockShoulder.getIndex()).thenReturn(Mech.ACTUATOR_SHOULDER);
-        doReturn(mockShoulder).when(entity).getCritical(eq(location), eq(3));
+        doReturn(true).when(unit).hasBadHipOrShoulder(anyInt());
+        doReturn(false).when(unit).hasBadHipOrShoulder(eq(location));
 
         // Shoulder is fine
         assertNull(mekLocation.checkFixable());
 
         // Shoulder is not fine
-        when(mockShoulder.isDestroyed()).thenReturn(true);
+        doReturn(true).when(unit).hasBadHipOrShoulder(eq(location));
         assertNotNull(mekLocation.checkFixable());
     }
 
