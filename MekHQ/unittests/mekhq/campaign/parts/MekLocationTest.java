@@ -726,6 +726,43 @@ public class MekLocationTest {
     }
 
     @Test
+    public void checkSalvagableTorsoWithArmsIntactQuadTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+        when(unit.isSalvage()).thenReturn(true);
+
+        int location = Mech.LOC_RT;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, /*forQuad:*/true, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // Cannot salvage a torso if the attached arm is Okay
+        doReturn(false).when(entity).isLocationBad(eq(Mech.LOC_RARM));
+        assertNotNull(mekLocation.checkSalvagable());
+        assertNotNull(mekLocation.checkFixable());
+
+        doReturn(true).when(entity).isLocationBad(eq(Mech.LOC_RARM));
+        assertNull(mekLocation.checkSalvagable());
+        assertNull(mekLocation.checkFixable());
+
+        location = Mech.LOC_LT;
+        mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // Cannot salvage a torso if the attached arm is Okay
+        doReturn(false).when(entity).isLocationBad(eq(Mech.LOC_LARM));
+        assertNotNull(mekLocation.checkSalvagable());
+        assertNotNull(mekLocation.checkFixable());
+
+        doReturn(true).when(entity).isLocationBad(eq(Mech.LOC_LARM));
+        assertNull(mekLocation.checkSalvagable());
+        assertNull(mekLocation.checkFixable());
+    }
+
+    @Test
     public void checkSalvagableArmorStillPresentTest() {
         Campaign mockCampaign = mock(Campaign.class);
         Unit unit = mock(Unit.class);
@@ -744,16 +781,263 @@ public class MekLocationTest {
         assertNull(mekLocation.checkFixable());
 
         // Some armor, for real.
-        doReturn(1).when(entity).getArmorForReal(eq(location), anyBoolean());
+        doReturn(1).when(entity).getArmor(eq(location), anyBoolean());
         assertNotNull(mekLocation.checkSalvagable());
         assertNotNull(mekLocation.checkFixable());
 
         // Some rear armor
-        doReturn(0).when(entity).getArmorForReal(eq(location), eq(false));
+        doReturn(0).when(entity).getArmor(eq(location), eq(false));
         doReturn(true).when(entity).hasRearArmor(eq(location));
-        doReturn(1).when(entity).getArmorForReal(eq(location), eq(true));
+        doReturn(1).when(entity).getArmor(eq(location), eq(true));
         assertNotNull(mekLocation.checkSalvagable());
         assertNotNull(mekLocation.checkFixable());
+
+        // No rear armor
+        doReturn(0).when(entity).getArmor(eq(location), eq(false));
+        doReturn(true).when(entity).hasRearArmor(eq(location));
+        doReturn(0).when(entity).getArmor(eq(location), eq(true));
+        assertNull(mekLocation.checkSalvagable());
+        assertNull(mekLocation.checkFixable());
+    }
+
+    @Test
+    public void checkSalvagableOnlyIgnorableSystemsTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+        when(unit.isSalvage()).thenReturn(true);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        int[] systems = new int[] { Mech.ACTUATOR_HIP, Mech.ACTUATOR_SHOULDER, 
+            Mech.SYSTEM_LIFE_SUPPORT, Mech.SYSTEM_SENSORS
+        };
+        doReturn(systems.length + 1).when(entity).getNumberOfCriticals(eq(location));
+        CriticalSlot notHittable = mock(CriticalSlot.class);
+        doReturn(notHittable).when(entity).getCritical(eq(location), eq(0));
+
+        for (int ii = 0; ii < systems.length; ++ii) {
+            CriticalSlot mockIgnoredSystem = mock(CriticalSlot.class);
+            when(mockIgnoredSystem.isEverHittable()).thenReturn(true);
+            when(mockIgnoredSystem.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
+            when(mockIgnoredSystem.getIndex()).thenReturn(systems[ii]);
+            doReturn(mockIgnoredSystem).when(entity).getCritical(eq(location), eq(ii + 1));
+        }
+
+        // No hittable or repairable systems
+        assertNull(mekLocation.checkSalvagable());
+        assertNull(mekLocation.checkFixable());
+    }
+
+    @Test
+    public void checkSalvagableRepairableSystemsTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+        when(unit.isSalvage()).thenReturn(true);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        doReturn(1).when(entity).getNumberOfCriticals(eq(location));
+        CriticalSlot repairable = mock(CriticalSlot.class);
+        when(repairable.isEverHittable()).thenReturn(true);
+        when(repairable.getType()).thenReturn(CriticalSlot.TYPE_EQUIPMENT);
+        doReturn(repairable).when(entity).getCritical(eq(location), eq(0));
+
+        // No repairable systems
+        assertNull(mekLocation.checkSalvagable());
+        assertNull(mekLocation.checkFixable());
+
+        when(repairable.isRepairable()).thenReturn(true);
+
+        // A repairable systems remains
+        assertNotNull(mekLocation.checkSalvagable());
+        assertNotNull(mekLocation.checkFixable());
+    }
+    
+    @Test
+    public void checkScrappableCannotScrapCenterTorsoTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+
+        MekLocation mekLocation = new MekLocation(Mech.LOC_CT, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        assertNotNull(mekLocation.checkScrappable());
+    }
+    
+    @Test
+    public void checkScrappableTorsoWithArmsIntactTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+        when(unit.isSalvage()).thenReturn(true);
+
+        int location = Mech.LOC_RT;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // Cannot salvage a torso if the attached arm is Okay
+        doReturn(false).when(entity).isLocationBad(eq(Mech.LOC_RARM));
+        assertNotNull(mekLocation.checkScrappable());
+
+        doReturn(true).when(entity).isLocationBad(eq(Mech.LOC_RARM));
+        assertNull(mekLocation.checkScrappable());
+
+        location = Mech.LOC_LT;
+        mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // Cannot salvage a torso if the attached arm is Okay
+        doReturn(false).when(entity).isLocationBad(eq(Mech.LOC_LARM));
+        assertNotNull(mekLocation.checkScrappable());
+
+        doReturn(true).when(entity).isLocationBad(eq(Mech.LOC_LARM));
+        assertNull(mekLocation.checkScrappable());
+    }
+
+    @Test
+    public void checkScrappableTorsoWithArmsIntactQuadTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+        when(unit.isSalvage()).thenReturn(true);
+
+        int location = Mech.LOC_RT;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, /*forQuad:*/true, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // Cannot salvage a torso if the attached arm is Okay
+        doReturn(false).when(entity).isLocationBad(eq(Mech.LOC_RARM));
+        assertNotNull(mekLocation.checkScrappable());
+
+        doReturn(true).when(entity).isLocationBad(eq(Mech.LOC_RARM));
+        assertNull(mekLocation.checkScrappable());
+
+        location = Mech.LOC_LT;
+        mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // Cannot salvage a torso if the attached arm is Okay
+        doReturn(false).when(entity).isLocationBad(eq(Mech.LOC_LARM));
+        assertNotNull(mekLocation.checkScrappable());
+
+        doReturn(true).when(entity).isLocationBad(eq(Mech.LOC_LARM));
+        assertNull(mekLocation.checkScrappable());
+    }
+
+    @Test
+    public void checkScrappableArmorStillPresentTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+        when(unit.isSalvage()).thenReturn(true);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // No armor
+        assertNull(mekLocation.checkScrappable());
+
+        // Some armor, for real.
+        doReturn(1).when(entity).getArmor(eq(location), anyBoolean());
+        assertNotNull(mekLocation.checkScrappable());
+
+        // Some rear armor
+        doReturn(0).when(entity).getArmor(eq(location), eq(false));
+        doReturn(true).when(entity).hasRearArmor(eq(location));
+        doReturn(1).when(entity).getArmor(eq(location), eq(true));
+        assertNotNull(mekLocation.checkScrappable());
+
+        // No rear armor
+        doReturn(0).when(entity).getArmor(eq(location), eq(false));
+        doReturn(true).when(entity).hasRearArmor(eq(location));
+        doReturn(0).when(entity).getArmor(eq(location), eq(true));
+        assertNull(mekLocation.checkScrappable());
+    }
+
+    @Test
+    public void checkScrappableOnlyIgnorableSystemsTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+        when(unit.isSalvage()).thenReturn(true);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        int[] systems = new int[] { Mech.SYSTEM_COCKPIT, Mech.ACTUATOR_HIP, Mech.ACTUATOR_SHOULDER };
+        doReturn(systems.length + 1).when(entity).getNumberOfCriticals(eq(location));
+        CriticalSlot notHittable = mock(CriticalSlot.class);
+        doReturn(notHittable).when(entity).getCritical(eq(location), eq(0));
+
+        for (int ii = 0; ii < systems.length; ++ii) {
+            CriticalSlot mockIgnoredSystem = mock(CriticalSlot.class);
+            when(mockIgnoredSystem.isEverHittable()).thenReturn(true);
+            when(mockIgnoredSystem.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
+            when(mockIgnoredSystem.getIndex()).thenReturn(systems[ii]);
+            doReturn(mockIgnoredSystem).when(entity).getCritical(eq(location), eq(ii + 1));
+        }
+
+        // No hittable or repairable systems
+        assertNull(mekLocation.checkScrappable());
+    }
+
+    @Test
+    public void checkScrappableRepairableSystemsTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+        when(unit.isSalvage()).thenReturn(true);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        doReturn(1).when(entity).getNumberOfCriticals(eq(location));
+        CriticalSlot repairable = mock(CriticalSlot.class);
+        when(repairable.isEverHittable()).thenReturn(true);
+        when(repairable.getType()).thenReturn(CriticalSlot.TYPE_EQUIPMENT);
+        doReturn(repairable).when(entity).getCritical(eq(location), eq(0));
+
+        // No repairable systems
+        assertNull(mekLocation.checkScrappable());
+
+        when(repairable.isRepairable()).thenReturn(true);
+
+        // A repairable systems remains
+        assertNotNull(mekLocation.checkScrappable());
     }
 
     @Test

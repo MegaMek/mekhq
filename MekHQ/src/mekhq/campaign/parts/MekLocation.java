@@ -667,8 +667,8 @@ public class MekLocation extends Part {
             return "must salvage/scrap left" + limbName + "first";
         }
         //check for armor
-        if (unit.getEntity().getArmorForReal(loc, false) > 0
-                || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmorForReal(loc, true) > 0 )) {
+        if (unit.getEntity().getArmor(loc, false) > 0
+                || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) > 0 )) {
             return "must salvage armor in this location first";
         }
         //you can only salvage a location that has nothing left on it
@@ -733,11 +733,15 @@ public class MekLocation extends Part {
         //otherwise you will get weirdness where armor and actuators are
         //still attached but everything else is scrapped
         //cant salvage torsos until arms and legs are gone
+        String limbName = " arm ";
+        if (forQuad) {
+            limbName = " front leg ";
+        }
         if (unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && !unit.getEntity().isLocationBad(Mech.LOC_RARM)) {
-            return "You must first remove the right arm before you scrap the right torso";
+            return "You must first remove the right " + limbName + " before you scrap the right torso";
         }
         if (unit.getEntity() instanceof Mech && loc == Mech.LOC_LT && !unit.getEntity().isLocationBad(Mech.LOC_LARM)) {
-            return "You must first remove the left arm before you scrap the left torso";
+            return "You must first remove the left " + limbName + " before you scrap the left torso";
         }
         //check for armor
         if (unit.getEntity().getArmor(loc, false) > 0
