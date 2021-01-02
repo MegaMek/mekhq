@@ -34,6 +34,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -1517,7 +1518,74 @@ public class MekLocationTest {
     }
         
     @Test
-    public void removeSimpleSalvageTest() {
+    public void removeCenterTorsoDoesntAddMissingPartTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+        Unit unit = mock(Unit.class);
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            part.setUnit(unit);
+            return null;
+        }).when(unit).addPart(any());
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_CT;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setId(25);
+        mekLocation.setUnit(unit);
+
+        warehouse.addPart(mekLocation);
+
+        mekLocation.remove(false);
+
+        assertFalse(mekLocation.getId() > 0);
+        assertNull(mekLocation.getUnit());
+        assertTrue(warehouse.getParts().isEmpty());
+    }
+
+    @Test
+    public void updateConditionFromEntityNoInternalsRemovesLocationTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        Quartermaster mockQuartermaster = mock(Quartermaster.class);
+        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(entity.getWeight()).thenReturn(100.0);
+        when(unit.getEntity()).thenReturn(entity);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL, 
+                true, true, true, true, true, mockCampaign);
+
+        // Add the location to a unit
+        mekLocation.setUnit(unit);
+
+        // Destroy the limb
+        doReturn(0).when(entity).getInternalForReal(anyInt());
+        doReturn(1).when(entity).getOInternal(anyInt());
+
+        mekLocation.updateConditionFromEntity(false);
+
+        // We should have removed the limb
+        verify(mockWarehouse, times(1)).removePart(eq(mekLocation));
+
+        ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
+        verify(mockQuartermaster, times(1)).addPart(partCaptor.capture(), eq(0));
+
+        Part part = partCaptor.getValue();
+        assertTrue(part instanceof MissingMekLocation);
+        assertEquals(location, ((MissingMekLocation) part).getLocation());
+    }
+
+    @Test
+    public void salvageSimpleTest() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse warehouse = new Warehouse();
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
@@ -1559,5 +1627,42 @@ public class MekLocationTest {
         }
 
         assertEquals(location, missingPart.getLocation());
+    }
+    
+    @Test
+    public void salvageCenterTorsoDoesntAddMissingPartTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Warehouse warehouse = new Warehouse();
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+        Unit unit = mock(Unit.class);
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            part.setUnit(unit);
+            return null;
+        }).when(unit).addPart(any());
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_CT;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setId(25);
+        mekLocation.setUnit(unit);
+
+        warehouse.addPart(mekLocation);
+
+        mekLocation.remove(true);
+
+        assertTrue(mekLocation.getId() > 0);
+        assertNull(mekLocation.getUnit());
+        assertTrue(mekLocation.isSpare());
+        assertTrue(warehouse.getParts().contains(mekLocation));
+
+        // No missing parts in the warehouse if a CT
+        for (Part part : warehouse.getParts()) {
+            assertFalse(part instanceof MissingMekLocation);
+        }
     }
 }
