@@ -558,6 +558,57 @@ public class MekLocationTest {
     }
 
     @Test
+    public void needsFixingTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(entity.getWeight()).thenReturn(100.0);
+        when(unit.getEntity()).thenReturn(entity);
+        
+        int location = Mech.LOC_RT;
+        MekLocation torso = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        
+        // Not on a unit
+        assertFalse(torso.needsFixing());
+
+        // On a unit which is fine
+        torso.setUnit(unit);
+        assertFalse(torso.needsFixing());
+
+        // Bad hip or shoulder
+        doReturn(true).when(unit).hasBadHipOrShoulder(eq(location));
+        assertTrue(torso.needsFixing());
+
+        // restore the hip/shoulder
+        doReturn(false).when(unit).hasBadHipOrShoulder(eq(location));
+        assertFalse(torso.needsFixing());
+
+        // Less than 100% armor
+        torso.setPercent(0.99);
+        assertTrue(torso.needsFixing());
+
+        // restore the armor
+        torso.setPercent(1.0);
+        assertFalse(torso.needsFixing());
+
+        // Breached
+        torso.setBreached(true);
+        assertTrue(torso.needsFixing());
+
+        // Not breached
+        torso.setBreached(false);
+        assertFalse(torso.needsFixing());
+
+        // Blown off
+        torso.setBlownOff(true);
+        assertTrue(torso.needsFixing());
+
+        // Not blown off
+        torso.setBlownOff(false);
+        assertFalse(torso.needsFixing());
+    }
+
+    @Test
     public void checkFixableNoUnitTest() {
         Campaign mockCampaign = mock(Campaign.class);
         MekLocation torso = new MekLocation(Mech.LOC_RT, 30, 0, false, false, false, false, false, mockCampaign);

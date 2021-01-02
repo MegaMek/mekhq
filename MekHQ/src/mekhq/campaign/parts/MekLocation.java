@@ -536,7 +536,7 @@ public class MekLocation extends Part {
     @Override
     public boolean needsFixing() {
         return (getPercent() < 1.0) || isBreached() || isBlownOff()
-                || (getUnit() == null) || getUnit().hasBadHipOrShoulder(getLoc());
+                || ((getUnit() != null) && getUnit().hasBadHipOrShoulder(getLoc()));
     }
 
     @Override
