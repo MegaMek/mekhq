@@ -306,43 +306,45 @@ public class MekLocation extends Part {
     @Override
     public void fix() {
         super.fix();
-        if (isBlownOff()) {
-            blownOff = false;
-            if (null != unit) {
-                unit.getEntity().setLocationBlownOff(loc, false);
-                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                    CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-                    // ignore empty & non-hittable slots
-                    if (slot == null) {
-                        continue;
-                    }
-                    slot.setMissing(false);
-                    Mounted m = slot.getMount();
-                    if (null != m) {
-                        m.setMissing(false);
-                    }
+
+        final Unit unit = getUnit();
+        if ((unit != null) && isBlownOff()) {
+            setBlownOff(false);
+
+            unit.getEntity().setLocationBlownOff(loc, false);
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+                // ignore empty slots
+                if (slot == null) {
+                    continue;
+                }
+
+                slot.setMissing(false);
+                Mounted m = slot.getMount();
+                if (null != m) {
+                    m.setMissing(false);
                 }
             }
-        } else if (isBreached()) {
+        } else if ((unit != null) && isBreached()) {
             setBreached(false);
-            if (null != unit) {
-                unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                    CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-                    // ignore empty & non-hittable slots
-                    if (slot == null) {
-                        continue;
-                    }
-                    slot.setBreached(false);
-                    Mounted m = slot.getMount();
-                    if (null != m) {
-                        m.setBreached(false);
-                    }
+
+            unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+                // ignore empty slots
+                if (slot == null) {
+                    continue;
+                }
+
+                slot.setBreached(false);
+                Mounted m = slot.getMount();
+                if (null != m) {
+                    m.setBreached(false);
                 }
             }
         } else {
             setPercent(1.0);
-            if (null != unit) {
+            if (unit != null) {
                 unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
             }
         }
@@ -603,10 +605,12 @@ public class MekLocation extends Part {
                     slot.setRepairable(true);
                     slot.setMissing(false);
                     Mounted m = slot.getMount();
-                    m.setHit(false);
-                    m.setDestroyed(false);
-                    m.setMissing(false);
-                    m.setRepairable(true);
+                    if (m != null) {
+                        m.setHit(false);
+                        m.setDestroyed(false);
+                        m.setMissing(false);
+                        m.setRepairable(true);
+                    }
                 }
             }
         }

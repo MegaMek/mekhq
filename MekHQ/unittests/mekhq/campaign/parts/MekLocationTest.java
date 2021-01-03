@@ -42,6 +42,7 @@ import org.xml.sax.SAXException;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.ILocationExposureStatus;
 import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.Mounted;
@@ -1666,6 +1667,116 @@ public class MekLocationTest {
         for (Part part : warehouse.getParts()) {
             assertFalse(part instanceof MissingMekLocation);
         }
+    }
+
+    @Test
+    public void fixSimpleTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        int location = Mech.LOC_CT;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setPercent(0.5);
+
+        // Fix the part in the warehouse
+        mekLocation.fix();
+
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+        assertFalse(mekLocation.needsFixing());
+
+        // Place the location on a unit
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        int originalInternal = 10;
+        doReturn(originalInternal).when(entity).getOInternal(eq(location));
+        when(entity.getWeight()).thenReturn(30.0);
+
+        mekLocation.setUnit(unit);
+        mekLocation.setPercent(0.01);
+
+        assertTrue(mekLocation.needsFixing());
+
+        // Fix the location on the unit
+        mekLocation.fix();
+
+        assertEquals(1.0, mekLocation.getPercent(), 0.001);
+        assertFalse(mekLocation.needsFixing());
+
+        verify(entity, times(1)).setInternal(eq(originalInternal), eq(location));
+    }
+    
+    @Test
+    public void fixBlownOffTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setBlownOff(true);
+        mekLocation.setUnit(unit);
+
+        // Setup the critical slots
+        doReturn(3).when(entity).getNumberOfCriticals(eq(location));
+        doReturn(null).when(entity).getCritical(eq(location), eq(0)); // empty
+        CriticalSlot mockSlot = mock(CriticalSlot.class);
+        Mounted mounted = mock(Mounted.class);
+        when(mockSlot.getMount()).thenReturn(mounted);
+        doReturn(mockSlot).when(entity).getCritical(eq(location), eq(1));
+        CriticalSlot mockSlotNoMount = mock(CriticalSlot.class);
+        doReturn(mockSlotNoMount).when(entity).getCritical(eq(location), eq(2)); // no mount
+
+        assertTrue(mekLocation.needsFixing());
+        assertTrue(mekLocation.isBlownOff());
+
+        // Reattach the blown off location on the unit
+        mekLocation.fix();
+
+        assertFalse(mekLocation.needsFixing());
+        assertFalse(mekLocation.isBlownOff());
+
+        verify(entity, times(1)).setLocationBlownOff(eq(location), eq(false));
+        verify(mockSlot, times(1)).setMissing(eq(false));
+        verify(mounted, times(1)).setMissing(eq(false));
+    }
+ 
+    @Test
+    public void fixBreachedTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setBreached(true);
+        mekLocation.setUnit(unit);
+
+        // Setup the critical slots
+        doReturn(3).when(entity).getNumberOfCriticals(eq(location));
+        doReturn(null).when(entity).getCritical(eq(location), eq(0)); // empty
+        CriticalSlot mockSlot = mock(CriticalSlot.class);
+        Mounted mounted = mock(Mounted.class);
+        when(mockSlot.getMount()).thenReturn(mounted);
+        doReturn(mockSlot).when(entity).getCritical(eq(location), eq(1));
+        CriticalSlot mockSlotNoMount = mock(CriticalSlot.class);
+        doReturn(mockSlotNoMount).when(entity).getCritical(eq(location), eq(2)); // no mount
+
+        assertTrue(mekLocation.needsFixing());
+        assertTrue(mekLocation.isBreached());
+
+        // Reattach the blown off location on the unit
+        mekLocation.fix();
+
+        assertFalse(mekLocation.needsFixing());
+        assertFalse(mekLocation.isBreached());
+
+        verify(entity, times(1)).setLocationStatus(eq(location), eq(ILocationExposureStatus.NORMAL), eq(true));
+        verify(mockSlot, times(1)).setBreached(eq(false));
+        verify(mounted, times(1)).setBreached(eq(false));
     }
 
     @Test
