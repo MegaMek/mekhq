@@ -1945,4 +1945,71 @@ public class MekLocationTest {
         
         assertEquals(PartRepairType.MEK_LOCATION, centerTorso.getRepairPartType());
     }
+
+    @Test
+    public void getDetailsSpareTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        MekLocation mekLocation = new MekLocation(Mech.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
+        
+        assertNotNull(mekLocation.getDetails());
+        assertNotNull(mekLocation.getDetails(false));
+
+        mekLocation.setPercent(0.1);
+
+        assertNotNull(mekLocation.getDetails());
+        assertNotNull(mekLocation.getDetails(false));
+
+        mekLocation = new MekLocation(Mech.LOC_HEAD, 25, 0, false, false, false, false, false, mockCampaign);
+
+        assertNotNull(mekLocation.getDetails());
+        assertNotNull(mekLocation.getDetails(false));
+
+        mekLocation.setSensors(true);
+
+        assertNotNull(mekLocation.getDetails());
+        assertNotNull(mekLocation.getDetails(false));
+
+        mekLocation.setLifeSupport(true);
+
+        assertNotNull(mekLocation.getDetails());
+        assertNotNull(mekLocation.getDetails(false));
+    }
+
+    @Test
+    public void getDetailsOnUnitTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(anyInt());
+
+        MekLocation mekLocation = new MekLocation(Mech.LOC_RARM, 25, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+        
+        assertNotNull(mekLocation.getDetails());
+        assertNotNull(mekLocation.getDetails(false));
+
+        mekLocation.setPercent(0.1);
+
+        assertNotNull(mekLocation.getDetails());
+        assertNotNull(mekLocation.getDetails(false));
+
+        mekLocation.setBlownOff(true);
+
+        assertNotNull(mekLocation.getDetails());
+        assertNotNull(mekLocation.getDetails(false));
+
+        mekLocation.setBlownOff(false);
+        mekLocation.setBreached(true);
+
+        assertNotNull(mekLocation.getDetails());
+        assertNotNull(mekLocation.getDetails(false));
+
+        doReturn(true).when(unit).hasBadHipOrShoulder(eq(mekLocation.getLoc()));
+
+        assertNotNull(mekLocation.getDetails());
+        assertNotNull(mekLocation.getDetails(false));
+    }
 }
