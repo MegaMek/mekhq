@@ -50,6 +50,8 @@ import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 
 public class MekLocationTest {
@@ -1664,5 +1666,50 @@ public class MekLocationTest {
         for (Part part : warehouse.getParts()) {
             assertFalse(part instanceof MissingMekLocation);
         }
+    }
+
+    @Test
+    public void isRightTechTypeTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        MekLocation centerTorso = new MekLocation(Mech.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
+        
+        assertTrue(centerTorso.isRightTechType(SkillType.S_TECH_MECH));
+        assertFalse(centerTorso.isRightTechType(SkillType.S_TECH_MECHANIC));
+    }
+
+    @Test
+    public void getTechAdvancementTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        int structureType = EquipmentType.T_STRUCTURE_ENDO_STEEL;
+        boolean isClan = true;
+        MekLocation centerTorso = new MekLocation(Mech.LOC_CT, 25, structureType, isClan, false, false, false, false, mockCampaign);
+        
+        assertNotNull(centerTorso.getTechAdvancement());
+
+        structureType = EquipmentType.T_STRUCTURE_ENDO_STEEL;
+        isClan = false;
+        centerTorso = new MekLocation(Mech.LOC_CT, 25, structureType, isClan, false, false, false, false, mockCampaign);
+        
+        assertNotNull(centerTorso.getTechAdvancement());
+    }
+
+    @Test
+    public void getMassRepairOptionTypeTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        MekLocation centerTorso = new MekLocation(Mech.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
+        
+        assertEquals(PartRepairType.GENERAL_LOCATION, centerTorso.getMassRepairOptionType());
+    }
+    
+    @Test
+    public void getRepairPartTypeTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        MekLocation centerTorso = new MekLocation(Mech.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
+        
+        assertEquals(PartRepairType.MEK_LOCATION, centerTorso.getRepairPartType());
     }
 }

@@ -880,11 +880,11 @@ public class MekLocation extends Part {
         }
         if (null != sensor) {
             sensor.remove(false);
-            sensors = true;
+            setSensors(true);
         }
         if (null != support) {
             support.remove(false);
-            lifeSupport = true;
+            setLifeSupport(true);
         }
     }
 
