@@ -58,6 +58,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.WorkTime;
 
 public class MekLocationTest {
     @Test
@@ -2139,7 +2140,15 @@ public class MekLocationTest {
 
         // default
         assertNotNull(mekLocation.getDesc());
+        assertTrue(mekLocation.getDesc().contains("Repair"));
         assertTrue(mekLocation.getDesc().contains("90 minutes"));
+
+        // default, salvage
+        when(unit.isSalvage()).thenReturn(true);
+        assertNotNull(mekLocation.getDesc());
+        assertTrue(mekLocation.getDesc().contains("Salvage"));
+
+        when(unit.isSalvage()).thenReturn(false);
 
         mekLocation.setBlownOff(true);
         assertNotNull(mekLocation.getDesc());
@@ -2151,6 +2160,13 @@ public class MekLocationTest {
         assertNotNull(mekLocation.getDesc());
         assertTrue(mekLocation.getDesc().contains("Seal "));
         assertTrue(mekLocation.getDesc().contains("60 minutes"));
+
+        mekLocation.setTech(mock(Person.class));
+        assertNotNull(mekLocation.getDesc());
+        assertTrue(mekLocation.getDesc().contains("(scheduled)"));
+
+        mekLocation.setMode(WorkTime.EXTRA_2);
+        assertTrue(mekLocation.getDesc().contains(mekLocation.getCurrentModeName()));
 
         // Breached, but too hard to handle
         mekLocation.setSkillMin(SkillType.EXP_ELITE + 1);
