@@ -2165,6 +2165,8 @@ public class MekLocationTest {
         assertNotNull(mekLocation.getDesc());
         assertTrue(mekLocation.getDesc().contains("(scheduled)"));
 
+        mekLocation.setBlownOff(true);
+        mekLocation.setBreached(false);
         mekLocation.setMode(WorkTime.EXTRA_2);
         assertTrue(mekLocation.getDesc().contains(mekLocation.getCurrentModeName()));
 
