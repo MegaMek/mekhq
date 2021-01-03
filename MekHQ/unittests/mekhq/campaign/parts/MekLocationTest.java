@@ -1669,6 +1669,67 @@ public class MekLocationTest {
     }
 
     @Test
+    public void getDifficultyTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        // Blown off non-head
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBlownOff(true);
+        assertEquals(+1, mekLocation.getDifficulty());
+
+        // Blown off head
+        location = Mech.LOC_HEAD;
+        mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBlownOff(true);
+        assertEquals(+2, mekLocation.getDifficulty());
+
+        // Salvaging the blown off location
+        mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setBlownOff(true);
+        when(unit.isSalvage()).thenReturn(true);
+        mekLocation.setUnit(unit);
+        assertEquals(0, mekLocation.getDifficulty());
+
+        when(unit.isSalvage()).thenReturn(false);
+
+        // Breached location
+        mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBreached(true);
+        assertEquals(0, mekLocation.getDifficulty());
+
+        // Otherwise we're by percent for both repair and salvage
+        mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setPercent(0.01);
+        assertEquals(+2, mekLocation.getDifficulty());
+        mekLocation.setPercent(0.25);
+        assertEquals(+1, mekLocation.getDifficulty());
+        mekLocation.setPercent(0.5);
+        assertEquals(0, mekLocation.getDifficulty());
+        mekLocation.setPercent(0.75);
+        assertEquals(-1, mekLocation.getDifficulty());
+
+        // Assign to a salvaging unit
+        when(unit.isSalvage()).thenReturn(true);
+        mekLocation.setUnit(unit);
+        mekLocation.setPercent(0.01);
+        assertEquals(+2, mekLocation.getDifficulty());
+        mekLocation.setPercent(0.25);
+        assertEquals(+1, mekLocation.getDifficulty());
+        mekLocation.setPercent(0.5);
+        assertEquals(0, mekLocation.getDifficulty());
+        mekLocation.setPercent(0.75);
+        assertEquals(-1, mekLocation.getDifficulty());
+    }
+
+    @Test
     public void isRightTechTypeTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
