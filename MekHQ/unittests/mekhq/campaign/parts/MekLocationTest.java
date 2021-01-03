@@ -2119,4 +2119,41 @@ public class MekLocationTest {
         // 1 (difficulty) + 1 (site mod) + 0 (D)
         assertTrue(roll.getValue() >= siteMod.getValue());
     }
+
+    @Test
+    public void getDescSimpleTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_RARM;
+        doReturn("Right Arm").when(entity).getLocationName(eq(location));
+
+        MekLocation mekLocation = new MekLocation(location, 25, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setPercent(0.75);
+
+        // default
+        assertNotNull(mekLocation.getDesc());
+        assertTrue(mekLocation.getDesc().contains("90 minutes"));
+
+        mekLocation.setBlownOff(true);
+        assertNotNull(mekLocation.getDesc());
+        assertTrue(mekLocation.getDesc().contains("Re-attach "));
+        assertTrue(mekLocation.getDesc().contains("180 minutes"));
+
+        mekLocation.setBlownOff(false);
+        mekLocation.setBreached(true);
+        assertNotNull(mekLocation.getDesc());
+        assertTrue(mekLocation.getDesc().contains("Seal "));
+        assertTrue(mekLocation.getDesc().contains("60 minutes"));
+
+        // Breached, but too hard to handle
+        mekLocation.setSkillMin(SkillType.EXP_ELITE + 1);
+        assertTrue(mekLocation.getDesc().contains("Impossible"));
+    }
 }
