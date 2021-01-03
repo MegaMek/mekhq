@@ -558,24 +558,15 @@ public class MekLocation extends Part {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        String toReturn = "";
-        if (null != unit) {
-            toReturn = unit.getEntity().getLocationName(loc);
-            if (includeRepairDetails) {
-                if (isBlownOff()) {
-                    toReturn += " (Blown Off)";
-                } else if (isBreached()) {
-                    toReturn += " (Breached)";
-                } else {
-                    toReturn += " (" + Math.round(100 * getPercent()) + "%)";
-                }
-            }
-            return toReturn;
+        if (getUnit() != null) {
+            return getDetailsOnUnit(includeRepairDetails);
         }
-        toReturn += getUnitTonnage() + " tons";
+
+        String toReturn = getUnitTonnage() + " tons";
         if (includeRepairDetails) {
             toReturn += " (" + Math.round(100 * getPercent()) + "%)";
         }
+
         if (loc == Mech.LOC_HEAD) {
             StringJoiner components = new StringJoiner(", ");
             if (hasSensors()) {
@@ -588,6 +579,26 @@ public class MekLocation extends Part {
                 toReturn += " [" + components.toString() + "]";
             }
         }
+
+        return toReturn;
+    }
+
+    private String getDetailsOnUnit(boolean includeRepairDetails) {
+        assert(getUnit() != null);
+
+        String toReturn = getUnit().getEntity().getLocationName(loc);
+        if (includeRepairDetails) {
+            if (isBlownOff()) {
+                toReturn += " (Blown Off)";
+            } else if (isBreached()) {
+                toReturn += " (Breached)";
+            } else if (onBadHipOrShoulder()) {
+                toReturn += " (Bad Hip/Shoulder)";
+            } else {
+                toReturn += " (" + Math.round(100 * getPercent()) + "%)";
+            }
+        }
+
         return toReturn;
     }
 
