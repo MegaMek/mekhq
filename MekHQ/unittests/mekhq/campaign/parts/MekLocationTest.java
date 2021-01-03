@@ -46,12 +46,16 @@ import megamek.common.ILocationExposureStatus;
 import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.Mounted;
+import megamek.common.TargetRoll;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 
@@ -1953,27 +1957,43 @@ public class MekLocationTest {
         MekLocation mekLocation = new MekLocation(Mech.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
         
         assertNotNull(mekLocation.getDetails());
+        assertTrue(mekLocation.getDetails().startsWith("25 tons"));
+        assertTrue(mekLocation.getDetails().contains("(100%)"));
         assertNotNull(mekLocation.getDetails(false));
+        assertEquals("25 tons", mekLocation.getDetails(false));
 
-        mekLocation.setPercent(0.1);
+        mekLocation.setPercent(0.01);
 
         assertNotNull(mekLocation.getDetails());
+        assertTrue(mekLocation.getDetails().contains("(1%)"));
         assertNotNull(mekLocation.getDetails(false));
+        assertEquals("25 tons", mekLocation.getDetails(false));
 
         mekLocation = new MekLocation(Mech.LOC_HEAD, 25, 0, false, false, false, false, false, mockCampaign);
 
         assertNotNull(mekLocation.getDetails());
+        assertTrue(mekLocation.getDetails().startsWith("25 tons"));
+        assertTrue(mekLocation.getDetails().contains("(100%)"));
         assertNotNull(mekLocation.getDetails(false));
+        assertEquals("25 tons", mekLocation.getDetails(false));
 
         mekLocation.setSensors(true);
 
         assertNotNull(mekLocation.getDetails());
+        assertTrue(mekLocation.getDetails().startsWith("25 tons"));
+        assertTrue(mekLocation.getDetails().contains("(100%)"));
+        assertTrue(mekLocation.getDetails().contains("[Sensors]"));
         assertNotNull(mekLocation.getDetails(false));
+        assertEquals("25 tons [Sensors]", mekLocation.getDetails(false));
 
         mekLocation.setLifeSupport(true);
 
         assertNotNull(mekLocation.getDetails());
+        assertTrue(mekLocation.getDetails().startsWith("25 tons"));
+        assertTrue(mekLocation.getDetails().contains("(100%)"));
+        assertTrue(mekLocation.getDetails().contains("[Sensors, Life Support]"));
         assertNotNull(mekLocation.getDetails(false));
+        assertEquals("25 tons [Sensors, Life Support]", mekLocation.getDetails(false));
     }
 
     @Test
@@ -1983,34 +2003,120 @@ public class MekLocationTest {
         Mech entity = mock(Mech.class);
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
-        doCallRealMethod().when(entity).getLocationName(anyInt());
 
-        MekLocation mekLocation = new MekLocation(Mech.LOC_RARM, 25, 0, false, false, false, false, false, mockCampaign);
+        int location = Mech.LOC_RARM;
+        doReturn("Right Arm").when(entity).getLocationName(eq(location));
+
+        MekLocation mekLocation = new MekLocation(location, 25, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
         
         assertNotNull(mekLocation.getDetails());
+        assertEquals("Right Arm (100%)", mekLocation.getDetails());
         assertNotNull(mekLocation.getDetails(false));
+        assertEquals("Right Arm", mekLocation.getDetails(false));
 
         mekLocation.setPercent(0.1);
 
         assertNotNull(mekLocation.getDetails());
+        assertEquals("Right Arm (10%)", mekLocation.getDetails());
         assertNotNull(mekLocation.getDetails(false));
+        assertEquals("Right Arm", mekLocation.getDetails(false));
 
         mekLocation.setBlownOff(true);
 
         assertNotNull(mekLocation.getDetails());
+        assertEquals("Right Arm (Blown Off)", mekLocation.getDetails());
         assertNotNull(mekLocation.getDetails(false));
+        assertEquals("Right Arm", mekLocation.getDetails(false));
 
         mekLocation.setBlownOff(false);
         mekLocation.setBreached(true);
 
         assertNotNull(mekLocation.getDetails());
+        assertEquals("Right Arm (Breached)", mekLocation.getDetails());
         assertNotNull(mekLocation.getDetails(false));
+        assertEquals("Right Arm", mekLocation.getDetails(false));
 
         mekLocation.setBreached(false);
         doReturn(true).when(unit).hasBadHipOrShoulder(eq(mekLocation.getLoc()));
 
         assertNotNull(mekLocation.getDetails());
+        assertEquals("Right Arm (Bad Hip/Shoulder)", mekLocation.getDetails());
         assertNotNull(mekLocation.getDetails(false));
+        assertEquals("Right Arm", mekLocation.getDetails(false));
+    }
+
+    @Test
+    public void getAllModsBreachedTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_RARM;
+        doReturn("Right Arm").when(entity).getLocationName(eq(location));
+
+        MekLocation mekLocation = new MekLocation(location, 25, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // Breached but not salvaging
+        mekLocation.setBreached(true);
+
+        TargetRoll roll = mekLocation.getAllMods(mock(Person.class));
+        assertEquals(TargetRoll.AUTOMATIC_SUCCESS, roll.getValue());
+    }
+
+    @Test
+    public void getAllModsBlownOffTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(unit.isSalvage()).thenReturn(true);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_RARM;
+        doReturn("Right Arm").when(entity).getLocationName(eq(location));
+
+        MekLocation mekLocation = new MekLocation(location, 25, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+
+        // Blown Off and salvaging
+        mekLocation.setBlownOff(true);
+
+        TargetRoll roll = mekLocation.getAllMods(mock(Person.class));
+        assertEquals(TargetRoll.AUTOMATIC_SUCCESS, roll.getValue());
+    }
+
+    @Test
+    public void getAllModsSimpleTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(unit.isSalvage()).thenReturn(true);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        int location = Mech.LOC_RARM;
+        doReturn("Right Arm").when(entity).getLocationName(eq(location));
+
+        MekLocation mekLocation = new MekLocation(location, 25, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setPercent(0.5);
+
+        TargetRoll siteMod = new TargetRoll(1, "site mod");
+        when(unit.getSiteMod()).thenReturn(siteMod);
+        
+        Person tech = mock(Person.class);
+        PersonnelOptions mockOptions = mock(PersonnelOptions.class);
+        when(tech.getOptions()).thenReturn(mockOptions);
+        TargetRoll roll = mekLocation.getAllMods(tech);
+
+        assertNotNull(roll);
+        // 1 (difficulty) + 1 (site mod) + 0 (D)
+        assertTrue(roll.getValue() >= siteMod.getValue());
     }
 }
