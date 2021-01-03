@@ -2007,6 +2007,7 @@ public class MekLocationTest {
         assertNotNull(mekLocation.getDetails());
         assertNotNull(mekLocation.getDetails(false));
 
+        mekLocation.setBreached(false);
         doReturn(true).when(unit).hasBadHipOrShoulder(eq(mekLocation.getLoc()));
 
         assertNotNull(mekLocation.getDetails());
