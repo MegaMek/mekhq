@@ -1730,6 +1730,67 @@ public class MekLocationTest {
     }
 
     @Test
+    public void getBaseTimeTest() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        Mech entity = mock(Mech.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+
+        // Blown off non-head
+        int location = Mech.LOC_LLEG;
+        MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBlownOff(true);
+        assertEquals(180, mekLocation.getBaseTime());
+
+        // Blown off head
+        location = Mech.LOC_HEAD;
+        mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBlownOff(true);
+        assertEquals(200, mekLocation.getBaseTime());
+
+        // Salvaging the blown off location
+        mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setBlownOff(true);
+        when(unit.isSalvage()).thenReturn(true);
+        mekLocation.setUnit(unit);
+        assertEquals(0, mekLocation.getBaseTime());
+
+        when(unit.isSalvage()).thenReturn(false);
+
+        // Breached location
+        mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setUnit(unit);
+        mekLocation.setBreached(true);
+        assertEquals(60, mekLocation.getBaseTime());
+
+        // Otherwise we're by percent for both repair and salvage
+        mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
+        mekLocation.setPercent(0.01);
+        assertEquals(270, mekLocation.getBaseTime());
+        mekLocation.setPercent(0.25);
+        assertEquals(180, mekLocation.getBaseTime());
+        mekLocation.setPercent(0.5);
+        assertEquals(135, mekLocation.getBaseTime());
+        mekLocation.setPercent(0.75);
+        assertEquals(90, mekLocation.getBaseTime());
+
+        // Assign to a salvaging unit
+        when(unit.isSalvage()).thenReturn(true);
+        mekLocation.setUnit(unit);
+        mekLocation.setPercent(0.01);
+        assertEquals(270, mekLocation.getBaseTime());
+        mekLocation.setPercent(0.25);
+        assertEquals(180, mekLocation.getBaseTime());
+        mekLocation.setPercent(0.5);
+        assertEquals(135, mekLocation.getBaseTime());
+        mekLocation.setPercent(0.75);
+        assertEquals(90, mekLocation.getBaseTime());
+    }
+
+    @Test
     public void isRightTechTypeTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
