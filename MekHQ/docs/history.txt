@@ -21,7 +21,8 @@ VERSION HISTORY:
 + Issue #2332: Delete refit file if unable to read it back when saving
 + PR #2294: Add contract market tests and add setters for static singletons (e.g. Systems and RandomFactionGenerator)
 + Issues #1727 and #2318: Colour Camouflage and Camouflage Selector Standardization
-+ PR#2293: Upgrades built in campaigns to 0.47.15
++ PR #2293: Upgrades built in campaigns to 0.47.15
++ Issue #2341: Equipment on incorrect mounts are not fixed
 
 0.47.15 (RC1) (2020-12-14 2330 UTC)
 + Issue #2166: NRE in Money::plus/Money::minus
