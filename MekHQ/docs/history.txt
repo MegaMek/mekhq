@@ -23,6 +23,7 @@ VERSION HISTORY:
 + Issues #1727 and #2318: Colour Camouflage and Camouflage Selector Standardization
 + PR #2293: Upgrades built in campaigns to 0.47.15
 + Issue #2341: Equipment on incorrect mounts are not fixed
++ Issue #2342: Customs in CPNX with invalid file name chars do not save to disk
 
 0.47.15 (RC1) (2020-12-14 2330 UTC)
 + Issue #2166: NRE in Money::plus/Money::minus
