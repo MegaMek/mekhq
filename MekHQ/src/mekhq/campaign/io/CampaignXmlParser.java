@@ -39,6 +39,8 @@ import megamek.common.icons.Camouflage;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -61,6 +63,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.MhqFileUtil;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
@@ -1061,55 +1064,63 @@ public class CampaignXmlParser {
             }
 
             if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                name = wn2.getTextContent();
+                name = wn2.getTextContent().trim();
             } else if (wn2.getNodeName().equalsIgnoreCase("mtf")) {
                 mtf = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("blk")) {
                 blk = wn2.getTextContent();
             }
         }
-        retVal.addCustom(name);
-        if ((name != null) && (mtf != null)) {
-            // if this file already exists then don't overwrite it or we
-            // will end up with a bunch of copies
-            String fileName = sCustomsDir + File.separator + name + ".mtf";
-            String fileNameCampaign = sCustomsDirCampaign + File.separator
-                    + name + ".mtf";
+
+        if (StringUtils.isNotBlank(name)) {
+            String ext;
+            String contents;
+
+            if (StringUtils.isNotBlank(mtf)) {
+                ext = ".mtf";
+                contents = mtf;
+            } else if (StringUtils.isNotBlank(blk)) {
+                ext = ".blk";
+                contents = blk;
+            } else {
+                return false;
+            }
+
+            // If this file already exists then don't overwrite it or we will end up with a bunch of copies
+            String safeName = MhqFileUtil.escapeReservedCharacters(name);
+            String fileName = sCustomsDir + File.separator + safeName + ext;
+            String fileNameCampaign = sCustomsDirCampaign + File.separator + safeName + ext;
+
+            // TODO: get a hash or something to validate and overwrite if we updated this
             if ((new File(fileName)).exists()
                     || (new File(fileNameCampaign)).exists()) {
                 return false;
             }
-            MekHQ.getLogger().info("Loading Custom unit from XML...");
-            try (OutputStream out = new FileOutputStream(fileNameCampaign);
-                 PrintStream p = new PrintStream(out)) {
-                p.println(mtf);
-                MekHQ.getLogger().info("Loaded Custom unit!");
-            } catch (Exception ex) {
-                MekHQ.getLogger().error(ex);
-            }
-        }
-        if ((name != null) && (blk != null)) {
-            // if this file already exists then don't overwrite it or we
-            // will end up with a bunch of copies
-            String fileName = sCustomsDir + File.separator + name + ".blk";
-            String fileNameCampaign = sCustomsDirCampaign + File.separator
-                    + name + ".blk";
-            if ((new File(fileName)).exists()
-                    || (new File(fileNameCampaign)).exists()) {
-                return false;
-            }
-            MekHQ.getLogger().info("Loading Custom unit from XML...");
 
-            try (FileOutputStream out = new FileOutputStream(fileNameCampaign);
-                 PrintStream p = new PrintStream(out)) {
-                p.println(blk);
-                MekHQ.getLogger().info("Loaded Custom unit!");
-            } catch (Exception ex) {
-                MekHQ.getLogger().error(ex);
+            if (tryWriteCustomToFile(fileNameCampaign, contents)) {
+                retVal.addCustom(name);
+                return true;
             }
         }
 
-        return true;
+        return false;
+    }
+
+    private static boolean tryWriteCustomToFile(String fileName, String contents) {
+        MekHQ.getLogger().info("Writing custom unit from inline data to " + fileName);
+
+        try (OutputStream out = new FileOutputStream(fileName);
+            PrintStream p = new PrintStream(out)) {
+
+            p.println(contents);
+
+            MekHQ.getLogger().info("Wrote custom unit from inline data to: " + fileName);
+
+            return true;
+        } catch (Exception ex) {
+            MekHQ.getLogger().error("Error writing custom unit from inline data to: " + fileName, ex);
+            return false;
+        }
     }
 
     private static void processMissionNodes(Campaign retVal, Node wn, Version version) {
