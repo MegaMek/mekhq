@@ -89,6 +89,8 @@ import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
+import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -1462,7 +1464,13 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
         oldUnit.setParts(newParts);
-        Utilities.unscrambleEquipmentNumbers(oldUnit, true);
+
+        EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(oldUnit);
+        EquipmentUnscramblerResult result = unscrambler.unscramble(true);
+        if (!result.succeeded()) {
+            MekHQ.getLogger().warning(result.getMessage());
+        }
+
         assignArmActuators();
         assignBayParts();
 
