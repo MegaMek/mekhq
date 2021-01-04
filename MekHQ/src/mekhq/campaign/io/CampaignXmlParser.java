@@ -1360,36 +1360,49 @@ public class CampaignXmlParser {
             }
 
             Unit u = prt.getUnit();
-            if (null != u) {
+            if (u != null) {
                 // get rid of any equipmentparts without locations or mounteds
                 if (prt instanceof EquipmentPart) {
-                    Mounted m = u.getEntity().getEquipment(
-                            ((EquipmentPart) prt).getEquipmentNum());
-                    if ((m == null) || (m.getLocation() == Entity.LOC_NONE)) {
-                        // ... don't remove ammo bins as they may not have a location
-                        if (!(prt instanceof AmmoBin)) {
-                            removeParts.add(prt);
-                            continue;
-                        }
+                    EquipmentPart ePart = (EquipmentPart) prt;
+                    Mounted m = u.getEntity().getEquipment(ePart.getEquipmentNum());
+
+                    // Remove equipment parts missing mounts
+                    if (m == null) {
+                        removeParts.add(prt);
+                        continue;
                     }
+
+                    // Remove equipment parts without a valid location, unless they're an ammo bin as they may not have a location
+                    if ((m.getLocation() == Entity.LOC_NONE) && !(prt instanceof AmmoBin)) {
+                        removeParts.add(prt);
+                        continue;
+                    }
+
                     // Remove existing duplicate parts.
-                    Part duplicatePart = u.getPartForEquipmentNum(((EquipmentPart) prt).getEquipmentNum(), prt.getLocation());
+                    Part duplicatePart = u.getPartForEquipmentNum(ePart.getEquipmentNum(), prt.getLocation());
                     if ((duplicatePart instanceof EquipmentPart)
-                            && ((EquipmentPart) prt).getType().equals(((EquipmentPart) duplicatePart).getType())) {
+                            && ePart.getType().equals(((EquipmentPart) duplicatePart).getType())) {
                         removeParts.add(prt);
                         continue;
                     }
                 }
                 if (prt instanceof MissingEquipmentPart) {
-                    Mounted m = u.getEntity().getEquipment(
-                            ((MissingEquipmentPart) prt).getEquipmentNum());
-                    if ((null == m) || (m.getLocation() == Entity.LOC_NONE)) {
+                    Mounted m = u.getEntity().getEquipment(((MissingEquipmentPart) prt).getEquipmentNum());
+
+                    // Remove equipment parts missing mounts
+                    if (m == null) {
+                        removeParts.add(prt);
+                        continue;
+                    }
+
+                    // Remove missing equipment parts without a valid location, unless they're an ammo bin as they may not have a location
+                    if ((m.getLocation() == Entity.LOC_NONE) && !(prt instanceof MissingAmmoBin)) {
                         removeParts.add(prt);
                         continue;
                     }
                 }
 
-                //if the type is a BayWeapon, remove
+                // if the type is a BayWeapon, remove
                 if ((prt instanceof EquipmentPart)
                         && (((EquipmentPart) prt).getType() instanceof BayWeapon)) {
                     removeParts.add(prt);
@@ -1418,8 +1431,7 @@ public class CampaignXmlParser {
                 }
             }
 
-            // deal with true values for sensor and life support on non-Mech
-            // heads
+            // deal with true values for sensor and life support on non-Mech heads
             if ((prt instanceof MekLocation)
                     && (((MekLocation) prt).getLoc() != Mech.LOC_HEAD)) {
                 ((MekLocation) prt).setSensors(false);
