@@ -5,7 +5,6 @@ import java.util.List;
 
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
-import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
