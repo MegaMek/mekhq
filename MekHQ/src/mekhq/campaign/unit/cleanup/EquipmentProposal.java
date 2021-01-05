@@ -6,12 +6,22 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.*;
+import mekhq.campaign.unit.Unit;
 
 public class EquipmentProposal {
-    private final Map<Integer, Mounted> equipment = new HashMap<>();
-    private final Map<Part, Integer> original = new HashMap<>();
-    private final Map<Part, Mounted> mapped = new HashMap<>();
-    private final Map<Integer, Part> proposed = new TreeMap<>();
+    protected final Unit unit;
+    protected final Map<Integer, Mounted> equipment = new HashMap<>();
+    protected final Map<Part, Integer> original = new HashMap<>();
+    protected final Map<Part, Mounted> mapped = new HashMap<>();
+    protected final Map<Integer, Part> proposed = new TreeMap<>();
+
+    public EquipmentProposal(Unit unit) {
+        this.unit = Objects.requireNonNull(unit);
+    }
+
+    public Unit getUnit() {
+        return unit;
+    }
 
     public void consider(Part part) {
         if (part instanceof EquipmentPart) {

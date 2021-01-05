@@ -50,7 +50,7 @@ public abstract class EquipmentUnscrambler {
     }
 
     protected EquipmentProposal createProposal() {
-        EquipmentProposal proposal = new EquipmentProposal();
+        EquipmentProposal proposal = new EquipmentProposal(unit);
         for (Part part : unit.getParts()) {
             proposal.consider(part);
         }

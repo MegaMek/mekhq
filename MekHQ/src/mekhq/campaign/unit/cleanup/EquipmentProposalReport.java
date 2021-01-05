@@ -13,9 +13,10 @@ public class EquipmentProposalReport {
      * @param proposal The unscrambling proposal.
      * @return A String describing the result of the unscrambling operation.
      */
-    public static String createReport(Unit unit, EquipmentProposal proposal) {
+    public static String createReport(EquipmentProposal proposal) {
         StringBuilder builder = new StringBuilder();
 
+        final Unit unit = proposal.getUnit();
         if (!proposal.isReduced()) {
             builder.append(String.format("Could not unscramble equipment for %s (%s)\r\n\r\n",
                     unit.getName(), unit.getId()));
