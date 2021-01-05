@@ -191,6 +191,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return ammoTypeChanged() ? getFullShots() : shotsNeeded;
     }
 
+    public boolean canChangeMunitions(AmmoType type) {
+        return getType().equalsAmmoTypeOnly(type)
+                && (getType().getRackSize() == type.getRackSize());
+    }
+
     public void changeMunition(AmmoType type) {
         this.type = type;
         this.name = type.getName();
