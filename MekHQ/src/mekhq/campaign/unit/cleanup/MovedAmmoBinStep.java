@@ -23,7 +23,7 @@ public class MovedAmmoBinStep extends UnscrambleStep {
             }
 
             if (ammoBin.canChangeMunitions((AmmoType) m.getType())) {
-                proposal.proposeMapping(ammoBin, equipment.getKey(), m);
+                proposal.proposeMapping(ammoBin, equipment.getKey());
                 return;
             }
         }

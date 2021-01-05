@@ -3,42 +3,46 @@ package mekhq.campaign.unit.cleanup;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import megamek.common.*;
+import megamek.common.BattleArmor;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.unit.Unit;
 
 public class BattleArmorEquipmentProposal extends EquipmentProposal {
+    private final int squadSize;
+    
     public BattleArmorEquipmentProposal(Unit unit) {
         super(unit);
+
+        squadSize = ((BattleArmor) unit.getEntity()).getSquadSize();
     }
 
     @Override
-    public void proposeMapping(Part part, int equipmentNum, Mounted mount) {
+    public void proposeMapping(Part part, int equipmentNum) {
         // We do not clear the equipment because multiple battle armor parts
         // may use the same equipment.
-        proposed.put(equipmentNum, part);
-        mapped.put(part, mount);
+        mapped.put(part, equipmentNum);
     }
 
     @Override
     public void apply() {
         super.apply();
 
-        // Clear out the used equipment from the equipment list
-        for (int equipmentNum : proposed.keySet()) {
+        // Clear used equipment from our list
+        for (int equipmentNum : mapped.values()) {
             equipment.remove(equipmentNum);
         }
 
         // Assign troopers per mount
         Map<Integer, List<BattleArmorEquipmentPart>> baPartMap =
-                proposed.values().stream().filter(p -> p instanceof BattleArmorEquipmentPart)
+                mapped.keySet().stream()
+                        .filter(p -> p instanceof BattleArmorEquipmentPart)
                         .map(p -> (BattleArmorEquipmentPart) p)
                         .collect(Collectors.groupingBy(p -> p.getEquipmentNum()));
         for (List<BattleArmorEquipmentPart> parts : baPartMap.values()) {
             // Try to find one for each trooper; if the Entity has multiple pieces of equipment of this
             // type this will make sure we're only setting one group to this equipment number.
-            Part[] perTrooper = new Part[unit.getEntity().locations() - 1];
+            Part[] perTrooper = new Part[squadSize];
             for (EquipmentPart p : parts) {
                 int trooper = ((BattleArmorEquipmentPart)p).getTrooper();
                 if (trooper > 0) {

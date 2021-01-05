@@ -19,7 +19,7 @@ public class ExactMatchStepTest {
 
         step.visit(mockProposal, mockPart);
 
-        verify(mockProposal, times(0)).proposeMapping(any(), anyInt(), any());
+        verify(mockProposal, times(0)).proposeMapping(any(), anyInt());
     }
 
     @Test
@@ -31,7 +31,7 @@ public class ExactMatchStepTest {
 
         step.visit(mockProposal, mockMissingPart);
 
-        verify(mockProposal, times(0)).proposeMapping(any(), anyInt(), any());
+        verify(mockProposal, times(0)).proposeMapping(any(), anyInt());
     }
 
     @Test
@@ -48,7 +48,7 @@ public class ExactMatchStepTest {
 
         step.visit(mockProposal, mockPart);
 
-        verify(mockProposal, times(0)).proposeMapping(any(), anyInt(), any());
+        verify(mockProposal, times(0)).proposeMapping(any(), anyInt());
     }
 
     @Test
@@ -65,7 +65,7 @@ public class ExactMatchStepTest {
 
         step.visit(mockProposal, mockMissingPart);
 
-        verify(mockProposal, times(0)).proposeMapping(any(), anyInt(), any());
+        verify(mockProposal, times(0)).proposeMapping(any(), anyInt());
     }
     
     @Test
@@ -83,7 +83,7 @@ public class ExactMatchStepTest {
 
         step.visit(mockProposal, mockPart);
 
-        verify(mockProposal, times(1)).proposeMapping(eq(mockPart), eq(1), eq(mockMount));
+        verify(mockProposal, times(1)).proposeMapping(eq(mockPart), eq(1));
     }
 
     @Test
@@ -101,6 +101,6 @@ public class ExactMatchStepTest {
 
         step.visit(mockProposal, mockMissingPart);
 
-        verify(mockProposal, times(1)).proposeMapping(eq(mockMissingPart), eq(1), eq(mockMount));
+        verify(mockProposal, times(1)).proposeMapping(eq(mockMissingPart), eq(1));
     }
 }

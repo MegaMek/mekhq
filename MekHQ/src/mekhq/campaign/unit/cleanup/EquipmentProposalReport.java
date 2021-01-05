@@ -51,7 +51,8 @@ public final class EquipmentProposalReport {
             if (isMissing) {
                 eName = "<Incorrect>";
             }
-            builder.append(String.format(" %d: %s %s %s %s\r\n", equipNum, p.getName(), p.getLocationName(), eName, isMissing ? " (Missing)" : ""));
+            builder.append(String.format(" %d: %s %s %s %s\r\n", (!isMissing ? equipNum : proposal.getOriginalMapping(p)),
+                    p.getName(), p.getLocationName(), eName, isMissing ? " (Missing)" : ""));
         }
 
         builder.append("\r\nEquipment:\r\n");

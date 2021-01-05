@@ -111,13 +111,13 @@ public class EquipmentProposalTest {
         Mounted mockMount1 = mock(Mounted.class);
         proposal.includeEquipment(originalMissingEquipmentNum, mockMount1);
 
-        proposal.proposeMapping(mockEquipmentPart, originalEquipmentNum, mockMount0);
+        proposal.proposeMapping(mockEquipmentPart, originalEquipmentNum);
 
         assertTrue(proposal.hasProposal(mockEquipmentPart));
         assertNull(proposal.getEquipment(originalEquipmentNum));
         assertEquals(mockMount1, proposal.getEquipment(originalMissingEquipmentNum));
 
-        proposal.proposeMapping(mockMissingEquipmentPart, originalMissingEquipmentNum, mockMount1);
+        proposal.proposeMapping(mockMissingEquipmentPart, originalMissingEquipmentNum);
 
         assertTrue(proposal.hasProposal(mockMissingEquipmentPart));
         assertNull(proposal.getEquipment(originalEquipmentNum));
@@ -149,11 +149,11 @@ public class EquipmentProposalTest {
         Mounted mockMount1 = mock(Mounted.class);
         proposal.includeEquipment(originalMissingEquipmentNum, mockMount1);
 
-        proposal.proposeMapping(mockEquipmentPart, originalEquipmentNum, mockMount0);
+        proposal.proposeMapping(mockEquipmentPart, originalEquipmentNum);
 
         assertFalse(proposal.isReduced());
 
-        proposal.proposeMapping(mockMissingEquipmentPart, originalMissingEquipmentNum, mockMount1);
+        proposal.proposeMapping(mockMissingEquipmentPart, originalMissingEquipmentNum);
 
         assertTrue(proposal.isReduced());
     }
@@ -189,8 +189,8 @@ public class EquipmentProposalTest {
         Mounted mockMount1 = mock(Mounted.class);
         proposal.includeEquipment(originalMissingEquipmentNum, mockMount1);
 
-        proposal.proposeMapping(mockEquipmentPart, originalEquipmentNum, mockMount0);
-        proposal.proposeMapping(mockMissingEquipmentPart, originalMissingEquipmentNum, mockMount1);
+        proposal.proposeMapping(mockEquipmentPart, originalEquipmentNum);
+        proposal.proposeMapping(mockMissingEquipmentPart, originalMissingEquipmentNum);
 
         assertFalse(proposal.isReduced());
 
