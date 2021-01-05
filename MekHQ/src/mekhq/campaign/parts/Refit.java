@@ -1466,10 +1466,12 @@ public class Refit extends Part implements IAcquisitionWork {
         oldUnit.setParts(newParts);
 
         EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(oldUnit);
-        EquipmentUnscramblerResult result = unscrambler.unscramble(true);
+        EquipmentUnscramblerResult result = unscrambler.unscramble();
         if (!result.succeeded()) {
             MekHQ.getLogger().warning(result.getMessage());
         }
+
+        changeAmmoBinMunitions(oldUnit);
 
         assignArmActuators();
         assignBayParts();
@@ -1542,6 +1544,24 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
+    }
+
+    private void changeAmmoBinMunitions(Unit unit) {
+        for (Part part : unit.getParts()) {
+            if (part instanceof AmmoBin) {
+                final AmmoBin ammoBin = (AmmoBin) part;
+                final Mounted mounted = unit.getEntity().getEquipment(ammoBin.getEquipmentNum());
+                if ((mounted != null) && (mounted.getType() instanceof AmmoType)
+                        && !ammoBin.getType().equals(mounted.getType())
+                        && ammoBin.canChangeMunitions((AmmoType) mounted.getType())) {
+                    // AmmoBin changed munition type during a refit
+                    ammoBin.updateConditionFromPart();
+                    // Unload bin before munition change
+                    ammoBin.unload();
+                    ammoBin.changeMunition((AmmoType) mounted.getType());
+                }
+            }
+        }
     }
 
     public void saveCustomization() throws EntityLoadingException {

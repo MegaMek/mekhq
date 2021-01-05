@@ -24,13 +24,8 @@ public class EquipmentProposalReport {
                     continue;
                 }
 
-                builder.append(" - ").append(part.getPartName()).append(" equipmentNum: ");
-                if (part instanceof EquipmentPart) {
-                    builder.append(((EquipmentPart) part).getEquipmentNum()).append("\r\n");
-                }
-                else if (part instanceof MissingEquipmentPart) {
-                    builder.append(((MissingEquipmentPart) part).getEquipmentNum()).append("\r\n");
-                }
+                builder.append(" - ").append(part.getPartName()).append(" equipmentNum: ")
+                        .append(proposal.getOriginalMapping(part)).append("\r\n");
             }
         } else {
             builder.append(String.format("Unscrambled equipment for %s (%s)\r\n\r\n",
@@ -38,18 +33,14 @@ public class EquipmentProposalReport {
         }
 
         builder.append("\r\nEquipment Parts:\r\n");
-        for (Part p : unit.getParts()) {
-            if (!(p instanceof EquipmentPart) &&
-                    (!(p instanceof MissingEquipmentPart))) {
-                continue;
-            }
+        for (Part p : proposal.getParts()) {
             int equipNum;
             if (p instanceof EquipmentPart) {
-                EquipmentPart ePart = (EquipmentPart) p;
-                equipNum = ePart.getEquipmentNum();
+                equipNum = ((EquipmentPart) p).getEquipmentNum();
+            } else if (p instanceof MissingEquipmentPart) {
+                equipNum = ((MissingEquipmentPart) p).getEquipmentNum();
             } else {
-                MissingEquipmentPart mePart = (MissingEquipmentPart) p;
-                equipNum = mePart.getEquipmentNum();
+                continue;
             }
             boolean isMissing = !proposal.hasProposal(p);
             String eName = equipNum >= 0 ? unit.getEntity().getEquipment(equipNum).getName() : "<None>";

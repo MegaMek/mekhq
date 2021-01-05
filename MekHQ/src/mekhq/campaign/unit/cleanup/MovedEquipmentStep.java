@@ -16,7 +16,7 @@ public class MovedEquipmentStep extends UnscrambleStep {
             }
 
             if (m.getType().equals(part.getType())) {
-                proposal.propose(part, equipment.getKey(), m);
+                proposal.proposeMapping(part, equipment.getKey(), m);
                 return;
             }
         }
@@ -31,7 +31,7 @@ public class MovedEquipmentStep extends UnscrambleStep {
             }
 
             if (m.getType().equals(part.getType())) {
-                proposal.propose(part, equipment.getKey(), m);
+                proposal.proposeMapping(part, equipment.getKey(), m);
                 return;
             }
         }

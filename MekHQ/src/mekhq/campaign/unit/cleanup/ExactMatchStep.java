@@ -9,7 +9,7 @@ public class ExactMatchStep extends UnscrambleStep {
     public void visit(EquipmentProposal proposal, EquipmentPart part) {
         final Mounted mount = proposal.getEquipment(part.getEquipmentNum());
         if ((mount != null) && part.getType().equals(mount.getType())) {
-            proposal.propose(part, part.getEquipmentNum(), mount);
+            proposal.proposeMapping(part, part.getEquipmentNum(), mount);
         }
     }
 
@@ -17,7 +17,7 @@ public class ExactMatchStep extends UnscrambleStep {
     public void visit(EquipmentProposal proposal, MissingEquipmentPart part) {
         final Mounted mount = proposal.getEquipment(part.getEquipmentNum());
         if ((mount != null) && part.getType().equals(mount.getType())) {
-            proposal.propose(part, part.getEquipmentNum(), mount);
+            proposal.proposeMapping(part, part.getEquipmentNum(), mount);
         }
     }
 }

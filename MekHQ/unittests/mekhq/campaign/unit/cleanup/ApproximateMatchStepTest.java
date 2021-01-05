@@ -20,7 +20,7 @@ public class ApproximateMatchStepTest {
 
         step.visit(mockProposal, mockPart);
 
-        verify(mockProposal, times(0)).propose(any(), anyInt(), any());
+        verify(mockProposal, times(0)).proposeMapping(any(), anyInt(), any());
     }
 
     @Test
@@ -32,7 +32,7 @@ public class ApproximateMatchStepTest {
 
         step.visit(mockProposal, mockPart);
 
-        verify(mockProposal, times(0)).propose(any(), anyInt(), any());
+        verify(mockProposal, times(0)).proposeMapping(any(), anyInt(), any());
     }
 
     @Test
@@ -49,7 +49,7 @@ public class ApproximateMatchStepTest {
 
         step.visit(mockProposal, mockPart);
 
-        verify(mockProposal, times(0)).propose(any(), anyInt(), any());
+        verify(mockProposal, times(0)).proposeMapping(any(), anyInt(), any());
     }
 
     @Test
@@ -66,7 +66,7 @@ public class ApproximateMatchStepTest {
 
         step.visit(mockProposal, mockPart);
 
-        verify(mockProposal, times(0)).propose(any(), anyInt(), any());
+        verify(mockProposal, times(0)).proposeMapping(any(), anyInt(), any());
     }
 
     @Test
@@ -85,6 +85,6 @@ public class ApproximateMatchStepTest {
 
         step.visit(mockProposal, mockPart);
 
-        verify(mockProposal, times(1)).propose(eq(mockPart), eq(1), eq(mockMount));
+        verify(mockProposal, times(1)).proposeMapping(eq(mockPart), eq(1), eq(mockMount));
     }
 }

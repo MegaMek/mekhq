@@ -414,7 +414,7 @@ public class CampaignXmlParser {
             // the ordering of equipment in the underlying data file for the unit.
             // We're not checking for refit here.
             EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(unit);
-            EquipmentUnscramblerResult result = unscrambler.unscramble(false);
+            EquipmentUnscramblerResult result = unscrambler.unscramble();
             if (!result.succeeded()) {
                 MekHQ.getLogger().warning(result.getMessage());
             }

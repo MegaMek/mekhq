@@ -1,5 +1,6 @@
 package mekhq.campaign.unit.cleanup;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
 	}
 
 	@Override
-    public EquipmentUnscramblerResult unscramble(boolean isRefit) {
+    public EquipmentUnscramblerResult unscramble() {
         EquipmentUnscramblerResult result = new EquipmentUnscramblerResult(unit);
 
         // Create a list that we can remove parts from as we match them
@@ -83,5 +84,19 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
         result.setSucceeded(true);
         return result;
     }
-    
+
+    @Override
+    protected EquipmentProposal createProposal() {
+        return new BattleArmorEquipmentProposal();
+    }
+
+    @Override
+    protected List<UnscrambleStep> createSteps() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    protected String createReport(EquipmentProposal proposal) {
+        return null;
+    }
 }
