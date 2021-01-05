@@ -34,13 +34,13 @@ public class EquipmentProposal {
     }
 
     public void includeEquipment(int equipmentNum, Mounted mount) {
-        equipment.put(equipmentNum, mount);
+        equipment.put(equipmentNum, Objects.requireNonNull(mount));
     }
 
     public void proposeMapping(Part part, int equipmentNum, Mounted mount) {
         equipment.remove(equipmentNum);
-        proposed.put(equipmentNum, part);
-        mapped.put(part, mount);
+        proposed.put(equipmentNum, Objects.requireNonNull(part));
+        mapped.put(part, Objects.requireNonNull(mount));
     }
 
     public Set<Part> getParts() {
@@ -60,7 +60,8 @@ public class EquipmentProposal {
     }
 
     public int getOriginalMapping(Part part) {
-        return original.get(part);
+        Integer originalEquipmentNum = original.get(part);
+        return (originalEquipmentNum != null) ? originalEquipmentNum : -1;
     }
 
     public boolean isReduced() {
