@@ -179,7 +179,7 @@ public class EquipmentProposalTest {
         when(mockIncorrectEquipmentPart.getEquipmentNum()).thenReturn(incorrectEquipmentNum);
         proposal.consider(mockIncorrectEquipmentPart);
 
-        EquipmentPart mockIncorrectMissingEquipmentPart = mock(EquipmentPart.class);
+        MissingEquipmentPart mockIncorrectMissingEquipmentPart = mock(MissingEquipmentPart.class);
         int incorrectMissingEquipmentNum = 4;
         when(mockIncorrectMissingEquipmentPart.getEquipmentNum()).thenReturn(incorrectMissingEquipmentNum);
         proposal.consider(mockIncorrectMissingEquipmentPart);
