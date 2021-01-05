@@ -7,7 +7,10 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.Unit;
 
-public class EquipmentProposalReport {
+public final class EquipmentProposalReport {
+    private EquipmentProposalReport() {
+    }
+
     /**
      * Creates a message detailing the results of the unscrambling.
      * @param proposal The unscrambling proposal.
