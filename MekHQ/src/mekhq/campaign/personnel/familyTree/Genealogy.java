@@ -64,7 +64,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
         this.origin = origin; // null only when reading from XML
         setSpouse(null);
         formerSpouses = new ArrayList<>();
-        family = new HashMap<>();
+        setFamily(new HashMap<>());
     }
     //endregion Constructors
 
@@ -123,6 +123,13 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      */
     public Map<FamilialRelationshipType, List<Person>> getFamily() {
         return family;
+    }
+
+    /**
+     * @param family the new family map for this person
+     */
+    public void setFamily(Map<FamilialRelationshipType, List<Person>> family) {
+        this.family = family;
     }
 
     /**

@@ -25,6 +25,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -70,28 +71,27 @@ public class PersonIdReference extends Person {
                 formerSpouse.setFormerSpouse(ex);
             }
         }
+        for (Person unknown : unknownPersonnel) {
+            person.getGenealogy().removeFormerSpouse(unknown);
+        }
 
         // Family
+        Map<FamilialRelationshipType, List<Person>> family = new HashMap<>();
         for (Map.Entry<FamilialRelationshipType, List<Person>> entry : person.getGenealogy().getFamily().entrySet()) {
-            final FamilialRelationshipType familialRelationshipType = entry.getKey();
             for (Person familyMemberRef : entry.getValue()) {
-                if (!(familyMemberRef instanceof PersonIdReference)) {
+                if (familyMemberRef == null) {
                     continue;
                 }
-                final Person familyMember = campaign.getPerson(familyMemberRef.getId());
+                final Person familyMember = (familyMemberRef instanceof PersonIdReference)
+                        ? campaign.getPerson(familyMemberRef.getId()) : familyMemberRef;
                 if (familyMember == null) {
                     MekHQ.getLogger().warning("Failed to find a person with id " + familyMemberRef.getId());
-                    unknownPersonnel.add(familyMemberRef);
                 } else {
-                    person.getGenealogy().removeFamilyMember(familialRelationshipType, familyMemberRef);
-                    person.getGenealogy().addFamilyMember(familialRelationshipType, familyMember);
+                    family.putIfAbsent(entry.getKey(), new ArrayList<>());
+                    family.get(entry.getKey()).add(familyMember);
                 }
             }
         }
-
-        for (Person unknown : unknownPersonnel) {
-            person.getGenealogy().removeFormerSpouse(unknown);
-            person.getGenealogy().removeFamilyMember(null, unknown);
-        }
+        person.getGenealogy().setFamily(family);
     }
 }
