@@ -26,8 +26,7 @@ import java.util.ResourceBundle;
 public enum FormerSpouseReason {
     //region Enum Declarations
     WIDOWED("FormerSpouseReason.WIDOWED.text"),
-    DIVORCE("FormerSpouseReason.DIVORCE.text"),
-    UNKNOWN("FormerSpouseReason.UNKNOWN.text");
+    DIVORCE("FormerSpouseReason.DIVORCE.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -54,8 +53,6 @@ public enum FormerSpouseReason {
             switch (Integer.parseInt(text)) {
                 case 1:
                     return DIVORCE;
-                case 2:
-                    return UNKNOWN;
                 case 0:
                 default:
                     return WIDOWED;
