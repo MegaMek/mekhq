@@ -145,8 +145,13 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             // to affect the 'spread'.
             double delta = Math.log10(pop) / (1 + distance * distanceScale);
             for (Faction faction : planetarySystem.getFactionSet(now)) {
-                if (faction.is(Tag.ABANDONED) || faction.is(Tag.HIDDEN) || faction.is(Tag.INACTIVE)
-                    || faction.is(Tag.MERC)) {
+                if (faction.is(Tag.ABANDONED) || faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)
+                        || faction.is(Tag.MERC)) {
+                    continue;
+                }
+
+                if (faction.is(Tag.INACTIVE) && !faction.isComStar()) {
+                    // Skip INACTIVE factions [excepting ComStar]
                     continue;
                 }
 
