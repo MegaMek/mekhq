@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -155,7 +155,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
             }
         } else if (getFamily().get(relationshipType) == null) {
             MekHQ.getLogger().error("Could not remove unknown family member of relationship "
-                    + relationshipType.name() + " and person " + person.getFullTitle() + " " + person.getId().toString() + ".");
+                    + relationshipType.name() + " and person " + person.getFullTitle() + " " + person.getId() + ".");
         } else {
             List<Person> familyTypeMembers = getFamily().get(relationshipType);
             familyTypeMembers.remove(person);
@@ -418,9 +418,9 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "genealogy");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "origin", getOrigin().getId().toString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "origin", getOrigin().getId());
         if (getSpouse() != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "spouse", getSpouse().getId().toString());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "spouse", getSpouse().getId());
         }
 
         if (!getFormerSpouses().isEmpty()) {
@@ -437,7 +437,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "relationship");
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "type", relationshipType.name());
                 for (Person person : getFamily().get(relationshipType)) {
-                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "personId", person.getId().toString());
+                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "personId", person.getId());
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "relationship");
             }
@@ -554,15 +554,12 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
     //region Clear Genealogy
     /**
-     * This is used to remove Genealogy for a person
+     * This is used to remove Genealogy links to a person
      */
     public void clearGenealogy() {
         // Clear Spouse
         if (getSpouse() != null) {
-            Person person = getSpouse();
-            if (person != null) {
-                person.getGenealogy().setSpouse(null);
-            }
+            getSpouse().getGenealogy().setSpouse(null);
         }
 
         // Clear Former Spouses
@@ -579,7 +576,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
         if (!familyIsEmpty()) {
             for (List<Person> list : getFamily().values()) {
                 for (Person person : list) {
-                    person.getGenealogy().removeFamilyMember(null, this.origin);
+                    person.getGenealogy().removeFamilyMember(null, getOrigin());
                 }
             }
         }
