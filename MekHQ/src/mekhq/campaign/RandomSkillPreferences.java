@@ -25,8 +25,8 @@ import java.io.Serializable;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.personnel.Person;
 
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -55,7 +55,7 @@ public class RandomSkillPreferences implements Serializable {
 
     public RandomSkillPreferences() {
         overallRecruitBonus = 0;
-        recruitBonuses = new int[Person.T_NUM];
+        recruitBonuses = new int[PersonnelRole.values().length];
         randomizeSkill = true;
         useClanBonuses = true;
         antiMekProb = 10;
@@ -77,14 +77,16 @@ public class RandomSkillPreferences implements Serializable {
         overallRecruitBonus = b;
     }
 
-    public int getRecruitBonus(int type) {
-        return (type < recruitBonuses.length) ? recruitBonuses[type] : 0;
+    public int[] getRecruitBonuses() {
+        return recruitBonuses;
     }
 
-    public void setRecruitBonus(int type, int bonus) {
-        if (type < recruitBonuses.length) {
-            recruitBonuses[type] = bonus;
-        }
+    public int getRecruitBonus(PersonnelRole role) {
+        return getRecruitBonuses()[role.ordinal()];
+    }
+
+    public void setRecruitBonus(int index, int bonus) {
+        recruitBonuses[index] = bonus;
     }
 
     public int getSpecialAbilBonus(int type) {
@@ -234,6 +236,7 @@ public class RandomSkillPreferences implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("secondSkillBonus")) {
                 retVal.secondSkillBonus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("recruitBonuses")) {
+                // TODO : PersonnelRole : I'm going to need migration
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
                     retVal.recruitBonuses[i] = Integer.parseInt(values[i]);

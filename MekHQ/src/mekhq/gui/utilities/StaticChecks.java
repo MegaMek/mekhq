@@ -26,6 +26,7 @@ import megamek.common.Entity;
 import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 
@@ -474,71 +475,71 @@ public class StaticChecks {
         return true;
     }
 
-    public static boolean areAllInfantry(Person[] people) {
+    public static boolean areAllInfantrySoldiers(Person... people) {
         for (Person person : people) {
-            if (Person.T_INFANTRY != person.getPrimaryRole()) {
+            if (PersonnelRole.SOLDIER != person.getPrimaryRole()) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean areAllBattleArmor(Person[] people) {
+    public static boolean areAllBattleArmor(Person... people) {
         for (Person person : people) {
-            if (Person.T_BA != person.getPrimaryRole()) {
+            if (PersonnelRole.BATTLE_ARMOUR != person.getPrimaryRole()) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean areAllVeeGunners(Person[] people) {
+    public static boolean areAllVehicleGunners(Person... people) {
         for (Person person : people) {
-            if (Person.T_VEE_GUNNER != person.getPrimaryRole()) {
+            if (PersonnelRole.VEHICLE_GUNNER != person.getPrimaryRole()) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean areAllVesselGunners(Person[] people) {
+    public static boolean areAllVesselGunners(Person... people) {
         for (Person person : people) {
-            if (Person.T_SPACE_GUNNER != person.getPrimaryRole()) {
+            if (PersonnelRole.VESSEL_GUNNER != person.getPrimaryRole()) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean areAllVesselCrew(Person[] people) {
+    public static boolean areAllVesselCrew(Person... people) {
         for (Person person : people) {
-            if (Person.T_SPACE_CREW != person.getPrimaryRole()
-                    && Person.T_VEHICLE_CREW != person.getPrimaryRole()) {
+            if (PersonnelRole.VESSEL_CREW != person.getPrimaryRole()
+                    && PersonnelRole.VEHICLE_CREW != person.getPrimaryRole()) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean areAllVesselPilots(Person[] people) {
+    public static boolean areAllVesselPilots(Person... people) {
         for (Person person : people) {
-            if (Person.T_SPACE_PILOT != person.getPrimaryRole()) {
+            if (PersonnelRole.VESSEL_PILOT != person.getPrimaryRole()) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean areAllVesselNavigators(Person[] people) {
+    public static boolean areAllVesselNavigators(Person... people) {
         for (Person person : people) {
-            if (Person.T_NAVIGATOR != person.getPrimaryRole()) {
+            if (PersonnelRole.VESSEL_NAVIGATOR != person.getPrimaryRole()) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean areAllActive(Person[] people) {
+    public static boolean areAllActive(Person... people) {
         for (Person person : people) {
             if (!person.getStatus().isActive()) {
                 return false;
@@ -547,7 +548,7 @@ public class StaticChecks {
         return true;
     }
 
-    public static boolean areAllClanEligible(Person[] people) {
+    public static boolean areAllClanEligible(Person... people) {
         for (Person p : people) {
             if (!p.isClanner()) {
                 return false;
@@ -556,7 +557,7 @@ public class StaticChecks {
         return areAllEligible(people);
     }
 
-    public static boolean areAllEligible(Person[] people) {
+    public static boolean areAllEligible(Person... people) {
         return areAllEligible(people, false);
     }
 
@@ -581,7 +582,7 @@ public class StaticChecks {
      * @param people the selected group of people
      * @return true if at least one has one award
      */
-    public static boolean doAnyHaveAnAward(Person[] people) {
+    public static boolean doAnyHaveAnAward(Person... people) {
         for (Person person : people) {
             if (person.getAwardController().hasAwards()) {
                 return true;

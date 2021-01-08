@@ -22,12 +22,14 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import mekhq.Version;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.service.MassRepairOption;
@@ -41,7 +43,6 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
@@ -316,7 +317,7 @@ public class CampaignOptions implements Serializable {
 
     //region Name and Portrait Generation
     private boolean useOriginFactionForNames;
-    private boolean[] usePortraitForType;
+    private boolean[] usePortraitForRole;
     private boolean assignPortraitOnRoleChange;
     //endregion Name and Portrait Generation
 
@@ -585,35 +586,36 @@ public class CampaignOptions implements Serializable {
         salaryXpMultiplier[SkillType.EXP_REGULAR] = 1.0;
         salaryXpMultiplier[SkillType.EXP_VETERAN] = 1.6;
         salaryXpMultiplier[SkillType.EXP_ELITE] = 3.2;
-        salaryTypeBase = new Money[Person.T_NUM];
-        salaryTypeBase[Person.T_NONE] = Money.of(0);
-        salaryTypeBase[Person.T_MECHWARRIOR] = Money.of(1500);
-        salaryTypeBase[Person.T_AERO_PILOT] = Money.of(1500);
-        salaryTypeBase[Person.T_VEE_GUNNER] = Money.of(900);
-        salaryTypeBase[Person.T_GVEE_DRIVER] = Money.of(900);
-        salaryTypeBase[Person.T_NVEE_DRIVER] = Money.of(900);
-        salaryTypeBase[Person.T_VTOL_PILOT] = Money.of(900);
-        salaryTypeBase[Person.T_CONV_PILOT] = Money.of(900);
-        salaryTypeBase[Person.T_INFANTRY] = Money.of(750);
-        salaryTypeBase[Person.T_BA] = Money.of(960);
-        salaryTypeBase[Person.T_SPACE_PILOT] = Money.of(1000);
-        salaryTypeBase[Person.T_SPACE_GUNNER] = Money.of(1000);
-        salaryTypeBase[Person.T_SPACE_CREW] = Money.of(1000);
-        salaryTypeBase[Person.T_NAVIGATOR] = Money.of( 1000);
-        salaryTypeBase[Person.T_DOCTOR] = Money.of(1500);
-        salaryTypeBase[Person.T_ADMIN_COM] = Money.of(500);
-        salaryTypeBase[Person.T_ADMIN_HR] = Money.of(500);
-        salaryTypeBase[Person.T_ADMIN_LOG] = Money.of(500);
-        salaryTypeBase[Person.T_ADMIN_TRA] = Money.of(500);
-        salaryTypeBase[Person.T_MECH_TECH] = Money.of(800);
-        salaryTypeBase[Person.T_AERO_TECH] = Money.of(800);
-        salaryTypeBase[Person.T_BA_TECH] = Money.of(800);
-        salaryTypeBase[Person.T_MECHANIC] = Money.of(800);
-        salaryTypeBase[Person.T_ASTECH] = Money.of(400);
-        salaryTypeBase[Person.T_MEDIC] = Money.of(400);
-        salaryTypeBase[Person.T_PROTO_PILOT] = Money.of(960);
-        salaryTypeBase[Person.T_LAM_PILOT] = Money.of(1500);
-        salaryTypeBase[Person.T_VEHICLE_CREW] = Money.of(900);
+        salaryTypeBase = new Money[PersonnelRole.values().length];
+        salaryTypeBase[PersonnelRole.MECHWARRIOR.ordinal()] = Money.of(1500);
+        salaryTypeBase[PersonnelRole.LAM_PILOT.ordinal()] = Money.of(1500);
+        salaryTypeBase[PersonnelRole.GROUND_VEHICLE_DRIVER.ordinal()] = Money.of(900);
+        salaryTypeBase[PersonnelRole.NAVAL_VEHICLE_DRIVER.ordinal()] = Money.of(900);
+        salaryTypeBase[PersonnelRole.VTOL_PILOT.ordinal()] = Money.of(900);
+        salaryTypeBase[PersonnelRole.VEHICLE_GUNNER.ordinal()] = Money.of(900);
+        salaryTypeBase[PersonnelRole.VEHICLE_CREW.ordinal()] = Money.of(900);
+        salaryTypeBase[PersonnelRole.AEROSPACE_PILOT.ordinal()] = Money.of(1500);
+        salaryTypeBase[PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT.ordinal()] = Money.of(900);
+        salaryTypeBase[PersonnelRole.PROTOMECH_PILOT.ordinal()] = Money.of(960);
+        salaryTypeBase[PersonnelRole.BATTLE_ARMOUR.ordinal()] = Money.of(960);
+        salaryTypeBase[PersonnelRole.SOLDIER.ordinal()] = Money.of(750);
+        salaryTypeBase[PersonnelRole.VESSEL_PILOT.ordinal()] = Money.of(1000);
+        salaryTypeBase[PersonnelRole.VESSEL_GUNNER.ordinal()] = Money.of(1000);
+        salaryTypeBase[PersonnelRole.VESSEL_CREW.ordinal()] = Money.of(1000);
+        salaryTypeBase[PersonnelRole.VESSEL_NAVIGATOR.ordinal()] = Money.of( 1000);
+        salaryTypeBase[PersonnelRole.MECH_TECH.ordinal()] = Money.of(800);
+        salaryTypeBase[PersonnelRole.MECHANIC.ordinal()] = Money.of(800);
+        salaryTypeBase[PersonnelRole.AERO_TECH.ordinal()] = Money.of(800);
+        salaryTypeBase[PersonnelRole.BA_TECH.ordinal()] = Money.of(800);
+        salaryTypeBase[PersonnelRole.ASTECH.ordinal()] = Money.of(400);
+        salaryTypeBase[PersonnelRole.DOCTOR.ordinal()] = Money.of(1500);
+        salaryTypeBase[PersonnelRole.MEDIC.ordinal()] = Money.of(400);
+        salaryTypeBase[PersonnelRole.ADMINISTRATOR_COMMAND.ordinal()] = Money.of(500);
+        salaryTypeBase[PersonnelRole.ADMINISTRATOR_LOGISTICS.ordinal()] = Money.of(500);
+        salaryTypeBase[PersonnelRole.ADMINISTRATOR_TRANSPORT.ordinal()] = Money.of(500);
+        salaryTypeBase[PersonnelRole.ADMINISTRATOR_HR.ordinal()] = Money.of(500);
+        salaryTypeBase[PersonnelRole.DEPENDENT.ordinal()] = Money.of(0);
+        salaryTypeBase[PersonnelRole.NONE.ordinal()] = Money.of(0);
 
         //Prisoner
         prisonerCaptureStyle = PrisonerCaptureStyle.TAHARQA;
@@ -640,7 +642,7 @@ public class CampaignOptions implements Serializable {
         usePeacetimeCost = false;
         useExtendedPartsModifier = false;
         showPeacetimeCost = false;
-        financialYearDuration = FinancialYearDuration.DEFAULT_TYPE;
+        financialYearDuration = FinancialYearDuration.ANNUAL;
         newFinancialYearFinancesToCSVExport = false;
         clanPriceModifier = 1.0;
         usedPartsValue = new double[6];
@@ -703,11 +705,9 @@ public class CampaignOptions implements Serializable {
 
         //region Name and Portrait Generation Tab
         useOriginFactionForNames = true;
-        usePortraitForType = new boolean[Person.T_NUM];
-        for (int i = 0; i < Person.T_NUM; i++) {
-            usePortraitForType[i] = false;
-        }
-        usePortraitForType[Person.T_MECHWARRIOR] = true;
+        usePortraitForRole = new boolean[PersonnelRole.values().length];
+        Arrays.fill(usePortraitForRole, false);
+        usePortraitForRole[PersonnelRole.MECHWARRIOR.ordinal()] = true;
         assignPortraitOnRoleChange = false;
         //endregion Name and Portrait Generation Tab
 
@@ -1548,27 +1548,16 @@ public class CampaignOptions implements Serializable {
         this.salaryXpMultiplier[xp] = d;
     }
 
-    public double getBaseSalary(int type) {
-        if ((type < 0) || (type >= salaryTypeBase.length)) {
-            return 0.0;
-        }
-
-        return salaryTypeBase[type].getAmount().doubleValue();
+    public Money[] getBaseSalaries() {
+        return salaryTypeBase;
     }
 
-    public Money getBaseSalaryMoney(int type) {
-        if (type < 0 || type >= salaryTypeBase.length) {
-            return Money.zero();
-        }
-        return salaryTypeBase[type];
+    public Money getBaseSalaryMoney(PersonnelRole role) {
+        return salaryTypeBase[role.ordinal()];
     }
 
-    public void setBaseSalary(int type, double base) {
-        if ((type < 0) || (type >= salaryTypeBase.length)) {
-            return;
-        }
-
-        this.salaryTypeBase[type] = Money.of(base);
+    public void setBaseSalary(int index, double base) {
+        this.salaryTypeBase[index] = Money.of(base);
     }
     //endregion salary
 
@@ -2115,25 +2104,23 @@ public class CampaignOptions implements Serializable {
     }
 
     public int getPhenotypeProbability(Phenotype phenotype) {
-        return phenotypeProbabilities[phenotype.getIndex()];
+        return getPhenotypeProbabilities()[phenotype.getIndex()];
     }
 
     public void setPhenotypeProbability(int index, int percentage) {
         phenotypeProbabilities[index] = percentage;
     }
 
-    public boolean usePortraitForType(int type) {
-        if (type < 0 || type >= usePortraitForType.length) {
-            return false;
-        }
-        return usePortraitForType[type];
+    public boolean[] usePortraitForRoles() {
+        return usePortraitForRole;
     }
 
-    public void setUsePortraitForType(int type, boolean b) {
-        if (type < 0 || type >= usePortraitForType.length) {
-            return;
-        }
-        usePortraitForType[type] = b;
+    public boolean usePortraitForRole(PersonnelRole role) {
+        return usePortraitForRoles()[role.ordinal()];
+    }
+
+    public void setUsePortraitForRole(int index, boolean b) {
+        usePortraitForRole[index] = b;
     }
 
     public boolean getAssignPortraitOnRoleChange() {
@@ -3319,9 +3306,9 @@ public class CampaignOptions implements Serializable {
 
         // cannot use StringUtils.join for a boolean array, so we are using this instead
         StringBuilder csv = new StringBuilder();
-        for (int i = 0; i < usePortraitForType.length; i++) {
-            csv.append(usePortraitForType[i]);
-            if (i < usePortraitForType.length - 1) {
+        for (int i = 0; i < usePortraitForRoles().length; i++) {
+            csv.append(usePortraitForRoles()[i]);
+            if (i < usePortraitForRoles().length - 1) {
                 csv.append(",");
             }
         }
@@ -3343,7 +3330,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {
-        MekHQ.getLogger().info("Loading Campaign Options from Version " + version.toString() + " XML...");
+        MekHQ.getLogger().info("Loading Campaign Options from Version " + version + " XML...");
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -3555,10 +3542,11 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("manualUnitRatingModifier")) {
                 retVal.setManualUnitRatingModifier(Integer.parseInt(wn2.getTextContent()));
             } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
+                // FIXME : PersonnelRole : Migration needed
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
-                    if (i < retVal.usePortraitForType.length) {
-                        retVal.usePortraitForType[i] = Boolean.parseBoolean(values[i].trim());
+                    if (i < retVal.usePortraitForRoles().length) {
+                        retVal.setUsePortraitForRole(i, Boolean.parseBoolean(values[i].trim()));
                     }
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("assignPortraitOnRoleChange")) {
@@ -3752,9 +3740,11 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                 retVal.salaryAntiMekMultiplier = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
+                // FIXME : PersonnelRole : Migration needed
+
                 // CAW: we need at least the correct number of salaries as are expected in this version,
                 //      otherwise we'll not be able to set a salary for a role.
-                retVal.salaryTypeBase = Utilities.readMoneyArray(wn2, Person.T_NUM);
+                retVal.salaryTypeBase = Utilities.readMoneyArray(wn2, retVal.salaryTypeBase.length);
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {

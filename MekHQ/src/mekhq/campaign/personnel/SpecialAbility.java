@@ -34,6 +34,7 @@ import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -568,12 +569,12 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return implants.get(name);
     }
 
-    public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year, boolean clusterOnly) {
+    public static String chooseWeaponSpecialization(PersonnelRole role, boolean isClan, int techLvl, int year, boolean clusterOnly) {
         ArrayList<String> candidates = new ArrayList<>();
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
 
-            if (!isWeaponEligibleForSPA(et, type, clusterOnly)) {
+            if (!isWeaponEligibleForSPA(et, role, clusterOnly)) {
                 continue;
             }
 
@@ -616,10 +617,10 @@ public class SpecialAbility implements MekHqXmlSerializable {
      * Worker function that determines if a piece of equipment is eligible
      * for being selected for an SPA.
      * @param et Equipment type to check
-     * @param type Person role, e.g. Person.T_MECHWARRIOR. This check is ignored if Person.T_NONE is passed in.
+     * @param role Person's primary role. This check is ignored if PersonnelRole.NONE is passed in.
      * @param clusterOnly All weapon types or just ones that do rolls on the cluster table
      */
-    public static boolean isWeaponEligibleForSPA(EquipmentType et, int type, boolean clusterOnly) {
+    public static boolean isWeaponEligibleForSPA(EquipmentType et, PersonnelRole role, boolean clusterOnly) {
         if (!(et instanceof WeaponType)) {
             return false;
         }
@@ -637,15 +638,12 @@ public class SpecialAbility implements MekHqXmlSerializable {
             return false;
         }
 
-        if (type > Person.T_NONE &&
-                !((wt.hasFlag(WeaponType.F_MECH_WEAPON) && type == Person.T_MECHWARRIOR)
-                || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && type != Person.T_AERO_PILOT)
-                || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !(type == Person.T_VEE_GUNNER
-                        || type == Person.T_NVEE_DRIVER
-                        || type == Person.T_GVEE_DRIVER
-                        || type == Person.T_VTOL_PILOT))
-                || (wt.hasFlag(WeaponType.F_BA_WEAPON) && type != Person.T_BA)
-                || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && type != Person.T_PROTO_PILOT))) {
+        if (!role.isDependentOrNone()
+                && !((wt.hasFlag(WeaponType.F_MECH_WEAPON) && !role.isMechWarrior())
+                || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && !role.isAerospacePilot())
+                || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !role.isVehicleCrewmember())
+                || (wt.hasFlag(WeaponType.F_BA_WEAPON) && !role.isBattleArmour())
+                || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && !role.isProtoMechPilot()))) {
             return false;
         }
 

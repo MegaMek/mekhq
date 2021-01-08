@@ -2,6 +2,7 @@
  * CampaignGUI.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,6 +41,7 @@ import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.dialog.*;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
@@ -743,15 +745,14 @@ public class CampaignGUI extends JPanel {
         miHireBulk.addActionListener(evt -> hireBulkPersonnel());
         menuMarket.add(miHireBulk);
 
-        JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text")); // NOI18N
+        JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
         menuHire.setMnemonic(KeyEvent.VK_H);
-        for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
-            JMenuItem miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan()));
-            int miHireMnemonic = Person.getRoleMnemonic(i);
-            if (miHireMnemonic != KeyEvent.VK_UNDEFINED) {
-                miHire.setMnemonic(miHireMnemonic);
+        for (PersonnelRole role : PersonnelRole.values()) {
+            JMenuItem miHire = new JMenuItem(role.getName(getCampaign().getFaction().isClan()));
+            if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
+                miHire.setMnemonic(role.getMnemonic());
             }
-            miHire.setActionCommand(Integer.toString(i));
+            miHire.setActionCommand(role.name());
             miHire.addActionListener(this::hirePerson);
             menuHire.add(miHire);
         }
@@ -1242,10 +1243,9 @@ public class CampaignGUI extends JPanel {
         return false;
     }
 
-    private void hirePerson(java.awt.event.ActionEvent evt) {
-        int type = Integer.parseInt(evt.getActionCommand());
+    private void hirePerson(ActionEvent evt) {
         NewRecruitDialog npd = new NewRecruitDialog(this, true,
-                getCampaign().newPerson(type));
+                getCampaign().newPerson(PersonnelRole.valueOf(evt.getActionCommand())));
         npd.setVisible(true);
     }
 
@@ -1276,7 +1276,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void menuSaveXmlActionPerformed(ActionEvent evt) {
-        MekHQ.getLogger().info(this, "Saving campaign...");
+        MekHQ.getLogger().info("Saving campaign...");
         // Choose a file...
         File file = selectSaveCampaignFile();
         if (file == null) {
@@ -1351,11 +1351,7 @@ public class CampaignGUI extends JPanel {
         return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
     }
 
-    private String getExtensionForSaveFile(Campaign c) {
-        return MekHQ.getMekHQOptions().getPreferGzippedOutput() ? ".cpnx.gz" : ".cpnx";
-    }
-
-    private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {
+    private void menuLoadXmlActionPerformed(ActionEvent evt) {
         File f = selectLoadCampaignFile();
         if (null == f) {
             return;
@@ -1585,19 +1581,17 @@ public class CampaignGUI extends JPanel {
             Map<String, Person> techHash = new HashMap<>();
             List<String> techList = new ArrayList<>();
             String skillLvl;
-            int TimePerDay;
+            int timePerDay;
 
             List<Person> techs = getCampaign().getTechs();
-            techs.sort(Comparator.comparingInt(Person::getPrimaryRole));
+            techs.sort(Comparator.comparing(Person::getPrimaryRole));
             for (Person tech : techs) {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                if (tech.getSecondaryRole() == Person.T_MECH_TECH || tech.getSecondaryRole() == Person.T_MECHANIC || tech.getSecondaryRole() == Person.T_AERO_TECH) {
-                    TimePerDay = 240 - tech.getMaintenanceTimeUsing();
-                } else {
-                    TimePerDay = 480 - tech.getMaintenanceTimeUsing();
-                }
+                timePerDay = (tech.getSecondaryRole().isTechSecondary()
+                        ? Person.SECONDARY_ROLE_SUPPORT_TIME : Person.PRIMARY_ROLE_SUPPORT_TIME)
+                        - tech.getMaintenanceTimeUsing();
                 skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(false));
                 name = tech.getFullName()
                         + ", "
@@ -1608,7 +1602,7 @@ public class CampaignGUI extends JPanel {
                         + getCampaign().getTargetFor(r, tech).getValueAsString()
                         + "+)"
                         + ", "
-                        + tech.getMinutesLeft() + "/" + TimePerDay
+                        + tech.getMinutesLeft() + "/" + timePerDay
                         + " minutes";
                 techHash.put(name, tech);
                 techList.add(name);
@@ -2606,7 +2600,7 @@ public class CampaignGUI extends JPanel {
     public void handlePersonUpdate(PersonEvent ev) {
         // only bother recalculating AtB parts availability if a logistics admin has been changed
         // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
-        if (ev.getPerson().hasRole(Person.T_ADMIN_LOG)) {
+        if (ev.getPerson().hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS)) {
             refreshPartsAvailability();
         }
     }

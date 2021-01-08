@@ -38,6 +38,7 @@ import mekhq.campaign.Hangar;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import org.junit.Before;
@@ -93,7 +94,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         // Set up the doctor.
         when(mockDoctorSkillRegular.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
         when(mockDoctorSkillGreen.getExperienceLevel()).thenReturn(SkillType.EXP_GREEN);
-        when(mockDoctor.getPrimaryRole()).thenReturn(Person.T_DOCTOR);
+        when(mockDoctor.getPrimaryRole()).thenReturn(PersonnelRole.DOCTOR);
         when(mockDoctor.isDoctor()).thenReturn(true);
         doReturn(PersonnelStatus.ACTIVE).when(mockDoctor).getStatus();
         when(mockDoctor.isDeployed()).thenReturn(false);
@@ -104,7 +105,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         // Set up the tech.
         when(mockMechTechSkillVeteran.getExperienceLevel()).thenReturn(SkillType.EXP_VETERAN);
         when(mockMechTechSkillRegular.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
-        when(mockTech.getPrimaryRole()).thenReturn(Person.T_MECH_TECH);
+        when(mockTech.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
         when(mockTech.isTech()).thenReturn(true);
         doReturn(PersonnelStatus.ACTIVE).when(mockTech).getStatus();
         when(mockTech.isDeployed()).thenReturn(false);
@@ -333,8 +334,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         // Add a mechwarrior who doubles as a back-up medic of Green skill.  This should add another 15 hours.
         testFieldManuMercRevDragoonsRating = new FieldManualMercRevDragoonsRating(mockCampaign);
         Person mockMechwarrior = mock(Person.class);
-        when(mockMechwarrior.getPrimaryRole()).thenReturn(Person.T_MECHWARRIOR);
-        when(mockMechwarrior.getSecondaryRole()).thenReturn(Person.T_DOCTOR);
+        when(mockMechwarrior.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
+        when(mockMechwarrior.getSecondaryRole()).thenReturn(PersonnelRole.DOCTOR);
         when(mockMechwarrior.isDoctor()).thenReturn(true);
         doReturn(PersonnelStatus.ACTIVE).when(mockMechwarrior).getStatus();
         when(mockMechwarrior.isDeployed()).thenReturn(false);
@@ -349,9 +350,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         // Hire a full-time Medic.  This should add another 20 hours.
         testFieldManuMercRevDragoonsRating = new FieldManualMercRevDragoonsRating(mockCampaign);
         Person mockMedic = mock(Person.class);
-        when(mockMedic.getPrimaryRole()).thenReturn(Person.T_MEDIC);
+        when(mockMedic.getPrimaryRole()).thenReturn(PersonnelRole.MEDIC);
         when(mockMedic.isDoctor()).thenReturn(false);
-        when(mockMedic.isMedic()).thenReturn(true);
         doReturn(PersonnelStatus.ACTIVE).when(mockMedic).getStatus();
         when(mockMedic.isDeployed()).thenReturn(false);
         when(mockMedic.getSkill(eq(SkillType.S_MEDTECH))).thenReturn(mockMedicSkill);
@@ -381,10 +381,9 @@ public class FieldManualMercRevDragoonsRatingTest {
         // Add a mechwarrior who doubles as a back-up tech of Regular skill.  This should add another 20 hours.
         testFieldManuMercRevDragoonsRating = new FieldManualMercRevDragoonsRating(mockCampaign);
         Person mockMechwarrior = mock(Person.class);
-        when(mockMechwarrior.getPrimaryRole()).thenReturn(Person.T_MECHWARRIOR);
-        when(mockMechwarrior.getSecondaryRole()).thenReturn(Person.T_MECH_TECH);
+        when(mockMechwarrior.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
+        when(mockMechwarrior.getSecondaryRole()).thenReturn(PersonnelRole.MECH_TECH);
         when(mockMechwarrior.isTech()).thenReturn(true);
-        when(mockMechwarrior.isTechSecondary()).thenReturn(true);
         doReturn(PersonnelStatus.ACTIVE).when(mockMechwarrior).getStatus();
         when(mockMechwarrior.isDeployed()).thenReturn(false);
         when(mockMechwarrior.getSkill(eq(SkillType.S_TECH_MECH))).thenReturn(mockMechTechSkillRegular);
@@ -398,7 +397,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         // Hire a full-time Astech.  This should add another 20 hours.
         testFieldManuMercRevDragoonsRating = new FieldManualMercRevDragoonsRating(mockCampaign);
         Person mockAstech = mock(Person.class);
-        when(mockAstech.getPrimaryRole()).thenReturn(Person.T_ASTECH);
+        when(mockAstech.getPrimaryRole()).thenReturn(PersonnelRole.ASTECH);
         when(mockAstech.isDoctor()).thenReturn(false);
         when(mockAstech.isTech()).thenReturn(false);
         doReturn(PersonnelStatus.ACTIVE).when(mockAstech).getStatus();

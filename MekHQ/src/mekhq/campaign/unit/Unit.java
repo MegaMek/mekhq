@@ -42,6 +42,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.*;
 
 import mekhq.campaign.parts.equipment.*;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -3905,7 +3906,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 engineer.setMinutesLeft(minutesLeft);
                 engineer.setOvertimeLeft(overtimeLeft);
                 engineer.setId(getCommander().getId());
-                engineer.setPrimaryRole(Person.T_MECHANIC);
+                engineer.setPrimaryRole(PersonnelRole.MECHANIC);
                 engineer.setRankNumeric(getCommander().getRankNumeric());
                 //will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
                 engineer.addSkill(SkillType.S_TECH_MECHANIC, SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(), 0);
@@ -3970,7 +3971,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     engineer.setMinutesLeft(minutesLeft);
                     engineer.setOvertimeLeft(overtimeLeft);
                     engineer.setId(getCommander().getId());
-                    engineer.setPrimaryRole(Person.T_SPACE_CREW);
+                    engineer.setPrimaryRole(PersonnelRole.VESSEL_CREW);
                     if (bestRank > -1) {
                         engineer.setRankNumeric(bestRank);
                     }

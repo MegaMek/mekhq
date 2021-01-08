@@ -80,12 +80,13 @@ import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarketDylan;
 import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -602,6 +603,8 @@ public class CampaignOptionsDialog extends JDialog {
         GridBagConstraints gridBagConstraints;
         int gridy = 0;
         int gridx = 0;
+
+        final PersonnelRole[] personnelRoles = PersonnelRole.values();
         //endregion Variable Declaration and Initialisation
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
@@ -1862,9 +1865,9 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSalary.add(panXpMultiplier, gridBagConstraints);
 
-        JPanel panAllTypes = new JPanel(new GridLayout(Person.T_NUM / 2, 2));
-        JPanel panType;
-        spnSalaryBase = new JSpinner[Person.T_NUM];
+        JPanel panAllRoles = new JPanel(new GridLayout(personnelRoles.length / 2, 2));
+        JPanel panRole;
+        spnSalaryBase = new JSpinner[personnelRoles.length];
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -1872,12 +1875,12 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        for (int i = 1; i < Person.T_NUM; i++) {
-            panType = new JPanel(new GridBagLayout());
+        for (int i = 0; i < personnelRoles.length; i++) {
+            panRole = new JPanel(new GridBagLayout());
 
             gridBagConstraints.gridx = 0;
             gridBagConstraints.weightx = 1.0;
-            panType.add(new JLabel(Person.getRoleDesc(i, false)), gridBagConstraints);
+            panRole.add(new JLabel(personnelRoles[i].toString()), gridBagConstraints);
 
             JSpinner spnType = new JSpinner(new SpinnerNumberModel(0.0, 0.0, null, 10.0));
             spnType.setMinimumSize(new Dimension(75, 20));
@@ -1885,11 +1888,12 @@ public class CampaignOptionsDialog extends JDialog {
             spnSalaryBase[i] = spnType;
             gridBagConstraints.gridx = 1;
             gridBagConstraints.weightx = 0.0;
-            panType.add(spnType, gridBagConstraints);
-            panAllTypes.add(panType);
+            panRole.add(spnType, gridBagConstraints);
+
+            panAllRoles.add(panRole);
         }
 
-        JScrollPane scrSalaryBase = new JScrollPane(panAllTypes);
+        JScrollPane scrSalaryBase = new JScrollPane(panAllRoles);
         scrSalaryBase.setBorder(BorderFactory.createTitledBorder("Base Salaries"));
         scrSalaryBase.setOpaque(false);
         scrSalaryBase.setPreferredSize(new Dimension(200, 200));
@@ -2856,26 +2860,29 @@ public class CampaignOptionsDialog extends JDialog {
         spnOverallRecruitBonus = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
         ((JSpinner.DefaultEditor) spnOverallRecruitBonus.getEditor()).getTextField().setEditable(false);
         spnOverallRecruitBonus.setToolTipText(resourceMap.getString("spnOverallRecruitBonus.toolTipText"));
-        spnTypeRecruitBonus = new JSpinner[Person.T_NUM];
-        int nRow = (int) Math.ceil(Person.T_NUM / 4.0);
+        spnTypeRecruitBonus = new JSpinner[personnelRoles.length];
+        int nRow = (int) Math.ceil(personnelRoles.length / 4.0);
         JPanel panTypeRecruitBonus = new JPanel(new GridLayout(nRow, 4));
         JSpinner spin;
         JPanel panRecruit;
-        for (int i = 0; i < Person.T_NUM; i++) {
+        for (PersonnelRole role : personnelRoles) {
             panRecruit = new JPanel(new GridBagLayout());
+
             spin = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
             ((JSpinner.DefaultEditor) spin.getEditor()).getTextField().setEditable(false);
-            spnTypeRecruitBonus[i] = spin;
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            spnTypeRecruitBonus[role.ordinal()] = spin;
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 0;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(2, 5, 0, 0);
             panRecruit.add(spin, gridBagConstraints);
+
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            panRecruit.add(new JLabel(Person.getRoleDesc(i, false)), gridBagConstraints);
+            panRecruit.add(new JLabel(role.toString()), gridBagConstraints);
+
             panTypeRecruitBonus.add(panRecruit);
         }
 
@@ -2883,7 +2890,7 @@ public class CampaignOptionsDialog extends JDialog {
                 BorderFactory.createTitledBorder(resourceMap.getString("panTypeRecruitBonus.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
@@ -3291,8 +3298,8 @@ public class CampaignOptionsDialog extends JDialog {
         // The math below is used to determine how to split the personnel role options for portraits,
         // which it does into 4 columns with rows equal to the number of roles plus two, with the
         // additional two being the all role and no role options.
-        JPanel panUsePortrait = new JPanel(new GridLayout((int) Math.ceil((Person.T_NUM + 2) / 4.0), 4));
-        chkUsePortrait = new JCheckBox[Person.T_NUM];
+        JPanel panUsePortrait = new JPanel(new GridLayout((int) Math.ceil((personnelRoles.length + 2) / 4.0), 4));
+        chkUsePortrait = new JCheckBox[personnelRoles.length];
         allPortraitsBox = new JCheckBox(resourceMap.getString("panUsePortrait.all.text"));
         noPortraitsBox = new JCheckBox(resourceMap.getString("panUsePortrait.no.text"));
         allPortraitsBox.addActionListener(evt -> {
@@ -3323,10 +3330,10 @@ public class CampaignOptionsDialog extends JDialog {
         panUsePortrait.add(noPortraitsBox);
 
         JCheckBox box;
-        for (int i = 0; i < Person.T_NUM; i++) {
-            box = new JCheckBox(Person.getRoleDesc(i, false));
+        for (PersonnelRole role : personnelRoles) {
+            box = new JCheckBox(role.toString());
             panUsePortrait.add(box);
-            chkUsePortrait[i] = box;
+            chkUsePortrait[role.ordinal()] = box;
         }
 
         panRandomPortrait.add(panUsePortrait, BorderLayout.CENTER);
@@ -4464,8 +4471,9 @@ public class CampaignOptionsDialog extends JDialog {
         for (int i = 0; i < spnSalaryXp.length; i++) {
             spnSalaryXp[i].setValue(options.getSalaryXpMultiplier(i));
         }
+        final Money[] baseSalaries = options.getBaseSalaries();
         for (int i = 1; i < spnSalaryBase.length; i++) {
-            spnSalaryBase[i].setValue(options.getBaseSalary(i));
+            spnSalaryBase[i].setValue(baseSalaries[i].getAmount().doubleValue());
         }
 
         //Prisoners
@@ -4545,14 +4553,15 @@ public class CampaignOptionsDialog extends JDialog {
 
         //region Skill Randomization Tab
         chkExtraRandom.setSelected(randomSkillPreferences.randomizeSkill());
-        int[] phenotypeProbabilities = options.getPhenotypeProbabilities();
+        final int[] phenotypeProbabilities = options.getPhenotypeProbabilities();
         for (int i = 0; i < phenotypeSpinners.length; i++) {
             phenotypeSpinners[i].setValue(phenotypeProbabilities[i]);
         }
         spnProbAntiMek.setValue(rSkillPrefs.getAntiMekProb());
         spnOverallRecruitBonus.setValue(rSkillPrefs.getOverallRecruitBonus());
-        for (int i = 0; i < Person.T_NUM; i++) {
-            spnTypeRecruitBonus[i].setValue(rSkillPrefs.getRecruitBonus(i));
+        final int[] recruitmentBonuses = rSkillPrefs.getRecruitBonuses();
+        for (int i = 0; i < spnTypeRecruitBonus.length; i++) {
+            spnTypeRecruitBonus[i].setValue(recruitmentBonuses[i]);
         }
         spnArtyProb.setValue(rSkillPrefs.getArtilleryProb());
         spnArtyBonus.setValue(rSkillPrefs.getArtilleryBonus());
@@ -4580,10 +4589,10 @@ public class CampaignOptionsDialog extends JDialog {
 
         boolean allSelected = true;
         boolean noneSelected = true;
-        for (int i = 0; i < Person.T_NUM; i++) {
-            boolean usePortrait = options.usePortraitForType(i);
-            chkUsePortrait[i].setSelected(usePortrait);
-            if (usePortrait) {
+        final boolean[] usePortraitForRole = options.usePortraitForRoles();
+        for (int i = 0; i < chkUsePortrait.length; i++) {
+            chkUsePortrait[i].setSelected(usePortraitForRole[i]);
+            if (usePortraitForRole[i]) {
                 noneSelected = false;
             } else {
                 allSelected = false;
@@ -4845,7 +4854,7 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.setIconFileName(iconFileName);
 
         for (int i = 0; i < chkUsePortrait.length; i++) {
-            options.setUsePortraitForType(i, chkUsePortrait[i].isSelected());
+            options.setUsePortraitForRole(i, chkUsePortrait[i].isSelected());
         }
 
         updateSkillTypes();
@@ -4968,7 +4977,7 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.getGameOptions().getOption("techlevel").setValue((String)choiceTechLevel.getSelectedItem());
 
         rSkillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getModel().getValue());
-        for (int i = 0; i < Person.T_NUM; i++) {
+        for (int i = 0; i < spnTypeRecruitBonus.length; i++) {
             rSkillPrefs.setRecruitBonus(i, (Integer) spnTypeRecruitBonus[i].getModel().getValue());
         }
         rSkillPrefs.setRandomizeSkill(chkExtraRandom.isSelected());
@@ -5059,10 +5068,12 @@ public class CampaignOptionsDialog extends JDialog {
         for (int i = 0; i < spnSalaryXp.length; i++) {
             options.setSalaryXpMultiplier((Double) spnSalaryXp[i].getModel().getValue(), i);
         }
-        for (int i = 1; i < Person.T_NUM; i++) {
+        for (int i = 1; i < spnSalaryBase.length; i++) {
             try {
                 options.setBaseSalary(i, (double) spnSalaryBase[i].getValue());
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+
+            }
         }
         //Prisoners
         options.setPrisonerCaptureStyle((PrisonerCaptureStyle) comboPrisonerCaptureStyle.getSelectedItem());

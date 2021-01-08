@@ -36,6 +36,7 @@ import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
 import mekhq.MHQStaticDirectoryManager;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.utilities.JMenuHelpers;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -682,8 +683,8 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         JMenu mechanics = new JMenu("Mechanics");
                         JMenu baTechs = new JMenu("BA Techs");
 
-                        int role;
-                        int previousRole = Person.T_MECH_TECH;
+                        PersonnelRole role;
+                        PersonnelRole previousRole = PersonnelRole.MECH_TECH;
 
                         JMenu eliteMenu = new JMenu(SkillType.ELITE_NM);
                         JMenu veteranMenu = new JMenu(SkillType.VETERAN_NM);
@@ -695,29 +696,29 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         // Get the list of techs, then sort them based on their tech role
                         List<Person> techList = gui.getCampaign().getTechs();
                         techList.sort((o1, o2) -> {
-                            int r1 = o1.isTechPrimary() ? o1.getPrimaryRole() : o1.getSecondaryRole();
-                            int r2 = o2.isTechPrimary() ? o2.getPrimaryRole() : o2.getSecondaryRole();
-                            return r1 - r2;
+                            PersonnelRole r1 = o1.getPrimaryRole().isTech() ? o1.getPrimaryRole() : o1.getSecondaryRole();
+                            PersonnelRole r2 = o2.getPrimaryRole().isTech() ? o2.getPrimaryRole() : o2.getSecondaryRole();
+                            return r1.compareTo(r2);
                         });
                         for (Person tech : techList) {
                             if ((tech.getMaintenanceTimeUsing() == 0) && !tech.isEngineer()) {
-                                role = tech.isTechPrimary() ? tech.getPrimaryRole() : tech.getSecondaryRole();
-                                String skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(!tech.isTechPrimary()));
+                                role = tech.getPrimaryRole().isTech() ? tech.getPrimaryRole() : tech.getSecondaryRole();
+                                String skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(!tech.getPrimaryRole().isTech()));
 
                                 // We need to add all the non-empty menus to the current menu, then
                                 // the current menu must be added to the main menu if the role changes
                                 // This enables us to use significantly less code to do the same thing
-                                if (role > previousRole) {
+                                if (role.ordinal() > previousRole.ordinal()) {
                                     previousRole = role;
 
                                     // Adding menus if they aren't empty and adding scrollbars if they
                                     // contain more than MAX_POPUP_ITEMS items
-                                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, eliteMenu, MAX_POPUP_ITEMS);
-                                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, veteranMenu, MAX_POPUP_ITEMS);
-                                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, regularMenu, MAX_POPUP_ITEMS);
-                                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, greenMenu, MAX_POPUP_ITEMS);
-                                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, ultraGreenMenu, MAX_POPUP_ITEMS);
-                                    JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu, MAX_POPUP_ITEMS);
+                                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, eliteMenu);
+                                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, veteranMenu);
+                                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, regularMenu);
+                                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, greenMenu);
+                                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, ultraGreenMenu);
+                                    JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu);
 
                                     eliteMenu = new JMenu(SkillType.ELITE_NM);
                                     veteranMenu = new JMenu(SkillType.VETERAN_NM);
@@ -725,14 +726,16 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                                     greenMenu = new JMenu(SkillType.GREEN_NM);
                                     ultraGreenMenu = new JMenu(SkillType.ULTRA_GREEN_NM);
                                     switch (role) {
-                                        case Person.T_MECHANIC:
+                                        case MECHANIC:
                                             currentMenu = mechanics;
                                             break;
-                                        case Person.T_AERO_TECH:
+                                        case AERO_TECH:
                                             currentMenu = aeroTechs;
                                             break;
-                                        case Person.T_BA_TECH:
+                                        case BA_TECH:
                                             currentMenu = baTechs;
+                                            break;
+                                        default:
                                             break;
                                     }
                                 }
@@ -756,18 +759,20 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                                     case SkillType.ULTRA_GREEN_NM:
                                         ultraGreenMenu.add(menuItem);
                                         break;
+                                    default:
+                                        break;
                                 }
                             }
                         }
 
                         // We need to add the last role to the menu after we assign the last tech
-                        JMenuHelpers.addMenuIfNonEmpty(currentMenu, eliteMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(currentMenu, veteranMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(currentMenu, regularMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(currentMenu, greenMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(currentMenu, ultraGreenMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu, MAX_POPUP_ITEMS);
-                        JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+                        JMenuHelpers.addMenuIfNonEmpty(currentMenu, eliteMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(currentMenu, veteranMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(currentMenu, regularMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(currentMenu, greenMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(currentMenu, ultraGreenMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu);
+                        JMenuHelpers.addMenuIfNonEmpty(popup, menu);
                     } else {
                         menuItem = new JMenuItem("Remove Tech from Force");
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_LANCE_TECH + force.getTechID() + "|" + forceIds);
@@ -782,8 +787,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     final List<Integer> svTypes = Arrays.asList(UnitType.TANK,
                             UnitType.VTOL, UnitType.NAVAL, UnitType.CONV_FIGHTER);
 
-                    for (int i = 0; i < UnitType.SIZE; i++)
-                    {
+                    for (int i = 0; i < UnitType.SIZE; i++) {
                         String unittype = UnitType.getTypeName(i);
                         String displayname = UnitType.getTypeDisplayableName(i);
                         unitTypeMenus.put(unittype, new JMenu(displayname));
@@ -900,7 +904,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         menu.add(unsorted);
                         menu.setEnabled(true);
                     }
-                    JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+                    JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
                     menuItem = new JMenuItem("Change Force Icon...");
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_ICON + forceIds);

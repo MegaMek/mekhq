@@ -64,6 +64,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
@@ -401,9 +402,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 } else {
                     if ((getCampaign().getRetirementDefectionTracker().getRetirees((AtBContract) mission) != null)
                             && getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
-                        final int[] admins = {Person.T_ADMIN_COM, Person.T_ADMIN_HR,
-                                Person.T_ADMIN_LOG, Person.T_ADMIN_TRA};
-                        for (int role : admins) {
+                        for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
                             Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
                             if (admin != null) {
                                 admin.awardXP(1);
