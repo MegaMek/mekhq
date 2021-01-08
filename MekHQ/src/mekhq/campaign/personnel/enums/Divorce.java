@@ -23,7 +23,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
-import mekhq.campaign.personnel.FormerSpouse;
+import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.Person;
 
 import java.util.ResourceBundle;

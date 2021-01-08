@@ -20,7 +20,7 @@ package mekhq.io.idReferenceClasses;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.FormerSpouse;
+import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 

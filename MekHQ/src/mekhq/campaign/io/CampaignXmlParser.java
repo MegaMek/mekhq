@@ -1668,7 +1668,7 @@ public class CampaignXmlParser {
 
         for (int x = 0; x < wList.getLength(); x++) {
             // First, we determine the node values
-            UUID  id = null;
+            UUID id = null;
             Person father = null;
             Person mother = null;
             Node wn2 = wList.item(x);

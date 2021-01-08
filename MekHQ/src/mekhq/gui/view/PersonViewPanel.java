@@ -43,7 +43,7 @@ import megamek.common.options.IOption;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.FormerSpouse;
+import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 
 import megamek.common.options.PilotOptions;
