@@ -2088,7 +2088,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public int getRankLevel() {
         // If we're somehow above the max level for this rank, drop to that level
-        int profession = getProfession();
+        int profession = getPrimaryRole().getProfession();
         while ((profession != Ranks.RPROF_MW) && getRanks().isEmptyProfession(profession)) {
             profession = getRanks().getAlternateProfession(profession);
         }
@@ -2132,7 +2132,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getRankName() {
         String rankName;
-        int profession = getProfession();
+        int profession = getPrimaryRole().getProfession();
 
         /* Track number of times the profession has been redirected so we don't get caught
          * in a loop by self-reference or loops due to bad configuration */
@@ -3309,51 +3309,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
     //endregion injuries
 
-    public int getProfession() {
-        return getProfessionFromPrimaryRole(getPrimaryRole());
-    }
-
-    public static int getProfessionFromPrimaryRole(PersonnelRole role) {
-        switch (role) {
-            case AEROSPACE_PILOT:
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                return Ranks.RPROF_ASF;
-            case GROUND_VEHICLE_DRIVER:
-            case NAVAL_VEHICLE_DRIVER:
-            case VTOL_PILOT:
-            case VEHICLE_GUNNER:
-            case VEHICLE_CREW:
-                return Ranks.RPROF_VEE;
-            case BATTLE_ARMOUR:
-            case SOLDIER:
-                return Ranks.RPROF_INF;
-            case VESSEL_PILOT:
-            case VESSEL_CREW:
-            case VESSEL_GUNNER:
-            case VESSEL_NAVIGATOR:
-                return Ranks.RPROF_NAVAL;
-            case MECH_TECH:
-            case MECHANIC:
-            case AERO_TECH:
-            case BA_TECH:
-            case ASTECH:
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_HR:
-            case ADMINISTRATOR_TRANSPORT:
-                return Ranks.RPROF_TECH;
-            case MECHWARRIOR:
-            case LAM_PILOT:
-            case PROTOMECH_PILOT:
-            case DOCTOR:
-            case MEDIC:
-            default:
-                return Ranks.RPROF_MW;
-        }
-    }
-
     /* For use by Against the Bot retirement/defection rolls */
-
     public boolean isFounder() {
         return founder;
     }
@@ -3420,7 +3376,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             int rankOrder = ranks.getOfficerCut();
             while ((rankOrder <= getRankNumeric()) && (rankOrder < Ranks.RC_NUM)) {
                 Rank rank = ranks.getAllRanks().get(rankOrder);
-                if (!rank.getName(getProfession()).equals("-")) {
+                if (!rank.getName(getPrimaryRole().getProfession()).equals("-")) {
                     shares++;
                 }
                 rankOrder++;

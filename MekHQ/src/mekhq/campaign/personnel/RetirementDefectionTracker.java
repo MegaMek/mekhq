@@ -424,14 +424,14 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     public static Money getBonusCost(Person person) {
         switch (person.getExperienceLevel(false)) {
             case SkillType.EXP_ELITE:
-                return Money.of((person.getProfession() == Ranks.RPROF_MW)?300000:150000);
+                return Money.of((person.getPrimaryRole().getProfession() == Ranks.RPROF_MW) ? 300000 : 150000);
             case SkillType.EXP_VETERAN:
-                return Money.of((person.getProfession() == Ranks.RPROF_MW)?150000:50000);
+                return Money.of((person.getPrimaryRole().getProfession() == Ranks.RPROF_MW) ? 150000 : 50000);
             case SkillType.EXP_REGULAR:
-                return Money.of((person.getProfession() == Ranks.RPROF_MW)?50000:20000);
+                return Money.of((person.getPrimaryRole().getProfession() == Ranks.RPROF_MW) ? 50000 : 20000);
             case SkillType.EXP_GREEN:
             default:
-                return Money.of((person.getProfession() == Ranks.RPROF_MW)?20000:10000);
+                return Money.of((person.getPrimaryRole().getProfession() == Ranks.RPROF_MW) ? 20000 : 10000);
         }
     }
 
@@ -494,7 +494,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             if (roll >= 6 && (p.getPrimaryRole().isAerospacePilot() || p.getSecondaryRole().isAerospacePilot())) {
                 stolenUnit = true;
             } else {
-                if (p.getProfession() == Ranks.RPROF_INF) {
+                if (p.getPrimaryRole().getProfession() == Ranks.RPROF_INF) {
                     if (p.getUnit() != null) {
                         payoutAmount = Money.of(50000);
                     }
@@ -505,7 +505,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     }
                 }
                 if (!shareSystem &&
-                        ((p.getProfession() == Ranks.RPROF_MW) || (p.getProfession() == Ranks.RPROF_ASF))
+                        ((p.getPrimaryRole().getProfession() == Ranks.RPROF_MW) || (p.getPrimaryRole().getProfession() == Ranks.RPROF_ASF))
                         && (p.getOriginalUnitWeight() > 0)) {
                     weightClass = p.getOriginalUnitWeight() + p.getOriginalUnitTech();
                     if (roll <= 1) {

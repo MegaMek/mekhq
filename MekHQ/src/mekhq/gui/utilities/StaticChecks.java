@@ -562,10 +562,10 @@ public class StaticChecks {
     }
 
     public static boolean areAllEligible(Person[] people, boolean ignorePrisonerStatus) {
-        int profession = people[0].getProfession();
+        int profession = people[0].getPrimaryRole().getProfession();
         for (Person person : people) {
             if (!(person.getPrisonerStatus().isFree() || ignorePrisonerStatus)
-                    || (person.getProfession() != profession)) {
+                    || (person.getPrimaryRole().getProfession() != profession)) {
                 return false;
             }
         }
@@ -592,7 +592,7 @@ public class StaticChecks {
         return false;
     }
 
-    public static boolean areAnyFree(Person[] people) {
+    public static boolean areAnyFree(Person... people) {
         for (Person person : people) {
             if (person.getPrisonerStatus().isFree()) {
                 return true;

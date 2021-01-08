@@ -1147,7 +1147,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 Ranks ranks = person.getRanks();
                 for (int rankOrder = 0; rankOrder < Ranks.RC_NUM; rankOrder++) {
                     Rank rank = ranks.getAllRanks().get(rankOrder);
-                    int profession = person.getProfession();
+                    int profession = person.getPrimaryRole().getProfession();
 
                     // Empty professions need swapped before the continuation
                     while (ranks.isEmptyProfession(profession) && (profession != Ranks.RPROF_MW)) {
