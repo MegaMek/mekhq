@@ -165,9 +165,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private boolean commander;
 
     // Supports edge usage by a ship's engineer composite crewman
-    int edgeUsedThisRound;
+    private int edgeUsedThisRound;
     // To track how many edge points support personnel have left until next refresh
-    int currentEdge;
+    private int currentEdge;
 
     //phenotype and background
     private Phenotype phenotype;
