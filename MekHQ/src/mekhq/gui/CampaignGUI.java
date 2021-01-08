@@ -1135,16 +1135,22 @@ public class CampaignGUI extends JPanel {
             return;
         }
         if (getTab(GuiTabType.REPAIR) != null) {
-            ((RepairTab)getTab(GuiTabType.REPAIR)).focusOnUnit(id);
+            ((RepairTab) getTab(GuiTabType.REPAIR)).focusOnUnit(id);
             tabMain.setSelectedComponent(getTab(GuiTabType.REPAIR));
         }
     }
 
+    public void focusOnPerson(Person person) {
+        if (person != null) {
+            focusOnPerson(person.getId());
+        }
+    }
+
     public void focusOnPerson(UUID id) {
-        if (null == id) {
+        if (id == null) {
             return;
         }
-        PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
+        PersonnelTab pt = (PersonnelTab) getTab(GuiTabType.PERSONNEL);
         if (pt == null) {
             return;
         }

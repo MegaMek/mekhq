@@ -816,7 +816,7 @@ public class PersonViewPanel extends ScrollablePanel {
             lblSpouse2.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    gui.getPersonnelTab().focusOnPerson(spouse.getId());
+                    gui.focusOnPerson(spouse);
                 }
             });
             gridBagConstraints.gridx = 1;
@@ -848,12 +848,12 @@ public class PersonViewPanel extends ScrollablePanel {
                 lblFormerSpouses2.setName("lblFormerSpouses2");
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
-                        ex.getFullName(), formerSpouse.getReason().toString(),
+                        ex.getFullName(), formerSpouse.getReason(),
                         MekHQ.getMekHQOptions().getDisplayFormattedDate(formerSpouse.getDate())));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        gui.getPersonnelTab().focusOnPerson(ex.getId());
+                        gui.focusOnPerson(ex);
                     }
                 });
                 pnlFamily.add(lblFormerSpouses2, gridBagConstraints);
@@ -886,7 +886,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblChildren2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(child.getId());
+                            gui.focusOnPerson(child);
                         }
                     });
                     pnlFamily.add(lblChildren2, gridBagConstraints);
@@ -921,7 +921,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblGrandchildren2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(grandchild.getId());
+                            gui.focusOnPerson(grandchild);
                         }
                     });
                     pnlFamily.add(lblGrandchildren2, gridBagConstraints);
@@ -947,7 +947,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     labelParentName.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(parent.getId());
+                            gui.focusOnPerson(parent);
                         }
                     });
                     gridBagConstraints.gridx = 1;
@@ -984,7 +984,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblSiblings2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(sibling.getId());
+                            gui.focusOnPerson(sibling);
                         }
                     });
                     pnlFamily.add(lblSiblings2, gridBagConstraints);
@@ -1019,7 +1019,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblGrandparents2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(grandparent.getId());
+                            gui.focusOnPerson(grandparent);
                         }
                     });
                     pnlFamily.add(lblGrandparents2, gridBagConstraints);
@@ -1054,7 +1054,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblAuntsOrUncles2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(auntOrUncle.getId());
+                            gui.focusOnPerson(auntOrUncle);
                         }
                     });
                     pnlFamily.add(lblAuntsOrUncles2, gridBagConstraints);
@@ -1089,7 +1089,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     lblCousins2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            gui.getPersonnelTab().focusOnPerson(cousin.getId());
+                            gui.focusOnPerson(cousin);
                         }
                     });
                     pnlFamily.add(lblCousins2, gridBagConstraints);
