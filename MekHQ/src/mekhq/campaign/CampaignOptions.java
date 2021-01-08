@@ -3542,10 +3542,14 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("manualUnitRatingModifier")) {
                 retVal.setManualUnitRatingModifier(Integer.parseInt(wn2.getTextContent()));
             } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
-                // FIXME : PersonnelRole : Migration needed
                 String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    if (i < retVal.usePortraitForRoles().length) {
+                if (version.isLowerThan("0.49.0")) {
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.setUsePortraitForRole(PersonnelRole.parseFromString(String.valueOf(i)).ordinal(),
+                                Boolean.parseBoolean(values[i].trim()));
+                    }
+                } else {
+                    for (int i = 0; i < values.length; i++) {
                         retVal.setUsePortraitForRole(i, Boolean.parseBoolean(values[i].trim()));
                     }
                 }
@@ -3740,11 +3744,16 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                 retVal.salaryAntiMekMultiplier = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
-                // FIXME : PersonnelRole : Migration needed
-
                 // CAW: we need at least the correct number of salaries as are expected in this version,
                 //      otherwise we'll not be able to set a salary for a role.
-                retVal.salaryTypeBase = Utilities.readMoneyArray(wn2, retVal.salaryTypeBase.length);
+                Money[] salaryTypeBase = Utilities.readMoneyArray(wn2, retVal.salaryTypeBase.length);
+                if (version.isLowerThan("0.49.0")) {
+                    for (int i = 0; i < salaryTypeBase.length; i++) {
+                        retVal.salaryTypeBase[PersonnelRole.parseFromString(String.valueOf(i)).ordinal()] = salaryTypeBase[i];
+                    }
+                } else {
+                    retVal.salaryTypeBase = salaryTypeBase;
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {

@@ -4472,7 +4472,7 @@ public class CampaignOptionsDialog extends JDialog {
             spnSalaryXp[i].setValue(options.getSalaryXpMultiplier(i));
         }
         final Money[] baseSalaries = options.getBaseSalaries();
-        for (int i = 1; i < spnSalaryBase.length; i++) {
+        for (int i = 0; i < spnSalaryBase.length; i++) {
             spnSalaryBase[i].setValue(baseSalaries[i].getAmount().doubleValue());
         }
 
@@ -5068,7 +5068,7 @@ public class CampaignOptionsDialog extends JDialog {
         for (int i = 0; i < spnSalaryXp.length; i++) {
             options.setSalaryXpMultiplier((Double) spnSalaryXp[i].getModel().getValue(), i);
         }
-        for (int i = 1; i < spnSalaryBase.length; i++) {
+        for (int i = 0; i < spnSalaryBase.length; i++) {
             try {
                 options.setBaseSalary(i, (double) spnSalaryBase[i].getValue());
             } catch (Exception ignored) {

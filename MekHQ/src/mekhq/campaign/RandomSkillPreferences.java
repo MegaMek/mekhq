@@ -26,6 +26,7 @@ import java.io.Serializable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 
+import mekhq.Version;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -199,7 +200,7 @@ public class RandomSkillPreferences implements Serializable {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "randomSkillPreferences");
     }
 
-    public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn) {
+    public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn, Version version) {
         MekHQ.getLogger().debug("Loading Random Skill Preferences from XML...");
 
         wn.normalize();
@@ -236,10 +237,15 @@ public class RandomSkillPreferences implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("secondSkillBonus")) {
                 retVal.secondSkillBonus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("recruitBonuses")) {
-                // TODO : PersonnelRole : I'm going to need migration
                 String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
+                if (version.isLowerThan("0.49.0")) {
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.recruitBonuses[PersonnelRole.parseFromString(String.valueOf(i)).ordinal()] = Integer.parseInt(values[i]);
+                    }
+                } else {
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
+                    }
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
                 String[] values = wn2.getTextContent().split(",");
