@@ -151,7 +151,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
                     continue;
                 }
 
-                if (faction.is(Tag.CLAN) && !(isClan || isAllowClan())) {
+                if (faction.isClan() && !(isClan || isAllowClan())) {
                     continue;
                 }
 
