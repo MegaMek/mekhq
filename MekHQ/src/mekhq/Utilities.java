@@ -1070,8 +1070,8 @@ public class Utilities {
         return name;
     }
 
-    public static String printMoneyArray(Money[] array) {
-        StringJoiner joiner = new StringJoiner(","); //$NON-NLS-1$
+    public static String printMoneyArray(Money... array) {
+        StringJoiner joiner = new StringJoiner(",");
         for (Money value : array) {
             joiner.add(value.toXmlString());
         }
