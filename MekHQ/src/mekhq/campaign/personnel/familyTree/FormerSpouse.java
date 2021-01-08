@@ -112,7 +112,7 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "formerSpouse");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "id", formerSpouse.getId());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "date", MekHqXmlUtil.saveFormattedDate(date));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "date", date);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "reason", reason.name());
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "formerSpouse");
     }
@@ -150,7 +150,7 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
      */
     @Override
     public String toString() {
-        return getReason().toString() + ": " + getFormerSpouse().getFullTitle() + " ("
+        return getReason() + ": " + getFormerSpouse().getFullTitle() + " ("
                 + MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate()) + ")";
     }
 
@@ -174,7 +174,7 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
 
     @Override
     public int hashCode() {
-        return (getFormerSpouse().getId().toString() + getDate().toString() + getReason().toString()).hashCode();
+        return (getFormerSpouse().getId().toString() + getDate() + getReason()).hashCode();
     }
     //endregion Overrides
 }
