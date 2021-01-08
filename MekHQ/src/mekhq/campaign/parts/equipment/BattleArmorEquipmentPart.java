@@ -223,7 +223,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 	}
 
     @Override
-    public MissingPart getMissingPart() {
+    public MissingBattleArmorEquipmentPart getMissingPart() {
         return new MissingBattleArmorEquipmentPart(getUnitTonnage(), type, equipmentNum, size, trooper,
                 campaign, equipTonnage);
     }

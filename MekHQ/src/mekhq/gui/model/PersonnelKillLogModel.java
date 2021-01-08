@@ -51,7 +51,7 @@ public class PersonnelKillLogModel extends DataTableModel {
     public PersonnelKillLogModel() {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel", new EncodeControl());
         data = new ArrayList<Kill>();
-        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMekHQOptions().getDisplayFormattedDate(LocalDate.now())) + 10;
+        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMekHQOptions().getDisplayFormattedDate(LocalDate.now()).concat("MM"));
     }
 
     @Override

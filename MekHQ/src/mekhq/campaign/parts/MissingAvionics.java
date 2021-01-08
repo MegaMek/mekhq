@@ -30,6 +30,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
+import megamek.common.Mech;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
@@ -75,6 +76,24 @@ public class MissingAvionics extends MissingPart {
 
     @Override
     public String checkFixable() {
+        if ((unit != null) && (unit.getEntity() instanceof LandAirMech)) {
+            // Avionics are installed in the Head and both Torsos,
+            // make sure they're not missing.
+            for (Part part : unit.getParts()) {
+                if (part instanceof MissingMekLocation) {
+                    switch (part.getLocation()) {
+                        case Mech.LOC_HEAD:
+                            return "Cannot reinstall avionics with a missing Head.";
+                        case Mech.LOC_LT:
+                            return "Cannot reinstall avionics with a missing Left Torso.";
+                        case Mech.LOC_RT:
+                            return "Cannot reinstall avionics with a missing Right Torso.";
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
         return null;
     }
 

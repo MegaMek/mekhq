@@ -42,7 +42,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.UnitGeneratorParameters;
@@ -209,20 +209,20 @@ public class AtBEventProcessor {
 
         MechSummary ms = campaign.getUnitGenerator().generate(params);
         if (null != ms) {
-            if (Faction.getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
+            if (Factions.getInstance().getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
                 String name = "Clan " + ms.getName().replaceAll("Platoon", "Point");
                 ms = MechSummaryCache.getInstance().getMech(name);
-                MekHQ.getLogger().info(this, "looking for Clan infantry " + name);
+                MekHQ.getLogger().info("looking for Clan infantry " + name);
             }
             try {
                 en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             } catch (EntityLoadingException ex) {
                 en = null;
-                MekHQ.getLogger().error(this, "Unable to load entity: "
+                MekHQ.getLogger().error("Unable to load entity: "
                         + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage(), ex);
             }
         } else {
-            MekHQ.getLogger().error(this, "Personnel market could not find "
+            MekHQ.getLogger().error("Personnel market could not find "
                     + UnitType.getTypeName(unitType) + " for recruit from faction " + faction);
             return;
         }
@@ -288,7 +288,7 @@ public class AtBEventProcessor {
             if ((c.getGameYear() > 3055) && (Compute.randomInt(20) == 0)) {
                 ArrayList<String> clans = new ArrayList<>();
                 for (String f : RandomFactionGenerator.getInstance().getCurrentFactions()) {
-                    if (Faction.getFaction(f).isClan()) {
+                    if (Factions.getInstance().getFaction(f).isClan()) {
                         clans.add(f);
                     }
                 }

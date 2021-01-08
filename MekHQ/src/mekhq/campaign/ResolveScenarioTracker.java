@@ -52,6 +52,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.gui.FileDialogs;
 
 /**
@@ -207,7 +208,7 @@ public class ResolveScenarioTracker {
                 }
                 if (null != e.getCrew()) {
                     if (!e.getCrew().getExternalIdAsString().equals("-1")) {
-                        if (!e.getCrew().isEjected() || e instanceof EjectedCrew) {
+                        if (!e.getCrew().isEjected() || (e instanceof EjectedCrew)) {
                             pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
                         }
                         if (e instanceof EjectedCrew) {
@@ -232,7 +233,7 @@ public class ResolveScenarioTracker {
                         continue;
                     }
 
-                    if (e instanceof BattleArmor && e.isDestroyed()) {
+                    if ((e instanceof BattleArmor) && e.isDestroyed()) {
                         // BA can only be salvaged with a 10+ roll
                         if (Utilities.dice(2, 6) < 10) {
                             continue;
@@ -853,7 +854,6 @@ public class ResolveScenarioTracker {
      *                  in order to be processed, a unit must be in the salvageStatus hashtable.
      */
     private void processPrisonerCapture(List<TestUnit> unitsToProcess) {
-
         Mission currentMission = campaign.getMission(scenario.getMissionId());
         String enemyCode;
         if (currentMission instanceof AtBContract) {
@@ -1368,9 +1368,12 @@ public class ResolveScenarioTracker {
         //ok lets do the whole enchilada and go ahead and update campaign
         //first figure out if we need any battle loss comp
         double blc = 0;
-        Mission m = campaign.getMission(scenario.getMissionId());
-        if (m instanceof Contract) {
-            blc = ((Contract) m).getBattleLossComp() / 100.0;
+        final Mission mission = getMission();
+
+        final boolean isContract = mission instanceof Contract;
+        final boolean isAtBContract = mission instanceof AtBContract;
+        if (isContract) {
+            blc = ((Contract) mission).getBattleLossComp() / 100.0;
         }
 
         //now lets update personnel
@@ -1385,9 +1388,11 @@ public class ResolveScenarioTracker {
             if (status.getHits() > person.getHits()) {
                 person.setHits(status.getHits());
             }
+
             if (status.wasDeployed()) {
                 person.awardXP(status.getXP());
-                ServiceLogger.participatedInMission(person, campaign.getLocalDate(), scenario.getName(), m.getName());
+                ServiceLogger.participatedInMission(person, campaign.getLocalDate(),
+                        scenario.getName(), mission.getName());
             }
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);
@@ -1396,17 +1401,19 @@ public class ResolveScenarioTracker {
                 person.changeStatus(getCampaign(), PersonnelStatus.MIA);
             } else if (status.isDead()) {
                 person.changeStatus(getCampaign(), PersonnelStatus.KIA);
-                if (campaign.getCampaignOptions().getUseAtB() && m instanceof AtBContract) {
+                if (campaign.getCampaignOptions().getUseAtB() && isAtBContract) {
                     campaign.getRetirementDefectionTracker().removeFromCampaign(person,
                             true, campaign.getCampaignOptions().getUseShareSystem()
                                     ? person.getNumShares(campaign.getCampaignOptions().getSharesForAll())
                                     : 0,
-                            campaign, (AtBContract) m);
+                            campaign, (AtBContract) mission);
                 }
             }
+
             if (campaign.getCampaignOptions().useAdvancedMedical()) {
                 person.diagnose(status.getHits());
             }
+
             if (status.toRemove()) {
                 campaign.removePerson(pid, false);
             }
@@ -1430,9 +1437,9 @@ public class ResolveScenarioTracker {
 
                 // Then, we need to determine if they are a defector
                 if (prisonerStatus.isPrisoner() && getCampaign().getCampaignOptions().useAtBPrisonerDefection()
-                        && (m instanceof AtBContract)) {
+                        && isAtBContract) {
                     // Are they actually a defector?
-                    if (Compute.d6(2) >= (10 + ((AtBContract) m).getEnemySkill() - getCampaign().getUnitRatingAsInteger())) {
+                    if (Compute.d6(2) >= (10 + ((AtBContract) mission).getEnemySkill() - getCampaign().getUnitRatingAsInteger())) {
                         prisonerStatus = PrisonerStatus.PRISONER_DEFECTOR;
                     }
                 }
@@ -1450,7 +1457,7 @@ public class ResolveScenarioTracker {
                 person.setHits(status.getHits());
             }
 
-            ServiceLogger.participatedInMission(person, campaign.getLocalDate(), scenario.getName(), m.getName());
+            ServiceLogger.participatedInMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
 
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);
@@ -1482,13 +1489,15 @@ public class ResolveScenarioTracker {
             if (campaign.getCampaignOptions().useBLCSaleValue()) {
                 unitValue = unit.getSellValue();
             }
+
             if (ustatus.isTotalLoss()) {
                 //missing unit
                 if (blc > 0) {
                     Money value = unitValue.multipliedBy(blc);
                     campaign.getFinances().credit(value, Transaction.C_BLC,
                             "Battle loss compensation for " + unit.getName(), campaign.getLocalDate());
-                    campaign.addReport(value.toAmountAndSymbolString() + " in battle loss compensation for " + unit.getName() + " has been credited to your account.");
+                    campaign.addReport(value.toAmountAndSymbolString() + " in battle loss compensation for "
+                            + unit.getName() + " has been credited to your account.");
                 }
                 campaign.removeUnit(unit.getId());
             } else {
@@ -1496,11 +1505,11 @@ public class ResolveScenarioTracker {
                 campaign.clearGameData(en);
                 // FIXME: Need to implement a "fuel" part just like the "armor" part
                 if (en.isAero()) {
-                    ((IAero)en).setFuelTonnage(((IAero)ustatus.getBaseEntity()).getFuelTonnage());
+                    ((IAero) en).setFuelTonnage(((IAero) ustatus.getBaseEntity()).getFuelTonnage());
                 }
                 unit.setEntity(en);
                 if (en.usesWeaponBays()) {
-                    unit.adjustLargeCraftAmmo();
+                    new AdjustLargeCraftAmmoAction().execute(campaign, unit);
                 }
                 unit.runDiagnostic(true);
                 unit.resetPilotAndEntity();
@@ -1529,9 +1538,7 @@ public class ResolveScenarioTracker {
                 blcValue = blcValue.plus(repairBLC);
                 if ((blc > 0) && blcValue.isPositive()) {
                     Money finalValue = blcValue.multipliedBy(blc);
-                    campaign.getFinances().credit(
-                            finalValue,
-                            Transaction.C_BLC,
+                    campaign.getFinances().credit(finalValue, Transaction.C_BLC,
                             blcString.substring(0, 1).toUpperCase() + blcString.substring(1),
                             campaign.getLocalDate());
                     campaign.addReport( finalValue.toAmountAndSymbolString() + " in " + blcString + " has been credited to your account.");
@@ -1549,8 +1556,8 @@ public class ResolveScenarioTracker {
             campaign.clearGameData(salvageUnit.getEntity());
             campaign.addTestUnit(salvageUnit);
             //if this is a contract, add to the salvaged value
-            if (getMission() instanceof Contract) {
-                ((Contract) getMission()).addSalvageByUnit(salvageUnit.getSellValue());
+            if (isContract) {
+                ((Contract) mission).addSalvageByUnit(salvageUnit.getSellValue());
             }
         }
 
@@ -1566,31 +1573,34 @@ public class ResolveScenarioTracker {
                 getCampaign().addReport(unitRansoms.toAmountAndNameString()
                         + " has been credited to your account from unit ransoms following "
                         + getScenario().getName() + ".");
+                if (isContract) {
+                    ((Contract) mission).addSalvageByUnit(unitRansoms);
+                }
             }
         }
 
-        if (getMission() instanceof Contract) {
+        if (isContract) {
             Money value = Money.zero();
             for (Unit salvageUnit : getLeftoverSalvage()) {
                 value = value.plus(salvageUnit.getSellValue());
             }
-            if (((Contract) getMission()).isSalvageExchange()) {
-                value = value.multipliedBy(((Contract) getMission()).getSalvagePct()).dividedBy(100);
+            if (((Contract) mission).isSalvageExchange()) {
+                value = value.multipliedBy(((Contract) mission).getSalvagePct()).dividedBy(100);
                 campaign.getFinances().credit(value, Transaction.C_SALVAGE, "Salvage exchange for "
                         + scenario.getName(),  campaign.getLocalDate());
                 campaign.addReport(value.toAmountAndSymbolString() + " have been credited to your account for salvage exchange.");
             } else {
-                ((Contract) getMission()).addSalvageByEmployer(value);
+                ((Contract) mission).addSalvageByEmployer(value);
             }
         }
 
-        if (campaign.getCampaignOptions().getUseAtB() && (getMission() instanceof AtBContract)) {
-            int unitRatingMod = campaign.getUnitRatingMod();
+        if (campaign.getCampaignOptions().getUseAtB() && isAtBContract) {
+            final int unitRatingMod = campaign.getUnitRatingMod();
             for (Unit unit : getUnits()) {
-                unit.setSite(((AtBContract) getMission()).getRepairLocation(unitRatingMod));
+                unit.setSite(((AtBContract) mission).getRepairLocation(unitRatingMod));
             }
             for (Unit unit : getActualSalvage()) {
-                unit.setSite(((AtBContract) getMission()).getRepairLocation(unitRatingMod));
+                unit.setSite(((AtBContract) mission).getRepairLocation(unitRatingMod));
             }
         }
 
@@ -1707,7 +1717,7 @@ public class ResolveScenarioTracker {
     }
 
     public boolean usesSalvageExchange() {
-        return (getMission() instanceof Contract) && ((Contract)getMission()).isSalvageExchange();
+        return (getMission() instanceof Contract) && ((Contract) getMission()).isSalvageExchange();
     }
 
     /**

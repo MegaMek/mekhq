@@ -539,7 +539,11 @@ public class AcquisitionsDialog extends JDialog {
                         actualWork = ((AmmoBin) targetWork).getAcquisitionWork();
                     }
 
-                    campaignGUI.getCampaign().addReport(actualWork.find(0));
+                    // GM find the actual number required
+                    for (int count = 0; count < partCountInfo.getMissingCount(); ++count) {
+                        campaignGUI.getCampaign().addReport(actualWork.find(0));
+                    }
+
                     Unit unit = actualWork.getUnit();
                     if (unit != null) {
                         MekHQ.triggerEvent(new UnitChangedEvent(unit));

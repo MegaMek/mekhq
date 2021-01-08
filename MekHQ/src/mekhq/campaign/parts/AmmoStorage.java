@@ -28,7 +28,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
-import megamek.common.BombType;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
@@ -36,6 +35,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -116,25 +116,30 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public boolean isSamePartType(@Nullable Part part) {
         if ((getType() != null) && (part instanceof AmmoStorage)) {
-            AmmoStorage other = (AmmoStorage) part;
-            return isSameAmmoType(getType(), other.getType());
+            return getType().equals(((AmmoStorage) part).getType());
         }
 
         return false;
     }
 
-    public static boolean isSameAmmoType(AmmoType a, AmmoType b) {
-        // TODO: move this to AmmoType::equals and a Comparator
-        if (a instanceof BombType && b instanceof BombType) {
-            return isSameBombType((BombType) a, (BombType) b);
-        } else {
-            return a.equals(b) && (a.getMunitionType() == b.getMunitionType());
-        }
+    /**
+     * Gets a value indicating whether or an {@code AmmoType} is
+     * the same as this instance's ammo.
+     * @param otherAmmoType The other {@code AmmoType}.
+     */
+    public boolean isSameAmmoType(AmmoType otherAmmoType) {
+        return getType().equalsAmmoTypeOnly(otherAmmoType)
+            && (getType().getMunitionType() == otherAmmoType.getMunitionType())
+            && (getType().getRackSize() == otherAmmoType.getRackSize());
     }
 
-    public static boolean isSameBombType(BombType a, BombType b) {
-        // TODO: move this to BombType::equals and a Comparator
-        return a.equals(b) && (a.getBombType() == b.getBombType());
+    /**
+     * Gets a value indicating whether or not an {@code AmmoType}
+     * is compatible with this instance's ammo.
+     * @param otherAmmoType The other {@code AmmoType}.
+     */
+    public boolean isCompatibleAmmo(AmmoType otherAmmoType) {
+        return getType().isCompatibleWith(otherAmmoType);
     }
 
     public void changeShots(int s) {
@@ -148,18 +153,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<equipmentNum>"
-                +equipmentNum
-                +"</equipmentNum>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<typeName>"
-                +MekHqXmlUtil.escape(typeName)
-                +"</typeName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<shots>"
-                +shots
-                +"</shots>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", getType().getInternalName());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "shots", shots);
         writeToXmlEnd(pw1, indent);
     }
 
@@ -167,16 +162,15 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
-                equipmentNum = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
+            if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
                 typeName = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("shots")) {
                 shots = Integer.parseInt(wn2.getTextContent());
             }
         }
+
         restore();
     }
 
@@ -191,7 +185,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public MissingPart getMissingPart() {
+    public MissingEquipmentPart getMissingPart() {
         //nothing to do here
         return null;
     }
@@ -271,27 +265,6 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String failToFind() {
         return "<font color='red'><b> part not found</b>.</font>";
-    }
-
-    public void changeAmountAvailable(int amount, final AmmoType curType) {
-        if (amount == 0) {
-            return;
-        }
-
-        AmmoStorage a = (AmmoStorage) campaign.getWarehouse().findSparePart(part -> {
-            return (part instanceof AmmoStorage)
-                    && part.isPresent()
-                    && isSameAmmoType(curType, ((AmmoStorage) part).getType());
-        });
-
-        if (null != a) {
-            a.changeShots(amount);
-            if (a.getShots() <= 0) {
-                campaign.getWarehouse().removePart(a);
-            }
-        } else if(amount > 0) {
-            campaign.getQuartermaster().addPart(new AmmoStorage(1, curType, amount, campaign), 0);
-        }
     }
 
     @Override

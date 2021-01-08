@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Miguel Azevedo
  */
 @XmlRootElement(name="award")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(value = XmlAccessType.FIELD)
 public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializable {
     private static final long serialVersionUID = -3290927068079223579L;
 
@@ -214,7 +214,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
      * @param people to be given the award
      * @return true if this award can be awarded to the selected people
      */
-    public boolean canBeAwarded(Person[] people) {
+    public boolean canBeAwarded(Person... people) {
         for (Person person : people) {
             if (!canBeAwarded(person)) {
                 return false;

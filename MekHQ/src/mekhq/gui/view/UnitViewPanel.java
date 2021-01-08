@@ -18,7 +18,6 @@
  */
 package mekhq.gui.view;
 
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.Image;
 import java.util.ResourceBundle;
@@ -27,16 +26,12 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.client.ui.swing.util.FluffImageHelper;
-import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Entity;
 import megamek.common.MechView;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.utilities.ImgLabel;
@@ -84,7 +79,7 @@ public class UnitViewPanel extends ScrollablePanel {
 		txtFluff = new javax.swing.JTextPane();
 		pnlStats = new javax.swing.JPanel();
 
-    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel", new EncodeControl()); //$NON-NLS-1$
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel", new EncodeControl());
 
 		setLayout(new java.awt.GridBagLayout());
 
@@ -106,7 +101,7 @@ public class UnitViewPanel extends ScrollablePanel {
             //no fluff image, so just use image icon from top-down view
             compWidth=2;
             lblImage = new JLabel();
-            image = getImageFor(unit, lblImage);
+            image = unit.getImage(lblImage);
             if (null != image) {
                 ImageIcon icon = new ImageIcon(image);
                 lblImage.setIcon(icon);
@@ -319,26 +314,4 @@ public class UnitViewPanel extends ScrollablePanel {
 		}
 
 	}
-
-	private Image getImageFor(Unit u, Component c) {
-        if (null == MHQStaticDirectoryManager.getMechTileset()) {
-            return null;
-        }
-        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
-        int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
-        EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c, u.getEntity());
-        return entityImage.loadPreviewImage();
-    }
-
-    private Image getCamo(Unit unit) {
-        // Try to get the player's camo file.
-        Image camo = null;
-        try {
-            camo = (Image) MHQStaticDirectoryManager.getCamouflage()
-                    .getItem(unit.getCamoCategory(), unit.getCamoFileName());
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-        }
-        return camo;
-    }
 }
