@@ -96,6 +96,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockDoctorSkillGreen.getExperienceLevel()).thenReturn(SkillType.EXP_GREEN);
         when(mockDoctor.getPrimaryRole()).thenReturn(PersonnelRole.DOCTOR);
         when(mockDoctor.isDoctor()).thenReturn(true);
+        when(mockDoctor.getPrimaryRole()).thenReturn(PersonnelRole.DOCTOR);
+        when(mockDoctor.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockDoctor).getStatus();
         when(mockDoctor.isDeployed()).thenReturn(false);
         when(mockDoctor.getSkill(eq(SkillType.S_DOCTOR))).thenReturn(mockDoctorSkillRegular);
@@ -107,6 +109,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockMechTechSkillRegular.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
         when(mockTech.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
         when(mockTech.isTech()).thenReturn(true);
+        when(mockTech.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
+        when(mockTech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockTech).getStatus();
         when(mockTech.isDeployed()).thenReturn(false);
         when(mockTech.getSkill(eq(SkillType.S_TECH_MECH))).thenReturn(mockMechTechSkillVeteran);
@@ -397,9 +401,10 @@ public class FieldManualMercRevDragoonsRatingTest {
         // Hire a full-time Astech.  This should add another 20 hours.
         testFieldManuMercRevDragoonsRating = new FieldManualMercRevDragoonsRating(mockCampaign);
         Person mockAstech = mock(Person.class);
-        when(mockAstech.getPrimaryRole()).thenReturn(PersonnelRole.ASTECH);
         when(mockAstech.isDoctor()).thenReturn(false);
         when(mockAstech.isTech()).thenReturn(false);
+        when(mockAstech.getPrimaryRole()).thenReturn(PersonnelRole.ASTECH);
+        when(mockAstech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockAstech).getStatus();
         when(mockAstech.isDeployed()).thenReturn(false);
         when(mockAstech.getSkill(eq(SkillType.S_ASTECH))).thenReturn(mockAstechSkill);
