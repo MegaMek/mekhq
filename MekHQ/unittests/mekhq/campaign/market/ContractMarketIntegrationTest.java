@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import mekhq.campaign.mission.enums.MissionStatus;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -71,7 +72,7 @@ public class ContractMarketIntegrationTest {
         Systems.setInstance(Systems.loadDefault());
         Ranks.initializeRankSystems();
     }
-    
+
     @AfterClass
     public static void cleanupStatics() {
         Systems.setInstance(null);
@@ -157,10 +158,11 @@ public class ContractMarketIntegrationTest {
         AtBContract existing = mock(AtBContract.class);
         when(existing.getId()).thenReturn(1);
         when(existing.getScenarios()).thenReturn(new ArrayList<>());
-        when(existing.isActive()).thenReturn(true);
+        when(existing.getStatus()).thenReturn(MissionStatus.ACTIVE);
         when(existing.getEmployerCode()).thenReturn("FWL");
         when(existing.getEnemyCode()).thenReturn("CC");
         when(existing.getSystemId()).thenReturn("Sian");
+        when(existing.getStartDate()).thenReturn(campaign.getLocalDate().minusDays(3000));
         when(existing.getEndingDate()).thenReturn(campaign.getLocalDate().plusDays(3000));
         campaign.importMission(existing);
 
@@ -206,7 +208,7 @@ public class ContractMarketIntegrationTest {
             Compute.setRNG(MMRandom.R_DEFAULT);
         }
     }
-    
+
     @Test
     public void addAtBContractHouseTest() {
         campaign.setFactionCode("DC");
