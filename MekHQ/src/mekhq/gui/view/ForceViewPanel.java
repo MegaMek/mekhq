@@ -30,7 +30,6 @@ import javax.swing.JLabel;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.tileset.EntityImage;
-import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
@@ -456,8 +455,7 @@ public class ForceViewPanel extends ScrollablePanel {
 
     private Image getImageFor(Unit u, Component c) {
         Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
-        int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
-        EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c, u.getEntity());
+        EntityImage entityImage = new EntityImage(base, u.getCampaign().getColour(), getCamo(u), c, u.getEntity());
         return entityImage.loadPreviewImage();
     }
 

@@ -32,6 +32,8 @@ import javax.swing.JTree;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.TreePath;
 
+import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
+import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.gui.utilities.JMenuHelpers;
@@ -58,7 +60,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
@@ -357,22 +358,22 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 }
             }
         } else if (command.contains(TOEMouseAdapter.CHANGE_CAMO)) {
-            if (null != singleForce) {
-                CamoChoiceDialog ccd = getCamoChoiceDialogForForce(singleForce);
+            if (singleForce != null) {
+                CamoChooserDialog ccd = getCamoChooserDialogForForce(singleForce);
                 ccd.setLocationRelativeTo(gui.getFrame());
                 ccd.setVisible(true);
 
-                if (ccd.clickedSelect()) {
-                    for (UUID id : singleForce.getAllUnits(false)) {
-                        Unit unit = gui.getCampaign().getUnit(id);
-                        if (null != unit) {
-                            unit.getEntity().setCamoCategory(ccd.getCategory());
-                            unit.getEntity().setCamoFileName(ccd.getFileName());
-                            MekHQ.triggerEvent(new UnitChangedEvent(unit));
-                        }
-                    }
-                    MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
+                if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
+                    return;
                 }
+                for (UUID id : singleForce.getAllUnits(false)) {
+                    Unit unit = gui.getCampaign().getUnit(id);
+                    if (unit != null) {
+                        unit.getEntity().setCamouflage(ccd.getSelectedItem());
+                        MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                    }
+                }
+                MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
             }
         } else if (command.contains(TOEMouseAdapter.CHANGE_NAME)) {
             if (null != singleForce) {
@@ -578,8 +579,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
             gui.getCampaign().refreshNetworks();
             MekHQ.triggerEvent(new NetworkChangedEvent(units));
-        }
-        if (command.contains(TOEMouseAdapter.REMOVE_C3)) {
+        } else if (command.contains(TOEMouseAdapter.REMOVE_C3)) {
             for (Unit u : units) {
                 u.getEntity().setC3MasterIsUUIDAsString(null);
                 u.getEntity().setC3Master(null, true);
@@ -1490,13 +1490,13 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
     }
 
     /**
-     * Creates a Camouflage choice dialog for a force, starting with
+     * Creates a Camouflage chooser dialog for a force, starting with
      * the most used camouflage in the force; otherwise the campaign
      * camouflage.
      * @param force The force to create a camouflage choice dialog for.
-     * @return A CamoChoiceDialog for the given force.
+     * @return A CamoChooserDialog for the given force.
      */
-    private CamoChoiceDialog getCamoChoiceDialogForForce(Force force) {
+    private CamoChooserDialog getCamoChooserDialogForForce(Force force) {
         String category = gui.getCampaign().getCamoCategory();
         String fileName = gui.getCampaign().getCamoFileName();
 
@@ -1522,8 +1522,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         }
 
-        return new CamoChoiceDialog(gui.getFrame(), true, category, fileName,
-            gui.getCampaign().getColorIndex());
+        return new CamoChooserDialog(gui.getFrame(), new Camouflage(category, fileName));
     }
 
     /**

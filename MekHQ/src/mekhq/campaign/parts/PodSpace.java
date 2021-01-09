@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - The MegaMek Team
+ * Copyright (C) 2017 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,20 +10,18 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import megamek.common.Aero;
@@ -34,6 +32,7 @@ import megamek.common.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -45,7 +44,6 @@ import mekhq.campaign.work.IPartWork;
  * to group them together as recipients of a single tech action.
  *
  * @author Neoancient
- *
  */
 public class PodSpace implements Serializable, IPartWork {
 
@@ -73,7 +71,7 @@ public class PodSpace implements Serializable, IPartWork {
         if (unit != null) {
             this.campaign = unit.getCampaign();
             //We don't need a LOC_WINGS podspace, but we do need one for the fuselage equipment, which is stored at LOC_NONE.
-            if (unit.getEntity() instanceof Aero && location == Aero.LOC_WINGS) {
+            if ((unit.getEntity() instanceof Aero) && (location == Aero.LOC_WINGS)) {
                 this.location = -1;
             }
         }
@@ -134,7 +132,7 @@ public class PodSpace implements Serializable, IPartWork {
         updateConditionFromEntity(false);
         for (int pid : childPartIds) {
             final Part part = campaign.getPart(pid);
-            if (part != null && part instanceof MissingPart) {
+            if (part instanceof MissingPart) {
                 part.fix();
                 MekHQ.triggerEvent(new PartChangedEvent(part));
             }
@@ -149,12 +147,12 @@ public class PodSpace implements Serializable, IPartWork {
 
     @Override
     public String checkFixable() {
-        if(isSalvaging() || location < 0) {
+        if (isSalvaging() || location < 0) {
             return null;
         }
         // The part is only fixable if the location is not destroyed.
         // be sure to check location and second location
-        if(null != unit) {
+        if (null != unit) {
             if (unit.isLocationBreached(location)) {
                 return unit.getEntity().getLocationName(location) + " is breached.";
             }
@@ -164,7 +162,7 @@ public class PodSpace implements Serializable, IPartWork {
             if (repairInPlace) {
                 for (int id : childPartIds) {
                     final Part p = unit.getCampaign().getPart(id);
-                    if (p != null && p instanceof MissingPart) {
+                    if (p instanceof MissingPart) {
                         return null;
                     }
                 }
@@ -175,9 +173,9 @@ public class PodSpace implements Serializable, IPartWork {
                     if (p == null || !p.needsFixing()) {
                         continue;
                     }
-                    MissingPart missing = null;
+                    MissingPart missing;
                     if (p instanceof MissingPart) {
-                        missing = (MissingPart)p;
+                        missing = (MissingPart) p;
                     } else {
                         missing = p.getMissingPart();
                     }
@@ -218,6 +216,7 @@ public class PodSpace implements Serializable, IPartWork {
         return null;
     }
 
+    @Override
     public int getLocation() {
         return location;
     }
@@ -225,12 +224,11 @@ public class PodSpace implements Serializable, IPartWork {
     @Override
     public TargetRoll getAllMods(Person tech) {
         TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
-        if(null != unit) {
+        if (null != unit) {
             mods.append(unit.getSiteMod());
-            if(unit.getEntity().hasQuirk("easy_maintain")) {
+            if (unit.getEntity().hasQuirk("easy_maintain")) {
                 mods.addModifier(-1, "easy to maintain");
-            }
-            else if(unit.getEntity().hasQuirk("difficult_maintain")) {
+            } else if (unit.getEntity().hasQuirk("difficult_maintain")) {
                 mods.addModifier(1, "difficult to maintain");
             }
         }
@@ -261,7 +259,7 @@ public class PodSpace implements Serializable, IPartWork {
                 replacing |= part instanceof MissingPart;
             }
         }
-        if(rating >= SkillType.EXP_ELITE && replacing) {
+        if (rating >= SkillType.EXP_ELITE && replacing) {
                 return " <font color='red'><b> failed and part(s) destroyed.</b></font>";
         } else {
             return " <font color='red'><b> failed.</b></font>";
@@ -380,7 +378,7 @@ public class PodSpace implements Serializable, IPartWork {
         bonus = "(" + bonus + ")";
         String toReturn = "<html><font size='2'";
         String action = "Replace ";
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             action = "Salvage ";
         }
         String scheduled = "";
@@ -391,11 +389,11 @@ public class PodSpace implements Serializable, IPartWork {
         toReturn += ">";
         toReturn += "<b>" + action + getPartName() + " Equipment</b><br/>";
         toReturn += getDetails() + "<br/>";
-        if(getSkillMin() > SkillType.EXP_ELITE) {
+        if (getSkillMin() > SkillType.EXP_ELITE) {
             toReturn += "<font color='red'>Impossible</font>";
         } else {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-            if(!campaign.getCampaignOptions().isDestroyByMargin()) {
+            if (!campaign.getCampaignOptions().isDestroyByMargin()) {
                 toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
             }
             toReturn += " " + bonus;
@@ -496,13 +494,12 @@ public class PodSpace implements Serializable, IPartWork {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.GENERAL_LOCATION;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.GENERAL_LOCATION;
     }
 
     @Override
-    public int getRepairPartType() {
-        return Part.REPAIR_PART_TYPE.POD_SPACE;
+    public PartRepairType getRepairPartType() {
+        return PartRepairType.POD_SPACE;
     }
-
 }

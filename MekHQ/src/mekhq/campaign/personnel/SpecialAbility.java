@@ -329,8 +329,6 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     @SuppressWarnings("unchecked")
     public static void generateInstanceFromXML(Node wn, PilotOptions options, Version v) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,PilotOptions,Version)"; //$NON-NLS-1$
-
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
@@ -381,14 +379,6 @@ public class SpecialAbility implements MekHqXmlSerializable {
                     retVal.desc = option.getDescription();
                 }
             }
-            if (v != null) {
-                if (defaultSpecialAbilities != null && v.isLowerThan("0.3.6-r1965")) {
-                    if (defaultSpecialAbilities.get(retVal.lookupName) != null
-                            && defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills() != null) {
-                        retVal.prereqSkills = (Vector<SkillPrereq>) defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills().clone();
-                    }
-                }
-            }
 
             if (wn.getNodeName().equalsIgnoreCase("edgetrigger")) {
                 edgeTriggers.put(retVal.lookupName, retVal);
@@ -401,7 +391,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 

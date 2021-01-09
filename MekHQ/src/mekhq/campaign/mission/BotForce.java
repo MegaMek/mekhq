@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.icons.Camouflage;
 import megamek.common.logging.LogLevel;
 import org.w3c.dom.Node;
@@ -50,7 +51,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     private int start;
     private String camoCategory;
     private String camoFileName;
-    private int colorIndex;
+    private PlayerColour colour;
     private BehaviorSettings behaviorSettings;
 
     public BotForce() {
@@ -58,20 +59,20 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
-            MekHQ.getLogger().error(this, "Error getting Princess default behaviors", ex);
+            MekHQ.getLogger().error("Error getting Princess default behaviors", ex);
         }
     }
 
     public BotForce(String name, int team, int start, List<Entity> entityList) {
-        this(name, team, start, start, entityList, Camouflage.NO_CAMOUFLAGE, null, -1);
+        this(name, team, start, start, entityList, Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name(), PlayerColour.BLUE);
     }
 
     public BotForce(String name, int team, int start, int home, List<Entity> entityList) {
-        this(name, team, start, home, entityList, Camouflage.NO_CAMOUFLAGE, null, -1);
+        this(name, team, start, home, entityList, Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name(), PlayerColour.BLUE);
     }
 
     public BotForce(String name, int team, int start, int home, List<Entity> entityList,
-                    String camoCategory, String camoFileName, int colorIndex) {
+                    String camoCategory, String camoFileName, PlayerColour colour) {
         this.name = name;
         this.team = team;
         this.start = start;
@@ -79,11 +80,11 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.entityList = entityList.stream().filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
         this.camoCategory = camoCategory;
         this.camoFileName = camoFileName;
-        this.colorIndex = colorIndex;
+        this.colour = colour;
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
-            MekHQ.getLogger().error(this, "Error getting Princess default behaviors", ex);
+            MekHQ.getLogger().error("Error getting Princess default behaviors", ex);
         }
         behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST_OR_NONE);
         behaviorSettings.setDestinationEdge(CardinalEdge.NEAREST_OR_NONE);
@@ -148,6 +149,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.start = start;
     }
 
+    public Camouflage getCamouflage() {
+        return new Camouflage(getCamoCategory(), getCamoFileName());
+    }
+
     public String getCamoCategory() {
         return camoCategory;
     }
@@ -164,12 +169,16 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.camoFileName = camoFileName;
     }
 
-    public int getColorIndex() {
-        return colorIndex;
+    public PlayerColour getColour() {
+        return colour;
     }
 
-    public void setColorIndex(int index) {
-        colorIndex = index;
+    public void setColour(PlayerColour colour) {
+        Objects.requireNonNull(colour, "Colour cannot be set to null");
+        this.colour = colour;
+        if (getCamouflage().isColourCamouflage()) {
+            setCamoFileName(colour.name());
+        }
     }
 
     public int getTotalBV() {
@@ -177,7 +186,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
         for (Entity entity : getEntityList()) {
             if (entity == null) {
-                MekHQ.getLogger().error(BotForce.class, "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+                MekHQ.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
             }
@@ -209,12 +218,12 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "start", start);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "camoCategory", camoCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "camoFileName", camoFileName);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "colorIndex", colorIndex);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "colour", getColour().name());
 
         pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<entities>");
         for (Entity en : entityList) {
             if (en == null) {
-                MekHQ.getLogger().error(BotForce.class, "Null entity when saving a bot force, we should never find a null here. Please investigate");
+                MekHQ.getLogger().error("Null entity when saving a bot force, we should never find a null here. Please investigate");
             } else {
                 pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent + 2, entityList));
             }
@@ -249,8 +258,14 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                 camoCategory = MekHqXmlUtil.unEscape(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("camoFileName")) {
                 camoFileName = MekHqXmlUtil.unEscape(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("colorIndex")) {
-                colorIndex = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("colour")) {
+                setColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("colorIndex")) { // Legacy - 0.47.15 removal
+                setColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
+                if (Camouflage.NO_CAMOUFLAGE.equals(getCamoCategory())) {
+                    setCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
+                    setCamoFileName(getColour().name());
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("entities")) {
                 NodeList nl2 = wn2.getChildNodes();
                 for (int i = 0; i < nl2.getLength(); i++) {
@@ -260,7 +275,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                         try {
                             en = MekHqXmlUtil.getEntityFromXmlString(wn3);
                         } catch (Exception e) {
-                            MekHQ.getLogger().error(this, "Error loading allied unit in scenario", e);
+                            MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                         }
                         if (en != null) {
                             entityList.add(en);

@@ -19,9 +19,11 @@
 package mekhq.gui.model;
 
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import javax.swing.SwingConstants;
 
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
@@ -30,6 +32,7 @@ import mekhq.campaign.mission.Scenario;
  * A table model for displaying scenarios
  */
 public class ScenarioTableModel extends DataTableModel {
+    //region Variable Declarations
     private static final long serialVersionUID = 534443424190075264L;
 
     private Campaign campaign;
@@ -38,11 +41,37 @@ public class ScenarioTableModel extends DataTableModel {
     public final static int COL_STATUS     = 1;
     public final static int COL_DATE       = 2;
     public final static int COL_ASSIGN     = 3;
+    public final static int N_COL          = 4;
 
+    private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ScenarioTableModel", new EncodeControl());
+    //endregion Variable Declarations
+
+    //region Constructors
     public ScenarioTableModel(Campaign c) {
-        columnNames = new String[] { "Scenario Name", "Resolution", "Date", "# Units Assigned" };
         data = new ArrayList<Scenario>();
         campaign = c;
+    }
+    //endregion Constructors
+
+    @Override
+    public int getColumnCount() {
+        return N_COL;
+    }
+
+    @Override
+    public String getColumnName(int column) {
+        switch (column) {
+            case COL_NAME:
+                return resources.getString("col_name.text");
+            case COL_STATUS:
+                return resources.getString("col_status.text");
+            case COL_DATE:
+                return resources.getString("col_date.text");
+            case COL_ASSIGN:
+                return resources.getString("col_assign.text");
+            default:
+                return resources.getString("col_unknown.text");
+        }
     }
 
     public int getColumnWidth(int c) {
@@ -65,11 +94,7 @@ public class ScenarioTableModel extends DataTableModel {
     }
 
     public Scenario getScenario(int row) {
-        if (row >= getRowCount()) {
-            return null;
-        } else {
-            return (Scenario) data.get(row);
-        }
+        return (row < getRowCount()) ? (Scenario) data.get(row) : null;
     }
 
     @Override

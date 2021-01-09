@@ -47,14 +47,14 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                MekHQ.getLogger().error(getClass(), "RATGeneratorConnector", e);
+                MekHQ.getLogger().error(e);
             }
         }
         RATGenerator.getInstance().loadYear(year);
     }
 
     private UnitTable findTable(String faction, int unitType, int weightClass, int year, int quality, Collection<EntityMovementMode> movementModes) {
-        FactionRecord fRec = Faction.getFactionRecordOrFallback(faction);
+        FactionRecord fRec = Factions.getInstance().getFactionRecordOrFallback(faction);
         if(fRec == null) {
             return null;
         }

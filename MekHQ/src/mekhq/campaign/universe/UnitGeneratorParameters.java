@@ -67,7 +67,7 @@ public class UnitGeneratorParameters {
      * @return
      */
     public Parameters getRATGeneratorParameters() {
-        FactionRecord fRec = Faction.getFactionRecordOrFallback(getFaction());
+        FactionRecord fRec = Factions.getInstance().getFactionRecordOrFallback(getFaction());
         String rating = RATGeneratorConnector.getFactionSpecificRating(fRec, getQuality());
         List<Integer> weightClasses = new ArrayList<>();
         

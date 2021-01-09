@@ -34,6 +34,7 @@ import java.util.UUID;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 
+import mekhq.campaign.personnel.ranks.Ranks;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

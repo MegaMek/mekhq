@@ -41,10 +41,11 @@ import javax.swing.UIManager;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.loaders.BLKFile;
+import megamek.common.loaders.EntityLoadingException;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import megamek.common.weapons.infantry.InfantryWeapon;
@@ -54,9 +55,6 @@ import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.MissingThrusters;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -68,8 +66,10 @@ import mekhq.campaign.unit.actions.CancelMothballUnitAction;
 import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
+import mekhq.campaign.unit.actions.RestoreUnitAction;
 import mekhq.campaign.unit.actions.ShowUnitBvAction;
 import mekhq.campaign.unit.actions.StripUnitAction;
+import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.MekLabTab;
@@ -96,7 +96,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     public static final String COMMAND_CHANGE_SITE = "CHANGE_SITE";
     // Ammo Swap Commands
     public static final String COMMAND_LC_SWAP_AMMO = "LC_SWAP_AMMO";
-    public static final String COMMAND_SWAP_AMMO = "SWAP_AMMO";
     public static final String COMMAND_SMALL_SV_SWAP_AMMO = "SMALL_SV_SWAP_AMMO";
     // Repair Commands
     public static final String COMMAND_REPAIR = "REPAIR";
@@ -271,17 +270,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (!dialog.wasCanceled()) {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
-        } else if (command.contains(COMMAND_SWAP_AMMO)) { // Single Unit only
-            String[] fields = command.split(":");
-            int selAmmoId = Integer.parseInt(fields[1]);
-            Part part = gui.getCampaign().getWarehouse().getPart(selAmmoId);
-            if (!(part instanceof AmmoBin)) {
-                return;
-            }
-            AmmoBin ammo = (AmmoBin) part;
-            AmmoType atype = (AmmoType) EquipmentType.get(fields[2]);
-            ammo.changeMunition(atype);
-            MekHQ.triggerEvent(new UnitChangedEvent(part.getUnit()));
         } else if (command.contains(COMMAND_CHANGE_SITE)) {
             int selected = Integer.parseInt(command.split(":")[1]);
             for (Unit unit : units) {
@@ -316,14 +304,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 }
             }
             if (toRemove.size() > 0) {
-                String title = String.format(resourceMap.getString("deleteUnitsCount.text"), toRemove.size()); //$NON-NLS-1$
+                String title = String.format(resourceMap.getString("deleteUnitsCount.text"), toRemove.size());
                 if (toRemove.size() == 1) {
                     title = toRemove.get(0).getName();
                 }
                 if (0 == JOptionPane.showConfirmDialog(
                         null,
-                        String.format(resourceMap.getString("confirmRemove.format"), title), //$NON-NLS-1$
-                        resourceMap.getString("removeQ.text"), //$NON-NLS-1$
+                        String.format(resourceMap.getString("confirmRemove.format"), title),
+                        resourceMap.getString("removeQ.text"),
                         JOptionPane.YES_NO_OPTION)) {
                     for (Unit unit : toRemove) {
                         gui.getCampaign().removeUnit(unit.getId());
@@ -360,17 +348,46 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
             ((MekLabTab) gui.getTab(GuiTabType.MEKLAB)).loadUnit(selectedUnit);
             gui.getTabMain().setSelectedIndex(GuiTabType.MEKLAB.getDefaultPos());
-        } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) { // Single Unit only
-            selectedUnit.getRefit().cancel();
-        } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) { // Single Unit only
-            gui.getCampaign().addReport(selectedUnit.getRefit().succeed());
-        } else if (command.equals(COMMAND_REFURBISH)) { // Single Unit only
-            Refit r = new Refit(selectedUnit, selectedUnit.getEntity(),false, true);
-            gui.refitUnit(r, false);
-        } else if (command.equals(COMMAND_REFIT_KIT)) { // Single Unit only
-            ChooseRefitDialog crd = new ChooseRefitDialog(gui.getFrame(), true,
-                    gui.getCampaign(), selectedUnit, gui);
+        } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
+            for (Unit unit : units) {
+                if (unit.isRefitting()) {
+                    selectedUnit.getRefit().cancel();
+                }
+            }
+        } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
+            for (Unit unit : units) {
+                if (unit.isRefitting()) {
+                    gui.getCampaign().addReport(selectedUnit.getRefit().succeed());
+                }
+            }
+        } else if (command.equals(COMMAND_REFURBISH)) {
+            for (Unit unit : units) {
+                Refit refit = new Refit(unit, unit.getEntity(), false, true);
+                gui.refitUnit(refit, false);
+            }
+        } else if (command.equals(COMMAND_REFIT_KIT)) { // Single Unit or Multiple of Units of the same type only
+            ChooseRefitDialog crd = new ChooseRefitDialog(gui.getFrame(), true, gui.getCampaign(),
+                    selectedUnit);
             crd.setVisible(true);
+            if (crd.isConfirmed()) {
+                MechSummary summary = MechSummaryCache.getInstance().getMech(crd.getSelectedRefit()
+                        .getNewEntity().getShortNameRaw());
+                if (summary != null) {
+                    for (Unit unit : units) {
+                        try {
+                            Entity refitEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                            if (refitEntity != null) {
+                                Refit refit = new Refit(unit, refitEntity, false, false);
+                                if (refit.checkFixable() == null) {
+                                    gui.refitUnit(refit, false);
+                                }
+                            }
+                        } catch (EntityLoadingException ex) {
+                            MekHQ.getLogger().error(ex);
+                        }
+                    }
+                }
+            }
         } else if (command.equals(COMMAND_CHANGE_HISTORY)) { // Single Unit only
             MarkdownEditorDialog tad = new MarkdownEditorDialog(gui.getFrame(), true,
                     "Edit Unit History", selectedUnit.getHistory());
@@ -387,20 +404,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 }
             }
         } else if (command.equals(COMMAND_INDI_CAMO)) { // Single Unit only
-            String category = selectedUnit.getCamoCategory();
-            if (StringUtil.isNullOrEmpty(category)) {
-                category = AbstractIcon.ROOT_CATEGORY;
+            CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(), gui.getCampaign().getCamouflage(), selectedUnit.getCamouflage());
+            if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
+                return;
             }
-            CamoChoiceDialog ccd = new CamoChoiceDialog(gui.getFrame(), true, category,
-                    selectedUnit.getCamoFileName(), gui.getCampaign().getColorIndex());
-            ccd.setLocationRelativeTo(gui.getFrame());
-            ccd.setVisible(true);
-
-            if (ccd.clickedSelect()) {
-                selectedUnit.getEntity().setCamoCategory(ccd.getCategory());
-                selectedUnit.getEntity().setCamoFileName(ccd.getFileName());
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
-            }
+            selectedUnit.getEntity().setCamouflage(ccd.getSelectedItem());
+            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equals(COMMAND_CANCEL_ORDER)) {
             double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
             for (Unit u : units) {
@@ -464,77 +473,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             IUnitAction showUnitBvAction = new ShowUnitBvAction();
             showUnitBvAction.execute(gui.getCampaign(), selectedUnit);
         } else if (command.equals(COMMAND_RESTORE_UNIT)) {
-            for (Unit unit : units) {
-                unit.setSalvage(false);
-
-                boolean needsCheck = true;
-                while (unit.isAvailable() && needsCheck) {
-                    needsCheck = false;
-                    for (int x = 0; x < unit.getParts().size(); x++) {
-                        Part part = unit.getParts().get(x);
-                        if (part instanceof MissingPart) {
-                            //Make sure we restore both left and right thrusters
-                            if (part instanceof MissingThrusters) {
-                                if (((Aero) unit.getEntity()).getLeftThrustHits() > 0) {
-                                    ((MissingThrusters) part).setLeftThrusters(true);
-                                }
-                            }
-                            // We magically acquire a replacement part, then fix the missing one.
-                            part.getCampaign().getQuartermaster().addPart(((MissingPart) part).getNewPart(), 0);
-                            part.fix();
-                            part.resetTimeSpent();
-                            part.resetOvertime();
-                            part.setTech(null);
-                            part.cancelReservation();
-                            part.remove(false);
-                            needsCheck = true;
-                        } else {
-                            if (part.needsFixing()) {
-                                needsCheck = true;
-                                part.fix();
-                            } else {
-                                part.resetRepairSettings();
-                            }
-                            part.resetTimeSpent();
-                            part.resetOvertime();
-                            part.setTech(null);
-                            part.cancelReservation();
-                        }
-
-                        // replace damaged armor and reload ammo bins after fixing their respective locations
-                        if (part instanceof Armor) {
-                            final Armor armor = (Armor) part;
-                            armor.setAmount(armor.getTotalAmount());
-                        } else if (part instanceof AmmoBin) {
-                            final AmmoBin ammoBin = (AmmoBin) part;
-
-                            // we magically find the ammo we need, then load the bin
-                            // we only want to get the amount of ammo the bin actually needs
-                            if (ammoBin.getShotsNeeded() > 0) {
-                                ammoBin.setShotsNeeded(0);
-                                ammoBin.updateConditionFromPart();
-                            }
-                        }
-
-                    }
-
-                    // TODO: Make this less painful. We just want to fix hips and shoulders.
-                    Entity entity = unit.getEntity();
-                    if (entity instanceof Mech) {
-                        for (int loc : new int[] {
-                            Mech.LOC_CLEG, Mech.LOC_LLEG, Mech.LOC_RLEG, Mech.LOC_LARM, Mech.LOC_RARM}) {
-                            int numberOfCriticals = entity.getNumberOfCriticals(loc);
-                            for (int crit = 0; crit < numberOfCriticals; ++ crit) {
-                                CriticalSlot slot = entity.getCritical(loc, crit);
-                                if (null != slot) {
-                                    slot.setHit(false);
-                                    slot.setDestroyed(false);
-                                }
-                            }
-                        }
-                    }
-                }
-                MekHQ.triggerEvent(new UnitChangedEvent(unit));
+            IUnitAction restoreUnitAction = new RestoreUnitAction();
+            for (Unit u : units) {
+                restoreUnitAction.execute(gui.getCampaign(), u);
             }
         } else if (command.equals(COMMAND_STRIP_UNIT)) {
             IUnitAction stripUnitAction = new StripUnitAction();
@@ -657,7 +598,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 boolean areAllRepairFlagged = true; // If everyone has the repair flag, then we show the repair flag box as selected
                 boolean areAllSalvageFlagged = true;  // Same as above, but with the salvage flag
                 boolean allRequireSameTechType = true; // If everyone requires the same tech type, we can allow bulk tech assignment
-                String skill = units[0].determineUnitTechSkillType();
+                boolean allSameModel = true; // If everyone is the exact same unit and model of that unit
+                boolean oneRefitting = false; // If any one selected unit is refitting
+                boolean allAvailable = true; // If everyone is available
+                boolean allAvailableIgnoreRefit = true; // If everyone is available
+
+                final String model = unit.getEntity().getShortNameRaw();
+                String skill = unit.determineUnitTechSkillType();
                 int maintenanceTime = 0;
                 for (Unit u : units) {
                     if (u.isMothballed()) {
@@ -680,6 +627,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
 
                     if (!u.isPresent()) {
                         oneNotPresent = true;
+                    }
+
+                    if (allAvailableIgnoreRefit && !u.isAvailable(true)) {
+                        allAvailableIgnoreRefit = false;
+                        allAvailable = false;
+                    } else if (allAvailable && !u.isAvailable()) {
+                        allAvailable = false;
                     }
 
                     if (u.isEntityCamo()) {
@@ -717,6 +671,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                             skill = ""; //little performance saving hack
                         }
                     }
+
+                    if (!model.equals(u.getEntity().getShortNameRaw())) {
+                        allSameModel = false;
+                    }
+
+                    if (u.isRefitting()) {
+                        oneRefitting = true;
+                    }
                 }
                 //endregion Determine if to Display
 
@@ -733,7 +695,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     }
                     menu.add(cbMenuItem);
                 }
-                menu.setEnabled(unit.isAvailable());
+                menu.setEnabled(allAvailable);
                 popup.add(menu);
 
                 // swap ammo
@@ -757,26 +719,25 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         }
                     } else {
                         menu = new JMenu("Swap ammo");
-                        JMenu ammoMenu;
                         for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
-                            ammoMenu = new JMenu(ammo.getType().getDesc());
-                            AmmoType curType = (AmmoType) ammo.getType();
+                            JMenu ammoMenu = new JMenu(ammo.getType().getDesc());
+                            AmmoType curType = ammo.getType();
                             for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType,
                                     gui.getCampaign().getCampaignOptions().getTechLevel())) {
                                 cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                                // Identity Comparison is required, not .equals
-                                if (atype == curType) {
+                                if (atype.equals(curType)) {
                                     cbMenuItem.setSelected(true);
                                 } else {
-                                    cbMenuItem.setActionCommand(COMMAND_SWAP_AMMO + ":" + ammo.getId()
-                                            + ":" + atype.getInternalName());
-                                    cbMenuItem.addActionListener(this);
+                                    cbMenuItem.addActionListener(evt -> {
+                                        IUnitAction swapAmmoTypeAction = new SwapAmmoTypeAction(ammo, atype);
+                                        swapAmmoTypeAction.execute(gui.getCampaign(), unit);
+                                    });
                                 }
                                 ammoMenu.add(cbMenuItem);
                             }
                             JMenuHelpers.addMenuIfNonEmpty(menu, ammoMenu);
                         }
-                        menu.setEnabled(unit.isAvailable());
+                        menu.setEnabled(allAvailable);
                         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
                     }
                 }
@@ -922,46 +883,50 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     popup.add(menuItem);
                 }
 
-                // Customize
-                if (oneSelected) {
+                // Customize unit menu
+                if (allUnitsAreRepairable && allAvailableIgnoreRefit) {
                     menu = new JMenu("Customize");
-                    if (unit.getEntity().isOmni()) {
-                        menuItem = new JMenuItem("Choose configuration...");
-                    } else {
-                        menuItem = new JMenuItem("Choose Refit Kit...");
+
+                    // TODO : Should I be able to refit BA?
+                    if (allSameModel && allAvailable
+                            && ((unit.getEntity() instanceof Mech)
+                            || (unit.getEntity() instanceof Tank)
+                            || (unit.getEntity() instanceof Aero)
+                            || ((unit.getEntity() instanceof Infantry)))) {
+                        menuItem = new JMenuItem(unit.getEntity().isOmni() ? "Choose configuration..."
+                                : "Choose Refit Kit...");
+                        menuItem.setActionCommand(COMMAND_REFIT_KIT);
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
                     }
-                    menuItem.setActionCommand(COMMAND_REFIT_KIT);
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(unit.isAvailable()
-                            && (unit.getEntity() instanceof Mech
-                            || unit.getEntity() instanceof Tank
-                            || unit.getEntity() instanceof Aero
-                            || (unit.getEntity() instanceof Infantry)));
-                    //TODO : Should ProtoMech be included in the above?
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem("Refurbish Unit");
-                    menuItem.setActionCommand(COMMAND_REFURBISH);
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(unit.isAvailable()
-                            && (unit.getEntity() instanceof Mech
-                            || unit.getEntity() instanceof Tank
-                            || unit.getEntity() instanceof Aero
-                            || unit.getEntity() instanceof BattleArmor
-                            || unit.getEntity() instanceof Protomech));
-                    menu.add(menuItem);
-                    if (gui.hasTab(GuiTabType.MEKLAB)) {
+
+                    if (allSameModel && allAvailable
+                            && ((unit.getEntity() instanceof Mech)
+                            || (unit.getEntity() instanceof Tank)
+                            || (unit.getEntity() instanceof Aero)
+                            || ((unit.getEntity() instanceof Infantry)
+                            || (unit.getEntity() instanceof Protomech)))) {
+                        menuItem = new JMenuItem("Refurbish Unit");
+                        menuItem.setActionCommand(COMMAND_REFURBISH);
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
+                    }
+
+                    if (oneSelected && gui.hasTab(GuiTabType.MEKLAB)) {
                         menuItem = new JMenuItem("Customize in Mek Lab...");
                         menuItem.setActionCommand(COMMAND_CUSTOMIZE);
                         menuItem.addActionListener(this);
-                        menuItem.setEnabled(unit.isAvailable()
+                        menuItem.setEnabled(allAvailable
                                 && !(unit.getEntity() instanceof GunEmplacement));
                         menu.add(menuItem);
                     }
-                    if (unit.isRefitting()) {
+
+                    if (oneRefitting) {
                         menuItem = new JMenuItem("Cancel Customization");
                         menuItem.setActionCommand(COMMAND_CANCEL_CUSTOMIZE);
                         menuItem.addActionListener(this);
                         menu.add(menuItem);
+
                         if (isGM) {
                             menuItem = new JMenuItem("Complete Refit (GM)");
                             menuItem.setActionCommand(COMMAND_REFIT_GM_COMPLETE);
@@ -969,8 +934,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                             menu.add(menuItem);
                         }
                     }
-                    menu.setEnabled(unit.isAvailable(true) && unit.isRepairable());
-                    popup.add(menu);
+                    JMenuHelpers.addMenuIfNonEmpty(popup, menu);
                 }
 
                 // fill with personnel
@@ -1126,7 +1090,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
         }
     }
 
-    private void addCustomUnitTag(Unit[] units) {
+    private void addCustomUnitTag(Unit... units) {
         String sCustomsDir = "data/mechfiles/customs/";
         String sCustomsDirCampaign = sCustomsDir + gui.getCampaign().getName() + "/";
         File customsDir = new File(sCustomsDir);
