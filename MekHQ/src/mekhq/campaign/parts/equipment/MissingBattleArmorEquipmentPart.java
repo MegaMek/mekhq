@@ -175,7 +175,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     }
 
     @Override
-    public Part getNewPart() {
+    public BattleArmorEquipmentPart getNewPart() {
         BattleArmorEquipmentPart epart = new BattleArmorEquipmentPart(getUnitTonnage(), type, -1, size, -1, campaign);
         epart.setEquipTonnage(equipTonnage);
         return epart;

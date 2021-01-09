@@ -31,7 +31,8 @@ public enum PersonnelStatus {
     NATURAL_CAUSES("PersonnelStatus.NATURAL_CAUSES.text"),
     WOUNDS("PersonnelStatus.WOUNDS.text"),
     DISEASE("PersonnelStatus.DISEASE.text"),
-    OLD_AGE("PersonnelStatus.OLD_AGE.text");
+    OLD_AGE("PersonnelStatus.OLD_AGE.text"),
+    PREGNANCY_COMPLICATIONS("PersonnelStatus.PREGNANCY_COMPLICATIONS.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -106,12 +107,20 @@ public enum PersonnelStatus {
     public boolean hasDiedOfOldAge() {
         return this == OLD_AGE;
     }
+
+    /**
+     * @return true if a person has died from PREGNANCY_COMPLICATIONS, otherwise false
+     */
+    public boolean hasDiedOfPregnancyComplications() {
+        return this == PREGNANCY_COMPLICATIONS;
+    }
+
     /**
      * @return true if a person is dead, otherwise false
      */
     public boolean isDead() {
         return isKIA() || hasDiedOfNaturalCauses() || hasDiedOfWounds() || hasDiedOfDisease()
-                || hasDiedOfOldAge();
+                || hasDiedOfOldAge() || hasDiedOfPregnancyComplications();
     }
 
     /**

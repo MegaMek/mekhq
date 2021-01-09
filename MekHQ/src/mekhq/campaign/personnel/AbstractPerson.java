@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -443,11 +443,11 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "status", getStatus().name());
 
         if (!getPortrait().hasDefaultCategory()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", getPortrait().getCategory());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "portraitCategory", getPortrait().getCategory());
         }
 
         if (!getPortrait().hasDefaultFilename()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", getPortrait().getFilename());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "portraitFile", getPortrait().getFilename());
         }
 
         if (getBirthday() != null) {
@@ -484,11 +484,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    try {
-                        retVal.id = UUID.fromString(wn2.getTextContent().trim());
-                    } catch (Exception ignored) {
-
-                    }
+                    retVal.id = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("preNominal")) {
                     retVal.preNominal = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {

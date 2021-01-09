@@ -22,14 +22,12 @@
 package mekhq.campaign.universe;
 
 import java.awt.Color;
-import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -37,16 +35,10 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.xml.parsers.DocumentBuilder;
-
 import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.client.ratgenerator.FactionRecord;
-import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -59,10 +51,6 @@ import mekhq.campaign.parts.Part;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Faction {
-    private static Map<String,Faction> factions;
-    private static Map<Integer,Faction> factionIdMap;
-    private static List<String> choosableFactionCodes = Collections.singletonList("MERC");
-
     private String shortName;
     private String fullName;
     private NavigableMap<Integer,String> nameChanges = new TreeMap<>();
@@ -93,16 +81,6 @@ public class Faction {
         tags = EnumSet.noneOf(Faction.Tag.class);
         start = 0;
         end = 9999;
-    }
-
-    public static List<String> getChoosableFactionCodes() {
-        return choosableFactionCodes;
-    }
-
-    public static void setChoosableFactionCodes(String... choosableFactionCodes) {
-        if (choosableFactionCodes.length > 0) {
-            Faction.choosableFactionCodes = Arrays.asList(choosableFactionCodes);
-        }
     }
 
     public String getShortName() {
@@ -265,75 +243,7 @@ public class Faction {
         return false;
     }
 
-    public static Collection<Faction> getFactions() {
-        return factions.values();
-    }
-
-    public static Collection<String> getFactionList() {
-        return new ArrayList<>(factions.keySet());
-    }
-
-    public static Faction getFaction(String sname) {
-        Faction defaultFaction = new Faction();
-        if (factions == null) {
-            return defaultFaction;
-        } else {
-            return factions.getOrDefault(sname, defaultFaction);
-        }
-    }
-
-    public static Faction getFactionFromFullName(String fname, int year) {
-        return getFactionFromFullNameAndYear(fname, year);
-    }
-
-    public static Faction getFactionFromFullNameAndYear(String fname, int year) {
-        Faction faction = null;
-        for (Faction f : factions.values()) {
-            if (f.getFullName(year).equals(fname)) {
-                faction = f;
-                break;
-            }
-        }
-        return faction;
-    }
-
-    /**
-     * Helper function that gets the faction record for the specified faction, or a fallback general faction record.
-     * Useful for RAT generator activity.
-     * @param faction The faction whose MegaMek faction record to retrieve.
-     * @return Found faction record or null.
-     */
-    public static FactionRecord getFactionRecordOrFallback(String faction) {
-        FactionRecord fRec = RATGenerator.getInstance().getFaction(faction);
-        if (fRec == null) {
-            Faction f = Faction.getFaction(faction);
-            if (f != null) {
-                if (f.isPeriphery()) {
-                    fRec = RATGenerator.getInstance().getFaction("Periphery");
-                } else if (f.isClan()) {
-                    fRec = RATGenerator.getInstance().getFaction("CLAN");
-                } else {
-                    fRec = RATGenerator.getInstance().getFaction("IS");
-                }
-            }
-
-            if (fRec == null) {
-                MekHQ.getLogger().error(RATGenerator.class, "getFactionRecordOrFallback",
-                        "Could not locate faction record for " + faction);
-            }
-        }
-
-        return fRec;
-    }
-
-    public static String getFactionCode(int faction) {
-        Faction f = factionIdMap.get(faction);
-        return (null != f) ? f.getShortName() : "IND";
-    }
-
     public static Faction getFactionFromXML(Node wn) throws DOMException {
-        final String METHOD_NAME = "getFactionFromXML(Node)";
-
         Faction retVal = new Faction();
         NodeList nl = wn.getChildNodes();
 
@@ -397,84 +307,10 @@ public class Faction {
         }
 
         if ((retVal.eraMods != null) && (retVal.eraMods.length < 9)) {
-            MekHQ.getLogger().warning(Faction.class, METHOD_NAME,
-                    retVal.fullName + " faction did not have a long enough eraMods vector");
+            MekHQ.getLogger().warning(retVal.fullName + " faction did not have a long enough eraMods vector");
         }
 
         return retVal;
-    }
-
-    public static void generateFactions() throws DOMException {
-        final String METHOD_NAME = "generateFactions()";
-
-        MekHQ.getLogger().info(Faction.class, METHOD_NAME, "Starting load of faction data from XML...");
-        // Initialize variables.
-        factions = new HashMap<>();
-        factionIdMap = new HashMap<>();
-
-        Document xmlDoc;
-
-        try (FileInputStream fis = new FileInputStream("data/universe/factions.xml")) {
-            // Using factory get an instance of document builder
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
-
-            // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(fis);
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(Faction.class, METHOD_NAME, ex);
-            return;
-        }
-
-        Element factionEle = xmlDoc.getDocumentElement();
-        NodeList nl = factionEle.getChildNodes();
-
-        // Get rid of empty text nodes and adjacent text nodes...
-        // Stupid weird parsing of XML.  At least this cleans it up.
-        factionEle.normalize();
-
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn = nl.item(x);
-
-            if (!wn.getParentNode().equals(factionEle)) {
-                continue;
-            }
-
-            int xc = wn.getNodeType();
-
-            if (xc == Node.ELEMENT_NODE) {
-                // This is what we really care about.
-                // All the meat of our document is in this node type, at this
-                // level.
-                // Okay, so what element is it?
-                String xn = wn.getNodeName();
-
-                if (xn.equalsIgnoreCase("faction")) {
-                    Faction f = getFactionFromXML(wn);
-                    if (!factions.containsKey(f.getShortName())) {
-                        factions.put(f.getShortName(), f);
-                        if (null != f.getId()) {
-                            if (!factionIdMap.containsKey(f.getId())) {
-                                factionIdMap.put(f.getId(), f);
-                            } else {
-                                MekHQ.getLogger().error(Faction.class, METHOD_NAME,
-                                        String.format("Faction id \"%d\" already used for faction %s, can't re-use it for %s",
-                                                f.getId(), factionIdMap.get(f.getId()).getFullName(0),
-                                                f.getFullName(0)));
-                            }
-                        }
-                    } else {
-                        MekHQ.getLogger().error(Faction.class, METHOD_NAME,
-                                String.format("Faction code \"%s\" already used for faction %s, can't re-use it for %s",
-                                        f.getShortName(), factions.get(f.getShortName()).getFullName(0), f.getFullName(0)));
-                    }
-                } else if (xn.equalsIgnoreCase("choosableFactionCodes")) {
-                    setChoosableFactionCodes(wn.getTextContent().split(","));
-                }
-            }
-        }
-        MekHQ.getLogger().info(Faction.class, METHOD_NAME,
-                "Loaded a total of " + factions.size() + " factions");
     }
 
     /** @return Sorted list of faction names as one string */

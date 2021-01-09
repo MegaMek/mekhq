@@ -22,18 +22,14 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.UUID;
 
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 
 /**
@@ -41,7 +37,7 @@ import mekhq.campaign.work.WorkTime;
  * task needs to be performed
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class MissingPart extends Part implements Serializable, MekHqXmlSerializable, IPartWork, IAcquisitionWork {
+public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     /**
      *
@@ -132,25 +128,38 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
+        if (replacement != null) {
             Part actualReplacement = replacement.clone();
+
+            // Assign the replacement part to the unit
             unit.addPart(actualReplacement);
+
+            // Add the replacement part to the campaign (after adding to the unit)
             campaign.getQuartermaster().addPart(actualReplacement, 0);
+
             replacement.decrementQuantity();
+
             remove(false);
-            //assign the replacement part to the unit
+
             actualReplacement.updateConditionFromPart();
         }
     }
 
     @Override
     public void remove(boolean salvage) {
+        final Unit unit = getUnit();
+
         campaign.getWarehouse().removePart(this);
-        if(null != unit) {
+        if (unit != null) {
             unit.removePart(this);
         }
+
         setUnit(null);
-        if (null != parentPart) {
+
+        // Grab a reference to our parent part so that we don't accidentally NRE
+        // when we remove the parent part reference.
+        Part parentPart = getParentPart();
+        if (parentPart != null) {
             parentPart.removeChildPart(this);
         }
     }
@@ -345,18 +354,6 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
     }
 
     @Override
-    public void writeToXmlBegin(PrintWriter pw1, int indent) {
-        super.writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<daysToWait>"
-                +daysToWait
-                +"</daysToWait>");
-        if (hasReplacementPart()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "replacementId", getReplacementPart().getId());
-        }
-    }
-
-    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);
@@ -419,18 +416,19 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 
     @Override
     public void cancelReservation() {
-        Part replacement = findReplacement(false);
-        if (hasReplacementPart() && (null != replacement)) {
-            setReplacementPart(null);
-            replacement.setReservedBy(null);
-            if (replacement.isSpare()) {
-                Part spare = campaign.getWarehouse().checkForExistingSparePart(replacement);
-                if (null != spare) {
-                    spare.incrementQuantity();
-                    campaign.getWarehouse().removePart(replacement);
+        if (hasReplacementPart()) {
+            Part replacement = getReplacementPart();
+            if (replacement != null) {
+                replacement.setReservedBy(null);
+
+                // Only return the replacement part to the campaign if we have one
+                if (replacement.getQuantity() > 0) {
+                    campaign.getQuartermaster().addPart(replacement, 0);
                 }
             }
         }
+
+        setReplacementPart(null);
     }
 
     @Override

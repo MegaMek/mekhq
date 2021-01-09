@@ -12,17 +12,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
@@ -31,7 +31,6 @@ import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingProtomekLegActuator extends MissingPart {
@@ -47,14 +46,14 @@ public class MissingProtomekLegActuator extends MissingPart {
     }
 
     @Override
-	public int getBaseTime() {
-		return 120;
-	}
+    public int getBaseTime() {
+        return 120;
+    }
 
-	@Override
-	public int getDifficulty() {
-		return 0;
-	}
+    @Override
+    public int getDifficulty() {
+        return 0;
+    }
 
     @Override
     public double getTonnage() {
@@ -76,20 +75,20 @@ public class MissingProtomekLegActuator extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
+        if (null != unit) {
               unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_LEGCRIT, Protomech.LOC_LEG, 2);
         }
     }
 
     @Override
     public String checkFixable() {
-    	if(null == unit) {
-    		return null;
-    	}
-        if(unit.isLocationBreached(Protomech.LOC_LEG)) {
+        if (null == unit) {
+            return null;
+        }
+        if (unit.isLocationBreached(Protomech.LOC_LEG)) {
             return unit.getEntity().getLocationName(Protomech.LOC_LEG) + " is breached.";
         }
-        if(unit.isLocationDestroyed(Protomech.LOC_LEG)) {
+        if (unit.isLocationDestroyed(Protomech.LOC_LEG)) {
             return unit.getEntity().getLocationName(Protomech.LOC_LEG) + " is destroyed.";
         }
         return null;
@@ -98,7 +97,7 @@ public class MissingProtomekLegActuator extends MissingPart {
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
+        if (null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
@@ -112,7 +111,7 @@ public class MissingProtomekLegActuator extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof ProtomekLegActuator
-                && getUnitTonnage() == ((ProtomekLegActuator)part).getUnitTonnage();
+                && getUnitTonnage() == part.getUnitTonnage();
     }
 
     @Override
@@ -121,22 +120,22 @@ public class MissingProtomekLegActuator extends MissingPart {
     }
 
     @Override
-   	public String getLocationName() {
-   		return unit != null ? unit.getEntity().getLocationName(getLocation()) : null;
-   	}
+    public String getLocationName() {
+        return unit != null ? unit.getEntity().getLocationName(getLocation()) : null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Protomech.LOC_LEG;
-	}
+    @Override
+    public int getLocation() {
+        return Protomech.LOC_LEG;
+    }
 
     @Override
     public TechAdvancement getTechAdvancement() {
         return ProtomekLocation.TECH_ADVANCEMENT;
     }
 
-	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ACTUATOR;
+    @Override
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ACTUATOR;
     }
 }

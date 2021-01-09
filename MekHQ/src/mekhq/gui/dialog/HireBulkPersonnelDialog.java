@@ -40,7 +40,7 @@ import megamek.common.Compute;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.gui.CampaignGUI;
 
 /**

@@ -22,9 +22,11 @@ package mekhq.campaign;
 
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -43,6 +45,11 @@ import static org.mockito.Mockito.*;
  * @since 6/10/14 10:23 AM
  */
 public class CampaignTest {
+    @Before
+    public void setup() {
+        Ranks.initializeRankSystems();
+    }
+
     @Test
     public void testGetTechs() {
         final UUID testId = UUID.fromString("c8682a91-346f-49b0-9f1f-28e669ee4e95");

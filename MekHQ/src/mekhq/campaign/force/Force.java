@@ -480,11 +480,7 @@ public class Force implements Serializable {
             NamedNodeMap attrs = wn2.getAttributes();
             Node classNameNode = attrs.getNamedItem("id");
             String idString = classNameNode.getTextContent();
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                retVal.oldUnits.add(Integer.parseInt(idString));
-            } else {
-                retVal.addUnit(UUID.fromString(idString));
-            }
+            retVal.addUnit(UUID.fromString(idString));
         }
     }
 

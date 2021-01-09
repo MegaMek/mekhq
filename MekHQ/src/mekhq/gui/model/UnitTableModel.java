@@ -344,7 +344,7 @@ public class UnitTableModel extends DataTableModel {
                     }
                     desc += "<br>" + u.getStatus() + "</html>";
                     setHtmlText(desc);
-                    Image mekImage = getImageFor(u);
+                    Image mekImage = u.getImage(this);
                     if (mekImage != null) {
                         setImage(mekImage);
                     } else {
