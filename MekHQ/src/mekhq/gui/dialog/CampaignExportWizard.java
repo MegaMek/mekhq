@@ -484,8 +484,7 @@ public class CampaignExportWizard extends JDialog {
 
         if (chkExportState.isSelected()) {
             destinationCampaign.setFactionCode(sourceCampaign.getFactionCode());
-            destinationCampaign.setCamoCategory(sourceCampaign.getCamoCategory());
-            destinationCampaign.setCamoFileName(sourceCampaign.getCamoFileName());
+            destinationCampaign.setCamouflage(sourceCampaign.getCamouflage().clone());
             destinationCampaign.setLocalDate(sourceCampaign.getLocalDate());
             destinationCampaign.setLocation(sourceCampaign.getLocation());
         }

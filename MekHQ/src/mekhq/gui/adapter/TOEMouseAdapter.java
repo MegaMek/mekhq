@@ -1497,8 +1497,8 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
      * @return A CamoChooserDialog for the given force.
      */
     private CamoChooserDialog getCamoChooserDialogForForce(Force force) {
-        String category = gui.getCampaign().getCamoCategory();
-        String fileName = gui.getCampaign().getCamoFileName();
+        String category = gui.getCampaign().getCamouflage().getCategory();
+        String fileName = gui.getCampaign().getCamouflage().getFilename();
 
         // Gather the most used camo category/file name for the force
         Optional<Pair<String, String>> used = force.getAllUnits(false).stream()
@@ -1508,7 +1508,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             .collect(
                 Collectors.collectingAndThen(
                     Collectors.groupingBy(
-                        e -> Pair.of(e.getCamoCategory(), e.getCamoFileName()),
+                        e -> Pair.of(e.getCamouflage().getCategory(), e.getCamouflage().getFilename()),
                         Collectors.counting()),
                     m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey)
                 )

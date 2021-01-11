@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.finances.Money;
@@ -157,8 +156,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public Unit(Entity en, Campaign c) {
         this.entity = en;
         if (entity != null) {
-            entity.setCamoCategory(null);
-            entity.setCamoFileName(null);
+            entity.setCamouflage(new Camouflage());
         }
         this.site = SITE_BAY;
         this.campaign = c;
@@ -3276,47 +3274,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return getCamouflage().hasDefaultCategory() ? camouflage : getCamouflage();
     }
 
-    public String getCamoCategory() {
-        if (null == entity) {
-            return "";
-        }
-
-        String category = getCampaign().getCamoCategory();
-        if (isEntityCamo()) {
-            category = entity.getCamoCategory();
-        }
-
-        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-            category = "";
-        }
-
-        return category;
-    }
-
-    public String getCamoFileName() {
-        if (null == getCampaign() || null == entity) {
-            return "";
-        }
-
-        String fileName = getCampaign().getCamoFileName();
-        if (isEntityCamo()) {
-            fileName = entity.getCamoFileName();
-        }
-
-        if (null == fileName) {
-            fileName = "";
-        }
-
-        return fileName;
-    }
-
     public Image getImage(Component component) {
         if (MHQStaticDirectoryManager.getMechTileset() == null) {
             return null;
         }
         Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
-        return new EntityImage(base, getCampaign().getColour(),
-                (getCamouflage().isDefault() ? getCampaign().getCamouflage() : getCamouflage()).getImage(),
+        return new EntityImage(base, getCampaign().getColour(), getCamouflageOrElse(getCampaign().getCamouflage()).getImage(),
                 component, getEntity()).loadPreviewImage();
     }
 

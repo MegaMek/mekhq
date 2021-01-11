@@ -44,6 +44,7 @@ import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.util.EncodeControl;
@@ -399,8 +400,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
         } else if (command.equals(COMMAND_REMOVE_INDI_CAMO)) {
             for (Unit u : units) {
                 if (u.isEntityCamo()) {
-                    u.getEntity().setCamoCategory(null);
-                    u.getEntity().setCamoFileName(null);
+                    u.getEntity().setCamouflage(new Camouflage());
                 }
             }
         } else if (command.equals(COMMAND_INDI_CAMO)) { // Single Unit only
