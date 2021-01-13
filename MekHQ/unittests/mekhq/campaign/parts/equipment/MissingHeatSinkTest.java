@@ -79,8 +79,9 @@ public class MissingHeatSinkTest {
 
         missingHeatSink.fix();
 
-        assertTrue(!warehouse.getParts().contains(missingHeatSink));
+        assertFalse(warehouse.getParts().contains(missingHeatSink));
         assertNull(missingHeatSink.getUnit());
+        assertFalse(warehouse.getParts().contains(legitHeatSink));
 
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
         verify(unit, times(1)).addPart(partCaptor.capture());
@@ -92,5 +93,6 @@ public class MissingHeatSinkTest {
         HeatSink addedHeatSink = (HeatSink) addedPart;
         assertEquals(unit, addedHeatSink.getUnit());
         assertEquals(equipmentNum, addedHeatSink.getEquipmentNum());
+        assertEquals(heatSinkType, addedHeatSink.getType());
     }
 }

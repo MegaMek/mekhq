@@ -23,6 +23,7 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import mekhq.MekHQ;
 import org.w3c.dom.Node;
@@ -195,11 +196,14 @@ public class MissingEquipmentPart extends MissingPart {
             return false;
         }
 
+        EquipmentPart equipmentPart = (EquipmentPart) part;
+
         newPart.setEquipmentNum(getEquipmentNum());
         newPart.setUnit(unit); // CAW: find a way to do this without setting a unit
-        return (type.equals(newPart.getType()) && getTonnage() == part.getTonnage())
-                && (size == newPart.getSize())
-                && part.getStickerPrice().equals(newPart.getStickerPrice());
+        return getType().equals(equipmentPart.getType())
+                && (getTonnage() == equipmentPart.getTonnage())
+                && (getSize() == equipmentPart.getSize())
+                && Objects.equals(newPart.getStickerPrice(), equipmentPart.getStickerPrice());
     }
 
     protected @Nullable Mounted getMounted() {
