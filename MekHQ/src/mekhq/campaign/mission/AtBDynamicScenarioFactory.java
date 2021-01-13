@@ -499,8 +499,7 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
 
             if ((forceTemplate != null) && forceTemplate.isAlliedPlayerForce()) {
-                final Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE,
-                        scenario.getContract(campaign).getAllyColour().name());
+                final Camouflage camouflage = scenario.getContract(campaign).getAllyCamouflage();
                 for (Entity en : botForce.getEntityList()) {
                     scenario.getAlliesPlayer().add(en);
                     scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);

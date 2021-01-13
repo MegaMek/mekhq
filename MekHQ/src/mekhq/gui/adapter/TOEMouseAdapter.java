@@ -369,7 +369,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 for (UUID id : singleForce.getAllUnits(false)) {
                     Unit unit = gui.getCampaign().getUnit(id);
                     if (unit != null) {
-                        unit.getEntity().setCamouflage(ccd.getSelectedItem());
+                        unit.getEntity().setCamouflage(ccd.getSelectedItem().clone());
                         MekHQ.triggerEvent(new UnitChangedEvent(unit));
                     }
                 }
