@@ -54,6 +54,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     private BehaviorSettings behaviorSettings;
 
     public BotForce() {
+        setCamouflage(new Camouflage());
         this.entityList = new ArrayList<>();
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();

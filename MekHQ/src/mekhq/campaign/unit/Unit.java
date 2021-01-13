@@ -3270,8 +3270,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return (entity == null) ? new Camouflage() : entity.getCamouflage();
     }
 
-    public Camouflage getCamouflageOrElse(Camouflage camouflage) {
-        return getCamouflage().hasDefaultCategory() ? camouflage : getCamouflage();
+    public Camouflage getUtilizedCamouflage(Campaign campaign) {
+        if (getCamouflage().hasDefaultCategory()) {
+            final Force force = campaign.getForce(getForceId());
+            return ((force != null) && !force.getCamouflage().hasDefaultCategory())
+                    ? force.getCamouflage() : campaign.getCamouflage();
+        } else {
+            return getCamouflage();
+        }
     }
 
     public Image getImage(Component component) {
@@ -3279,7 +3285,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return null;
         }
         Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
-        return new EntityImage(base, getCampaign().getColour(), getCamouflageOrElse(getCampaign().getCamouflage()).getImage(),
+        return new EntityImage(base, getCampaign().getColour(), getUtilizedCamouflage(getCampaign()).getImage(),
                 component, getEntity()).loadPreviewImage();
     }
 
@@ -4646,10 +4652,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         return null;
-    }
-
-    public boolean isEntityCamo() {
-        return !getCamouflage().hasDefaultCategory();
     }
 
     public int getAvailability(int era) {

@@ -399,12 +399,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             }
         } else if (command.equals(COMMAND_REMOVE_INDI_CAMO)) {
             for (Unit u : units) {
-                if (u.isEntityCamo()) {
-                    u.getEntity().setCamouflage(new Camouflage());
-                }
+                u.getEntity().setCamouflage(new Camouflage());
             }
         } else if (command.equals(COMMAND_INDI_CAMO)) { // Single Unit only
-            CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(), gui.getCampaign().getCamouflage(), selectedUnit.getCamouflage());
+            CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
+                    selectedUnit.getUtilizedCamouflage(gui.getCampaign()), true);
             if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
                 return;
             }
@@ -636,7 +635,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         allAvailable = false;
                     }
 
-                    if (u.isEntityCamo()) {
+                    if (!u.getCamouflage().hasDefaultCategory()) {
                         oneHasIndividualCamo = true;
                     }
 
@@ -946,14 +945,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 }
 
                 // Camo
-                if (oneSelected && !unit.isEntityCamo()) {
-                    menuItem = new JMenuItem(gui.getResourceMap()
-                            .getString("customizeMenu.individualCamo.text"));
+                if (oneSelected) {
+                    menuItem = new JMenuItem(gui.getResourceMap().getString("customizeMenu.individualCamo.text"));
                     menuItem.setActionCommand(COMMAND_INDI_CAMO);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
                 }
-                if (oneHasIndividualCamo) {
+                if (!oneSelected && oneHasIndividualCamo) {
                     menuItem = new JMenuItem(gui.getResourceMap()
                             .getString("customizeMenu.removeIndividualCamo.text"));
                     menuItem.setActionCommand(COMMAND_REMOVE_INDI_CAMO);
