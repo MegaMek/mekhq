@@ -455,20 +455,8 @@ public class ForceViewPanel extends ScrollablePanel {
 
     private Image getImageFor(Unit u, Component c) {
         Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(u.getEntity());
-        EntityImage entityImage = new EntityImage(base, u.getCampaign().getColour(), getCamo(u), c, u.getEntity());
+        EntityImage entityImage = new EntityImage(base, u.getCamouflageOrElse(campaign.getCamouflage()), c, u.getEntity());
         return entityImage.loadPreviewImage();
-    }
-
-    private Image getCamo(Unit unit) {
-        // Try to get the player's camo file.
-        Image camo = null;
-        try {
-            camo = (Image) MHQStaticDirectoryManager.getCamouflage().
-                    getItem(unit.getCamoCategory(), unit.getCamoFileName());
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-        }
-        return camo;
     }
 
     public String getSummaryFor(Person person, Unit unit) {
