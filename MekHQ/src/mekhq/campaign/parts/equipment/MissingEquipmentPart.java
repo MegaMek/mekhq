@@ -189,6 +189,12 @@ public class MissingEquipmentPart extends MissingPart {
         //well
         //http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
         EquipmentPart newPart = getNewPart();
+
+        // Don't replace with parts that don't match our expected type!
+        if (!newPart.getClass().equals(part.getClass())) {
+            return false;
+        }
+
         newPart.setEquipmentNum(getEquipmentNum());
         newPart.setUnit(unit); // CAW: find a way to do this without setting a unit
         return (type.equals(newPart.getType()) && getTonnage() == part.getTonnage())
