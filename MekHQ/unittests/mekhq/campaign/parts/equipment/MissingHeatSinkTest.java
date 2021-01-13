@@ -64,7 +64,7 @@ public class MissingHeatSinkTest {
         missingHeatSink.setUnit(unit);
         warehouse.addPart(missingHeatSink);
 
-        // Add an aero heat sink that isn't legic
+        // Add an aero heat sink that isn't legit
         AeroHeatSink aeroHeatSink = new AeroHeatSink(1, Aero.HEAT_DOUBLE, false, mockCampaign);
         warehouse.addPart(aeroHeatSink);
 
