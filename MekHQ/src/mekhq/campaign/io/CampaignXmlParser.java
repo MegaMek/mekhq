@@ -364,7 +364,7 @@ public class CampaignXmlParser {
         if (retVal.getCampaignOptions().getUseAtB()) {
             Hashtable<Integer, Lance> lances = retVal.getLances();
             for (Force f : retVal.getAllForces()) {
-                if (f.getUnits().size() > 0 && (null == lances.get(f.getId()))) {
+                if ((f.getUnits().size() > 0) && (null == lances.get(f.getId()))) {
                     lances.put(f.getId(), new Lance(f.getId(), retVal));
                     MekHQ.getLogger().warning(String.format("Added missing Lance %s to AtB list", f.getName()));
                 }
