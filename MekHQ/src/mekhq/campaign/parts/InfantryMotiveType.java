@@ -189,10 +189,7 @@ public class InfantryMotiveType extends Part {
 
 		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			if (wn2.getNodeName().equalsIgnoreCase("mode")) {
-				mode = EntityMovementMode.getMode(wn2.getTextContent());
-				assignName();
-			} else if (wn2.getNodeName().equalsIgnoreCase("moveMode")) {
+            if (wn2.getNodeName().equalsIgnoreCase("moveMode")) {
 				mode = EntityMovementMode.getMode(wn2.getTextContent());
 				assignName();
 			}
