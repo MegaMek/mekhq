@@ -4880,8 +4880,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isSelfCrewed() {
-        return (getEntity() instanceof Dropship || getEntity() instanceof Jumpship
-                || getEntity() instanceof Infantry && !(getEntity() instanceof BattleArmor));
+        return (getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship)
+                || getEntity().isConventionalInfantry();
     }
 
     public boolean isUnderRepair() {
