@@ -88,7 +88,7 @@ public class RefitNameDialog extends JDialog {
         txtChassis.setText(refit.getNewEntity().getChassis());
         txtChassis.setMinimumSize(new Dimension(150, 28));
         //only allow chassis renaming for conventional infantry
-        if (refit.getNewEntity().isConventionalInfantry()) {
+        if (!refit.getNewEntity().isConventionalInfantry()) {
         	txtChassis.setEditable(false);
         	txtChassis.setEnabled(false);
         }
