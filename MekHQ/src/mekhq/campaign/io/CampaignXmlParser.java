@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -355,6 +356,17 @@ public class CampaignXmlParser {
                     if (f.isDeployed()) {
                         u.setScenarioId(f.getScenarioId());
                     }
+                }
+            }
+        }
+
+        // determine if we've missed any lances and add those back into the campaign
+        if (retVal.getCampaignOptions().getUseAtB()) {
+            Hashtable<Integer, Lance> lances = retVal.getLances();
+            for (Force f : retVal.getAllForces()) {
+                if ((f.getUnits().size() > 0) && (null == lances.get(f.getId()))) {
+                    lances.put(f.getId(), new Lance(f.getId(), retVal));
+                    MekHQ.getLogger().warning(String.format("Added missing Lance %s to AtB list", f.getName()));
                 }
             }
         }
