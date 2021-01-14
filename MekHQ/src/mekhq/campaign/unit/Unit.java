@@ -3315,8 +3315,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return null;
         }
         Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
-        return new EntityImage(base, getCampaign().getColour(),
-                (getCamouflage().isDefault() ? getCampaign().getCamouflage() : getCamouflage()).getImage(),
+        return new EntityImage(base, getCamouflageOrElse(getCampaign().getCamouflage()),
                 component, getEntity()).loadPreviewImage();
     }
 
