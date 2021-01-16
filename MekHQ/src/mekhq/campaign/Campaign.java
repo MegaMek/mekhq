@@ -934,12 +934,6 @@ public class Campaign implements Serializable, ITechManager {
                 .map(c -> (AtBContract) c).collect(Collectors.toList());
     }
 
-    public List<AtBContract> getSortedActiveAtBContracts() {
-        return getActiveAtBContracts().stream()
-                .sorted(Comparator.comparing(AtBContract::getStatus))
-                .collect(Collectors.toList());
-    }
-
     /**
      * @return whether or not the current campaign has an active contract for the current date
      */
@@ -3066,20 +3060,16 @@ public class Campaign implements Serializable, ITechManager {
             AtBScenarioFactory.createScenariosForNewWeek(this);
         }
 
-        // and fourth
-        for (Mission m : getMissions()) {
-            if (m.getStatus().isActive() && (m instanceof AtBContract)
-                    && !((AtBContract) m).getStartDate().isAfter(getLocalDate())) {
-                ((AtBContract) m).checkEvents(this);
-            }
-            /*
-             * If there is a standard battle set for today, deploy the lance.
-             */
-            for (Scenario s : m.getScenarios()) {
-                if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
+        // Fourth, we look at deployments for pre-existing and new scenarios
+        for (AtBContract contract : contracts) {
+            contract.checkEvents(this);
+
+            // If there is a standard battle set for today, deploy the lance.
+            for (Scenario s : contract.getScenarios()) {
+                if ((s instanceof AtBScenario) && (s.getDate() != null)
+                        && s.getDate().equals(getLocalDate())) {
                     int forceId = ((AtBScenario) s).getLanceForceId();
                     if ((lances.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
-
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
@@ -3096,22 +3086,22 @@ public class Campaign implements Serializable, ITechManager {
                             s.addForces(forceId);
                             for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
                                 Unit u = getHangar().getUnit(uid);
-                                if (null != u) {
+                                if (u != null) {
                                     u.setScenarioId(s.getId());
                                 }
                             }
 
                             addReport(MessageFormat.format(
-                                resources.getString("atbMissionTodayWithForce.format"),
-                                s.getName(), forceIds.get(forceId).getName()));
+                                    resources.getString("atbMissionTodayWithForce.format"),
+                                    s.getName(), forceIds.get(forceId).getName()));
                             MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), s));
                         } else {
                             addReport(MessageFormat.format(
-                                resources.getString("atbMissionToday.format"), s.getName()));
+                                    resources.getString("atbMissionToday.format"), s.getName()));
                         }
                     } else {
                         addReport(MessageFormat.format(
-                            resources.getString("atbMissionToday.format"), s.getName()));
+                                resources.getString("atbMissionToday.format"), s.getName()));
                     }
                 }
             }

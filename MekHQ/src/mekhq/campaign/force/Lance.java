@@ -90,7 +90,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         forceId = fid;
         role = AtBLanceRole.UNASSIGNED;
         missionId = -1;
-        for (AtBContract contract : c.getSortedActiveAtBContracts()) {
+        for (AtBContract contract : c.getActiveAtBContracts()) {
             missionId = ((contract.getParentContract() == null)
                     ? contract : contract.getParentContract()).getId();
         }
