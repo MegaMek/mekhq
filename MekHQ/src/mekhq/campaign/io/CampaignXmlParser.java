@@ -1164,18 +1164,15 @@ public class CampaignXmlParser {
         }
 
         // Restore references on AtBContracts
-        for (Mission m : retVal.getMissions()) {
-            if (m instanceof AtBContract) {
-                final AtBContract atbContract = (AtBContract) m;
-                atbContract.restore(retVal);
-            }
+        for (AtBContract contract : retVal.getAtBContracts()) {
+            contract.restore(retVal);
         }
 
         MekHQ.getLogger().info("Load Mission Nodes Complete!");
     }
 
     private static String checkUnits(Node wn) {
-        MekHQ.getLogger().info(CampaignXmlParser.class, "Checking for missing entities...");
+        MekHQ.getLogger().info("Checking for missing entities...");
 
         List<String> unitList = new ArrayList<>();
         NodeList wList = wn.getChildNodes();

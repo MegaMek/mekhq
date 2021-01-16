@@ -146,8 +146,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setSuccessCount(0);
         setFailCount(0);
         setBreachCount(0);
-        for (Mission m : getCampaign().getMissions()) {
-            //Skip ongoing missions.
+        for (Mission m : getCampaign().getCompletedMissions()) {
             switch (m.getStatus()) {
                 case SUCCESS:
                     setSuccessCount(getSuccessCount() + 1);

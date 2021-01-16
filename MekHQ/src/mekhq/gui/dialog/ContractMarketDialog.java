@@ -45,7 +45,6 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.view.ContractSummaryPanel;
@@ -104,12 +103,11 @@ public class ContractMarketDialog extends JDialog {
      */
     private void countSuccessfulContracts() {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
-        for (Mission m : campaign.getMissions()) {
-            if (m.getStatus().isActive() || !(m instanceof AtBContract)
-                    || ((AtBContract) m).getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
+        for (AtBContract contract : campaign.getAtBContracts()) {
+            if (contract.getStatus().isActive()
+                    || contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
                 continue;
             }
-            AtBContract contract = (AtBContract) m;
             int num;
             num = successfulContracts.getOrDefault(contract.getEmployerCode(), 0);
             successfulContracts.put(contract.getEmployerCode(),

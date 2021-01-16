@@ -274,9 +274,8 @@ public class ContractMarket implements Serializable {
     private void checkForSubcontracts(Campaign campaign, AtBContract contract, int unitRatingMod) {
         if (contract.getMissionType() == AtBContract.MT_GARRISONDUTY) {
             int numSubcontracts = 0;
-            for (Mission m : campaign.getMissions()) {
-                if ((m instanceof AtBContract) &&
-                        contract.equals(((AtBContract) m).getParentContract())) {
+            for (AtBContract c : campaign.getAtBContracts()) {
+                if (contract.equals(c.getParentContract())) {
                     numSubcontracts++;
                 }
             }
