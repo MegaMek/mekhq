@@ -27,6 +27,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 
@@ -852,6 +853,7 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    //region Missions/Contracts
     /**
      * Add a mission to the campaign
      *
@@ -895,9 +897,9 @@ public class Campaign implements Serializable, ITechManager {
      * @return missions List sorted with complete missions at the bottom
      */
     public List<Mission> getSortedMissions() {
-        List<Mission> missions = new ArrayList<>(getMissions());
-        missions.sort(Comparator.comparing(Mission::getStatus));
-        return missions;
+        return getMissions().stream()
+                .sorted(Comparator.comparing(Mission::getStatus))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -939,6 +941,42 @@ public class Campaign implements Serializable, ITechManager {
     public Scenario getScenario(int id) {
         return scenarios.get(id);
     }
+
+    /**
+     * @return a list of all currently active contracts
+     */
+    public List<Contract> getActiveContracts() {
+        return getMissions().stream()
+                .filter(c -> (c instanceof Contract) && c.getStatus().isActive()
+                        && !getLocalDate().isAfter(((Contract) c).getEndingDate())
+                        && !getLocalDate().isBefore(((Contract) c).getStartDate()))
+                .map(c -> (Contract) c).collect(Collectors.toList());
+    }
+
+    public List<AtBContract> getActiveAtBContracts() {
+        return getActiveContracts().stream()
+                .filter(c -> c instanceof AtBContract)
+                .map(c -> (AtBContract) c).collect(Collectors.toList());
+    }
+
+    /**
+     * @return whether or not the current campaign has an active contract for the current date
+     */
+    public boolean hasActiveContract() {
+        return hasActiveContract;
+    }
+
+    /**
+     * This is used to check if the current campaign has one or more active contacts, and sets the
+     * value of hasActiveContract based on that check. This value should not be set elsewhere
+     */
+    public void setHasActiveContract() {
+        hasActiveContract = getMissions().stream()
+                .anyMatch(c -> (c instanceof Contract) && c.getStatus().isActive()
+                        && !getLocalDate().isAfter(((Contract) c).getEndingDate())
+                        && !getLocalDate().isBefore(((Contract) c).getStartDate()));
+    }
+    //endregion Missions/Contracts
 
     public void setLocation(CurrentLocation l) {
         location = l;
@@ -3415,53 +3453,6 @@ public class Campaign implements Serializable, ITechManager {
 
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
-    }
-
-    /**
-     * @return a list of all currently active contracts
-     */
-    public List<Contract> getActiveContracts() {
-        List<Contract> active = new ArrayList<>();
-        for (Mission mission : getMissions()) {
-            if (!(mission instanceof Contract)) {
-                continue;
-            }
-            Contract contract = (Contract) mission;
-            if (contract.getStatus().isActive()
-                    && !getLocalDate().isAfter(contract.getEndingDate())
-                    && !getLocalDate().isBefore(contract.getStartDate())) {
-                active.add(contract);
-            }
-        }
-        return active;
-    }
-
-    /**
-     * @return whether or not the current campaign has an active contract for the current date
-     */
-    public boolean hasActiveContract() {
-        return hasActiveContract;
-    }
-
-    /**
-     * This is used to check if the current campaign has one or more active contacts, and sets the
-     * value of hasActiveContract based on that check. This value should not be set elsewhere
-     */
-    public void setHasActiveContract() {
-        hasActiveContract = false;
-        for (Mission mission : getMissions()) {
-            if (!(mission instanceof Contract)) {
-                continue;
-            }
-            Contract contract = (Contract) mission;
-
-            if (contract.getStatus().isActive()
-                    && !getLocalDate().isAfter(contract.getEndingDate())
-                    && !getLocalDate().isBefore(contract.getStartDate())) {
-                hasActiveContract = true;
-                break;
-            }
-        }
     }
 
     public Person getFlaggedCommander() {
