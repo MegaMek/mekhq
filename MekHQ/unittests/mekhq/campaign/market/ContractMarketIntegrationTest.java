@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.market;
 
 import static org.junit.Assert.*;
@@ -98,7 +97,7 @@ public class ContractMarketIntegrationTest {
         ContractMarket market = new ContractMarket();
 
         // Simulate clicking GM Add on the contract market three times
-        for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ++ii) {
+        for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ii++) {
             market.addAtBContract(campaign);
         }
 
@@ -111,7 +110,7 @@ public class ContractMarketIntegrationTest {
 
         // Simulate three months of contract generation ...
         boolean foundContract = false;
-        for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ++ii) {
+        for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ii++) {
             market.generateContractOffers(campaign, true);
 
             // ... and one of these three should get us a contract!
@@ -128,7 +127,7 @@ public class ContractMarketIntegrationTest {
         ContractMarket market = new ContractMarket();
 
         // Simulate clicking GM Add on the contract market three times
-        for (int ii = 0; ii < 3; ++ii) {
+        for (int ii = 0; ii < 3; ii++) {
             market.addAtBContract(campaign);
         }
 
@@ -143,7 +142,7 @@ public class ContractMarketIntegrationTest {
 
         // Simulate three months of contract generation ...
         boolean foundContract = false;
-        for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ++ii) {
+        for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ii++) {
             market.generateContractOffers(campaign, true);
 
             // ... and one of these three should get us a contract!
@@ -164,6 +163,7 @@ public class ContractMarketIntegrationTest {
         when(existing.getSystemId()).thenReturn("Sian");
         when(existing.getStartDate()).thenReturn(campaign.getLocalDate().minusDays(3000));
         when(existing.getEndingDate()).thenReturn(campaign.getLocalDate().plusDays(3000));
+        when(existing.isActiveOn(campaign.getLocalDate(), false)).thenCallRealMethod();
         campaign.importMission(existing);
 
         ContractMarket market = new ContractMarket();
@@ -189,7 +189,7 @@ public class ContractMarketIntegrationTest {
 
             // Simulate three months of contract generation to get a sub contract ...
             boolean foundContract = false;
-            for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ++ii) {
+            for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ii++) {
                 market.generateContractOffers(campaign, true);
 
                 // ... and hopefully, one of these should get us a sub-contract! 3 of 12 chance.

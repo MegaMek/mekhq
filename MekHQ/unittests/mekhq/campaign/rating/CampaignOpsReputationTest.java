@@ -76,6 +76,7 @@ public class CampaignOpsReputationTest {
     private List<Person> personnelList;
     private List<Person> activePersonnelList;
     private List<Mission> missionList;
+    private List<Mission> completedMissionList;
 
     // Mothballed units.
     private Unit mockMechMothballed;
@@ -222,6 +223,7 @@ public class CampaignOpsReputationTest {
         personnelList = new ArrayList<>();
         activePersonnelList = new ArrayList<>();
         missionList = new ArrayList<>();
+        completedMissionList = new ArrayList<>();
 
         mockMothballed();
         mockSkills();
@@ -297,6 +299,7 @@ public class CampaignOpsReputationTest {
         doCallRealMethod().when(mockCampaign).getAdmins();
         doReturn(mockGrasshopper2Pilot).when(mockCampaign).getFlaggedCommander();
         doReturn(missionList).when(mockCampaign).getMissions();
+        doReturn(completedMissionList).when(mockCampaign).getCompletedMissions();
         doReturn(mockFinances).when(mockCampaign).getFinances();
     }
 
@@ -398,15 +401,19 @@ public class CampaignOpsReputationTest {
         Mission winOne = mock(Mission.class);
         when(winOne.getStatus()).thenReturn(MissionStatus.SUCCESS);
         missionList.add(winOne);
+        completedMissionList.add(winOne);
         Mission winTwo = mock(Mission.class);
         when(winTwo.getStatus()).thenReturn(MissionStatus.SUCCESS);
         missionList.add(winTwo);
+        completedMissionList.add(winTwo);
         Mission winThree = mock(Mission.class);
         when(winThree.getStatus()).thenReturn(MissionStatus.SUCCESS);
         missionList.add(winThree);
+        completedMissionList.add(winThree);
         Mission lossOne = mock(Mission.class);
         when(lossOne.getStatus()).thenReturn(MissionStatus.FAILED);
         missionList.add(lossOne);
+        completedMissionList.add(lossOne);
         Mission active = mock(Mission.class);
         when(active.getStatus()).thenReturn(MissionStatus.ACTIVE);
         missionList.add(active);
