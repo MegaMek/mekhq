@@ -1143,7 +1143,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             JCheckBoxMenuItem cbMenuItem;
             Person[] selected = getSelectedPeople();
             // lets fill the pop up menu
-            if (StaticChecks.areAllEligible(selected, true)) {
+            if (StaticChecks.areAllEligible(true, selected)) {
                 menu = new JMenu(resourceMap.getString("changeRank.text"));
                 Ranks ranks = person.getRanks();
                 for (int rankOrder = 0; rankOrder < Ranks.RC_NUM; rankOrder++) {
