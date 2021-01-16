@@ -408,8 +408,9 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         cachedJumpPath = null;
     }
 
+    @Override
     public boolean isActiveOn(LocalDate date, boolean excludeEndDateCheck) {
-        return getStatus().isActive() && !date.isBefore(getStartDate())
+        return super.isActiveOn(date, excludeEndDateCheck) && !date.isBefore(getStartDate())
                 && (excludeEndDateCheck || !date.isAfter(getEndingDate()));
     }
 

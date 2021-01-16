@@ -133,6 +133,14 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         this.status = status;
     }
 
+    public boolean isActiveOn(LocalDate date) {
+        return isActiveOn(date, false);
+    }
+
+    public boolean isActiveOn(LocalDate date, boolean excludeEndDateCheck) {
+        return getStatus().isActive();
+    }
+
     public ArrayList<Scenario> getScenarios() {
         return scenarios;
     }

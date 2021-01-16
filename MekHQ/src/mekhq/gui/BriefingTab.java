@@ -786,7 +786,7 @@ public final class BriefingTab extends CampaignGuiTab {
         List<Mission> missions = getCampaign().getSortedMissions();
         for (Mission m : missions) {
             String desc = m.getName();
-            if (!m.getStatus().isActive()) {
+            if (m.getStatus().isCompleted()) {
                 desc += " (Complete)";
             }
             choiceMission.addItem(desc);
@@ -881,8 +881,8 @@ public final class BriefingTab extends CampaignGuiTab {
                 btnEditMission.setEnabled(true);
                 btnCompleteMission.setEnabled(m.getStatus().isActive());
                 btnDeleteMission.setEnabled(true);
-                btnAddScenario.setEnabled(m.getStatus().isActive());
-                btnGMGenerateScenarios.setEnabled(m.getStatus().isActive() && getCampaign().isGM());
+                btnAddScenario.setEnabled(m.isActiveOn(getCampaign().getLocalDate()));
+                btnGMGenerateScenarios.setEnabled(m.isActiveOn(getCampaign().getLocalDate()) && getCampaign().isGM());
             }
         } else {
             selectedMission = -1;
