@@ -3,6 +3,9 @@ VERSION HISTORY:
 0.47.17 (RC3)-SNAPSHOT
 + PR #2354: Don't skip ComStar as an origin faction
 + Issue #2348: Allow Clanner origins
++ Issue #2365: MissingEquipmentParts should only be replaced with parts of the correct Java type
++ Issue #2358: Add missing AtB lances on CPNX load
++ PR #2372: Infantry Motive Type File I/O Fixes
 
 0.47.16 (RC2) (2021-01-05 1700 UTC)
 + PR #2289: Drop support for migrating Campaigns older than v0.41.24 (2016-10-06 03:15 UTC)
