@@ -62,7 +62,6 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -377,7 +376,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
         cmd.setVisible(true);
-        if (cmd.getStatus() == MissionStatus.ACTIVE) {
+        if (cmd.getStatus().isActive()) {
             return;
         }
 
@@ -427,11 +426,8 @@ public final class BriefingTab extends CampaignGuiTab {
             ((AtBContract) mission).checkForFollowup(getCampaign());
         }
 
-        if (getCampaign().getSortedMissions().size() > 0) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
-        } else {
-            selectedMission = -1;
-        }
+        List<Mission> missions = getCampaign().getSortedMissions();
+        selectedMission = missions.isEmpty() ? -1 : missions.get(0).getId();
     }
 
     private void deleteMission() {
@@ -442,11 +438,8 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         getCampaign().removeMission(mission.getId());
-        if (getCampaign().getSortedMissions().size() > 0) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
-        } else {
-            selectedMission = -1;
-        }
+        List<Mission> missions = getCampaign().getSortedMissions();
+        selectedMission = missions.isEmpty() ? -1 : missions.get(0).getId();
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
@@ -783,14 +776,15 @@ public final class BriefingTab extends CampaignGuiTab {
 
         if (undeployed.length() > 0) {
             JOptionPane.showMessageDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed.toString(),
+                    "The following units could not be deployed:" + undeployed,
                     "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
         }
     }
 
     public void refreshMissions() {
         choiceMission.removeAllItems();
-        for (Mission m : getCampaign().getSortedMissions()) {
+        List<Mission> missions = getCampaign().getSortedMissions();
+        for (Mission m : missions) {
             String desc = m.getName();
             if (!m.getStatus().isActive()) {
                 desc += " (Complete)";
@@ -800,8 +794,8 @@ public final class BriefingTab extends CampaignGuiTab {
                 choiceMission.setSelectedItem(m.getName());
             }
         }
-        if ((choiceMission.getSelectedIndex() == -1) && (getCampaign().getSortedMissions().size() > 0)) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
+        if ((choiceMission.getSelectedIndex() == -1) && !missions.isEmpty()) {
+            selectedMission = missions.get(0).getId();
             choiceMission.setSelectedIndex(0);
         }
         changeMission();
@@ -875,8 +869,9 @@ public final class BriefingTab extends CampaignGuiTab {
         btnDeleteMission.setEnabled(false);
         btnAddScenario.setEnabled(false);
         btnGMGenerateScenarios.setEnabled(false);
-        if ((idx >= 0) && (idx < getCampaign().getSortedMissions().size())) {
-            Mission m = getCampaign().getSortedMissions().get(idx);
+        List<Mission> missions = getCampaign().getSortedMissions();
+        if ((idx >= 0) && (idx < missions.size())) {
+            Mission m = missions.get(idx);
             if (m != null) {
                 selectedMission = m.getId();
                 scrollMissionView.setViewportView(new MissionViewPanel(m, scenarioTable, getCampaignGui()));

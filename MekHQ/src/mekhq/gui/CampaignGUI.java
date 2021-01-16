@@ -40,7 +40,6 @@ import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Contract;
 import mekhq.gui.dialog.*;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
@@ -82,7 +81,6 @@ import mekhq.campaign.event.TransactionEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -1204,12 +1202,12 @@ public class CampaignGUI extends JPanel {
         if (getCampaign().getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY) {
             return false;
         }
-        for (Contract contract : getCampaign().getActiveContracts()) {
-            if (!(contract instanceof AtBContract) || !getCampaign().getLocation().isOnPlanet()) {
+        for (AtBContract contract : getCampaign().getActiveAtBContracts()) {
+            if (!getCampaign().getLocation().isOnPlanet()) {
                 continue;
             }
 
-            if (getCampaign().getDeploymentDeficit((AtBContract) contract) > 0) {
+            if (getCampaign().getDeploymentDeficit(contract) > 0) {
                 return 0 != JOptionPane.showConfirmDialog(null,
                         "You have not met the deployment levels required by contract. Do your really wish to advance the day?",
                         "Unmet deployment requirements", JOptionPane.YES_NO_OPTION);
@@ -1219,11 +1217,8 @@ public class CampaignGUI extends JPanel {
     }
 
     public boolean nagOutstandingScenarios() {
-        for (Mission m : getCampaign().getMissions()) {
-            if (!m.getStatus().isActive() || !(m instanceof AtBContract)) {
-                continue;
-            }
-            for (Scenario s : m.getScenarios()) {
+        for (AtBContract contract : getCampaign().getActiveAtBContracts(true)) {
+            for (Scenario s : contract.getScenarios()) {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
                     continue;
                 }

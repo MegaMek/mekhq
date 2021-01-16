@@ -49,7 +49,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 
 /**
  * @author Neoancient
@@ -214,15 +213,14 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                  * active contracts, pick the one with the best percentage.
                  */
                 AtBContract c = contract;
-                if (null == c) {
-                    for (Mission m : campaign.getActiveContracts()) {
-                        if ((m instanceof AtBContract)
-                                && ((c == null) || (c.getSharesPct() < ((AtBContract) m).getSharesPct()))) {
-                            c = (AtBContract) m;
+                if (c == null) {
+                    for (AtBContract atBContract : campaign.getActiveAtBContracts()) {
+                        if ((c == null) || (c.getSharesPct() < atBContract.getSharesPct())) {
+                            c = atBContract;
                         }
                     }
                 }
-                if (null != c && c.getSharesPct() > 20) {
+                if ((c != null) && (c.getSharesPct() > 20)) {
                     target.addModifier(-((c.getSharesPct() - 20) / 10), "Shares");
                 }
             } else {

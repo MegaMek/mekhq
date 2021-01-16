@@ -894,6 +894,14 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
+     * @param id the <code>int</code> id of the team
+     * @return a <code>SupportTeam</code> object
+     */
+    public Mission getMission(int id) {
+        return missions.get(id);
+    }
+
+    /**
      * @return missions List sorted with complete missions at the bottom
      */
     public List<Mission> getSortedMissions() {
@@ -902,13 +910,53 @@ public class Campaign implements Serializable, ITechManager {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * @param id the <code>int</code> id of the team
-     * @return a <code>SupportTeam</code> object
-     */
-    public Mission getMission(int id) {
-        return missions.get(id);
+    public List<Contract> getActiveContracts() {
+        return getActiveContracts(false);
     }
+
+    /**
+     * @return a list of all currently active contracts
+     */
+    public List<Contract> getActiveContracts(boolean excludeEndDateCheck) {
+        return getMissions().stream()
+                .filter(c -> (c instanceof Contract)
+                        && ((Contract) c).isActiveOn(getLocalDate(), excludeEndDateCheck))
+                .map(c -> (Contract) c).collect(Collectors.toList());
+    }
+
+    public List<AtBContract> getActiveAtBContracts() {
+        return getActiveAtBContracts(false);
+    }
+
+    public List<AtBContract> getActiveAtBContracts(boolean excludeEndDateCheck) {
+        return getActiveContracts(excludeEndDateCheck).stream()
+                .filter(c -> c instanceof AtBContract)
+                .map(c -> (AtBContract) c).collect(Collectors.toList());
+    }
+
+    public List<AtBContract> getSortedActiveAtBContracts() {
+        return getActiveAtBContracts().stream()
+                .sorted(Comparator.comparing(AtBContract::getStatus))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * @return whether or not the current campaign has an active contract for the current date
+     */
+    public boolean hasActiveContract() {
+        return hasActiveContract;
+    }
+
+    /**
+     * This is used to check if the current campaign has one or more active contacts, and sets the
+     * value of hasActiveContract based on that check. This value should not be set elsewhere
+     */
+    public void setHasActiveContract() {
+        hasActiveContract = getMissions().stream()
+                .anyMatch(c -> (c instanceof Contract)
+                        && ((Contract) c).isActiveOn(getLocalDate(), false));
+    }
+    //endregion Missions/Contracts
 
     /**
      * Add scenario to an existing mission. This method will also assign the scenario an id, provided
@@ -941,42 +989,6 @@ public class Campaign implements Serializable, ITechManager {
     public Scenario getScenario(int id) {
         return scenarios.get(id);
     }
-
-    /**
-     * @return a list of all currently active contracts
-     */
-    public List<Contract> getActiveContracts() {
-        return getMissions().stream()
-                .filter(c -> (c instanceof Contract) && c.getStatus().isActive()
-                        && !getLocalDate().isAfter(((Contract) c).getEndingDate())
-                        && !getLocalDate().isBefore(((Contract) c).getStartDate()))
-                .map(c -> (Contract) c).collect(Collectors.toList());
-    }
-
-    public List<AtBContract> getActiveAtBContracts() {
-        return getActiveContracts().stream()
-                .filter(c -> c instanceof AtBContract)
-                .map(c -> (AtBContract) c).collect(Collectors.toList());
-    }
-
-    /**
-     * @return whether or not the current campaign has an active contract for the current date
-     */
-    public boolean hasActiveContract() {
-        return hasActiveContract;
-    }
-
-    /**
-     * This is used to check if the current campaign has one or more active contacts, and sets the
-     * value of hasActiveContract based on that check. This value should not be set elsewhere
-     */
-    public void setHasActiveContract() {
-        hasActiveContract = getMissions().stream()
-                .anyMatch(c -> (c instanceof Contract) && c.getStatus().isActive()
-                        && !getLocalDate().isAfter(((Contract) c).getEndingDate())
-                        && !getLocalDate().isBefore(((Contract) c).getStartDate()));
-    }
-    //endregion Missions/Contracts
 
     public void setLocation(CurrentLocation l) {
         location = l;
@@ -3006,11 +3018,11 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private void processNewDayATBScenarios() {
-        for (Mission m : getMissions()) {
-            if (!m.getStatus().isActive() || !(m instanceof AtBContract)
-                    || getLocalDate().isBefore(((Contract) m).getStartDate())) {
-                continue;
-            }
+        // First, we get the list of all active AtBContracts
+        List<AtBContract> contracts = getActiveAtBContracts(true);
+
+        // Second, we process them and any already generated scenarios
+        for (AtBContract contract : contracts) {
             /*
              * Situations like a delayed start or running out of funds during transit can
              * delay arrival until after the contract start. In that case, shift the
@@ -3018,32 +3030,30 @@ public class Campaign implements Serializable, ITechManager {
              * unit is actually on route to the planet in case the user is using a custom
              * system for transport or splitting the unit, etc.
              */
-            if (!getLocation().isOnPlanet() &&
-                    !getLocation().getJumpPath().isEmpty() &&
-                    getLocation().getJumpPath().getLastSystem().getId().equals(m.getSystemId())) {
-
+            if (!getLocation().isOnPlanet() && !getLocation().getJumpPath().isEmpty()
+                    && getLocation().getJumpPath().getLastSystem().getId().equals(contract.getSystemId())) {
                 // transitTime is measured in days; so we round up to the next whole day
-                ((AtBContract) m).setStartAndEndDate(getLocalDate().plusDays((int) Math.ceil(getLocation().getTransitTime())));
-                addReport("The start and end dates of " + m.getName() + " have been shifted to reflect the current ETA.");
+                contract.setStartAndEndDate(getLocalDate().plusDays((int) Math.ceil(getLocation().getTransitTime())));
+                addReport("The start and end dates of " + contract.getName() + " have been shifted to reflect the current ETA.");
                 continue;
             }
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                int deficit = getDeploymentDeficit((AtBContract) m);
+                int deficit = getDeploymentDeficit(contract);
                 if (deficit > 0) {
-                    ((AtBContract) m).addPlayerMinorBreaches(deficit);
-                    addReport("Failure to meet " + m.getName() + " requirements resulted in " + deficit
+                    contract.addPlayerMinorBreaches(deficit);
+                    addReport("Failure to meet " + contract.getName() + " requirements resulted in " + deficit
                             + ((deficit == 1) ? " minor contract breach" : " minor contract breaches"));
                 }
             }
 
-            for (Scenario s : m.getScenarios()) {
+            for (Scenario s : contract.getScenarios()) {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
                     continue;
                 }
                 if ((s.getDate() != null) && s.getDate().isBefore(getLocalDate())) {
                     s.setStatus(Scenario.S_DEFEAT);
                     s.clearAllForcesAndPersonnel(this);
-                    ((AtBContract) m).addPlayerMinorBreach();
+                    contract.addPlayerMinorBreach();
                     addReport("Failure to deploy for " + s.getName()
                             + " resulted in defeat and a minor contract breach.");
                     s.generateStub(this);
@@ -3051,10 +3061,12 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
+        // Third, on Mondays we generate new scenarios for the week
         if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             AtBScenarioFactory.createScenariosForNewWeek(this);
         }
 
+        // and fourth
         for (Mission m : getMissions()) {
             if (m.getStatus().isActive() && (m instanceof AtBContract)
                     && !((AtBContract) m).getStartDate().isAfter(getLocalDate())) {
@@ -3108,11 +3120,8 @@ public class Campaign implements Serializable, ITechManager {
 
     private void processNewDayATBFatigue() {
         boolean inContract = false;
-        for (Contract contract : getActiveContracts()) {
-            if (!(contract instanceof AtBContract)) {
-                continue;
-            }
-            switch (((AtBContract) contract).getMissionType()) {
+        for (AtBContract contract : getActiveAtBContracts()) {
+            switch (contract.getMissionType()) {
                 case AtBContract.MT_GARRISONDUTY:
                 case AtBContract.MT_SECURITYDUTY:
                 case AtBContract.MT_CADREDUTY:
@@ -3200,12 +3209,10 @@ public class Campaign implements Serializable, ITechManager {
             IUnitRating rating = getUnitRating();
             rating.reInitialize();
 
-            for (Contract contract : getActiveContracts()) {
-                if (contract instanceof AtBContract) {
-                    ((AtBContract) contract).checkMorale(getLocalDate(), getUnitRatingMod());
-                    addReport("Enemy morale is now " + ((AtBContract) contract).getMoraleLevelName()
-                            + " on contract " + contract.getName());
-                }
+            for (AtBContract contract : getActiveAtBContracts()) {
+                contract.checkMorale(getLocalDate(), getUnitRatingMod());
+                addReport("Enemy morale is now " + contract.getMoraleLevelName()
+                        + " on contract " + contract.getName());
             }
 
             // Account for fatigue

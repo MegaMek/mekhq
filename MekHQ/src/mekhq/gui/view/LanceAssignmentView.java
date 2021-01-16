@@ -49,7 +49,6 @@ import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.MekHqColors;
 import mekhq.gui.model.DataTableModel;
@@ -215,12 +214,9 @@ public class LanceAssignmentView extends JPanel {
 
     public void refresh() {
         cbContract.removeAllItems();
-        List<AtBContract> activeContracts = new ArrayList<>();
-        for (Mission m : campaign.getActiveContracts()) {
-            if (m instanceof AtBContract) {
-                activeContracts.add((AtBContract)m);
-                cbContract.addItem((AtBContract)m);
-            }
+        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        for (AtBContract contract : activeContracts) {
+            cbContract.addItem(contract);
         }
         AtBContract defaultContract = null;
         if (activeContracts.size() > 0) {

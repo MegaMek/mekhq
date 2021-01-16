@@ -36,7 +36,6 @@ import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Contract;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.preferences.JToggleButtonPreference;
 import mekhq.gui.preferences.JWindowPreference;
@@ -138,14 +137,14 @@ public class ShipSearchDialog extends JDialog {
             mainPanel.add(lblWarshipTarget, gbc);
         }
 
-        if (isInContract() && !isInSearch()) {
+        if (gui.getCampaign().hasActiveContract() && !isInSearch()) {
             JLabel lblInContract = new JLabel(resourceMap.getString("lblInContract.text"));
             gbc.gridx = 0;
             gbc.gridy = 6;
             mainPanel.add(lblInContract, gbc);
         }
 
-        if (isInContract() || isInSearch()) {
+        if (gui.getCampaign().hasActiveContract() || isInSearch()) {
             btnDropship.setEnabled(false);
             lblDropshipTarget.setEnabled(false);
             btnJumpship.setEnabled(false);
@@ -205,7 +204,7 @@ public class ShipSearchDialog extends JDialog {
                     gui.getCampaign().getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString(),
                     gui.getCampaign().getAtBConfig().getShipSearchLengthWeeks()));
             button.addActionListener(ev -> startSearch());
-            button.setEnabled(!isInContract());
+            button.setEnabled(!gui.getCampaign().hasActiveContract());
         }
         panButtons.add(button);
 
@@ -257,13 +256,6 @@ public class ShipSearchDialog extends JDialog {
         } else {
             return UnitType.DROPSHIP;
         }
-    }
-
-    private boolean isInContract() {
-        return gui.getCampaign().getMissions().stream().anyMatch(m ->
-                m.getStatus().isActive() && (m instanceof Contract)
-                        && ((Contract) m).getStartDate().isBefore(gui.getCampaign().getLocalDate())
-        );
     }
 
     private boolean isInSearch() {

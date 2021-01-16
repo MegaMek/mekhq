@@ -165,10 +165,8 @@ public class ContractMarket implements Serializable {
 
 			int unitRatingMod = campaign.getUnitRatingMod();
 
-			for (Contract contract : campaign.getActiveContracts()) {
-				if (contract instanceof AtBContract) {
-					checkForSubcontracts(campaign, (AtBContract) contract, unitRatingMod);
-				}
+			for (AtBContract contract : campaign.getActiveAtBContracts()) {
+                checkForSubcontracts(campaign, contract, unitRatingMod);
 			}
 
 			int numContracts = Compute.d6() - 4 + unitRatingMod;

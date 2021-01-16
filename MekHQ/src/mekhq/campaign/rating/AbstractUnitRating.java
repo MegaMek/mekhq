@@ -148,21 +148,22 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setBreachCount(0);
         for (Mission m : getCampaign().getMissions()) {
             //Skip ongoing missions.
-            if (m.getStatus().isActive()) {
-                continue;
-            }
-
-            if (m.getStatus().isSuccess()) {
-                setSuccessCount(getSuccessCount() + 1);
-            } else if (m.getStatus().isFailed()) {
-                setFailCount(getFailCount() + 1);
-            } else if (m.getStatus().isBreach()) {
-                setBreachCount(getBreachCount() + 1);
+            switch (m.getStatus()) {
+                case SUCCESS:
+                    setSuccessCount(getSuccessCount() + 1);
+                    break;
+                case FAILED:
+                    setFailCount(getFailCount() + 1);
+                    break;
+                case BREACH:
+                    setBreachCount(getBreachCount() + 1);
+                    break;
+                default:
+                    break;
             }
         }
 
-        return (getSuccessCount() * 5) - (getFailCount() * 10) -
-               (getBreachCount() * 25);
+        return (getSuccessCount() * 5) - (getFailCount() * 10) - (getBreachCount() * 25);
     }
 
     /**
