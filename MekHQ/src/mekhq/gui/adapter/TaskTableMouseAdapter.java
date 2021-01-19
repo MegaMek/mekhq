@@ -131,13 +131,13 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
              */
             if (partWork.checkFixable() == null) {
                 for (IPartWork p : parts) {
-                    gui.getCampaign().addReport(p.succeed());
+                    gui.getCampaign().addReport(String.format("GM Repair, %s %s", p.getPartName(), p.succeed()));
                     if (p.getUnit() != null) {
                         p.getUnit().refreshPodSpace();
                     }
                     //PodSpace triggers event for each child part
                     if (p instanceof Part) {
-                        MekHQ.triggerEvent(new PartChangedEvent((Part)p));
+                        MekHQ.triggerEvent(new PartChangedEvent((Part) p));
                     }
                 }
             }
@@ -185,8 +185,8 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             for (IPartWork p : parts) {
                 canChangeMode &= p.canChangeWorkMode()
                         && p.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS;
-                isScrappable &= (p instanceof Part) && !((Part)p).canNeverScrap();
-                isBeingWorked |= (p instanceof Part) && ((Part)p).isBeingWorkedOn();
+                isScrappable &= (p instanceof Part) && !((Part) p).canNeverScrap();
+                isBeingWorked |= (p instanceof Part) && p.isBeingWorkedOn();
                 isFixable &= (null == p.checkFixable());
             }
             if (canChangeMode) {
@@ -213,15 +213,17 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 popup.add(menuItem);
             }
 
-            menu = new JMenu("GM Mode");
-            popup.add(menu);
-            // Auto complete task
+            if (gui.getCampaign().isGM()) {
+                menu = new JMenu("GM Mode");
+                popup.add(menu);
+                // Auto complete task
 
-            menuItem = new JMenuItem("Complete Task");
-            menuItem.setActionCommand("FIX");
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM() && isFixable);
-            menu.add(menuItem);
+                menuItem = new JMenuItem("Complete Task");
+                menuItem.setActionCommand("FIX");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(isFixable);
+                menu.add(menuItem);
+            }
 
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
