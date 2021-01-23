@@ -2309,6 +2309,45 @@ public class QuartermasterTest {
     }
 
     @Test
+    public void removeAmmoWhenExactlyEnoughCompatibleAmmoExists2() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaignOptions.useAmmoByType()).thenReturn(true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+
+        AmmoType ammoType = getAmmoType("ISLRM5 Ammo");
+        AmmoType compatibleAmmoType = getAmmoType("ISLRM20 Ammo");
+
+        // Setup a warehouse with compatible ammo types
+        Warehouse warehouse = new Warehouse();
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+
+        // We have JUST enough compatible ammo
+        int compatibleShots = compatibleAmmoType.getShots();
+        AmmoStorage compatible = new AmmoStorage(0, compatibleAmmoType, compatibleShots, mockCampaign);
+        warehouse.addPart(compatible);
+
+        // And a basic quartermaster
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        // Ask for one ton of ammo (exactly what we have on hand in a compatible ammo type)
+        int shotsNeeded = ammoType.getShots();
+        int shotsRemoved = quartermaster.removeAmmo(ammoType, shotsNeeded);
+
+        // Between the ammo on hand and our compatible ammo, we should have enough.
+        assertEquals(shotsNeeded, shotsRemoved);
+        assertEquals(0, quartermaster.getAmmoAvailable(ammoType));
+
+        // ... which should result in the existing ammo being removed from the campaign,
+        // and not some weird situation where some part is there with negative or zero
+        // rounds of ammo present.
+        assertFalse(warehouse.getParts().contains(compatible));
+        assertEquals(0, compatible.getShots());
+        assertEquals(0, quartermaster.getAmmoAvailable(compatibleAmmoType));
+    }
+
+    @Test
     public void removeAmmoWayMoreThanAvailableButCompatibleAndIncompatibleAmmoExists() {
         Campaign mockCampaign = mock(Campaign.class);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -2424,6 +2463,90 @@ public class QuartermasterTest {
         // ... and ensure they were NOT deducted.
         assertEquals(compatibleShots, compatible.getShots());
         assertEquals(compatibleShots, quartermaster.getAmmoAvailable(compatibleAmmoType));
+    }
+
+    @Test
+    public void removeAmmoWhenEnoughCompatibleAmmoExists() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaignOptions.useAmmoByType()).thenReturn(true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+
+        AmmoType ammoType = getAmmoType("ISLRM5 Ammo");
+        AmmoType compatibleAmmoType = getAmmoType("ISLRM20 Ammo");
+
+        // Setup a warehouse with compatible ammo types
+        Warehouse warehouse = new Warehouse();
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+
+        // We have enough compatible ammo
+        int compatibleShots = compatibleAmmoType.getShots();
+        AmmoStorage compatible = new AmmoStorage(0, compatibleAmmoType, compatibleShots, mockCampaign);
+        warehouse.addPart(compatible);
+
+        // And a basic quartermaster
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        // Ask for one round of ammo
+        int shotsNeeded = 1;
+        int shotsRemoved = quartermaster.removeAmmo(ammoType, shotsNeeded);
+
+        // Between the ammo on hand and our compatible ammo, we have enough.
+        assertEquals(shotsNeeded, shotsRemoved);
+
+        // We'll have some converted shots "left over", as an LRM20 shot breaks
+        // down into more than one LRM5 shot ...
+        int convertedShots = compatibleAmmoType.getRackSize() / ammoType.getRackSize();
+        assertEquals((convertedShots - shotsRemoved) + ((compatibleShots - 1) * convertedShots), quartermaster.getAmmoAvailable(ammoType));
+
+        // ... and some more left over in our compatible type as well.
+        assertTrue(warehouse.getParts().contains(compatible));
+        assertEquals(compatibleShots - 1, compatible.getShots());
+        assertEquals(compatibleShots - 1, quartermaster.getAmmoAvailable(compatibleAmmoType));
+    }
+
+    @Test
+    public void removeAmmoWhenEnoughCompatibleAmmoExists2() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaignOptions.useAmmoByType()).thenReturn(true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+
+        AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
+        AmmoType compatibleAmmoType = getAmmoType("ISLRM5 Ammo");
+
+        // Setup a warehouse with compatible ammo types
+        Warehouse warehouse = new Warehouse();
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+
+        // We have JUST enough compatible ammo
+        int compatibleShots = compatibleAmmoType.getShots();
+        AmmoStorage compatible = new AmmoStorage(0, compatibleAmmoType, compatibleShots, mockCampaign);
+        warehouse.addPart(compatible);
+
+        // And a basic quartermaster
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        // Ask for one shot of ammo
+        int shotsNeeded = 1;
+        int shotsRemoved = quartermaster.removeAmmo(ammoType, shotsNeeded);
+
+        // Between the ammo on hand and our compatible ammo, we should have enough.
+        assertEquals(shotsNeeded, shotsRemoved);
+
+        // There should be compatible ammo available ...
+        int convertedShots = ammoType.getRackSize() / compatibleAmmoType.getRackSize();
+        assertEquals((compatibleAmmoType.getRackSize() * (compatibleShots - convertedShots)) / ammoType.getRackSize(),
+                quartermaster.getAmmoAvailable(ammoType));
+
+        // ... which should result in the existing ammo being removed from the campaign,
+        // and not some weird situation where some part is there with negative or zero
+        // rounds of ammo present.
+        assertTrue(warehouse.getParts().contains(compatible));
+        assertEquals(compatibleShots - convertedShots, compatible.getShots());
+        assertEquals(compatibleShots - convertedShots, quartermaster.getAmmoAvailable(compatibleAmmoType));
     }
 
     @Test
@@ -2775,5 +2898,97 @@ public class QuartermasterTest {
         // rounds of ammo present.
         assertTrue(warehouse.getParts().isEmpty());
         assertEquals(0, quartermaster.getAmmoAvailable(ammoType, weaponType));
+    }
+
+    @Test
+    public void convertShotsTest() {
+        AmmoType lrm5 = getAmmoType("ISLRM5 Ammo");
+        AmmoType lrm15 = getAmmoType("ISLRM15 Ammo");
+        AmmoType lrm20 = getAmmoType("ISLRM20 Ammo");
+
+        // 1 shot
+        assertEquals(1, Quartermaster.convertShots(lrm5, 1, lrm5));
+        assertEquals(3, Quartermaster.convertShots(lrm15, 1, lrm5));
+        assertEquals(4, Quartermaster.convertShots(lrm20, 1, lrm5));
+
+        assertEquals(0, Quartermaster.convertShots(lrm5, 1, lrm15));
+        assertEquals(1, Quartermaster.convertShots(lrm15, 1, lrm15));
+        assertEquals(1, Quartermaster.convertShots(lrm20, 1, lrm15));
+
+        assertEquals(0, Quartermaster.convertShots(lrm5, 1, lrm20));
+        assertEquals(0, Quartermaster.convertShots(lrm15, 1, lrm20));
+        assertEquals(1, Quartermaster.convertShots(lrm20, 1, lrm20));
+
+        // 3 shots
+        assertEquals(3, Quartermaster.convertShots(lrm5, 3, lrm5));
+        assertEquals(9, Quartermaster.convertShots(lrm15, 3, lrm5));
+        assertEquals(12, Quartermaster.convertShots(lrm20, 3, lrm5));
+
+        assertEquals(1, Quartermaster.convertShots(lrm5, 3, lrm15));
+        assertEquals(3, Quartermaster.convertShots(lrm15, 3, lrm15));
+        assertEquals(4, Quartermaster.convertShots(lrm20, 3, lrm15));
+
+        assertEquals(0, Quartermaster.convertShots(lrm5, 3, lrm20));
+        assertEquals(2, Quartermaster.convertShots(lrm15, 3, lrm20));
+        assertEquals(3, Quartermaster.convertShots(lrm20, 3, lrm20));
+
+        // 100 shots
+        assertEquals(100, Quartermaster.convertShots(lrm5, 100, lrm5));
+        assertEquals(300, Quartermaster.convertShots(lrm15, 100, lrm5));
+        assertEquals(400, Quartermaster.convertShots(lrm20, 100, lrm5));
+
+        assertEquals(33, Quartermaster.convertShots(lrm5, 100, lrm15));
+        assertEquals(100, Quartermaster.convertShots(lrm15, 100, lrm15));
+        assertEquals(133, Quartermaster.convertShots(lrm20, 100, lrm15));
+
+        assertEquals(25, Quartermaster.convertShots(lrm5, 100, lrm20));
+        assertEquals(75, Quartermaster.convertShots(lrm15, 100, lrm20));
+        assertEquals(100, Quartermaster.convertShots(lrm20, 100, lrm20));
+    }
+
+    @Test
+    public void convertShotsNeededTest() {
+        AmmoType lrm5 = getAmmoType("ISLRM5 Ammo");
+        AmmoType lrm15 = getAmmoType("ISLRM15 Ammo");
+        AmmoType lrm20 = getAmmoType("ISLRM20 Ammo");
+
+        // 1 shot
+        assertEquals(1, Quartermaster.convertShotsNeeded(lrm5, 1, lrm5));
+        assertEquals(3, Quartermaster.convertShotsNeeded(lrm15, 1, lrm5));
+        assertEquals(4, Quartermaster.convertShotsNeeded(lrm20, 1, lrm5));
+
+        assertEquals(1, Quartermaster.convertShotsNeeded(lrm5, 1, lrm15));
+        assertEquals(1, Quartermaster.convertShotsNeeded(lrm15, 1, lrm15));
+        assertEquals(2, Quartermaster.convertShotsNeeded(lrm20, 1, lrm15));
+
+        assertEquals(1, Quartermaster.convertShotsNeeded(lrm5, 1, lrm20));
+        assertEquals(1, Quartermaster.convertShotsNeeded(lrm15, 1, lrm20));
+        assertEquals(1, Quartermaster.convertShotsNeeded(lrm20, 1, lrm20));
+
+        // 3 shots
+        assertEquals(3, Quartermaster.convertShotsNeeded(lrm5, 3, lrm5));
+        assertEquals(9, Quartermaster.convertShotsNeeded(lrm15, 3, lrm5));
+        assertEquals(12, Quartermaster.convertShotsNeeded(lrm20, 3, lrm5));
+
+        assertEquals(1, Quartermaster.convertShotsNeeded(lrm5, 3, lrm15));
+        assertEquals(3, Quartermaster.convertShotsNeeded(lrm15, 3, lrm15));
+        assertEquals(4, Quartermaster.convertShotsNeeded(lrm20, 3, lrm15));
+
+        assertEquals(1, Quartermaster.convertShotsNeeded(lrm5, 3, lrm20));
+        assertEquals(3, Quartermaster.convertShotsNeeded(lrm15, 3, lrm20));
+        assertEquals(3, Quartermaster.convertShotsNeeded(lrm20, 3, lrm20));
+
+        // 100 shots
+        assertEquals(100, Quartermaster.convertShotsNeeded(lrm5, 100, lrm5));
+        assertEquals(300, Quartermaster.convertShotsNeeded(lrm15, 100, lrm5));
+        assertEquals(400, Quartermaster.convertShotsNeeded(lrm20, 100, lrm5));
+
+        assertEquals(34, Quartermaster.convertShotsNeeded(lrm5, 100, lrm15));
+        assertEquals(100, Quartermaster.convertShotsNeeded(lrm15, 100, lrm15));
+        assertEquals(134, Quartermaster.convertShotsNeeded(lrm20, 100, lrm15));
+
+        assertEquals(25, Quartermaster.convertShotsNeeded(lrm5, 100, lrm20));
+        assertEquals(75, Quartermaster.convertShotsNeeded(lrm15, 100, lrm20));
+        assertEquals(100, Quartermaster.convertShotsNeeded(lrm20, 100, lrm20));
     }
 }

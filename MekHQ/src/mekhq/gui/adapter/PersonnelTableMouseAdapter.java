@@ -1136,14 +1136,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
             int row = personnelTable.getSelectedRow();
             boolean oneSelected = personnelTable.getSelectedRowCount() == 1;
-            Person person = personnelModel.getPerson(personnelTable
-                    .convertRowIndexToModel(row));
+            Person person = personnelModel.getPerson(personnelTable.convertRowIndexToModel(row));
             JMenuItem menuItem;
             JMenu menu;
             JMenu submenu;
             JCheckBoxMenuItem cbMenuItem;
             Person[] selected = getSelectedPeople();
-            // **lets fill the pop up menu**//
+            // lets fill the pop up menu
             if (StaticChecks.areAllEligible(selected, true)) {
                 menu = new JMenu(resourceMap.getString("changeRank.text"));
                 Ranks ranks = person.getRanks();
@@ -1151,8 +1150,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     Rank rank = ranks.getAllRanks().get(rankOrder);
                     int profession = person.getProfession();
 
-                    // Empty professions need swapped before the
-                    // continuation
+                    // Empty professions need swapped before the continuation
                     while (ranks.isEmptyProfession(profession) && (profession != Ranks.RPROF_MW)) {
                         profession = ranks.getAlternateProfession(profession);
                     }
@@ -1209,7 +1207,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 if (system == Ranks.RS_CUSTOM) {
                     continue;
                 }
-                cbMenuItem = new JCheckBoxMenuItem(Ranks.getRanksFromSystem(system).getRankSystemName());
+                final Ranks ranks = Ranks.getRanksFromSystem(system);
+                if (ranks == null) {
+                    continue;
+                }
+                cbMenuItem = new JCheckBoxMenuItem(ranks.getRankSystemName());
                 cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, String.valueOf(system)));
                 cbMenuItem.addActionListener(this);
                 cbMenuItem.setEnabled(true);

@@ -47,6 +47,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
@@ -68,6 +69,11 @@ public class ContractMarket implements Serializable {
     public final static int CLAUSE_SUPPORT = 2;
     public final static int CLAUSE_TRANSPORT = 3;
     public final static int CLAUSE_NUM = 4;
+
+    /**
+     * An arbitrary maximum number of attempts to generate a contract.
+     */
+    private final static int MAXIMUM_GENERATION_RETRIES = 3;
 
     /**
      * An arbitrary maximum number of attempts to find a random employer faction that
@@ -295,24 +301,25 @@ public class ContractMarket implements Serializable {
     private @Nullable AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
         if (campaign.getFactionCode().equals("MERC")) {
             if (null == campaign.getRetainerEmployerCode()) {
-                int retries = 3;
+                int retries = MAXIMUM_GENERATION_RETRIES;
                 AtBContract retVal = null;
                 while ((retries > 0) && (retVal == null)) {
+                    // Send only 1 retry down because we're handling retries in our loop
                     retVal = generateAtBContract(campaign, RandomFactionGenerator.getInstance().getEmployer(),
-                            unitRatingMod, 0);
+                            unitRatingMod, 1);
                     retries--;
                 }
                 return retVal;
             } else {
-                return generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod, 3);
+                return generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod);
             }
         } else {
-            return generateAtBContract(campaign, campaign.getFactionCode(), unitRatingMod, 3);
+            return generateAtBContract(campaign, campaign.getFactionCode(), unitRatingMod);
         }
     }
 
     private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod) {
-        return generateAtBContract(campaign, employer, unitRatingMod, 3);
+        return generateAtBContract(campaign, employer, unitRatingMod, MAXIMUM_GENERATION_RETRIES);
     }
 
     private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod, int retries) {
@@ -350,7 +357,7 @@ public class ContractMarket implements Serializable {
         contract.setEmployerCode(employer, campaign.getGameYear());
         contract.setMissionType(findAtBMissionType(unitRatingMod,
                 RandomFactionGenerator.getInstance().getFactionHints()
-                        .isISMajorPower(Faction.getFaction(contract.getEmployerCode()))));
+                        .isISMajorPower(Factions.getInstance().getFaction(contract.getEmployerCode()))));
 
         if (contract.getMissionType() == AtBContract.MT_PIRATEHUNTING) {
             contract.setEnemyCode("PIR");
@@ -368,9 +375,9 @@ public class ContractMarket implements Serializable {
          * (ComStar, Mercs not under contract) are more likely to have garrison-type
          * contracts and less likely to have battle-type contracts unless at war.
          */
-        if (RandomFactionGenerator.getInstance().getFactionHints().isNeutral(Faction.getFaction(employer)) &&
-                !RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(Faction.getFaction(employer),
-                        Faction.getFaction(contract.getEnemyCode()), campaign.getLocalDate())) {
+        if (RandomFactionGenerator.getInstance().getFactionHints().isNeutral(Factions.getInstance().getFaction(employer)) &&
+                !RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(Factions.getInstance().getFaction(employer),
+                        Factions.getInstance().getFaction(contract.getEnemyCode()), campaign.getLocalDate())) {
             if (contract.getMissionType() == AtBContract.MT_PLANETARYASSAULT) {
                 contract.setMissionType(AtBContract.MT_GARRISONDUTY);
             } else if (contract.getMissionType() == AtBContract.MT_RELIEFDUTY) {
@@ -424,9 +431,9 @@ public class ContractMarket implements Serializable {
         contract.calculateContract(campaign);
 
         //Ralgith had a version of this then the PR got added. Commenting this Out.
-/*        contract.setName(Faction.getFaction(employer).getShortName() + "-" + String.format("%1$tY%1$tm", contract.getStartDate())
+/*        contract.setName(Factions.getInstance().getFaction(employer).getShortName() + "-" + String.format("%1$tY%1$tm", contract.getStartDate())
                          + "-" + AtBContract.missionTypeNames[contract.getMissionType()]
-                         + "-" + Faction.getFaction(contract.getEnemyCode()).getShortName()
+                         + "-" + Factions.getInstance().getFaction(contract.getEnemyCode()).getShortName()
                          + "-" + contract.getLength());*/
 
         return contract;
@@ -438,7 +445,7 @@ public class ContractMarket implements Serializable {
         contract.setEmployerCode(parent.getEmployerCode(), campaign.getGameYear());
         contract.setMissionType(findAtBMissionType(unitRatingMod,
                 RandomFactionGenerator.getInstance().getFactionHints()
-                    .isISMajorPower(Faction.getFaction(contract.getEmployerCode()))));
+                    .isISMajorPower(Factions.getInstance().getFaction(contract.getEmployerCode()))));
 
         if (contract.getMissionType() == AtBContract.MT_PIRATEHUNTING)
             contract.setEnemyCode("PIR");
@@ -606,13 +613,13 @@ public class ContractMarket implements Serializable {
         if (contract.getMissionType() == AtBContract.MT_PLANETARYASSAULT) {
             mod += 1;
         }
-        if (Faction.getFaction(contract.getEmployerCode()).isClan() && !isAttacker) {
+        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isClan() && !isAttacker) {
             //facing front-line units
             mod += 1;
         }
         contract.setAllySkill(getSkillRating(Compute.d6(2) + mod));
         if (year > 2950 && year < 3039 &&
-                !Faction.getFaction(contract.getEmployerCode()).isClan()) {
+                !Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
             mod -= 1;
         }
         contract.setAllyQuality(getQualityRating(Compute.d6(2) + mod));
@@ -633,12 +640,12 @@ public class ContractMarket implements Serializable {
         if (AtBContract.isMinorPower(contract.getEmployerCode())) {
             mod -= 1;
         }
-        if (Faction.getFaction(contract.getEmployerCode()).isClan()) {
+        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
             mod += isAttacker?2:4;
         }
         contract.setEnemySkill(getSkillRating(Compute.d6(2) + mod));
         if (year > 2950 && year < 3039 &&
-                !Faction.getFaction(contract.getEnemyCode()).isClan()) {
+                !Factions.getInstance().getFaction(contract.getEnemyCode()).isClan()) {
             mod -= 1;
         }
         contract.setEnemyQuality(getQualityRating(Compute.d6(2) + mod));
@@ -712,8 +719,8 @@ public class ContractMarket implements Serializable {
             mods.mods[Compute.randomInt(4)] -= 1;
         }
 
-        if (Faction.getFaction(contract.getEnemyCode()).isClan() &&
-                !Faction.getFaction(contract.getEmployerCode()).isClan()) {
+        if (Factions.getInstance().getFaction(contract.getEnemyCode()).isClan() &&
+                !Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
             for (int i = 0; i < 4; i++)
                 if (i == CLAUSE_SALVAGE) mods.mods[i] -= 2;
                 else mods.mods[i] += 1;
@@ -734,7 +741,7 @@ public class ContractMarket implements Serializable {
         }
 
         if (RandomFactionGenerator.getInstance().getFactionHints()
-                .isISMajorPower(Faction.getFaction(contract.getEmployerCode()))) {
+                .isISMajorPower(Factions.getInstance().getFaction(contract.getEmployerCode()))) {
             mods.mods[CLAUSE_SALVAGE] += -1;
             mods.mods[CLAUSE_TRANSPORT] += 1;
         }

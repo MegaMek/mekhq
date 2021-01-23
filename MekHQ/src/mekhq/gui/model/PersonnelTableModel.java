@@ -325,18 +325,8 @@ public class PersonnelTableModel extends DataTableModel {
         }
     }
 
-    @Override
-    public Class<?> getColumnClass(int c) {
-        return getValueAt(0, c).getClass();
-    }
-
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-
     public Person getPerson(int i) {
-        return (i < data.size()) ? (Person) data.get(i) : null;
+        return (i < getRowCount()) ? (Person) data.get(i) : null;
     }
 
     public boolean isDeployed(int row) {
@@ -345,13 +335,13 @@ public class PersonnelTableModel extends DataTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
-        Person p;
         if (data.isEmpty()) {
             return "";
-        } else {
-            p = getPerson(row);
         }
-
+        Person p = getPerson(row);
+        if (p == null) {
+            return "?";
+        }
         String toReturn = "";
 
         switch (col) {
@@ -766,7 +756,7 @@ public class PersonnelTableModel extends DataTableModel {
                             }
                             desc += "<br>" + u.getStatus() + "";
                             setText(desc);
-                            Image mekImage = getImageFor(u);
+                            Image mekImage = u.getImage(this);
                             if (mekImage != null) {
                                 setImage(mekImage);
                             } else {

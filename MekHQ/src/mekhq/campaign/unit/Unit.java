@@ -21,15 +21,20 @@
  */
 package mekhq.campaign.unit;
 
+import java.awt.*;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.ServiceLogger;
@@ -87,7 +92,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private int site;
     private boolean salvaged;
     private UUID id;
-    private int oldId;
     private String fluffName;
     // This is the large craft assigned to transport this unit
     private TransportShipAssignment transportShipAssignment;
@@ -1870,11 +1874,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Unit retVal = new Unit();
         NamedNodeMap attrs = wn.getAttributes();
         Node idNode = attrs.getNamedItem("id");
-        if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-            retVal.oldId = Integer.parseInt(idNode.getTextContent());
-        } else {
-            retVal.id = UUID.fromString(idNode.getTextContent());
-        }
+
+        retVal.id = UUID.fromString(idNode.getTextContent());
 
         //Temp storage for used bay capacities
         boolean needsBayInitialization = true;
@@ -3230,6 +3231,21 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return parts;
     }
 
+    /**
+     * Find a part on a unit.
+     * @param predicate A predicate to apply to each part on the unit.
+     * @return The first part which matched the predicate, otherwise null.
+     */
+    public @Nullable Part findPart(Predicate<Part> predicate) {
+        for (Part part : parts) {
+            if (predicate.test(part)) {
+                return part;
+            }
+        }
+
+        return null;
+    }
+
     public void setParts(ArrayList<Part> newParts) {
         parts = newParts;
     }
@@ -3252,8 +3268,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return ammo;
     }
 
-    public AbstractIcon getCamouflage() {
-        return new Camouflage(getCamoCategory(), getCamoFileName());
+    public Camouflage getCamouflage() {
+        return (entity == null) ? new Camouflage() : entity.getCamouflage();
+    }
+
+    public Camouflage getCamouflageOrElse(Camouflage camouflage) {
+        return getCamouflage().hasDefaultCategory() ? camouflage : getCamouflage();
     }
 
     public String getCamoCategory() {
@@ -3288,6 +3308,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
 
         return fileName;
+    }
+
+    public Image getImage(Component component) {
+        if (MHQStaticDirectoryManager.getMechTileset() == null) {
+            return null;
+        }
+        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
+        return new EntityImage(base, getCamouflageOrElse(getCampaign().getCamouflage()),
+                component, getEntity()).loadPreviewImage();
     }
 
     /**
@@ -4646,10 +4675,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return engineer;
     }
 
-    public int getOldId() {
-        return oldId;
-    }
-
     public Part getPartForEquipmentNum(int index, int loc) {
         for (Part p : parts) {
             if (p.isPartForEquipmentNum(index, loc)) {
@@ -4660,12 +4685,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isEntityCamo() {
-        return (entity != null) && ((entity.getCamoCategory() != null)
-                && !Camouflage.NO_CAMOUFLAGE.equals(entity.getCamoCategory())
-                && !entity.getCamoCategory().isEmpty())
-                && ((entity.getCamoFileName() != null)
-                && !Camouflage.NO_CAMOUFLAGE.equals(entity.getCamoFileName())
-                && !entity.getCamoFileName().isEmpty());
+        return !getCamouflage().hasDefaultCategory();
     }
 
     public int getAvailability(int era) {

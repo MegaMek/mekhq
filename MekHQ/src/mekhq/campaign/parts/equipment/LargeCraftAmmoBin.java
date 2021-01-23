@@ -187,7 +187,10 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("bayEqNum")) {
+            // CAW: campaigns prior to 0.47.15 stored `size` in `capacity`
+            if (wn2.getNodeName().equalsIgnoreCase("capacity")) {
+                size = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("bayEqNum")) {
                 bayEqNum = Integer.parseInt(wn2.getTextContent());
             }
         }

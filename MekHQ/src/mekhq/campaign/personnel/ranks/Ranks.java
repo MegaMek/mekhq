@@ -25,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.StringJoiner;
@@ -34,6 +33,7 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.io.Migration.PersonMigrator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -171,8 +171,9 @@ public class Ranks {
         MekHQ.getLogger().info("Done loading Rank Systems");
     }
 
-    public static Ranks getRanksFromSystem(int system) {
-        return rankSystems.get(system);
+    public static @Nullable Ranks getRanksFromSystem(int system) {
+        final Ranks ranks = rankSystems.get(system);
+        return (ranks == null) ? rankSystems.get(Ranks.RS_SL) : ranks;
     }
 
     public int getRankSystem() {
@@ -187,16 +188,8 @@ public class Ranks {
         this.rankSystemName = rankSystemName;
     }
 
-    public int getOldRankSystem() {
-        return oldRankSystem;
-    }
-
-    public void setOldRankSystem(int old) {
-        oldRankSystem = old;
-    }
-
     public int getRankNumericFromNameAndProfession(int profession, String name) {
-        while (profession != RPROF_MW && isEmptyProfession(profession)) {
+        while ((profession != RPROF_MW) && isEmptyProfession(profession)) {
             profession = getAlternateProfession(profession);
         }
 
@@ -205,7 +198,7 @@ public class Ranks {
             int p = profession;
 
             // Grab rank from correct profession as needed
-            while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
+            while (rank.getName(p).startsWith("--") && (p != Ranks.RPROF_MW)) {
                 if (rank.getName(p).equals("--")) {
                     p = getAlternateProfession(p);
                 } else if (rank.getName(p).startsWith("--")) {
@@ -241,10 +234,6 @@ public class Ranks {
 
         // It's empty...
         return true;
-    }
-
-    public boolean useAlternateProfession(int profession) {
-        return ranks.get(0).getName(profession).startsWith("--");
     }
 
     public int getAlternateProfession(int profession) {
@@ -424,7 +413,6 @@ public class Ranks {
                     if (retVal.oldRankSystem == 7) {
                         showMessage = true;
                     }
-
                     if ((version == null) || (retVal.rankSystem == RS_CUSTOM)) {
                         retVal.ranks.add(Rank.generateInstanceFromXML(wn2));
                     } else {

@@ -8,6 +8,13 @@
 #
 fixes:
   - "mekhq/::"        # reduce root e.g., "before/path/" => "path/"
+  
+#
+# https://docs.codecov.io/docs/ignoring-paths
+#
+ignore:
+  - "megamek"
+  - "megameklab"
 
 github_checks:
   #

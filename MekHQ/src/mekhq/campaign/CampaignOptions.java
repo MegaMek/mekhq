@@ -22,11 +22,11 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import mekhq.Version;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
@@ -428,8 +428,8 @@ public class CampaignOptions implements Serializable {
         massRepairReplacePod = true;
         massRepairOptions = new ArrayList<>();
 
-        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-            massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
+        for (PartRepairType type : PartRepairType.values()) {
+            massRepairOptions.add(new MassRepairOption(type));
         }
         //endregion Unlisted Variables
 
@@ -3016,27 +3016,12 @@ public class CampaignOptions implements Serializable {
     }
 
     public void addMassRepairOption(MassRepairOption mro) {
-        if (mro.getType() == -1) {
+        if (mro.getType() == PartRepairType.UNKNOWN_LOCATION) {
             return;
         }
 
-        int foundIdx = -1;
-
-        for (int i = 0; i < massRepairOptions.size(); i++) {
-            if (massRepairOptions.get(i).getType() == mro.getType()) {
-                foundIdx = i;
-                break;
-            }
-        }
-
-        if (foundIdx == -1) {
-            massRepairOptions.add(mro);
-        } else {
-            massRepairOptions.add(foundIdx, mro);
-            massRepairOptions.remove(foundIdx + 1);
-        }
-
-        massRepairOptions.sort(Comparator.comparingInt(MassRepairOption::getType));
+        getMassRepairOptions().removeIf(massRepairOption -> massRepairOption.getType() == mro.getType());
+        getMassRepairOptions().add(mro);
     }
     //endregion Mass Repair/ Mass Salvage
 
@@ -3566,11 +3551,6 @@ public class CampaignOptions implements Serializable {
                 retVal.factionIntroDate = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
                 retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") // Legacy
-                    || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) { // Legacy
-                if (!Boolean.parseBoolean(wn2.getTextContent())) {
-                    retVal.setUnitRatingMethod(UnitRatingMethod.NONE);
-                }
             } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod")
                     || wn2.getNodeName().equalsIgnoreCase("dragoonsRatingMethod")) {
                 retVal.setUnitRatingMethod(UnitRatingMethod.parseFromString(wn2.getTextContent().trim()));
@@ -3846,14 +3826,6 @@ public class CampaignOptions implements Serializable {
                 for (int i = 0; i < values.length; i++) {
                     retVal.phenotypeProbabilities[i] = Integer.parseInt(values[i]);
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) {
-                retVal.phenotypeProbabilities[Phenotype.MECHWARRIOR.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) {
-                retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) {
-                retVal.phenotypeProbabilities[Phenotype.AEROSPACE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) {
-                retVal.phenotypeProbabilities[Phenotype.VEHICLE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
                 retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtBUnitMarket")) {
@@ -3989,7 +3961,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
                 retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
-                retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2));
+                retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
 
             //region Legacy
             // Removed in 0.47.*
@@ -4015,6 +3987,19 @@ public class CampaignOptions implements Serializable {
                 MekHQ.getMekHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
                 MekHQ.getMekHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") // Legacy
+                    || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) { // Legacy
+                if (!Boolean.parseBoolean(wn2.getTextContent())) {
+                    retVal.setUnitRatingMethod(UnitRatingMethod.NONE);
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) { // Legacy
+                retVal.phenotypeProbabilities[Phenotype.MECHWARRIOR.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) { // Legacy
+                retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) { // Legacy
+                retVal.phenotypeProbabilities[Phenotype.AEROSPACE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) { // Legacy
+                retVal.phenotypeProbabilities[Phenotype.VEHICLE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
             }
         }
 

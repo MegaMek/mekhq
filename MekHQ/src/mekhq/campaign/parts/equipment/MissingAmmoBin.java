@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
@@ -32,11 +31,11 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingAmmoBin extends MissingEquipmentPart {
@@ -49,10 +48,10 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     public MissingAmmoBin(int tonnage, @Nullable AmmoType et, int equipNum, boolean singleShot,
-            boolean omniPodded, @Nullable Campaign c) {
+                          boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, et, equipNum, c, 1.0, 1.0, omniPodded);
         this.oneShot = singleShot;
-        if(null != name) {
+        if (null != name) {
             this.name += " Bin";
         }
     }
@@ -160,10 +159,10 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
-                oneShot = wn2.getTextContent().equalsIgnoreCase("true");
+                oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
             }
         }
 
@@ -171,7 +170,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.AMMO;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.AMMO;
     }
 }

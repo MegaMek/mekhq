@@ -63,6 +63,7 @@ import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 
 /**
@@ -292,10 +293,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
 
-    //region Reverse Compatibility
-    // Unknown version
-    private int oldId;
-    //endregion Reverse Compatibility
     //endregion Variable Declarations
 
     //region Constructors
@@ -347,13 +344,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         secondaryDesignator = ROMDesignation.NONE;
         commander = false;
         dependent = false;
-        originFaction = Faction.getFaction(factionCode);
+        originFaction = Factions.getInstance().getFaction(factionCode);
         originPlanet = null;
         clan = originFaction.isClan();
         phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
-        idleMonths = -1;
         genealogy = new Genealogy(getId());
         tryingToMarry = true;
         tryingToConceive = true;
@@ -362,7 +358,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         setPortrait(new Portrait());
         xp = 0;
         daysToWaitForHealing = 0;
-        gender = Gender.MALE;
+        setGender(Gender.MALE);
         rank = 0;
         rankLevel = 0;
         rankSystem = -1;
@@ -1463,8 +1459,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 ? Utilities.nonNull(getGenealogy().getSpouseId(), fatherId) : fatherId;
 
         // Determine Prisoner Status
-        PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
-                ? PrisonerStatus.FREE : getPrisonerStatus();
+        final PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
+                ? getPrisonerStatus() : PrisonerStatus.FREE;
 
         // Output a specific report to the campaign if they are giving birth to multiple children
         if (PREGNANCY_MULTIPLE_NAMES[size] != null) {
@@ -1747,7 +1743,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWaitForHealing", daysToWaitForHealing);
             }
             // Always save the person's gender, as it would otherwise get confusing fast
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", gender.name());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", getGender().name());
             // Always save a person's rank
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rank", rank);
             if (rankLevel != 0) {
@@ -1932,7 +1928,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) {
                     retVal.dependent = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-                    retVal.originFaction = Faction.getFaction(wn2.getTextContent().trim());
+                    retVal.originFaction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
                     String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
                     String planetId = wn2.getTextContent().trim();
@@ -1960,11 +1956,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
                     retVal.idleMonths = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        retVal.id = UUID.fromString(wn2.getTextContent());
-                    }
+                    retVal.id = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) { // legacy - 0.47.6 removal
                     CampaignXmlParser.addToAncestryMigrationMap(UUID.fromString(wn2.getTextContent().trim()), retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) { // legacy - 0.47.6 removal
@@ -1992,7 +1984,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
                     retVal.hits = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
-                    retVal.gender = Gender.parseFromString(wn2.getTextContent().trim());
+                    retVal.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                     retVal.rank = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
@@ -2181,72 +2173,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (version.isLowerThan("0.47.5") && (retVal.getExpectedDueDate() == null)
                     && (retVal.getDueDate() != null)) {
                 retVal.setExpectedDueDate(retVal.getDueDate());
-            }
-
-            //versions before 0.3.4 did not have proper clan phenotypes
-            if (version.isLowerThan("0.3.4") && c.getFaction().isClan()) {
-                //assume personnel are clan and trueborn if the right role
-                retVal.setClanner(true);
-                switch (retVal.getPrimaryRole()) {
-                    case Person.T_MECHWARRIOR:
-                        retVal.setPhenotype(Phenotype.MECHWARRIOR);
-                        break;
-                    case Person.T_AERO_PILOT:
-                    case Person.T_CONV_PILOT:
-                        retVal.setPhenotype(Phenotype.AEROSPACE);
-                        break;
-                    case Person.T_BA:
-                        retVal.setPhenotype(Phenotype.ELEMENTAL);
-                        break;
-                    case Person.T_VEE_GUNNER:
-                    case Person.T_GVEE_DRIVER:
-                    case Person.T_NVEE_DRIVER:
-                    case Person.T_VTOL_PILOT:
-                        retVal.setPhenotype(Phenotype.VEHICLE);
-                        break;
-                    case Person.T_PROTO_PILOT:
-                        retVal.setPhenotype(Phenotype.PROTOMECH);
-                        break;
-                    default:
-                        retVal.setPhenotype(Phenotype.NONE);
-                        break;
-                }
-            }
-
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {
-                if (retVal.primaryRole > T_INFANTRY) {
-                    retVal.primaryRole += 4;
-
-                }
-                if (retVal.secondaryRole > T_INFANTRY) {
-                    retVal.secondaryRole += 4;
-                }
-            }
-
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() == 2) {
-                //adjust for conventional fighter pilots
-                if (retVal.primaryRole >= T_CONV_PILOT) {
-                    retVal.primaryRole += 1;
-                }
-                if (retVal.secondaryRole >= T_CONV_PILOT) {
-                    retVal.secondaryRole += 1;
-                }
-            }
-
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() == 3 && version.getSnapshot() < 1) {
-                //adjust for conventional fighter pilots
-                if (retVal.primaryRole == T_CONV_PILOT && retVal.hasSkill(SkillType.S_PILOT_SPACE) && !retVal.hasSkill(SkillType.S_PILOT_JET)) {
-                    retVal.primaryRole += 1;
-                }
-                if (retVal.secondaryRole == T_CONV_PILOT && retVal.hasSkill(SkillType.S_PILOT_SPACE) && !retVal.hasSkill(SkillType.S_PILOT_JET)) {
-                    retVal.secondaryRole += 1;
-                }
-                if (retVal.primaryRole == T_AERO_PILOT && !retVal.hasSkill(SkillType.S_PILOT_SPACE) && retVal.hasSkill(SkillType.S_PILOT_JET)) {
-                    retVal.primaryRole += 8;
-                }
-                if (retVal.secondaryRole == T_AERO_PILOT && !retVal.hasSkill(SkillType.S_PILOT_SPACE) && retVal.hasSkill(SkillType.S_PILOT_JET)) {
-                    retVal.secondaryRole += 8;
-                }
             }
 
             if ((null != advantages) && (advantages.trim().length() > 0)) {
@@ -2445,24 +2371,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public int getRankSystem() {
-        if (rankSystem == -1) {
-            return campaign.getRanks().getRankSystem();
-        }
-        return rankSystem;
+        return (rankSystem == -1) ? campaign.getRanks().getRankSystem() : rankSystem;
     }
 
     public void setRankSystem(int system) {
-        rankSystem = system;
-        if (system == campaign.getRanks().getRankSystem()) {
-            rankSystem = -1;
-        }
-
-        // Set the ranks too
-        if (rankSystem == -1) {
-            ranks = null;
-        } else {
-            ranks = Ranks.getRanksFromSystem(rankSystem);
-        }
+        rankSystem = (system == campaign.getRanks().getRankSystem()) ? -1 : system;
+        ranks = (rankSystem == -1) ? null : Ranks.getRanksFromSystem(rankSystem);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
@@ -2478,10 +2392,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public Rank getRank() {
-        if (rankSystem != -1) {
-            return Ranks.getRanksFromSystem(rankSystem).getRank(rank);
-        }
-        return campaign.getRanks().getRank(rank);
+        final Ranks system = (rankSystem == -1) ? campaign.getRanks() : Ranks.getRanksFromSystem(rankSystem);
+        return Objects.requireNonNull(system, "Error: Failed to get a valid rank system").getRank(rank);
     }
 
     public String getRankName() {
@@ -2524,10 +2436,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Manei Domini Additions
         if (getRankSystem() == Ranks.RS_WOB) {
             if (maneiDominiClass != ManeiDominiClass.NONE) {
-                rankName = maneiDominiClass.toString() + " " + rankName;
+                rankName = maneiDominiClass + " " + rankName;
             }
             if (maneiDominiRank != ManeiDominiRank.NONE) {
-                rankName += " " + maneiDominiRank.toString();
+                rankName += " " + maneiDominiRank;
             }
         } else {
             maneiDominiClass = ManeiDominiClass.NONE;
@@ -3576,10 +3488,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         for (Skill s : skills.getSkills()) {
             s.updateType();
         }
-    }
-
-    public int getOldId() {
-        return oldId;
     }
 
     public int getNTasks() {

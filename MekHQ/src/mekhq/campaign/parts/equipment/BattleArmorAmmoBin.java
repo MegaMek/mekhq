@@ -18,9 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
-
 
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
@@ -34,11 +32,9 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.PartInventory;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class BattleArmorAmmoBin extends AmmoBin {
-
     /**
      * Battle Armor ammo bins need to look for shots for all the remaining troopers in the
      * squad.
@@ -67,7 +63,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
     }
 
     public int getNumTroopers() {
-        if(null != unit && unit.getEntity() instanceof BattleArmor) {
+        if (null != unit && unit.getEntity() instanceof BattleArmor) {
             //we are going to base this on the full squad size, even though this makes understrength
             //squads overpay for their ammo - that way suits can be moved around without having to adjust
             //ammo - Tech: "oh you finally got here. Check in the back corner, we stockpiled some ammo for
@@ -170,7 +166,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
     @Override
     public String checkFixable() {
         int amountAvailable = getAmountAvailable();
-        if(amountAvailable > 0 && amountAvailable < getNumTroopers()) {
+        if ((amountAvailable > 0) && (amountAvailable < getNumTroopers())) {
             return "Cannot do a partial reload of Battle Armor ammo less than the number of troopers";
         }
         return super.checkFixable();
@@ -220,7 +216,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
     @Override
     public String getAcquisitionBonus() {
         String bonus = getAllAcquisitionMods().getValueAsString();
-        if(getAllAcquisitionMods().getValue() > -1) {
+        if (getAllAcquisitionMods().getValue() > -1) {
             bonus = "+" + bonus;
         }
 
@@ -240,7 +236,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
         if (typeName == null) {
             typeName = getType().getName();
         } else {
-            type = (AmmoType) EquipmentType.get(typeName);
+            type = EquipmentType.get(typeName);
         }
 
 
@@ -249,15 +245,14 @@ public class BattleArmorAmmoBin extends AmmoBin {
         //a check on the XML loading after restore - we also will need to to the same for proto
         //ammo but we can only do this if we have all the correct ammo rack sizes for the
         //generics (e.g. LRM1, LRM2, LRM3, etc)
-        /*if(typeName.contains("BA-")) {
+        /*if (typeName.contains("BA-")) {
             String newTypeName = "IS" + typeName.split("BA-")[1];
             EquipmentType newType = EquipmentType.get(newTypeName);
-            if(null != newType) {
+            if (null != newType) {
                 typeName = newTypeName;
                 type = newType;
             }
         }*/
-
 
         if (type == null) {
             MekHQ.getLogger().error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
@@ -265,8 +260,8 @@ public class BattleArmorAmmoBin extends AmmoBin {
         }
         try {
             equipTonnage = type.getTonnage(null);
-        } catch(NullPointerException ex) {
-            MekHQ.getLogger().error(ex);
+        } catch (NullPointerException e) {
+            MekHQ.getLogger().error(e);
         }
     }
 }

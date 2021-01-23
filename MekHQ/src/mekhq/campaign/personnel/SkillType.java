@@ -395,8 +395,6 @@ public class SkillType implements Serializable {
     }
 
     public static void generateInstanceFromXML(Node wn, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)";
-
         try {
             SkillType retVal = new SkillType();
             NodeList nl = wn.getChildNodes();
@@ -425,20 +423,12 @@ public class SkillType implements Serializable {
                 }
             }
 
-            if (version.getMinorVersion() < 3) {
-                //need to change negotiation and scrounge to be countUp=false with
-                //TNs of 10
-                if (retVal.name.equals(SkillType.S_NEG) || retVal.name.equals(SkillType.S_SCROUNGE)) {
-                    retVal.countUp = false;
-                    retVal.target = 10;
-                }
-            }
             lookupHash.put(retVal.name, retVal);
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(SkillType.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
         }
     }
 

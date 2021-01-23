@@ -12,15 +12,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -41,41 +43,41 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingEnginePart extends MissingPart {
-	private static final long serialVersionUID = -6961398614705924172L;
-	protected Engine engine;
-	protected boolean forHover;
+    private static final long serialVersionUID = -6961398614705924172L;
+    protected Engine engine;
+    protected boolean forHover;
 
-	public MissingEnginePart() {
-		this(0, null, null, false);
-	}
+    public MissingEnginePart() {
+        this(0, null, null, false);
+    }
 
-	public MissingEnginePart(int tonnage, Engine e, Campaign c, boolean hover) {
-		super(tonnage, c);
-		this.engine = e;
-		this.forHover = hover;
-		if(null != engine) {
-			this.name = engine.getEngineName() + " Engine";
-		}
-		this.engine = e;
-	}
+    public MissingEnginePart(int tonnage, Engine e, Campaign c, boolean hover) {
+        super(tonnage, c);
+        this.engine = e;
+        this.forHover = hover;
+        if (null != engine) {
+            this.name = engine.getEngineName() + " Engine";
+        }
+        this.engine = e;
+    }
 
-	@Override
-	public int getBaseTime() {
-		return 360;
-	}
+    @Override
+    public int getBaseTime() {
+        return 360;
+    }
 
-	@Override
-	public int getDifficulty() {
-		return -1;
-	}
+    @Override
+    public int getDifficulty() {
+        return -1;
+    }
 
-	public Engine getEngine() {
-		return engine;
-	}
+    public Engine getEngine() {
+        return engine;
+    }
 
-	@Override
-	public double getTonnage() {
-	    double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
+    @Override
+    public double getTonnage() {
+        double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
         switch (engine.getEngineType()) {
             case Engine.COMBUSTION_ENGINE:
                 weight *= 2.0f;
@@ -113,151 +115,148 @@ public class MissingEnginePart extends MissingPart {
             return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage()/5.0, TestEntity.Ceil.HALFTON), toReturn);
         }
         return toReturn;
-	}
+    }
 
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		// The engine is a MM object...
-		// And doesn't support XML serialization...
-		// But it's defined by 3 ints. So we'll save those here.
-		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineType>"
-				+ engine.getEngineType() + "</engineType>");
-		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineRating>"
-				+ engine.getRating() + "</engineRating>");
-		 pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				 +"<engineFlags>"
-				 +engine.getFlags()
-				 +"</engineFlags>");
-		 pw1.println(MekHqXmlUtil.indentStr(indent+1)
-					+"<forHover>"
-					+forHover
-					+"</forHover>");
-		writeToXmlEnd(pw1, indent);
-	}
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        // The engine is a MM object...
+        // And doesn't support XML serialization...
+        // But it's defined by 3 ints. So we'll save those here.
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineType>"
+                + engine.getEngineType() + "</engineType>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineRating>"
+                + engine.getRating() + "</engineRating>");
+         pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                 +"<engineFlags>"
+                 +engine.getFlags()
+                 +"</engineFlags>");
+         pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                    +"<forHover>"
+                    +forHover
+                    +"</forHover>");
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-		int engineType = -1;
-		int engineRating = -1;
-		int engineFlags = 0;
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
+        int engineType = -1;
+        int engineRating = -1;
+        int engineFlags = 0;
 
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
 
-			if (wn2.getNodeName().equalsIgnoreCase("engineType")) {
-				engineType = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
-				engineRating = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("engineFlags")) {
-				engineFlags = Integer.parseInt(wn2.getTextContent());
-			}
-		}
-
-		engine = new Engine(engineRating, engineType, engineFlags);
-		this.name = engine.getEngineName() + " Engine";
-	}
-
-	@Override
-	public boolean isAcceptableReplacement(Part part, boolean refit) {
-	    int year = campaign.getGameYear();
-		if(part instanceof EnginePart) {
-			Engine eng = ((EnginePart)part).getEngine();
-			if (null != eng) {
-				return getEngine().getEngineType() == eng.getEngineType()
-						&& getEngine().getRating() == eng.getRating()
-						&& getEngine().getTechType(year) == eng.getTechType(year)
-						&& getUnitTonnage() == ((EnginePart)part).getUnitTonnage()
-						&& getTonnage() == ((EnginePart)part).getTonnage();
-			}
-		}
-		return false;
-	}
-
-	public void fixTankFlag(boolean hover) {
-		int flags = engine.getFlags();
-		if(!engine.hasFlag(Engine.TANK_ENGINE)) {
-			flags |= Engine.TANK_ENGINE;
-		}
-		engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
-		this.name = engine.getEngineName() + " Engine";
-		this.forHover = hover;
-	}
-
-	public void fixClanFlag() {
-		int flags = engine.getFlags();
-		if(!engine.hasFlag(Engine.CLAN_ENGINE)) {
-			flags |= Engine.CLAN_ENGINE;
-		}
-		engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
-		this.name = engine.getEngineName() + " Engine";
-	}
-
-	 @Override
-	 public String checkFixable() {
-		 if(null == unit) {
-			 return null;
-		 }
-		 for(int i = 0; i < unit.getEntity().locations(); i++) {
-			 if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
-					 && unit.isLocationDestroyed(i)) {
-				 return unit.getEntity().getLocationName(i) + " is destroyed.";
-			 }
-		 }
-		 return null;
-	 }
-
-	@Override
-	public Part getNewPart() {
-		boolean useHover = null != unit && unit.getEntity().getMovementMode() == EntityMovementMode.HOVER && unit.getEntity() instanceof Tank;
-		return new EnginePart(getUnitTonnage(), new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, useHover);
-	}
-
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit) {
-			if(unit.getEntity() instanceof Mech) {
-			    unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
-			}
-			if(unit.getEntity() instanceof Aero) {
-				((Aero)unit.getEntity()).setEngineHits(((Aero)unit.getEntity()).getMaxEngineHits());
-			}
-			if(unit.getEntity() instanceof Tank) {
-				((Tank)unit.getEntity()).engineHit();
-			}
-			if(unit.getEntity() instanceof Protomech) {
-                ((Protomech)unit.getEntity()).setEngineHit(true);
+            if (wn2.getNodeName().equalsIgnoreCase("engineType")) {
+                engineType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
+                engineRating = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("engineFlags")) {
+                engineFlags = Integer.parseInt(wn2.getTextContent());
             }
-		}
-	}
+        }
 
-	@Override
-	public String getAcquisitionName() {
-		return getPartName() + ",  " + getTonnage() + " tons";
-	}
+        engine = new Engine(engineRating, engineType, engineFlags);
+        this.name = engine.getEngineName() + " Engine";
+    }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        int year = campaign.getGameYear();
+        if(part instanceof EnginePart) {
+            Engine eng = ((EnginePart)part).getEngine();
+            if (null != eng) {
+                return getEngine().getEngineType() == eng.getEngineType()
+                        && getEngine().getRating() == eng.getRating()
+                        && getEngine().getTechType(year) == eng.getTechType(year)
+                        && getUnitTonnage() == ((EnginePart)part).getUnitTonnage()
+                        && getTonnage() == ((EnginePart)part).getTonnage();
+            }
+        }
+        return false;
+    }
 
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
+    public void fixTankFlag(boolean hover) {
+        int flags = engine.getFlags();
+        if(!engine.hasFlag(Engine.TANK_ENGINE)) {
+            flags |= Engine.TANK_ENGINE;
+        }
+        engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
+        this.name = engine.getEngineName() + " Engine";
+        this.forHover = hover;
+    }
 
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return engine.getTechAdvancement();
-	}
-	@Override
+    public void fixClanFlag() {
+        int flags = engine.getFlags();
+        if(!engine.hasFlag(Engine.CLAN_ENGINE)) {
+            flags |= Engine.CLAN_ENGINE;
+        }
+        engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
+        this.name = engine.getEngineName() + " Engine";
+    }
+
+     @Override
+     public String checkFixable() {
+         if (null == unit) {
+             return null;
+         }
+         for (int i = 0; i < unit.getEntity().locations(); i++) {
+             if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
+                     && unit.isLocationDestroyed(i)) {
+                 return unit.getEntity().getLocationName(i) + " is destroyed.";
+             }
+         }
+         return null;
+     }
+
+    @Override
+    public Part getNewPart() {
+        boolean useHover = null != unit && unit.getEntity().getMovementMode() == EntityMovementMode.HOVER && unit.getEntity() instanceof Tank;
+        return new EnginePart(getUnitTonnage(), new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, useHover);
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        if (null != unit) {
+            if (unit.getEntity() instanceof Mech) {
+                unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+            } else if (unit.getEntity() instanceof Aero) {
+                ((Aero) unit.getEntity()).setEngineHits(((Aero) unit.getEntity()).getMaxEngineHits());
+            } else if (unit.getEntity() instanceof Tank) {
+                ((Tank) unit.getEntity()).engineHit();
+            } else if (unit.getEntity() instanceof Protomech) {
+                ((Protomech) unit.getEntity()).setEngineHit(true);
+            }
+        }
+    }
+
+    @Override
+    public String getAcquisitionName() {
+        return getPartName() + ",  " + getTonnage() + " tons";
+    }
+
+    @Override
+    public String getLocationName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public int getLocation() {
+        return Entity.LOC_NONE;
+    }
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return engine.getTechAdvancement();
+    }
+    @Override
     public boolean isInLocation(String loc) {
-		 if(null == unit || null == unit.getEntity()) {
-			 return false;
-		 }
-		 if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+         if (null == unit || null == unit.getEntity()) {
+             return false;
+         }
+         if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
              return true;
          }
          boolean needsSideTorso = false;
@@ -267,17 +266,16 @@ public class MissingEnginePart extends MissingPart {
              case Engine.XXL_ENGINE:
                  needsSideTorso = true;
                  break;
+             default:
+                 break;
          }
-         if (needsSideTorso
-                 && (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT
-                         || unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT)) {
-             return true;
-         }
-         return false;
+        return needsSideTorso
+                && ((unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT)
+                || (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT));
     }
 
-	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ENGINE;
+    @Override
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ENGINE;
     }
 }
