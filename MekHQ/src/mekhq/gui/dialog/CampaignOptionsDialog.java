@@ -221,7 +221,7 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Tech Limits Tab
 
     //region Personnel Tab
-    //General Personnel
+    // General Personnel
     private JCheckBox useTacticsBox;
     private JCheckBox useInitBonusBox;
     private JCheckBox useToughnessBox;
@@ -233,7 +233,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox altQualityAveragingCheckBox;
     private JCheckBox chkUseTransfers;
 
-    //Expanded Personnel
+    // Expanded Personnel
     private JCheckBox chkUseTimeInService;
     private JComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
     private JCheckBox chkUseTimeInRank;
@@ -242,15 +242,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkTrackTotalEarnings;
     private JCheckBox chkShowOriginFaction;
 
-    //Personnel Randomization
-    private JCheckBox useDylansRandomXpBox;
-    private JCheckBox chkRandomizeOrigin;
-    private JCheckBox chkRandomizeDependentsOrigin;
-    private JSpinner spnOriginSearchRadius;
-    private JCheckBox chkOriginExtraRandom;
-    private JSpinner spnOriginDistanceScale;
-
-    //Medical
+    // Medical
     private JCheckBox useAdvancedMedicalBox;
     private JSpinner spnHealWaitingPeriod;
     private JSpinner spnNaturalHealWaitingPeriod;
@@ -258,10 +250,32 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox useRandomHitsForVees;
     private JCheckBox useTougherHealing;
 
-    //Family
+    // Prisoners
+    private JComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
+    private JComboBox<PrisonerStatus> comboPrisonerStatus;
+    private JCheckBox chkPrisonerBabyStatus;
+    private JCheckBox chkAtBPrisonerDefection;
+    private JCheckBox chkAtBPrisonerRansom;
+
+    // Personnel Randomization
+    private JCheckBox useDylansRandomXpBox;
+    private JCheckBox chkRandomizeOrigin;
+    private JCheckBox chkRandomizeDependentsOrigin;
+    private JSpinner spnOriginSearchRadius;
+    private JCheckBox chkOriginExtraRandom;
+    private JSpinner spnOriginDistanceScale;
+
+    // Family
     private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
 
-    //Marriage
+    // Salary
+    private JSpinner spnSalaryCommission;
+    private JSpinner spnSalaryEnlisted;
+    private JSpinner spnSalaryAntiMek;
+    private JSpinner[] spnSalaryXp;
+    private JSpinner[] spnSalaryBase;
+
+    // Marriage
     private JCheckBox chkUseManualMarriages;
     private JSpinner spnMinimumMarriageAge;
     private JSpinner spnCheckMutualAncestorsDepth;
@@ -273,7 +287,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUseRandomSameSexMarriages;
     private JSpinner spnChanceRandomSameSexMarriages;
 
-    //Procreation
+    // Procreation
     private JCheckBox chkUseUnofficialProcreation;
     private JSpinner spnChanceProcreation;
     private JCheckBox chkUseUnofficialProcreationNoRelationship;
@@ -283,21 +297,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
     private JCheckBox chkDetermineFatherAtBirth;
 
-    //Salary
-    private JSpinner spnSalaryCommission;
-    private JSpinner spnSalaryEnlisted;
-    private JSpinner spnSalaryAntiMek;
-    private JSpinner[] spnSalaryXp;
-    private JSpinner[] spnSalaryBase;
-
-    //Prisoners
-    private JComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
-    private JComboBox<PrisonerStatus> comboPrisonerStatus;
-    private JCheckBox chkPrisonerBabyStatus;
-    private JCheckBox chkAtBPrisonerDefection;
-    private JCheckBox chkAtBPrisonerRansom;
-
-    //Death
+    // Death
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     //endregion Personnel Tab
 
@@ -3738,14 +3738,13 @@ public class CampaignOptionsDialog extends JDialog {
     private JScrollPane createPersonnelTab() {
         JPanel generalPersonnelPanel = createGeneralPersonnelPanel();
         JPanel expandedPersonnelInformationPanel = createExpandedPersonnelInformationPanel();
-        JPanel personnelRandomizationPanel = createPersonnelRandomizationPanel();
         JPanel medicalPanel = createMedicalPanel();
+        JPanel prisonerPanel = createPrisonerPanel();
+        JPanel personnelRandomizationPanel = createPersonnelRandomizationPanel();
         JPanel familyPanel = createFamilyPanel();
+        JPanel salaryPanel = createSalaryPanel();
         JPanel marriagePanel = createMarriagePanel();
         JPanel procreationPanel = createProcreationPanel();
-
-        JPanel salaryPanel = createSalaryPanel();
-        JPanel prisonerPanel = createPrisonerPanel();
         JPanel deathPanel = createDeathPanel();
 
         // Layout the Panel
@@ -3762,34 +3761,36 @@ public class CampaignOptionsDialog extends JDialog {
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(generalPersonnelPanel)
-                                .addComponent(salaryPanel, GroupLayout.Alignment.LEADING))
+                                .addComponent(expandedPersonnelInformationPanel, GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(expandedPersonnelInformationPanel)
+                                .addComponent(medicalPanel)
                                 .addComponent(prisonerPanel, GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(personnelRandomizationPanel)
-                                .addComponent(deathPanel, GroupLayout.Alignment.LEADING))
-                        .addComponent(medicalPanel)
-                        .addComponent(familyPanel)
-                        .addComponent(marriagePanel)
-                        .addComponent(procreationPanel)
+                                .addComponent(familyPanel, GroupLayout.Alignment.LEADING))
+                        .addComponent(salaryPanel)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(marriagePanel)
+                                .addComponent(procreationPanel, GroupLayout.Alignment.LEADING))
+                        .addComponent(deathPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(generalPersonnelPanel)
-                                .addComponent(salaryPanel))
+                                .addComponent(expandedPersonnelInformationPanel))
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(expandedPersonnelInformationPanel)
+                                .addComponent(medicalPanel)
                                 .addComponent(prisonerPanel))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(personnelRandomizationPanel)
-                                .addComponent(deathPanel))
-                        .addComponent(medicalPanel)
-                        .addComponent(familyPanel)
-                        .addComponent(marriagePanel)
-                        .addComponent(procreationPanel)
+                                .addComponent(familyPanel))
+                        .addComponent(salaryPanel)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(marriagePanel)
+                                .addComponent(procreationPanel))
+                        .addComponent(deathPanel)
         );
 
         JScrollPane scrollPersonnel = new JScrollPane(panPersonnel);
@@ -3942,68 +3943,6 @@ public class CampaignOptionsDialog extends JDialog {
         return panel;
     }
 
-    private JPanel createPersonnelRandomizationPanel() {
-        useDylansRandomXpBox = new JCheckBox(resources.getString("useDylansRandomXpBox.text"));
-        useDylansRandomXpBox.setToolTipText(resources.getString("useDylansRandomXpBox.toolTipText"));
-        useDylansRandomXpBox.setName("useDylansRandomXpBox");
-
-        chkRandomizeOrigin = new JCheckBox(resources.getString("randomizeOrigin.text"));
-
-        chkRandomizeDependentsOrigin = new JCheckBox(resources.getString("randomizeDependentsOrigin.text"));
-
-        JLabel lblOriginSearchRadius = new JLabel(resources.getString("originSearchRadius.text"));
-
-        spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(50, 10, 250, 10));
-
-        chkOriginExtraRandom = new JCheckBox(resources.getString("lblOriginExtraRandom.text"));
-        chkOriginExtraRandom.setToolTipText(resources.getString("lblOriginExtraRandom.toolTipText"));
-
-        JLabel lblOriginDistanceScale = new JLabel(resources.getString("lblOriginDistanceScale.text"));
-        lblOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
-
-        spnOriginDistanceScale = new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1 ));
-        spnOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
-
-        // Layout the Panel
-        JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("panPersonnelRandomization.text")));
-        GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addComponent(useDylansRandomXpBox)
-                        .addComponent(chkRandomizeOrigin)
-                        .addComponent(chkRandomizeDependentsOrigin)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblOriginSearchRadius)
-                                .addComponent(spnOriginSearchRadius, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkOriginExtraRandom)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblOriginDistanceScale)
-                                .addComponent(spnOriginDistanceScale, GroupLayout.Alignment.LEADING))
-        );
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(useDylansRandomXpBox)
-                        .addComponent(chkRandomizeOrigin)
-                        .addComponent(chkRandomizeDependentsOrigin)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblOriginSearchRadius)
-                                .addComponent(spnOriginSearchRadius))
-                        .addComponent(chkOriginExtraRandom)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblOriginDistanceScale)
-                                .addComponent(spnOriginDistanceScale))
-        );
-
-        return panel;
-    }
-
     private JPanel createMedicalPanel() {
         useAdvancedMedicalBox = new JCheckBox(resources.getString("useAdvancedMedicalBox.text"));
         useAdvancedMedicalBox.setToolTipText(resources.getString("useAdvancedMedicalBox.toolTipText"));
@@ -4074,6 +4013,142 @@ public class CampaignOptionsDialog extends JDialog {
         return panel;
     }
 
+    private JPanel createPrisonerPanel() {
+        comboPrisonerCaptureStyle = new JComboBox<>(PrisonerCaptureStyle.values());
+        comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
+            private static final long serialVersionUID = -543354619818226314L;
+
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (isSelected && (index > -1) && (list.getSelectedValue() instanceof PrisonerCaptureStyle)) {
+                    list.setToolTipText(((PrisonerCaptureStyle) list.getSelectedValue()).getToolTip());
+                }
+
+                return this;
+            }
+        });
+
+        JLabel prisonerCaptureStyleLabel = new JLabel(resources.getString("prisonerCaptureStyle.text"));
+
+        DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
+        prisonerStatusModel.removeElement(PrisonerStatus.FREE); // we don't want this as a standard use case for prisoners
+        comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
+
+        JLabel prisonerStatusLabel = new JLabel(resources.getString("prisonerStatus.text"));
+
+        chkPrisonerBabyStatus = new JCheckBox(resources.getString("prisonerBabyStatus.text"));
+        chkPrisonerBabyStatus.setToolTipText(resources.getString("prisonerBabyStatus.toolTipText"));
+        chkPrisonerBabyStatus.setName("chkPrisonerBabyStatus");
+
+        chkAtBPrisonerDefection = new JCheckBox(resources.getString("chkAtBPrisonerDefection.text"));
+        chkAtBPrisonerDefection.setToolTipText(resources.getString("chkAtBPrisonerDefection.toolTipText"));
+        chkAtBPrisonerDefection.setName("chkAtBPrisonerDefection");
+
+        chkAtBPrisonerRansom = new JCheckBox(resources.getString("chkAtBPrisonerRansom.text"));
+        chkAtBPrisonerRansom.setName("chkAtBPrisonerRansom");
+
+        // Layout the Panel
+        JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("panPrisoners.text")));
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(prisonerCaptureStyleLabel)
+                                .addComponent(comboPrisonerCaptureStyle, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(prisonerStatusLabel)
+                                .addComponent(comboPrisonerStatus, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkPrisonerBabyStatus)
+                        .addComponent(chkAtBPrisonerDefection)
+                        .addComponent(chkAtBPrisonerRansom)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(prisonerCaptureStyleLabel)
+                                .addComponent(comboPrisonerCaptureStyle))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(prisonerStatusLabel)
+                                .addComponent(comboPrisonerStatus))
+                        .addComponent(chkPrisonerBabyStatus)
+                        .addComponent(chkAtBPrisonerDefection)
+                        .addComponent(chkAtBPrisonerRansom)
+        );
+
+        return panel;
+    }
+
+    private JPanel createPersonnelRandomizationPanel() {
+        useDylansRandomXpBox = new JCheckBox(resources.getString("useDylansRandomXpBox.text"));
+        useDylansRandomXpBox.setToolTipText(resources.getString("useDylansRandomXpBox.toolTipText"));
+        useDylansRandomXpBox.setName("useDylansRandomXpBox");
+
+        chkRandomizeOrigin = new JCheckBox(resources.getString("randomizeOrigin.text"));
+
+        chkRandomizeDependentsOrigin = new JCheckBox(resources.getString("randomizeDependentsOrigin.text"));
+
+        JLabel lblOriginSearchRadius = new JLabel(resources.getString("originSearchRadius.text"));
+
+        spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(50, 10, 250, 10));
+
+        chkOriginExtraRandom = new JCheckBox(resources.getString("lblOriginExtraRandom.text"));
+        chkOriginExtraRandom.setToolTipText(resources.getString("lblOriginExtraRandom.toolTipText"));
+
+        JLabel lblOriginDistanceScale = new JLabel(resources.getString("lblOriginDistanceScale.text"));
+        lblOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
+
+        spnOriginDistanceScale = new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1 ));
+        spnOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
+
+        // Layout the Panel
+        JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("panPersonnelRandomization.text")));
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(useDylansRandomXpBox)
+                        .addComponent(chkRandomizeOrigin)
+                        .addComponent(chkRandomizeDependentsOrigin)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblOriginSearchRadius)
+                                .addComponent(spnOriginSearchRadius, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkOriginExtraRandom)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblOriginDistanceScale)
+                                .addComponent(spnOriginDistanceScale, GroupLayout.Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(useDylansRandomXpBox)
+                        .addComponent(chkRandomizeOrigin)
+                        .addComponent(chkRandomizeDependentsOrigin)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblOriginSearchRadius)
+                                .addComponent(spnOriginSearchRadius))
+                        .addComponent(chkOriginExtraRandom)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblOriginDistanceScale)
+                                .addComponent(spnOriginDistanceScale))
+        );
+
+        return panel;
+    }
+
     private JPanel createFamilyPanel() {
         JLabel lblDisplayFamilyLevel = new JLabel(resources.getString("displayFamilyLevel.text"));
         lblDisplayFamilyLevel.setToolTipText(resources.getString("displayFamilyLevel.toolTipText"));
@@ -4103,6 +4178,97 @@ public class CampaignOptionsDialog extends JDialog {
                                 .addComponent(lblDisplayFamilyLevel)
                                 .addComponent(comboDisplayFamilyLevel))
         );
+
+        return panel;
+    }
+
+    private JPanel createSalaryPanel() {
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("SalaryTab.text")));
+
+        JPanel panMultiplier = new JPanel(new GridLayout(1, 3));
+        panMultiplier.setBorder(BorderFactory.createTitledBorder("Multipliers"));
+        spnSalaryCommission = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
+        ((JSpinner.DefaultEditor) spnSalaryCommission.getEditor()).getTextField().setEditable(false);
+        JPanel panSalaryCommission = new JPanel();
+        panSalaryCommission.add(spnSalaryCommission);
+        panSalaryCommission.add(new JLabel("Commissioned"));
+        panMultiplier.add(panSalaryCommission);
+
+        spnSalaryEnlisted = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
+        ((JSpinner.DefaultEditor) spnSalaryEnlisted.getEditor()).getTextField().setEditable(false);
+        JPanel panSalaryEnlisted = new JPanel();
+        panSalaryEnlisted.add(spnSalaryEnlisted);
+        panSalaryEnlisted.add(new JLabel("Enlisted"));
+        panMultiplier.add(panSalaryEnlisted);
+
+        spnSalaryAntiMek = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
+        ((JSpinner.DefaultEditor) spnSalaryAntiMek.getEditor()).getTextField().setEditable(false);
+        JPanel panSalaryAntiMek = new JPanel();
+        panSalaryAntiMek.add(spnSalaryAntiMek);
+        panSalaryAntiMek.add(new JLabel("Anti-Mek"));
+        panMultiplier.add(panSalaryAntiMek);
+
+        panel.add(panMultiplier, gridBagConstraints);
+
+        JPanel panXpMultiplier = new JPanel(new GridLayout(2, 3));
+        panXpMultiplier.setBorder(BorderFactory.createTitledBorder("Experience Multipliers"));
+        spnSalaryXp = new JSpinner[5];
+        JSpinner spnXpSalary;
+        JPanel panXpSalary;
+        for (int i = 0; i < 5; i++) {
+            spnXpSalary = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
+            ((JSpinner.DefaultEditor) spnXpSalary.getEditor()).getTextField().setEditable(false);
+            panXpSalary = new JPanel();
+            panXpSalary.add(spnXpSalary);
+            panXpSalary.add(new JLabel(SkillType.getExperienceLevelName(i)));
+            panXpMultiplier.add(panXpSalary);
+            spnSalaryXp[i] = spnXpSalary;
+        }
+        gridBagConstraints.gridy = 1;
+        panel.add(panXpMultiplier, gridBagConstraints);
+
+        JPanel panAllTypes = new JPanel(new GridLayout(Person.T_NUM / 2, 2));
+        JPanel panType;
+        spnSalaryBase = new JSpinner[Person.T_NUM];
+        gridBagConstraints.gridx = 0;
+        for (int i = 1; i < Person.T_NUM; i++) {
+            panType = new JPanel(new GridBagLayout());
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.weightx = 1.0;
+            panType.add(new JLabel(Person.getRoleDesc(i, false)), gridBagConstraints);
+
+            JSpinner spnType = new JSpinner(new SpinnerNumberModel(0.0, 0.0, null, 10.0));
+            spnType.setMinimumSize(new Dimension(75, 20));
+            spnType.setPreferredSize(new Dimension(75, 25));
+            spnSalaryBase[i] = spnType;
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.weightx = 0.0;
+            panType.add(spnType, gridBagConstraints);
+            panAllTypes.add(panType);
+        }
+
+        JScrollPane scrSalaryBase = new JScrollPane(panAllTypes);
+        scrSalaryBase.setBorder(BorderFactory.createTitledBorder("Base Salaries"));
+        scrSalaryBase.setOpaque(false);
+        scrSalaryBase.setPreferredSize(new Dimension(200, 200));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panel.add(scrSalaryBase, gridBagConstraints);
 
         return panel;
     }
@@ -4350,171 +4516,6 @@ public class CampaignOptionsDialog extends JDialog {
         return panel;
     }
 
-    private JPanel createSalaryPanel() {
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("SalaryTab.text")));
-
-        JPanel panMultiplier = new JPanel(new GridLayout(1, 3));
-        panMultiplier.setBorder(BorderFactory.createTitledBorder("Multipliers"));
-        spnSalaryCommission = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
-        ((JSpinner.DefaultEditor) spnSalaryCommission.getEditor()).getTextField().setEditable(false);
-        JPanel panSalaryCommission = new JPanel();
-        panSalaryCommission.add(spnSalaryCommission);
-        panSalaryCommission.add(new JLabel("Commissioned"));
-        panMultiplier.add(panSalaryCommission);
-
-        spnSalaryEnlisted = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
-        ((JSpinner.DefaultEditor) spnSalaryEnlisted.getEditor()).getTextField().setEditable(false);
-        JPanel panSalaryEnlisted = new JPanel();
-        panSalaryEnlisted.add(spnSalaryEnlisted);
-        panSalaryEnlisted.add(new JLabel("Enlisted"));
-        panMultiplier.add(panSalaryEnlisted);
-
-        spnSalaryAntiMek = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
-        ((JSpinner.DefaultEditor) spnSalaryAntiMek.getEditor()).getTextField().setEditable(false);
-        JPanel panSalaryAntiMek = new JPanel();
-        panSalaryAntiMek.add(spnSalaryAntiMek);
-        panSalaryAntiMek.add(new JLabel("Anti-Mek"));
-        panMultiplier.add(panSalaryAntiMek);
-
-        panel.add(panMultiplier, gridBagConstraints);
-
-        JPanel panXpMultiplier = new JPanel(new GridLayout(2, 3));
-        panXpMultiplier.setBorder(BorderFactory.createTitledBorder("Experience Multipliers"));
-        spnSalaryXp = new JSpinner[5];
-        JSpinner spnXpSalary;
-        JPanel panXpSalary;
-        for (int i = 0; i < 5; i++) {
-            spnXpSalary = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
-            ((JSpinner.DefaultEditor) spnXpSalary.getEditor()).getTextField().setEditable(false);
-            panXpSalary = new JPanel();
-            panXpSalary.add(spnXpSalary);
-            panXpSalary.add(new JLabel(SkillType.getExperienceLevelName(i)));
-            panXpMultiplier.add(panXpSalary);
-            spnSalaryXp[i] = spnXpSalary;
-        }
-        gridBagConstraints.gridy = 1;
-        panel.add(panXpMultiplier, gridBagConstraints);
-
-        JPanel panAllTypes = new JPanel(new GridLayout(Person.T_NUM / 2, 2));
-        JPanel panType;
-        spnSalaryBase = new JSpinner[Person.T_NUM];
-        gridBagConstraints.gridx = 0;
-        for (int i = 1; i < Person.T_NUM; i++) {
-            panType = new JPanel(new GridBagLayout());
-
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.weightx = 1.0;
-            panType.add(new JLabel(Person.getRoleDesc(i, false)), gridBagConstraints);
-
-            JSpinner spnType = new JSpinner(new SpinnerNumberModel(0.0, 0.0, null, 10.0));
-            spnType.setMinimumSize(new Dimension(75, 20));
-            spnType.setPreferredSize(new Dimension(75, 25));
-            spnSalaryBase[i] = spnType;
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.weightx = 0.0;
-            panType.add(spnType, gridBagConstraints);
-            panAllTypes.add(panType);
-        }
-
-        JScrollPane scrSalaryBase = new JScrollPane(panAllTypes);
-        scrSalaryBase.setBorder(BorderFactory.createTitledBorder("Base Salaries"));
-        scrSalaryBase.setOpaque(false);
-        scrSalaryBase.setPreferredSize(new Dimension(200, 200));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panel.add(scrSalaryBase, gridBagConstraints);
-
-        return panel;
-    }
-
-    private JPanel createPrisonerPanel() {
-        comboPrisonerCaptureStyle = new JComboBox<>(PrisonerCaptureStyle.values());
-        comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
-            private static final long serialVersionUID = -543354619818226314L;
-
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (isSelected && (index > -1) && (list.getSelectedValue() instanceof PrisonerCaptureStyle)) {
-                    list.setToolTipText(((PrisonerCaptureStyle) list.getSelectedValue()).getToolTip());
-                }
-
-                return this;
-            }
-        });
-
-        JLabel prisonerCaptureStyleLabel = new JLabel(resources.getString("prisonerCaptureStyle.text"));
-
-        DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
-        prisonerStatusModel.removeElement(PrisonerStatus.FREE); // we don't want this as a standard use case for prisoners
-        comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
-
-        JLabel prisonerStatusLabel = new JLabel(resources.getString("prisonerStatus.text"));
-
-        chkPrisonerBabyStatus = new JCheckBox(resources.getString("prisonerBabyStatus.text"));
-        chkPrisonerBabyStatus.setToolTipText(resources.getString("prisonerBabyStatus.toolTipText"));
-        chkPrisonerBabyStatus.setName("chkPrisonerBabyStatus");
-
-        chkAtBPrisonerDefection = new JCheckBox(resources.getString("chkAtBPrisonerDefection.text"));
-        chkAtBPrisonerDefection.setToolTipText(resources.getString("chkAtBPrisonerDefection.toolTipText"));
-        chkAtBPrisonerDefection.setName("chkAtBPrisonerDefection");
-
-        chkAtBPrisonerRansom = new JCheckBox(resources.getString("chkAtBPrisonerRansom.text"));
-        chkAtBPrisonerRansom.setName("chkAtBPrisonerRansom");
-
-        // Layout the Panel
-        JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("panPrisoners.text")));
-        GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(prisonerCaptureStyleLabel)
-                                .addComponent(comboPrisonerCaptureStyle, GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(prisonerStatusLabel)
-                                .addComponent(comboPrisonerStatus, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkPrisonerBabyStatus)
-                        .addComponent(chkAtBPrisonerDefection)
-                        .addComponent(chkAtBPrisonerRansom)
-        );
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(prisonerCaptureStyleLabel)
-                                .addComponent(comboPrisonerCaptureStyle))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(prisonerStatusLabel)
-                                .addComponent(comboPrisonerStatus))
-                        .addComponent(chkPrisonerBabyStatus)
-                        .addComponent(chkAtBPrisonerDefection)
-                        .addComponent(chkAtBPrisonerRansom)
-        );
-
-        return panel;
-    }
-
     private JPanel createDeathPanel() {
         chkKeepMarriedNameUponSpouseDeath = new JCheckBox(resources.getString("keepMarriedNameUponSpouseDeath.text"));
 
@@ -4683,7 +4684,7 @@ public class CampaignOptionsDialog extends JDialog {
         //endregion Tech Limits Tab
 
         //region Personnel Tab
-        //General Personnel
+        // General Personnel
         useTacticsBox.setSelected(options.useTactics());
         useInitBonusBox.setSelected(options.useInitBonus());
         useToughnessBox.setSelected(options.useToughness());
@@ -4697,7 +4698,7 @@ public class CampaignOptionsDialog extends JDialog {
         altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
         chkUseTransfers.setSelected(options.useTransfers());
 
-        //Expanded Personnel Information
+        // Expanded Personnel Information
         chkUseTimeInService.setSelected(options.getUseTimeInService());
         comboTimeInServiceDisplayFormat.setSelectedItem(options.getTimeInServiceDisplayFormat());
         chkUseTimeInRank.setSelected(options.getUseTimeInRank());
@@ -4706,15 +4707,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkTrackTotalEarnings.setSelected(options.trackTotalEarnings());
         chkShowOriginFaction.setSelected(options.showOriginFaction());
 
-        //Personnel Randomization
-        useDylansRandomXpBox.setSelected(options.useDylansRandomXP());
-        chkRandomizeOrigin.setSelected(options.randomizeOrigin());
-        chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
-        spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
-        chkOriginExtraRandom.setSelected(options.isOriginExtraRandom());
-        spnOriginDistanceScale.setValue(options.getOriginDistanceScale());
-
-        //Medical
+        // Medical
         useAdvancedMedicalBox.setSelected(options.useAdvancedMedical());
         spnHealWaitingPeriod.setValue(options.getHealingWaitingPeriod());
         spnNaturalHealWaitingPeriod.setValue(options.getNaturalHealingWaitingPeriod());
@@ -4722,10 +4715,36 @@ public class CampaignOptionsDialog extends JDialog {
         useRandomHitsForVees.setSelected(options.useRandomHitsForVees());
         useTougherHealing.setSelected(options.useTougherHealing());
 
-        //Family
+        // Prisoners
+        comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
+        comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
+        chkPrisonerBabyStatus.setSelected(options.getPrisonerBabyStatus());
+        chkAtBPrisonerDefection.setSelected(options.useAtBPrisonerDefection());
+        chkAtBPrisonerRansom.setSelected(options.useAtBPrisonerRansom());
+
+        // Personnel Randomization
+        useDylansRandomXpBox.setSelected(options.useDylansRandomXP());
+        chkRandomizeOrigin.setSelected(options.randomizeOrigin());
+        chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
+        spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
+        chkOriginExtraRandom.setSelected(options.isOriginExtraRandom());
+        spnOriginDistanceScale.setValue(options.getOriginDistanceScale());
+
+        // Family
         comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
 
-        //Marriage
+        // Salary
+        spnSalaryCommission.setValue(options.getSalaryCommissionMultiplier());
+        spnSalaryEnlisted.setValue(options.getSalaryEnlistedMultiplier());
+        spnSalaryAntiMek.setValue(options.getSalaryAntiMekMultiplier());
+        for (int i = 0; i < spnSalaryXp.length; i++) {
+            spnSalaryXp[i].setValue(options.getSalaryXpMultiplier(i));
+        }
+        for (int i = 1; i < spnSalaryBase.length; i++) {
+            spnSalaryBase[i].setValue(options.getBaseSalary(i));
+        }
+
+        // Marriage
         chkUseManualMarriages.setSelected(options.useManualMarriages());
         spnMinimumMarriageAge.setValue(options.getMinimumMarriageAge());
         spnCheckMutualAncestorsDepth.setValue(options.checkMutualAncestorsDepth());
@@ -4739,7 +4758,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseRandomSameSexMarriages.setSelected(options.useRandomSameSexMarriages());
         spnChanceRandomSameSexMarriages.setValue(options.getChanceRandomSameSexMarriages() * 100.0);
 
-        //Procreation
+        // Procreation
         if (chkUseUnofficialProcreation.isSelected() != options.useUnofficialProcreation()) {
             chkUseUnofficialProcreation.doClick();
         }
@@ -4753,25 +4772,7 @@ public class CampaignOptionsDialog extends JDialog {
         comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
         chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
 
-        //Salary
-        spnSalaryCommission.setValue(options.getSalaryCommissionMultiplier());
-        spnSalaryEnlisted.setValue(options.getSalaryEnlistedMultiplier());
-        spnSalaryAntiMek.setValue(options.getSalaryAntiMekMultiplier());
-        for (int i = 0; i < spnSalaryXp.length; i++) {
-            spnSalaryXp[i].setValue(options.getSalaryXpMultiplier(i));
-        }
-        for (int i = 1; i < spnSalaryBase.length; i++) {
-            spnSalaryBase[i].setValue(options.getBaseSalary(i));
-        }
-
-        //Prisoners
-        comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
-        comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
-        chkPrisonerBabyStatus.setSelected(options.getPrisonerBabyStatus());
-        chkAtBPrisonerDefection.setSelected(options.useAtBPrisonerDefection());
-        chkAtBPrisonerRansom.setSelected(options.useAtBPrisonerRansom());
-
-        //Death
+        // Death
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
         //endregion Personnel Tab
 
@@ -5291,7 +5292,7 @@ public class CampaignOptionsDialog extends JDialog {
         }
 
         //region Personnel Tab
-        //General Personnel
+        // General Personnel
         options.setUseTactics(useTacticsBox.isSelected());
         campaign.getGameOptions().getOption("command_init").setValue(useTacticsBox.isSelected());
         options.setUseInitBonus(useInitBonusBox.isSelected());
@@ -5310,7 +5311,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
 
-        //Expanded Personnel Information
+        // Expanded Personnel Information
         options.setUseTimeInService(chkUseTimeInService.isSelected());
         options.setTimeInServiceDisplayFormat((TimeInDisplayFormat) comboTimeInServiceDisplayFormat.getSelectedItem());
         options.setUseTimeInRank(chkUseTimeInRank.isSelected());
@@ -5319,7 +5320,24 @@ public class CampaignOptionsDialog extends JDialog {
         options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
         options.setShowOriginFaction(chkShowOriginFaction.isSelected());
 
-        //Personnel Randomization
+        // Medical
+        options.setUseAdvancedMedical(useAdvancedMedicalBox.isSelected());
+        // we need to reset healing time options through the campaign because we may need to
+        // loop through personnel to make adjustments
+        campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getValue(),
+                (Integer) spnNaturalHealWaitingPeriod.getValue());
+        options.setMinimumHitsForVees((Integer) spnMinimumHitsForVees.getValue());
+        options.setUseRandomHitsForVees(useRandomHitsForVees.isSelected());
+        options.setTougherHealing(useTougherHealing.isSelected());
+
+        // Prisoners
+        options.setPrisonerCaptureStyle((PrisonerCaptureStyle) comboPrisonerCaptureStyle.getSelectedItem());
+        options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
+        options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
+        options.setUseAtBPrisonerDefection(chkAtBPrisonerDefection.isSelected());
+        options.setUseAtBPrisonerRansom(chkAtBPrisonerRansom.isSelected());
+
+        // Personnel Randomization
         options.setUseDylansRandomXP(useDylansRandomXpBox.isSelected());
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
         options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
@@ -5327,20 +5345,23 @@ public class CampaignOptionsDialog extends JDialog {
         options.setOriginExtraRandom(chkOriginExtraRandom.isSelected());
         options.setOriginDistanceScale((Double) spnOriginDistanceScale.getValue());
 
-        //Medical
-        options.setUseAdvancedMedical(useAdvancedMedicalBox.isSelected());
-        //we need to reset healing time options through the campaign because we may need to
-        //loop through personnel to make adjustments
-        campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getValue(),
-                (Integer) spnNaturalHealWaitingPeriod.getValue());
-        options.setMinimumHitsForVees((Integer) spnMinimumHitsForVees.getValue());
-        options.setUseRandomHitsForVees(useRandomHitsForVees.isSelected());
-        options.setTougherHealing(useTougherHealing.isSelected());
-
-        //Family
+        // Family
         options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
 
-        //Marriage
+        // Salary
+        options.setSalaryCommissionMultiplier((Double) spnSalaryCommission.getValue());
+        options.setSalaryEnlistedMultiplier((Double) spnSalaryEnlisted.getValue());
+        options.setSalaryAntiMekMultiplier((Double) spnSalaryAntiMek.getValue());
+        for (int i = 0; i < spnSalaryXp.length; i++) {
+            options.setSalaryXpMultiplier((Double) spnSalaryXp[i].getValue(), i);
+        }
+        for (int i = 1; i < Person.T_NUM; i++) {
+            try {
+                options.setBaseSalary(i, (double) spnSalaryBase[i].getValue());
+            } catch (Exception ignored) { }
+        }
+
+        // Marriage
         options.setUseManualMarriages(chkUseManualMarriages.isSelected());
         options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getValue());
         options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getValue());
@@ -5355,7 +5376,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
         options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getValue() / 100.0);
 
-        //Procreation
+        // Procreation
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
         options.setChanceProcreation((Double) spnChanceProcreation.getValue() / 100.0);
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
@@ -5365,27 +5386,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
         options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
 
-        //Salary
-        options.setSalaryCommissionMultiplier((Double) spnSalaryCommission.getValue());
-        options.setSalaryEnlistedMultiplier((Double) spnSalaryEnlisted.getValue());
-        options.setSalaryAntiMekMultiplier((Double) spnSalaryAntiMek.getValue());
-        for (int i = 0; i < spnSalaryXp.length; i++) {
-            options.setSalaryXpMultiplier((Double) spnSalaryXp[i].getValue(), i);
-        }
-        for (int i = 1; i < Person.T_NUM; i++) {
-            try {
-                options.setBaseSalary(i, (double) spnSalaryBase[i].getValue());
-            } catch (Exception ignored) { }
-        }
-
-        //Prisoners
-        options.setPrisonerCaptureStyle((PrisonerCaptureStyle) comboPrisonerCaptureStyle.getSelectedItem());
-        options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
-        options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
-        options.setUseAtBPrisonerDefection(chkAtBPrisonerDefection.isSelected());
-        options.setUseAtBPrisonerRansom(chkAtBPrisonerRansom.isSelected());
-
-        //Death
+        // Death
         options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
         //endregion Personnel Tab
 
