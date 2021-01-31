@@ -2287,7 +2287,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
 
-                if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation()
+                if (gui.getCampaign().getCampaignOptions().useProcreation()
                         && person.getGender().isFemale()) {
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
                     cbMenuItem.setToolTipText(resourceMap.getString("tryingToConceive.toolTipText"));
@@ -2486,7 +2486,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                     menu.add(cbMenuItem);
                 }
 
-                if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation()
+                if (gui.getCampaign().getCampaignOptions().useProcreation()
                         && StaticChecks.areAllFemale(selected)
                         && StaticChecks.areEitherAllTryingToConceiveOrNot(selected)) {
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));

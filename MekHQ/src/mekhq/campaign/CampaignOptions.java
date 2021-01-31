@@ -232,7 +232,7 @@ public class CampaignOptions implements Serializable {
     private double salaryCommissionMultiplier;
     private double salaryEnlistedMultiplier;
     private double salaryAntiMekMultiplier;
-    private double[] salaryXpMultiplier;
+    private double[] salaryXPMultiplier;
     private Money[] salaryTypeBase;
 
     // Marriage
@@ -574,12 +574,12 @@ public class CampaignOptions implements Serializable {
         salaryCommissionMultiplier = 1.2;
         salaryEnlistedMultiplier = 1.0;
         salaryAntiMekMultiplier = 1.5;
-        salaryXpMultiplier = new double[5];
-        salaryXpMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
-        salaryXpMultiplier[SkillType.EXP_GREEN] = 0.6;
-        salaryXpMultiplier[SkillType.EXP_REGULAR] = 1.0;
-        salaryXpMultiplier[SkillType.EXP_VETERAN] = 1.6;
-        salaryXpMultiplier[SkillType.EXP_ELITE] = 3.2;
+        salaryXPMultiplier = new double[5];
+        salaryXPMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
+        salaryXPMultiplier[SkillType.EXP_GREEN] = 0.6;
+        salaryXPMultiplier[SkillType.EXP_REGULAR] = 1.0;
+        salaryXPMultiplier[SkillType.EXP_VETERAN] = 1.6;
+        salaryXPMultiplier[SkillType.EXP_ELITE] = 3.2;
         salaryTypeBase = new Money[Person.T_NUM];
         salaryTypeBase[Person.T_NONE] = Money.of(0);
         salaryTypeBase[Person.T_MECHWARRIOR] = Money.of(1500);
@@ -1319,15 +1319,15 @@ public class CampaignOptions implements Serializable {
         this.salaryAntiMekMultiplier = salaryAntiMekMultiplier;
     }
 
-    public double getSalaryXpMultiplier(int xp) {
-        return ((xp < 0) || (xp >= salaryXpMultiplier.length)) ? 1.0 : salaryXpMultiplier[xp];
+    public double getSalaryXPMultiplier(int xp) {
+        return ((xp < 0) || (xp >= salaryXPMultiplier.length)) ? 1.0 : salaryXPMultiplier[xp];
     }
 
-    public void setSalaryXpMultiplier(double d, int xp) {
-        if ((xp < 0) || (xp >= salaryXpMultiplier.length)) {
+    public void setSalaryXPMultiplier(double d, int xp) {
+        if ((xp < 0) || (xp >= salaryXPMultiplier.length)) {
             return;
         }
-        this.salaryXpMultiplier[xp] = d;
+        this.salaryXPMultiplier[xp] = d;
     }
 
     public double getBaseSalary(int type) {
@@ -1513,7 +1513,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @return whether or not to use unofficial procreation
      */
-    public boolean useUnofficialProcreation() {
+    public boolean useProcreation() {
         return useProcreation;
     }
 
@@ -1541,9 +1541,9 @@ public class CampaignOptions implements Serializable {
     }
 
     /**
-     * @return whether or not to use unofficial procreation without a relationship
+     * @return whether or not to use procreation without a relationship
      */
-    public boolean useUnofficialProcreationNoRelationship() {
+    public boolean useProcreationNoRelationship() {
         return useProcreationNoRelationship;
     }
 
@@ -3180,7 +3180,7 @@ public class CampaignOptions implements Serializable {
         //endregion Prisoners
 
         //region Personnel Randomization
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useDylansRandomXp", useDylansRandomXP());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useDylansRandomXP", useDylansRandomXP());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "randomizeOrigin", randomizeOrigin());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "randomizeDependentOrigin", getRandomizeDependentOrigin());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "originSearchRadius", getOriginSearchRadius());
@@ -3196,7 +3196,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryXpMultiplier", salaryXpMultiplier);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryXPMultiplier", salaryXPMultiplier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salaryTypeBase", Utilities.printMoneyArray(salaryTypeBase));
         //endregion Salary
 
@@ -3214,9 +3214,9 @@ public class CampaignOptions implements Serializable {
         //endregion Marriage
 
         //region Procreation
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useUnofficialProcreation", useUnofficialProcreation());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useProcreation", useProcreation());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "chanceProcreation", getChanceProcreation());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useProcreationNoRelationship", useProcreationNoRelationship());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "chanceProcreationNoRelationship", getChanceProcreationNoRelationship());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "displayTrueDueDate", getDisplayTrueDueDate());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "logConception", logConception());
@@ -3625,9 +3625,11 @@ public class CampaignOptions implements Serializable {
                 retVal.setHealingWaitingPeriod(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("naturalHealingWaitingPeriod")) {
                 retVal.setNaturalHealingWaitingPeriod(Integer.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees") // Legacy - 0.49.1 removal
+                    || wn2.getNodeName().equalsIgnoreCase("minimumHitsForVehicles")) {
                 retVal.setMinimumHitsForVehicles(Integer.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees") // Legacy - 0.49.1 removal
+                    || wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVehicles")) {
                 retVal.setUseRandomHitsForVehicles(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
                 retVal.setTougherHealing(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -3655,7 +3657,7 @@ public class CampaignOptions implements Serializable {
             //endregion Prisoners
 
             //region Personnel Randomization
-            } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXp")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXP")) {
                 retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent()));
             } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) {
                 retVal.setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent()));
@@ -3681,10 +3683,10 @@ public class CampaignOptions implements Serializable {
                 retVal.setSalaryEnlistedMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                 retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
-                    retVal.salaryXpMultiplier[i] = Double.parseDouble(values[i]);
+                    retVal.salaryXPMultiplier[i] = Double.parseDouble(values[i]);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
                 // CAW: we need at least the correct number of salaries as are expected in this version,
@@ -3725,11 +3727,13 @@ public class CampaignOptions implements Serializable {
             //endregion Marriage
 
             //region Procreation
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation") // Legacy - 0.49.1 removal
+                    || wn2.getNodeName().equalsIgnoreCase("useProcreation")) {
                 retVal.setUseProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) {
                 retVal.setChanceProcreation(Double.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship") // Legacy - 0.49.1 removal
+                    || wn2.getNodeName().equalsIgnoreCase("useProcreationNoRelationship")) {
                 retVal.setUseProcreationNoRelationship(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
                 retVal.setChanceProcreationNoRelationship(Double.parseDouble(wn2.getTextContent().trim()));

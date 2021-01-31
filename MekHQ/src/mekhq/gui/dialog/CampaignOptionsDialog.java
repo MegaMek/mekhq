@@ -258,7 +258,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkAtBPrisonerRansom;
 
     // Personnel Randomization
-    private JCheckBox chkUseDylansRandomExperience;
+    private JCheckBox chkUseDylansRandomXP;
     private JCheckBox chkRandomizeOrigin;
     private JCheckBox chkRandomizeDependentsOrigin;
     private JSpinner spnOriginSearchRadius;
@@ -4108,9 +4108,9 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createPersonnelRandomizationPanel() {
-        chkUseDylansRandomExperience = new JCheckBox(resources.getString("chkUseDylansRandomExperience.text"));
-        chkUseDylansRandomExperience.setToolTipText(resources.getString("chkUseDylansRandomExperience.toolTipText"));
-        chkUseDylansRandomExperience.setName("chkUseDylansRandomExperience");
+        chkUseDylansRandomXP = new JCheckBox(resources.getString("chkUseDylansRandomXP.text"));
+        chkUseDylansRandomXP.setToolTipText(resources.getString("chkUseDylansRandomXP.toolTipText"));
+        chkUseDylansRandomXP.setName("chkUseDylansRandomXP");
 
         chkRandomizeOrigin = new JCheckBox(resources.getString("chkRandomizeOrigin.text"));
         chkRandomizeOrigin.setName("chkRandomizeOrigin");
@@ -4148,7 +4148,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(chkUseDylansRandomExperience)
+                        .addComponent(chkUseDylansRandomXP)
                         .addComponent(chkRandomizeOrigin)
                         .addComponent(chkRandomizeDependentsOrigin)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -4162,7 +4162,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(chkUseDylansRandomExperience)
+                        .addComponent(chkUseDylansRandomXP)
                         .addComponent(chkRandomizeOrigin)
                         .addComponent(chkRandomizeDependentsOrigin)
                         .addGroup(layout.createSequentialGroup()
@@ -4881,7 +4881,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkAtBPrisonerRansom.setSelected(options.useAtBPrisonerRansom());
 
         // Personnel Randomization
-        chkUseDylansRandomExperience.setSelected(options.useDylansRandomXP());
+        chkUseDylansRandomXP.setSelected(options.useDylansRandomXP());
         chkRandomizeOrigin.setSelected(options.randomizeOrigin());
         chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
         spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
@@ -4896,7 +4896,7 @@ public class CampaignOptionsDialog extends JDialog {
         spnEnlistedSalary.setValue(options.getSalaryEnlistedMultiplier());
         spnAntiMekSalary.setValue(options.getSalaryAntiMekMultiplier());
         for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
-            spnSalaryExperienceMultipliers[i].setValue(options.getSalaryXpMultiplier(i));
+            spnSalaryExperienceMultipliers[i].setValue(options.getSalaryXPMultiplier(i));
         }
         for (int i = 1; i < spnBaseSalary.length; i++) {
             spnBaseSalary[i].setValue(options.getBaseSalary(i));
@@ -4921,11 +4921,11 @@ public class CampaignOptionsDialog extends JDialog {
         spnChanceRandomSameSexMarriages.setValue(options.getChanceRandomSameSexMarriages() * 100.0);
 
         // Procreation
-        if (chkUseProcreation.isSelected() != options.useUnofficialProcreation()) {
+        if (chkUseProcreation.isSelected() != options.useProcreation()) {
             chkUseProcreation.doClick();
         }
         spnChanceProcreation.setValue(options.getChanceProcreation() * 100.0);
-        if (chkUseProcreationNoRelationship.isSelected() != options.useUnofficialProcreationNoRelationship()) {
+        if (chkUseProcreationNoRelationship.isSelected() != options.useProcreationNoRelationship()) {
             chkUseProcreationNoRelationship.doClick();
         }
         spnChanceProcreationNoRelationship.setValue(options.getChanceProcreationNoRelationship() * 100.0);
@@ -5500,7 +5500,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setUseAtBPrisonerRansom(chkAtBPrisonerRansom.isSelected());
 
         // Personnel Randomization
-        options.setUseDylansRandomXP(chkUseDylansRandomExperience.isSelected());
+        options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
         options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
         options.setOriginSearchRadius((Integer) spnOriginSearchRadius.getValue());
@@ -5515,7 +5515,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setSalaryEnlistedMultiplier((Double) spnEnlistedSalary.getValue());
         options.setSalaryAntiMekMultiplier((Double) spnAntiMekSalary.getValue());
         for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
-            options.setSalaryXpMultiplier((Double) spnSalaryExperienceMultipliers[i].getValue(), i);
+            options.setSalaryXPMultiplier((Double) spnSalaryExperienceMultipliers[i].getValue(), i);
         }
         for (int i = 1; i < Person.T_NUM; i++) {
             try {
