@@ -262,7 +262,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkRandomizeOrigin;
     private JCheckBox chkRandomizeDependentsOrigin;
     private JSpinner spnOriginSearchRadius;
-    private JCheckBox chkOriginExtraRandom;
+    private JCheckBox chkExtraRandomOrigin;
     private JSpinner spnOriginDistanceScale;
 
     // Family
@@ -4124,9 +4124,9 @@ public class CampaignOptionsDialog extends JDialog {
         spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(50, 10, 250, 10));
         spnOriginSearchRadius.setName("spnOriginSearchRadius");
 
-        chkOriginExtraRandom = new JCheckBox(resources.getString("chkOriginExtraRandom.text"));
-        chkOriginExtraRandom.setToolTipText(resources.getString("chkOriginExtraRandom.toolTipText"));
-        chkOriginExtraRandom.setName("chkOriginExtraRandom");
+        chkExtraRandomOrigin = new JCheckBox(resources.getString("chkExtraRandomOrigin.text"));
+        chkExtraRandomOrigin.setToolTipText(resources.getString("chkExtraRandomOrigin.toolTipText"));
+        chkExtraRandomOrigin.setName("chkExtraRandomOrigin");
 
         JLabel lblOriginDistanceScale = new JLabel(resources.getString("lblOriginDistanceScale.text"));
         lblOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
@@ -4154,7 +4154,7 @@ public class CampaignOptionsDialog extends JDialog {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblOriginSearchRadius)
                                 .addComponent(spnOriginSearchRadius, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkOriginExtraRandom)
+                        .addComponent(chkExtraRandomOrigin)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblOriginDistanceScale)
                                 .addComponent(spnOriginDistanceScale, GroupLayout.Alignment.LEADING))
@@ -4168,7 +4168,7 @@ public class CampaignOptionsDialog extends JDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblOriginSearchRadius)
                                 .addComponent(spnOriginSearchRadius))
-                        .addComponent(chkOriginExtraRandom)
+                        .addComponent(chkExtraRandomOrigin)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblOriginDistanceScale)
                                 .addComponent(spnOriginDistanceScale))
@@ -4491,6 +4491,10 @@ public class CampaignOptionsDialog extends JDialog {
         spnChanceRandomSameSexMarriages.setToolTipText(resources.getString("lblChanceRandomSameSexMarriages.toolTipText"));
         spnChanceRandomSameSexMarriages.setName("spnChanceRandomSameSexMarriages");
 
+        // Disable the panel as default
+        chkUseRandomMarriages.setEnabled(true);
+        chkUseRandomMarriages.doClick();
+
         // Layout the Panel
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomMarriagePanel.title")));
@@ -4614,6 +4618,10 @@ public class CampaignOptionsDialog extends JDialog {
         chkDetermineFatherAtBirth = new JCheckBox(resources.getString("chkDetermineFatherAtBirth.text"));
         chkDetermineFatherAtBirth.setToolTipText(resources.getString("chkDetermineFatherAtBirth.toolTipText"));
         chkDetermineFatherAtBirth.setName("chkDetermineFatherAtBirth");
+
+        // Disable the panel as default
+        chkUseProcreation.setEnabled(true);
+        chkUseProcreation.doClick();
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -4836,7 +4844,7 @@ public class CampaignOptionsDialog extends JDialog {
         //region Personnel Tab
         // General Personnel
         chkUseTactics.setSelected(options.useTactics());
-        chkUseInitiativeBonus.setSelected(options.useInitBonus());
+        chkUseInitiativeBonus.setSelected(options.useInitiativeBonus());
         chkUseToughness.setSelected(options.useToughness());
         chkUseArtillery.setSelected(options.useArtillery());
         chkUseAbilities.setSelected(options.useAbilities());
@@ -4845,7 +4853,7 @@ public class CampaignOptionsDialog extends JDialog {
         }
         chkUseSupportEdge.setSelected(options.useSupportEdge());
         chkUseImplants.setSelected(options.useImplants());
-        chkUseAlternativeQualityAveraging.setSelected(options.useAltQualityAveraging());
+        chkUseAlternativeQualityAveraging.setSelected(options.useAlternativeQualityAveraging());
         chkUseTransfers.setSelected(options.useTransfers());
 
         // Expanded Personnel Information
@@ -4877,7 +4885,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkRandomizeOrigin.setSelected(options.randomizeOrigin());
         chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
         spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
-        chkOriginExtraRandom.setSelected(options.isOriginExtraRandom());
+        chkExtraRandomOrigin.setSelected(options.extraRandomOrigin());
         spnOriginDistanceScale.setValue(options.getOriginDistanceScale());
 
         // Family
@@ -4905,7 +4913,7 @@ public class CampaignOptionsDialog extends JDialog {
         spnChanceRandomMarriages.setValue(options.getChanceRandomMarriages() * 100.0);
         spnMarriageAgeRange.setValue(options.getMarriageAgeRange());
         for (int i = 0; i < spnMarriageSurnameWeights.length; i++) {
-            spnMarriageSurnameWeights[i].setValue(options.getRandomMarriageSurnameWeights(i) / 10.0);
+            spnMarriageSurnameWeights[i].setValue(options.getMarriageSurnameWeights(i) / 10.0);
         }
         if (chkUseRandomSameSexMarriages.isSelected() != options.useRandomSameSexMarriages()) {
             chkUseRandomSameSexMarriages.doClick();
@@ -5449,7 +5457,7 @@ public class CampaignOptionsDialog extends JDialog {
         // General Personnel
         options.setUseTactics(chkUseTactics.isSelected());
         campaign.getGameOptions().getOption("command_init").setValue(chkUseTactics.isSelected());
-        options.setUseInitBonus(chkUseInitiativeBonus.isSelected());
+        options.setUseInitiativeBonus(chkUseInitiativeBonus.isSelected());
         campaign.getGameOptions().getOption("individual_initiative").setValue(chkUseInitiativeBonus.isSelected());
         options.setUseToughness(chkUseToughness.isSelected());
         campaign.getGameOptions().getOption("toughness").setValue(chkUseToughness.isSelected());
@@ -5462,7 +5470,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setUseSupportEdge(chkUseEdge.isSelected() && chkUseSupportEdge.isSelected());
         options.setUseImplants(chkUseImplants.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(chkUseImplants.isSelected());
-        options.setAltQualityAveraging(chkUseAlternativeQualityAveraging.isSelected());
+        options.setAlternativeQualityAveraging(chkUseAlternativeQualityAveraging.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
 
         // Expanded Personnel Information
@@ -5496,7 +5504,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
         options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
         options.setOriginSearchRadius((Integer) spnOriginSearchRadius.getValue());
-        options.setOriginExtraRandom(chkOriginExtraRandom.isSelected());
+        options.setExtraRandomOrigin(chkExtraRandomOrigin.isSelected());
         options.setOriginDistanceScale((Double) spnOriginDistanceScale.getValue());
 
         // Family
@@ -5525,15 +5533,15 @@ public class CampaignOptionsDialog extends JDialog {
         options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getValue());
         for (int i = 0; i < spnMarriageSurnameWeights.length; i++) {
             int val = (int) Math.round(((Double) spnMarriageSurnameWeights[i].getValue()) * 10);
-            options.setRandomMarriageSurnameWeight(i, val);
+            options.setMarriageSurnameWeight(i, val);
         }
         options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
         options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getValue() / 100.0);
 
         // Procreation
-        options.setUseUnofficialProcreation(chkUseProcreation.isSelected());
+        options.setUseProcreation(chkUseProcreation.isSelected());
         options.setChanceProcreation((Double) spnChanceProcreation.getValue() / 100.0);
-        options.setUseUnofficialProcreationNoRelationship(chkUseProcreationNoRelationship.isSelected());
+        options.setUseProcreationNoRelationship(chkUseProcreationNoRelationship.isSelected());
         options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getValue() / 100.0);
         options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
         options.setLogConception(chkLogConception.isSelected());

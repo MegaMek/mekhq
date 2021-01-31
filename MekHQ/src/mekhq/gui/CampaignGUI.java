@@ -2726,7 +2726,7 @@ public class CampaignGUI extends JPanel {
 
     private void setCampaignOptionsFromGameOptions() {
         getCampaign().getCampaignOptions().setUseTactics(getCampaign().getGameOptions().getOption("command_init").booleanValue());
-        getCampaign().getCampaignOptions().setUseInitBonus(getCampaign().getGameOptions().getOption("individual_initiative").booleanValue());
+        getCampaign().getCampaignOptions().setUseInitiativeBonus(getCampaign().getGameOptions().getOption("individual_initiative").booleanValue());
         getCampaign().getCampaignOptions().setUseToughness(getCampaign().getGameOptions().getOption("toughness").booleanValue());
         getCampaign().getCampaignOptions().setUseArtillery(getCampaign().getGameOptions().getOption("artillery_skill").booleanValue());
         getCampaign().getCampaignOptions().setUseAbilities(getCampaign().getGameOptions().getOption("pilot_advantages").booleanValue());

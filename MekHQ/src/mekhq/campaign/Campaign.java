@@ -1539,7 +1539,7 @@ public class Campaign implements Serializable, ITechManager {
         if (getCampaignOptions().randomizeOrigin()) {
             RangedPlanetSelector selector =
                     new RangedPlanetSelector(getCampaignOptions().getOriginSearchRadius(),
-                            getCampaignOptions().isOriginExtraRandom());
+                            getCampaignOptions().extraRandomOrigin());
             selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
             return selector;
         } else {

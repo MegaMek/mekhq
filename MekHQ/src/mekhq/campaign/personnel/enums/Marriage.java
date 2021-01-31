@@ -227,7 +227,7 @@ public enum Marriage {
     private WeightedMap<Marriage> createWeightedSurnameMap(Campaign campaign) {
         WeightedMap<Marriage> map = new WeightedMap<>();
 
-        int[] weights = campaign.getCampaignOptions().getRandomMarriageSurnameWeights();
+        int[] weights = campaign.getCampaignOptions().getMarriageSurnameWeights();
         Marriage[] styles = Marriage.values();
         for (int i = 0; i < (styles.length - 1); i++) {
             map.add(weights[i], styles[i]);
