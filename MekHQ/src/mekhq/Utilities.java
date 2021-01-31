@@ -580,8 +580,8 @@ public class Utilities {
             for (Person p : newCrew) {
                 for (int i = 0; i < casualties; i++) {
                     if(Compute.d6(2) >= 7) {
-                        int hits = c.getCampaignOptions().getMinimumHitsForVees();
-                        if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVees()) {
+                        int hits = c.getCampaignOptions().getMinimumHitsForVehicles();
+                        if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVehicles()) {
                             int range = 6 - hits;
                             hits = hits + Compute.randomInt(range);
                         }
@@ -1154,7 +1154,7 @@ public class Utilities {
             assignTroopersAndEquipmentNums(unit);
             return;
         }
-        
+
         Map<Integer, Part> partMap = new HashMap<>();
         List<Integer> equipNums = new ArrayList<>();
         for (Mounted m : unit.getEntity().getEquipment()) {

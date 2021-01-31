@@ -652,8 +652,8 @@ public class ResolveScenarioTracker {
                             }
                         }
                         if (wounded) {
-                            int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                            if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                            int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                            if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
                                 int range = 6 - hits;
                                 hits = hits + Compute.randomInt(range);
                             }
@@ -755,8 +755,8 @@ public class ResolveScenarioTracker {
                 }
             }
             if (wounded) {
-                int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
                     int range = 6 - hits;
                     hits = hits + Compute.randomInt(range);
                 }
@@ -794,8 +794,8 @@ public class ResolveScenarioTracker {
                                 status.setDead(true);
                             }
                             if (wounded) {
-                                int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                                int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
                                     int range = 6 - hits;
                                     hits = hits + Compute.randomInt(range);
                                 }
@@ -1031,8 +1031,8 @@ public class ResolveScenarioTracker {
                         }
                     }
                     if (wounded) {
-                        int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                        if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                        int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
+                        if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
                             int range = 6 - hits;
                             hits = hits + Compute.randomInt(range);
                         }

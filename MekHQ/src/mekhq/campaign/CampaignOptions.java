@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) - 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
@@ -206,8 +207,8 @@ public class CampaignOptions implements Serializable {
     private boolean useAdvancedMedical; // Unofficial
     private int healWaitingPeriod;
     private int naturalHealingWaitingPeriod;
-    private int minimumHitsForVees;
-    private boolean useRandomHitsForVees;
+    private int minimumHitsForVehicles;
+    private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
 
     // Prisoners
@@ -548,8 +549,8 @@ public class CampaignOptions implements Serializable {
         useAdvancedMedical = false;
         healWaitingPeriod = 1;
         naturalHealingWaitingPeriod = 15;
-        minimumHitsForVees = 1;
-        useRandomHitsForVees = false;
+        minimumHitsForVehicles = 1;
+        useRandomHitsForVehicles = false;
         tougherHealing = false;
 
         // Prisoners
@@ -1120,20 +1121,20 @@ public class CampaignOptions implements Serializable {
         naturalHealingWaitingPeriod = d;
     }
 
-    public int getMinimumHitsForVees() {
-        return minimumHitsForVees;
+    public int getMinimumHitsForVehicles() {
+        return minimumHitsForVehicles;
     }
 
-    public void setMinimumHitsForVees(int d) {
-        minimumHitsForVees = d;
+    public void setMinimumHitsForVehicles(int d) {
+        minimumHitsForVehicles = d;
     }
 
-    public boolean useRandomHitsForVees() {
-        return useRandomHitsForVees;
+    public boolean useRandomHitsForVehicles() {
+        return useRandomHitsForVehicles;
     }
 
-    public void setUseRandomHitsForVees(boolean b) {
-        useRandomHitsForVees = b;
+    public void setUseRandomHitsForVehicles(boolean b) {
+        useRandomHitsForVehicles = b;
     }
 
     public boolean useTougherHealing() {
@@ -3167,8 +3168,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAdvancedMedical", useAdvancedMedical());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "healWaitingPeriod", getHealingWaitingPeriod());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "naturalHealingWaitingPeriod", getNaturalHealingWaitingPeriod());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "minimumHitsForVees", getMinimumHitsForVees());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useRandomHitsForVees", useRandomHitsForVees());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "minimumHitsForVees", getMinimumHitsForVehicles());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useRandomHitsForVees", useRandomHitsForVehicles());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "tougherHealing", useTougherHealing());
         //endregion Medical
 
@@ -3624,10 +3625,10 @@ public class CampaignOptions implements Serializable {
                 retVal.setHealingWaitingPeriod(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("naturalHealingWaitingPeriod")) {
                 retVal.setNaturalHealingWaitingPeriod(Integer.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
-                retVal.setUseRandomHitsForVees(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees")) {
-                retVal.setMinimumHitsForVees(Integer.parseInt(wn2.getTextContent().trim()));
+                retVal.setMinimumHitsForVehicles(Integer.parseInt(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
+                retVal.setUseRandomHitsForVehicles(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
                 retVal.setTougherHealing(Boolean.parseBoolean(wn2.getTextContent().trim()));
             //endregion Medical
