@@ -500,13 +500,13 @@ public class Utilities {
 
     public static int generateExpLevel(int bonus) {
         int roll = Compute.d6(2) + bonus;
-        if (roll < 2) {
+        if (roll <= 2) {
             return SkillType.EXP_ULTRA_GREEN;
         } else if (roll < 6) {
             return SkillType.EXP_GREEN;
-        } else if(roll < 10) {
+        } else if (roll < 10) {
             return SkillType.EXP_REGULAR;
-        } else if(roll < 12) {
+        } else if (roll < 12) {
             return SkillType.EXP_VETERAN;
         } else {
             return SkillType.EXP_ELITE;
@@ -1154,7 +1154,7 @@ public class Utilities {
             assignTroopersAndEquipmentNums(unit);
             return;
         }
-        
+
         Map<Integer, Part> partMap = new HashMap<>();
         List<Integer> equipNums = new ArrayList<>();
         for (Mounted m : unit.getEntity().getEquipment()) {
