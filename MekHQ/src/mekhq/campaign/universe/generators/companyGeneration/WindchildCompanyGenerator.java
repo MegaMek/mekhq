@@ -18,6 +18,9 @@
  */
 package mekhq.campaign.universe.generators.companyGeneration;
 
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.enums.CompanyGenerationType;
 
 public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
@@ -26,4 +29,24 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
         super(CompanyGenerationType.WINDCHILD);
     }
     //endregion Constructors
+
+    @Override
+    protected void generateCommandingOfficer(Person commandingOfficer, int numMechWarriors) {
+        commandingOfficer.setCommander(true);
+        commandingOfficer.improveSkill(SkillType.S_GUN_MECH);
+        commandingOfficer.improveSkill(SkillType.S_PILOT_MECH);
+        assignRandomOfficerSkillIncrease(commandingOfficer, 2);
+
+        if (getOptions().isAutomaticallyAssignRanks()) {
+            if (numMechWarriors > 36) {
+                commandingOfficer.setRankLevel(Ranks.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 8));
+            } else if (numMechWarriors > 12) {
+                commandingOfficer.setRankLevel(Ranks.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 5));
+            } else if (numMechWarriors > 4) {
+                commandingOfficer.setRankLevel(Ranks.RWO_MAX + 4);
+            } else {
+                commandingOfficer.setRankLevel(Ranks.RWO_MAX + 3);
+            }
+        }
+    }
 }

@@ -792,13 +792,20 @@ public class Campaign implements Serializable, ITechManager {
         scenarios.put(scenario.getId(), scenario);
     }
 
+    public void addUnitToForce(final @Nullable Unit unit, final Force force) {
+        addUnitToForce(unit, force.getId());
+    }
+
     /**
      * Add unit to an existing force. This method will also assign that force's id to the unit.
      *
      * @param u
      * @param id
      */
-    public void addUnitToForce(Unit u, int id) {
+    public void addUnitToForce(@Nullable Unit u, int id) {
+        if (u == null) {
+            return;
+        }
         Force prevForce = forceIds.get(u.getForceId());
         if (null != prevForce) {
             prevForce.removeUnit(u.getId());

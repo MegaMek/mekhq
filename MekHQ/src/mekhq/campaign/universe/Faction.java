@@ -105,7 +105,11 @@ public class Faction {
     }
 
     public boolean isComStar() {
-        return "CS".equals(shortName);
+        return "CS".equals(getShortName());
+    }
+
+    public boolean isComStarOrWoB() {
+        return isComStar() || "WoB".equals(getShortName());
     }
 
     public boolean isPeriphery() {

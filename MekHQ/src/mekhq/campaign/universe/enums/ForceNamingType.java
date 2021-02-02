@@ -19,55 +19,37 @@
 package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.universe.generators.companyGeneration.AbstractCompanyGenerator;
-import mekhq.campaign.universe.generators.companyGeneration.AtBCompanyGenerator;
-import mekhq.campaign.universe.generators.companyGeneration.WindchildCompanyGenerator;
 
 import java.util.ResourceBundle;
 
-public enum CompanyGenerationType {
+public enum ForceNamingType {
     //region Enum Declarations
-    AGAINST_THE_BOT("CompanyGenerationType.AGAINST_THE_BOT.text", "CompanyGenerationType.AGAINST_THE_BOT.toolTipText"),
-    WINDCHILD("CompanyGenerationType.WINDCHILD.text", "CompanyGenerationType.WINDCHILD.toolTipText");
+    CCB_1943("ForceNamingType.CCB_1943.text"),
+    ICAO_1956("ForceNamingType.ICAO_1956.text"),
+    GREEK_ALPHABET("ForceNamingType.GREEK_ALPHABET.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
-    private final String toolTipText;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    CompanyGenerationType(String name, String toolTipText) {
+    ForceNamingType(String name) {
         this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
 
-    //region Getters
-    public String getToolTipText() {
-        return toolTipText;
-    }
-    //endregion Getters
-
-    //region Boolean Comparisons
-    public boolean isAtB() {
-        return this == AGAINST_THE_BOT;
-    }
-
-    public boolean isWindchild() {
-        return this == WINDCHILD;
-    }
-    //endregion Boolean Comparisons
-
-    public AbstractCompanyGenerator getGenerator() {
+    public String getValue(Alphabet alphabet) {
         switch (this) {
-            case WINDCHILD:
-                return new WindchildCompanyGenerator();
-            case AGAINST_THE_BOT:
+            case ICAO_1956:
+                return alphabet.getICAO1956();
+            case GREEK_ALPHABET:
+                return alphabet.getGreek();
+            case CCB_1943:
             default:
-                return new AtBCompanyGenerator();
+                return alphabet.getCCB1943();
         }
     }
 

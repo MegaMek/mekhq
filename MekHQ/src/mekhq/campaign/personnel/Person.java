@@ -2819,9 +2819,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return skills;
     }
 
-    @Nullable
-    public Skill getSkill(String skillName) {
+    public @Nullable Skill getSkill(String skillName) {
         return skills.getSkill(skillName);
+    }
+
+    public int getSkillLevel(String skillName) {
+        final Skill skill = getSkill(skillName);
+        return (skill == null) ? 0 : skill.getExperienceLevel();
     }
 
     public void addSkill(String skillName, Skill skill) {

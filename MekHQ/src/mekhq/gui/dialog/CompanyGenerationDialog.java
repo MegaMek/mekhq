@@ -19,25 +19,26 @@
 package mekhq.gui.dialog;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.generators.companyGeneration.AbstractCompanyGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.swing.*;
 
-public class CompanyGenerationDialog {
+public class CompanyGenerationDialog extends JDialog {
     //region Variable Declarations
     private Campaign campaign;
     private AbstractCompanyGenerator companyGenerator;
     //endregion Variable Declarations
 
     //region Constructors
-    public CompanyGenerationDialog(Campaign campaign, AbstractCompanyGenerator companyGenerator) {
+    public CompanyGenerationDialog(JFrame frame, Campaign campaign, AbstractCompanyGenerator companyGenerator) {
+        super(frame);
+
         setCampaign(campaign);
         setCompanyGenerator(companyGenerator);
+        initialize();
     }
     //endregion Constructors
+
 
     //region Getters/Setters
     public Campaign getCampaign() {
@@ -57,27 +58,14 @@ public class CompanyGenerationDialog {
     }
     //endregion Getters/Setters
 
-    private void applyToCampaign() {
-        List<Person> personnel = new ArrayList<>();
-        if (getCompanyGenerator().getOptions().isPoolAssistants()) {
-            getCampaign().fillAstechPool();
-            getCampaign().fillMedicPool();
-        } else {
-            for (int i = 0; i < getCampaign().getAstechNeed(); i++) {
-                personnel.add(getCompanyGenerator().generatePerson(Person.T_ASTECH));
-            }
-            for (int i = 0; i < getCampaign().getMedicsNeed(); i++) {
-                personnel.add(getCompanyGenerator().generatePerson(Person.T_MEDIC));
-            }
-        }
+    //region Initialization
+    private void initialize() {
 
-        if (getCompanyGenerator().getOptions().isPayForSetup()) {
-            Money unitCosts = Money.zero();
-            Money hiringCosts = Money.zero();
-            Money partCosts = Money.zero();
-            for (Person person : personnel) {
-                hiringCosts = hiringCosts.plus(person.getSalary().multipliedBy(2));
-            }
-        }
+    }
+    //endregion Initialization
+
+    private boolean validateData() {
+        // ensure you have a minimum of 1 lance or company generated
+        return true;
     }
 }
