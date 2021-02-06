@@ -122,8 +122,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
         // than an LargeCraftAmmoBin. Subclasses should use a similar check, which
         // breaks Composability to a degree but in this case we've used
         // subclasses where they're not truly composable.
-        if ((part instanceof LargeCraftAmmoBin)
-                && Objects.equals(part.getClass(), LargeCraftAmmoBin.class)) {
+        if (Objects.equals(part.getClass(), LargeCraftAmmoBin.class)) {
             LargeCraftAmmoBin ammoBin = (LargeCraftAmmoBin) part;
             return getType().equals(ammoBin.getType())
                     && (getFullShots() == ammoBin.getFullShots());
