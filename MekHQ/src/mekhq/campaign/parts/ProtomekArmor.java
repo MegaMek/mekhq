@@ -87,7 +87,7 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof ProtomekArmor
+        return getClass().equals(part.getClass())
                 && getType() == ((ProtomekArmor) part).getType()
                 && isClanTechBase() == part.isClanTechBase()
                 && Objects.equals(getRefitUnit(), part.getRefitUnit());
