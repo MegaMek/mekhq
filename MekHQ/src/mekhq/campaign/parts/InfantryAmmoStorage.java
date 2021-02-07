@@ -97,7 +97,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return (part instanceof InfantryAmmoStorage)
+        return getClass().equals(part.getClass())
                 && isSameAmmoType(((InfantryAmmoStorage) part).getType(), ((InfantryAmmoStorage) part).getWeaponType());
     }
 
