@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public enum PersonnelFilter {
-    //region Personnel Filters
+    //region Enum Declarations
     //region Standard Personnel Filters
     ALL("PersonnelFilter.ALL"),
     ACTIVE("PersonnelFilter.ACTIVE"),
@@ -77,7 +77,7 @@ public enum PersonnelFilter {
     KIA("PersonnelFilter.KIA", false, false),
     DEAD("PersonnelFilter.DEAD", false, false);
     //endregion Expanded Personnel Tab Filters
-    //endregion Personnel Filters
+    //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
@@ -85,7 +85,7 @@ public enum PersonnelFilter {
     private final boolean standard;
     private final boolean individualRole;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUIEnums", new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

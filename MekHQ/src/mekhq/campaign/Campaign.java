@@ -1228,6 +1228,16 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * Generate a new {@link Person} of the given type, using the supplied {@link AbstractPersonnelGenerator}
      * @param type The primary role of the {@link Person}.
+     * @param personnelGenerator The {@link AbstractPersonnelGenerator} to use when creating the {@link Person}.
+     * @return A new {@link Person} configured using {@code personnelGenerator}.
+     */
+    public Person newPerson(final int type, final AbstractPersonnelGenerator personnelGenerator) {
+        return newPerson(type, Person.T_NONE, personnelGenerator, Gender.RANDOMIZE);
+    }
+
+    /**
+     * Generate a new {@link Person} of the given type, using the supplied {@link AbstractPersonnelGenerator}
+     * @param type The primary role of the {@link Person}.
      * @param secondary The secondary role, or {@link Person#T_NONE}, of the {@link Person}.
      * @param personnelGenerator The {@link AbstractPersonnelGenerator} to use when creating the {@link Person}.
      * @param gender The gender of the person to be generated, or a randomize it value

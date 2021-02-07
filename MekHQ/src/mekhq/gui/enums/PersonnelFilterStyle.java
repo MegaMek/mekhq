@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,7 @@ public enum PersonnelFilterStyle {
     private final String name;
     private final String toolTipText;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUIEnums", new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -43,6 +43,12 @@ public enum PersonnelFilterStyle {
         this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
+
+    //region Getters
+    public String getToolTipText() {
+        return toolTipText;
+    }
+    //endregion Getters
 
     public List<PersonnelFilter> getFilters(boolean standard) {
         switch (this) {
@@ -57,10 +63,6 @@ public enum PersonnelFilterStyle {
                 return standard ? PersonnelFilter.getStandardPersonnelFilters()
                         : PersonnelFilter.getExpandedPersonnelFilters();
         }
-    }
-
-    public String getToolTipText() {
-        return toolTipText;
     }
 
     @Override

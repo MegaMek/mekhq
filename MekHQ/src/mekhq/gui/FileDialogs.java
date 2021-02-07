@@ -238,7 +238,6 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> saveScenarioTemplate(JFrame frame, ScenarioTemplate template) {
-
         String fileName = String.format(
                 "%s.xml", //$NON-NLS-1$
                 template.name);
@@ -284,6 +283,33 @@ public class FileDialogs {
                 "starmap.png");
 
         value.ifPresent(x -> MekHQ.getStarMapsDirectory().setValue(x.getParent()));
+        return value;
+    }
+
+    /**
+     * Displays a dialog window from which the user can select an <tt>.xml</tt> file to open.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> openCompanyGenerationOptions(JFrame frame) {
+        Optional<File> value = GUI.fileDialogOpen(frame, "Load Company Generation Options",
+                FileType.XML, MekHQ.getMekHQOptions().getCompanyGenerationDirectoryPath());
+
+        value.ifPresent(x -> MekHQ.getMekHQOptions().setCompanyGenerationDirectoryPath(x.getParent()));
+        return value;
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <tt>.xml</tt> file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveCompanyGenerationOptions(JFrame frame) {
+        Optional<File> value = GUI.fileDialogSave(frame, "Save Company Generation Options",
+                FileType.XML, MekHQ.getMekHQOptions().getCompanyGenerationDirectoryPath(),
+                "myoptions.xml");
+
+        value.ifPresent(x -> MekHQ.getMekHQOptions().setCompanyGenerationDirectoryPath(x.getParent()));
         return value;
     }
 }

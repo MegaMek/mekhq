@@ -67,7 +67,8 @@ public class GMToolsDialog extends JDialog {
     private static final long serialVersionUID = 7724064095803583812L;
 
     //region GUI Variables
-    private JSpinner numDice;
+    private JSpinner countDice;
+    private JSpinner numberDice;
     private JSpinner sizeDice;
     private JLabel totalDiceResult;
     private JTextPane individualDiceResults;
@@ -139,7 +140,7 @@ public class GMToolsDialog extends JDialog {
     private static final Integer[] ERAS = {2807, 2825, 2850, 2900, 2950, 3000, 3050, 3060, 3075, 3085, 3100};
     //endregion Constants
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GMToolsDialog", new EncodeControl());
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -183,16 +184,22 @@ public class GMToolsDialog extends JDialog {
 
     //region Dice Panel Initialization
     private JPanel getDiceRoller() {
-        int gridx = 0, gridy = 0;
+        int gridx = 0, gridy = 0, gridyMax;
 
         JPanel dicePanel = new JPanel(new GridBagLayout());
         dicePanel.setName("dicePanel");
         dicePanel.setBorder(BorderFactory.createTitledBorder(resources.getString("dicePanel.text")));
 
-        numDice = new JSpinner(new SpinnerNumberModel(2, 1, 100, 1));
-        numDice.setName("numDice");
-        ((JSpinner.DefaultEditor) numDice.getEditor()).getTextField().setEditable(true);
-        dicePanel.add(numDice, newGridBagConstraints(gridx++, gridy));
+        countDice = new JSpinner(new SpinnerNumberModel(2, 1, 100, 1));
+        countDice.setName("countDice");
+        dicePanel.add(countDice, newGridBagConstraints(gridx++, gridy));
+
+        JLabel rolls = new JLabel(resources.getString("rolls.text"));
+        dicePanel.add(rolls, newGridBagConstraints(gridx++, gridy));
+
+        numberDice = new JSpinner(new SpinnerNumberModel(2, 1, 100, 1));
+        numberDice.setName("numberDice");
+        dicePanel.add(numberDice, newGridBagConstraints(gridx++, gridy));
 
         JLabel sides = new JLabel(resources.getString("sides.text"));
         sides.setName("sides");
@@ -203,6 +210,7 @@ public class GMToolsDialog extends JDialog {
         ((JSpinner.DefaultEditor) sizeDice.getEditor()).getTextField().setEditable(true);
         dicePanel.add(sizeDice, newGridBagConstraints(gridx++, gridy++));
 
+        gridyMax = --gridx;
         gridx = 0;
 
         JLabel totalDiceResultLabel = new JLabel(resources.getString("totalDiceResultsLabel.text"));
@@ -216,7 +224,7 @@ public class GMToolsDialog extends JDialog {
         JButton diceRoll = new JButton(resources.getString("diceRoll.text"));
         diceRoll.setName("diceRoll");
         diceRoll.addActionListener(evt -> performDiceRoll());
-        dicePanel.add(diceRoll, newGridBagConstraints(gridx++, gridy++, 2, 1));
+        dicePanel.add(diceRoll, newGridBagConstraints(gridyMax--, gridy++, 2, 1));
 
         gridx = 0;
 
@@ -228,7 +236,7 @@ public class GMToolsDialog extends JDialog {
         individualDiceResults.setText("-");
         individualDiceResults.setName("individualDiceResults");
         individualDiceResults.setEditable(false);
-        dicePanel.add(individualDiceResults, newGridBagConstraints(gridx++, gridy, 3, 1));
+        dicePanel.add(individualDiceResults, newGridBagConstraints(gridx++, gridy, 5, 1));
 
         return dicePanel;
     }
@@ -602,7 +610,9 @@ public class GMToolsDialog extends JDialog {
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(GMToolsDialog.class);
 
-        preferences.manage(new JIntNumberSpinnerPreference(numDice));
+        preferences.manage(new JIntNumberSpinnerPreference(countDice));
+
+        preferences.manage(new JIntNumberSpinnerPreference(numberDice));
 
         preferences.manage(new JIntNumberSpinnerPreference(sizeDice));
 
@@ -787,8 +797,8 @@ public class GMToolsDialog extends JDialog {
 
     //region ActionEvent Handlers
     public void performDiceRoll() {
-        List<Integer> individualDice = Utilities.individualDice((Integer) numDice.getValue(),
-                (Integer) sizeDice.getValue());
+        List<Integer> individualDice = Utilities.individualDice((Integer) countDice.getValue(),
+                (Integer) numberDice.getValue(), (Integer) sizeDice.getValue());
         totalDiceResult.setText(String.format(resources.getString("totalDiceResult.text"),
                 individualDice.get(0)));
         StringBuilder sb = new StringBuilder();

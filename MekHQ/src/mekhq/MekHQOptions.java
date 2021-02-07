@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MekHQ Team. All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MekHQ Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,6 +18,7 @@
  */
 package mekhq;
 
+import mekhq.campaign.universe.enums.CompanyGenerationType;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import java.time.LocalDate;
@@ -62,6 +63,23 @@ public final class MekHQOptions {
 
     public void setHistoricalDailyLog(boolean value) {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.HISTORICAL_DAILY_LOG, value);
+    }
+
+    public boolean getShowCompanyGenerator() {
+        return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.SHOW_COMPANY_GENERATOR, false);
+    }
+
+    public void setShowCompanyGenerator(boolean value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.SHOW_COMPANY_GENERATOR, value);
+    }
+
+    public CompanyGenerationType getDefaultCompanyGenerationType() {
+        return CompanyGenerationType.valueOf(userPreferences.node(MekHqConstants.DISPLAY_NODE)
+                .get(MekHqConstants.DEFAULT_COMPANY_GENERATION_TYPE, CompanyGenerationType.AGAINST_THE_BOT.name()));
+    }
+
+    public void setDefaultCompanyGenerationType(CompanyGenerationType value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).put(MekHqConstants.DEFAULT_COMPANY_GENERATION_TYPE, value.name());
     }
 
     //region Command Center Display
@@ -205,6 +223,14 @@ public final class MekHQOptions {
     public void setSaveMothballState(boolean value) {
         userPreferences.node(MekHqConstants.XML_SAVES_NODE).putBoolean(MekHqConstants.SAVE_MOTHBALL_STATE, value);
     }
+
+    public boolean getSaveCompanyGenerationOptions() {
+        return userPreferences.node(MekHqConstants.XML_SAVES_NODE).getBoolean(MekHqConstants.SAVE_COMPANY_GENERATION_OPTIONS, false);
+    }
+
+    public void setSaveCompanyGenerationOptions(boolean value) {
+        userPreferences.node(MekHqConstants.XML_SAVES_NODE).putBoolean(MekHqConstants.SAVE_COMPANY_GENERATION_OPTIONS, value);
+    }
     //endregion Campaign XML Save Options
 
     //region File Paths
@@ -214,6 +240,14 @@ public final class MekHQOptions {
 
     public void setAwardsDirectoryPath(String value) {
         userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.AWARDS_DIRECTORY_PATH, value);
+    }
+
+    public String getCompanyGenerationDirectoryPath() {
+        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.COMPANY_GENERATION_DIRECTORY_PATH, "mmconf/mhqCompanyGenerationPresets/");
+    }
+
+    public void setCompanyGenerationDirectoryPath(String value) {
+        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.COMPANY_GENERATION_DIRECTORY_PATH, value);
     }
     //endregion File Paths
 

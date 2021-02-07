@@ -18,35 +18,136 @@
  */
 package mekhq.campaign.universe.generators.companyGeneration;
 
+import megamek.common.EntityWeightClass;
+import megamek.common.MechSummary;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.enums.CompanyGenerationType;
 
 public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
     //region Constructors
-    public WindchildCompanyGenerator() {
-        super(CompanyGenerationType.WINDCHILD);
+    public WindchildCompanyGenerator(final Campaign campaign) {
+        super(CompanyGenerationType.WINDCHILD, campaign);
     }
     //endregion Constructors
 
+    //region Personnel
+    /**
+     * Set based on greater than instead of the greater than or equal to of AtB
+     * @param commandingOfficer the commanding officer
+     * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
+     */
     @Override
-    protected void generateCommandingOfficer(Person commandingOfficer, int numMechWarriors) {
-        commandingOfficer.setCommander(true);
-        commandingOfficer.improveSkill(SkillType.S_GUN_MECH);
-        commandingOfficer.improveSkill(SkillType.S_PILOT_MECH);
-        assignRandomOfficerSkillIncrease(commandingOfficer, 2);
-
-        if (getOptions().isAutomaticallyAssignRanks()) {
-            if (numMechWarriors > 36) {
-                commandingOfficer.setRankLevel(Ranks.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 8));
-            } else if (numMechWarriors > 12) {
-                commandingOfficer.setRankLevel(Ranks.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 5));
-            } else if (numMechWarriors > 4) {
-                commandingOfficer.setRankLevel(Ranks.RWO_MAX + 4);
-            } else {
-                commandingOfficer.setRankLevel(Ranks.RWO_MAX + 3);
-            }
+    protected void generateCommandingOfficerRank(Person commandingOfficer, int numMechWarriors) {
+        if (numMechWarriors > 36) {
+            commandingOfficer.setRankNumeric(Ranks.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 8));
+        } else if (numMechWarriors > 12) {
+            commandingOfficer.setRankNumeric(Ranks.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 5));
+        } else if (numMechWarriors > 4) {
+            commandingOfficer.setRankNumeric(Ranks.RWO_MAX + 4);
+        } else {
+            commandingOfficer.setRankNumeric(Ranks.RWO_MAX + 3);
         }
     }
+    //endregion Personnel
+
+    //region Units
+    /**
+     * This guarantees a BattleMech, and rolls an overall heavier lance
+     *
+     * @param roll the modified roll to use
+     * @return the generated EntityWeightClass
+     * EntityWeightClass.WEIGHT_ULTRA_LIGHT for none,
+     * EntityWeightClass.WEIGHT_SUPER_HEAVY for SL tables
+     */
+    @Override
+    protected int determineBattleMechWeight(int roll) {
+        switch (roll) {
+            case 2:
+            case 3:
+            case 4:
+                return EntityWeightClass.WEIGHT_LIGHT;
+            case 5:
+            case 6:
+            case 7:
+                return EntityWeightClass.WEIGHT_MEDIUM;
+            case 8:
+            case 9:
+            case 10:
+                return EntityWeightClass.WEIGHT_HEAVY;
+            case 11:
+            case 12:
+                return EntityWeightClass.WEIGHT_ASSAULT;
+            default:
+                return EntityWeightClass.WEIGHT_SUPER_HEAVY;
+        }
+    }
+
+    /**
+     * This generates a slightly higher average quality rating
+     * @param roll the modified roll to use
+     * @return the generated IUnitRating magic int for Dragoon Quality
+     */
+    @Override
+    protected int determineBattleMechQuality(int roll) {
+        switch (roll) {
+            case 2:
+            case 3:
+            case 4:
+                return IUnitRating.DRAGOON_F;
+            case 5:
+            case 6:
+                return IUnitRating.DRAGOON_D;
+            case 7:
+            case 8:
+                return IUnitRating.DRAGOON_C;
+            case 9:
+            case 10:
+                return IUnitRating.DRAGOON_B;
+            case 11:
+            case 12:
+                return IUnitRating.DRAGOON_A;
+            default:
+                return IUnitRating.DRAGOON_ASTAR;
+        }
+    }
+
+    /**
+     * This generates clan mech differently, so you can get any of the quality ratings for clanners
+     *
+     * @param campaign the campaign to generate for
+     * @param parameters the parameters to use in generation
+     * @param person the person to generate the mech for
+     * @return the MechSummary generated from the provided parameters
+     */
+    @Override
+    protected MechSummary generateMechSummary(final Campaign campaign,
+                                              final RandomMechParameters parameters,
+                                              final Person person) {
+        if (parameters.isStarLeague()) {
+            final String faction;
+            if (person.isClanner()) {
+                faction = person.getOriginFaction().getShortName();
+                // Clanners generate using the Keshik Table if they roll A*, otherwise they roll on
+                // the Front Line tables
+                parameters.setQuality((parameters.getQuality() < IUnitRating.DRAGOON_ASTAR)
+                        ? IUnitRating.DRAGOON_B : parameters.getQuality());
+            } else {
+                // Roll on the Star League Royal table if you get a SL mech with A* Rating
+                faction = ((parameters.getQuality() == IUnitRating.DRAGOON_ASTAR) ? "SL.R" : "SL");
+            }
+            return generateMechSummary(campaign, parameters, faction, getOptions().getStarLeagueYear());
+        } else {
+            // Clanners Generate from 2nd Line (or lesser) Tables (core AtB is just 2nd Line,
+            // but this is more interesting)
+            if (person.isClanner() && (parameters.getQuality() > IUnitRating.DRAGOON_C)) {
+                parameters.setQuality(IUnitRating.DRAGOON_C);
+            }
+            return generateMechSummary(campaign, parameters, person.getOriginFaction().getShortName(),
+                    campaign.getGameYear());
+        }
+    }
+    //endregion Units
 }

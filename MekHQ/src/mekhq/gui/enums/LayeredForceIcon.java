@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -27,14 +27,14 @@ import java.util.ResourceBundle;
 
 public enum LayeredForceIcon {
     //region Enum Declarations
-    TYPE("LayeredForceIcon.types", "Pieces/Type/", "tableTypes", ListSelectionModel.SINGLE_SELECTION),
-    FORMATION("LayeredForceIcon.formations", "Pieces/Formations/", "tableFormations", ListSelectionModel.SINGLE_SELECTION),
-    ADJUSTMENT("LayeredForceIcon.adjustments", "Pieces/Adjustments/", "tableAdjustments", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    ALPHANUMERIC("LayeredForceIcon.alphanumerics", "Pieces/Alphanumerics/", "tableAlphanumerics", ListSelectionModel.SINGLE_SELECTION),
-    SPECIAL_MODIFIER("LayeredForceIcon.special", "Pieces/Special Modifiers/", "tableSpecialModifiers", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    BACKGROUND("LayeredForceIcon.backgrounds", "Pieces/Backgrounds/", "tableBackgrounds", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    FRAME("LayeredForceIcon.frame", "Pieces/Frames/", "tableFrames", ListSelectionModel.SINGLE_SELECTION),
-    LOGO("LayeredForceIcon.logos", "Pieces/Logos/", "tableLogos", ListSelectionModel.SINGLE_SELECTION);
+    TYPE("LayeredForceIcon.types.text", "Pieces/Type/", "tableTypes", ListSelectionModel.SINGLE_SELECTION),
+    FORMATION("LayeredForceIcon.formations.text", "Pieces/Formations/", "tableFormations", ListSelectionModel.SINGLE_SELECTION),
+    ADJUSTMENT("LayeredForceIcon.adjustments.text", "Pieces/Adjustments/", "tableAdjustments", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
+    ALPHANUMERIC("LayeredForceIcon.alphanumerics.text", "Pieces/Alphanumerics/", "tableAlphanumerics", ListSelectionModel.SINGLE_SELECTION),
+    SPECIAL_MODIFIER("LayeredForceIcon.special.text", "Pieces/Special Modifiers/", "tableSpecialModifiers", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
+    BACKGROUND("LayeredForceIcon.backgrounds.text", "Pieces/Backgrounds/", "tableBackgrounds", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
+    FRAME("LayeredForceIcon.frame.text", "Pieces/Frames/", "tableFrames", ListSelectionModel.SINGLE_SELECTION),
+    LOGO("LayeredForceIcon.logos.text", "Pieces/Logos/", "tableLogos", ListSelectionModel.SINGLE_SELECTION);
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -42,16 +42,20 @@ public enum LayeredForceIcon {
     private final String layerPath; // The String containing the individual layer's path
     private final String tableName; // The String used in JTable::setName for accessibility purposes
     private final int listSelectionModel; // The int used to determine how the selection
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
+    //region Constructors
     LayeredForceIcon(String name, String layerPath, String tableName, int listSelectionModel) {
-        this.name = ResourceBundle.getBundle("mekhq.resources.GUIEnums", new EncodeControl())
-                .getString(name);
+        this.name = resources.getString(name);
         this.layerPath = layerPath;
         this.tableName = tableName;
         this.listSelectionModel = listSelectionModel;
     }
+    //endregion Constructors
 
+    //region Getters
     public String getLayerPath() {
         return layerPath;
     }
@@ -63,6 +67,7 @@ public enum LayeredForceIcon {
     public int getListSelectionModel() {
         return listSelectionModel;
     }
+    //endregion Getters
 
     /**
      * @return the layered force icon enum values in the order they are drawn in

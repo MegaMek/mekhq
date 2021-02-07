@@ -39,6 +39,7 @@ import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
 import mekhq.MekHqConstants;
+import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.dialog.*;
 import mekhq.gui.preferences.JWindowPreference;
@@ -128,6 +129,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JMenuItem miAdvanceMultipleDays;
+    private JMenuItem miCompanyGenerator;
 
     private EnumMap<GuiTabType, CampaignGuiTab> standardTabs;
 
@@ -195,10 +197,8 @@ public class CampaignGUI extends JPanel {
      * Show a dialog indicating that the user must resolve overdue loans before advanching the day
      */
     public void showOverdueLoansDialog() {
-
         JOptionPane.showMessageDialog(null, "You must resolve overdue loans before advancing the day",
                 "Overdue loans", JOptionPane.WARNING_MESSAGE);
-
     }
 
     public void showAdvanceMultipleDays(boolean isHost) {
@@ -918,7 +918,7 @@ public class CampaignGUI extends JPanel {
 
         //region Manage Campaign Menu
         // The Manage Campaign menu uses the following Mnemonic keys as of 19-March-2020:
-        // A, B, G, M, S
+        // A, B, C, G, M, S
         JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
         menuManage.setMnemonic(KeyEvent.VK_C);
         menuManage.setName("manageMenu");
@@ -952,15 +952,22 @@ public class CampaignGUI extends JPanel {
         });
         menuManage.add(miScenarioEditor);
 
+        miCompanyGenerator = new JMenuItem(resourceMap.getString("miCompanyGenerator.text"));
+        miCompanyGenerator.setMnemonic(KeyEvent.VK_C);
+        miCompanyGenerator.setVisible(MekHQ.getMekHQOptions().getShowCompanyGenerator());
+        miCompanyGenerator.addActionListener(evt ->
+                new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
+        menuManage.add(miCompanyGenerator);
+
         menuBar.add(menuManage);
         //endregion Manage Campaign Menu
 
         //region Help Menu
         // The Help menu uses the following Mnemonic keys as of 19-March-2020:
         // A
-        JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text")); // NOI18N
+        JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text"));
         menuHelp.setMnemonic(KeyEvent.VK_SLASH);
-        menuHelp.setName("helpMenu"); // NOI18N
+        menuHelp.setName("helpMenu");
 
         JMenuItem menuAboutItem = new JMenuItem(resourceMap.getString("menuAbout.text"));
         menuAboutItem.setMnemonic(KeyEvent.VK_A);
@@ -1266,7 +1273,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void menuSaveXmlActionPerformed(ActionEvent evt) {
-        MekHQ.getLogger().info(this, "Saving campaign...");
+        MekHQ.getLogger().info("Saving campaign...");
         // Choose a file...
         File file = selectSaveCampaignFile();
         if (file == null) {
@@ -2228,7 +2235,7 @@ public class CampaignGUI extends JPanel {
     protected void loadOptionsFile() {
         Optional<File> maybeFile = FileDialogs.openCampaignOptions(frame);
 
-        if (!maybeFile.isPresent()) {
+        if (maybeFile.isEmpty()) {
             return;
         }
 
@@ -2599,6 +2606,11 @@ public class CampaignGUI extends JPanel {
         if (ev.getPerson().hasRole(Person.T_ADMIN_LOG)) {
             refreshPartsAvailability();
         }
+    }
+
+    @Subscribe
+    public void handle(MekHQOptionsChangedEvent evt) {
+        miCompanyGenerator.setVisible(MekHQ.getMekHQOptions().getShowCompanyGenerator());
     }
 
     public void refreshLocation() {

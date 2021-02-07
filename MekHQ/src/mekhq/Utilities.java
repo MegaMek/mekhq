@@ -147,17 +147,23 @@ public class Utilities {
     }
 
     /**
-     * @param num   the number of dice to roll
+     * c ndf, so this handles 10 rolls of 2d6
+     *
+     * @param count the number of sets of dice to roll
+     * @param number the number of dice to roll for each
      * @param faces the number of faces on those dice
      * @return an Integer list of every dice roll, with index 0 containing the summed result
      */
-    public static List<Integer> individualDice(int num, int faces) {
+    public static List<Integer> individualDice(int count, int number, int faces) {
         List<Integer> individualRolls = new ArrayList<>();
         int result = 0, roll;
         individualRolls.add(result);
 
-        for (int i = 0; i < num; i++) {
-            roll = Compute.randomInt(faces) + 1;
+        for (int x = 0; x < count; x++) {
+            roll = 0;
+            for (int y = 0; y < number; y++) {
+                roll += Compute.randomInt(faces) + 1;
+            }
             individualRolls.add(roll);
             result += roll;
         }

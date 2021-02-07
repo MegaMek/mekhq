@@ -1,7 +1,7 @@
 /*
  * MekHqConstants.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,6 +28,8 @@ public final class MekHqConstants {
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history, also used as a limit in the UI
+    public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
+    public static final String DEFAULT_COMPANY_GENERATION_TYPE = "defaultCompanyGenerationType";
 
     // region Command Center
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
@@ -62,11 +64,13 @@ public final class MekHqConstants {
     public static final String PREFER_GZIPPED_CAMPAIGN_FILE = "preferGzippedCampaignFile";
     public static final String WRITE_CUSTOMS_TO_XML = "writeCustomsToXML";
     public static final String SAVE_MOTHBALL_STATE = "saveMothballState";
+    public static final String SAVE_COMPANY_GENERATION_OPTIONS = "saveCompanyGenerationOptions";
     //endregion Campaign XML Save Options
 
     //region File Paths
     public static final String FILE_PATH_NODE = "mekhq/prefs/filepaths";
     public static final String AWARDS_DIRECTORY_PATH = "awardsDirectoryPath";
+    public static final String COMPANY_GENERATION_DIRECTORY_PATH = "companyGenerationDirectoryPath";
     //endregion File Paths
 
     //region Miscellaneous Options

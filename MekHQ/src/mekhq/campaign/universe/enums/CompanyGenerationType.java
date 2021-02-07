@@ -19,6 +19,7 @@
 package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.generators.companyGeneration.AbstractCompanyGenerator;
 import mekhq.campaign.universe.generators.companyGeneration.AtBCompanyGenerator;
 import mekhq.campaign.universe.generators.companyGeneration.WindchildCompanyGenerator;
@@ -61,13 +62,13 @@ public enum CompanyGenerationType {
     }
     //endregion Boolean Comparisons
 
-    public AbstractCompanyGenerator getGenerator() {
+    public AbstractCompanyGenerator getGenerator(final Campaign campaign) {
         switch (this) {
             case WINDCHILD:
-                return new WindchildCompanyGenerator();
+                return new WindchildCompanyGenerator(campaign);
             case AGAINST_THE_BOT:
             default:
-                return new AtBCompanyGenerator();
+                return new AtBCompanyGenerator(campaign);
         }
     }
 

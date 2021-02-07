@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -23,6 +23,7 @@ import megamek.common.util.EncodeControl;
 import java.util.ResourceBundle;
 
 public enum PersonnelTabView {
+    //region Enum Declarations
     GRAPHIC("PersonnelTabView.GRAPHIC"),
     GENERAL("PersonnelTabView.GENERAL"),
     PILOT_GUNNERY_SKILLS("PersonnelTabView.PILOT_GUNNERY_SKILLS"),
@@ -32,13 +33,19 @@ public enum PersonnelTabView {
     ADMINISTRATIVE_SKILLS("PersonnelTabView.ADMINISTRATIVE_SKILLS"),
     BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL"),
     FLUFF("PersonnelTabView.FLUFF");
+    //endregion Enum Declarations
 
+    //region Variable Declarations
     private final String name;
 
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+    //endregion Variable Declarations
+
+    //region Constructors
     PersonnelTabView(String name) {
-        this.name = ResourceBundle.getBundle("mekhq.resources.GUIEnums", new EncodeControl())
-                .getString(name);
+        this.name = resources.getString(name);
     }
+    //endregion Constructors
 
     @Override
     public String toString() {

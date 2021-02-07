@@ -106,6 +106,7 @@ import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.TableCellListener;
+import mekhq.gui.view.CompanyGenerationOptionsPanel;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 import mekhq.preferences.PreferencesNode;
@@ -490,6 +491,10 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
     //endregion Against the Bot Tab
+
+    //region Company Generation Options
+    private CompanyGenerationOptionsPanel companyGenerationOptionsPanel;
+    //endregion Company Generation Options
     //endregion Variable Declarations
 
     public CampaignOptionsDialog(JFrame parent, boolean modal, Campaign c) {
@@ -4202,11 +4207,18 @@ public class CampaignOptionsDialog extends JDialog {
         enableAtBComponents(panAtB, chkUseAtB.isSelected());
         enableAtBComponents(panSubAtBRat, chkUseAtB.isSelected() && btnStaticRATs.isSelected());
 
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        SwingUtilities.invokeLater(() -> {
             scrSPA.getVerticalScrollBar().setValue(0);
             scrAtB.getVerticalScrollBar().setValue(0);
         });
         //endregion Against the Bot Tab
+
+        //region Company Generation Options
+        if (MekHQ.getMekHQOptions().getSaveCompanyGenerationOptions()) {
+            companyGenerationOptionsPanel = new CompanyGenerationOptionsPanel(frame, campaign);
+            tabOptions.addTab(resourceMap.getString("companyGenerationOptionsPanel.title"), companyGenerationOptionsPanel);
+        }
+        //endregion Company Generation Options
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -4692,6 +4704,13 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseLightConditions.setSelected(options.getUseLightConditions());
         chkUsePlanetaryConditions.setSelected(options.getUsePlanetaryConditions());
         //endregion Against the Bot Tab
+
+        //region Company Generation Options
+        // Only trigger this if there are saved options and the panel has been initialized
+        if ((companyGenerationOptionsPanel != null) && (options.getCompanyGenerationOptions() != null)) {
+            companyGenerationOptionsPanel.setOptions(options.getCompanyGenerationOptions());
+        }
+        //endregion Company Generation Options
     }
 
     public static String[][] getSkillCostsArray(Hashtable<String, SkillType> skillHash) {
@@ -5152,6 +5171,12 @@ public class CampaignOptionsDialog extends JDialog {
         options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
         options.setUnitMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
         // End Against the Bot
+
+        //region Company Generation Options
+        if (companyGenerationOptionsPanel != null) {
+            options.setCompanyGenerationOptions(companyGenerationOptionsPanel.createOptionsFromPanel());
+        }
+        //endregion Company Generation Options
 
         campaign.setCampaignOptions(options);
 
