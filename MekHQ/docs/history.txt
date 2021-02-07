@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-0.47.17 (RC3)-SNAPSHOT
+0.47.17 (RC3) (2021-02-075 2015 UTC)
 + PR #2354: Don't skip ComStar as an origin faction
 + Issue #2348: Allow Clanner origins
 + Issue #2365: MissingEquipmentParts should only be replaced with parts of the correct Java type
