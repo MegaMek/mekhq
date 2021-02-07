@@ -1,6 +1,8 @@
 VERSION HISTORY:
 ----------------
-0.47.17 (RC3)-SNAPSHOT
+0.47.18 (RC4)-SNAPSHOT
+
+0.47.17 (RC3) (2021-02-075 2015 UTC)
 + PR #2354: Don't skip ComStar as an origin faction
 + Issue #2348: Allow Clanner origins
 + Issue #2365: MissingEquipmentParts should only be replaced with parts of the correct Java type
@@ -10,6 +12,8 @@ VERSION HISTORY:
 + Issue #2389: Fixing graphical NPE when not purchasing units in the unit selector dialog
 + PR #2390: Fixing Baby Prisoner Status Determination
 + Issue #2397: Adding Fall Back SPA check for current SPAs being edited
++ Issue #2396: Resolve Infantry part and other part type bugs
++ Issue #2387: Allow salvaging components on destroyed locations from repair bay
 
 0.47.16 (RC2) (2021-01-05 1700 UTC)
 + PR #2289: Drop support for migrating Campaigns older than v0.41.24 (2016-10-06 03:15 UTC)

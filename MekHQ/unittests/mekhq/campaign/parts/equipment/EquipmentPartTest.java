@@ -29,7 +29,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -820,7 +819,11 @@ public class EquipmentPartTest {
         // Location destroyed
         doReturn(false).when(unit).isLocationBreached(eq(location));
         doReturn(true).when(unit).isLocationDestroyed(eq(location));
-        assertNotNull(equipmentPart.checkFixable());
+        // CAW: this should be non-null in a perfect world, but because
+        //      MekHQ automagically switches to salvage mode when the
+        //      location is destroyed, this should return null.
+        //      See: https://github.com/MegaMek/mekhq/issues/2387
+        assertNull(equipmentPart.checkFixable());
 
         String secondaryLocationName = "Mech Left Arm";
         int secondaryLocation = Mech.LOC_LARM;
@@ -840,7 +843,11 @@ public class EquipmentPartTest {
         // Location destroyed
         doReturn(false).when(unit).isLocationBreached(eq(secondaryLocation));
         doReturn(true).when(unit).isLocationDestroyed(eq(secondaryLocation));
-        assertNotNull(equipmentPart.checkFixable());
+        // CAW: this should be non-null in a perfect world, but because
+        //      MekHQ automagically switches to salvage mode when the
+        //      location is destroyed, this should return null.
+        //      See: https://github.com/MegaMek/mekhq/issues/2387
+        assertNull(equipmentPart.checkFixable());
 
         // Restore both locations
         doReturn(false).when(unit).isLocationBreached(eq(location));
