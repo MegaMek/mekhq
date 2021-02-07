@@ -393,13 +393,13 @@ public class EquipmentPart extends Part {
 
     @Override
     public String checkFixable() {
-        final Unit unit = getUnit();
-        if ((unit != null) && (unit.isSalvage() || isTeamSalvaging())) {
+        if (isSalvaging()) {
             return null;
         }
 
         // The part is only fixable if the location is not destroyed.
         // be sure to check location and second location
+        final Unit unit = getUnit();
         final Mounted m = getMounted();
         if ((unit != null) && (m != null)) {
             int loc = m.getLocation();
