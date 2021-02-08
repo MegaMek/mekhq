@@ -53,9 +53,9 @@ public class CompanyGenerationOptions implements Serializable {
     private CompanyGenerationType type;
     private Faction faction;
     private Planet startingPlanet;
+    private boolean generateMercenaryCompanyCommandLance;
     private int companyCount;
     private int individualLanceCount;
-    private boolean generateMercenaryCompanyCommandLance;
     private int lancesPerCompany;
     private int lanceSize;
 
@@ -229,6 +229,14 @@ public class CompanyGenerationOptions implements Serializable {
         this.startingPlanet = startingPlanet;
     }
 
+    public boolean isGenerateMercenaryCompanyCommandLance() {
+        return generateMercenaryCompanyCommandLance;
+    }
+
+    public void setGenerateMercenaryCompanyCommandLance(boolean generateMercenaryCompanyCommandLance) {
+        this.generateMercenaryCompanyCommandLance = generateMercenaryCompanyCommandLance;
+    }
+
     public int getCompanyCount() {
         return companyCount;
     }
@@ -243,14 +251,6 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void setIndividualLanceCount(int individualLanceCount) {
         this.individualLanceCount = individualLanceCount;
-    }
-
-    public boolean isGenerateMercenaryCompanyCommandLance() {
-        return generateMercenaryCompanyCommandLance;
-    }
-
-    public void setGenerateMercenaryCompanyCommandLance(boolean generateMercenaryCompanyCommandLance) {
-        this.generateMercenaryCompanyCommandLance = generateMercenaryCompanyCommandLance;
     }
 
     public int getLanceSize() {
@@ -637,9 +637,9 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "faction", getFaction().getShortName());
         MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "startingPlanet", "systemId",
                 getStartingPlanet().getParentSystem().getId(), getStartingPlanet().getId());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMercenaryCompanyCommandLance", isGenerateMercenaryCompanyCommandLance());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "companyCount", getCompanyCount());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "individualLanceCount", getIndividualLanceCount());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMercenaryCompanyCommandLance", isGenerateMercenaryCompanyCommandLance());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lancesPerCompany", getLancesPerCompany());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceSize", getLanceSize());
 
@@ -752,14 +752,14 @@ public class CompanyGenerationOptions implements Serializable {
                         String startingPlanetPlanetId = wn2.getTextContent().trim();
                         options.setStartingPlanet(Systems.getInstance().getSystemById(startingPlanetSystemId).getPlanetById(startingPlanetPlanetId));
                         break;
+                    case "generateMercenaryCompanyCommandLance":
+                        options.setGenerateMercenaryCompanyCommandLance(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        break;
                     case "companyCount":
                         options.setCompanyCount(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "individualLanceCount":
                         options.setIndividualLanceCount(Integer.parseInt(wn2.getTextContent().trim()));
-                        break;
-                    case "generateMercenaryCompanyCommandLance":
-                        options.setGenerateMercenaryCompanyCommandLance(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "lancesPerCompany":
                         options.setLancesPerCompany(Integer.parseInt(wn2.getTextContent().trim()));

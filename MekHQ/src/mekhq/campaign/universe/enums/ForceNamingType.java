@@ -24,24 +24,32 @@ import java.util.ResourceBundle;
 
 public enum ForceNamingType {
     //region Enum Declarations
-    CCB_1943("ForceNamingType.CCB_1943.text"),
-    ICAO_1956("ForceNamingType.ICAO_1956.text"),
-    GREEK_ALPHABET("ForceNamingType.GREEK_ALPHABET.text");
+    CCB_1943("ForceNamingType.CCB_1943.text", "ForceNamingType.CCB_1943.toolTipText"),
+    ICAO_1956("ForceNamingType.ICAO_1956.text", "ForceNamingType.ICAO_1956.toolTipText"),
+    GREEK_ALPHABET("ForceNamingType.GREEK_ALPHABET.text", "ForceNamingType.GREEK_ALPHABET.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
+    private final String toolTipText;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    ForceNamingType(String name) {
+    ForceNamingType(final String name, final String toolTipText) {
         this.name = resources.getString(name);
+        this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
 
-    public String getValue(Alphabet alphabet) {
+    //region Getters
+    public String getToolTipText() {
+        return toolTipText;
+    }
+    //endregion Getters
+
+    public String getValue(final Alphabet alphabet) {
         switch (this) {
             case ICAO_1956:
                 return alphabet.getICAO1956();

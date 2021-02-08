@@ -64,9 +64,6 @@ import java.util.stream.Collectors;
 
 /**
  * Ideas:
- * Finances: Randomize is a base 8d6 million C-Bill option, creates a nice curve averaging around 28m c-bills,
- * which is a company plus likely a slight float. Recommended 10d6 for 3067 in the notes
- *
  * First panel is the options panel
  * Second panel is the generated personnel panel, where you can customize and reroll personnel
  * Third panel is the generated units panel, where you can customize applicable units
@@ -114,18 +111,17 @@ public abstract class AbstractCompanyGenerator {
     //region Variable Declarations
     private CompanyGenerationType type;
     private CompanyGenerationOptions options;
+    private AbstractPersonnelGenerator personnelGenerator;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    protected AbstractCompanyGenerator(final CompanyGenerationType type, final Campaign campaign) {
-        this(type, new CompanyGenerationOptions(type, campaign));
-    }
-
-    protected AbstractCompanyGenerator(final CompanyGenerationType type, final CompanyGenerationOptions options) {
+    protected AbstractCompanyGenerator(final Campaign campaign, final CompanyGenerationType type,
+                                       final CompanyGenerationOptions options) {
         setType(type);
         setOptions(options);
+        createPersonnelGenerator(campaign);
     }
     //endregion Constructors
 
@@ -134,7 +130,10 @@ public abstract class AbstractCompanyGenerator {
         return type;
     }
 
-    public void setType(final CompanyGenerationType type) {
+    /**
+     * This is ONLY to be called by constructors
+     */
+    protected void setType(final CompanyGenerationType type) {
         this.type = type;
     }
 
@@ -142,8 +141,41 @@ public abstract class AbstractCompanyGenerator {
         return options;
     }
 
-    public void setOptions(final CompanyGenerationOptions options) {
+    /**
+     * This is ONLY to be called by constructors
+     */
+    protected void setOptions(final CompanyGenerationOptions options) {
         this.options = options;
+    }
+
+    public AbstractPersonnelGenerator getPersonnelGenerator() {
+        return personnelGenerator;
+    }
+
+    public void setPersonnelGenerator(final AbstractPersonnelGenerator personnelGenerator) {
+        this.personnelGenerator = personnelGenerator;
+    }
+
+    /**
+     * This creates the personnel generator to use with the generator's options
+     * @param campaign the Campaign to generate using
+     */
+    private void createPersonnelGenerator(final Campaign campaign) {
+        final AbstractFactionSelector factionSelector;
+        final AbstractPlanetSelector planetSelector;
+
+        if (getOptions().isRandomizeOrigin()) {
+            factionSelector = new RangedFactionSelector(getOptions().getOriginSearchRadius());
+            ((RangedFactionSelector) factionSelector).setDistanceScale(getOptions().getOriginDistanceScale());
+
+            planetSelector = new RangedPlanetSelector(getOptions().getOriginSearchRadius(),
+                    getOptions().isExtraRandomOrigin());
+            ((RangedPlanetSelector) planetSelector).setDistanceScale(getOptions().getOriginDistanceScale());
+        } else {
+            factionSelector = new DefaultFactionSelector(getOptions().getFaction());
+            planetSelector = new DefaultPlanetSelector();
+        }
+        setPersonnelGenerator(campaign.getPersonnelGenerator(factionSelector, planetSelector));
     }
     //endregion Getters/Setters
 
@@ -184,10 +216,9 @@ public abstract class AbstractCompanyGenerator {
     public List<Person> generateCombatPersonnel(final Campaign campaign) {
         List<Person> combatPersonnel = new ArrayList<>();
         final int numMechWarriors = determineNumberLances() * getOptions().getLanceSize();
-        final AbstractPersonnelGenerator personnelGenerator = createPersonnelGenerator(campaign);
 
         for (int i = 0; i < numMechWarriors; i++) {
-            combatPersonnel.add(campaign.newPerson(Person.T_MECHWARRIOR, personnelGenerator));
+            combatPersonnel.add(campaign.newPerson(Person.T_MECHWARRIOR, getPersonnelGenerator()));
         }
 
         if (getOptions().isAssignBestOfficers()) {
@@ -354,11 +385,10 @@ public abstract class AbstractCompanyGenerator {
      */
     public List<Person> generateSupportPersonnel(final Campaign campaign) {
         final List<Person> supportPersonnel = new ArrayList<>();
-        final AbstractPersonnelGenerator personnelGenerator = createPersonnelGenerator(campaign);
 
         for (final Map.Entry<Integer, Integer> entry : getOptions().getSupportPersonnel().entrySet()) {
             for (int i = 0; i < entry.getValue(); i++) {
-                final Person person = campaign.newPerson(entry.getKey(), personnelGenerator);
+                final Person person = campaign.newPerson(entry.getKey(), getPersonnelGenerator());
                 // All support personnel get assigned is their rank
                 if (getOptions().isAutomaticallyAssignRanks()) {
                     switch (campaign.getRanks().getRankSystem()) {
@@ -388,38 +418,39 @@ public abstract class AbstractCompanyGenerator {
     private void generateAssistants(final Campaign campaign, final List<Person> personnel) {
         // If you don't want to use pooled assistants, then this generates them as personnel instead
         if (!getOptions().isPoolAssistants()) {
-            final AbstractPersonnelGenerator personnelGenerator = createPersonnelGenerator(campaign);
+            final int assistantRank;
+            switch (campaign.getRanks().getRankSystem()) {
+                case Ranks.RS_CCWH:
+                case Ranks.RS_CL:
+                    assistantRank = 0;
+                    break;
+                case Ranks.RS_COM:
+                case Ranks.RS_WOB:
+                case Ranks.RS_MOC:
+                    assistantRank = 4;
+                    break;
+                default:
+                    assistantRank = 2;
+                    break;
+            }
+
             for (int i = 0; i < campaign.getAstechNeed(); i++) {
-                personnel.add(campaign.newPerson(Person.T_ASTECH, personnelGenerator));
+                final Person astech = campaign.newPerson(Person.T_ASTECH, getPersonnelGenerator());
+                if (getOptions().isAutomaticallyAssignRanks()) {
+                    astech.setRankNumeric(assistantRank);
+                }
+                personnel.add(astech);
             }
             for (int i = 0; i < campaign.getMedicsNeed(); i++) {
-                personnel.add(campaign.newPerson(Person.T_MEDIC, personnelGenerator));
+                final Person medic = campaign.newPerson(Person.T_MEDIC, getPersonnelGenerator());
+                if (getOptions().isAutomaticallyAssignRanks()) {
+                    medic.setRankNumeric(assistantRank);
+                }
+                personnel.add(medic);
             }
         }
     }
     //endregion Support Personnel
-
-    /**
-     * @param campaign the Campaign to generate using
-     * @return the Personnel Generator to use in generation
-     */
-    private AbstractPersonnelGenerator createPersonnelGenerator(final Campaign campaign) {
-        final AbstractFactionSelector factionSelector;
-        final AbstractPlanetSelector planetSelector;
-
-        if (getOptions().isRandomizeOrigin()) {
-            factionSelector = new RangedFactionSelector(getOptions().getOriginSearchRadius());
-            ((RangedFactionSelector) factionSelector).setDistanceScale(getOptions().getOriginDistanceScale());
-
-            planetSelector = new RangedPlanetSelector(getOptions().getOriginSearchRadius(),
-                    getOptions().isExtraRandomOrigin());
-            ((RangedPlanetSelector) planetSelector).setDistanceScale(getOptions().getOriginDistanceScale());
-        } else {
-            factionSelector = new DefaultFactionSelector(getOptions().getFaction());
-            planetSelector = new DefaultPlanetSelector();
-        }
-        return campaign.getPersonnelGenerator(factionSelector, planetSelector);
-    }
     //endregion Personnel
 
     //region Units

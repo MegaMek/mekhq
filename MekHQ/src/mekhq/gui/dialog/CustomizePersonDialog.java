@@ -29,6 +29,7 @@ import javax.swing.*;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomCallsignGenerator;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
@@ -417,7 +418,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
         choiceSystem.addActionListener(evt -> {
             // Update the clan check box based on the new selected faction
-            PlanetarySystem selectedSystem = (PlanetarySystem)choiceSystem.getSelectedItem();
+            PlanetarySystem selectedSystem = (PlanetarySystem) choiceSystem.getSelectedItem();
 
             choicePlanet.setSelectedIndex(-1);
             updatePlanetsComboBoxModel(planetsModel, selectedSystem);
@@ -895,10 +896,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void filterPlanetarySystemsForOurFaction(boolean onlyOurFaction) {
-        PlanetarySystem selectedSystem = (PlanetarySystem)choiceSystem.getSelectedItem();
-        Planet selectedPlanet = (Planet)choicePlanet.getSelectedItem();
+        PlanetarySystem selectedSystem = (PlanetarySystem) choiceSystem.getSelectedItem();
+        Planet selectedPlanet = (Planet) choicePlanet.getSelectedItem();
         if (onlyOurFaction && choiceFaction.getSelectedItem() != null) {
-            Faction faction = (Faction)choiceFaction.getSelectedItem();
+            Faction faction = (Faction) choiceFaction.getSelectedItem();
 
             DefaultComboBoxModel<PlanetarySystem> model = getPlanetarySystemsComboBoxModel(faction);
             if (model.getIndexOf(selectedSystem) < 0) {
@@ -906,18 +907,19 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 selectedPlanet = null;
             }
 
-            updatePlanetsComboBoxModel((DefaultComboBoxModel<Planet>)choicePlanet.getModel(), null);
+            updatePlanetsComboBoxModel((DefaultComboBoxModel<Planet>) choicePlanet.getModel(), null);
             choiceSystem.setModel(model);
         } else {
             choiceSystem.setModel(allSystems);
         }
         choiceSystem.setSelectedItem(selectedSystem);
 
-        updatePlanetsComboBoxModel((DefaultComboBoxModel<Planet>)choicePlanet.getModel(), selectedSystem);
+        updatePlanetsComboBoxModel((DefaultComboBoxModel<Planet>) choicePlanet.getModel(), selectedSystem);
         choicePlanet.setSelectedItem(selectedPlanet);
     }
 
-    private void updatePlanetsComboBoxModel(DefaultComboBoxModel<Planet> planetsModel, PlanetarySystem planetarySystem) {
+    private void updatePlanetsComboBoxModel(DefaultComboBoxModel<Planet> planetsModel,
+                                            @Nullable PlanetarySystem planetarySystem) {
         planetsModel.removeAllElements();
         if (planetarySystem != null) {
             planetsModel.addElement(planetarySystem.getPrimaryPlanet());

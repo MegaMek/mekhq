@@ -257,7 +257,7 @@ public class GMToolsDialog extends JDialog {
         yearPicker.setName("yearPicker");
         ratPanel.add(yearPicker, newGridBagConstraints(0, 1));
 
-        JLabel factionLabel = new JLabel(resources.getString("factionLabel.text"));
+        JLabel factionLabel = new JLabel(resources.getString("Faction"));
         factionLabel.setName("factionLabel");
         ratPanel.add(factionLabel, newGridBagConstraints(1, 0, 2, 1));
 

@@ -28,8 +28,8 @@ import mekhq.campaign.universe.enums.CompanyGenerationType;
 
 public class AtBCompanyGenerator extends AbstractCompanyGenerator {
     //region Constructors
-    public AtBCompanyGenerator(final Campaign campaign) {
-        super(CompanyGenerationType.AGAINST_THE_BOT, campaign);
+    public AtBCompanyGenerator(final Campaign campaign, final CompanyGenerationOptions options) {
+        super(campaign, CompanyGenerationType.AGAINST_THE_BOT, options);
     }
     //endregion Constructors
 

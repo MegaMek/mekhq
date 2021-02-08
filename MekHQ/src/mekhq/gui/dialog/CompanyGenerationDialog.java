@@ -69,7 +69,7 @@ public class CompanyGenerationDialog extends JDialog {
     //region Initialization
     private void initialize(final Campaign campaign) {
         setLayout(new BorderLayout());
-        add(initializeCompanyGenerationOptionsPanel(campaign), BorderLayout.CENTER);
+        add(new JScrollPane(initializeCompanyGenerationOptionsPanel(campaign)), BorderLayout.CENTER);
         add(initializeButtons(), BorderLayout.PAGE_END);
 
         setMinimumSize(new Dimension(480, 240));

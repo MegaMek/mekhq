@@ -4216,7 +4216,7 @@ public class CampaignOptionsDialog extends JDialog {
         //region Company Generation Options
         if (MekHQ.getMekHQOptions().getSaveCompanyGenerationOptions()) {
             companyGenerationOptionsPanel = new CompanyGenerationOptionsPanel(frame, campaign);
-            tabOptions.addTab(resourceMap.getString("companyGenerationOptionsPanel.title"), companyGenerationOptionsPanel);
+            tabOptions.addTab(resourceMap.getString("companyGenerationOptionsPanel.title"), new JScrollPane(companyGenerationOptionsPanel));
         }
         //endregion Company Generation Options
 

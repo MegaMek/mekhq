@@ -28,8 +28,8 @@ import mekhq.campaign.universe.enums.CompanyGenerationType;
 
 public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
     //region Constructors
-    public WindchildCompanyGenerator(final Campaign campaign) {
-        super(CompanyGenerationType.WINDCHILD, campaign);
+    public WindchildCompanyGenerator(final Campaign campaign, final CompanyGenerationOptions options) {
+        super(campaign, CompanyGenerationType.WINDCHILD, options);
     }
     //endregion Constructors
 

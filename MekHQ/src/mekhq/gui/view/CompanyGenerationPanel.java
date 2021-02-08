@@ -64,8 +64,7 @@ public class CompanyGenerationPanel {
             return;
         }
 
-        setCompanyGenerator(getCompanyGenerationType().getGenerator(getCampaign()));
-        getCompanyGenerator().setOptions(createOptionsFromPanel());
+        setCompanyGenerator(getCompanyGenerationType().getGenerator(getCampaign(), createOptionsFromPanel()));
 
         setCombatPersonnel(getCompanyGenerator().generateCombatPersonnel(getCampaign()));
         setSupportPersonnel(getCompanyGenerator().generateSupportPersonnel(getCampaign()));

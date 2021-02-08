@@ -22,6 +22,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.generators.companyGeneration.AbstractCompanyGenerator;
 import mekhq.campaign.universe.generators.companyGeneration.AtBCompanyGenerator;
+import mekhq.campaign.universe.generators.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.generators.companyGeneration.WindchildCompanyGenerator;
 
 import java.util.ResourceBundle;
@@ -62,13 +63,14 @@ public enum CompanyGenerationType {
     }
     //endregion Boolean Comparisons
 
-    public AbstractCompanyGenerator getGenerator(final Campaign campaign) {
+    public AbstractCompanyGenerator getGenerator(final Campaign campaign,
+                                                 final CompanyGenerationOptions options) {
         switch (this) {
             case WINDCHILD:
-                return new WindchildCompanyGenerator(campaign);
+                return new WindchildCompanyGenerator(campaign, options);
             case AGAINST_THE_BOT:
             default:
-                return new AtBCompanyGenerator(campaign);
+                return new AtBCompanyGenerator(campaign, options);
         }
     }
 

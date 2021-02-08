@@ -24,15 +24,15 @@ import java.util.ResourceBundle;
 
 public enum PersonnelTabView {
     //region Enum Declarations
-    GRAPHIC("PersonnelTabView.GRAPHIC"),
-    GENERAL("PersonnelTabView.GENERAL"),
-    PILOT_GUNNERY_SKILLS("PersonnelTabView.PILOT_GUNNERY_SKILLS"),
-    INFANTRY_SKILLS("PersonnelTabView.INFANTRY_SKILLS"),
-    TACTICAL_SKILLS("PersonnelTabView.TACTICAL_SKILLS"),
-    TECHNICAL_SKILLS("PersonnelTabView.TECHNICAL_SKILLS"),
-    ADMINISTRATIVE_SKILLS("PersonnelTabView.ADMINISTRATIVE_SKILLS"),
-    BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL"),
-    FLUFF("PersonnelTabView.FLUFF");
+    GRAPHIC("PersonnelTabView.GRAPHIC.text"),
+    GENERAL("PersonnelTabView.GENERAL.text"),
+    PILOT_GUNNERY_SKILLS("PersonnelTabView.PILOT_GUNNERY_SKILLS.text"),
+    INFANTRY_SKILLS("PersonnelTabView.INFANTRY_SKILLS.text"),
+    TACTICAL_SKILLS("PersonnelTabView.TACTICAL_SKILLS.text"),
+    TECHNICAL_SKILLS("PersonnelTabView.TECHNICAL_SKILLS.text"),
+    ADMINISTRATIVE_SKILLS("PersonnelTabView.ADMINISTRATIVE_SKILLS.text"),
+    BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL.text"),
+    FLUFF("PersonnelTabView.FLUFF.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
