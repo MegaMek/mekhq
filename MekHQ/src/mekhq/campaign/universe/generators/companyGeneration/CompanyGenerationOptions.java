@@ -160,9 +160,9 @@ public class CompanyGenerationOptions implements Serializable {
         // Personnel Randomization
         setRandomizeOrigin(true);
         setCentralPlanet(Systems.getInstance().getSystems().get("Terra").getPrimaryPlanet());
-        setOriginSearchRadius(45);
+        setOriginSearchRadius(1000);
         setExtraRandomOrigin(false);
-        setOriginDistanceScale(0.6);
+        setOriginDistanceScale(0.2);
 
         // Units
         setGenerateUnitsAsAttached(type.isAtB());

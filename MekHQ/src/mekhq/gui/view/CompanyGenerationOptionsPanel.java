@@ -50,7 +50,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     private JFrame frame;
     private Campaign campaign;
 
-    // GUI Variables
     // Base Information
     private JComboBox<CompanyGenerationType> comboCompanyGenerationType;
     private JComboBox<FactionChoice> comboFaction;
@@ -125,6 +124,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
     //region Constructors
     public CompanyGenerationOptionsPanel(final JFrame frame, final Campaign campaign) {
+        super(new GridBagLayout());
         setFrame(frame);
         setCampaign(campaign);
 
@@ -155,7 +155,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         this.campaign = campaign;
     }
 
-    //region GUI Variables
     //region Base Information
     public JComboBox<CompanyGenerationType> getComboCompanyGenerationType() {
         return comboCompanyGenerationType;
@@ -668,7 +667,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         this.chkPayForAmmunition = chkPayForAmmunition;
     }
     //endregion Finances
-    //endregion GUI Variables
     //endregion Getters/Setters
 
     //region Initialization
@@ -687,13 +685,23 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy++;
-        add(createUnitsPanel(), gbc);
+        add(createPersonnelRandomizationPanel(), gbc);
 
         gbc.gridx++;
-        add(createUnitPanel(), gbc);
+        add(createUnitsPanel(), gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
+        add(createUnitPanel(), gbc);
+
+        gbc.gridx++;
+        add(createSparesPanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        add(createContractsPanel(), gbc);
+
+        gbc.gridx++;
         add(createFinancesPanel(), gbc);
     }
 
@@ -1054,7 +1062,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         lblOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
         lblOriginSearchRadius.setName("lblOriginSearchRadius");
 
-        setSpnOriginSearchRadius(new JSpinner(new SpinnerNumberModel(0, 0, 0, 0)));
+        setSpnOriginSearchRadius(new JSpinner(new SpinnerNumberModel(0, 0, 2000, 25)));
         getSpnOriginSearchRadius().setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
         getSpnOriginSearchRadius().setName("spnOriginSearchRadius");
 
@@ -1066,7 +1074,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         lblOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
         lblOriginDistanceScale.setName("lblOriginDistanceScale");
 
-        setSpnOriginDistanceScale(new JSpinner(new SpinnerNumberModel(0, 0, 0, 0)));
+        setSpnOriginDistanceScale(new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1)));
         getSpnOriginDistanceScale().setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
         getSpnOriginDistanceScale().setName("spnOriginDistanceScale");
 
@@ -1234,10 +1242,50 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     }
 
     private JPanel createSparesPanel() {
+        setChkGenerateMothballedSpareUnits(new JCheckBox(resources.getString("chkGenerateMothballedSpareUnits.text")));
+        getChkGenerateMothballedSpareUnits().setToolTipText(resources.getString("chkGenerateMothballedSpareUnits.toolTipText"));
+        getChkGenerateMothballedSpareUnits().setName("chkGenerateMothballedSpareUnits");
+
+        JLabel lblSparesPercentOfActiveUnits = new JLabel(resources.getString("lblSparesPercentOfActiveUnits.text"));
+        lblSparesPercentOfActiveUnits.setToolTipText(resources.getString("lblSparesPercentOfActiveUnits.toolTipText"));
+        lblSparesPercentOfActiveUnits.setName("lblSparesPercentOfActiveUnits");
+
+        setSpnSparesPercentOfActiveUnits(new JSpinner(new SpinnerNumberModel(0, 0, 100, 1)));
+        getSpnSparesPercentOfActiveUnits().setToolTipText(resources.getString("chkGenerateMothballedSpareUnits.toolTipText"));
+        getSpnSparesPercentOfActiveUnits().setName("lblGenerateMothballedSpareUnits");
+
+        setChkGenerateSpareParts(new JCheckBox(resources.getString("chkGenerateSpareParts.text")));
+        getChkGenerateSpareParts().setToolTipText(resources.getString("chkGenerateSpareParts.toolTipText"));
+        getChkGenerateSpareParts().setName("chkGenerateSpareParts");
+
+        JLabel lblStartingArmourWeight = new JLabel(resources.getString("lblStartingArmourWeight.text"));
+        lblStartingArmourWeight.setToolTipText(resources.getString("lblStartingArmourWeight.toolTipText"));
+        lblStartingArmourWeight.setName("lblStartingArmourWeight");
+
+        setSpnStartingArmourWeight(new JSpinner(new SpinnerNumberModel(0, 0, 500, 1)));
+        getSpnStartingArmourWeight().setToolTipText(resources.getString("lblStartingArmourWeight.toolTipText"));
+        getSpnStartingArmourWeight().setName("spnStartingArmourWeight");
+
+        setChkGenerateSpareAmmunition(new JCheckBox(resources.getString("chkGenerateSpareAmmunition.text")));
+        getChkGenerateSpareAmmunition().setToolTipText(resources.getString("chkGenerateSpareAmmunition.toolTipText"));
+        getChkGenerateSpareAmmunition().setName("chkGenerateSpareAmmunition");
+
+        JLabel lblNumberReloadsPerWeapon = new JLabel(resources.getString("lblNumberReloadsPerWeapon.text"));
+        lblNumberReloadsPerWeapon.setToolTipText(resources.getString("lblNumberReloadsPerWeapon.toolTipText"));
+        lblNumberReloadsPerWeapon.setName("lblNumberReloadsPerWeapon");
+
+        setSpnNumberReloadsPerWeapon(new JSpinner(new SpinnerNumberModel(0, 0, 25, 1)));
+        getSpnNumberReloadsPerWeapon().setToolTipText(resources.getString("lblNumberReloadsPerWeapon.toolTipText"));
+        getSpnNumberReloadsPerWeapon().setName("spnNumberReloadsPerWeapon");
+
+        setChkGenerateFractionalMachineGunAmmunition(new JCheckBox(resources.getString("chkGenerateFractionalMachineGunAmmunition.text")));
+        getChkGenerateFractionalMachineGunAmmunition().setToolTipText(resources.getString("chkGenerateFractionalMachineGunAmmunition.toolTipText"));
+        getChkGenerateFractionalMachineGunAmmunition().setName("chkGenerateFractionalMachineGunAmmunition");
+
         // Layout the UI
         JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("unitPanel.title")));
-        panel.setName("unitPanel");
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("sparesPanel.title")));
+        panel.setName("sparesPanel");
         GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
@@ -1246,18 +1294,36 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
+                        .addComponent(getChkGenerateMothballedSpareUnits())
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblForceNamingType)
-                                .addComponent(getComboForceNamingType(), GroupLayout.Alignment.LEADING))
-                        .addComponent(getChkGenerateForceIcons())
+                                .addComponent(lblSparesPercentOfActiveUnits)
+                                .addComponent(getSpnSparesPercentOfActiveUnits(), GroupLayout.Alignment.LEADING))
+                        .addComponent(getChkGenerateSpareParts())
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblStartingArmourWeight)
+                                .addComponent(getSpnStartingArmourWeight(), GroupLayout.Alignment.LEADING))
+                        .addComponent(getChkGenerateSpareAmmunition())
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblNumberReloadsPerWeapon)
+                                .addComponent(getSpnNumberReloadsPerWeapon(), GroupLayout.Alignment.LEADING))
+                        .addComponent(getChkGenerateFractionalMachineGunAmmunition())
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(getChkGenerateMothballedSpareUnits())
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblForceNamingType)
-                                .addComponent(getComboForceNamingType()))
-                        .addComponent(getChkGenerateForceIcons())
+                                .addComponent(lblSparesPercentOfActiveUnits)
+                                .addComponent(getSpnSparesPercentOfActiveUnits()))
+                        .addComponent(getChkGenerateSpareParts())
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStartingArmourWeight)
+                                .addComponent(getSpnStartingArmourWeight()))
+                        .addComponent(getChkGenerateSpareAmmunition())
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblNumberReloadsPerWeapon)
+                                .addComponent(getSpnNumberReloadsPerWeapon()))
+                        .addComponent(getChkGenerateFractionalMachineGunAmmunition())
         );
         return panel;
     }

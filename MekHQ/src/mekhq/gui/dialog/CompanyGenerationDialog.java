@@ -89,7 +89,7 @@ public class CompanyGenerationDialog extends JDialog {
         btnExport.addActionListener(evt -> getCompanyGenerationOptionsPanel().exportOptionsToXML());
 
         JButton btnGenerate = new JButton(resources.getString("Generate"));
-        btnGenerate.addActionListener(evt -> getCompanyGenerationOptionsPanel().generate());
+        //btnGenerate.addActionListener(evt -> getCompanyGenerationOptionsPanel().generate());
 
         JButton btnRestore = new JButton(resources.getString("RestoreDefaults"));
         btnRestore.addActionListener(evt -> getCompanyGenerationOptionsPanel().setOptions(
@@ -99,11 +99,13 @@ public class CompanyGenerationDialog extends JDialog {
         btnImport.addActionListener(evt -> getCompanyGenerationOptionsPanel().importOptionsFromXML());
 
         JButton btnApply = new JButton(resources.getString("Apply"));
+        /*
         btnApply.addActionListener(evt -> {
             getCompanyGenerationOptionsPanel().apply();
             MekHQ.triggerEvent(new OrganizationChangedEvent(getCompanyGenerationOptionsPanel().getCampaign().getForces()));
             setVisible(false);
         });
+        */
 
         // Layout the UI
         JPanel panel = new JPanel();

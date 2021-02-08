@@ -40,7 +40,6 @@ public class MekHqOptionsDialog extends BaseDialog {
     private JTextField optionLongDisplayDateFormat;
     private JCheckBox optionHistoricalDailyLog;
     private JCheckBox optionShowCompanyGenerator;
-    private JComboBox<CompanyGenerationType> optionDefaultCompanyGenerationType;
 
     //region Command Center Display
     private JCheckBox optionCommandCenterUseUnitMarket;
@@ -76,6 +75,7 @@ public class MekHqOptionsDialog extends BaseDialog {
 
     //region Miscellaneous
     private JSpinner optionStartGameDelay;
+    private JComboBox<CompanyGenerationType> optionDefaultCompanyGenerationType;
     //endregion Miscellaneous
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog");
@@ -109,7 +109,6 @@ public class MekHqOptionsDialog extends BaseDialog {
     }
 
     private JPanel createDisplayTab() {
-        //region Create Graphical Segments
         JLabel labelDisplayDateFormat = new JLabel(resources.getString("labelDisplayDateFormat.text"));
         JLabel labelDisplayDateFormatExample = new JLabel();
         optionDisplayDateFormat = new JTextField();
@@ -132,22 +131,6 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionShowCompanyGenerator = new JCheckBox(resources.getString("optionShowCompanyGenerator.text"));
         optionShowCompanyGenerator.setToolTipText(resources.getString("optionShowCompanyGenerator.toolTipText"));
         optionShowCompanyGenerator.setName("optionShowCompanyGenerator");
-
-        JLabel labelDefaultCompanyGenerationType = new JLabel(resources.getString("labelDefaultCompanyGenerationType.text"));
-        labelDefaultCompanyGenerationType.setToolTipText(resources.getString("labelDefaultCompanyGenerationType.toolTipText"));
-        optionDefaultCompanyGenerationType = new JComboBox<>(CompanyGenerationType.values());
-        optionDefaultCompanyGenerationType.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (isSelected && (index > -1)) {
-                    list.setToolTipText((list.getSelectedValue() instanceof CompanyGenerationType)
-                            ? ((CompanyGenerationType) list.getSelectedValue()).getToolTipText() : "");
-                }
-                return this;
-            }
-        });
 
         //region Command Center Display
         JLabel labelCommandCenterDisplay = new JLabel(resources.getString("labelCommandCenterDisplay.text"));
@@ -181,9 +164,7 @@ public class MekHqOptionsDialog extends BaseDialog {
 
         optionPersonnelFilterOnPrimaryRole = new JCheckBox(resources.getString("optionPersonnelFilterOnPrimaryRole.text"));
         //endregion Personnel Tab Display Options
-        //endregion Create Graphical Components
 
-        //region Layout
         // Layout the UI
         JPanel body = new JPanel();
         GroupLayout layout = new GroupLayout(body);
@@ -204,9 +185,6 @@ public class MekHqOptionsDialog extends BaseDialog {
                                 .addComponent(labelLongDisplayDateFormatExample, GroupLayout.Alignment.TRAILING))
                         .addComponent(optionHistoricalDailyLog)
                         .addComponent(optionShowCompanyGenerator)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(labelDefaultCompanyGenerationType)
-                                .addComponent(optionDefaultCompanyGenerationType))
                         .addComponent(labelCommandCenterDisplay)
                         .addComponent(optionCommandCenterUseUnitMarket)
                         .addComponent(optionCommandCenterMRMS)
@@ -230,9 +208,6 @@ public class MekHqOptionsDialog extends BaseDialog {
                                 .addComponent(labelLongDisplayDateFormatExample))
                         .addComponent(optionHistoricalDailyLog)
                         .addComponent(optionShowCompanyGenerator)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(labelDefaultCompanyGenerationType)
-                                .addComponent(optionDefaultCompanyGenerationType))
                         .addComponent(labelCommandCenterDisplay)
                         .addComponent(optionCommandCenterUseUnitMarket)
                         .addComponent(optionCommandCenterMRMS)
@@ -242,13 +217,11 @@ public class MekHqOptionsDialog extends BaseDialog {
                                 .addComponent(optionPersonnelFilterStyle))
                         .addComponent(optionPersonnelFilterOnPrimaryRole)
         );
-        //endregion Layout
 
         return body;
     }
 
     private JPanel createAutosaveTab() {
-        //region Create Graphical Components
         optionNoSave = new JRadioButton(resources.getString("optionNoSave.text"));
         optionNoSave.setMnemonic(KeyEvent.VK_N);
 
@@ -277,9 +250,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         JLabel labelSavedGamesCount = new JLabel(resources.getString("labelSavedGamesCount.text"));
         spinnerSavedGamesCount = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
         labelSavedGamesCount.setLabelFor(spinnerSavedGamesCount);
-        //endregion Create Graphical Components
 
-        //region Layout
         // Layout the UI
         JPanel body = new JPanel();
         GroupLayout layout = new GroupLayout(body);
@@ -314,17 +285,13 @@ public class MekHqOptionsDialog extends BaseDialog {
                                 .addComponent(labelSavedGamesCount)
                                 .addComponent(spinnerSavedGamesCount))
         );
-        //endregion Layout
 
         return body;
     }
 
     private JPanel createNewDayTab() {
-        //region Create Graphical Components
         optionNewDayMRMS = new JCheckBox(resources.getString("optionNewDayMRMS.text"));
-        //endregion Create Graphical Components
 
-        //region Layout
         // Layout the UI
         JPanel body = new JPanel();
         GroupLayout layout = new GroupLayout(body);
@@ -342,13 +309,11 @@ public class MekHqOptionsDialog extends BaseDialog {
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(optionNewDayMRMS)
         );
-        //endregion Layout
 
         return body;
     }
 
     private JPanel createCampaignXMLSaveTab() {
-        //region Create Graphical Components
         optionPreferGzippedOutput = new JCheckBox(resources.getString("optionPreferGzippedOutput.text"));
         optionPreferGzippedOutput.setToolTipText(resources.getString("optionPreferGzippedOutput.toolTipText"));
 
@@ -362,9 +327,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionSaveCompanyGenerationOptions = new JCheckBox(resources.getString("optionSaveCompanyGenerationOptions.text"));
         optionSaveCompanyGenerationOptions.setToolTipText(resources.getString("optionSaveCompanyGenerationOptions.toolTipText"));
         optionSaveCompanyGenerationOptions.setName("optionSaveCompanyGenerationOptions");
-        //endregion Create Graphical Components
 
-        //region Layout
         // Layout the UI
         JPanel body = new JPanel();
         GroupLayout layout = new GroupLayout(body);
@@ -388,21 +351,33 @@ public class MekHqOptionsDialog extends BaseDialog {
                         .addComponent(optionSaveMothballState)
                         .addComponent(optionSaveCompanyGenerationOptions)
         );
-        //endregion Layout
 
         return body;
     }
 
     private JPanel createMiscellaneousTab() {
-        //region Create Graphical Components
         JLabel labelStartGameDelay = new JLabel(resources.getString("labelStartGameDelay.text"));
         labelStartGameDelay.setToolTipText(resources.getString("optionStartGameDelay.toolTipText"));
 
         optionStartGameDelay = new JSpinner(new SpinnerNumberModel(0, 0, 2500, 25));
         optionStartGameDelay.setToolTipText(resources.getString("optionStartGameDelay.toolTipText"));
-        //endregion Create Graphical Components
 
-        //region Layout
+        JLabel labelDefaultCompanyGenerationType = new JLabel(resources.getString("labelDefaultCompanyGenerationType.text"));
+        labelDefaultCompanyGenerationType.setToolTipText(resources.getString("labelDefaultCompanyGenerationType.toolTipText"));
+        optionDefaultCompanyGenerationType = new JComboBox<>(CompanyGenerationType.values());
+        optionDefaultCompanyGenerationType.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (isSelected && (index > -1)) {
+                    list.setToolTipText((list.getSelectedValue() instanceof CompanyGenerationType)
+                            ? ((CompanyGenerationType) list.getSelectedValue()).getToolTipText() : "");
+                }
+                return this;
+            }
+        });
+
         // Layout the UI
         JPanel body = new JPanel();
         GroupLayout layout = new GroupLayout(body);
@@ -417,6 +392,9 @@ public class MekHqOptionsDialog extends BaseDialog {
                                 .addComponent(labelStartGameDelay)
                                 .addComponent(optionStartGameDelay, GroupLayout.DEFAULT_SIZE,
                                         GroupLayout.DEFAULT_SIZE, 40))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(labelDefaultCompanyGenerationType)
+                                .addComponent(optionDefaultCompanyGenerationType))
         );
 
         layout.setHorizontalGroup(
@@ -424,8 +402,10 @@ public class MekHqOptionsDialog extends BaseDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(labelStartGameDelay)
                                 .addComponent(optionStartGameDelay))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(labelDefaultCompanyGenerationType)
+                                .addComponent(optionDefaultCompanyGenerationType))
         );
-        //endregion Layout
 
         return body;
     }
@@ -441,7 +421,6 @@ public class MekHqOptionsDialog extends BaseDialog {
         }
         MekHQ.getMekHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
         MekHQ.getMekHQOptions().setShowCompanyGenerator(optionShowCompanyGenerator.isSelected());
-        MekHQ.getMekHQOptions().setDefaultCompanyGenerationType((CompanyGenerationType) Objects.requireNonNull(optionDefaultCompanyGenerationType.getSelectedItem()));
         MekHQ.getMekHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
         MekHQ.getMekHQOptions().setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
         MekHQ.getMekHQOptions().setPersonnelFilterStyle((PersonnelFilterStyle) Objects.requireNonNull(optionPersonnelFilterStyle.getSelectedItem()));
@@ -463,6 +442,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setSaveCompanyGenerationOptions(optionSaveCompanyGenerationOptions.isSelected());
 
         MekHQ.getMekHQOptions().setStartGameDelay((Integer) optionStartGameDelay.getValue());
+        MekHQ.getMekHQOptions().setDefaultCompanyGenerationType((CompanyGenerationType) Objects.requireNonNull(optionDefaultCompanyGenerationType.getSelectedItem()));
 
         MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
     }
@@ -472,7 +452,6 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionLongDisplayDateFormat.setText(MekHQ.getMekHQOptions().getLongDisplayDateFormat());
         optionHistoricalDailyLog.setSelected(MekHQ.getMekHQOptions().getHistoricalDailyLog());
         optionShowCompanyGenerator.setSelected(MekHQ.getMekHQOptions().getShowCompanyGenerator());
-        optionDefaultCompanyGenerationType.setSelectedItem(MekHQ.getMekHQOptions().getDefaultCompanyGenerationType());
         optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket());
         optionCommandCenterMRMS.setSelected(MekHQ.getMekHQOptions().getCommandCenterMRMS());
         optionPersonnelFilterStyle.setSelectedItem(MekHQ.getMekHQOptions().getPersonnelFilterStyle());
@@ -494,6 +473,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionSaveCompanyGenerationOptions.setSelected(MekHQ.getMekHQOptions().getSaveCompanyGenerationOptions());
 
         optionStartGameDelay.setValue(MekHQ.getMekHQOptions().getStartGameDelay());
+        optionDefaultCompanyGenerationType.setSelectedItem(MekHQ.getMekHQOptions().getDefaultCompanyGenerationType());
     }
 
     //region Data Validation

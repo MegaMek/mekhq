@@ -73,15 +73,6 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putBoolean(MekHqConstants.SHOW_COMPANY_GENERATOR, value);
     }
 
-    public CompanyGenerationType getDefaultCompanyGenerationType() {
-        return CompanyGenerationType.valueOf(userPreferences.node(MekHqConstants.DISPLAY_NODE)
-                .get(MekHqConstants.DEFAULT_COMPANY_GENERATION_TYPE, CompanyGenerationType.AGAINST_THE_BOT.name()));
-    }
-
-    public void setDefaultCompanyGenerationType(CompanyGenerationType value) {
-        userPreferences.node(MekHqConstants.DISPLAY_NODE).put(MekHqConstants.DEFAULT_COMPANY_GENERATION_TYPE, value.name());
-    }
-
     //region Command Center Display
     public boolean getCommandCenterUseUnitMarket() {
         return userPreferences.node(MekHqConstants.DISPLAY_NODE).getBoolean(MekHqConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
@@ -103,7 +94,7 @@ public final class MekHQOptions {
     //region Personnel Tab Display Options
     public PersonnelFilterStyle getPersonnelFilterStyle() {
         return PersonnelFilterStyle.valueOf(userPreferences.node(MekHqConstants.DISPLAY_NODE)
-                .get(MekHqConstants.PERSONNEL_FILTER_STYLE, "STANDARD"));
+                .get(MekHqConstants.PERSONNEL_FILTER_STYLE, PersonnelFilterStyle.STANDARD.name()));
     }
 
     public void setPersonnelFilterStyle(PersonnelFilterStyle value) {
@@ -238,7 +229,7 @@ public final class MekHQOptions {
         return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.AWARDS_DIRECTORY_PATH, "data/universe/awards/");
     }
 
-    public void setAwardsDirectoryPath(String value) {
+    public void setAwardsDirectoryPath(final String value) {
         userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.AWARDS_DIRECTORY_PATH, value);
     }
 
@@ -246,7 +237,7 @@ public final class MekHQOptions {
         return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.COMPANY_GENERATION_DIRECTORY_PATH, "mmconf/mhqCompanyGenerationPresets/");
     }
 
-    public void setCompanyGenerationDirectoryPath(String value) {
+    public void setCompanyGenerationDirectoryPath(final String value) {
         userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.COMPANY_GENERATION_DIRECTORY_PATH, value);
     }
     //endregion File Paths
@@ -256,8 +247,17 @@ public final class MekHQOptions {
         return userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).getInt(MekHqConstants.START_GAME_DELAY, 500);
     }
 
-    public void setStartGameDelay(int startGameDelay) {
+    public void setStartGameDelay(final int startGameDelay) {
         userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).putInt(MekHqConstants.START_GAME_DELAY, startGameDelay);
+    }
+
+    public CompanyGenerationType getDefaultCompanyGenerationType() {
+        return CompanyGenerationType.valueOf(userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE)
+                .get(MekHqConstants.DEFAULT_COMPANY_GENERATION_TYPE, CompanyGenerationType.AGAINST_THE_BOT.name()));
+    }
+
+    public void setDefaultCompanyGenerationType(final CompanyGenerationType value) {
+        userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).put(MekHqConstants.DEFAULT_COMPANY_GENERATION_TYPE, value.name());
     }
     //endregion Miscellaneous Options
 }

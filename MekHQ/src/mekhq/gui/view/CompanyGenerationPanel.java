@@ -52,7 +52,7 @@ public class CompanyGenerationPanel {
     }
     //endregion Data
     //endregion Getters/Setters
-
+/**
 
     public void generate() {
         if ((getCompanyGenerator() != null) && (JOptionPane.showConfirmDialog(getFrame(),
@@ -90,4 +90,5 @@ public class CompanyGenerationPanel {
         getCompanyGenerator().applyToCampaign(getCampaign(), getCombatPersonnel(),
                 getSupportPersonnel(), getEntities());
     }
+ */
 }

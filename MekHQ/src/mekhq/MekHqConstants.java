@@ -29,7 +29,6 @@ public final class MekHqConstants {
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history, also used as a limit in the UI
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
-    public static final String DEFAULT_COMPANY_GENERATION_TYPE = "defaultCompanyGenerationType";
 
     // region Command Center
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
@@ -76,6 +75,7 @@ public final class MekHqConstants {
     //region Miscellaneous Options
     public static final String MISCELLANEOUS_NODE = "mekhq/prefs/miscellaneous";
     public static final String START_GAME_DELAY = "startGameDelay";
+    public static final String DEFAULT_COMPANY_GENERATION_TYPE = "defaultCompanyGenerationType";
     //endregion Miscellaneous Options
     //endregion MekHQ Options
 
