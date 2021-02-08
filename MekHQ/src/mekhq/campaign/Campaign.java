@@ -1163,8 +1163,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * Generate a new Person of the given role using whatever randomization options have been given in the
-     * CampaignOptions
+     * Generate a new Person of the given role using whatever randomization options have been given
+     * in the CampaignOptions
      *
      * @param role The primary role
      * @return A new {@link Person}.
@@ -1174,8 +1174,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * Generate a new Person of the given role using whatever randomization options have been given in the
-     * CampaignOptions
+     * Generate a new Person of the given role using whatever randomization options have been given
+     * in the CampaignOptions
      *
      * @param primaryRole The primary role
      * @param secondaryRole A secondary role
@@ -1186,22 +1186,21 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * Generate a new Person of the given role using whatever randomization options have been given in the
-     * CampaignOptions
+     * Generate a new Person of the given role using whatever randomization options have been given
+     * in the CampaignOptions
      *
      * @param primaryRole The primary role
-     * @param secondaryRole A secondary role
      * @param factionCode The code for the faction this person is to be generated from
      * @param gender The gender of the person to be generated, or a randomize it value
      * @return A new {@link Person}.
      */
-    public Person newPerson(PersonnelRole primaryRole, PersonnelRole secondaryRole, String factionCode, Gender gender) {
-        return newPerson(primaryRole, secondaryRole, new DefaultFactionSelector(factionCode), getPlanetSelector(), gender);
+    public Person newPerson(final PersonnelRole primaryRole, final String factionCode, final Gender gender) {
+        return newPerson(primaryRole, PersonnelRole.NONE, new DefaultFactionSelector(factionCode), getPlanetSelector(), gender);
     }
 
     /**
-     * Generate a new Person of the given role using whatever randomization options have been given in the
-     * CampaignOptions
+     * Generate a new Person of the given role using whatever randomization options have been given
+     * in the CampaignOptions
      *
      * @param primaryRole The primary role
      * @param secondaryRole A secondary role
@@ -1210,8 +1209,9 @@ public class Campaign implements Serializable, ITechManager {
      * @param gender The gender of the person to be generated, or a randomize it value
      * @return A new {@link Person}.
      */
-    public Person newPerson(PersonnelRole primaryRole, PersonnelRole secondaryRole, AbstractFactionSelector factionSelector,
-                            AbstractPlanetSelector planetSelector, Gender gender) {
+    public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole,
+                            final AbstractFactionSelector factionSelector,
+                            final AbstractPlanetSelector planetSelector, Gender gender) {
         AbstractPersonnelGenerator personnelGenerator = getPersonnelGenerator(factionSelector, planetSelector);
         return newPerson(primaryRole, secondaryRole, personnelGenerator, gender);
     }
@@ -1224,7 +1224,8 @@ public class Campaign implements Serializable, ITechManager {
      * @param gender The gender of the person to be generated, or a randomize it value
      * @return A new {@link Person} configured using {@code personnelGenerator}.
      */
-    public Person newPerson(PersonnelRole primaryRole, PersonnelRole secondaryRole, AbstractPersonnelGenerator personnelGenerator, Gender gender) {
+    public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole,
+                            final AbstractPersonnelGenerator personnelGenerator, final Gender gender) {
         Person person = personnelGenerator.generate(this, primaryRole, secondaryRole, gender);
 
         // Assign a random portrait after we generate a new person

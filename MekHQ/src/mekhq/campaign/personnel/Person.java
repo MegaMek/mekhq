@@ -1661,14 +1661,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             String edge = null;
             String implants = null;
 
-            //backwards compatibility
-            String pilotName = null;
-            String pilotNickname = null;
-            int pilotGunnery = -1;
-            int pilotPiloting = -1;
-            int pilotCommandBonus = -1;
-            int type = 0;
-
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
@@ -1800,20 +1792,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     implants = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("toughness")) {
                     retVal.toughness = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotGunnery")) {
-                    pilotGunnery = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotPiloting")) {
-                    pilotPiloting = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("pilotHits")) {
                     retVal.hits = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotCommandBonus")) {
-                    pilotCommandBonus = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotName")) {
-                    pilotName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotNickname")) {
-                    pilotNickname = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
-                    type = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("skill")) {
                     Skill s = Skill.generateInstanceFromXML(wn2);
                     if ((s != null) && (s.getType() != null)) {
@@ -1946,7 +1926,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(Person.class, "Error restoring advantage: " + adv);
+                        MekHQ.getLogger().error("Error restoring advantage: " + adv);
                     }
                 }
             }
@@ -1960,7 +1940,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(Person.class, "Error restoring edge: " + adv);
+                        MekHQ.getLogger().error("Error restoring edge: " + adv);
                     }
                 }
             }
@@ -1974,15 +1954,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.getLogger().error(Person.class, "Error restoring implants: " + adv);
+                        MekHQ.getLogger().error("Error restoring implants: " + adv);
                     }
                 }
-            }
-            if (pilotName != null) {
-                retVal.migrateName(pilotName);
-            }
-            if (null != pilotNickname) {
-                retVal.setCallsign(pilotNickname);
             }
 
             // Ensure the Genealogy Origin Id is set to the proper id

@@ -38,8 +38,8 @@ public enum PersonnelRole {
     VEHICLE_CREW("PersonnelRole.VEHICLE_CREW.text", KeyEvent.VK_UNDEFINED),
     AEROSPACE_PILOT("PersonnelRole.AEROSPACE_PILOT.text", KeyEvent.VK_A),
     CONVENTIONAL_AIRCRAFT_PILOT("PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT.text", KeyEvent.VK_C),
-    PROTOMECH_PILOT("PersonnelRole.PROTOMECH_PILOT.text", "PersonnelRole.BATTLE_ARMOUR.clan.text", KeyEvent.VK_P),
-    BATTLE_ARMOUR("PersonnelRole.BATTLE_ARMOUR.text", KeyEvent.VK_B),
+    PROTOMECH_PILOT("PersonnelRole.PROTOMECH_PILOT.text", KeyEvent.VK_P),
+    BATTLE_ARMOUR("PersonnelRole.BATTLE_ARMOUR.text", "PersonnelRole.BATTLE_ARMOUR.clan.text", KeyEvent.VK_B),
     SOLDIER("PersonnelRole.SOLDIER.text", KeyEvent.VK_S),
     VESSEL_PILOT("PersonnelRole.VESSEL_PILOT.text", KeyEvent.VK_I),
     VESSEL_GUNNER("PersonnelRole.VESSEL_GUNNER.text", KeyEvent.VK_U),
@@ -348,7 +348,7 @@ public enum PersonnelRole {
         }
     }
 
-    //egion Static Methods
+    //region Static Methods
     public static List<PersonnelRole> getMarketableRoles() {
         List<PersonnelRole> marketableRoles = new ArrayList<>();
         for (PersonnelRole role : values()) {
