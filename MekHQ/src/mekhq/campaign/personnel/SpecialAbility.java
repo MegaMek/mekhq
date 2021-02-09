@@ -568,22 +568,23 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return implants.get(name);
     }
 
-    public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year, boolean clusterOnly) {
-        ArrayList<String> candidates = new ArrayList<>();
+    public static String chooseWeaponSpecialization(final Person person, final int techLvl,
+                                                    final int year, final boolean clusterOnly) {
+        final List<String> candidates = new ArrayList<>();
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
-            EquipmentType et = e.nextElement();
+            final EquipmentType et = e.nextElement();
 
-            if (!isWeaponEligibleForSPA(et, type, clusterOnly)) {
+            if (!isWeaponEligibleForSPA(et, person.getPrimaryRole(), clusterOnly)) {
                 continue;
             }
 
-            WeaponType wt = (WeaponType) et;
+            final WeaponType wt = (WeaponType) et;
 
-            if (TechConstants.isClan(wt.getTechLevel(year)) != isClan) {
+            if (TechConstants.isClan(wt.getTechLevel(year)) != person.isClanner()) {
                 continue;
             }
 
-            int lvl = wt.getTechLevel(year);
+            final int lvl = wt.getTechLevel(year);
             if (lvl < 0) {
                 continue;
             }
@@ -606,10 +607,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 ntimes--;
             }
         }
-        if (candidates.isEmpty()) {
-            return "??";
-        }
-        return Utilities.getRandomItem(candidates);
+
+        return candidates.isEmpty() ? "??" : Utilities.getRandomItem(candidates);
     }
 
     /**
