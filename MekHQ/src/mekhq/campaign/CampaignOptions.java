@@ -1,5 +1,5 @@
 /*
- * Copyright (c) - 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -916,7 +916,7 @@ public class CampaignOptions implements Serializable {
         return useTactics;
     }
 
-    public void setUseTactics(boolean useTactics) {
+    public void setUseTactics(final boolean useTactics) {
         this.useTactics = useTactics;
     }
 
@@ -924,7 +924,7 @@ public class CampaignOptions implements Serializable {
         return useInitiativeBonus;
     }
 
-    public void setUseInitiativeBonus(boolean useInitiativeBonus) {
+    public void setUseInitiativeBonus(final boolean useInitiativeBonus) {
         this.useInitiativeBonus = useInitiativeBonus;
     }
 
@@ -932,7 +932,7 @@ public class CampaignOptions implements Serializable {
         return useToughness;
     }
 
-    public void setUseToughness(boolean useToughness) {
+    public void setUseToughness(final boolean useToughness) {
         this.useToughness = useToughness;
     }
 
@@ -940,7 +940,7 @@ public class CampaignOptions implements Serializable {
         return useArtillery;
     }
 
-    public void setUseArtillery(boolean useArtillery) {
+    public void setUseArtillery(final boolean useArtillery) {
         this.useArtillery = useArtillery;
     }
 
@@ -948,7 +948,7 @@ public class CampaignOptions implements Serializable {
         return useAbilities;
     }
 
-    public void setUseAbilities(boolean useAbilities) {
+    public void setUseAbilities(final boolean useAbilities) {
         this.useAbilities = useAbilities;
     }
 
@@ -956,7 +956,7 @@ public class CampaignOptions implements Serializable {
         return useEdge;
     }
 
-    public void setUseEdge(boolean useEdge) {
+    public void setUseEdge(final boolean useEdge) {
         this.useEdge = useEdge;
     }
 
@@ -964,7 +964,7 @@ public class CampaignOptions implements Serializable {
         return useSupportEdge;
     }
 
-    public void setUseSupportEdge(boolean useSupportEdge) {
+    public void setUseSupportEdge(final boolean useSupportEdge) {
         this.useSupportEdge = useSupportEdge;
     }
 
@@ -972,7 +972,7 @@ public class CampaignOptions implements Serializable {
         return useImplants;
     }
 
-    public void setUseImplants(boolean useImplants) {
+    public void setUseImplants(final boolean useImplants) {
         this.useImplants = useImplants;
     }
 
@@ -980,7 +980,7 @@ public class CampaignOptions implements Serializable {
         return alternativeQualityAveraging;
     }
 
-    public void setAlternativeQualityAveraging(boolean alternativeQualityAveraging) {
+    public void setAlternativeQualityAveraging(final boolean alternativeQualityAveraging) {
         this.alternativeQualityAveraging = alternativeQualityAveraging;
     }
 
@@ -988,7 +988,7 @@ public class CampaignOptions implements Serializable {
         return useTransfers;
     }
 
-    public void setUseTransfers(boolean useTransfers) {
+    public void setUseTransfers(final boolean useTransfers) {
         this.useTransfers = useTransfers;
     }
     //endregion General Personnel
@@ -1004,7 +1004,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param useTimeInService the new value for whether to use time in service or not
      */
-    public void setUseTimeInService(boolean useTimeInService) {
+    public void setUseTimeInService(final boolean useTimeInService) {
         this.useTimeInService = useTimeInService;
     }
 
@@ -1018,7 +1018,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param timeInServiceDisplayFormat the new display format for Time in Service
      */
-    public void setTimeInServiceDisplayFormat(TimeInDisplayFormat timeInServiceDisplayFormat) {
+    public void setTimeInServiceDisplayFormat(final TimeInDisplayFormat timeInServiceDisplayFormat) {
         this.timeInServiceDisplayFormat = timeInServiceDisplayFormat;
     }
 
@@ -1032,7 +1032,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param useTimeInRank the new value for whether or not to use time in rank
      */
-    public void setUseTimeInRank(boolean useTimeInRank) {
+    public void setUseTimeInRank(final boolean useTimeInRank) {
         this.useTimeInRank = useTimeInRank;
     }
 
@@ -1046,7 +1046,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param timeInRankDisplayFormat the new display format for Time in Rank
      */
-    public void setTimeInRankDisplayFormat(TimeInDisplayFormat timeInRankDisplayFormat) {
+    public void setTimeInRankDisplayFormat(final TimeInDisplayFormat timeInRankDisplayFormat) {
         this.timeInRankDisplayFormat = timeInRankDisplayFormat;
     }
 
@@ -1060,7 +1060,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param useRetirementDateTracking the new value for whether or not to track retirement dates
      */
-    public void setUseRetirementDateTracking(boolean useRetirementDateTracking) {
+    public void setUseRetirementDateTracking(final boolean useRetirementDateTracking) {
         this.useRetirementDateTracking = useRetirementDateTracking;
     }
 
@@ -1074,23 +1074,23 @@ public class CampaignOptions implements Serializable {
     /**
      * @param trackTotalEarnings the new value for whether or not to track total earnings for personnel
      */
-    public void setTrackTotalEarnings(boolean trackTotalEarnings) {
+    public void setTrackTotalEarnings(final boolean trackTotalEarnings) {
         this.trackTotalEarnings = trackTotalEarnings;
     }
 
     /**
-     * Gets a value indicating whether or not to show a person's
-     * origin faction when displaying their details.
+     * Gets a value indicating whether or not to show a person's origin faction when displaying
+     * their details.
      */
     public boolean showOriginFaction() {
         return showOriginFaction;
     }
 
     /**
-     * Sets a value indicating whether or not to show a person's
-     * origin faction when displaying their details.
+     * Sets a value indicating whether or not to show a person's origin faction when displaying
+     * their details.
      */
-    public void setShowOriginFaction(boolean showOriginFaction) {
+    public void setShowOriginFaction(final boolean showOriginFaction) {
         this.showOriginFaction = showOriginFaction;
     }
     //endregion Expanded Personnel Information
@@ -1100,7 +1100,7 @@ public class CampaignOptions implements Serializable {
         return useAdvancedMedical;
     }
 
-    public void setUseAdvancedMedical(boolean useAdvancedMedical) {
+    public void setUseAdvancedMedical(final boolean useAdvancedMedical) {
         this.useAdvancedMedical = useAdvancedMedical;
     }
 
@@ -1108,7 +1108,7 @@ public class CampaignOptions implements Serializable {
         return healWaitingPeriod;
     }
 
-    public void setHealingWaitingPeriod(int healWaitingPeriod) {
+    public void setHealingWaitingPeriod(final int healWaitingPeriod) {
         this.healWaitingPeriod = healWaitingPeriod;
     }
 
@@ -1116,7 +1116,7 @@ public class CampaignOptions implements Serializable {
         return naturalHealingWaitingPeriod;
     }
 
-    public void setNaturalHealingWaitingPeriod(int naturalHealingWaitingPeriod) {
+    public void setNaturalHealingWaitingPeriod(final int naturalHealingWaitingPeriod) {
         this.naturalHealingWaitingPeriod = naturalHealingWaitingPeriod;
     }
 
@@ -1124,7 +1124,7 @@ public class CampaignOptions implements Serializable {
         return minimumHitsForVehicles;
     }
 
-    public void setMinimumHitsForVehicles(int minimumHitsForVehicles) {
+    public void setMinimumHitsForVehicles(final int minimumHitsForVehicles) {
         this.minimumHitsForVehicles = minimumHitsForVehicles;
     }
 
@@ -1132,7 +1132,7 @@ public class CampaignOptions implements Serializable {
         return useRandomHitsForVehicles;
     }
 
-    public void setUseRandomHitsForVehicles(boolean useRandomHitsForVehicles) {
+    public void setUseRandomHitsForVehicles(final boolean useRandomHitsForVehicles) {
         this.useRandomHitsForVehicles = useRandomHitsForVehicles;
     }
 
@@ -1140,7 +1140,7 @@ public class CampaignOptions implements Serializable {
         return tougherHealing;
     }
 
-    public void setTougherHealing(boolean tougherHealing) {
+    public void setTougherHealing(final boolean tougherHealing) {
         this.tougherHealing = tougherHealing;
     }
     //endregion Medical
@@ -1150,7 +1150,7 @@ public class CampaignOptions implements Serializable {
         return prisonerCaptureStyle;
     }
 
-    public void setPrisonerCaptureStyle(PrisonerCaptureStyle prisonerCaptureStyle) {
+    public void setPrisonerCaptureStyle(final PrisonerCaptureStyle prisonerCaptureStyle) {
         this.prisonerCaptureStyle = prisonerCaptureStyle;
     }
 
@@ -1158,7 +1158,7 @@ public class CampaignOptions implements Serializable {
         return defaultPrisonerStatus;
     }
 
-    public void setDefaultPrisonerStatus(PrisonerStatus defaultPrisonerStatus) {
+    public void setDefaultPrisonerStatus(final PrisonerStatus defaultPrisonerStatus) {
         this.defaultPrisonerStatus = defaultPrisonerStatus;
     }
 
@@ -1166,7 +1166,7 @@ public class CampaignOptions implements Serializable {
         return prisonerBabyStatus;
     }
 
-    public void setPrisonerBabyStatus(boolean prisonerBabyStatus) {
+    public void setPrisonerBabyStatus(final boolean prisonerBabyStatus) {
         this.prisonerBabyStatus = prisonerBabyStatus;
     }
 
@@ -1174,7 +1174,7 @@ public class CampaignOptions implements Serializable {
         return useAtBPrisonerDefection;
     }
 
-    public void setUseAtBPrisonerDefection(boolean useAtBPrisonerDefection) {
+    public void setUseAtBPrisonerDefection(final boolean useAtBPrisonerDefection) {
         this.useAtBPrisonerDefection = useAtBPrisonerDefection;
     }
 
@@ -1182,7 +1182,7 @@ public class CampaignOptions implements Serializable {
         return useAtBPrisonerRansom;
     }
 
-    public void setUseAtBPrisonerRansom(boolean useAtBPrisonerRansom) {
+    public void setUseAtBPrisonerRansom(final boolean useAtBPrisonerRansom) {
         this.useAtBPrisonerRansom = useAtBPrisonerRansom;
     }
     //endregion Prisoners
@@ -1192,7 +1192,7 @@ public class CampaignOptions implements Serializable {
         return useDylansRandomXP;
     }
 
-    public void setUseDylansRandomXP(boolean useDylansRandomXP) {
+    public void setUseDylansRandomXP(final boolean useDylansRandomXP) {
         this.useDylansRandomXP = useDylansRandomXP;
     }
     /**
@@ -1204,11 +1204,10 @@ public class CampaignOptions implements Serializable {
     }
 
     /**
-     * Sets a value indicating whether or not to randomize
-     * the origin of personnel.
+     * Sets a value indicating whether or not to randomize the origin of personnel.
      * @param randomizeOrigin true for randomize, otherwise false
      */
-    public void setRandomizeOrigin(boolean randomizeOrigin) {
+    public void setRandomizeOrigin(final boolean randomizeOrigin) {
         this.randomizeOrigin = randomizeOrigin;
     }
 
@@ -1223,13 +1222,12 @@ public class CampaignOptions implements Serializable {
      * Sets a value indicating whether or not to randomize the origin of dependents
      * @param randomizeDependentOrigin true for randomize, otherwise false
      */
-    public void setRandomizeDependentOrigin(boolean randomizeDependentOrigin) {
+    public void setRandomizeDependentOrigin(final boolean randomizeDependentOrigin) {
         this.randomizeDependentOrigin = randomizeDependentOrigin;
     }
 
     /**
-     * Gets the search radius to use for randomizing
-     * personnel origins.
+     * Gets the search radius to use for randomizing personnel origins.
      */
     public int getOriginSearchRadius() {
         return originSearchRadius;
@@ -1239,41 +1237,38 @@ public class CampaignOptions implements Serializable {
      * Sets the search radius to use for randomizing personnel origins.
      * @param originSearchRadius The search radius.
      */
-    public void setOriginSearchRadius(int originSearchRadius) {
+    public void setOriginSearchRadius(final int originSearchRadius) {
         this.originSearchRadius = originSearchRadius;
     }
 
     /**
-     * Gets a value indicating whether or not to randomize
-     * origin to the planetary level, rather than just the
-     * system level.
+     * Gets a value indicating whether or not to randomize origin to the planetary level, rather
+     * than just the system level.
      */
     public boolean extraRandomOrigin() {
         return extraRandomOrigin;
     }
 
     /**
-     * Sets a value indicating whether or not to randomize
-     * origin to the planetary level, rather than just the
-     * system level.
+     * Sets a value indicating whether or not to randomize origin to the planetary level, rather
+     * than just the system level.
      */
-    public void setExtraRandomOrigin(boolean extraRandomOrigin) {
+    public void setExtraRandomOrigin(final boolean extraRandomOrigin) {
         this.extraRandomOrigin = extraRandomOrigin;
     }
 
     /**
-     * Gets the distance scale factor to apply when weighting
-     * random origin planets.
+     * Gets the distance scale factor to apply when weighting random origin planets.
      */
     public double getOriginDistanceScale() {
         return originDistanceScale;
     }
 
     /**
-     * Sets the distance scale factor to apply when weighting
-     * random origin planets (should be between 0.1 and 2).
+     * Sets the distance scale factor to apply when weighting random origin planets
+     * (should be between 0.1 and 2).
      */
-    public void setOriginDistanceScale(double originDistanceScale) {
+    public void setOriginDistanceScale(final double originDistanceScale) {
         this.originDistanceScale = originDistanceScale;
     }
     //endregion Personnel Randomization
@@ -1289,7 +1284,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param displayFamilyLevel the level of familial relation to display
      */
-    public void setDisplayFamilyLevel(FamilialRelationshipDisplayLevel displayFamilyLevel) {
+    public void setDisplayFamilyLevel(final FamilialRelationshipDisplayLevel displayFamilyLevel) {
         this.displayFamilyLevel = displayFamilyLevel;
     }
     //endregion Family
@@ -1299,7 +1294,7 @@ public class CampaignOptions implements Serializable {
         return salaryCommissionMultiplier;
     }
 
-    public void setSalaryCommissionMultiplier(double salaryCommissionMultiplier) {
+    public void setSalaryCommissionMultiplier(final double salaryCommissionMultiplier) {
         this.salaryCommissionMultiplier = salaryCommissionMultiplier;
     }
 
@@ -1307,7 +1302,7 @@ public class CampaignOptions implements Serializable {
         return salaryEnlistedMultiplier;
     }
 
-    public void setSalaryEnlistedMultiplier(double salaryEnlistedMultiplier) {
+    public void setSalaryEnlistedMultiplier(final double salaryEnlistedMultiplier) {
         this.salaryEnlistedMultiplier = salaryEnlistedMultiplier;
     }
 
@@ -1315,36 +1310,36 @@ public class CampaignOptions implements Serializable {
         return salaryAntiMekMultiplier;
     }
 
-    public void setSalaryAntiMekMultiplier(double salaryAntiMekMultiplier) {
+    public void setSalaryAntiMekMultiplier(final double salaryAntiMekMultiplier) {
         this.salaryAntiMekMultiplier = salaryAntiMekMultiplier;
     }
 
-    public double getSalaryXPMultiplier(int xp) {
-        return ((xp < 0) || (xp >= salaryXPMultiplier.length)) ? 1.0 : salaryXPMultiplier[xp];
+    public double getSalaryXPMultiplier(final int index) {
+        return ((index < 0) || (index >= salaryXPMultiplier.length)) ? 1.0 : salaryXPMultiplier[index];
     }
 
-    public void setSalaryXPMultiplier(double d, int xp) {
-        if ((xp < 0) || (xp >= salaryXPMultiplier.length)) {
+    public void setSalaryXPMultiplier(final int index, final double multiplier) {
+        if ((index < 0) || (index >= salaryXPMultiplier.length)) {
             return;
         }
-        this.salaryXPMultiplier[xp] = d;
+        this.salaryXPMultiplier[index] = multiplier;
     }
 
-    public double getBaseSalary(int type) {
-        return ((type < 0) || (type >= salaryTypeBase.length)) ? 0.0
-                : salaryTypeBase[type].getAmount().doubleValue();
+    public double getBaseSalary(final int role) {
+        return ((role < 0) || (role >= salaryTypeBase.length)) ? 0.0
+                : salaryTypeBase[role].getAmount().doubleValue();
     }
 
-    public Money getBaseSalaryMoney(int type) {
-        return ((type < 0) || (type >= salaryTypeBase.length)) ? Money.zero() : salaryTypeBase[type];
+    public Money getBaseSalaryMoney(final int role) {
+        return ((role < 0) || (role >= salaryTypeBase.length)) ? Money.zero() : salaryTypeBase[role];
     }
 
-    public void setBaseSalary(int type, double base) {
-        if ((type < 0) || (type >= salaryTypeBase.length)) {
+    public void setBaseSalary(final int role, final double base) {
+        if ((role < 0) || (role >= salaryTypeBase.length)) {
             return;
         }
 
-        this.salaryTypeBase[type] = Money.of(base);
+        this.salaryTypeBase[role] = Money.of(base);
     }
     //endregion Salary
 
@@ -1359,7 +1354,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param useManualMarriages whether or not to use manual marriages
      */
-    public void setUseManualMarriages(boolean useManualMarriages) {
+    public void setUseManualMarriages(final boolean useManualMarriages) {
         this.useManualMarriages = useManualMarriages;
     }
 
@@ -1373,7 +1368,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param minimumMarriageAge the minimum age a person can get married at
      */
-    public void setMinimumMarriageAge(int minimumMarriageAge) {
+    public void setMinimumMarriageAge(final int minimumMarriageAge) {
         this.minimumMarriageAge = minimumMarriageAge;
     }
 
@@ -1389,7 +1384,7 @@ public class CampaignOptions implements Serializable {
      * This sets the number of recursions to use when checking mutual ancestors between two personnel
      * @param checkMutualAncestorsDepth the number of recursions
      */
-    public void setCheckMutualAncestorsDepth(int checkMutualAncestorsDepth) {
+    public void setCheckMutualAncestorsDepth(final int checkMutualAncestorsDepth) {
         this.checkMutualAncestorsDepth = checkMutualAncestorsDepth;
     }
 
@@ -1403,7 +1398,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param logMarriageNameChange whether to log marriage name changes or not
      */
-    public void setLogMarriageNameChange(boolean logMarriageNameChange) {
+    public void setLogMarriageNameChange(final boolean logMarriageNameChange) {
         this.logMarriageNameChange = logMarriageNameChange;
     }
 
@@ -1416,20 +1411,20 @@ public class CampaignOptions implements Serializable {
 
     /**
      * This gets one of the values in the array of weights of potential surname changes for weighted marriage surname generation
-     * @param pos the position in the array to set
-     * @return the weight at index pos
+     * @param index the array index to get
+     * @return the weight at the index
      */
-    public int getMarriageSurnameWeights(int pos) {
-        return marriageSurnameWeights[pos];
+    public int getMarriageSurnameWeights(final int index) {
+        return marriageSurnameWeights[index];
     }
 
     /**
      * This sets one of the values in the array of weights of potential surname changes for weighted marriage surname generation
-     * @param pos the position in the array to set
+     * @param index the array index to set
      * @param marriageSurnameWeight the weight to use
      */
-    public void setMarriageSurnameWeight(int pos, int marriageSurnameWeight) {
-        marriageSurnameWeights[pos] = marriageSurnameWeight;
+    public void setMarriageSurnameWeight(final int index, final int marriageSurnameWeight) {
+        marriageSurnameWeights[index] = marriageSurnameWeight;
     }
 
     /**
@@ -1442,7 +1437,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param useRandomMarriages whether or not to use random marriages
      */
-    public void setUseRandomMarriages(boolean useRandomMarriages) {
+    public void setUseRandomMarriages(final boolean useRandomMarriages) {
         this.useRandomMarriages = useRandomMarriages;
     }
 
@@ -1458,7 +1453,7 @@ public class CampaignOptions implements Serializable {
      * This sets the decimal chance (between 0 and 1) of a random marriage occurring
      * @param chanceRandomMarriages the chance, with a value between 0 and 1
      */
-    public void setChanceRandomMarriages(double chanceRandomMarriages) {
+    public void setChanceRandomMarriages(final double chanceRandomMarriages) {
         this.chanceRandomMarriages = chanceRandomMarriages;
     }
 
@@ -1474,7 +1469,7 @@ public class CampaignOptions implements Serializable {
      * A random marriage can only happen between two people whose ages differ (+/-) by this value
      * @param marriageAgeRange the maximum age range
      */
-    public void setMarriageAgeRange(int marriageAgeRange) {
+    public void setMarriageAgeRange(final int marriageAgeRange) {
         this.marriageAgeRange = marriageAgeRange;
     }
 
@@ -1488,7 +1483,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param useRandomSameSexMarriages whether or not to use random same sex marriages
      */
-    public void setUseRandomSameSexMarriages(boolean useRandomSameSexMarriages) {
+    public void setUseRandomSameSexMarriages(final boolean useRandomSameSexMarriages) {
         this.useRandomSameSexMarriages = useRandomSameSexMarriages;
     }
 
@@ -1504,7 +1499,7 @@ public class CampaignOptions implements Serializable {
      * This sets the decimal chance (between 0 and 1) of a random same sex marriage occurring
      * @param chanceRandomSameSexMarriages the chance, with a value between 0 and 1
      */
-    public void setChanceRandomSameSexMarriages(double chanceRandomSameSexMarriages) {
+    public void setChanceRandomSameSexMarriages(final double chanceRandomSameSexMarriages) {
         this.chanceRandomSameSexMarriages = chanceRandomSameSexMarriages;
     }
     //endregion Marriage
@@ -1520,7 +1515,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param useProcreation whether or not to use unofficial procreation
      */
-    public void setUseProcreation(boolean useProcreation) {
+    public void setUseProcreation(final boolean useProcreation) {
         this.useProcreation = useProcreation;
     }
 
@@ -1536,7 +1531,7 @@ public class CampaignOptions implements Serializable {
      * This sets the decimal chance (between 0 and 1) of random procreation occurring
      * @param chanceProcreation the chance, with a value between 0 and 1
      */
-    public void setChanceProcreation(double chanceProcreation) {
+    public void setChanceProcreation(final double chanceProcreation) {
         this.chanceProcreation = chanceProcreation;
     }
 
@@ -1550,7 +1545,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param useProcreationNoRelationship whether or not to use unofficial procreation without a relationship
      */
-    public void setUseProcreationNoRelationship(boolean useProcreationNoRelationship) {
+    public void setUseProcreationNoRelationship(final boolean useProcreationNoRelationship) {
         this.useProcreationNoRelationship = useProcreationNoRelationship;
     }
 
@@ -1566,7 +1561,7 @@ public class CampaignOptions implements Serializable {
      * This sets the decimal chance (between 0 and 1) of random procreation occurring without a relationship
      * @param chanceProcreationNoRelationship the chance, with a value between 0 and 1
      */
-    public void setChanceProcreationNoRelationship(double chanceProcreationNoRelationship) {
+    public void setChanceProcreationNoRelationship(final double chanceProcreationNoRelationship) {
         this.chanceProcreationNoRelationship = chanceProcreationNoRelationship;
     }
 
@@ -1580,7 +1575,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param displayTrueDueDate whether to show the expected or actual due date for personnel
      */
-    public void setDisplayTrueDueDate(boolean displayTrueDueDate) {
+    public void setDisplayTrueDueDate(final boolean displayTrueDueDate) {
         this.displayTrueDueDate = displayTrueDueDate;
     }
 
@@ -1594,7 +1589,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param logConception whether to log conception
      */
-    public void setLogConception(boolean logConception) {
+    public void setLogConception(final boolean logConception) {
         this.logConception = logConception;
     }
 
@@ -1608,7 +1603,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param babySurnameStyle the style of surname to use for a baby
      */
-    public void setBabySurnameStyle(BabySurnameStyle babySurnameStyle) {
+    public void setBabySurnameStyle(final BabySurnameStyle babySurnameStyle) {
         this.babySurnameStyle = babySurnameStyle;
     }
 
@@ -1622,7 +1617,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param determineFatherAtBirth whether or not to determine the father at birth instead of at conception
      */
-    public void setDetermineFatherAtBirth(boolean determineFatherAtBirth) {
+    public void setDetermineFatherAtBirth(final boolean determineFatherAtBirth) {
         this.determineFatherAtBirth = determineFatherAtBirth;
     }
     //endregion Procreation
@@ -1638,7 +1633,7 @@ public class CampaignOptions implements Serializable {
     /**
      * @param keepMarriedNameUponSpouseDeath whether to keep ones married name upon spouse death or not
      */
-    public void setKeepMarriedNameUponSpouseDeath(boolean keepMarriedNameUponSpouseDeath) {
+    public void setKeepMarriedNameUponSpouseDeath(final boolean keepMarriedNameUponSpouseDeath) {
         this.keepMarriedNameUponSpouseDeath = keepMarriedNameUponSpouseDeath;
     }
     //endregion Death

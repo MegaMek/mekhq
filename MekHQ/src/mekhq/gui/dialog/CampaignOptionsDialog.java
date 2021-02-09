@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -115,8 +115,9 @@ import mekhq.preferences.PreferencesNode;
  */
 public class CampaignOptionsDialog extends JDialog {
     //region Variable Declarations
-    //region General Variables (ones not relating to a specific tab)
     private static final long serialVersionUID = 1935043247792962964L;
+
+    //region General Variables (ones not relating to a specific tab)
     private Campaign campaign;
     private CampaignOptions options;
     private RandomSkillPreferences rSkillPrefs;
@@ -3744,52 +3745,41 @@ public class CampaignOptionsDialog extends JDialog {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        personnelPanel.add(createGeneralPersonnelPanel(), gbc);
 
-        JPanel generalPersonnelPanel = createGeneralPersonnelPanel();
-        personnelPanel.add(generalPersonnelPanel, gbc);
-
-        JPanel expandedPersonnelInformationPanel = createExpandedPersonnelInformationPanel();
         gbc.gridx++;
-        personnelPanel.add(expandedPersonnelInformationPanel, gbc);
+        personnelPanel.add(createExpandedPersonnelInformationPanel(), gbc);
 
-        JPanel medicalPanel = createMedicalPanel();
         gbc.gridx = 0;
         gbc.gridy++;
-        personnelPanel.add(medicalPanel, gbc);
+        personnelPanel.add(createMedicalPanel(), gbc);
 
-        JPanel prisonerPanel = createPrisonerPanel();
         gbc.gridx++;
-        personnelPanel.add(prisonerPanel, gbc);
+        personnelPanel.add(createPrisonerPanel(), gbc);
 
-        JPanel personnelRandomizationPanel = createPersonnelRandomizationPanel();
         gbc.gridx = 0;
         gbc.gridy++;
-        personnelPanel.add(personnelRandomizationPanel, gbc);
+        personnelPanel.add(createPersonnelRandomizationPanel(), gbc);
 
-        JPanel familyPanel = createFamilyPanel();
         gbc.gridx++;
-        personnelPanel.add(familyPanel, gbc);
+        personnelPanel.add(createFamilyPanel(), gbc);
 
-        JPanel salaryPanel = createSalaryPanel();
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
-        personnelPanel.add(salaryPanel, gbc);
+        personnelPanel.add(createSalaryPanel(), gbc);
 
-        JPanel marriagePanel = createMarriagePanel();
         gbc.gridy++;
         gbc.gridwidth = 1;
-        personnelPanel.add(marriagePanel, gbc);
+        personnelPanel.add(createMarriagePanel(), gbc);
 
-        JPanel procreationPanel = createProcreationPanel();
         gbc.gridx++;
-        personnelPanel.add(procreationPanel, gbc);
+        personnelPanel.add(createProcreationPanel(), gbc);
 
-        JPanel deathPanel = createDeathPanel();
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
-        personnelPanel.add(deathPanel, gbc);
+        personnelPanel.add(createDeathPanel(), gbc);
 
         JScrollPane scrollPersonnel = new JScrollPane(personnelPanel);
         scrollPersonnel.setPreferredSize(new Dimension(500, 400));
@@ -3836,6 +3826,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseAlternativeQualityAveraging.setName("chkUseAlternativeQualityAveraging");
 
         chkUseTransfers = new JCheckBox(resources.getString("chkUseTransfers.text"));
+        chkUseTransfers.setToolTipText(resources.getString("chkUseTransfers.toolTipText"));
         chkUseTransfers.setName("chkUseTransfers");
 
         // Layout the Panel
@@ -3881,24 +3872,31 @@ public class CampaignOptionsDialog extends JDialog {
 
     private JPanel createExpandedPersonnelInformationPanel() {
         chkUseTimeInService = new JCheckBox(resources.getString("chkUseTimeInService.text"));
+        chkUseTimeInService.setToolTipText(resources.getString("chkUseTimeInService.toolTipText"));
         chkUseTimeInService.setName("chkUseTimeInService");
 
         JLabel lblTimeInServiceDisplayFormat = new JLabel(resources.getString("lblTimeInServiceDisplayFormat.text"));
+        lblTimeInServiceDisplayFormat.setToolTipText(resources.getString("lblTimeInServiceDisplayFormat.toolTipText"));
         lblTimeInServiceDisplayFormat.setName("lblTimeInServiceDisplayFormat");
 
         comboTimeInServiceDisplayFormat = new JComboBox<>(TimeInDisplayFormat.values());
+        comboTimeInServiceDisplayFormat.setToolTipText(resources.getString("lblTimeInServiceDisplayFormat.toolTipText"));
         comboTimeInServiceDisplayFormat.setName("comboTimeInServiceDisplayFormat");
 
         chkUseTimeInRank = new JCheckBox(resources.getString("chkUseTimeInRank.text"));
+        chkUseTimeInRank.setToolTipText(resources.getString("chkUseTimeInRank.toolTipText"));
         chkUseTimeInRank.setName("chkUseTimeInRank");
 
         JLabel lblTimeInRankDisplayFormat = new JLabel(resources.getString("lblTimeInRankDisplayFormat.text"));
+        lblTimeInRankDisplayFormat.setToolTipText(resources.getString("lblTimeInRankDisplayFormat.toolTipText"));
         lblTimeInRankDisplayFormat.setName("lblTimeInRankDisplayFormat");
 
         comboTimeInRankDisplayFormat = new JComboBox<>(TimeInDisplayFormat.values());
+        comboTimeInRankDisplayFormat.setToolTipText(resources.getString("lblTimeInRankDisplayFormat.toolTipText"));
         comboTimeInRankDisplayFormat.setName("comboTimeInRankDisplayFormat");
 
         chkUseRetirementDateTracking = new JCheckBox(resources.getString("chkUseRetirementDateTracking.text"));
+        chkUseRetirementDateTracking.setToolTipText(resources.getString("chkUseRetirementDateTracking.toolTipText"));
         chkUseRetirementDateTracking.setName("chkUseRetirementDateTracking");
 
         chkTrackTotalEarnings = new JCheckBox(resources.getString("chkTrackTotalEarnings.text"));
@@ -3906,6 +3904,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkTrackTotalEarnings.setName("chkTrackTotalEarnings");
 
         chkShowOriginFaction = new JCheckBox(resources.getString("chkShowOriginFaction.text"));
+        chkShowOriginFaction.setToolTipText(resources.getString("chkShowOriginFaction.toolTipText"));
         chkShowOriginFaction.setName("chkShowOriginFaction");
 
         // Layout the Panel
@@ -3957,21 +3956,27 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseAdvancedMedical.setName("chkUseAdvancedMedical");
 
         JLabel lblHealWaitingPeriod = new JLabel(resources.getString("lblHealWaitingPeriod.text"));
+        lblHealWaitingPeriod.setToolTipText(resources.getString("lblHealWaitingPeriod.toolTipText"));
         lblHealWaitingPeriod.setName("lblHealWaitingPeriod");
 
         spnHealWaitingPeriod = new JSpinner(new SpinnerNumberModel(1, 1, 30, 1));
+        spnHealWaitingPeriod.setToolTipText(resources.getString("lblHealWaitingPeriod.toolTipText"));
         spnHealWaitingPeriod.setName("spnHealWaitingPeriod");
 
         JLabel lblNaturalHealWaitingPeriod = new JLabel(resources.getString("lblNaturalHealWaitingPeriod.text"));
+        lblNaturalHealWaitingPeriod.setToolTipText(resources.getString("lblNaturalHealWaitingPeriod.toolTipText"));
         lblNaturalHealWaitingPeriod.setName("lblNaturalHealWaitingPeriod");
 
         spnNaturalHealWaitingPeriod = new JSpinner(new SpinnerNumberModel(1, 1, 365, 1));
+        spnNaturalHealWaitingPeriod.setToolTipText(resources.getString("lblNaturalHealWaitingPeriod.toolTipText"));
         spnNaturalHealWaitingPeriod.setName("spnNaturalHealWaitingPeriod");
 
         JLabel lblMinimumHitsForVehicles = new JLabel(resources.getString("lblMinimumHitsForVehicles.text"));
+        lblMinimumHitsForVehicles.setToolTipText(resources.getString("lblMinimumHitsForVehicles.toolTipText"));
         lblMinimumHitsForVehicles.setName("lblMinimumHitsForVehicles");
 
         spnMinimumHitsForVehicles = new JSpinner(new SpinnerNumberModel(1, 1, 5, 1));
+        spnMinimumHitsForVehicles.setToolTipText(resources.getString("lblMinimumHitsForVehicles.toolTipText"));
         spnMinimumHitsForVehicles.setName("spnMinimumHitsForVehicles");
         ((JSpinner.DefaultEditor) spnMinimumHitsForVehicles.getEditor()).getTextField().setEditable(false);
 
@@ -4029,6 +4034,10 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createPrisonerPanel() {
+        JLabel lblPrisonerCaptureStyle = new JLabel(resources.getString("lblPrisonerCaptureStyle.text"));
+        lblPrisonerCaptureStyle.setToolTipText(resources.getString("lblPrisonerCaptureStyle.toolTipText"));
+        lblPrisonerCaptureStyle.setName("lblPrisonerCaptureStyle");
+
         comboPrisonerCaptureStyle = new JComboBox<>(PrisonerCaptureStyle.values());
         comboPrisonerCaptureStyle.setName("comboPrisonerCaptureStyle");
         comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
@@ -4046,16 +4055,15 @@ public class CampaignOptionsDialog extends JDialog {
             }
         });
 
-        JLabel lblPrisonerCaptureStyle = new JLabel(resources.getString("lblPrisonerCaptureStyle.text"));
-        lblPrisonerCaptureStyle.setName("lblPrisonerCaptureStyle");
+        JLabel lblPrisonerStatus = new JLabel(resources.getString("lblPrisonerStatus.text"));
+        lblPrisonerStatus.setToolTipText(resources.getString("lblPrisonerStatus.toolTipText"));
+        lblPrisonerStatus.setName("lblPrisonerStatus");
 
         DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
         prisonerStatusModel.removeElement(PrisonerStatus.FREE); // we don't want this as a standard use case for prisoners
         comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
+        comboPrisonerStatus.setToolTipText(resources.getString("lblPrisonerStatus.toolTipText"));
         comboPrisonerStatus.setName("comboPrisonerStatus");
-
-        JLabel lblPrisonerStatus = new JLabel(resources.getString("lblPrisonerStatus.text"));
-        lblPrisonerStatus.setName("lblPrisonerStatus");
 
         chkPrisonerBabyStatus = new JCheckBox(resources.getString("chkPrisonerBabyStatus.text"));
         chkPrisonerBabyStatus.setToolTipText(resources.getString("chkPrisonerBabyStatus.toolTipText"));
@@ -4066,6 +4074,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkAtBPrisonerDefection.setName("chkAtBPrisonerDefection");
 
         chkAtBPrisonerRansom = new JCheckBox(resources.getString("chkAtBPrisonerRansom.text"));
+        chkAtBPrisonerRansom.setToolTipText(resources.getString("chkAtBPrisonerRansom.toolTipText"));
         chkAtBPrisonerRansom.setName("chkAtBPrisonerRansom");
 
         // Layout the Panel
@@ -4113,15 +4122,19 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseDylansRandomXP.setName("chkUseDylansRandomXP");
 
         chkRandomizeOrigin = new JCheckBox(resources.getString("chkRandomizeOrigin.text"));
+        chkRandomizeOrigin.setToolTipText(resources.getString("chkRandomizeOrigin.toolTipText"));
         chkRandomizeOrigin.setName("chkRandomizeOrigin");
 
         chkRandomizeDependentsOrigin = new JCheckBox(resources.getString("chkRandomizeDependentsOrigin.text"));
+        chkRandomizeDependentsOrigin.setToolTipText(resources.getString("chkRandomizeDependentsOrigin.toolTipText"));
         chkRandomizeDependentsOrigin.setName("chkRandomizeDependentsOrigin");
 
         JLabel lblOriginSearchRadius = new JLabel(resources.getString("lblOriginSearchRadius.text"));
+        lblOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
         lblOriginSearchRadius.setName("lblOriginSearchRadius");
 
         spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(50, 10, 250, 10));
+        spnOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
         spnOriginSearchRadius.setName("spnOriginSearchRadius");
 
         chkExtraRandomOrigin = new JCheckBox(resources.getString("chkExtraRandomOrigin.text"));
@@ -4132,7 +4145,7 @@ public class CampaignOptionsDialog extends JDialog {
         lblOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
         lblOriginDistanceScale.setName("lblOriginDistanceScale");
 
-        spnOriginDistanceScale = new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1 ));
+        spnOriginDistanceScale = new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1));
         spnOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
         spnOriginDistanceScale.setName("spnOriginDistanceScale");
 
@@ -4249,26 +4262,33 @@ public class CampaignOptionsDialog extends JDialog {
 
     private JPanel createSalaryMultiplierPanel() {
         JLabel lblCommissionedSalary = new JLabel(resources.getString("lblCommissionedSalary.text"));
+        lblCommissionedSalary.setToolTipText(resources.getString("lblCommissionedSalary.toolTipText"));
         lblCommissionedSalary.setName("lblCommissionedSalary");
 
         spnCommissionedSalary = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
+        spnCommissionedSalary.setToolTipText(resources.getString("lblCommissionedSalary.toolTipText"));
         spnCommissionedSalary.setName("spnCommissionedSalary");
 
         JLabel lblEnlistedSalary = new JLabel(resources.getString("lblEnlistedSalary.text"));
+        lblEnlistedSalary.setToolTipText(resources.getString("lblEnlistedSalary.toolTipText"));
         lblEnlistedSalary.setName("lblEnlistedSalary");
 
         spnEnlistedSalary = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
+        spnEnlistedSalary.setToolTipText(resources.getString("lblEnlistedSalary.toolTipText"));
         spnEnlistedSalary.setName("spnEnlistedSalary");
 
         JLabel lblAntiMekSalary = new JLabel(resources.getString("lblAntiMekSalary.text"));
+        lblAntiMekSalary.setToolTipText(resources.getString("lblAntiMekSalary.toolTipText"));
         lblAntiMekSalary.setName("lblAntiMekSalary");
 
         spnAntiMekSalary = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
+        spnAntiMekSalary.setToolTipText(resources.getString("lblAntiMekSalary.toolTipText"));
         spnAntiMekSalary.setName("spnAntiMekSalary");
 
         // Layout the Panel
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("salaryMultiplierPanel.title")));
+        panel.setToolTipText(resources.getString("salaryMultiplierPanel.toolTipText"));
         panel.setName("salaryMultiplierPanel");
         GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
@@ -4304,17 +4324,21 @@ public class CampaignOptionsDialog extends JDialog {
     private JPanel createSalaryExperienceMultiplierPanel() {
         JPanel panel = new JPanel(new GridLayout(1, 10));
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("salaryExperienceMultiplierPanel.title")));
+        panel.setToolTipText(resources.getString("salaryExperienceMultiplierPanel.toolTipText"));
         panel.setName("salaryExperienceMultiplierPanel");
 
         spnSalaryExperienceMultipliers = new JSpinner[5];
         for (int i = 0; i < 5; i++) {
             final String skillLevel = SkillType.getExperienceLevelName(i);
+            final String toolTipText = String.format(resources.getString("lblSalaryExperienceMultiplier.toolTipText"), skillLevel);
 
             JLabel label = new JLabel(skillLevel);
+            label.setToolTipText(toolTipText);
             label.setName("lbl" + skillLevel);
             panel.add(label);
 
             spnSalaryExperienceMultipliers[i] = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
+            spnSalaryExperienceMultipliers[i].setToolTipText(toolTipText);
             spnSalaryExperienceMultipliers[i].setName("spn" + skillLevel);
             panel.add(spnSalaryExperienceMultipliers[i]);
         }
@@ -4331,11 +4355,14 @@ public class CampaignOptionsDialog extends JDialog {
 
         for (int i = 1; i < Person.T_NUM; i++) {
             final String roleName = Person.getRoleDesc(i, false);
+            final String toolTipText = String.format(resources.getString("lblBaseSalary.toolTipText"), roleName);
             JLabel label = new JLabel(roleName);
+            label.setToolTipText(toolTipText);
             label.setName("lbl" + roleName);
             panel.add(label);
 
             spnBaseSalary[i] = new JSpinner(new SpinnerNumberModel(0.0, 0.0, null, 10.0));
+            spnBaseSalary[i].setToolTipText(toolTipText);
             spnBaseSalary[i].setName("spn" + roleName);
             panel.add(spnBaseSalary[i]);
         }
@@ -4591,6 +4618,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkDisplayTrueDueDate.setName("chkDisplayTrueDueDate");
 
         chkLogConception = new JCheckBox(resources.getString("chkLogConception.text"));
+        chkLogConception.setToolTipText(resources.getString("chkLogConception.toolTipText"));
         chkLogConception.setName("chkLogConception");
 
         lblBabySurnameStyle.setText(resources.getString("lblBabySurnameStyle.text"));
@@ -4674,6 +4702,7 @@ public class CampaignOptionsDialog extends JDialog {
 
     private JPanel createDeathPanel() {
         chkKeepMarriedNameUponSpouseDeath = new JCheckBox(resources.getString("chkKeepMarriedNameUponSpouseDeath.text"));
+        chkKeepMarriedNameUponSpouseDeath.setToolTipText(resources.getString("chkKeepMarriedNameUponSpouseDeath.toolTipText"));
         chkKeepMarriedNameUponSpouseDeath.setName("chkKeepMarriedNameUponSpouseDeath");
 
         // Layout the Panel
@@ -5515,7 +5544,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setSalaryEnlistedMultiplier((Double) spnEnlistedSalary.getValue());
         options.setSalaryAntiMekMultiplier((Double) spnAntiMekSalary.getValue());
         for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
-            options.setSalaryXPMultiplier((Double) spnSalaryExperienceMultipliers[i].getValue(), i);
+            options.setSalaryXPMultiplier(i, (Double) spnSalaryExperienceMultipliers[i].getValue());
         }
         for (int i = 1; i < Person.T_NUM; i++) {
             try {
