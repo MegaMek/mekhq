@@ -139,7 +139,7 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
     }
 
     private void setPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(BaseDialog.class);
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
 
         preferences.manage(new JWindowPreference(this));
         this.setCustomPreferences(preferences);

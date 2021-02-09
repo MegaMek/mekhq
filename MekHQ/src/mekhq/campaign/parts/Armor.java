@@ -227,7 +227,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return (part instanceof Armor)
+        return getClass().equals(part.getClass())
                 && Objects.equals(getRefitUnit(), part.getRefitUnit())
                 && isSameType((Armor)part);
     }
