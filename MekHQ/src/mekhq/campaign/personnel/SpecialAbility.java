@@ -641,7 +641,6 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 : (weaponTechLevel < CampaignOptions.TECH_ADVANCED) ? 25
                 : (weaponTechLevel < CampaignOptions.TECH_EXPERIMENTAL) ? 5
                 : 1;
-        MekHQ.getLogger().warning(equipmentType.getName() + " has a weight of " + weight + " with weapon tech level " + weaponTechLevel);
         weapons.add(weight, equipmentType);
     }
 
