@@ -3871,11 +3871,19 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createExpandedPersonnelInformationPanel() {
+        // These are initialized first so they can be disabled
+        JLabel lblTimeInServiceDisplayFormat = new JLabel();
+        JLabel lblTimeInRankDisplayFormat = new JLabel();
+
         chkUseTimeInService = new JCheckBox(resources.getString("chkUseTimeInService.text"));
         chkUseTimeInService.setToolTipText(resources.getString("chkUseTimeInService.toolTipText"));
         chkUseTimeInService.setName("chkUseTimeInService");
+        chkUseTimeInService.addActionListener(evt -> {
+            lblTimeInServiceDisplayFormat.setEnabled(chkUseTimeInService.isSelected());
+            comboTimeInServiceDisplayFormat.setEnabled(chkUseTimeInService.isSelected());
+        });
 
-        JLabel lblTimeInServiceDisplayFormat = new JLabel(resources.getString("lblTimeInServiceDisplayFormat.text"));
+        lblTimeInServiceDisplayFormat.setText(resources.getString("lblTimeInServiceDisplayFormat.text"));
         lblTimeInServiceDisplayFormat.setToolTipText(resources.getString("lblTimeInServiceDisplayFormat.toolTipText"));
         lblTimeInServiceDisplayFormat.setName("lblTimeInServiceDisplayFormat");
 
@@ -3886,8 +3894,12 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseTimeInRank = new JCheckBox(resources.getString("chkUseTimeInRank.text"));
         chkUseTimeInRank.setToolTipText(resources.getString("chkUseTimeInRank.toolTipText"));
         chkUseTimeInRank.setName("chkUseTimeInRank");
+        chkUseTimeInRank.addActionListener(evt -> {
+            lblTimeInRankDisplayFormat.setEnabled(chkUseTimeInRank.isSelected());
+            comboTimeInRankDisplayFormat.setEnabled(chkUseTimeInRank.isSelected());
+        });
 
-        JLabel lblTimeInRankDisplayFormat = new JLabel(resources.getString("lblTimeInRankDisplayFormat.text"));
+        lblTimeInRankDisplayFormat.setText(resources.getString("lblTimeInRankDisplayFormat.text"));
         lblTimeInRankDisplayFormat.setToolTipText(resources.getString("lblTimeInRankDisplayFormat.toolTipText"));
         lblTimeInRankDisplayFormat.setName("lblTimeInRankDisplayFormat");
 
@@ -3906,6 +3918,12 @@ public class CampaignOptionsDialog extends JDialog {
         chkShowOriginFaction = new JCheckBox(resources.getString("chkShowOriginFaction.text"));
         chkShowOriginFaction.setToolTipText(resources.getString("chkShowOriginFaction.toolTipText"));
         chkShowOriginFaction.setName("chkShowOriginFaction");
+
+        // Disable Time in Service and Time in Rank by default
+        chkUseTimeInService.setEnabled(true);
+        chkUseTimeInService.doClick();
+        chkUseTimeInRank.setEnabled(true);
+        chkUseTimeInRank.doClick();
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -4041,8 +4059,6 @@ public class CampaignOptionsDialog extends JDialog {
         comboPrisonerCaptureStyle = new JComboBox<>(PrisonerCaptureStyle.values());
         comboPrisonerCaptureStyle.setName("comboPrisonerCaptureStyle");
         comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
-            private static final long serialVersionUID = -543354619818226314L;
-
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                                                           boolean isSelected, boolean cellHasFocus) {
@@ -4121,33 +4137,7 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseDylansRandomXP.setToolTipText(resources.getString("chkUseDylansRandomXP.toolTipText"));
         chkUseDylansRandomXP.setName("chkUseDylansRandomXP");
 
-        chkRandomizeOrigin = new JCheckBox(resources.getString("chkRandomizeOrigin.text"));
-        chkRandomizeOrigin.setToolTipText(resources.getString("chkRandomizeOrigin.toolTipText"));
-        chkRandomizeOrigin.setName("chkRandomizeOrigin");
-
-        chkRandomizeDependentsOrigin = new JCheckBox(resources.getString("chkRandomizeDependentsOrigin.text"));
-        chkRandomizeDependentsOrigin.setToolTipText(resources.getString("chkRandomizeDependentsOrigin.toolTipText"));
-        chkRandomizeDependentsOrigin.setName("chkRandomizeDependentsOrigin");
-
-        JLabel lblOriginSearchRadius = new JLabel(resources.getString("lblOriginSearchRadius.text"));
-        lblOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
-        lblOriginSearchRadius.setName("lblOriginSearchRadius");
-
-        spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(50, 10, 250, 10));
-        spnOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
-        spnOriginSearchRadius.setName("spnOriginSearchRadius");
-
-        chkExtraRandomOrigin = new JCheckBox(resources.getString("chkExtraRandomOrigin.text"));
-        chkExtraRandomOrigin.setToolTipText(resources.getString("chkExtraRandomOrigin.toolTipText"));
-        chkExtraRandomOrigin.setName("chkExtraRandomOrigin");
-
-        JLabel lblOriginDistanceScale = new JLabel(resources.getString("lblOriginDistanceScale.text"));
-        lblOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
-        lblOriginDistanceScale.setName("lblOriginDistanceScale");
-
-        spnOriginDistanceScale = new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1));
-        spnOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
-        spnOriginDistanceScale.setName("spnOriginDistanceScale");
+        JPanel randomOriginPanel = createRandomOriginPanel();
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -4162,6 +4152,76 @@ public class CampaignOptionsDialog extends JDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseDylansRandomXP)
+                        .addComponent(randomOriginPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(chkUseDylansRandomXP)
+                        .addComponent(randomOriginPanel)
+        );
+
+        return panel;
+    }
+
+    private JPanel createRandomOriginPanel() {
+        // These are initialized first so they can be disabled
+        JLabel lblOriginSearchRadius = new JLabel();
+        JLabel lblOriginDistanceScale = new JLabel();
+
+        chkRandomizeOrigin = new JCheckBox(resources.getString("chkRandomizeOrigin.text"));
+        chkRandomizeOrigin.setToolTipText(resources.getString("chkRandomizeOrigin.toolTipText"));
+        chkRandomizeOrigin.setName("chkRandomizeOrigin");
+        chkRandomizeOrigin.addActionListener(evt -> {
+            final boolean selected = chkRandomizeOrigin.isSelected();
+            chkRandomizeDependentsOrigin.setEnabled(selected);
+            lblOriginSearchRadius.setEnabled(selected);
+            spnOriginSearchRadius.setEnabled(selected);
+            chkExtraRandomOrigin.setEnabled(selected);
+            lblOriginDistanceScale.setEnabled(selected);
+            spnOriginDistanceScale.setEnabled(selected);
+        });
+
+        chkRandomizeDependentsOrigin = new JCheckBox(resources.getString("chkRandomizeDependentsOrigin.text"));
+        chkRandomizeDependentsOrigin.setToolTipText(resources.getString("chkRandomizeDependentsOrigin.toolTipText"));
+        chkRandomizeDependentsOrigin.setName("chkRandomizeDependentsOrigin");
+
+        lblOriginSearchRadius.setText(resources.getString("lblOriginSearchRadius.text"));
+        lblOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
+        lblOriginSearchRadius.setName("lblOriginSearchRadius");
+
+        spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(50, 10, 250, 10));
+        spnOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
+        spnOriginSearchRadius.setName("spnOriginSearchRadius");
+
+        chkExtraRandomOrigin = new JCheckBox(resources.getString("chkExtraRandomOrigin.text"));
+        chkExtraRandomOrigin.setToolTipText(resources.getString("chkExtraRandomOrigin.toolTipText"));
+        chkExtraRandomOrigin.setName("chkExtraRandomOrigin");
+
+        lblOriginDistanceScale.setText(resources.getString("lblOriginDistanceScale.text"));
+        lblOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
+        lblOriginDistanceScale.setName("lblOriginDistanceScale");
+
+        spnOriginDistanceScale = new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1));
+        spnOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
+        spnOriginDistanceScale.setName("spnOriginDistanceScale");
+
+        // Disable the panel as default
+        chkRandomizeOrigin.setEnabled(true);
+        chkRandomizeOrigin.doClick();
+
+        // Layout the Panel
+        JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomOriginPanel.title")));
+        panel.setName("randomOriginPanel");
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
                         .addComponent(chkRandomizeOrigin)
                         .addComponent(chkRandomizeDependentsOrigin)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -4175,7 +4235,6 @@ public class CampaignOptionsDialog extends JDialog {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(chkUseDylansRandomXP)
                         .addComponent(chkRandomizeOrigin)
                         .addComponent(chkRandomizeDependentsOrigin)
                         .addGroup(layout.createSequentialGroup()
@@ -4356,6 +4415,7 @@ public class CampaignOptionsDialog extends JDialog {
         for (int i = 1; i < Person.T_NUM; i++) {
             final String roleName = Person.getRoleDesc(i, false);
             final String toolTipText = String.format(resources.getString("lblBaseSalary.toolTipText"), roleName);
+
             JLabel label = new JLabel(roleName);
             label.setToolTipText(toolTipText);
             label.setName("lbl" + roleName);
@@ -4466,7 +4526,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createRandomMarriagePanel() {
-        // these are initialized first so they can be disabled
+        // These are initialized first so they can be disabled
         JLabel lblChanceRandomMarriages = new JLabel();
         JLabel lblMarriageAgeRange = new JLabel();
         JLabel lblChanceRandomSameSexMarriages = new JLabel();
@@ -4481,8 +4541,8 @@ public class CampaignOptionsDialog extends JDialog {
             lblMarriageAgeRange.setEnabled(selected);
             spnMarriageAgeRange.setEnabled(selected);
             chkUseRandomSameSexMarriages.setEnabled(selected);
-            lblChanceRandomSameSexMarriages.setEnabled(selected);
-            spnChanceRandomSameSexMarriages.setEnabled(selected);
+            lblChanceRandomSameSexMarriages.setEnabled(selected && chkUseRandomSameSexMarriages.isSelected());
+            spnChanceRandomSameSexMarriages.setEnabled(selected && chkUseRandomSameSexMarriages.isSelected());
         });
 
         lblChanceRandomMarriages.setText(resources.getString("lblChanceRandomMarriages.text"));
@@ -4566,7 +4626,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createProcreationPanel() {
-        // these are created first so they can be disabled
+        // These are initialized first so they can be disabled
         JLabel lblChanceProcreation = new JLabel();
         JLabel lblChanceProcreationNoRelationship = new JLabel();
         JLabel lblBabySurnameStyle = new JLabel();
@@ -4579,8 +4639,8 @@ public class CampaignOptionsDialog extends JDialog {
             lblChanceProcreation.setEnabled(selected);
             spnChanceProcreation.setEnabled(selected);
             chkUseProcreationNoRelationship.setEnabled(selected);
-            lblChanceProcreationNoRelationship.setEnabled(selected);
-            spnChanceProcreationNoRelationship.setEnabled(selected);
+            lblChanceProcreationNoRelationship.setEnabled(selected && chkUseProcreationNoRelationship.isSelected());
+            spnChanceProcreationNoRelationship.setEnabled(selected && chkUseProcreationNoRelationship.isSelected());
             chkDisplayTrueDueDate.setEnabled(selected);
             chkLogConception.setEnabled(selected);
             lblBabySurnameStyle.setEnabled(selected);
@@ -4628,8 +4688,6 @@ public class CampaignOptionsDialog extends JDialog {
         comboBabySurnameStyle = new JComboBox<>(BabySurnameStyle.values());
         comboBabySurnameStyle.setName("comboBabySurnameStyle");
         comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
-            private static final long serialVersionUID = -543354619818226314L;
-
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                                                           boolean isSelected, boolean cellHasFocus) {
@@ -4886,9 +4944,13 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseTransfers.setSelected(options.useTransfers());
 
         // Expanded Personnel Information
-        chkUseTimeInService.setSelected(options.getUseTimeInService());
+        if (chkUseTimeInService.isSelected() != options.getUseTimeInService()) {
+            chkUseTimeInService.doClick();
+        }
         comboTimeInServiceDisplayFormat.setSelectedItem(options.getTimeInServiceDisplayFormat());
-        chkUseTimeInRank.setSelected(options.getUseTimeInRank());
+        if (chkUseTimeInRank.isSelected() != options.getUseTimeInRank()) {
+            chkUseTimeInRank.doClick();
+        }
         comboTimeInRankDisplayFormat.setSelectedItem(options.getTimeInRankDisplayFormat());
         chkUseRetirementDateTracking.setSelected(options.useRetirementDateTracking());
         chkTrackTotalEarnings.setSelected(options.trackTotalEarnings());
@@ -4911,7 +4973,9 @@ public class CampaignOptionsDialog extends JDialog {
 
         // Personnel Randomization
         chkUseDylansRandomXP.setSelected(options.useDylansRandomXP());
-        chkRandomizeOrigin.setSelected(options.randomizeOrigin());
+        if (chkRandomizeOrigin.isSelected() != options.randomizeOrigin()) {
+            chkRandomizeOrigin.doClick();
+        }
         chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
         spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
         chkExtraRandomOrigin.setSelected(options.extraRandomOrigin());
@@ -5485,20 +5549,20 @@ public class CampaignOptionsDialog extends JDialog {
         //region Personnel Tab
         // General Personnel
         options.setUseTactics(chkUseTactics.isSelected());
-        campaign.getGameOptions().getOption("command_init").setValue(chkUseTactics.isSelected());
+        campaign.getGameOptions().getOption(OptionsConstants.RPG_COMMAND_INIT).setValue(chkUseTactics.isSelected());
         options.setUseInitiativeBonus(chkUseInitiativeBonus.isSelected());
-        campaign.getGameOptions().getOption("individual_initiative").setValue(chkUseInitiativeBonus.isSelected());
+        campaign.getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).setValue(chkUseInitiativeBonus.isSelected());
         options.setUseToughness(chkUseToughness.isSelected());
-        campaign.getGameOptions().getOption("toughness").setValue(chkUseToughness.isSelected());
+        campaign.getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).setValue(chkUseToughness.isSelected());
         options.setUseArtillery(chkUseArtillery.isSelected());
-        campaign.getGameOptions().getOption("artillery_skill").setValue(chkUseArtillery.isSelected());
+        campaign.getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).setValue(chkUseArtillery.isSelected());
         options.setUseAbilities(chkUseAbilities.isSelected());
-        campaign.getGameOptions().getOption("pilot_advantages").setValue(chkUseAbilities.isSelected());
+        campaign.getGameOptions().getOption(OptionsConstants.RPG_PILOT_ADVANTAGES).setValue(chkUseAbilities.isSelected());
         options.setUseEdge(chkUseEdge.isSelected());
-        campaign.getGameOptions().getOption("edge").setValue(chkUseEdge.isSelected());
+        campaign.getGameOptions().getOption(OptionsConstants.EDGE).setValue(chkUseEdge.isSelected());
         options.setUseSupportEdge(chkUseEdge.isSelected() && chkUseSupportEdge.isSelected());
         options.setUseImplants(chkUseImplants.isSelected());
-        campaign.getGameOptions().getOption("manei_domini").setValue(chkUseImplants.isSelected());
+        campaign.getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).setValue(chkUseImplants.isSelected());
         options.setAlternativeQualityAveraging(chkUseAlternativeQualityAveraging.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
 
@@ -5549,7 +5613,9 @@ public class CampaignOptionsDialog extends JDialog {
         for (int i = 1; i < Person.T_NUM; i++) {
             try {
                 options.setBaseSalary(i, (double) spnBaseSalary[i].getValue());
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+
+            }
         }
 
         // Marriage
