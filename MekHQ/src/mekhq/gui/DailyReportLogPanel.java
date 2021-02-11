@@ -67,6 +67,7 @@ public class DailyReportLogPanel extends JPanel {
                 return true;
             }
         };
+        txtLog.getAccessibleContext().setAccessibleName("Daily Log");
         txtLog.addHyperlinkListener(gui.getReportHLL());
         initComponents();
     }
