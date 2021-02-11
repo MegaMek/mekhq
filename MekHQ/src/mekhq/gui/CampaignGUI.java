@@ -240,6 +240,7 @@ public class CampaignGUI extends JPanel {
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
+        tabMain.getAccessibleContext().setAccessibleName("Main Tabs");
         tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
@@ -555,6 +556,7 @@ public class CampaignGUI extends JPanel {
         // TODO: Implement "Export All" versions for Personnel and Parts
         // See the JavaDoc comment for used mnemonic keys
         menuBar = new JMenuBar();
+        menuBar.getAccessibleContext().setAccessibleName("Main Menu");
 
         //region File Menu
         // The File menu uses the following Mnemonic keys as of 19-MAR-2020:
@@ -984,6 +986,7 @@ public class CampaignGUI extends JPanel {
 
     private void initStatusBar() {
         statusPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 20, 4));
+        statusPanel.getAccessibleContext().setAccessibleName("Status Bar");
 
         lblFunds = new JLabel();
         lblTempAstechs = new JLabel();
@@ -1002,6 +1005,7 @@ public class CampaignGUI extends JPanel {
         lblLocation = new JLabel(getCampaign().getLocation().getReport(getCampaign().getLocalDate())); // NOI18N
 
         btnPanel = new JPanel(new GridBagLayout());
+        btnPanel.getAccessibleContext().setAccessibleName("Campaign Actions");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
