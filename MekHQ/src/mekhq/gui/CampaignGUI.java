@@ -38,6 +38,7 @@ import javax.xml.parsers.DocumentBuilder;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
+import megamek.common.options.OptionsConstants;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.dialog.*;
@@ -2725,16 +2726,16 @@ public class CampaignGUI extends JPanel {
     }
 
     private void setCampaignOptionsFromGameOptions() {
-        getCampaign().getCampaignOptions().setUseTactics(getCampaign().getGameOptions().getOption("command_init").booleanValue());
-        getCampaign().getCampaignOptions().setUseInitiativeBonus(getCampaign().getGameOptions().getOption("individual_initiative").booleanValue());
-        getCampaign().getCampaignOptions().setUseToughness(getCampaign().getGameOptions().getOption("toughness").booleanValue());
-        getCampaign().getCampaignOptions().setUseArtillery(getCampaign().getGameOptions().getOption("artillery_skill").booleanValue());
-        getCampaign().getCampaignOptions().setUseAbilities(getCampaign().getGameOptions().getOption("pilot_advantages").booleanValue());
-        getCampaign().getCampaignOptions().setUseEdge(getCampaign().getGameOptions().getOption("edge").booleanValue());
-        getCampaign().getCampaignOptions().setUseImplants(getCampaign().getGameOptions().getOption("manei_domini").booleanValue());
-        getCampaign().getCampaignOptions().setQuirks(getCampaign().getGameOptions().getOption("stratops_quirks").booleanValue());
-        getCampaign().getCampaignOptions().setAllowCanonOnly(getCampaign().getGameOptions().getOption("canon_only").booleanValue());
-        getCampaign().getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getCampaign().getGameOptions().getOption("techlevel").stringValue()));
+        getCampaign().getCampaignOptions().setUseTactics(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_COMMAND_INIT).booleanValue());
+        getCampaign().getCampaignOptions().setUseInitiativeBonus(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).booleanValue());
+        getCampaign().getCampaignOptions().setUseToughness(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).booleanValue());
+        getCampaign().getCampaignOptions().setUseArtillery(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).booleanValue());
+        getCampaign().getCampaignOptions().setUseAbilities(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_PILOT_ADVANTAGES).booleanValue());
+        getCampaign().getCampaignOptions().setUseEdge(getCampaign().getGameOptions().getOption(OptionsConstants.EDGE).booleanValue());
+        getCampaign().getCampaignOptions().setUseImplants(getCampaign().getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).booleanValue());
+        getCampaign().getCampaignOptions().setQuirks(getCampaign().getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).booleanValue());
+        getCampaign().getCampaignOptions().setAllowCanonOnly(getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_CANON_ONLY).booleanValue());
+        getCampaign().getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).stringValue()));
         MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign()));
     }
 }
