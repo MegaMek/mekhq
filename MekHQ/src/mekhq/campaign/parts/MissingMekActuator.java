@@ -12,17 +12,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -34,17 +34,16 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingMekActuator extends MissingPart {
-	private static final long serialVersionUID = 719878556021696393L;
-	protected int type;
-	protected int location;
+    private static final long serialVersionUID = 719878556021696393L;
+    protected int type;
+    protected int location;
 
-	public MissingMekActuator() {
-		this(0, 0, null);
-	}
+    public MissingMekActuator() {
+        this(0, 0, null);
+    }
 
     public int getType() {
         return type;
@@ -55,7 +54,7 @@ public class MissingMekActuator extends MissingPart {
     }
 
     public MissingMekActuator(int tonnage, int type, int loc, Campaign c) {
-    	super(tonnage, c);
+        super(tonnage, c);
         this.type = type;
         Mech m = new BipedMech();
         this.name = m.getSystemName(type) + " Actuator" ;
@@ -63,132 +62,133 @@ public class MissingMekActuator extends MissingPart {
     }
 
     @Override
-	public int getBaseTime() {
-		return isOmniPodded()? 30 : 90;
-	}
+    public int getBaseTime() {
+        return isOmniPodded()? 30 : 90;
+    }
 
-	@Override
-	public int getDifficulty() {
-		return -3;
-	}
+    @Override
+    public int getDifficulty() {
+        return -3;
+    }
 
     @Override
     public double getTonnage() {
-    	//TODO: how much do actuators weight?
-    	//apparently nothing
-    	return 0;
+        //TODO: how much do actuators weight?
+        //apparently nothing
+        return 0;
     }
 
+    @Override
     public int getLocation() {
-    	return location;
+        return location;
     }
 
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<type>"
-				+type
-				+"</type>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<location>"
-				+location
-				+"</location>");
-		writeToXmlEnd(pw1, indent);
-	}
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<type>"
+                +type
+                +"</type>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<location>"
+                +location
+                +"</location>");
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
 
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
 
-			if (wn2.getNodeName().equalsIgnoreCase("type")) {
-				type = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("location")) {
-				location = Integer.parseInt(wn2.getTextContent());
-			}
-		}
-	}
+            if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                type = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("location")) {
+                location = Integer.parseInt(wn2.getTextContent());
+            }
+        }
+    }
 
-	@Override
-	public void fix() {
-		Part replacement = findReplacement(false);
-		if(null != replacement) {
-			Part actualReplacement = replacement.clone();
-			unit.addPart(actualReplacement);
-			campaign.getQuartermaster().addPart(actualReplacement, 0);
-			replacement.decrementQuantity();
-			((MekActuator)actualReplacement).setLocation(location);
-			remove(false);
-			//assign the replacement part to the unit
-			actualReplacement.updateConditionFromPart();
-		}
-	}
+    @Override
+    public void fix() {
+        Part replacement = findReplacement(false);
+        if (null != replacement) {
+            Part actualReplacement = replacement.clone();
+            unit.addPart(actualReplacement);
+            campaign.getQuartermaster().addPart(actualReplacement, 0);
+            replacement.decrementQuantity();
+            ((MekActuator) actualReplacement).setLocation(location);
+            remove(false);
+            //assign the replacement part to the unit
+            actualReplacement.updateConditionFromPart();
+        }
+    }
 
-	@Override
-	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		if(part instanceof MekActuator) {
-			MekActuator actuator = (MekActuator)part;
-			return actuator.getType() == type && getUnitTonnage() == actuator.getUnitTonnage();
-		}
-		return false;
-	}
+    @Override
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        if (part instanceof MekActuator) {
+            MekActuator actuator = (MekActuator) part;
+            return actuator.getType() == type && getUnitTonnage() == actuator.getUnitTonnage();
+        }
+        return false;
+    }
 
-	@Override
-	public String checkFixable() {
-		if(null == unit) {
-			 return null;
-		}
-		if(unit.isLocationBreached(location)) {
-			return unit.getEntity().getLocationName(location) + " is breached.";
-		}
-		if(unit.isLocationDestroyed(location)) {
-			return unit.getEntity().getLocationName(location) + " is destroyed.";
-		}
-		return null;
-	}
+    @Override
+    public String checkFixable() {
+        if (null == unit) {
+             return null;
+        }
+        if (unit.isLocationBreached(location)) {
+            return unit.getEntity().getLocationName(location) + " is breached.";
+        }
+        if (unit.isLocationDestroyed(location)) {
+            return unit.getEntity().getLocationName(location) + " is destroyed.";
+        }
+        return null;
+    }
 
-	@Override
-	public boolean onBadHipOrShoulder() {
-		return null != unit && unit.hasBadHipOrShoulder(location);
-	}
+    @Override
+    public boolean onBadHipOrShoulder() {
+        return null != unit && unit.hasBadHipOrShoulder(location);
+    }
 
-	@Override
-	public Part getNewPart() {
-		return new MekActuator(getUnitTonnage(), type, -1, campaign);
-	}
+    @Override
+    public Part getNewPart() {
+        return new MekActuator(getUnitTonnage(), type, -1, campaign);
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit) {
-			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
-		}
-	}
+    @Override
+    public void updateConditionFromPart() {
+        if (null != unit) {
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
+        }
+    }
 
-	@Override
-	public boolean isOmniPoddable() {
-		return type == Mech.ACTUATOR_LOWER_ARM || type == Mech.ACTUATOR_HAND;
-	}
+    @Override
+    public boolean isOmniPoddable() {
+        return type == Mech.ACTUATOR_LOWER_ARM || type == Mech.ACTUATOR_HAND;
+    }
 
-	@Override
-	public boolean isOmniPodded() {
-	    return isOmniPoddable() && getUnit() != null && getUnit().getEntity().isOmni();
-	}
+    @Override
+    public boolean isOmniPodded() {
+        return isOmniPoddable() && getUnit() != null && getUnit().getEntity().isOmni();
+    }
 
-	@Override
-	public String getLocationName() {
-		return unit != null ? unit.getEntity().getLocationName(location) : null;
-	}
+    @Override
+    public String getLocationName() {
+        return unit != null ? unit.getEntity().getLocationName(location) : null;
+    }
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return (getUnitTonnage() <= 100)? MekActuator.TA_STANDARD : MekActuator.TA_SUPERHEAVY;
+        return (getUnitTonnage() <= 100) ? MekActuator.TA_STANDARD : MekActuator.TA_SUPERHEAVY;
     }
 
-	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ACTUATOR;
+    @Override
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ACTUATOR;
     }
 }

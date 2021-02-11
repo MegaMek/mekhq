@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.icons.Camouflage;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.finances.Money;
@@ -53,6 +54,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
 /**
@@ -129,10 +131,10 @@ public class AtBContract extends Contract implements Serializable {
     protected String enemyBotName;
     protected String allyCamoCategory;
     protected String allyCamoFileName;
-    protected int allyColorIndex;
+    protected PlayerColour allyColour;
     protected String enemyCamoCategory;
     protected String enemyCamoFileName;
-    protected int enemyColorIndex;
+    protected PlayerColour enemyColour;
 
     protected int extensionLength;
 
@@ -181,12 +183,12 @@ public class AtBContract extends Contract implements Serializable {
         enemyQuality = IUnitRating.DRAGOON_C;
         allyBotName = "Ally";
         enemyBotName = "Enemy";
-        allyCamoCategory = Camouflage.NO_CAMOUFLAGE;
-        allyCamoFileName = null;
-        allyColorIndex = 1;
-        enemyCamoCategory = Camouflage.NO_CAMOUFLAGE;
-        enemyCamoFileName = null;
-        enemyColorIndex = 2;
+        allyCamoCategory = Camouflage.COLOUR_CAMOUFLAGE;
+        allyCamoFileName = PlayerColour.RED.name();
+        setAllyColour(PlayerColour.RED);
+        enemyCamoCategory = Camouflage.COLOUR_CAMOUFLAGE;
+        enemyCamoFileName = PlayerColour.GREEN.name();
+        setEnemyColour(PlayerColour.GREEN);
 
         extensionLength = 0;
 
@@ -340,7 +342,7 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     public static boolean isMinorPower(String fName) {
-        Faction faction = Faction.getFaction(fName);
+        Faction faction = Factions.getInstance().getFaction(fName);
         if (null != faction) {
             return !RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(faction) &&
                     !faction.isClan();
@@ -397,7 +399,7 @@ public class AtBContract extends Contract implements Serializable {
                 break;
         }
 
-        Faction employer = Faction.getFaction(employerCode);
+        Faction employer = Factions.getInstance().getFaction(employerCode);
         if ((null != employer)
                 && (RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(employer)
                 || employer.isClan())) {
@@ -494,7 +496,7 @@ public class AtBContract extends Contract implements Serializable {
                 isMinorPower(enemyCode) ||
                 enemyCode.equals("MERC")) {
             mod -= 1;
-        } else if (Faction.getFaction(enemyCode).isClan()) {
+        } else if (Factions.getInstance().getFaction(enemyCode).isClan()) {
             mod += 2;
         }
 
@@ -1021,8 +1023,8 @@ public class AtBContract extends Contract implements Serializable {
     public boolean contractExtended (Campaign campaign) {
         if ((getMissionType() != MT_PIRATEHUNTING) && (getMissionType() != MT_RIOTDUTY)) {
             String warName = RandomFactionGenerator.getInstance()
-                    .getFactionHints().getCurrentWar(Faction.getFaction(getEmployerCode()),
-                    Faction.getFaction(getEnemyCode()), campaign.getLocalDate());
+                    .getFactionHints().getCurrentWar(Factions.getInstance().getFaction(getEmployerCode()),
+                    Factions.getInstance().getFaction(getEnemyCode()), campaign.getLocalDate());
             if (null != warName) {
                 int extension = 0;
                 int roll = Compute.d6();
@@ -1125,10 +1127,7 @@ public class AtBContract extends Contract implements Serializable {
                 +"<allyCamoFileName>"
                 +allyCamoFileName
                 +"</allyCamoFileName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<allyColorIndex>"
-                +allyColorIndex
-                +"</allyColorIndex>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allyColour", getAllyColour().name());
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<enemyCamoCategory>"
                 +enemyCamoCategory
@@ -1137,10 +1136,7 @@ public class AtBContract extends Contract implements Serializable {
                 +"<enemyCamoFileName>"
                 +enemyCamoFileName
                 +"</enemyCamoFileName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<enemyColorIndex>"
-                +enemyColorIndex
-                +"</enemyColorIndex>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "enemyColour", getEnemyColour().name());
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<requiredLances>"
                 +requiredLances
@@ -1193,6 +1189,9 @@ public class AtBContract extends Contract implements Serializable {
                 +"<nextWeekBattleTypeMod>"
                 +nextWeekBattleTypeMod
                 +"</nextWeekBattleTypeMod>");
+        if (parentContract != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "parentContractId", parentContract.getId());
+        }
 
         if (null != specialEventScenarioDate) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "specialEventScenarioDate",
@@ -1231,14 +1230,26 @@ public class AtBContract extends Contract implements Serializable {
                 allyCamoCategory = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("allyCamoFileName")) {
                 allyCamoFileName = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("allyColorIndex")) {
-                allyColorIndex = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getTextContent().equalsIgnoreCase("allyColour")) {
+                setAllyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("allyColorIndex")) { // Legacy - 0.47.15 removal
+                setAllyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
+                if (Camouflage.NO_CAMOUFLAGE.equals(getAllyCamoCategory())) {
+                    setAllyCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
+                    setAllyCamoFileName(getAllyColour().name());
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("enemyCamoCategory")) {
                 enemyCamoCategory = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("enemyCamoFileName")) {
                 enemyCamoFileName = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("enemyColorIndex")) {
-                enemyColorIndex = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getTextContent().equalsIgnoreCase("enemyColour")) {
+                setEnemyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("enemyColorIndex")) { // Legacy - 0.47.15 removal
+                setEnemyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
+                if (Camouflage.NO_CAMOUFLAGE.equals(getEnemyCamoCategory())) {
+                    setEnemyCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
+                    setEnemyCamoFileName(getEnemyColour().name());
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("requiredLances")) {
                 requiredLances = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("moraleLevel")) {
@@ -1269,6 +1280,31 @@ public class AtBContract extends Contract implements Serializable {
                 specialEventScenarioDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
                 specialEventScenarioType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("parentContractId")) {
+                parentContract = new AtBContractRef(Integer.parseInt(wn2.getTextContent()));
+            }
+        }
+    }
+
+    /**
+     * Restores any references to other contracts.
+     * @param c The Campaign which holds this contract.
+     */
+    public void restore(Campaign c) {
+        if (parentContract != null) {
+            Mission m = c.getMission(parentContract.getId());
+            if (m != null) {
+                if (m instanceof AtBContract) {
+                    setParentContract((AtBContract) m);
+                } else {
+                    MekHQ.getLogger().warning(String.format("Parent Contract reference #%d is not an AtBContract for contract %s",
+                            parentContract.getId(), getName()));
+                    setParentContract(null);
+                }
+            } else {
+                MekHQ.getLogger().warning(String.format("Parent Contract #%d reference was not found for contract %s",
+                        parentContract.getId(), getName()));
+                setParentContract(null);
             }
         }
     }
@@ -1285,9 +1321,9 @@ public class AtBContract extends Contract implements Serializable {
     public String getEmployerName(int year) {
         if (mercSubcontract) {
             return "Mercenary (" +
-                    Faction.getFaction(employerCode).getFullName(year) + ")";
+                    Factions.getInstance().getFaction(employerCode).getFullName(year) + ")";
         }
-        return Faction.getFaction(employerCode).getFullName(year);
+        return Factions.getInstance().getFaction(employerCode).getFullName(year);
     }
 
     public String getEnemyCode() {
@@ -1295,7 +1331,7 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     public String getEnemyName(int year) {
-        return Faction.getFaction(enemyCode).getFullName(year);
+        return Factions.getInstance().getFaction(enemyCode).getFullName(year);
     }
 
     public void setEnemyCode(String enemyCode) {
@@ -1379,12 +1415,12 @@ public class AtBContract extends Contract implements Serializable {
         allyCamoFileName = fileName;
     }
 
-    public int getAllyColorIndex() {
-        return allyColorIndex;
+    public PlayerColour getAllyColour() {
+        return allyColour;
     }
 
-    public void setAllyColorIndex(int index) {
-        allyColorIndex = index;
+    public void setAllyColour(PlayerColour allyColour) {
+        this.allyColour = allyColour;
     }
 
     public String getEnemyCamoCategory() {
@@ -1403,12 +1439,12 @@ public class AtBContract extends Contract implements Serializable {
         enemyCamoFileName = fileName;
     }
 
-    public int getEnemyColorIndex() {
-        return enemyColorIndex;
+    public PlayerColour getEnemyColour() {
+        return enemyColour;
     }
 
-    public void setEnemyColorIndex(int index) {
-        enemyColorIndex = index;
+    public void setEnemyColour(PlayerColour enemyColour) {
+        this.enemyColour = enemyColour;
     }
 
     public int getRequiredLances() {
@@ -1538,7 +1574,7 @@ public class AtBContract extends Contract implements Serializable {
                 missionType = MT_PLANETARYASSAULT;
             }
         }
-        Faction f = Faction.getFactionFromFullNameAndYear(c.getEmployer(), campaign.getGameYear());
+        Faction f = Factions.getInstance().getFactionFromFullNameAndYear(c.getEmployer(), campaign.getGameYear());
         if (null == f) {
             employerCode = "IND";
         } else {
@@ -1592,6 +1628,17 @@ public class AtBContract extends Contract implements Serializable {
         retVal.setEnemyBotName(c.getEnemyBotName());
 
         return retVal;
+    }
+
+    /**
+     * Represents a reference to another AtBContract.
+     */
+    protected static class AtBContractRef extends AtBContract {
+        private static final long serialVersionUID = 1L;
+
+        public AtBContractRef(int id) {
+            setId(id);
+        }
     }
 
 }

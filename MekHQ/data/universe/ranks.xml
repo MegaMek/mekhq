@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rankSystems>
 	<rankSystem>
-		<!-- Second Star League -->
-		<system>0</system>
+		<systemId>0</systemId>
+		<systemName>Second Star League</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -260,8 +260,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Federated Suns -->
-		<system>1</system>
+		<systemId>1</systemId>
+		<systemName>Federated Suns</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -519,8 +519,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Federated Commonwealth -->
-		<system>2</system>
+		<systemId>2</systemId>
+		<systemName>Federated Commonwealth</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -778,8 +778,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Lyran Commonwealth -->
-		<system>3</system>
+		<systemId>3</systemId>
+		<systemName>Lyran Commonwealth</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -1037,8 +1037,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Lyran Alliance -->
-		<system>4</system>
+		<systemId>4</systemId>
+		<systemName>Lyran Alliance</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -1296,8 +1296,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Free Worlds League -->
-		<system>5</system>
+		<systemId>5</systemId>
+		<systemName>Free Worlds League</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -1555,8 +1555,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Capellan Confederation -->
-		<system>6</system>
+		<systemId>6</systemId>
+		<systemName>Capellan Confederation</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -1814,8 +1814,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Capellan Confederation Warrior House -->
-		<system>7</system>
+		<systemId>7</systemId>
+		<systemName>Capellan Confederation Warrior House</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -2073,8 +2073,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Draconis Combine -->
-		<system>8</system>
+		<systemId>8</systemId>
+		<systemName>Draconis Combine</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -2332,8 +2332,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Clan -->
-		<system>9</system>
+		<systemId>9</systemId>
+		<systemName>Clan</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -2591,8 +2591,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Comstar -->
-		<system>10</system>
+		<systemId>10</systemId>
+		<systemName>ComStar</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -2850,8 +2850,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Word of Blake -->
-		<system>11</system>
+		<systemId>11</systemId>
+		<systemName>Word of Blake</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -3109,8 +3109,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Custom -->
-		<system>12</system>
+		<systemId>12</systemId>
+		<systemName>Custom</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -3368,8 +3368,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Magistry of Canopus -->
-		<system>13</system>
+		<systemId>13</systemId>
+		<systemName>Magistracy of Canopus</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -3627,8 +3627,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Taurian Concordat -->
-		<system>14</system>
+		<systemId>14</systemId>
+		<systemName>Taurian Concordat</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -3886,8 +3886,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Marian Hegemony -->
-		<system>15</system>
+		<systemId>15</systemId>
+		<systemName>Marian Hegemony</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -4145,8 +4145,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Outworld's Alliance -->
-		<system>16</system>
+		<systemId>16</systemId>
+		<systemName>Outworlds Alliance</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -4404,8 +4404,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Free Rasalhague Republic -->
-		<system>17</system>
+		<systemId>17</systemId>
+		<systemName>Free Rasalhague Republic</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -4663,8 +4663,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- Aurigan Coalition -->
-		<system>18</system>
+		<systemId>18</systemId>
+		<systemName>Aurigan Coalition</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
@@ -4922,8 +4922,8 @@
 		</rank> <!-- O20 -->
 	</rankSystem>
 	<rankSystem>
-		<!-- First Star League -->
-		<system>19</system>
+		<systemId>19</systemId>
+		<systemName>First Star League</systemName>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>

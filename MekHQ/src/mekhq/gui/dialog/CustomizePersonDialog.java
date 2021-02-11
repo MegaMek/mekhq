@@ -49,6 +49,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -838,7 +839,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private DefaultComboBoxModel<Faction> getFactionsComboBoxModel() {
         int year = campaign.getGameYear();
-        List<Faction> orderedFactions = Faction.getFactions().stream()
+        List<Faction> orderedFactions = Factions.getInstance().getFactions().stream()
             .sorted((a, b) -> a.getFullName(year).compareToIgnoreCase(b.getFullName(year)))
             .collect(Collectors.toList());
 

@@ -29,7 +29,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import megamek.client.generator.RandomGenderGenerator;
-import megamek.common.IPlayer;
 import megamek.common.MechSummaryCache;
 import megamek.common.enums.Gender;
 import megamek.common.icons.Camouflage;
@@ -78,6 +77,7 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.Planet;
@@ -505,8 +505,8 @@ public class AtBDynamicScenarioFactory {
                     scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
 
                     if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
-                        en.setCamoCategory(Camouflage.NO_CAMOUFLAGE);
-                        en.setCamoFileName(IPlayer.colorNames[scenario.getContract(campaign).getAllyColorIndex()]);
+                        en.setCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
+                        en.setCamoFileName(scenario.getContract(campaign).getAllyColour().name());
                     }
                 }
 
@@ -1163,7 +1163,7 @@ public class AtBDynamicScenarioFactory {
         // if yes, then pick the fastest mech and load it up, adding the generated BA to the transport relationships.
 
         // non-clan forces and units that aren't stars don't become novas
-        if (!Faction.getFaction(factionCode).isClan() && (starUnits.size() != 5)) {
+        if (!Factions.getInstance().getFaction(factionCode).isClan() && (starUnits.size() != 5)) {
             return transportedUnits;
         }
 
@@ -1289,7 +1289,7 @@ public class AtBDynamicScenarioFactory {
         en.setOwner(campaign.getPlayer());
         en.setGame(campaign.getGame());
 
-        Faction faction = Faction.getFaction(factionCode);
+        Faction faction = Factions.getInstance().getFaction(factionCode);
 
         RandomNameGenerator rng = RandomNameGenerator.getInstance();
         rng.setChosenFaction(faction.getNameGenerator());
@@ -1445,7 +1445,7 @@ public class AtBDynamicScenarioFactory {
         int actualUnitType = unitTypeCode;
 
         if (unitTypeCode == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
-            Faction faction = Faction.getFaction(factionCode);
+            Faction faction = Factions.getInstance().getFaction(factionCode);
 
             // "AtB Mix" will skip vehicles if the "use vehicles" checkbox is turned off
             // or if the faction is clan and "clan opfors use vehicles" is turned off
@@ -1543,7 +1543,7 @@ public class AtBDynamicScenarioFactory {
      * @return Unit weight string.
      */
     private static String generateUnitWeights(List<Integer> unitTypes, String faction, int weightClass, int maxWeight, int minWeight, Campaign campaign) {
-        Faction genFaction = Faction.getFaction(faction);
+        Faction genFaction = Factions.getInstance().getFaction(faction);
         String factionWeightString = AtBConfiguration.ORG_IS;
         if (genFaction.isClan() || faction.equals("MH")) {
             factionWeightString = AtBConfiguration.ORG_CLAN;
@@ -1745,12 +1745,12 @@ public class AtBDynamicScenarioFactory {
             ForceAlignment forceAlignment, AtBContract contract) {
         if (forceAlignment == ScenarioForceTemplate.ForceAlignment.Allied) {
             generatedForce.setName(String.format("%s %s", contract.getAllyBotName(), forceTemplate.getForceName()));
-            generatedForce.setColorIndex(contract.getAllyColorIndex());
+            generatedForce.setColour(contract.getAllyColour());
             generatedForce.setCamoCategory(contract.getAllyCamoCategory());
             generatedForce.setCamoFileName(contract.getAllyCamoFileName());
         } else if (forceAlignment == ScenarioForceTemplate.ForceAlignment.Opposing) {
             generatedForce.setName(String.format("%s %s", contract.getEnemyBotName(), forceTemplate.getForceName()));
-            generatedForce.setColorIndex(contract.getEnemyColorIndex());
+            generatedForce.setColour(contract.getEnemyColour());
             generatedForce.setCamoCategory(contract.getEnemyCamoCategory());
             generatedForce.setCamoFileName(contract.getEnemyCamoFileName());
         } else {
@@ -2218,7 +2218,7 @@ public class AtBDynamicScenarioFactory {
      * @return "Lance" size.
      */
     public static int getLanceSize(String factionCode) {
-        Faction faction = Faction.getFaction(factionCode);
+        Faction faction = Factions.getInstance().getFaction(factionCode);
         if (faction != null) {
             // clans and marian hegemony use a fundamental unit size of 5.
             if (faction.isClan() || factionCode.equals("MH")) {
@@ -2343,7 +2343,7 @@ public class AtBDynamicScenarioFactory {
         List<String> planetFactions = contract.getSystem().getFactions(currentDate);
         if (planetFactions != null && !planetFactions.isEmpty()) {
             factionCode = planetFactions.get(0);
-            Faction ownerFaction = Faction.getFaction(factionCode);
+            Faction ownerFaction = Factions.getInstance().getFaction(factionCode);
 
             if (ownerFaction.is(Tag.ABANDONED)) {
                 factionCode = "MERC";

@@ -35,10 +35,6 @@ import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.Vector;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-
 import megamek.common.*;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
@@ -62,7 +58,7 @@ import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -709,11 +705,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 externalIDLookup.put(en.getExternalIdAsString(), en);
 
                 if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
-                    en.setCamoCategory(Camouflage.NO_CAMOUFLAGE);
-                    en.setCamoFileName(IPlayer.colorNames[getContract(campaign).getAllyColorIndex()]);
+                    en.setCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
+                    en.setCamoFileName(getContract(campaign).getAllyColour().name());
                 }
             } else {
-                MekHQ.getLogger().error(AtBScenario.class, "Entity for player-controlled allies is null");
+                MekHQ.getLogger().error("Entity for player-controlled allies is null");
             }
         }
 
@@ -727,7 +723,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 allyEntities.add(en);
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
             } else {
-                MekHQ.getLogger().error(AtBScenario.class, "Entity for ally bot is null");
+                MekHQ.getLogger().error("Entity for ally bot is null");
             }
         }
 
@@ -1041,7 +1037,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     private void addLance(List<Entity> list, String faction, int skill, int quality, int weightClass,
             int maxWeight, Campaign campaign, int arrivalTurn) {
-        if (Faction.getFaction(faction).isClan()) {
+        if (Factions.getInstance().getFaction(faction).isClan()) {
             addStar(list, faction, skill, quality, weightClass, maxWeight, campaign, arrivalTurn);
             return;
         }
@@ -1477,9 +1473,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /* Convenience methods for frequently-used arguments */
     protected BotForce getAllyBotForce(AtBContract c, int start, int home, List<Entity> entities) {
         return new BotForce(c.getAllyBotName(), 1, start, home, entities,
-                c.getAllyCamoCategory(),
-                c.getAllyCamoFileName(),
-                c.getAllyColorIndex());
+                c.getAllyCamoCategory(), c.getAllyCamoFileName(), c.getAllyColour());
     }
 
     protected BotForce getEnemyBotForce(AtBContract c, int start, List<Entity> entities) {
@@ -1488,9 +1482,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     protected BotForce getEnemyBotForce(AtBContract c, int start, int home, List<Entity> entities) {
         return new BotForce(c.getEnemyBotName(), 2, start, home, entities,
-                c.getEnemyCamoCategory(),
-                c.getEnemyCamoFileName(),
-                c.getEnemyColorIndex());
+                c.getEnemyCamoCategory(), c.getEnemyCamoFileName(), c.getEnemyColour());
     }
 
     public List<String> generateEntityStub(List<Entity> entities) {
@@ -1751,7 +1743,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         try {
                             en = MekHqXmlUtil.getEntityFromXmlString(wn3);
                         } catch (Exception e) {
-                            MekHQ.getLogger().error(this, "Error loading allied unit in scenario", e);
+                            MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                         }
                         if (en != null) {
                             alliesPlayer.add(en);
@@ -1770,7 +1762,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         try {
                             en = MekHqXmlUtil.getEntityFromXmlString(wn3);
                         } catch (Exception e) {
-                            MekHQ.getLogger().error(this, "Error loading allied unit in scenario", e);
+                            MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                         }
                         if (en != null) {
                             bigBattleAllies.add(en);
@@ -1797,7 +1789,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 try {
                                     en = MekHqXmlUtil.getEntityFromXmlString(wn4);
                                 } catch (Exception e) {
-                                    MekHQ.getLogger().error(this, "Error loading allied unit in scenario", e);
+                                    MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                                 }
                                 if (null != en) {
                                     specMissionEnemies.get(weightClass).add(en);
@@ -1813,7 +1805,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 try {
                     bf.setFieldsFromXmlNode(wn2);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(this, "Error loading allied unit in scenario", e);
+                    MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                     bf = null;
                 }
                 if (null != bf) {
@@ -1837,9 +1829,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("transportLinkages")) {
                 try {
-                    loadTransportLinkages(wn2);
+                    transportLinkages = loadTransportLinkages(wn2);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(this, "Error loading transport linkages in scenario", e);
+                    MekHQ.getLogger().error("Error loading transport linkages in scenario", e);
                 }
             }
         }
@@ -1847,7 +1839,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
          * remove the entry from the list of entities that give survival bonuses
          * to avoid an critical error that prevents battle resolution.
          */
-        ArrayList<UUID> toRemove = new ArrayList<UUID>();
+        ArrayList<UUID> toRemove = new ArrayList<>();
         for (UUID uid : survivalBonus) {
             if (!entityIds.containsKey(uid)) {
                 toRemove.add(uid);
@@ -1856,15 +1848,36 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         survivalBonus.removeAll(toRemove);
     }
 
-    private void loadTransportLinkages(Node wn) throws XPathExpressionException {
-        XPath xp = MekHqXmlUtil.getXPathInstance();
-        NodeList transportIDs = (NodeList) xp.evaluate("transportLinkage/transportID", wn, XPathConstants.NODESET);
-        NodeList transporteeIDs = (NodeList) xp.evaluate("transportLinkage/transportedUnits", wn, XPathConstants.NODESET);
+    private static Map<String, List<String>> loadTransportLinkages(Node wn) {
+        NodeList nl = wn.getChildNodes();
 
-        for (int x = 0; x < transportIDs.getLength(); x++) {
-            String transportID = transportIDs.item(x).getTextContent();
-            List<String> transportedUnitIDs = Arrays.asList(transporteeIDs.item(x).getTextContent().split(","));
+        Map<String, List<String>> transportLinkages = new HashMap<>();
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            if (wn2.getNodeName().equalsIgnoreCase("transportLinkage")) {
+                loadTransportLinkage(wn2, transportLinkages);
+            }
+        }
 
+        return transportLinkages;
+    }
+
+    private static void loadTransportLinkage(Node wn, Map<String, List<String>> transportLinkages) {
+        NodeList nl = wn.getChildNodes();
+
+        String transportID = null;
+        List<String> transportedUnitIDs = null;
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+
+            if (wn2.getNodeName().equalsIgnoreCase("transportID")) {
+                transportID = wn2.getTextContent().trim();
+            } else if (wn2.getNodeName().equalsIgnoreCase("transportedUnits")) {
+                transportedUnitIDs = Arrays.asList(wn2.getTextContent().split(","));
+            }
+        }
+
+        if ((transportID != null) && (transportedUnitIDs != null)) {
             transportLinkages.put(transportID, transportedUnitIDs);
         }
     }

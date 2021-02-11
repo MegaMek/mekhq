@@ -27,7 +27,7 @@ import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {

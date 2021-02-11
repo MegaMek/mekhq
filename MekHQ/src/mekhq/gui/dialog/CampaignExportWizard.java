@@ -861,7 +861,7 @@ public class CampaignExportWizard extends JDialog {
                 return ((Armor) part).getArmorWeight(count);
             } else if (part instanceof AmmoStorage) {
                 AmmoStorage ammoPart = (AmmoStorage) part;
-                AmmoType ammoType = (AmmoType) ammoPart.getType();
+                AmmoType ammoType = ammoPart.getType();
                 return ammoType.getKgPerShot() * count / 1000.0;
             } else {
                 return count * part.getTonnage() * 1.0;

@@ -12,18 +12,18 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -41,7 +41,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class TankLocation extends Part {
@@ -80,17 +79,17 @@ public class TankLocation extends Part {
         this.damage = 0;
         this.breached = false;
         this.name = "Tank Location";
-        switch(loc) {
-            case(Tank.LOC_FRONT):
+        switch (loc) {
+            case Tank.LOC_FRONT:
                 this.name = "Vehicle Front";
                 break;
-            case(Tank.LOC_LEFT):
+            case Tank.LOC_LEFT:
                 this.name = "Vehicle Left Side";
                 break;
-            case(Tank.LOC_RIGHT):
+            case Tank.LOC_RIGHT:
                 this.name = "Vehicle Right Side";
                 break;
-            case(Tank.LOC_REAR):
+            case Tank.LOC_REAR:
                 this.name = "Vehicle Rear";
                 break;
         }
@@ -104,8 +103,8 @@ public class TankLocation extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof TankLocation
-                && getLoc() == ((TankLocation)part).getLoc()
-                && getUnitTonnage() == ((TankLocation)part).getUnitTonnage();
+                && getLoc() == ((TankLocation) part).getLoc()
+                && getUnitTonnage() == part.getUnitTonnage();
     }
 
     @Override
@@ -139,7 +138,7 @@ public class TankLocation extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("loc")) {
@@ -147,7 +146,7 @@ public class TankLocation extends Part {
             } else if (wn2.getNodeName().equalsIgnoreCase("damage")) {
                 damage = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
-                breached = wn2.getTextContent().equalsIgnoreCase("true");
+                breached = Boolean.parseBoolean(wn2.getTextContent().trim());
             }
         }
     }
@@ -155,7 +154,7 @@ public class TankLocation extends Part {
     @Override
     public void fix() {
         super.fix();
-        if(isBreached()) {
+        if (isBreached()) {
             breached = false;
             if (null != unit) {
                 unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
@@ -167,14 +166,14 @@ public class TankLocation extends Part {
                     }
                     slot.setBreached(false);
                     Mounted m = slot.getMount();
-                    if(null != m) {
+                    if (null != m) {
                         m.setBreached(false);
                     }
                 }
             }
         } else {
             damage = 0;
-            if(null != unit) {
+            if (null != unit) {
                 unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
             }
         }
@@ -188,12 +187,12 @@ public class TankLocation extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit) {
+        if (null != unit) {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -205,14 +204,14 @@ public class TankLocation extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {
-            if(IArmorState.ARMOR_DESTROYED == unit.getEntity().getInternal(loc)) {
+        if (null != unit) {
+            if (IArmorState.ARMOR_DESTROYED == unit.getEntity().getInternal(loc)) {
                 remove(false);
             } else {
                 int originalInternal = unit.getEntity().getOInternal(loc);
                 int internal = unit.getEntity().getInternal(loc);
                 damage = originalInternal - Math.min(originalInternal, Math.max(internal, 0));
-                if(unit.isLocationBreached(loc)) {
+                if (unit.isLocationBreached(loc)) {
                     breached = true;
                 }
             }
@@ -246,19 +245,19 @@ public class TankLocation extends Part {
     @Override
     public String getDetails(boolean includeRepairDetails) {
         if (includeRepairDetails) {
-            if(isBreached()) {
+            if (isBreached()) {
                 return "Breached";
             } else {
-                return  damage + " point(s) of damage";
+                return damage + " point(s) of damage";
             }
         } else {
-            return super.getDetails(includeRepairDetails);
+            return super.getDetails(false);
         }
     }
 
     @Override
     public void updateConditionFromPart() {
-        ((Tank) unit.getEntity()).setInternal(((Tank) unit.getEntity()).getOInternal(loc) - damage, loc);
+        unit.getEntity().setInternal(unit.getEntity().getOInternal(loc) - damage, loc);
     }
 
     @Override
@@ -295,7 +294,7 @@ public class TankLocation extends Part {
 
     @Override
     public TargetRoll getAllMods(Person tech) {
-        if(isBreached() && !isSalvaging()) {
+        if (isBreached() && !isSalvaging()) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "fixing breach");
         }
         return super.getAllMods(tech);
@@ -303,7 +302,7 @@ public class TankLocation extends Part {
 
     @Override
     public String getDesc() {
-        if(!isBreached() || isSalvaging()) {
+        if (!isBreached() || isSalvaging()) {
             return super.getDesc();
         }
         String toReturn = "<html><font size='2'";
@@ -325,6 +324,7 @@ public class TankLocation extends Part {
          return skillType.equals(SkillType.S_TECH_MECHANIC);
      }
 
+     @Override
      public void doMaintenanceDamage(int d) {
          int points = unit.getEntity().getInternal(loc);
          points = Math.max(points -d, 1);
@@ -348,7 +348,7 @@ public class TankLocation extends Part {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.GENERAL_LOCATION;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.GENERAL_LOCATION;
     }
 }

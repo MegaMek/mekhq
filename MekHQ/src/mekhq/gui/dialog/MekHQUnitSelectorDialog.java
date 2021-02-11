@@ -21,11 +21,7 @@ package mekhq.gui.dialog;
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
-import megamek.client.ui.swing.tileset.EntityImage;
-import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.*;
-import megamek.common.icons.Camouflage;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.UnitOrder;
@@ -152,15 +148,17 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy", TARGET_UNKNOWN));
                 buttonSelect.setToolTipText(null);
             }
-        } else if (addToCampaign) {
+        } else {
             selectedUnit = new UnitOrder(entity, campaign);
-            buttonSelect.setEnabled(true);
-            Person logisticsPerson = campaign.getLogisticsPerson();
-            buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy",
-                    campaign.getTargetForAcquisition(selectedUnit, logisticsPerson, false)
-                            .getValueAsString()));
-            buttonSelect.setToolTipText(campaign.getTargetForAcquisition(selectedUnit,
-                    logisticsPerson, false).getDesc());
+            if (addToCampaign) {
+                buttonSelect.setEnabled(true);
+                Person logisticsPerson = campaign.getLogisticsPerson();
+                buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy",
+                        campaign.getTargetForAcquisition(selectedUnit, logisticsPerson, false)
+                                .getValueAsString()));
+                buttonSelect.setToolTipText(campaign.getTargetForAcquisition(selectedUnit,
+                        logisticsPerson, false).getDesc());
+            }
         }
 
         return entity;
@@ -170,21 +168,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     protected Entity refreshUnitView() {
         Entity selectedEntity = super.refreshUnitView();
         if (selectedEntity != null) {
-            Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(selectedEntity);
-
-            Image camo;
-            if ((selectedEntity.getCamoCategory() != null)
-                    && !Camouflage.NO_CAMOUFLAGE.equals(selectedEntity.getCamoCategory())) {
-                camo = selectedEntity.getCamouflage().getImage();
-            } else {
-                camo = campaign.getCamouflage().getImage();
-            }
-
-            // This seems unnecessary as the CamoManager will return an image for a playercolor
-            int tint = PlayerColors.getColorRGB(campaign.getColorIndex());
-
-            labelImage.setIcon(new ImageIcon(new EntityImage(base, tint, camo, labelImage, selectedEntity)
-                    .loadPreviewImage()));
+            labelImage.setIcon(new ImageIcon(selectedUnit.getImage(this)));
         } else {
             labelImage.setIcon(null);
         }
