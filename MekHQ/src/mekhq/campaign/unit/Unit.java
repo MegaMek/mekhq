@@ -1,7 +1,7 @@
 /*
  * Unit.java
  *
- * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2021 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -3280,11 +3280,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return (entity == null) ? new Camouflage() : entity.getCamouflage();
     }
 
-    public Camouflage getUtilizedCamouflage(Campaign campaign) {
+    public Camouflage getUtilizedCamouflage(final Campaign campaign) {
         if (getCamouflage().hasDefaultCategory()) {
             final Force force = campaign.getForce(getForceId());
-            return ((force != null) && !force.getCamouflage().hasDefaultCategory())
-                    ? force.getCamouflage() : campaign.getCamouflage();
+            return (force != null) ? force.getCamouflageOrElse(campaign.getCamouflage())
+                    : campaign.getCamouflage();
         } else {
             return getCamouflage();
         }

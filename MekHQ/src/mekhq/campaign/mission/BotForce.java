@@ -209,8 +209,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "camoFileName", getCamouflage().getFilename());
         }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
-
-        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<entities>");
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "entities");
         for (Entity en : entityList) {
             if (en == null) {
                 MekHQ.getLogger().error("Null entity when saving a bot force, we should never find a null here. Please investigate");
@@ -218,9 +217,8 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                 pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent, entityList));
             }
         }
-        pw1.println(MekHqXmlUtil.indentStr(--indent) + "</entities>");
-
-        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<behaviorSettings>");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "entities");
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "behaviorSettings");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "verbosity", behaviorSettings.getVerbosity().toString());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "autoFlee", behaviorSettings.shouldAutoFlee());
@@ -231,7 +229,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "retreatEdge", behaviorSettings.getRetreatEdge().ordinal());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "braveryIndex", behaviorSettings.getBraveryIndex());
-        pw1.println(MekHqXmlUtil.indentStr(--indent) + "</behaviorSettings>");
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "behaviorSettings");
     }
 
     public void setFieldsFromXmlNode(Node wn) {
