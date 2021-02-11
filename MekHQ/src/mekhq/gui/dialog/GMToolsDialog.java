@@ -284,11 +284,11 @@ public class GMToolsDialog extends JDialog {
         }
         unitTypePicker = new JComboBox<>(unitTypeModel);
         unitTypePicker.setName("unitTypePicker");
-        unitTypePicker.addItemListener(ev ->
-                unitWeightPicker.setEnabled(unitTypePicker.getSelectedItem().equals("Mek")
-                        || unitTypePicker.getSelectedItem().equals("Tank")
-                        || unitTypePicker.getSelectedItem().equals("Aero"))
-        );
+        unitTypePicker.addItemListener(ev -> {
+            final String unitType = (String) Objects.requireNonNull(unitTypePicker.getSelectedItem());
+            unitWeightPicker.setEnabled(unitType.equals("Mek") || unitType.equals("Tank")
+                    || unitType.equals("Aero"));
+        });
         ratPanel.add(unitTypePicker, newGridBagConstraints(4, 1));
 
         JLabel unitWeightLabel = new JLabel(resources.getString("unitWeightLabel.text"));
