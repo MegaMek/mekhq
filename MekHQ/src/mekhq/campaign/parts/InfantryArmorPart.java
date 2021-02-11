@@ -214,7 +214,7 @@ public class InfantryArmorPart extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof InfantryArmorPart
+        return getClass().equals(part.getClass())
                 && damageDivisor == ((InfantryArmorPart)part).getDamageDivisor()
                 && dest == ((InfantryArmorPart)part).isDest()
                 && encumbering == ((InfantryArmorPart)part).isEncumbering()

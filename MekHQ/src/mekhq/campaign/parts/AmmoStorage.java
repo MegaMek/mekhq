@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -115,11 +116,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public boolean isSamePartType(@Nullable Part part) {
-        if ((getType() != null) && (part instanceof AmmoStorage)) {
-            return getType().equals(((AmmoStorage) part).getType());
-        }
-
-        return false;
+        return getClass().equals(part.getClass())
+                && Objects.equals(getType(), ((AmmoStorage) part).getType());
     }
 
     /**
