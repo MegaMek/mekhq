@@ -240,7 +240,6 @@ public class CampaignGUI extends JPanel {
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
-        tabMain.getAccessibleContext().setAccessibleName("Main Tabs");
         tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
