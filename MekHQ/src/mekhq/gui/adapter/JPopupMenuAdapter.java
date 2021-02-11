@@ -68,11 +68,15 @@ public abstract class JPopupMenuAdapter extends MouseInputAdapter implements Act
 
     @Override
     public void mousePressed(MouseEvent e) {
+        // Implement mousePressed per:
+        // https://docs.oracle.com/javase/tutorial/uiswing/components/menu.html#popup
         maybeShowPopup(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        // Implement mouseReleased per:
+        // https://docs.oracle.com/javase/tutorial/uiswing/components/menu.html#popup
         maybeShowPopup(e);
     }
 
