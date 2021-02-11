@@ -351,7 +351,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         }
         procurementTable.setIntercellSpacing(new Dimension(0, 0));
         procurementTable.setShowGrid(false);
-        procurementTable.addMouseListener(new ProcurementTableMouseAdapter(getCampaignGui()));
+        ProcurementTableMouseAdapter.connect(getCampaignGui(), procurementTable, procurementModel);
         procurementTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         procurementTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "ADD");
