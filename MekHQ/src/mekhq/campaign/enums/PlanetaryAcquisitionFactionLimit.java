@@ -38,7 +38,7 @@ public enum PlanetaryAcquisitionFactionLimit {
     //endregion Variable Declarations
 
     //region Constructors
-    PlanetaryAcquisitionFactionLimit(String name) {
+    PlanetaryAcquisitionFactionLimit(final String name) {
         this.name = resources.getString(name);
     }
     //endregion Constructors
@@ -60,21 +60,21 @@ public enum PlanetaryAcquisitionFactionLimit {
         return this == SELF;
     }
 
-    public boolean generateEnemy() {
+    public boolean generateOnEnemyPlanets() {
         return isAll();
     }
 
-    public boolean generateNeutral() {
-        return generateEnemy() || isNeutral();
+    public boolean generateOnNeutralPlanets() {
+        return generateOnEnemyPlanets() || isNeutral();
     }
 
-    public boolean generateAllied() {
-        return generateNeutral() || isAllied();
+    public boolean generateOnAlliedPlanets() {
+        return generateOnNeutralPlanets() || isAllied();
     }
     //endregion Boolean Comparison Methods
 
-    //region File IO
-    public static PlanetaryAcquisitionFactionLimit parseFromString(String text) {
+    //region File I/O
+    public static PlanetaryAcquisitionFactionLimit parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
@@ -102,7 +102,7 @@ public enum PlanetaryAcquisitionFactionLimit {
 
         return NEUTRAL;
     }
-    //endregion File IO
+    //endregion File I/O
 
     @Override
     public String toString() {

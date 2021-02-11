@@ -2273,7 +2273,7 @@ public class CampaignOptions implements Serializable {
         return planetAcquisitionFactionLimit;
     }
 
-    public void setPlanetAcquisitionFactionLimit(PlanetaryAcquisitionFactionLimit planetAcquisitionFactionLimit) {
+    public void setPlanetAcquisitionFactionLimit(final PlanetaryAcquisitionFactionLimit planetAcquisitionFactionLimit) {
         this.planetAcquisitionFactionLimit = planetAcquisitionFactionLimit;
     }
 

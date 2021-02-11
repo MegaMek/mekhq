@@ -827,12 +827,12 @@ public class Planet implements Serializable {
             }
             if (!ownFaction) {
                 if (enemies && !neutrals && !allies
-                        && !options.getPlanetAcquisitionFactionLimit().generateEnemy()) {
+                        && !options.getPlanetAcquisitionFactionLimit().generateOnEnemyPlanets()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from enemy planets");
                 } else if (neutrals && !allies
-                        && !options.getPlanetAcquisitionFactionLimit().generateNeutral()) {
+                        && !options.getPlanetAcquisitionFactionLimit().generateOnNeutralPlanets()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from neutral planets");
-                } else if (allies && !options.getPlanetAcquisitionFactionLimit().generateAllied()) {
+                } else if (allies && !options.getPlanetAcquisitionFactionLimit().generateOnAlliedPlanets()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from allied planets");
                 } else if (clanCrossover && options.disallowPlanetAcquisitionClanCrossover()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "The clans and inner sphere do not trade supplies");
