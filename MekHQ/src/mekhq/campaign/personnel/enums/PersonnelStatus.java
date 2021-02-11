@@ -131,7 +131,6 @@ public enum PersonnelStatus {
     }
     //endregion Boolean Information Methods
 
-
     /**
      * @param text containing the PersonnelStatus
      * @return the saved PersonnelStatus

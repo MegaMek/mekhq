@@ -74,19 +74,20 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      *
      * @param id the id of the person being referenced
      */
-    protected AbstractPerson(UUID id) {
+    protected AbstractPerson(final UUID id) {
         setId(id);
     }
 
     /**
      * Primary AbstractPerson constructor, variables are initialized in the exact same order as they are
      * saved to the XML file
-     * @param preNominal        the person's pre-nominal
-     * @param givenName         the person's given name
-     * @param surname           the person's surname
-     * @param postNominal       the person's post-nominal
+     * @param preNominal    the person's pre-nominal
+     * @param givenName     the person's given name
+     * @param surname       the person's surname
+     * @param postNominal   the person's post-nominal
      */
-    protected AbstractPerson(String preNominal, String givenName, String surname, String postNominal) {
+    protected AbstractPerson(final String preNominal, final String givenName, final String surname,
+                             final String postNominal) {
         setId(UUID.randomUUID());
 
         //region Name
@@ -121,7 +122,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param id the person's new id
      */
-    public void setId(UUID id) {
+    public void setId(final UUID id) {
         this.id = id;
     }
 
@@ -152,12 +153,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      * @return a String of the person's last name
      */
     public String getLastName() {
-        String lastName = "";
-
-        if (!StringUtil.isNullOrEmpty(getSurname())) {
-            lastName += getSurname();
-        }
-
+        String lastName = StringUtil.isNullOrEmpty(getSurname()) ? "" : getSurname();
         if (!StringUtil.isNullOrEmpty(getPostNominal())) {
             lastName += (lastName.isEmpty() ? "" : " ") + getPostNominal();
         }
@@ -177,7 +173,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      * @param fullName this sets the full name to be equal to the input string. This can ONLY be
      *                 called by {@link AbstractPerson#setFullName()} or its overrides.
      */
-    protected void setFullNameDirect(String fullName) {
+    protected void setFullNameDirect(final String fullName) {
         this.fullName = fullName;
     }
 
@@ -191,7 +187,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param preNominal the person's new pre-nominal
      */
-    public void setPreNominal(String preNominal) {
+    public void setPreNominal(final String preNominal) {
         this.preNominal = preNominal;
         setFullName();
     }
@@ -206,7 +202,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param givenName the person's new given name
      */
-    public void setGivenName(String givenName) {
+    public void setGivenName(final String givenName) {
         this.givenName = givenName;
         setFullName();
     }
@@ -221,7 +217,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param surname the person's new surname
      */
-    public void setSurname(String surname) {
+    public void setSurname(final String surname) {
         this.surname = surname;
         setFullName();
     }
@@ -236,7 +232,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param postNominal the person's new post-nominal
      */
-    public void setPostNominal(String postNominal) {
+    public void setPostNominal(final String postNominal) {
         this.postNominal = postNominal;
         setFullName();
     }
@@ -251,7 +247,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param maidenName the person's new maiden name
      */
-    public void setMaidenName(@Nullable String maidenName) {
+    public void setMaidenName(final @Nullable String maidenName) {
         this.maidenName = maidenName;
     }
 
@@ -265,7 +261,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param callsign the person's new callsign
      */
-    public void setCallsign(String callsign) {
+    public void setCallsign(final String callsign) {
         this.callsign = callsign;
     }
     //endregion Name
@@ -281,7 +277,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param gender the person's new gender
      */
-    public void setGender(Gender gender) {
+    public void setGender(final Gender gender) {
         this.gender = gender;
     }
 
@@ -295,7 +291,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param status the person's new status
      */
-    public void setStatus(PersonnelStatus status) {
+    public void setStatus(final PersonnelStatus status) {
         this.status = status;
     }
 
@@ -309,14 +305,16 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param portrait the person's new portrait
      */
-    public void setPortrait(AbstractIcon portrait) {
+    public void setPortrait(final AbstractIcon portrait) {
         this.portrait = Objects.requireNonNull(portrait);
     }
 
+    @Deprecated
     public String getPortraitCategory() {
         return getPortrait().getCategory();
     }
 
+    @Deprecated
     public String getPortraitFileName() {
         return getPortrait().getFilename();
     }
@@ -331,7 +329,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param birthday the person's new birthday
      */
-    public void setBirthday(LocalDate birthday) {
+    public void setBirthday(final LocalDate birthday) {
         this.birthday = birthday;
     }
 
@@ -345,7 +343,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param dateOfDeath the date the person died
      */
-    public void setDateOfDeath(@Nullable LocalDate dateOfDeath) {
+    public void setDateOfDeath(final @Nullable LocalDate dateOfDeath) {
         this.dateOfDeath = dateOfDeath;
     }
 
@@ -353,14 +351,10 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      * @param today the current date
      * @return the age of the person, based on either today or, if they are dead, their date of death
      */
-    public int getAge(LocalDate today) {
-        // Get age based on year
-        if (getDateOfDeath() != null) {
-            //use date of death instead of birthday
-            today = getDateOfDeath();
-        }
-
-        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
+    public int getAge(final LocalDate today) {
+        // Get age based on year, using the date of death to determine age at their death if they have passed
+        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(),
+                (getDateOfDeath() == null) ? today : getDateOfDeath()));
     }
 
     public Genealogy getGenealogy() {
@@ -377,7 +371,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @param biography the person's new biography
      */
-    public void setBiography(String biography) {
+    public void setBiography(final String biography) {
         this.biography = biography;
     }
     //endregion Personal Information
@@ -388,9 +382,8 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      * @param today the current date
      * @return true if the person is a child (age is less than adulthood), otherwise false
      */
-    public boolean isChild(LocalDate today) {
-        // TODO : Windchild - make this based on age of adulthood option
-        return (getAge(today) < 14);
+    public boolean isChild(final LocalDate today) {
+        return getAge(today) < 14;
     }
     //endregion Boolean Information Methods
 
@@ -406,7 +399,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     public abstract boolean isDependent();
     //endregion Abstract Methods
 
-    //region Read/Write from XML
+    //region File I/O
     /**
      * This is to be called by the individual methods that implement AbstractPerson, as it does not
      * create a start or end tag.
@@ -414,7 +407,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      * @param indent    The indent level to use
      */
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXml(final PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "id", getId().toString());
 
         //region Name
@@ -476,7 +469,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      * @param retVal    The initialized class that inherits AbstractPerson
      * @return an AbstractPerson that has all AbstractPerson fields loaded
      */
-    public static AbstractPerson generateInstanceFromXML(Node wn, AbstractPerson retVal) {
+    public static AbstractPerson generateInstanceFromXML(final Node wn, AbstractPerson retVal) {
         try {
             // Okay, now load AbstractPerson-specific fields!
             NodeList nl = wn.getChildNodes();
@@ -522,5 +515,5 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
 
         return retVal;
     }
-    //endregion Read/Write from XML
+    //endregion File I/O
 }

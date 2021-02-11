@@ -395,14 +395,8 @@ public class PersonnelTableModel extends DataTableModel {
                                     : resources.getString("surname_crew.text"));
                 }
             }
-            case COL_POSTNOMINAL: {
-                toReturn = p.getPostNominal();
-                if (!StringUtil.isNullOrEmpty(toReturn)) {
-                    return toReturn;
-                } else {
-                    return "";
-                }
-            }
+            case COL_POSTNOMINAL:
+                return p.getPostNominal();
             case COL_CALL:
                 return p.getCallsign();
             case COL_BLOODNAME:

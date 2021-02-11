@@ -298,15 +298,15 @@ public class Person extends AbstractPerson {
     /**
      * Primary Person constructor, variables are initialized in the exact same order as they are
      * saved to the XML file
-     * @param preNominal        the person's pre-nominal
-     * @param givenName         the person's given name
-     * @param surname           the person's surname
-     * @param postNominal       the person's post-nominal
+     * @param preNominal    the person's pre-nominal
+     * @param givenName     the person's given name
+     * @param surname       the person's surname
+     * @param postNominal   the person's post-nominal
      * @param campaign      the campaign this person is a part of
      * @param factionCode   the faction this person was borne into
      */
-    public Person(String preNominal, String givenName, String surname, String postNominal,
-                  Campaign campaign, String factionCode) {
+    public Person(final String preNominal, final String givenName, final String surname,
+                  final String postNominal, final Campaign campaign, final String factionCode) {
         super(preNominal, givenName, surname, postNominal);
         // First, we assign campaign
         this.campaign = campaign;
@@ -524,14 +524,9 @@ public class Person extends AbstractPerson {
      */
     @Override
     public String getLastName() {
-        String lastName = "";
-
-        if (!StringUtil.isNullOrEmpty(getBloodname())) {
-            lastName += getBloodname();
-        } else if (!StringUtil.isNullOrEmpty(getSurname())) {
-            lastName += getSurname();
-        }
-
+        String lastName = !StringUtil.isNullOrEmpty(getBloodname()) ? getBloodname()
+                : !StringUtil.isNullOrEmpty(getSurname()) ? getSurname()
+                : "";
         if (!StringUtil.isNullOrEmpty(getPostNominal())) {
             lastName += (lastName.isEmpty() ? "" : " ") + getPostNominal();
         }
@@ -540,8 +535,9 @@ public class Person extends AbstractPerson {
 
 
     /**
-     * This method is used to migrate names from being a joined name to split between given name and surname,
-     * as part of the Personnel changes in MekHQ 0.47.4.
+     * This method is used to migrate names from being a joined name to split between given name and
+     * surname, as part of the Personnel changes in MekHQ 0.47.4, and is used to migrate from
+     * MM-style names to MHQ-style names
      * @param n the name to be migrated
      */
     public void migrateName(String n) {
@@ -561,18 +557,18 @@ public class Person extends AbstractPerson {
         // Then, the full name is set
         String[] name = n.trim().split("\\s+");
 
-        String givenName = name[0];
+        StringBuilder givenName = new StringBuilder(name[0]);
         String surname = "";
 
         if (isClanner()) {
             if (name.length > 1) {
                 int i;
                 for (i = 1; i < name.length - 1; i++) {
-                    givenName += " " + name[i];
+                    givenName.append(" ").append(name[i]);
                 }
 
                 if (!(!StringUtil.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
-                    givenName += " " + name[i];
+                    givenName.append(" ").append(name[i]);
                 }
             }
         } else {
@@ -583,7 +579,7 @@ public class Person extends AbstractPerson {
             } else if (name.length > 3) {
                 int i;
                 for (i = 1; i < name.length - 2; i++) {
-                    givenName += " " + name[i];
+                    givenName.append(" ").append(name[i]);
                 }
 
                 surname = name[i] + " " + name[i + 1];
@@ -594,7 +590,7 @@ public class Person extends AbstractPerson {
             surname = "";
         }
 
-        setGivenName(givenName);
+        setGivenName(givenName.toString());
         setSurname(surname);
     }
     //endregion Names
@@ -1689,7 +1685,8 @@ public class Person extends AbstractPerson {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 
-    public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
+    public static @Nullable Person generateInstanceFromXML(final Node wn, final Campaign c,
+                                                           final Version version) {
         Person retVal = new Person(c);
 
         retVal = (Person) AbstractPerson.generateInstanceFromXML(wn, retVal);
