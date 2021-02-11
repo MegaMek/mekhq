@@ -107,7 +107,7 @@ public class SVArmor extends Armor {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof SVArmor
+        return getClass().equals(part.getClass())
                 && bar == ((SVArmor) part).bar
                 && techRating == ((SVArmor) part).techRating;
     }
