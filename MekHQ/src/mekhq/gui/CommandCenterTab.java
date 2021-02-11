@@ -111,6 +111,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         initProcurementPanel();
         panIcon = new JPanel(new BorderLayout());
         lblIcon = new JLabel();
+        lblIcon.getAccessibleContext().setAccessibleName("Player Camouflage");
         panIcon.add(lblIcon, BorderLayout.CENTER);
         setIcon();
 
@@ -174,6 +175,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 1, 5);
         panInfo.add(lblRatingHead, gridBagConstraints);
         lblRating = new JLabel(getCampaign().getUnitRatingText());
+        lblRatingHead.setLabelFor(lblRating);
         lblRating.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -187,6 +189,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblExperienceHead, gridBagConstraints);
         lblExperience = new JLabel(getCampaign().getUnitRating().getAverageExperience());
+        lblExperienceHead.setLabelFor(lblExperience);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblExperience, gridBagConstraints);
@@ -200,6 +203,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblMissionSuccessHead, gridBagConstraints);
         lblMissionSuccess = new JLabel(getCampaign().getCampaignSummary().getMissionSuccessReport());
+        lblMissionSuccessHead.setLabelFor(lblMissionSuccess);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblMissionSuccess, gridBagConstraints);
@@ -213,6 +217,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblPersonnelHead, gridBagConstraints);
         lblPersonnel = new JLabel(getCampaign().getCampaignSummary().getPersonnelReport());
+        lblPersonnelHead.setLabelFor(lblPersonnel);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblPersonnel, gridBagConstraints);
@@ -226,6 +231,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblCompositionHead, gridBagConstraints);
         lblComposition = new JLabel(getCampaign().getCampaignSummary().getForceCompositionReport());
+        lblCompositionHead.setLabelFor(lblComposition);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblComposition, gridBagConstraints);
@@ -239,6 +245,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblRepairStatusHead, gridBagConstraints);
         lblRepairStatus = new JLabel(getCampaign().getCampaignSummary().getForceRepairReport());
+        lblRepairStatusHead.setLabelFor(lblRepairStatus);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblRepairStatus, gridBagConstraints);
@@ -252,6 +259,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblTransportCapacityHead, gridBagConstraints);
         lblTransportCapacity = new JLabel(getCampaign().getCampaignSummary().getTransportCapacity());
+        lblTransportCapacityHead.setLabelFor(lblTransportCapacity);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblTransportCapacity, gridBagConstraints);
@@ -265,6 +273,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(1, 5, 5, 5);
         panInfo.add(lblCargoSummaryHead, gridBagConstraints);
         lblCargoSummary = new JLabel(getCampaign().getCampaignSummary().getCargoCapacityReport());
+        lblCargoSummaryHead.setLabelFor(lblCargoSummary);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblCargoSummary, gridBagConstraints);
@@ -288,6 +297,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private void initProcurementPanel() {
         /* shopping buttons */
         JPanel panProcurementButtons = new JPanel(new GridLayout(6, 1));
+        panProcurementButtons.getAccessibleContext().setAccessibleName("Procurement Actions");
+
         btnGetUnit = new JButton(resourceMap.getString("btnGetUnit.text"));
         btnGetUnit.setToolTipText(resourceMap.getString("btnGetUnit.toolTipText"));
         btnGetUnit.addActionListener(ev -> getUnit());
@@ -339,6 +350,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         /* shopping table */
         procurementModel = new ProcurementTableModel(getCampaign());
         procurementTable = new JTable(procurementModel);
+        procurementTable.getAccessibleContext().setAccessibleName("Pending Procurements");
         TableRowSorter<ProcurementTableModel> shoppingSorter = new TableRowSorter<>(procurementModel);
         shoppingSorter.setComparator(ProcurementTableModel.COL_COST, new FormattedNumberSorter());
         shoppingSorter.setComparator(ProcurementTableModel.COL_TARGET, new TargetSorter());
