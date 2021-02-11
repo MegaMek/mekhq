@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2014-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,6 +21,7 @@ package mekhq.gui.utilities;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 import megamek.common.Entity;
 import megamek.common.UnitType;
@@ -646,13 +647,8 @@ public class StaticChecks {
      * @param people an array of people
      * @return true if any of the people can procreate, otherwise false
      */
-    public static boolean anyCanBePregnant(Campaign campaign, Person... people) {
-        for (Person person : people) {
-            if (person.canProcreate(campaign)) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean anyCanBePregnant(final Campaign campaign, final Person... people) {
+        return Stream.of(people).anyMatch(p -> p.canProcreate(campaign));
     }
 
     /**
@@ -660,12 +656,7 @@ public class StaticChecks {
      * @return true if any of the people are pregnant, otherwise false
      */
     public static boolean anyPregnant(Person... people) {
-        for (Person person : people) {
-            if (person.isPregnant()) {
-                return true;
-            }
-        }
-        return false;
+        return Stream.of(people).anyMatch(Person::isPregnant);
     }
 
     /**

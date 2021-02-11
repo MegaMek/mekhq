@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -476,21 +477,17 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                 break;
             }
             case CMD_ADD_PREGNANCY: {
-                for (Person person : people) {
-                    if (person.canProcreate(gui.getCampaign())) {
-                        person.addPregnancy(gui.getCampaign());
-                        MekHQ.triggerEvent(new PersonChangedEvent(person));
-                    }
-                }
+                Stream.of(people).filter(p -> p.canProcreate(gui.getCampaign())).forEach(p -> {
+                    p.addPregnancy(gui.getCampaign());
+                    MekHQ.triggerEvent(new PersonChangedEvent(p));
+                });
                 break;
             }
             case CMD_REMOVE_PREGNANCY: {
-                for (Person person : people) {
-                    if (person.isPregnant()) {
-                        person.removePregnancy();
-                        MekHQ.triggerEvent(new PersonChangedEvent(person));
-                    }
-                }
+                Stream.of(people).filter(Person::isPregnant).forEach(p -> {
+                    p.removePregnancy();
+                    MekHQ.triggerEvent(new PersonChangedEvent(p));
+                });
                 break;
             }
             case CMD_REMOVE_SPOUSE: {
