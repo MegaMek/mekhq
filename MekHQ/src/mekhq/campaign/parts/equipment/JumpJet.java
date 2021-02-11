@@ -108,7 +108,7 @@ public class JumpJet extends EquipmentPart {
     }
 
 	@Override
-	public MissingPart getMissingPart() {
+	public MissingJumpJet getMissingPart() {
 		return new MissingJumpJet(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
 	}
 

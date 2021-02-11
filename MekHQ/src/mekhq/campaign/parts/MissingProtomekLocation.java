@@ -12,17 +12,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -34,7 +34,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingProtomekLocation extends MissingPart {
@@ -59,46 +58,46 @@ public class MissingProtomekLocation extends MissingPart {
         this.forQuad = quad;
         //TODO: need to account for internal structure and myomer types
         //crap, no static report for location names?
-        switch(loc) {
-        case(Protomech.LOC_HEAD):
-            this.name = "Protomech Head";
-            break;
-        case(Protomech.LOC_TORSO):
-            this.name = "Protomech Torso";
-            break;
-        case(Protomech.LOC_LARM):
-            this.name = "Protomech Left Arm";
-            break;
-        case(Protomech.LOC_RARM):
-            this.name = "Protomech Right Arm";
-            break;
-        case(Protomech.LOC_LEG):
-            this.name = "Protomech Legs";
-            if(forQuad) {
-                this.name = "Protomech Legs (Quad)";
-            }
-            break;
-        case(Protomech.LOC_MAINGUN):
-            this.name = "Protomech Main Gun";
-            break;
-        default:
-            this.name = "Protomech Location";
-            break;
+        switch (loc) {
+            case Protomech.LOC_HEAD:
+                this.name = "Protomech Head";
+                break;
+                case Protomech.LOC_TORSO:
+                this.name = "Protomech Torso";
+                break;
+            case Protomech.LOC_LARM:
+                this.name = "Protomech Left Arm";
+                break;
+            case Protomech.LOC_RARM:
+                this.name = "Protomech Right Arm";
+                break;
+            case Protomech.LOC_LEG:
+                this.name = "Protomech Legs";
+                if (forQuad) {
+                    this.name = "Protomech Legs (Quad)";
+                }
+                break;
+            case Protomech.LOC_MAINGUN:
+                this.name = "Protomech Main Gun";
+                break;
+            default:
+                this.name = "Protomech Location";
+                break;
         }
-        if(booster) {
+        if (booster) {
             this.name += " (Myomer Booster)";
         }
     }
 
     @Override
-	public int getBaseTime() {
-		return 240;
-	}
+    public int getBaseTime() {
+        return 240;
+    }
 
-	@Override
-	public int getDifficulty() {
-		return 3;
-	}
+    @Override
+    public int getDifficulty() {
+        return 3;
+    }
 
     public int getLoc() {
         return loc;
@@ -111,7 +110,6 @@ public class MissingProtomekLocation extends MissingPart {
     public int getStructureType() {
         return structureType;
     }
-
 
     public double getTonnage() {
         //TODO: how much should this weigh?
@@ -148,7 +146,7 @@ public class MissingProtomekLocation extends MissingPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("loc")) {
@@ -158,15 +156,9 @@ public class MissingProtomekLocation extends MissingPart {
             } else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
                 percent = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("booster")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    booster = true;
-                else
-                    booster = false;
+                booster = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    forQuad = true;
-                else
-                    forQuad = false;
+                forQuad = Boolean.parseBoolean(wn2.getTextContent().trim());
             }
         }
     }
@@ -177,11 +169,11 @@ public class MissingProtomekLocation extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if(loc == Protomech.LOC_TORSO && !refit) {
+        if (loc == Protomech.LOC_TORSO && !refit) {
             //you can't replace a center torso
             return false;
         }
-        if(part instanceof ProtomekLocation) {
+        if (part instanceof ProtomekLocation) {
             ProtomekLocation mekLoc = (ProtomekLocation)part;
             return mekLoc.getLoc() == loc
                 && mekLoc.getUnitTonnage() == getUnitTonnage()
@@ -198,9 +190,9 @@ public class MissingProtomekLocation extends MissingPart {
 
     @Override
     public String checkFixable() {
-    	if(null == unit) {
-			 return null;
-		 }
+        if (null == unit) {
+             return null;
+         }
         //there must be no usable equipment currently in the location
         //you can only salvage a location that has nothing left on it
         for (Part part : unit.getParts()) {
@@ -219,24 +211,24 @@ public class MissingProtomekLocation extends MissingPart {
     }
 
     private int getAppropriateSystemIndex() {
-    	switch(loc) {
-    	case(Protomech.LOC_LEG):
-    		return Protomech.SYSTEM_LEGCRIT;
-    	case(Protomech.LOC_LARM):
-    	case(Protomech.LOC_RARM):
-    		return Protomech.SYSTEM_ARMCRIT;
-    	case(Protomech.LOC_HEAD):
-    		return Protomech.SYSTEM_HEADCRIT;
-    	case(Protomech.LOC_TORSO):
-    		return Protomech.SYSTEM_TORSOCRIT;
-    	default:
-    		return -1;
-    	}
+        switch (loc) {
+            case Protomech.LOC_LEG:
+                return Protomech.SYSTEM_LEGCRIT;
+            case Protomech.LOC_LARM:
+            case Protomech.LOC_RARM:
+                return Protomech.SYSTEM_ARMCRIT;
+            case Protomech.LOC_HEAD:
+                return Protomech.SYSTEM_HEADCRIT;
+            case Protomech.LOC_TORSO:
+                return Protomech.SYSTEM_TORSOCRIT;
+            default:
+                return -1;
+        }
     }
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
+        if (null != unit) {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
             //need to assign all possible crits to the appropriate system
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, getAppropriateSystemIndex(), loc);
@@ -246,7 +238,7 @@ public class MissingProtomekLocation extends MissingPart {
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
+        if (null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
@@ -258,14 +250,14 @@ public class MissingProtomekLocation extends MissingPart {
 
 
     @Override
-   	public String getLocationName() {
-   		return unit != null ? unit.getEntity().getLocationName(getLocation()) : null;
-   	}
+    public String getLocationName() {
+        return unit != null ? unit.getEntity().getLocationName(getLocation()) : null;
+    }
 
-	@Override
-	public int getLocation() {
-		return loc;
-	}
+    @Override
+    public int getLocation() {
+        return loc;
+    }
 
     @Override
     public TechAdvancement getTechAdvancement() {
@@ -273,12 +265,12 @@ public class MissingProtomekLocation extends MissingPart {
     }
 
     @Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.GENERAL_LOCATION;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.GENERAL_LOCATION;
     }
 
-	@Override
-	public int getRepairPartType() {
-    	return Part.REPAIR_PART_TYPE.MEK_LOCATION;
+    @Override
+    public PartRepairType getRepairPartType() {
+        return PartRepairType.MEK_LOCATION;
     }
 }

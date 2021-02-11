@@ -378,7 +378,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                 alts.remove(index);
             }
         }
-        Faction f = Faction.getFaction(faction);
+        Faction f = Factions.getInstance().getFaction(faction);
         if (f.isPeriphery()) {
             retVal.add("Periphery");
         }

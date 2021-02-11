@@ -52,6 +52,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.gui.FileDialogs;
 
 /**
@@ -1508,7 +1509,7 @@ public class ResolveScenarioTracker {
                 }
                 unit.setEntity(en);
                 if (en.usesWeaponBays()) {
-                    unit.adjustLargeCraftAmmo();
+                    new AdjustLargeCraftAmmoAction().execute(campaign, unit);
                 }
                 unit.runDiagnostic(true);
                 unit.resetPilotAndEntity();

@@ -83,6 +83,9 @@ public class Cubicle extends Part {
 
     @Override
     public void remove(boolean salvage) {
+        // Grab a reference to our parent part so that we don't accidentally NRE
+        // when we remove the parent part reference.
+        Part parentPart = getParentPart();
         if (null != parentPart) {
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {

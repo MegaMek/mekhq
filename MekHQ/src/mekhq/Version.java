@@ -143,6 +143,25 @@ public class Version {
     }
 
     /**
+     *
+     * @param lower the lower Version bound (exclusive)
+     * @param upper the upper Version bound (exclusive)
+     * @return true is the version is between lower and upper versions, both exclusive
+     */
+    public boolean isBetween(String lower, String upper) {
+       return isBetween(new Version(lower), new Version(upper));
+    }
+
+    /**
+     * @param lower the lower Version bound (exclusive)
+     * @param upper the upper Version bound (exclusive)
+     * @return true is the version is between lower and upper versions, both exclusive
+     */
+    public boolean isBetween(Version lower, Version upper) {
+        return isHigherThan(lower) && isLowerThan(upper);
+    }
+
+    /**
      * Compare versions
      *
      * @param left  left version to compare

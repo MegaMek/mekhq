@@ -207,6 +207,16 @@ public final class MekHQOptions {
     }
     //endregion Campaign XML Save Options
 
+    //region File Paths
+    public String getAwardsDirectoryPath() {
+        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.AWARDS_DIRECTORY_PATH, "data/universe/awards/");
+    }
+
+    public void setAwardsDirectoryPath(String value) {
+        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.AWARDS_DIRECTORY_PATH, value);
+    }
+    //endregion File Paths
+
     //region Miscellaneous Options
     public int getStartGameDelay() {
         return userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).getInt(MekHqConstants.START_GAME_DELAY, 500);

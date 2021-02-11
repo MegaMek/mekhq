@@ -254,7 +254,7 @@ public class Planet implements Serializable {
                 // there are a few situations where all this stuff with parens is for naught, which is
                 // PlanetName (FactionCode) or if the PlanetName (AltName) is already in our planets "database"
 
-                if ((null == Faction.getFaction(altName)) && (null == Systems.getInstance().getSystemById(primaryName))) {
+                if ((null == Factions.getInstance().getFaction(altName)) && (null == Systems.getInstance().getSystemById(primaryName))) {
                     primaryName = nameString.substring(0, parenIndex - 1);
 
                     PlanetaryEvent nameChangeEvent = getOrCreateEvent(nameChangeYearDate);
@@ -705,7 +705,7 @@ public class Planet implements Serializable {
         }
         Set<Faction> factions = new HashSet<>(codes.size());
         for (String code : codes) {
-            factions.add(Faction.getFaction(code));
+            factions.add(Factions.getInstance().getFaction(code));
         }
         return factions;
     }
@@ -950,7 +950,7 @@ public class Planet implements Serializable {
             if ((event.faction != null) && (event.faction.size() > 0)) {
                 // the purpose of this code is to evaluate whether the current "other planet" event is
                 // a faction change to an active, valid faction.
-                Faction eventFaction = Faction.getFaction(event.faction.get(0));
+                Faction eventFaction = Factions.getInstance().getFaction(event.faction.get(0));
                 boolean eventHasActualFaction = eventFaction != null && (!eventFaction.is(Tag.INACTIVE) && !eventFaction.is(Tag.ABANDONED));
 
                 if (eventHasActualFaction) {
@@ -959,8 +959,8 @@ public class Planet implements Serializable {
                     // if this planet has an "inactive and abandoned" current faction...
                     // we also want to catch the situation where the next faction change isn't to the same exact faction
                     if ((currentFactions.size() == 1)
-                            && Faction.getFaction(currentFactions.get(0)).is(Tag.INACTIVE)
-                            && Faction.getFaction(currentFactions.get(0)).is(Tag.ABANDONED)) {
+                            && Factions.getInstance().getFaction(currentFactions.get(0)).is(Tag.INACTIVE)
+                            && Factions.getInstance().getFaction(currentFactions.get(0)).is(Tag.ABANDONED)) {
 
                         // now we travel into the future, to the next "other" event, and if this planet has acquired a faction
                         // before the next "other" event, then we
@@ -977,8 +977,8 @@ public class Planet implements Serializable {
 
                         List<String> nextFactions = this.getFactions(nextEventDate);
                         boolean factionBeforeNextEvent = !(nextFactions.size() == 1 &&
-                                Faction.getFaction(nextFactions.get(0)).is(Tag.INACTIVE) &&
-                                Faction.getFaction(nextFactions.get(0)).is(Tag.ABANDONED));
+                                Factions.getInstance().getFaction(nextFactions.get(0)).is(Tag.INACTIVE) &&
+                                Factions.getInstance().getFaction(nextFactions.get(0)).is(Tag.ABANDONED));
 
                         if (!factionBeforeNextEvent) {
                             sb.append("Adding faction change in ").append(event.date.getYear())
@@ -1138,7 +1138,7 @@ public class Planet implements Serializable {
             if (codes != otherCodes) {
                 current = new HashSet<>(codes.size());
                 for (String code : codes) {
-                    current.add(Faction.getFaction(code));
+                    current.add(Factions.getInstance().getFaction(code));
                 }
             }
             return current;

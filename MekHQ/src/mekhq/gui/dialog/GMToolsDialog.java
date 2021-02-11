@@ -53,6 +53,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.preferences.JComboBoxPreference;
@@ -589,7 +590,7 @@ public class GMToolsDialog extends JDialog {
     private List<FactionChoice> getFactionChoices(int year) {
         List<FactionChoice> factionChoices = new ArrayList<>();
 
-        for (Faction faction : Faction.getFactions()) {
+        for (Faction faction : Factions.getInstance().getFactions()) {
             factionChoices.add(new FactionChoice(faction, year));
         }
 

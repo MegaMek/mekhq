@@ -1,6 +1,8 @@
 package mekhq.gui.model;
 
 import java.awt.Component;
+import java.util.Optional;
+
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -65,31 +67,29 @@ public class ProcurementTableModel extends DataTableModel {
     }
 
     public void incrementItem(int row) {
-        ((IAcquisitionWork)data.get(row)).incrementQuantity();
+        getAcquisition(row).ifPresent(IAcquisitionWork::incrementQuantity);
         this.fireTableCellUpdated(row, COL_QUEUE);
     }
 
     public void decrementItem(int row) {
-        ((IAcquisitionWork)data.get(row)).decrementQuantity();
+        getAcquisition(row).ifPresent(IAcquisitionWork::decrementQuantity);
         this.fireTableCellUpdated(row, COL_QUEUE);
     }
 
     public void removeRow(int row) {
-        getCampaign().getShoppingList().removeItem(getNewEquipmentAt(row));
+        getNewEquipmentAt(row).ifPresent(getCampaign().getShoppingList()::removeItem);
     }
 
-    public Object getValueAt(int row, int col) {
-        //Part part;
-        IAcquisitionWork shoppingItem;
-        if(data.isEmpty()) {
+    @Override
+    public Object getValueAt(final int row, final int col) {
+        if (data.isEmpty()) {
             return "";
-        } else {
-            //part = getNewPartAt(row);
-            shoppingItem = getAcquisition(row);
         }
-        if(null == shoppingItem) {
-            return "?";
-        }
+        
+        return getAcquisition(row).map(a -> getValueFor(a, col)).orElse("?");
+    }
+
+    private Object getValueFor(IAcquisitionWork shoppingItem, int col) {
         if(col == COL_NAME) {
             return shoppingItem.getAcquisitionName();
         }
@@ -140,12 +140,16 @@ public class ProcurementTableModel extends DataTableModel {
         return getValueAt(0, c).getClass();
     }
 
-    public Object getNewEquipmentAt(int row) {
-        return ((IAcquisitionWork) data.get(row)).getNewEquipment();
+    public Optional<Object> getNewEquipmentAt(int row) {
+        return getAcquisition(row).map(IAcquisitionWork::getNewEquipment);
     }
 
-    public IAcquisitionWork getAcquisition(int row) {
-        return (IAcquisitionWork) data.get(row);
+    public Optional<IAcquisitionWork> getAcquisition(int row) {
+        if (row >= 0 && row < data.size()) {
+            return Optional.of((IAcquisitionWork) data.get(row));
+        }
+        
+        return Optional.empty();
     }
 
     public int getColumnWidth(int c) {
@@ -177,25 +181,18 @@ public class ProcurementTableModel extends DataTableModel {
         }
     }
 
-    public String getTooltip(int row, int col) {
-        //Part part;
-        IAcquisitionWork shoppingItem;
-        if(data.isEmpty()) {
-            return null;
-        } else {
-            //part = getNewPartAt(row);
-            shoppingItem = getAcquisition(row);
-        }
-        if(null ==shoppingItem) {
-            return null;
-        }
+    public String getTooltip(final int row, final int col) {
+        return getAcquisition(row).map(a -> getTooltipFor(a, col)).orElse(null);
+    }
+
+    private String getTooltipFor(IAcquisitionWork shoppingItem, int col) {
         switch(col) {
-        case COL_TARGET:
-            TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getLogisticsPerson(), false);
-            return target.getDesc();
-        default:
-            return "<html>You can increase or decrease the quantity with the left/right arrows keys or the plus/minus keys.<br>Quantities reduced to zero will remain on the list until the next procurement cycle.</html>";
-        }
+            case COL_TARGET:
+                TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getLogisticsPerson(), false);
+                return target.getDesc();
+            default:
+                return "<html>You can increase or decrease the quantity with the left/right arrows keys or the plus/minus keys.<br>Quantities reduced to zero will remain on the list until the next procurement cycle.</html>";
+            }
     }
 
     private Campaign getCampaign() {
@@ -210,6 +207,7 @@ public class ProcurementTableModel extends DataTableModel {
 
         private static final long serialVersionUID = 9054581142945717303L;
 
+        @Override
         public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {

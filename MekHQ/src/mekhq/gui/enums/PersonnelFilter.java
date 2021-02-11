@@ -287,7 +287,7 @@ public enum PersonnelFilter {
             case FOUNDER:
                 return person.isFounder();
             case PRISONER:
-                return person.getPrisonerStatus().isPrisoner();
+                return person.getPrisonerStatus().isPrisoner() || person.getPrisonerStatus().isBondsman();
             case INACTIVE:
                 return !person.getStatus().isActive();
             case RETIRED:

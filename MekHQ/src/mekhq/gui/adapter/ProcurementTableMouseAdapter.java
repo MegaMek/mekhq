@@ -54,7 +54,9 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                 .convertRowIndexToModel(table.getSelectedRow());
         final int[] rows = table.getSelectedRows();
         final boolean oneSelected = table.getSelectedRowCount() == 1;
-        if (e.isPopupTrigger()) {
+        
+        // GM Only (for now)
+        if (e.isPopupTrigger() && gui.getCampaign().isGM()) {
             // **lets fill the pop up menu**//
             // GM mode
             menu = new JMenu("GM Mode");
@@ -67,109 +69,15 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                         return;
                     }
                     if (oneSelected) {
-                        IAcquisitionWork acquisition = model
-                                .getAcquisition(row);
-                        Object equipment = acquisition.getNewEquipment();
-                        if (equipment instanceof Part) {
-                            if (gui.getCampaign()
-                                    .getQuartermaster()
-                                    .buyPart(
-                                            (Part) equipment,
-                                            gui.getCampaign().calculatePartTransitTime(0))) {
-                                gui.getCampaign()
-                                        .addReport(
-                                                "<font color='Green'><b>"
-                                                        + acquisition
-                                                                .getAcquisitionName()
-                                                        + " found.</b></font>");
-                                acquisition.decrementQuantity();
-                            } else {
-                                gui.getCampaign()
-                                        .addReport(
-                                                "<font color='red'><b>You cannot afford to purchase "
-                                                        + acquisition
-                                                                .getAcquisitionName()
-                                                        + "</b></font>");
-                            }
-                        } else if (equipment instanceof Entity) {
-                            if (gui.getCampaign()
-                                    .getQuartermaster()
-                                    .buyUnit(
-                                            (Entity) equipment,
-                                            gui.getCampaign().calculatePartTransitTime(0))) {
-                                gui.getCampaign()
-                                        .addReport(
-                                                "<font color='Green'><b>"
-                                                        + acquisition
-                                                                .getAcquisitionName()
-                                                        + " found.</b></font>");
-                                acquisition.decrementQuantity();
-                            } else {
-                                gui.getCampaign()
-                                        .addReport(
-                                                "<font color='red'><b>You cannot afford to purchase "
-                                                        + acquisition
-                                                                .getAcquisitionName()
-                                                        + "</b></font>");
-                            }
-                        }
+                        model.getAcquisition(row)
+                                .ifPresent(ProcurementTableMouseAdapter.this::tryProcureOneItem);
                     } else {
                         for (int curRow : rows) {
                             if (curRow < 0) {
                                 continue;
                             }
-                            int row = table.convertRowIndexToModel(curRow);
-                            IAcquisitionWork acquisition = model
-                                    .getAcquisition(row);
-                            Object equipment = acquisition
-                                    .getNewEquipment();
-                            if (equipment instanceof Part) {
-                                if (gui.getCampaign()
-                                        .getQuartermaster()
-                                        .buyPart(
-                                                (Part) equipment,
-                                                gui.getCampaign()
-                                                        .calculatePartTransitTime(
-                                                                0))) {
-                                    gui.getCampaign()
-                                            .addReport(
-                                                    "<font color='Green'><b>"
-                                                            + acquisition
-                                                                    .getAcquisitionName()
-                                                            + " found.</b></font>");
-                                    acquisition.decrementQuantity();
-                                } else {
-                                    gui.getCampaign()
-                                            .addReport(
-                                                    "<font color='red'><b>You cannot afford to purchase "
-                                                            + acquisition
-                                                                    .getAcquisitionName()
-                                                            + "</b></font>");
-                                }
-                            } else if (equipment instanceof Entity) {
-                                if (gui.getCampaign()
-                                        .getQuartermaster()
-                                        .buyUnit(
-                                                (Entity) equipment,
-                                                gui.getCampaign()
-                                                        .calculatePartTransitTime(
-                                                                0))) {
-                                    gui.getCampaign()
-                                            .addReport(
-                                                    "<font color='Green'><b>"
-                                                            + acquisition
-                                                                    .getAcquisitionName()
-                                                            + " found.</b></font>");
-                                    acquisition.decrementQuantity();
-                                } else {
-                                    gui.getCampaign()
-                                            .addReport(
-                                                    "<font color='red'><b>You cannot afford to purchase "
-                                                            + acquisition
-                                                                    .getAcquisitionName()
-                                                            + "</b></font>");
-                                }
-                            }
+                            model.getAcquisition(table.convertRowIndexToModel(curRow))
+                                    .ifPresent(ProcurementTableMouseAdapter.this::tryProcureOneItem);
                         }
                     }
                 }
@@ -184,125 +92,15 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                         return;
                     }
                     if (oneSelected) {
-                        IAcquisitionWork acquisition = model
-                                .getAcquisition(row);
-                        boolean canAfford = true;
-                        while (canAfford && acquisition.getQuantity() > 0) {
-                            Object equipment = acquisition
-                                    .getNewEquipment();
-                            if (equipment instanceof Part) {
-                                if (gui.getCampaign()
-                                        .getQuartermaster()
-                                        .buyPart(
-                                                (Part) equipment,
-                                                gui.getCampaign()
-                                                        .calculatePartTransitTime(
-                                                                0))) {
-                                    gui.getCampaign()
-                                            .addReport(
-                                                    "<font color='Green'><b>"
-                                                            + acquisition
-                                                                    .getAcquisitionName()
-                                                            + " found.</b></font>");
-                                    acquisition.decrementQuantity();
-                                } else {
-                                    gui.getCampaign()
-                                            .addReport(
-                                                    "<font color='red'><b>You cannot afford to purchase "
-                                                            + acquisition
-                                                                    .getAcquisitionName()
-                                                            + "</b></font>");
-                                    canAfford = false;
-                                }
-                            } else if (equipment instanceof Entity) {
-                                if (gui.getCampaign()
-                                        .getQuartermaster()
-                                        .buyUnit(
-                                                (Entity) equipment,
-                                                gui.getCampaign()
-                                                        .calculatePartTransitTime(
-                                                                0))) {
-                                    gui.getCampaign()
-                                            .addReport(
-                                                    "<font color='Green'><b>"
-                                                            + acquisition
-                                                                    .getAcquisitionName()
-                                                            + " found.</b></font>");
-                                    acquisition.decrementQuantity();
-                                } else {
-                                    gui.getCampaign()
-                                            .addReport(
-                                                    "<font color='red'><b>You cannot afford to purchase "
-                                                            + acquisition
-                                                                    .getAcquisitionName()
-                                                            + "</b></font>");
-                                    canAfford = false;
-                                }
-                            }
-                        }
+                        model.getAcquisition(row)
+                                .ifPresent(ProcurementTableMouseAdapter.this::procureAllItems);
                     } else {
                         for (int curRow : rows) {
                             if (curRow < 0) {
                                 continue;
                             }
-                            int row = table.convertRowIndexToModel(curRow);
-                            IAcquisitionWork acquisition = model
-                                    .getAcquisition(row);
-                            boolean canAfford = true;
-                            while (canAfford
-                                    && acquisition.getQuantity() > 0) {
-                                Object equipment = acquisition
-                                        .getNewEquipment();
-                                if (equipment instanceof Part) {
-                                    if (gui.getCampaign()
-                                            .getQuartermaster()
-                                            .buyPart(
-                                                    (Part) equipment,
-                                                    gui.getCampaign()
-                                                            .calculatePartTransitTime(
-                                                                    0))) {
-                                        gui.getCampaign()
-                                                .addReport(
-                                                        "<font color='Green'><b>"
-                                                                + acquisition
-                                                                        .getAcquisitionName()
-                                                                + " found.</b></font>");
-                                        acquisition.decrementQuantity();
-                                    } else {
-                                        gui.getCampaign()
-                                                .addReport(
-                                                        "<font color='red'><b>You cannot afford to purchase "
-                                                                + acquisition
-                                                                        .getAcquisitionName()
-                                                                + "</b></font>");
-                                        canAfford = false;
-                                    }
-                                } else if (equipment instanceof Entity) {
-                                    if (gui.getCampaign()
-                                            .getQuartermaster()
-                                            .buyUnit(
-                                                    (Entity) equipment,
-                                                    gui.getCampaign()
-                                                            .calculatePartTransitTime(
-                                                                    0))) {
-                                        gui.getCampaign()
-                                                .addReport(
-                                                        "<font color='Green'><b>"
-                                                                + acquisition
-                                                                        .getAcquisitionName()
-                                                                + " found.</b></font>");
-                                        acquisition.decrementQuantity();
-                                    } else {
-                                        gui.getCampaign()
-                                                .addReport(
-                                                        "<font color='red'><b>You cannot afford to purchase "
-                                                                + acquisition
-                                                                        .getAcquisitionName()
-                                                                + "</b></font>");
-                                        canAfford = false;
-                                    }
-                                }
-                            }
+                            model.getAcquisition(table.convertRowIndexToModel(curRow))
+                                    .ifPresent(ProcurementTableMouseAdapter.this::procureAllItems);
                         }
                     }
                 }
@@ -317,20 +115,20 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                         return;
                     }
                     if (oneSelected) {
-                        IAcquisitionWork acquisition = model
-                                .getAcquisition(row);
-                        model.removeRow(row);
-                        MekHQ.triggerEvent(new ProcurementEvent(acquisition));
+                        model.getAcquisition(row).ifPresent(a -> {
+                            model.removeRow(row);
+                            MekHQ.triggerEvent(new ProcurementEvent(a));
+                        });
                     } else {
                         for (int curRow : rows) {
                             if (curRow < 0) {
                                 continue;
                             }
-                            int row = table.convertRowIndexToModel(curRow);
-                            IAcquisitionWork acquisition = model
-                                    .getAcquisition(row);
-                            model.removeRow(row);
-                            MekHQ.triggerEvent(new ProcurementEvent(acquisition));
+                            model.getAcquisition(table.convertRowIndexToModel(curRow))
+                                    .ifPresent(a -> {
+                                        model.removeRow(row);
+                                        MekHQ.triggerEvent(new ProcurementEvent(a));
+                                    });
                         }
                     }
                 }
@@ -342,5 +140,49 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
             popup.add(menu);
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
+    }
+
+    private void procureAllItems(IAcquisitionWork acquisition) {
+        while (acquisition.getQuantity() > 0) {
+            if (!tryProcureOneItem(acquisition)) {
+                break;
+            }
+        }
+    }
+
+    private boolean tryProcureOneItem(IAcquisitionWork acquisition) {
+        Object equipment = acquisition.getNewEquipment();
+        int transitTime = gui.getCampaign().calculatePartTransitTime(0);
+        if (equipment instanceof Part) {
+            if (gui.getCampaign().getQuartermaster().buyPart((Part) equipment, transitTime)) {
+                reportAcquisitionSuccess(acquisition);
+                acquisition.decrementQuantity();
+                return true;
+            } else {
+                reportAcquisitionFailure(acquisition);
+            }
+        } else if (equipment instanceof Entity) {
+            if (gui.getCampaign().getQuartermaster().buyUnit((Entity) equipment, transitTime)) {
+                reportAcquisitionSuccess(acquisition);
+                acquisition.decrementQuantity();
+                return true;
+            } else {
+                reportAcquisitionFailure(acquisition);
+            }
+        }
+
+        return false;
+    }
+
+    private void reportAcquisitionSuccess(IAcquisitionWork acquisition) {
+        gui.getCampaign()
+                .addReport(String.format("<font color='Green'><b>Procured %s</b></font>",
+                        acquisition.getAcquisitionName()));
+    }
+
+    private void reportAcquisitionFailure(IAcquisitionWork acquisition) {
+        gui.getCampaign()
+                .addReport(String.format("<font color='red'><b>You cannot afford to purchase %s</b></font>",
+                        acquisition.getAcquisitionName()));
     }
 }

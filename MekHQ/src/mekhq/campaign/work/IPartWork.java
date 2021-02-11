@@ -1,7 +1,7 @@
 /*
  * IPartWork.java
  *
- * Copyright (C) 2016 MegaMek team
+ * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.work;
 
@@ -26,7 +26,7 @@ import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -53,6 +53,7 @@ public interface IPartWork extends IWork {
     TargetRoll getAllModsForMaintenance();
 
     void setTech(@Nullable Person tech);
+
     boolean hasWorkedOvertime();
     void setWorkedOvertime(boolean b);
     int getShorthandedMod();
@@ -85,6 +86,7 @@ public interface IPartWork extends IWork {
      * @return A string containing details regarding the part.
      */
     String getDetails(boolean includeRepairDetails);
+
     int getLocation();
 
     @Nullable Unit getUnit();
@@ -94,29 +96,30 @@ public interface IPartWork extends IWork {
     String checkFixable();
 
     void reservePart();
+
     void cancelReservation();
+
     boolean isBeingWorkedOn();
 
-    int getMassRepairOptionType();
-    int getRepairPartType();
+    PartRepairType getMassRepairOptionType();
 
-    public static int findCorrectMassRepairType(IPartWork part) {
-        if (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType) {
-            return Part.REPAIR_PART_TYPE.WEAPON;
+    PartRepairType getRepairPartType();
+
+    static PartRepairType findCorrectMassRepairType(IPartWork part) {
+        if ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType)) {
+            return PartRepairType.WEAPON;
         } else {
             return part.getMassRepairOptionType();
         }
     }
 
-    public static int findCorrectRepairType(IPartWork part) {
-        if ((part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType) ||
-                (part instanceof MissingEquipmentPart && ((MissingEquipmentPart)part).getType() instanceof WeaponType)) {
-            return Part.REPAIR_PART_TYPE.WEAPON;
+    static PartRepairType findCorrectRepairType(IPartWork part) {
+        if (((part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType))
+                || ((part instanceof MissingEquipmentPart) && (((MissingEquipmentPart) part).getType() instanceof WeaponType))) {
+            return PartRepairType.WEAPON;
+        } else if ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType().hasFlag(MiscType.F_CLUB))) {
+            return PartRepairType.PHYSICAL_WEAPON;
         } else {
-            if (part instanceof EquipmentPart && ((EquipmentPart)part).getType().hasFlag(MiscType.F_CLUB)) {
-                return Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON;
-            }
-
             return part.getRepairPartType();
         }
     }
