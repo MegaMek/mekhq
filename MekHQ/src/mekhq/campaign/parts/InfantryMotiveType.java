@@ -178,25 +178,18 @@ public class InfantryMotiveType extends Part {
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<moveMode>"
-				+mode
-				+"</moveMode>");
-		writeToXmlEnd(pw1, indent);
+		writeToXmlBegin(pw1, indent++);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "moveMode", mode.name());
+		writeToXmlEnd(pw1, --indent);
 	}
 
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
 
-		for (int x=0; x<nl.getLength(); x++) {
+		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			if (wn2.getNodeName().equalsIgnoreCase("mode")) {
-				mode = EntityMovementMode.getMode(wn2.getTextContent());
-				assignName();
-			}
-			else if (wn2.getNodeName().equalsIgnoreCase("moveMode")) {
+            if (wn2.getNodeName().equalsIgnoreCase("moveMode")) {
 				mode = EntityMovementMode.getMode(wn2.getTextContent());
 				assignName();
 			}

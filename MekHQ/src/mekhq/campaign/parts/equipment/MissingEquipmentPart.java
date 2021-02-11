@@ -23,6 +23,7 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import mekhq.MekHQ;
 import org.w3c.dom.Node;
@@ -189,11 +190,20 @@ public class MissingEquipmentPart extends MissingPart {
         //well
         //http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
         EquipmentPart newPart = getNewPart();
+
+        // Don't replace with parts that don't match our expected type!
+        if (!newPart.getClass().equals(part.getClass())) {
+            return false;
+        }
+
+        EquipmentPart equipmentPart = (EquipmentPart) part;
+
         newPart.setEquipmentNum(getEquipmentNum());
         newPart.setUnit(unit); // CAW: find a way to do this without setting a unit
-        return (type.equals(newPart.getType()) && getTonnage() == part.getTonnage())
-                && (size == newPart.getSize())
-                && part.getStickerPrice().equals(newPart.getStickerPrice());
+        return getType().equals(equipmentPart.getType())
+                && (getTonnage() == equipmentPart.getTonnage())
+                && (getSize() == equipmentPart.getSize())
+                && Objects.equals(newPart.getStickerPrice(), equipmentPart.getStickerPrice());
     }
 
     protected @Nullable Mounted getMounted() {
