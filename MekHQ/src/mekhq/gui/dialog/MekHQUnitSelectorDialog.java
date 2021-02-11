@@ -148,15 +148,17 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy", TARGET_UNKNOWN));
                 buttonSelect.setToolTipText(null);
             }
-        } else if (addToCampaign) {
+        } else {
             selectedUnit = new UnitOrder(entity, campaign);
-            buttonSelect.setEnabled(true);
-            Person logisticsPerson = campaign.getLogisticsPerson();
-            buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy",
-                    campaign.getTargetForAcquisition(selectedUnit, logisticsPerson, false)
-                            .getValueAsString()));
-            buttonSelect.setToolTipText(campaign.getTargetForAcquisition(selectedUnit,
-                    logisticsPerson, false).getDesc());
+            if (addToCampaign) {
+                buttonSelect.setEnabled(true);
+                Person logisticsPerson = campaign.getLogisticsPerson();
+                buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy",
+                        campaign.getTargetForAcquisition(selectedUnit, logisticsPerson, false)
+                                .getValueAsString()));
+                buttonSelect.setToolTipText(campaign.getTargetForAcquisition(selectedUnit,
+                        logisticsPerson, false).getDesc());
+            }
         }
 
         return entity;
