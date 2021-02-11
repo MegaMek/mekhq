@@ -23,14 +23,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.event.MouseInputAdapter;
-
-import megamek.common.annotations.Nullable;
 
 /**
  * Provides a popup menu adapter for a component which also ensures that
@@ -55,13 +54,9 @@ public abstract class JPopupMenuAdapter extends MouseInputAdapter implements Act
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Immediately return if there are no units selected
-                if (!shouldShowPopup()) {
-                    return;
-                }
-
-                JPopupMenu popup = createPopupMenu();
-                popup.show(component, component.getX(), component.getY());
+                createPopupMenu().ifPresent(popup -> {
+                    popup.show(component, component.getX(), component.getY());
+                });
             }
         });
     }
@@ -83,29 +78,15 @@ public abstract class JPopupMenuAdapter extends MouseInputAdapter implements Act
 
     private void maybeShowPopup(MouseEvent e) {
         if (e.isPopupTrigger()) {
-            // Immediately return if there are no units selected
-            if (!shouldShowPopup()) {
-                return;
-            }
-
-            JPopupMenu popup = createPopupMenu();
-            if (popup != null) {
+            createPopupMenu().ifPresent(popup -> {
                 popup.show(e.getComponent(), e.getX(), e.getY());
-            }
+            });
         }
     }
 
     /**
-     * Gets a value indicating whether or not to show the popup.
+     * A {@link JPopupMenu} to show, if applicable.
+     * @return An optional {@link JPopupMenu} to show.
      */
-    protected abstract boolean shouldShowPopup();
-
-    /**
-     * Creates the popup menu, or returns {@code null} if the
-     * popup menu should not be shown.
-     * @return A {@link JPopupMenu} to show, or {@code null} if no
-     *         popup menu should be shown.
-     */
-    @Nullable
-    protected abstract JPopupMenu createPopupMenu();
+    protected abstract Optional<JPopupMenu> createPopupMenu();
 }

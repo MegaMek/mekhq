@@ -1,6 +1,7 @@
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
+import java.util.Optional;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -10,7 +11,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import megamek.common.TargetRoll;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartModeChangedEvent;
@@ -243,15 +243,9 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     @Override
-    protected boolean shouldShowPopup() {
-        return partsTable.getSelectedRowCount() > 0;
-    }
-
-    @Override
-    @Nullable
-    protected JPopupMenu createPopupMenu() {
+    protected Optional<JPopupMenu> createPopupMenu() {
         if (partsTable.getSelectedRowCount() == 0) {
-            return null;
+            return Optional.empty();
         }
 
         JPopupMenu popup = new JPopupMenu();
@@ -389,31 +383,31 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             }
             popup.add(menu);
         }
-        // GM mode
-        menu = new JMenu("GM Mode");
-        if (areAllPartsInTransit(parts)) {
-            menuItem = new JMenuItem("Deliver Part Now");
-            menuItem.setActionCommand("ARRIVE");
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-        }
-        // remove part
-        menuItem = new JMenuItem("Remove Part");
-        menuItem.setActionCommand("REMOVE");
-        menuItem.addActionListener(this);
-        menuItem.setEnabled(gui.getCampaign().isGM());
-        menu.add(menuItem);
-        // set part quality
-        menuItem = new JMenuItem("Set Quality...");
-        menuItem.setActionCommand("SET_QUALITY");
-        menuItem.addActionListener(this);
-        menuItem.setEnabled(gui.getCampaign().isGM());
-        menu.add(menuItem);
-        // end
-        popup.addSeparator();
-        popup.add(menu);
 
-        return popup;
+        if (gui.getCampaign().isGM()) {
+            // GM mode
+            menu = new JMenu("GM Mode");
+            if (areAllPartsInTransit(parts)) {
+                menuItem = new JMenuItem("Deliver Part Now");
+                menuItem.setActionCommand("ARRIVE");
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+            }
+            // remove part
+            menuItem = new JMenuItem("Remove Part");
+            menuItem.setActionCommand("REMOVE");
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+            // set part quality
+            menuItem = new JMenuItem("Set Quality...");
+            menuItem.setActionCommand("SET_QUALITY");
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+            // end
+            popup.addSeparator();
+            popup.add(menu);
+        }
+
+        return Optional.of(popup);
     }
 }

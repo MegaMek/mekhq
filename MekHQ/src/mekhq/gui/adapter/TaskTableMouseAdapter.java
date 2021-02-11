@@ -20,6 +20,7 @@
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
+import java.util.Optional;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -29,7 +30,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import megamek.common.TargetRoll;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartModeChangedEvent;
@@ -148,28 +148,18 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
 
 
     @Override
-    protected boolean shouldShowPopup() {
+    protected Optional<JPopupMenu> createPopupMenu() {
         int row = taskTable.getSelectedRow();
         if (row < 0) {
-            return false;
-        }
-        
-        return taskModel.getTaskAt(taskTable.convertRowIndexToModel(row)) != null;
-    }
-
-    @Override
-    @Nullable
-    protected JPopupMenu createPopupMenu() {
-        JPopupMenu popup = new JPopupMenu();
-        int row = taskTable.getSelectedRow();
-        if (row < 0) {
-            return null;
+            return Optional.empty();
         }
 
         IPartWork partWork = taskModel.getTaskAt(taskTable.convertRowIndexToModel(row));
         if (partWork == null) {
-            return null;
+            return Optional.empty();
         }
+
+        JPopupMenu popup = new JPopupMenu();
 
         int[] rows = taskTable.getSelectedRows();
         IPartWork[] parts = new IPartWork[rows.length];
@@ -218,16 +208,20 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(menuItem);
         }
 
-        menu = new JMenu("GM Mode");
-        popup.add(menu);
-        // Auto complete task
+        if (gui.getCampaign().isGM()) {
+            popup.addSeparator();
+            menu = new JMenu("GM Mode");
 
-        menuItem = new JMenuItem("Complete Task");
-        menuItem.setActionCommand("FIX");
-        menuItem.addActionListener(this);
-        menuItem.setEnabled(gui.getCampaign().isGM() && isFixable);
-        menu.add(menuItem);
+            // Auto complete task
+            menuItem = new JMenuItem("Complete Task");
+            menuItem.setActionCommand("FIX");
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(isFixable);
+            menu.add(menuItem);
 
-        return popup;
+            popup.add(menu);
+        }
+
+        return Optional.of(popup);
     }
 }

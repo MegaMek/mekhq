@@ -593,15 +593,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     }
 
     @Override
-    protected boolean shouldShowPopup() {
-        return tree.getSelectionPaths() != null;
-    }
-
-    @Override
-    @Nullable
-    protected JPopupMenu createPopupMenu() {
+    protected Optional<JPopupMenu> createPopupMenu() {
         if (tree.getSelectionPaths() == null) {
-            return null;
+            return Optional.empty();
         }
 
         JPopupMenu popup = new JPopupMenu();
@@ -1485,7 +1479,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
         }
-        return popup;
+        
+        return Optional.of(popup);
     }
 
     /**

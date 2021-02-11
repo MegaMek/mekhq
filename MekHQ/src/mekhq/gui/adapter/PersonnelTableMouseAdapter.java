@@ -32,7 +32,6 @@ import megamek.client.ui.swing.dialog.imageChooser.AbstractIconChooserDialog;
 import megamek.client.ui.swing.dialog.imageChooser.PortraitChooserDialog;
 import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.*;
-import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
@@ -1138,15 +1137,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     @Override
-    protected boolean shouldShowPopup() {
-        return personnelTable.getSelectedRowCount() > 0;
-    }
-
-    @Override
-    @Nullable
-    protected JPopupMenu createPopupMenu() {
+    protected Optional<JPopupMenu> createPopupMenu() {
         if (personnelTable.getSelectedRowCount() == 0) {
-            return null;
+            return Optional.empty();
         }
 
         JPopupMenu popup = new JPopupMenu();
@@ -2706,7 +2699,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
         //endregion GM Menu
 
-        return popup;
+        return Optional.of(popup);
     }
 
     private JMenuItem newMenuItem(String text, String command) {

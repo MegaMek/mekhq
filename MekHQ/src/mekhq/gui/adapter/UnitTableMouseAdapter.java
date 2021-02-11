@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
@@ -543,15 +544,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     @Override
-    protected boolean shouldShowPopup() {
-        return unitTable.getSelectedRowCount() > 0;
-    }
-
-    @Override
-    @Nullable
-    protected JPopupMenu createPopupMenu() {
+    protected Optional<JPopupMenu> createPopupMenu() {
         if (unitTable.getSelectedRowCount() == 0) {
-            return null;
+            return Optional.empty();
         }
 
         //region Variable Declarations and Instantiations
@@ -1101,7 +1096,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             //endregion GM Mode
         }
 
-        return popup;
+        return Optional.of(popup);
     }
 
     private void addCustomUnitTag(Unit... units) {

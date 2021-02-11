@@ -1,12 +1,13 @@
 package mekhq.gui.adapter;
 
+import java.util.Optional;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import megamek.common.Entity;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;
@@ -31,18 +32,10 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     @Override
-    protected boolean shouldShowPopup() {
-        // GM Only (for now)
-        return (table.getSelectedRowCount() > 0)
-                && gui.getCampaign().isGM();
-    }
-
-    @Override
-    @Nullable
-    protected JPopupMenu createPopupMenu() {
+    protected Optional<JPopupMenu> createPopupMenu() {
         // GM Only (for now)
         if ((table.getSelectedRowCount() == 0) || !gui.getCampaign().isGM()) {
-            return null;
+            return Optional.empty();
         }
 
         JPopupMenu popup = new JPopupMenu();
@@ -74,7 +67,6 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         });
-        menuItem.setEnabled(gui.getCampaign().isGM());
         menu.add(menuItem);
         menuItem = new JMenuItem("Procure all items now");
         menuItem.addActionListener(evt -> {
@@ -94,7 +86,6 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         });
-        menuItem.setEnabled(gui.getCampaign().isGM());
         menu.add(menuItem);
         menuItem = new JMenuItem("Clear From the List");
         menuItem.addActionListener(evt -> {
@@ -119,13 +110,11 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         });
-        menuItem.setEnabled(gui.getCampaign().isGM());
         menu.add(menuItem);
         // end
-        popup.addSeparator();
         popup.add(menu);
 
-        return popup;
+        return Optional.of(popup);
     }
 
     private void procureAllItems(IAcquisitionWork acquisition) {

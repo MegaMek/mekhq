@@ -1,6 +1,7 @@
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.swing.JMenu;
@@ -9,7 +10,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.event.LoanRemovedEvent;
 import mekhq.campaign.event.PartRemovedEvent;
@@ -89,21 +89,14 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     @Override
-    protected boolean shouldShowPopup() {
-        return loanTable.getSelectedRowCount() > 0;
-    }
-
-    @Override
-    @Nullable
-    protected JPopupMenu createPopupMenu() {
+    protected Optional<JPopupMenu> createPopupMenu() {
         if (loanTable.getSelectedRowCount() == 0) {
-            return null;
+            return Optional.empty();
         }
 
         JPopupMenu popup = new JPopupMenu();
 
-        int row = loanTable.getSelectedRow();
-        Loan loan = loanModel.getLoan(loanTable.convertRowIndexToModel(row));
+        Loan loan = loanModel.getLoan(loanTable.convertRowIndexToModel(loanTable.getSelectedRow()));
         JMenuItem menuItem = null;
         JMenu menu = null;
         // **lets fill the pop up menu**//
@@ -117,18 +110,20 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
         menuItem.setActionCommand("DEFAULT");
         menuItem.addActionListener(this);
         popup.add(menuItem);
-        // GM mode
-        menu = new JMenu("GM Mode");
-        // remove part
-        menuItem = new JMenuItem("Remove Loan");
-        menuItem.setActionCommand("REMOVE");
-        menuItem.addActionListener(this);
-        menuItem.setEnabled(gui.getCampaign().isGM());
-        menu.add(menuItem);
-        // end
-        popup.addSeparator();
-        popup.add(menu);
 
-        return popup;
+        if (gui.getCampaign().isGM()) {
+            // GM mode
+            menu = new JMenu("GM Mode");
+            // remove part
+            menuItem = new JMenuItem("Remove Loan");
+            menuItem.setActionCommand("REMOVE");
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+            // end
+            popup.addSeparator();
+            popup.add(menu);
+        }
+
+        return Optional.of(popup);
     }
 }

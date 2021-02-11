@@ -19,6 +19,7 @@
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
+import java.util.Optional;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -28,7 +29,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import megamek.common.AmmoType;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
@@ -140,15 +140,9 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     @Override
-    protected boolean shouldShowPopup() {
-        return servicedUnitTable.getSelectedRowCount() > 0;
-    }
-
-    @Override
-    @Nullable
-    protected JPopupMenu createPopupMenu() {
+    protected Optional<JPopupMenu> createPopupMenu() {
         if (servicedUnitTable.getSelectedRowCount() == 0) {
-            return null;
+            return Optional.empty();
         }
 
         JPopupMenu popup = new JPopupMenu();
@@ -255,6 +249,6 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
 
-        return popup;
+        return Optional.of(popup);
     }
 }

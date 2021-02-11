@@ -18,13 +18,14 @@
  */
 package mekhq.gui.adapter;
 
+import java.util.Optional;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.mission.Mission;
@@ -52,16 +53,10 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     @Override
-    protected boolean shouldShowPopup() {
-        return scenarioTable.getSelectedRowCount() > 0;
-    }
-
-    @Override
-    @Nullable
-    protected JPopupMenu createPopupMenu() {
+    protected Optional<JPopupMenu> createPopupMenu() {
         int row = scenarioTable.getSelectedRow();
         if (row < 0) {
-            return null;
+            return Optional.empty();
         }
         
         JPopupMenu popup = new JPopupMenu();
@@ -88,7 +83,7 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(menu);
         }
 
-        return popup;
+        return Optional.of(popup);
     }
 
     private void editScenario(Scenario scenario) {

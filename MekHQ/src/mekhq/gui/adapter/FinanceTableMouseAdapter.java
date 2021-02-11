@@ -19,13 +19,13 @@
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
+import java.util.Optional;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.event.TransactionChangedEvent;
 import mekhq.campaign.event.TransactionVoidedEvent;
@@ -74,16 +74,10 @@ public class FinanceTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     @Override
-    protected boolean shouldShowPopup() {
-        return financeTable.getSelectedRowCount() > 0;
-    }
-
-    @Override
-    @Nullable
-    protected JPopupMenu createPopupMenu() {
+    protected Optional<JPopupMenu> createPopupMenu() {
         int row = financeTable.getSelectedRow();
-        if (row < 0) {
-            return null;
+        if ((row < 0) || !gui.getCampaign().isGM()) {
+            return Optional.empty();
         }
 
         JPopupMenu popup = new JPopupMenu();
@@ -94,15 +88,13 @@ public class FinanceTableMouseAdapter extends JPopupMenuAdapter {
         JMenuItem deleteItem = new JMenuItem("Delete Transaction");
         deleteItem.setActionCommand("DELETE");
         deleteItem.addActionListener(this);
-        deleteItem.setEnabled(gui.getCampaign().isGM());
         menu.add(deleteItem);
 
         JMenuItem editItem = new JMenuItem("Edit Transaction");
         editItem.setActionCommand("EDIT");
         editItem.addActionListener(this);
-        editItem.setEnabled(gui.getCampaign().isGM());
         menu.add(editItem);
 
-        return popup;
+        return Optional.of(popup);
     }
 }
