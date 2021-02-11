@@ -654,7 +654,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         areAllSalvageFlagged = false;
                     }
 
-                    if (u.getEntity().isConventionalInfantry()) {
+                    if (u.isConventionalInfantry()) {
                         noConventionalInfantry = false;
                     } else {
                         areAllConventionalInfantry = false;

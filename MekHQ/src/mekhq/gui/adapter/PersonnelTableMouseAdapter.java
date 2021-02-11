@@ -1614,7 +1614,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
                         }
 
                         if (StaticChecks.areAllInfantry(selected)) {
-                            if (!unit.getEntity().isConventionalInfantry()) {
+                            if (!unit.isConventionalInfantry()) {
                                 continue;
                             }
                             if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {

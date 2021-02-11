@@ -982,12 +982,12 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                 if (techLevel > TechConstants.T_INTRO_BOXSET) {
                     if (TechConstants.isClan(techLevel)) {
                         setNumberClan(getNumberClan().add(value));
-                        if (!u.getEntity().isConventionalInfantry()) {
+                        if (!u.isConventionalInfantry()) {
                             setCountClan(getCountClan() + 1);
                         }
                     } else {
                         setNumberIS2(getNumberIS2().add(value));
-                        if (!u.getEntity().isConventionalInfantry()) {
+                        if (!u.isConventionalInfantry()) {
                             setCountIS2(getCountIS2() + 1);
                         }
                     }

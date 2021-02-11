@@ -4852,7 +4852,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         // if this is an infantry refit, then automatic success
         if ((partWork instanceof Refit) && (partWork.getUnit() != null)
-                && partWork.getUnit().getEntity().isConventionalInfantry()) {
+                && partWork.getUnit().isConventionalInfantry()) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "infantry refit");
         }
 
