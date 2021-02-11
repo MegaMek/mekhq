@@ -300,18 +300,15 @@ public class MekHQ implements GameListener {
                 "Do you want to save the game before quitting MekHQ?",
                 "Save First?",
                 JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.WARNING_MESSAGE);
-        if (savePrompt == JOptionPane.CANCEL_OPTION) {
+                JOptionPane.QUESTION_MESSAGE);
+        if ((savePrompt == JOptionPane.CANCEL_OPTION) || (savePrompt == JOptionPane.CLOSED_OPTION)) {
+            return;
+        } else if ((savePrompt == JOptionPane.YES_OPTION) && !getCampaigngui().saveCampaign(null)) {
+            // When the user did not actually save the game, don't close MHQ
             return;
         }
 
-        if (savePrompt == JOptionPane.YES_OPTION) {
-            if (!getCampaigngui().saveCampaign(null)) {
-                // When the user did not actually save the game, don't close MM
-                return;
-            }
-        }
-
+        // Actually close MHQ
         if (campaigngui != null) {
             campaigngui.getFrame().dispose();
         }
