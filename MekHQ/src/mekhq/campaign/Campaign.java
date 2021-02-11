@@ -927,8 +927,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public List<Contract> getActiveContracts() {
         return getMissions().stream()
-                .filter(c -> (c instanceof Contract)
-                        && c.isActiveOn(getLocalDate()))
+                .filter(c -> (c instanceof Contract) && c.isActiveOn(getLocalDate()))
                 .map(c -> (Contract) c)
                 .collect(Collectors.toList());
     }
@@ -946,8 +945,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public List<AtBContract> getActiveAtBContracts(boolean excludeEndDateCheck) {
         return getMissions().stream()
-                .filter(c -> (c instanceof AtBContract)
-                        && c.isActiveOn(getLocalDate(), excludeEndDateCheck))
+                .filter(c -> (c instanceof AtBContract) && c.isActiveOn(getLocalDate(), excludeEndDateCheck))
                 .map(c -> (AtBContract) c)
                 .collect(Collectors.toList());
     }
@@ -3000,7 +2998,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     *
      * @param contract an active AtBContract
      * @return the current deployment deficit for the contract
      */
