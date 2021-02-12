@@ -125,7 +125,7 @@ public class CompanyGenerationOptions implements Serializable {
         setFaction(campaign.getFaction());
         setStartingPlanet(Systems.getInstance().getSystems().getOrDefault(
                 getFaction().getStartingPlanet(campaign.getLocalDate()),
-                Systems.getInstance().getSystems().get("Terra")).getPrimaryPlanet());
+                campaign.getSystemByName("Terra")).getPrimaryPlanet());
         setCompanyCount(1);
         setIndividualLanceCount(0);
         setGenerateMercenaryCompanyCommandLance(false);
@@ -159,7 +159,7 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Personnel Randomization
         setRandomizeOrigin(true);
-        setCentralPlanet(Systems.getInstance().getSystems().get("Terra").getPrimaryPlanet());
+        setCentralPlanet(campaign.getSystemByName("Terra").getPrimaryPlanet());
         setOriginSearchRadius(1000);
         setExtraRandomOrigin(false);
         setOriginDistanceScale(0.2);
@@ -209,7 +209,7 @@ public class CompanyGenerationOptions implements Serializable {
         return type;
     }
 
-    public void setType(CompanyGenerationType type) {
+    public void setType(final CompanyGenerationType type) {
         this.type = type;
     }
 
@@ -217,7 +217,7 @@ public class CompanyGenerationOptions implements Serializable {
         return faction;
     }
 
-    public void setFaction(Faction faction) {
+    public void setFaction(final Faction faction) {
         this.faction = faction;
     }
 
@@ -225,7 +225,7 @@ public class CompanyGenerationOptions implements Serializable {
         return startingPlanet;
     }
 
-    public void setStartingPlanet(Planet startingPlanet) {
+    public void setStartingPlanet(final Planet startingPlanet) {
         this.startingPlanet = startingPlanet;
     }
 
@@ -233,7 +233,7 @@ public class CompanyGenerationOptions implements Serializable {
         return generateMercenaryCompanyCommandLance;
     }
 
-    public void setGenerateMercenaryCompanyCommandLance(boolean generateMercenaryCompanyCommandLance) {
+    public void setGenerateMercenaryCompanyCommandLance(final boolean generateMercenaryCompanyCommandLance) {
         this.generateMercenaryCompanyCommandLance = generateMercenaryCompanyCommandLance;
     }
 
@@ -241,7 +241,7 @@ public class CompanyGenerationOptions implements Serializable {
         return companyCount;
     }
 
-    public void setCompanyCount(int companyCount) {
+    public void setCompanyCount(final int companyCount) {
         this.companyCount = companyCount;
     }
 
@@ -249,7 +249,7 @@ public class CompanyGenerationOptions implements Serializable {
         return individualLanceCount;
     }
 
-    public void setIndividualLanceCount(int individualLanceCount) {
+    public void setIndividualLanceCount(final int individualLanceCount) {
         this.individualLanceCount = individualLanceCount;
     }
 
@@ -257,7 +257,7 @@ public class CompanyGenerationOptions implements Serializable {
         return lanceSize;
     }
 
-    public void setLanceSize(int lanceSize) {
+    public void setLanceSize(final int lanceSize) {
         this.lanceSize = lanceSize;
     }
 
@@ -265,7 +265,7 @@ public class CompanyGenerationOptions implements Serializable {
         return lancesPerCompany;
     }
 
-    public void setLancesPerCompany(int lancesPerCompany) {
+    public void setLancesPerCompany(final int lancesPerCompany) {
         this.lancesPerCompany = lancesPerCompany;
     }
     //endregion Base Information
@@ -275,7 +275,7 @@ public class CompanyGenerationOptions implements Serializable {
         return supportPersonnel;
     }
 
-    public void setSupportPersonnel(Map<Integer, Integer> supportPersonnel) {
+    public void setSupportPersonnel(final Map<Integer, Integer> supportPersonnel) {
         this.supportPersonnel = supportPersonnel;
     }
 
@@ -283,7 +283,7 @@ public class CompanyGenerationOptions implements Serializable {
         return poolAssistants;
     }
 
-    public void setPoolAssistants(boolean poolAssistants) {
+    public void setPoolAssistants(final boolean poolAssistants) {
         this.poolAssistants = poolAssistants;
     }
 
@@ -291,7 +291,7 @@ public class CompanyGenerationOptions implements Serializable {
         return generateCaptains;
     }
 
-    public void setGenerateCaptains(boolean generateCaptains) {
+    public void setGenerateCaptains(final boolean generateCaptains) {
         this.generateCaptains = generateCaptains;
     }
 
@@ -299,7 +299,7 @@ public class CompanyGenerationOptions implements Serializable {
         return assignCompanyCommanderFlag;
     }
 
-    public void setAssignCompanyCommanderFlag(boolean assignCompanyCommanderFlag) {
+    public void setAssignCompanyCommanderFlag(final boolean assignCompanyCommanderFlag) {
         this.assignCompanyCommanderFlag = assignCompanyCommanderFlag;
     }
 
@@ -307,7 +307,7 @@ public class CompanyGenerationOptions implements Serializable {
         return companyCommanderLanceOfficer;
     }
 
-    public void setCompanyCommanderLanceOfficer(boolean companyCommanderLanceOfficer) {
+    public void setCompanyCommanderLanceOfficer(final boolean companyCommanderLanceOfficer) {
         this.companyCommanderLanceOfficer = companyCommanderLanceOfficer;
     }
 
@@ -315,7 +315,7 @@ public class CompanyGenerationOptions implements Serializable {
         return applyOfficerStatBonusToWorstSkill;
     }
 
-    public void setApplyOfficerStatBonusToWorstSkill(boolean applyOfficerStatBonusToWorstSkill) {
+    public void setApplyOfficerStatBonusToWorstSkill(final boolean applyOfficerStatBonusToWorstSkill) {
         this.applyOfficerStatBonusToWorstSkill = applyOfficerStatBonusToWorstSkill;
     }
 
@@ -323,7 +323,7 @@ public class CompanyGenerationOptions implements Serializable {
         return assignBestOfficers;
     }
 
-    public void setAssignBestOfficers(boolean assignBestOfficers) {
+    public void setAssignBestOfficers(final boolean assignBestOfficers) {
         this.assignBestOfficers = assignBestOfficers;
     }
 
@@ -331,7 +331,7 @@ public class CompanyGenerationOptions implements Serializable {
         return automaticallyAssignRanks;
     }
 
-    public void setAutomaticallyAssignRanks(boolean automaticallyAssignRanks) {
+    public void setAutomaticallyAssignRanks(final boolean automaticallyAssignRanks) {
         this.automaticallyAssignRanks = automaticallyAssignRanks;
     }
     //endregion Personnel
@@ -341,7 +341,7 @@ public class CompanyGenerationOptions implements Serializable {
         return randomizeOrigin;
     }
 
-    public void setRandomizeOrigin(boolean randomizeOrigin) {
+    public void setRandomizeOrigin(final boolean randomizeOrigin) {
         this.randomizeOrigin = randomizeOrigin;
     }
 
@@ -349,7 +349,7 @@ public class CompanyGenerationOptions implements Serializable {
         return centralPlanet;
     }
 
-    public void setCentralPlanet(Planet centralPlanet) {
+    public void setCentralPlanet(final Planet centralPlanet) {
         this.centralPlanet = centralPlanet;
     }
 
@@ -357,7 +357,7 @@ public class CompanyGenerationOptions implements Serializable {
         return originSearchRadius;
     }
 
-    public void setOriginSearchRadius(int originSearchRadius) {
+    public void setOriginSearchRadius(final int originSearchRadius) {
         this.originSearchRadius = originSearchRadius;
     }
 
@@ -365,7 +365,7 @@ public class CompanyGenerationOptions implements Serializable {
         return extraRandomOrigin;
     }
 
-    public void setExtraRandomOrigin(boolean extraRandomOrigin) {
+    public void setExtraRandomOrigin(final boolean extraRandomOrigin) {
         this.extraRandomOrigin = extraRandomOrigin;
     }
 
@@ -373,7 +373,7 @@ public class CompanyGenerationOptions implements Serializable {
         return originDistanceScale;
     }
 
-    public void setOriginDistanceScale(double originDistanceScale) {
+    public void setOriginDistanceScale(final double originDistanceScale) {
         this.originDistanceScale = originDistanceScale;
     }
     //endregion Personnel Randomization
@@ -383,7 +383,7 @@ public class CompanyGenerationOptions implements Serializable {
         return generateUnitsAsAttached;
     }
 
-    public void setGenerateUnitsAsAttached(boolean generateUnitsAsAttached) {
+    public void setGenerateUnitsAsAttached(final boolean generateUnitsAsAttached) {
         this.generateUnitsAsAttached = generateUnitsAsAttached;
     }
 
@@ -391,7 +391,7 @@ public class CompanyGenerationOptions implements Serializable {
         return assignBestRollToUnitCommander;
     }
 
-    public void setAssignBestRollToUnitCommander(boolean assignBestRollToUnitCommander) {
+    public void setAssignBestRollToUnitCommander(final boolean assignBestRollToUnitCommander) {
         this.assignBestRollToUnitCommander = assignBestRollToUnitCommander;
     }
 
@@ -399,7 +399,7 @@ public class CompanyGenerationOptions implements Serializable {
         return groupByWeight;
     }
 
-    public void setGroupByWeight(boolean groupByWeight) {
+    public void setGroupByWeight(final boolean groupByWeight) {
         this.groupByWeight = groupByWeight;
     }
 
@@ -407,7 +407,7 @@ public class CompanyGenerationOptions implements Serializable {
         return keepOfficerRollsSeparate;
     }
 
-    public void setKeepOfficerRollsSeparate(boolean keepOfficerRollsSeparate) {
+    public void setKeepOfficerRollsSeparate(final boolean keepOfficerRollsSeparate) {
         this.keepOfficerRollsSeparate = keepOfficerRollsSeparate;
     }
 
@@ -415,7 +415,7 @@ public class CompanyGenerationOptions implements Serializable {
         return starLeagueYear;
     }
 
-    public void setStarLeagueYear(int starLeagueYear) {
+    public void setStarLeagueYear(final int starLeagueYear) {
         this.starLeagueYear = starLeagueYear;
     }
 
@@ -423,7 +423,7 @@ public class CompanyGenerationOptions implements Serializable {
         return assignTechsToUnits;
     }
 
-    public void setAssignTechsToUnits(boolean assignTechsToUnits) {
+    public void setAssignTechsToUnits(final boolean assignTechsToUnits) {
         this.assignTechsToUnits = assignTechsToUnits;
     }
     //endregion Units
@@ -433,7 +433,7 @@ public class CompanyGenerationOptions implements Serializable {
         return forceNamingType;
     }
 
-    public void setForceNamingType(ForceNamingType forceNamingType) {
+    public void setForceNamingType(final ForceNamingType forceNamingType) {
         this.forceNamingType = forceNamingType;
     }
 
@@ -441,7 +441,7 @@ public class CompanyGenerationOptions implements Serializable {
         return generateForceIcons;
     }
 
-    public void setGenerateForceIcons(boolean generateForceIcons) {
+    public void setGenerateForceIcons(final boolean generateForceIcons) {
         this.generateForceIcons = generateForceIcons;
     }
     //endregion Unit
@@ -451,7 +451,7 @@ public class CompanyGenerationOptions implements Serializable {
         return generateMothballedSpareUnits;
     }
 
-    public void setGenerateMothballedSpareUnits(boolean generateMothballedSpareUnits) {
+    public void setGenerateMothballedSpareUnits(final boolean generateMothballedSpareUnits) {
         this.generateMothballedSpareUnits = generateMothballedSpareUnits;
     }
 
@@ -459,7 +459,7 @@ public class CompanyGenerationOptions implements Serializable {
         return sparesPercentOfActiveUnits;
     }
 
-    public void setSparesPercentOfActiveUnits(int sparesPercentOfActiveUnits) {
+    public void setSparesPercentOfActiveUnits(final int sparesPercentOfActiveUnits) {
         this.sparesPercentOfActiveUnits = sparesPercentOfActiveUnits;
     }
 
@@ -467,7 +467,7 @@ public class CompanyGenerationOptions implements Serializable {
         return generateSpareParts;
     }
 
-    public void setGenerateSpareParts(boolean generateSpareParts) {
+    public void setGenerateSpareParts(final boolean generateSpareParts) {
         this.generateSpareParts = generateSpareParts;
     }
 
@@ -475,7 +475,7 @@ public class CompanyGenerationOptions implements Serializable {
         return startingArmourWeight;
     }
 
-    public void setStartingArmourWeight(int startingArmourWeight) {
+    public void setStartingArmourWeight(final int startingArmourWeight) {
         this.startingArmourWeight = startingArmourWeight;
     }
 
@@ -483,7 +483,7 @@ public class CompanyGenerationOptions implements Serializable {
         return generateSpareAmmunition;
     }
 
-    public void setGenerateSpareAmmunition(boolean generateSpareAmmunition) {
+    public void setGenerateSpareAmmunition(final boolean generateSpareAmmunition) {
         this.generateSpareAmmunition = generateSpareAmmunition;
     }
 
@@ -491,7 +491,7 @@ public class CompanyGenerationOptions implements Serializable {
         return numberReloadsPerWeapon;
     }
 
-    public void setNumberReloadsPerWeapon(int numberReloadsPerWeapon) {
+    public void setNumberReloadsPerWeapon(final int numberReloadsPerWeapon) {
         this.numberReloadsPerWeapon = numberReloadsPerWeapon;
     }
 
@@ -499,7 +499,7 @@ public class CompanyGenerationOptions implements Serializable {
         return generateFractionalMachineGunAmmunition;
     }
 
-    public void setGenerateFractionalMachineGunAmmunition(boolean generateFractionalMachineGunAmmunition) {
+    public void setGenerateFractionalMachineGunAmmunition(final boolean generateFractionalMachineGunAmmunition) {
         this.generateFractionalMachineGunAmmunition = generateFractionalMachineGunAmmunition;
     }
     //endregion Spares
@@ -509,7 +509,7 @@ public class CompanyGenerationOptions implements Serializable {
         return selectStartingContract;
     }
 
-    public void setSelectStartingContract(boolean selectStartingContract) {
+    public void setSelectStartingContract(final boolean selectStartingContract) {
         this.selectStartingContract = selectStartingContract;
     }
 
@@ -517,7 +517,7 @@ public class CompanyGenerationOptions implements Serializable {
         return startCourseToContractPlanet;
     }
 
-    public void setStartCourseToContractPlanet(boolean startCourseToContractPlanet) {
+    public void setStartCourseToContractPlanet(final boolean startCourseToContractPlanet) {
         this.startCourseToContractPlanet = startCourseToContractPlanet;
     }
     //endregion Contracts
@@ -527,7 +527,7 @@ public class CompanyGenerationOptions implements Serializable {
         return startingCash;
     }
 
-    public void setStartingCash(int startingCash) {
+    public void setStartingCash(final int startingCash) {
         this.startingCash = startingCash;
     }
 
@@ -535,7 +535,7 @@ public class CompanyGenerationOptions implements Serializable {
         return randomizeStartingCash;
     }
 
-    public void setRandomizeStartingCash(boolean randomizeStartingCash) {
+    public void setRandomizeStartingCash(final boolean randomizeStartingCash) {
         this.randomizeStartingCash = randomizeStartingCash;
     }
 
@@ -543,7 +543,7 @@ public class CompanyGenerationOptions implements Serializable {
         return randomStartingCashDiceCount;
     }
 
-    public void setRandomStartingCashDiceCount(int randomStartingCashDiceCount) {
+    public void setRandomStartingCashDiceCount(final int randomStartingCashDiceCount) {
         this.randomStartingCashDiceCount = randomStartingCashDiceCount;
     }
 
@@ -551,7 +551,7 @@ public class CompanyGenerationOptions implements Serializable {
         return minimumStartingFloat;
     }
 
-    public void setMinimumStartingFloat(int minimumStartingFloat) {
+    public void setMinimumStartingFloat(final int minimumStartingFloat) {
         this.minimumStartingFloat = minimumStartingFloat;
     }
 
@@ -559,7 +559,7 @@ public class CompanyGenerationOptions implements Serializable {
         return payForSetup;
     }
 
-    public void setPayForSetup(boolean payForSetup) {
+    public void setPayForSetup(final boolean payForSetup) {
         this.payForSetup = payForSetup;
     }
 
@@ -567,7 +567,7 @@ public class CompanyGenerationOptions implements Serializable {
         return startingLoan;
     }
 
-    public void setStartingLoan(boolean startingLoan) {
+    public void setStartingLoan(final boolean startingLoan) {
         this.startingLoan = startingLoan;
     }
 
@@ -575,7 +575,7 @@ public class CompanyGenerationOptions implements Serializable {
         return payForPersonnel;
     }
 
-    public void setPayForPersonnel(boolean payForPersonnel) {
+    public void setPayForPersonnel(final boolean payForPersonnel) {
         this.payForPersonnel = payForPersonnel;
     }
 
@@ -583,7 +583,7 @@ public class CompanyGenerationOptions implements Serializable {
         return payForUnits;
     }
 
-    public void setPayForUnits(boolean payForUnits) {
+    public void setPayForUnits(final boolean payForUnits) {
         this.payForUnits = payForUnits;
     }
 
@@ -591,7 +591,7 @@ public class CompanyGenerationOptions implements Serializable {
         return payForParts;
     }
 
-    public void setPayForParts(boolean payForParts) {
+    public void setPayForParts(final boolean payForParts) {
         this.payForParts = payForParts;
     }
 
@@ -599,7 +599,7 @@ public class CompanyGenerationOptions implements Serializable {
         return payForAmmunition;
     }
 
-    public void setPayForAmmunition(boolean payForAmmunition) {
+    public void setPayForAmmunition(final boolean payForAmmunition) {
         this.payForAmmunition = payForAmmunition;
     }
     //endregion Finances
@@ -645,7 +645,7 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Personnel
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "supportPersonnel");
-        for (Map.Entry<Integer, Integer> entry : getSupportPersonnel().entrySet()) {
+        for (final Map.Entry<Integer, Integer> entry : getSupportPersonnel().entrySet()) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "supportRole");
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "role", entry.getKey());
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "number", entry.getValue());
@@ -712,7 +712,7 @@ public class CompanyGenerationOptions implements Serializable {
             MekHQ.getLogger().error("Received a null file, returning the default AtB options");
             return new CompanyGenerationOptions(CompanyGenerationType.AGAINST_THE_BOT, campaign);
         }
-        Element element;
+        final Element element;
 
         // Open up the file.
         try (InputStream is = new FileInputStream(file)) {
@@ -722,9 +722,9 @@ public class CompanyGenerationOptions implements Serializable {
             return new CompanyGenerationOptions(CompanyGenerationType.AGAINST_THE_BOT, campaign);
         }
         element.normalize();
-        NodeList nl = element.getChildNodes();
+        final NodeList nl = element.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
-            Node wn = nl.item(i);
+            final Node wn = nl.item(i);
             if ("companyGenerationOptions".equals(wn.getNodeName())) {
                 return parseFromXML(wn);
             }

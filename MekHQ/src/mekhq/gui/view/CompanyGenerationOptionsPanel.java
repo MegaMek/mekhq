@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CompanyGenerationOptionsPanel extends JPanel {
     //region Variable Declarations
@@ -143,7 +144,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return frame;
     }
 
-    public void setFrame(JFrame frame) {
+    public void setFrame(final JFrame frame) {
         this.frame = frame;
     }
 
@@ -151,7 +152,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return campaign;
     }
 
-    public void setCampaign(Campaign campaign) {
+    public void setCampaign(final Campaign campaign) {
         this.campaign = campaign;
     }
 
@@ -164,7 +165,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return (CompanyGenerationType) Objects.requireNonNull(getComboCompanyGenerationType().getSelectedItem());
     }
 
-    public void setComboCompanyGenerationType(JComboBox<CompanyGenerationType> comboCompanyGenerationType) {
+    public void setComboCompanyGenerationType(final JComboBox<CompanyGenerationType> comboCompanyGenerationType) {
         this.comboCompanyGenerationType = comboCompanyGenerationType;
     }
 
@@ -176,7 +177,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return ((FactionChoice) Objects.requireNonNull(getComboFaction().getSelectedItem())).getFaction();
     }
 
-    public void setComboFaction(JComboBox<FactionChoice> comboFaction) {
+    public void setComboFaction(final JComboBox<FactionChoice> comboFaction) {
         this.comboFaction = comboFaction;
     }
 
@@ -184,7 +185,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkStartingSystemFactionSpecific;
     }
 
-    public void setChkStartingSystemFactionSpecific(JCheckBox chkStartingSystemFactionSpecific) {
+    public void setChkStartingSystemFactionSpecific(final JCheckBox chkStartingSystemFactionSpecific) {
         this.chkStartingSystemFactionSpecific = chkStartingSystemFactionSpecific;
     }
 
@@ -192,40 +193,59 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return comboStartingSystem;
     }
 
-    public PlanetarySystem getStartingSystem() {
-        return (PlanetarySystem) Objects.requireNonNull(getComboStartingSystem().getSelectedItem());
+    public @Nullable PlanetarySystem getStartingSystem() {
+        return (PlanetarySystem) getComboStartingSystem().getSelectedItem();
     }
 
-    public void setComboStartingSystem(JComboBox<PlanetarySystem> comboStartingSystem) {
+    public void setComboStartingSystem(final JComboBox<PlanetarySystem> comboStartingSystem) {
         this.comboStartingSystem = comboStartingSystem;
     }
 
-    private void updateComboStartingSystem() {
+    private void restoreComboStartingSystem() {
         getComboStartingSystem().removeAllItems();
         getComboStartingSystem().setModel(new DefaultComboBoxModel<>(getPlanetarySystems(
                 getChkStartingSystemFactionSpecific().isSelected() ? getFaction() : null)));
         getComboStartingSystem().setSelectedIndex(0);
-        getComboStartingPlanet().setModel(new DefaultComboBoxModel<>(
-                getStartingSystem().getPlanets().toArray(new Planet[]{})));
+        restoreComboStartingPlanet();
+    }
+
+    private void updateComboStartingSystem() {
+        if ((getStartingSystem() != null)
+                && !getStartingSystem().getFactionSet(getCampaign().getLocalDate()).contains(getFaction())) {
+            restoreComboStartingSystem();
+        }
     }
 
     public JComboBox<Planet> getComboStartingPlanet() {
         return comboStartingPlanet;
     }
 
-    public Planet getStartingPlanet() {
-        return (Planet) Objects.requireNonNull(getComboStartingPlanet().getSelectedItem());
+    public @Nullable Planet getStartingPlanet() {
+        return (Planet) getComboStartingPlanet().getSelectedItem();
     }
 
-    public void setComboStartingPlanet(JComboBox<Planet> comboStartingPlanet) {
+    public void setComboStartingPlanet(final JComboBox<Planet> comboStartingPlanet) {
         this.comboStartingPlanet = comboStartingPlanet;
+    }
+
+    private void restoreComboStartingPlanet()  {
+        getComboStartingPlanet().setModel(new DefaultComboBoxModel<>(
+                getStartingSystem().getPlanets().toArray(new Planet[]{})));
+        getComboStartingPlanet().setSelectedItem(getStartingSystem().getPrimaryPlanet());
+    }
+
+    private void updateComboStartingPlanet() {
+        if ((getStartingSystem() != null) && (getStartingPlanet() != null)
+                && !getStartingPlanet().getParentSystem().equals(getStartingSystem())) {
+            restoreComboStartingPlanet();
+        }
     }
 
     public JCheckBox getChkGenerateMercenaryCompanyCommandLance() {
         return chkGenerateMercenaryCompanyCommandLance;
     }
 
-    public void setChkGenerateMercenaryCompanyCommandLance(JCheckBox chkGenerateMercenaryCompanyCommandLance) {
+    public void setChkGenerateMercenaryCompanyCommandLance(final JCheckBox chkGenerateMercenaryCompanyCommandLance) {
         this.chkGenerateMercenaryCompanyCommandLance = chkGenerateMercenaryCompanyCommandLance;
     }
 
@@ -233,7 +253,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnCompanyCount;
     }
 
-    public void setSpnCompanyCount(JSpinner spnCompanyCount) {
+    public void setSpnCompanyCount(final JSpinner spnCompanyCount) {
         this.spnCompanyCount = spnCompanyCount;
     }
 
@@ -241,7 +261,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnIndividualLanceCount;
     }
 
-    public void setSpnIndividualLanceCount(JSpinner spnIndividualLanceCount) {
+    public void setSpnIndividualLanceCount(final JSpinner spnIndividualLanceCount) {
         this.spnIndividualLanceCount = spnIndividualLanceCount;
     }
 
@@ -249,7 +269,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnLancesPerCompany;
     }
 
-    public void setSpnLancesPerCompany(JSpinner spnLancesPerCompany) {
+    public void setSpnLancesPerCompany(final JSpinner spnLancesPerCompany) {
         this.spnLancesPerCompany = spnLancesPerCompany;
     }
 
@@ -257,7 +277,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnLanceSize;
     }
 
-    public void setSpnLanceSize(JSpinner spnLanceSize) {
+    public void setSpnLanceSize(final JSpinner spnLanceSize) {
         this.spnLanceSize = spnLanceSize;
     }
     //endregion Base Information
@@ -268,17 +288,18 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     }
 
     public void updateLblTotalSupportPersonnel() {
-        updateLblTotalSupportPersonnel(((getChkGenerateMercenaryCompanyCommandLance().isSelected() ? 1 : 0)
+        updateLblTotalSupportPersonnel(
+                ((getChkGenerateMercenaryCompanyCommandLance().isSelected() ? 1 : 0)
                 + ((int) getSpnCompanyCount().getValue() * (int) getSpnLancesPerCompany().getValue())
                 + (int) getSpnIndividualLanceCount().getValue()) * (int) getSpnLanceSize().getValue());
     }
 
-    public void updateLblTotalSupportPersonnel(int numSupportPersonnel) {
+    public void updateLblTotalSupportPersonnel(final int numSupportPersonnel) {
         getLblTotalSupportPersonnel().setText(String.format(
                 resources.getString("lblTotalSupportPersonnel.text"), numSupportPersonnel));
     }
 
-    public void setLblTotalSupportPersonnel(JLabel lblTotalSupportPersonnel) {
+    public void setLblTotalSupportPersonnel(final JLabel lblTotalSupportPersonnel) {
         this.lblTotalSupportPersonnel = lblTotalSupportPersonnel;
     }
 
@@ -287,21 +308,18 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     }
 
     public Map<Integer, Integer> getSupportPersonnelNumbers() {
-        Map<Integer, Integer> supportPersonnelNumbers = new HashMap<>();
-        for (RoleToSpinner rts : getSpnSupportPersonnelNumbers()) {
-            if (rts.getValue() > 0) {
-                supportPersonnelNumbers.put(rts.getRole(), rts.getValue());
-            }
-        }
+        final Map<Integer, Integer> supportPersonnelNumbers = new HashMap<>();
+        Stream.of(getSpnSupportPersonnelNumbers()).filter(rts -> rts.getValue() > 0)
+                .forEach(rts -> supportPersonnelNumbers.put(rts.getRole(), rts.getValue()));
         return supportPersonnelNumbers;
     }
 
-    public void setSpnSupportPersonnelNumbers(RoleToSpinner... spnSupportPersonnelNumbers) {
+    public void setSpnSupportPersonnelNumbers(final RoleToSpinner... spnSupportPersonnelNumbers) {
         this.spnSupportPersonnelNumbers = spnSupportPersonnelNumbers;
     }
 
-    public void setSupportPersonnelNumbers(Map<Integer, Integer> supportPersonnelNumbers) {
-        for (RoleToSpinner rts : getSpnSupportPersonnelNumbers()) {
+    public void setSupportPersonnelNumbers(final Map<Integer, Integer> supportPersonnelNumbers) {
+        for (final RoleToSpinner rts : getSpnSupportPersonnelNumbers()) {
             rts.getSpinner().setValue(supportPersonnelNumbers.getOrDefault(rts.getRole(), 0));
         }
     }
@@ -310,7 +328,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkPoolAssistants;
     }
 
-    public void setChkPoolAssistants(JCheckBox chkPoolAssistants) {
+    public void setChkPoolAssistants(final JCheckBox chkPoolAssistants) {
         this.chkPoolAssistants = chkPoolAssistants;
     }
 
@@ -318,7 +336,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkGenerateCaptains;
     }
 
-    public void setChkGenerateCaptains(JCheckBox chkGenerateCaptains) {
+    public void setChkGenerateCaptains(final JCheckBox chkGenerateCaptains) {
         this.chkGenerateCaptains = chkGenerateCaptains;
     }
 
@@ -326,7 +344,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkAssignCompanyCommanderFlag;
     }
 
-    public void setChkAssignCompanyCommanderFlag(JCheckBox chkAssignCompanyCommanderFlag) {
+    public void setChkAssignCompanyCommanderFlag(final JCheckBox chkAssignCompanyCommanderFlag) {
         this.chkAssignCompanyCommanderFlag = chkAssignCompanyCommanderFlag;
     }
 
@@ -334,7 +352,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkCompanyCommanderLanceOfficer;
     }
 
-    public void setChkCompanyCommanderLanceOfficer(JCheckBox chkCompanyCommanderLanceOfficer) {
+    public void setChkCompanyCommanderLanceOfficer(final JCheckBox chkCompanyCommanderLanceOfficer) {
         this.chkCompanyCommanderLanceOfficer = chkCompanyCommanderLanceOfficer;
     }
 
@@ -342,7 +360,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkApplyOfficerStatBonusToWorstSkill;
     }
 
-    public void setChkApplyOfficerStatBonusToWorstSkill(JCheckBox chkApplyOfficerStatBonusToWorstSkill) {
+    public void setChkApplyOfficerStatBonusToWorstSkill(final JCheckBox chkApplyOfficerStatBonusToWorstSkill) {
         this.chkApplyOfficerStatBonusToWorstSkill = chkApplyOfficerStatBonusToWorstSkill;
     }
 
@@ -350,7 +368,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkAssignBestOfficers;
     }
 
-    public void setChkAssignBestOfficers(JCheckBox chkAssignBestOfficers) {
+    public void setChkAssignBestOfficers(final JCheckBox chkAssignBestOfficers) {
         this.chkAssignBestOfficers = chkAssignBestOfficers;
     }
 
@@ -358,7 +376,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkAutomaticallyAssignRanks;
     }
 
-    public void setChkAutomaticallyAssignRanks(JCheckBox chkAutomaticallyAssignRanks) {
+    public void setChkAutomaticallyAssignRanks(final JCheckBox chkAutomaticallyAssignRanks) {
         this.chkAutomaticallyAssignRanks = chkAutomaticallyAssignRanks;
     }
     //endregion Personnel
@@ -368,7 +386,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkRandomizeOrigin;
     }
 
-    public void setChkRandomizeOrigin(JCheckBox chkRandomizeOrigin) {
+    public void setChkRandomizeOrigin(final JCheckBox chkRandomizeOrigin) {
         this.chkRandomizeOrigin = chkRandomizeOrigin;
     }
 
@@ -376,7 +394,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkCentralSystemFactionSpecific;
     }
 
-    public void setChkCentralSystemFactionSpecific(JCheckBox chkCentralSystemFactionSpecific) {
+    public void setChkCentralSystemFactionSpecific(final JCheckBox chkCentralSystemFactionSpecific) {
         this.chkCentralSystemFactionSpecific = chkCentralSystemFactionSpecific;
     }
 
@@ -384,40 +402,59 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return comboCentralSystem;
     }
 
-    public PlanetarySystem getCentralSystem() {
-        return (PlanetarySystem) Objects.requireNonNull(getComboCentralSystem().getSelectedItem());
+    public @Nullable PlanetarySystem getCentralSystem() {
+        return (PlanetarySystem) getComboCentralSystem().getSelectedItem();
     }
 
-    public void setComboCentralSystem(JComboBox<PlanetarySystem> comboCentralSystem) {
+    public void setComboCentralSystem(final JComboBox<PlanetarySystem> comboCentralSystem) {
         this.comboCentralSystem = comboCentralSystem;
     }
 
-    private void updateComboCentralSystem() {
+    private void restoreComboCentralSystem() {
         getComboCentralSystem().removeAllItems();
         getComboCentralSystem().setModel(new DefaultComboBoxModel<>(getPlanetarySystems(
                 getChkCentralSystemFactionSpecific().isSelected() ? getFaction() : null)));
         getComboCentralSystem().setSelectedIndex(0);
-        getComboCentralPlanet().setModel(new DefaultComboBoxModel<>(
-                getCentralSystem().getPlanets().toArray(new Planet[]{})));
+        restoreComboCentralPlanet();
+    }
+
+    private void updateComboCentralSystem() {
+        if ((getCentralSystem() != null)
+                && !getCentralSystem().getFactionSet(getCampaign().getLocalDate()).contains(getFaction())) {
+            restoreComboCentralSystem();
+        }
     }
 
     public JComboBox<Planet> getComboCentralPlanet() {
         return comboCentralPlanet;
     }
 
-    public Planet getCentralPlanet() {
-        return (Planet) Objects.requireNonNull(getComboCentralPlanet().getSelectedItem());
+    public @Nullable Planet getCentralPlanet() {
+        return (Planet) getComboCentralPlanet().getSelectedItem();
     }
 
-    public void setComboCentralPlanet(JComboBox<Planet> comboCentralPlanet) {
+    public void setComboCentralPlanet(final JComboBox<Planet> comboCentralPlanet) {
         this.comboCentralPlanet = comboCentralPlanet;
+    }
+
+    private void restoreComboCentralPlanet() {
+        getComboCentralPlanet().setModel(new DefaultComboBoxModel<>(
+                getCentralSystem().getPlanets().toArray(new Planet[]{})));
+        getComboCentralPlanet().setSelectedItem(getCentralSystem().getPrimaryPlanet());
+    }
+
+    private void updateComboCentralPlanet() {
+        if ((getCentralSystem() != null) && (getCentralPlanet() != null)
+                && !getCentralPlanet().getParentSystem().equals(getCentralSystem())) {
+            restoreComboCentralPlanet();
+        }
     }
 
     public JSpinner getSpnOriginSearchRadius() {
         return spnOriginSearchRadius;
     }
 
-    public void setSpnOriginSearchRadius(JSpinner spnOriginSearchRadius) {
+    public void setSpnOriginSearchRadius(final JSpinner spnOriginSearchRadius) {
         this.spnOriginSearchRadius = spnOriginSearchRadius;
     }
 
@@ -425,7 +462,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkExtraRandomOrigin;
     }
 
-    public void setChkExtraRandomOrigin(JCheckBox chkExtraRandomOrigin) {
+    public void setChkExtraRandomOrigin(final JCheckBox chkExtraRandomOrigin) {
         this.chkExtraRandomOrigin = chkExtraRandomOrigin;
     }
 
@@ -433,7 +470,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnOriginDistanceScale;
     }
 
-    public void setSpnOriginDistanceScale(JSpinner spnOriginDistanceScale) {
+    public void setSpnOriginDistanceScale(final JSpinner spnOriginDistanceScale) {
         this.spnOriginDistanceScale = spnOriginDistanceScale;
     }
     //endregion Personnel Randomization
@@ -443,7 +480,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkGenerateUnitsAsAttached;
     }
 
-    public void setChkGenerateUnitsAsAttached(JCheckBox chkGenerateUnitsAsAttached) {
+    public void setChkGenerateUnitsAsAttached(final JCheckBox chkGenerateUnitsAsAttached) {
         this.chkGenerateUnitsAsAttached = chkGenerateUnitsAsAttached;
     }
 
@@ -451,7 +488,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkAssignBestRollToUnitCommander;
     }
 
-    public void setChkAssignBestRollToUnitCommander(JCheckBox chkAssignBestRollToUnitCommander) {
+    public void setChkAssignBestRollToUnitCommander(final JCheckBox chkAssignBestRollToUnitCommander) {
         this.chkAssignBestRollToUnitCommander = chkAssignBestRollToUnitCommander;
     }
 
@@ -459,7 +496,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkGroupByWeight;
     }
 
-    public void setChkGroupByWeight(JCheckBox chkGroupByWeight) {
+    public void setChkGroupByWeight(final JCheckBox chkGroupByWeight) {
         this.chkGroupByWeight = chkGroupByWeight;
     }
 
@@ -467,7 +504,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkKeepOfficerRollsSeparate;
     }
 
-    public void setChkKeepOfficerRollsSeparate(JCheckBox chkKeepOfficerRollsSeparate) {
+    public void setChkKeepOfficerRollsSeparate(final JCheckBox chkKeepOfficerRollsSeparate) {
         this.chkKeepOfficerRollsSeparate = chkKeepOfficerRollsSeparate;
     }
 
@@ -475,7 +512,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnStarLeagueYear;
     }
 
-    public void setSpnStarLeagueYear(JSpinner spnStarLeagueYear) {
+    public void setSpnStarLeagueYear(final JSpinner spnStarLeagueYear) {
         this.spnStarLeagueYear = spnStarLeagueYear;
     }
 
@@ -483,7 +520,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkAssignTechsToUnits;
     }
 
-    public void setChkAssignTechsToUnits(JCheckBox chkAssignTechsToUnits) {
+    public void setChkAssignTechsToUnits(final JCheckBox chkAssignTechsToUnits) {
         this.chkAssignTechsToUnits = chkAssignTechsToUnits;
     }
     //endregion Units
@@ -497,7 +534,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return (ForceNamingType) Objects.requireNonNull(getComboForceNamingType().getSelectedItem());
     }
 
-    public void setComboForceNamingType(JComboBox<ForceNamingType> comboForceNamingType) {
+    public void setComboForceNamingType(final JComboBox<ForceNamingType> comboForceNamingType) {
         this.comboForceNamingType = comboForceNamingType;
     }
 
@@ -505,7 +542,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkGenerateForceIcons;
     }
 
-    public void setChkGenerateForceIcons(JCheckBox chkGenerateForceIcons) {
+    public void setChkGenerateForceIcons(final JCheckBox chkGenerateForceIcons) {
         this.chkGenerateForceIcons = chkGenerateForceIcons;
     }
     //endregion Unit
@@ -515,7 +552,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkGenerateMothballedSpareUnits;
     }
 
-    public void setChkGenerateMothballedSpareUnits(JCheckBox chkGenerateMothballedSpareUnits) {
+    public void setChkGenerateMothballedSpareUnits(final JCheckBox chkGenerateMothballedSpareUnits) {
         this.chkGenerateMothballedSpareUnits = chkGenerateMothballedSpareUnits;
     }
 
@@ -523,7 +560,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnSparesPercentOfActiveUnits;
     }
 
-    public void setSpnSparesPercentOfActiveUnits(JSpinner spnSparesPercentOfActiveUnits) {
+    public void setSpnSparesPercentOfActiveUnits(final JSpinner spnSparesPercentOfActiveUnits) {
         this.spnSparesPercentOfActiveUnits = spnSparesPercentOfActiveUnits;
     }
 
@@ -531,7 +568,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkGenerateSpareParts;
     }
 
-    public void setChkGenerateSpareParts(JCheckBox chkGenerateSpareParts) {
+    public void setChkGenerateSpareParts(final JCheckBox chkGenerateSpareParts) {
         this.chkGenerateSpareParts = chkGenerateSpareParts;
     }
 
@@ -539,7 +576,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnStartingArmourWeight;
     }
 
-    public void setSpnStartingArmourWeight(JSpinner spnStartingArmourWeight) {
+    public void setSpnStartingArmourWeight(final JSpinner spnStartingArmourWeight) {
         this.spnStartingArmourWeight = spnStartingArmourWeight;
     }
 
@@ -547,7 +584,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkGenerateSpareAmmunition;
     }
 
-    public void setChkGenerateSpareAmmunition(JCheckBox chkGenerateSpareAmmunition) {
+    public void setChkGenerateSpareAmmunition(final JCheckBox chkGenerateSpareAmmunition) {
         this.chkGenerateSpareAmmunition = chkGenerateSpareAmmunition;
     }
 
@@ -555,7 +592,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnNumberReloadsPerWeapon;
     }
 
-    public void setSpnNumberReloadsPerWeapon(JSpinner spnNumberReloadsPerWeapon) {
+    public void setSpnNumberReloadsPerWeapon(final JSpinner spnNumberReloadsPerWeapon) {
         this.spnNumberReloadsPerWeapon = spnNumberReloadsPerWeapon;
     }
 
@@ -563,7 +600,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkGenerateFractionalMachineGunAmmunition;
     }
 
-    public void setChkGenerateFractionalMachineGunAmmunition(JCheckBox chkGenerateFractionalMachineGunAmmunition) {
+    public void setChkGenerateFractionalMachineGunAmmunition(final JCheckBox chkGenerateFractionalMachineGunAmmunition) {
         this.chkGenerateFractionalMachineGunAmmunition = chkGenerateFractionalMachineGunAmmunition;
     }
     //endregion Spares
@@ -573,7 +610,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkSelectStartingContract;
     }
 
-    public void setChkSelectStartingContract(JCheckBox chkSelectStartingContract) {
+    public void setChkSelectStartingContract(final JCheckBox chkSelectStartingContract) {
         this.chkSelectStartingContract = chkSelectStartingContract;
     }
 
@@ -581,7 +618,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkStartCourseToContractPlanet;
     }
 
-    public void setChkStartCourseToContractPlanet(JCheckBox chkStartCourseToContractPlanet) {
+    public void setChkStartCourseToContractPlanet(final JCheckBox chkStartCourseToContractPlanet) {
         this.chkStartCourseToContractPlanet = chkStartCourseToContractPlanet;
     }
     //endregion Contracts
@@ -591,7 +628,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnStartingCash;
     }
 
-    public void setSpnStartingCash(JSpinner spnStartingCash) {
+    public void setSpnStartingCash(final JSpinner spnStartingCash) {
         this.spnStartingCash = spnStartingCash;
     }
 
@@ -599,7 +636,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkRandomizeStartingCash;
     }
 
-    public void setChkRandomizeStartingCash(JCheckBox chkRandomizeStartingCash) {
+    public void setChkRandomizeStartingCash(final JCheckBox chkRandomizeStartingCash) {
         this.chkRandomizeStartingCash = chkRandomizeStartingCash;
     }
 
@@ -607,7 +644,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnRandomStartingCashDiceCount;
     }
 
-    public void setSpnRandomStartingCashDiceCount(JSpinner spnRandomStartingCashDiceCount) {
+    public void setSpnRandomStartingCashDiceCount(final JSpinner spnRandomStartingCashDiceCount) {
         this.spnRandomStartingCashDiceCount = spnRandomStartingCashDiceCount;
     }
 
@@ -615,7 +652,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return spnMinimumStartingFloat;
     }
 
-    public void setSpnMinimumStartingFloat(JSpinner spnMinimumStartingFloat) {
+    public void setSpnMinimumStartingFloat(final JSpinner spnMinimumStartingFloat) {
         this.spnMinimumStartingFloat = spnMinimumStartingFloat;
     }
 
@@ -623,7 +660,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkPayForSetup;
     }
 
-    public void setChkPayForSetup(JCheckBox chkPayForSetup) {
+    public void setChkPayForSetup(final JCheckBox chkPayForSetup) {
         this.chkPayForSetup = chkPayForSetup;
     }
 
@@ -631,7 +668,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkStartingLoan;
     }
 
-    public void setChkStartingLoan(JCheckBox chkStartingLoan) {
+    public void setChkStartingLoan(final JCheckBox chkStartingLoan) {
         this.chkStartingLoan = chkStartingLoan;
     }
 
@@ -639,7 +676,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkPayForPersonnel;
     }
 
-    public void setChkPayForPersonnel(JCheckBox chkPayForPersonnel) {
+    public void setChkPayForPersonnel(final JCheckBox chkPayForPersonnel) {
         this.chkPayForPersonnel = chkPayForPersonnel;
     }
 
@@ -647,7 +684,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkPayForUnits;
     }
 
-    public void setChkPayForUnits(JCheckBox chkPayForUnits) {
+    public void setChkPayForUnits(final JCheckBox chkPayForUnits) {
         this.chkPayForUnits = chkPayForUnits;
     }
 
@@ -655,7 +692,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkPayForParts;
     }
 
-    public void setChkPayForParts(JCheckBox chkPayForParts) {
+    public void setChkPayForParts(final JCheckBox chkPayForParts) {
         this.chkPayForParts = chkPayForParts;
     }
 
@@ -663,7 +700,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return chkPayForAmmunition;
     }
 
-    public void setChkPayForAmmunition(JCheckBox chkPayForAmmunition) {
+    public void setChkPayForAmmunition(final JCheckBox chkPayForAmmunition) {
         this.chkPayForAmmunition = chkPayForAmmunition;
     }
     //endregion Finances
@@ -673,7 +710,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     private void initialize() {
         setName("companyGenerationOptionsPanel");
 
-        GridBagConstraints gbc = new GridBagConstraints();
+        final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -714,12 +751,12 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getComboCompanyGenerationType().setName("comboCompanyGenerationType");
         getComboCompanyGenerationType().setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (isSelected && (index > -1)) {
-                    list.setToolTipText((list.getSelectedValue() instanceof CompanyGenerationType)
-                            ? ((CompanyGenerationType) list.getSelectedValue()).getToolTipText() : "");
+                if (value instanceof CompanyGenerationType) {
+                    list.setToolTipText(((CompanyGenerationType) value).getToolTipText());
                 }
                 return this;
             }
@@ -734,8 +771,9 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getComboFaction().setName("comboFaction");
 
         setChkStartingSystemFactionSpecific(new JCheckBox(resources.getString("FactionSpecific")));
-        getChkStartingSystemFactionSpecific().setToolTipText("chkStartingSystemFactionSpecific.toolTipText");
+        getChkStartingSystemFactionSpecific().setToolTipText(resources.getString("chkStartingSystemFactionSpecific.toolTipText"));
         getChkStartingSystemFactionSpecific().setName("chkStartingSystemFactionSpecific");
+        getChkStartingSystemFactionSpecific().addActionListener(evt -> updateComboStartingSystem());
 
         JLabel lblStartingPlanet = new JLabel(resources.getString("lblStartingPlanet.text"));
         lblStartingPlanet.setToolTipText(resources.getString("lblStartingPlanet.toolTipText"));
@@ -744,10 +782,35 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         setComboStartingSystem(new JComboBox<>());
         getComboStartingSystem().setToolTipText(resources.getString("lblStartingPlanet.toolTipText"));
         getComboStartingSystem().setName("comboStartingSystem");
+        getComboStartingSystem().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof PlanetarySystem) {
+                    setText(((PlanetarySystem) value).getName(getCampaign().getLocalDate()));
+                }
+                return this;
+            }
+        });
+        getComboStartingSystem().addActionListener(evt -> updateComboStartingPlanet());
 
         setComboStartingPlanet(new JComboBox<>());
         getComboStartingPlanet().setToolTipText(resources.getString("lblStartingPlanet.toolTipText"));
         getComboStartingPlanet().setName("comboStartingPlanet");
+        getComboStartingPlanet().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Planet) {
+                    setText(((Planet) value).getName(getCampaign().getLocalDate()));
+                }
+                return this;
+            }
+        });
 
         setChkGenerateMercenaryCompanyCommandLance(new JCheckBox(resources.getString("chkGenerateMercenaryCompanyCommandLance.text")));
         getChkGenerateMercenaryCompanyCommandLance().setToolTipText(resources.getString("chkGenerateMercenaryCompanyCommandLance.toolTipText"));
@@ -1045,6 +1108,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         setChkCentralSystemFactionSpecific(new JCheckBox(resources.getString("FactionSpecific")));
         getChkCentralSystemFactionSpecific().setToolTipText(resources.getString("chkCentralSystemFactionSpecific.toolTipText"));
         getChkCentralSystemFactionSpecific().setName("chkCentralSystemFactionSpecific");
+        getChkCentralSystemFactionSpecific().addActionListener(evt -> updateComboCentralSystem());
 
         JLabel lblCentralPlanet = new JLabel(resources.getString("lblCentralPlanet.text"));
         lblCentralPlanet.setToolTipText(resources.getString("lblCentralPlanet.toolTipText"));
@@ -1053,10 +1117,35 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         setComboCentralSystem(new JComboBox<>());
         getComboCentralSystem().setToolTipText(resources.getString("lblCentralPlanet.toolTipText"));
         getComboCentralSystem().setName("comboCentralSystem");
+        getComboCentralSystem().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof PlanetarySystem) {
+                    setText(((PlanetarySystem) value).getName(getCampaign().getLocalDate()));
+                }
+                return this;
+            }
+        });
+        getComboCentralSystem().addActionListener(evt -> updateComboCentralPlanet());
 
         setComboCentralPlanet(new JComboBox<>());
         getComboCentralPlanet().setToolTipText(resources.getString("lblCentralPlanet.toolTipText"));
         getComboCentralPlanet().setName("comboCentralPlanet");
+        getComboCentralPlanet().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Planet) {
+                    setText(((Planet) value).getName(getCampaign().getLocalDate()));
+                }
+                return this;
+            }
+        });
 
         JLabel lblOriginSearchRadius = new JLabel(resources.getString("lblOriginSearchRadius.text"));
         lblOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
@@ -1198,12 +1287,12 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getComboForceNamingType().setName("comboForceNamingType");
         getComboForceNamingType().setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (isSelected && (index > -1)) {
-                    list.setToolTipText((list.getSelectedValue() instanceof ForceNamingType)
-                            ? ((ForceNamingType) list.getSelectedValue()).getToolTipText() : "");
+                if (value instanceof ForceNamingType) {
+                    list.setToolTipText(((ForceNamingType) value).getToolTipText());
                 }
                 return this;
             }
@@ -1479,7 +1568,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return factionChoices;
     }
 
-    private PlanetarySystem[] getPlanetarySystems(@Nullable Faction faction) {
+    private PlanetarySystem[] getPlanetarySystems(final @Nullable Faction faction) {
         return getCampaign().getSystems().stream()
                 .filter(p -> (faction == null) || p.getFactionSet(getCampaign().getLocalDate()).contains(faction))
                 .sorted(Comparator.comparing(p -> p.getName(getCampaign().getLocalDate())))
@@ -1509,10 +1598,8 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                 break;
             }
         }
-        if (getChkStartingSystemFactionSpecific().isSelected()) {
-            getChkStartingSystemFactionSpecific().setSelected(false);
-            updateComboStartingSystem();
-        }
+        getChkStartingSystemFactionSpecific().setSelected(false);
+        restoreComboStartingSystem();
         getComboStartingSystem().setSelectedItem(options.getStartingPlanet().getParentSystem());
         getComboStartingPlanet().setSelectedItem(options.getStartingPlanet());
         getChkGenerateMercenaryCompanyCommandLance().setSelected(options.isGenerateMercenaryCompanyCommandLance());
@@ -1534,10 +1621,8 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
         // Personnel Randomization
         getChkRandomizeOrigin().setSelected(options.isRandomizeOrigin());
-        if (getChkCentralSystemFactionSpecific().isSelected()) {
-            getChkCentralSystemFactionSpecific().setSelected(false);
-            updateComboCentralSystem();
-        }
+        getChkCentralSystemFactionSpecific().setSelected(false);
+        restoreComboCentralSystem();
         getComboCentralSystem().setSelectedItem(options.getCentralPlanet().getParentSystem());
         getComboCentralPlanet().setSelectedItem(options.getCentralPlanet());
         getSpnOriginSearchRadius().setValue(options.getOriginSearchRadius());
@@ -1679,7 +1764,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         //endregion Variable Declarations
 
         //region Constructors
-        public FactionChoice(Faction faction, int year) {
+        public FactionChoice(final Faction faction, final int year) {
             setFaction(faction);
             setYear(year);
             setDisplayName();
@@ -1691,7 +1776,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             return faction;
         }
 
-        public void setFaction(Faction faction) {
+        public void setFaction(final Faction faction) {
             this.faction = faction;
         }
 
@@ -1699,7 +1784,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             return year;
         }
 
-        public void setYear(int year) {
+        public void setYear(final int year) {
             this.year = year;
         }
 
@@ -1733,7 +1818,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             return role;
         }
 
-        public void setRole(int role) {
+        public void setRole(final int role) {
             this.role = role;
         }
 
@@ -1745,7 +1830,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             return (Integer) getSpinner().getValue();
         }
 
-        public void setSpinner(JSpinner spinner) {
+        public void setSpinner(final JSpinner spinner) {
             this.spinner = spinner;
         }
         //endregion Getters/Setters

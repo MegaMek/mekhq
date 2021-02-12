@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,6 +18,7 @@
  */
 package mekhq;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
@@ -33,8 +34,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import megamek.common.icons.Camouflage;
+import megamek.common.annotations.Nullable;
 import megamek.utils.MegaMekXmlUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -295,8 +297,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * Contents copied from megamek.common.EntityListFile.getAeroCritString(...)
      * Modified to support saving to/from XML for our purposes in MekHQ
      *
-     * @param a
-     *            The Aero unit to generate a crit string for.
+     * @param a The Aero unit to generate a crit string for.
      * @return The generated crit string.
      */
     private static String getAeroCritString(Aero a, int indentLvl) {
@@ -370,8 +371,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * megamek.common.EntityListFile.getTurretLockedString(...) Modified to
      * support saving to/from XML for our purposes in MekHQ
      *
-     * @param e
-     *            The tank to generate a turret-locked string for.
+     * @param e The tank to generate a turret-locked string for.
      * @return The generated string.
      */
     private static String getTurretLockedString(Tank e, int indentLvl) {
@@ -386,8 +386,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * Contents copied from megamek.common.EntityListFile.getMovementString(...)
      * Modified to support saving to/from XML for our purposes in MekHQ
      *
-     * @param e
-     *            The tank to generate a movement string for.
+     * @param e The tank to generate a movement string for.
      * @return The generated string.
      */
     private static String getMovementString(Tank e, int indentLvl) {
@@ -425,12 +424,10 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * Contents copied from megamek.common.EntityListFile.getTankCritString(...)
      * Modified to support saving to/from XML for our purposes in MekHQ
      *
-     * @param e
-     *            The tank to generate a movement string for.
+     * @param e The tank to generate a movement string for.
      * @return The generated string.
      */
      private static String getTankCritString(Tank e, int indentLvl) {
-
          String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<tcriticals";
          String critVal = "";
 
@@ -497,7 +494,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      *         if the given element parses to multiple entities
      */
     public static Entity parseSingleEntityMul(Element element) {
-        MekHQ.getLogger().trace(MekHqXmlUtil.class, "Executing getEntityFromXmlString(Node)...");
+        MekHQ.getLogger().trace("Executing getEntityFromXmlString(Node)...");
 
         MULParser prs = new MULParser();
         prs.parse(element);
@@ -508,7 +505,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
                 return null;
             case 1:
                 Entity entity = entities.get(0);
-                MekHQ.getLogger().trace(MekHqXmlUtil.class, "Returning " + entity + " from getEntityFromXmlString(String)...");
+                MekHQ.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
                 return entity;
             default:
                 throw new IllegalArgumentException("More than one entity contained in XML string!  Expecting a single entity.");
@@ -520,5 +517,30 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         String chassis = attrs.getNamedItem("chassis").getTextContent();
         String model = attrs.getNamedItem("model").getTextContent();
         return chassis + " " + model;
+    }
+
+    /**
+     * This writes a String or an array of Strings to file, with an the possible addition of an
+     * attribute and its value
+     * @param pw the PrintWriter to use
+     * @param indent the indent to write at
+     * @param name the name of the XML tag
+     * @param attributeName the attribute to write as part of the XML tag
+     * @param attributeValue the value of the attribute
+     * @param values the String or String[] to write to XML
+     */
+    public static void writeSimpleXMLAttributedTag(final PrintWriter pw, final int indent,
+                                                   final String name,
+                                                   final @Nullable String attributeName,
+                                                   final @Nullable String attributeValue,
+                                                   final String... values) {
+        if (values.length > 0) {
+            final boolean hasAttribute = attributeValue != null;
+            pw.print(indentStr(indent) + "<" + name);
+            if (hasAttribute) {
+                pw.print(" " + attributeName + "=\"" + attributeValue + "\"");
+            }
+            pw.print(">" + escape(StringUtils.join(values, ',')) + "</" + name + ">\n");
+        }
     }
 }

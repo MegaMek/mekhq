@@ -20,7 +20,10 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.campaign.universe.enums.CompanyGenerationType;
 import mekhq.gui.enums.PersonnelFilterStyle;
@@ -77,16 +80,12 @@ public class MekHqOptionsDialog extends BaseDialog {
     private JSpinner optionStartGameDelay;
     private JComboBox<CompanyGenerationType> optionDefaultCompanyGenerationType;
     //endregion Miscellaneous
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog");
     //endregion Variable Declarations
 
     //region Constructors
     public MekHqOptionsDialog(JFrame parent) {
-        super(parent);
-
-        this.initialize(resources);
-        this.setInitialState();
+        super(parent, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog", new EncodeControl()));
+        setInitialState();
     }
     //endregion Constructors
 
@@ -94,9 +93,12 @@ public class MekHqOptionsDialog extends BaseDialog {
     /**
      * This dialog uses the following Mnemonics:
      * C, D, M, M, S, U, W, Y
+     *
+     * @param campaign this value will always be null for this dialog, unless the constructor is
+     *                 changed first
      */
     @Override
-    protected Container createCustomUI() {
+    protected Container createCenterPane(final @Nullable Campaign campaign) {
         JTabbedPane optionsTabbedPane = new JTabbedPane();
         optionsTabbedPane.setName("optionsTabbedPane");
         optionsTabbedPane.add(resources.getString("displayTab.title"), new JScrollPane(createDisplayTab()));
@@ -445,6 +447,11 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setDefaultCompanyGenerationType((CompanyGenerationType) Objects.requireNonNull(optionDefaultCompanyGenerationType.getSelectedItem()));
 
         MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
+    }
+
+    @Override
+    protected void cancelAction() {
+
     }
 
     private void setInitialState() {

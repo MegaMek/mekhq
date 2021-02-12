@@ -21,40 +21,33 @@ package mekhq.gui.dialog;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.gui.preferences.JWindowPreference;
+import mekhq.gui.enums.CompanyGenerationPanelType;
 import mekhq.gui.view.CompanyGenerationOptionsPanel;
-import mekhq.preferences.PreferencesNode;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-public class CompanyGenerationDialog extends JDialog {
+public class CompanyGenerationDialog extends BaseDialog {
     //region Variable Declarations
-    private JFrame frame;
+    private CompanyGenerationPanelType currentPanelType;
     private CompanyGenerationOptionsPanel companyGenerationOptionsPanel;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     public CompanyGenerationDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "", ModalityType.APPLICATION_MODAL);
-        setTitle(resources.getString("CompanyGenerationDialog.title"));
-        setFrame(frame);
-        initialize(campaign);
-        managePreferences();
+        super(frame, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()),
+                "CompanyGenerationDialog.title", campaign);
     }
     //endregion Constructors
 
     //region Getters/Setters
-    public JFrame getFrame() {
-        return frame;
+    public CompanyGenerationPanelType getCurrentPanelType() {
+        return currentPanelType;
     }
 
-    public void setFrame(JFrame frame) {
-        this.frame = frame;
+    public void setCurrentPanelType(CompanyGenerationPanelType currentPanelType) {
+        this.currentPanelType = currentPanelType;
     }
 
     public CompanyGenerationOptionsPanel getCompanyGenerationOptionsPanel() {
@@ -67,13 +60,24 @@ public class CompanyGenerationDialog extends JDialog {
     //endregion Getters/Setters
 
     //region Initialization
-    private void initialize(final Campaign campaign) {
-        setLayout(new BorderLayout());
-        add(new JScrollPane(initializeCompanyGenerationOptionsPanel(campaign)), BorderLayout.CENTER);
-        add(initializeButtons(), BorderLayout.PAGE_END);
-
-        setMinimumSize(new Dimension(480, 240));
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+    /**
+     * @param campaign the campaign with which to create the center pane
+     * @return
+     */
+    @Override
+    protected Container createCenterPane(final Campaign campaign) {
+        switch (getCurrentPanelType()) {
+            case OPTIONS:
+            case PERSONNEL:
+            case UNITS:
+            case UNIT:
+            case SPARES:
+            case CONTRACTS:
+            case FINANCES:
+            case OVERVIEW:
+            default:
+                return new JScrollPane(initializeCompanyGenerationOptionsPanel(campaign));
+        }
     }
 
     private JPanel initializeCompanyGenerationOptionsPanel(final Campaign campaign) {
@@ -81,19 +85,43 @@ public class CompanyGenerationDialog extends JDialog {
         return getCompanyGenerationOptionsPanel();
     }
 
-    private JPanel initializeButtons() {
-        JButton btnCancel = new JButton(resources.getString("Cancel"));
-        btnCancel.addActionListener(evt -> setVisible(false));
+    @Override
+    protected JPanel createButtonPanel() {
+        switch (getCurrentPanelType()) {
+            case OPTIONS:
+            case PERSONNEL:
+            case UNITS:
+            case UNIT:
+            case SPARES:
+            case CONTRACTS:
+            case FINANCES:
+            case OVERVIEW:
+            default:
+                return initializeCompanyGenerationOptionsButtonPanel();
+        }
+    }
+
+    private JPanel initializeCompanyGenerationOptionsButtonPanel() {
+        JPanel panel = new JPanel(new GridLayout(2, 3));
+
+        JButton cancelButton = new JButton(resources.getString("Cancel"));
+        cancelButton.setName("cancelButton");
+        cancelButton.addActionListener(this::cancelButtonActionPerformed);
+        panel.add(cancelButton);
 
         JButton btnExport = new JButton(resources.getString("Export"));
         btnExport.addActionListener(evt -> getCompanyGenerationOptionsPanel().exportOptionsToXML());
 
-        JButton btnGenerate = new JButton(resources.getString("Generate"));
-        //btnGenerate.addActionListener(evt -> getCompanyGenerationOptionsPanel().generate());
+        JButton okButton = new JButton(resources.getString("Generate"));
+        okButton.setName("okButton");
+        okButton.addActionListener(this::okButtonActionPerformed);
+        panel.add(okButton);
 
         JButton btnRestore = new JButton(resources.getString("RestoreDefaults"));
+        btnRestore.setName("btnRestore");
         btnRestore.addActionListener(evt -> getCompanyGenerationOptionsPanel().setOptions(
                 MekHQ.getMekHQOptions().getDefaultCompanyGenerationType()));
+        panel.add(btnRestore);
 
         JButton btnImport = new JButton(resources.getString("Import"));
         btnImport.addActionListener(evt -> getCompanyGenerationOptionsPanel().importOptionsFromXML());
@@ -107,45 +135,17 @@ public class CompanyGenerationDialog extends JDialog {
         });
         */
 
-        // Layout the UI
-        JPanel panel = new JPanel();
-        GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(btnCancel)
-                                .addComponent(btnExport)
-                                .addComponent(btnGenerate, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(btnRestore)
-                                .addComponent(btnImport)
-                                .addComponent(btnApply, GroupLayout.Alignment.TRAILING))
-        );
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnCancel)
-                                .addComponent(btnExport)
-                                .addComponent(btnGenerate))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnRestore)
-                                .addComponent(btnImport)
-                                .addComponent(btnApply))
-        );
-
         return panel;
     }
-
-    private void managePreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
-
-        preferences.manage(new JWindowPreference(this));
-    }
     //endregion Initialization
+
+    @Override
+    protected void okAction() {
+
+    }
+
+    @Override
+    protected void cancelAction() {
+
+    }
 }

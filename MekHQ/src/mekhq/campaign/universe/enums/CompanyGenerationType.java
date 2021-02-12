@@ -66,11 +66,11 @@ public enum CompanyGenerationType {
     public AbstractCompanyGenerator getGenerator(final Campaign campaign,
                                                  final CompanyGenerationOptions options) {
         switch (this) {
-            case WINDCHILD:
-                return new WindchildCompanyGenerator(campaign, options);
             case AGAINST_THE_BOT:
-            default:
                 return new AtBCompanyGenerator(campaign, options);
+            case WINDCHILD:
+            default:
+                return new WindchildCompanyGenerator(campaign, options);
         }
     }
 
