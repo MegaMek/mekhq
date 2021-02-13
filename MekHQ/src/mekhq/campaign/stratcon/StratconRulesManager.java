@@ -848,6 +848,10 @@ public class StratconRulesManager {
                     } else {
                         StratconFacility facility = trackState.getFacility(coords);
                         
+                        if (facility == null) {
+                            continue;
+                        }
+                        
                         if(capture) {
                             facility.incrementOwnershipChangeScore();
                         } else {
