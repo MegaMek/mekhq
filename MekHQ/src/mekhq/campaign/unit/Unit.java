@@ -21,15 +21,20 @@
  */
 package mekhq.campaign.unit;
 
+import java.awt.*;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.ServiceLogger;
@@ -2280,13 +2285,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     partsToRemove.add(part);
                 }
             } else if (part instanceof BattleArmorSuit) {
-                if (((BattleArmorSuit) part).getTrooper() < locations.length) {
+                if ((entity instanceof BattleArmor)
+                        && ((BattleArmorSuit) part).getTrooper() < locations.length) {
                     locations[((BattleArmorSuit) part).getTrooper()] = part;
                 } else {
                     partsToRemove.add(part);
                 }
             } else if (part instanceof MissingBattleArmorSuit) {
-                if (((MissingBattleArmorSuit) part).getTrooper() < locations.length) {
+                if ((entity instanceof BattleArmor)
+                        && ((MissingBattleArmorSuit) part).getTrooper() < locations.length) {
                     locations[((MissingBattleArmorSuit) part).getTrooper()] = part;
                 } else {
                     partsToRemove.add(part);
@@ -2320,19 +2327,27 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else if (part instanceof MissingJumpJet) {
                 jumpJets.put(((MissingJumpJet)part).getEquipmentNum(), part);
             }  else if (part instanceof BattleArmorEquipmentPart) {
-                Part[] parts = baEquipParts.get(((BattleArmorEquipmentPart)part).getEquipmentNum());
-                if (null == parts) {
-                    parts = new Part[((BattleArmor)entity).getSquadSize()];
+                if (!(entity instanceof BattleArmor)) {
+                    partsToRemove.add(part);
+                } else {
+                    Part[] parts = baEquipParts.get(((BattleArmorEquipmentPart) part).getEquipmentNum());
+                    if (null == parts) {
+                        parts = new Part[((BattleArmor) entity).getSquadSize()];
+                    }
+                    parts[((BattleArmorEquipmentPart) part).getTrooper() - BattleArmor.LOC_TROOPER_1] = part;
+                    baEquipParts.put(((BattleArmorEquipmentPart) part).getEquipmentNum(), parts);
                 }
-                parts[((BattleArmorEquipmentPart)part).getTrooper()-BattleArmor.LOC_TROOPER_1] = part;
-                baEquipParts.put(((BattleArmorEquipmentPart)part).getEquipmentNum(), parts);
             } else if (part instanceof MissingBattleArmorEquipmentPart) {
-                Part[] parts = baEquipParts.get(((MissingBattleArmorEquipmentPart)part).getEquipmentNum());
-                if (null == parts) {
-                    parts = new Part[((BattleArmor)entity).getSquadSize()];
+                if (!(entity instanceof BattleArmor)) {
+                    partsToRemove.add(part);
+                } else {
+                    Part[] parts = baEquipParts.get(((MissingBattleArmorEquipmentPart) part).getEquipmentNum());
+                    if (null == parts) {
+                        parts = new Part[((BattleArmor) entity).getSquadSize()];
+                    }
+                    parts[((MissingBattleArmorEquipmentPart) part).getTrooper() - BattleArmor.LOC_TROOPER_1] = part;
+                    baEquipParts.put(((MissingBattleArmorEquipmentPart) part).getEquipmentNum(), parts);
                 }
-                parts[((MissingBattleArmorEquipmentPart)part).getTrooper()-BattleArmor.LOC_TROOPER_1] = part;
-                baEquipParts.put(((MissingBattleArmorEquipmentPart)part).getEquipmentNum(), parts);
             } else if (part instanceof EquipmentPart) {
                 equipParts.put(((EquipmentPart)part).getEquipmentNum(), part);
             } else if (part instanceof MissingEquipmentPart) {
@@ -3226,6 +3241,21 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return parts;
     }
 
+    /**
+     * Find a part on a unit.
+     * @param predicate A predicate to apply to each part on the unit.
+     * @return The first part which matched the predicate, otherwise null.
+     */
+    public @Nullable Part findPart(Predicate<Part> predicate) {
+        for (Part part : parts) {
+            if (predicate.test(part)) {
+                return part;
+            }
+        }
+
+        return null;
+    }
+
     public void setParts(ArrayList<Part> newParts) {
         parts = newParts;
     }
@@ -3248,8 +3278,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return ammo;
     }
 
-    public AbstractIcon getCamouflage() {
-        return new Camouflage(getCamoCategory(), getCamoFileName());
+    public Camouflage getCamouflage() {
+        return (entity == null) ? new Camouflage() : entity.getCamouflage();
+    }
+
+    public Camouflage getCamouflageOrElse(Camouflage camouflage) {
+        return getCamouflage().hasDefaultCategory() ? camouflage : getCamouflage();
     }
 
     public String getCamoCategory() {
@@ -3284,6 +3318,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
 
         return fileName;
+    }
+
+    public Image getImage(Component component) {
+        if (MHQStaticDirectoryManager.getMechTileset() == null) {
+            return null;
+        }
+        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
+        return new EntityImage(base, getCamouflageOrElse(getCampaign().getCamouflage()),
+                component, getEntity()).loadPreviewImage();
     }
 
     /**
@@ -4652,12 +4695,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isEntityCamo() {
-        return (entity != null) && ((entity.getCamoCategory() != null)
-                && !Camouflage.NO_CAMOUFLAGE.equals(entity.getCamoCategory())
-                && !entity.getCamoCategory().isEmpty())
-                && ((entity.getCamoFileName() != null)
-                && !Camouflage.NO_CAMOUFLAGE.equals(entity.getCamoFileName())
-                && !entity.getCamoFileName().isEmpty());
+        return !getCamouflage().hasDefaultCategory();
     }
 
     public int getAvailability(int era) {

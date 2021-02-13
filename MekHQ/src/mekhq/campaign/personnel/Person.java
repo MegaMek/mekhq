@@ -63,6 +63,7 @@ import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 
 /**
@@ -343,13 +344,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         secondaryDesignator = ROMDesignation.NONE;
         commander = false;
         dependent = false;
-        originFaction = Faction.getFaction(factionCode);
+        originFaction = Factions.getInstance().getFaction(factionCode);
         originPlanet = null;
         clan = originFaction.isClan();
         phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
-        idleMonths = -1;
         genealogy = new Genealogy(getId());
         tryingToMarry = true;
         tryingToConceive = true;
@@ -1459,8 +1459,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 ? Utilities.nonNull(getGenealogy().getSpouseId(), fatherId) : fatherId;
 
         // Determine Prisoner Status
-        PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
-                ? PrisonerStatus.FREE : getPrisonerStatus();
+        final PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
+                ? getPrisonerStatus() : PrisonerStatus.FREE;
 
         // Output a specific report to the campaign if they are giving birth to multiple children
         if (PREGNANCY_MULTIPLE_NAMES[size] != null) {
@@ -1928,7 +1928,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) {
                     retVal.dependent = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-                    retVal.originFaction = Faction.getFaction(wn2.getTextContent().trim());
+                    retVal.originFaction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
                     String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
                     String planetId = wn2.getTextContent().trim();

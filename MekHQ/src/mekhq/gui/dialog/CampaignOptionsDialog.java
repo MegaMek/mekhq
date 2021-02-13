@@ -22,7 +22,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -32,7 +31,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -60,7 +58,8 @@ import javax.swing.table.TableColumn;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.swing.util.PlayerColors;
+import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
+import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.icons.AbstractIcon;
@@ -99,6 +98,7 @@ import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
@@ -124,7 +124,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JFrame frame;
     private String camoCategory;
     private String camoFileName;
-    private int colorIndex;
+    private PlayerColour colour;
     private String iconCategory;
     private String iconFileName;
     private Hashtable<String, JSpinner> hashSkillTargets;
@@ -500,7 +500,7 @@ public class CampaignOptionsDialog extends JDialog {
         this.date = campaign.getLocalDate();
         this.camoCategory = campaign.getCamoCategory();
         this.camoFileName = campaign.getCamoFileName();
-        this.colorIndex = campaign.getColorIndex();
+        this.colour = campaign.getColour();
         this.iconCategory = campaign.getIconCategory();
         this.iconFileName = campaign.getIconFileName();
         hashSkillTargets = new Hashtable<>();
@@ -638,8 +638,8 @@ public class CampaignOptionsDialog extends JDialog {
         panGeneral.add(lblFaction, gridBagConstraints);
 
         factionModel = new SortedComboBoxModel<>();
-        for (String sName : Faction.getChoosableFactionCodes()) {
-            Faction f = Faction.getFaction(sName);
+        for (String sName : Factions.getInstance().getChoosableFactionCodes()) {
+            Faction f = Factions.getInstance().getFaction(sName);
             if (f.validIn(date.getYear())) {
                 factionModel.addElement(f.getFullName(date.getYear()));
             }
@@ -4827,7 +4827,7 @@ public class CampaignOptionsDialog extends JDialog {
         GameOptions gameOpts = campaign.getGameOptions();
         int campaignYear = campaign.getGameYear();
         gameOpts.getOption("year").setValue(campaignYear);
-        campaign.setFactionCode(Faction.getFactionFromFullNameAndYear
+        campaign.setFactionCode(Factions.getInstance().getFactionFromFullNameAndYear
                 (String.valueOf(comboFaction.getSelectedItem()), date.getYear()).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
             RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
@@ -4839,7 +4839,7 @@ public class CampaignOptionsDialog extends JDialog {
         }
         campaign.setCamoCategory(camoCategory);
         campaign.setCamoFileName(camoFileName);
-        campaign.setColorIndex(colorIndex);
+        campaign.setColour(colour);
 
         campaign.setIconCategory(iconCategory);
         campaign.setIconFileName(iconFileName);
@@ -5217,8 +5217,8 @@ public class CampaignOptionsDialog extends JDialog {
             date = dc.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
             factionModel = new SortedComboBoxModel<>();
-            for (String sname : Faction.getChoosableFactionCodes()) {
-                Faction f = Faction.getFaction(sname);
+            for (String sname : Factions.getInstance().getChoosableFactionCodes()) {
+                Faction f = Factions.getInstance().getFaction(sname);
                 if (f.validIn(date.getYear())) {
                     factionModel.addElement(f.getFullName(date.getYear()));
                 }
@@ -5240,13 +5240,12 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void btnCamoActionPerformed(ActionEvent evt) {
-        CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex);
-        ccd.setVisible(true);
-        camoCategory = ccd.getCategory();
-        camoFileName = ccd.getFileName();
-        if (ccd.getColorIndex() != -1) {
-            colorIndex = ccd.getColorIndex();
+        CamoChooserDialog ccd = new CamoChooserDialog(frame, new Camouflage(camoCategory, camoFileName));
+        if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
+            return;
         }
+        camoCategory = ccd.getSelectedItem().getCategory();
+        camoFileName = ccd.getSelectedItem().getFilename();
         setCamoIcon();
     }
 
@@ -5341,45 +5340,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     public void setCamoIcon() {
-        if (null == camoCategory) {
-            return;
-        }
-
-        if (Camouflage.NO_CAMOUFLAGE.equals(camoCategory)) {
-            int colorInd = colorIndex;
-            if (colorInd == -1) {
-                colorInd = 0;
-            }
-            BufferedImage tempImage = new BufferedImage(84, 72, BufferedImage.TYPE_INT_RGB);
-            Graphics2D graphics = tempImage.createGraphics();
-            graphics.setColor(PlayerColors.getColor(colorInd));
-            graphics.fillRect(0, 0, 84, 72);
-            btnCamo.setIcon(new ImageIcon(tempImage));
-            return;
-        }
-
-        // Try to get the camo file.
-        try {
-            // Translate the root camo directory name.
-            if (AbstractIcon.ROOT_CATEGORY.equals(camoCategory)) {
-                camoCategory = "";
-            }
-            Image camo = (Image) MHQStaticDirectoryManager.getCamouflage().getItem(camoCategory, camoFileName);
-            btnCamo.setIcon(new ImageIcon(camo));
-        } catch (Exception err) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Cannot find your camo file.\n"
-                    + "Setting to default color.\n"
-                    + "You should browse to the correct camo file,\n"
-                    + "or if it isn't available copy it into MekHQ's"
-                    + "data/images/camo folder.",
-                    "Missing Camo File",
-                    JOptionPane.WARNING_MESSAGE);
-            camoCategory = Camouflage.NO_CAMOUFLAGE;
-            colorIndex = 0;
-            setCamoIcon();
-        }
+        btnCamo.setIcon(new Camouflage(camoCategory, camoFileName).getImageIcon());
     }
 
     public void setForceIcon() {

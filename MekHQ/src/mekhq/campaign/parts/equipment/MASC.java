@@ -153,7 +153,7 @@ public class MASC extends EquipmentPart {
 	}
 
 	@Override
-	public MissingPart getMissingPart() {
+	public MissingMASC getMissingPart() {
 		return new MissingMASC(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, engineRating,
 		        omniPodded);
 	}

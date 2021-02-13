@@ -45,7 +45,7 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
     @Override
     public Faction selectFaction(Campaign campaign) {
         if (factionCode != null) {
-            return Faction.getFaction(factionCode);
+            return Factions.getInstance().getFaction(factionCode);
         } else {
             return campaign.getFaction();
         }

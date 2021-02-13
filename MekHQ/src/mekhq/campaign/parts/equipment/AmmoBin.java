@@ -286,6 +286,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
      * @return The {@code Mounted} or {@code null} if no valid
      *         piece of equipment exists on the {@code Unit}.
      */
+    @Override
     protected @Nullable Mounted getMounted() {
         if ((getUnit() != null) && (getUnit().getEntity() != null)) {
             Mounted mounted = getUnit().getEntity().getEquipment(getEquipmentNum());
@@ -458,8 +459,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         // AmmoBins are the same type of part if they can hold the same
         // AmmoType and number of rounds of ammo (i.e. they are the same
         // irrespective of "munition type" or "bomb type").
-        return (part instanceof AmmoBin)
-                && !(part instanceof LargeCraftAmmoBin)
+        return getClass().equals(part.getClass())
                 && getType().isCompatibleWith(((AmmoBin) part).getType())
                 && ((AmmoBin) part).getFullShots() == getFullShots();
     }

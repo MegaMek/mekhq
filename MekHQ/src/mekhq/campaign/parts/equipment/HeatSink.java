@@ -63,10 +63,10 @@ public class HeatSink extends EquipmentPart {
         }
     }
 
-    @Override
-    public MissingPart getMissingPart() {
-        return new MissingHeatSink(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
-    }
+	@Override
+	public MissingHeatSink getMissingPart() {
+		return new MissingHeatSink(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
+	}
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {

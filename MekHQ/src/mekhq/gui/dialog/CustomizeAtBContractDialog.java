@@ -22,27 +22,23 @@ package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.swing.*;
 
-import megamek.client.ui.swing.util.PlayerColors;
-import megamek.common.icons.AbstractIcon;
+import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
+import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.EncodeControl;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
@@ -62,10 +58,10 @@ public class CustomizeAtBContractDialog extends JDialog {
     private Campaign campaign;
     private String allyCamoCategory;
     private String allyCamoFileName;
-    private int allyColorIndex;
+    private PlayerColour allyColour;
     private String enemyCamoCategory;
     private String enemyCamoFileName;
-    private int enemyColorIndex;
+    private PlayerColour enemyColour;
 
     protected JTextField txtName;
     protected FactionComboBox cbEmployer;
@@ -99,10 +95,10 @@ public class CustomizeAtBContractDialog extends JDialog {
         campaign = c;
         allyCamoCategory = contract.getAllyCamoCategory();
         allyCamoFileName = contract.getAllyCamoFileName();
-        allyColorIndex = contract.getAllyColorIndex();
+        allyColour = contract.getAllyColour();
         enemyCamoCategory = contract.getEnemyCamoCategory();
         enemyCamoFileName = contract.getEnemyCamoFileName();
-        enemyColorIndex = contract.getEnemyColorIndex();
+        enemyColour = contract.getEnemyColour();
 
         initComponents();
         setLocationRelativeTo(parent);
@@ -449,7 +445,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         rightPanel.add(btnAllyCamo, gbc);
         btnAllyCamo.addActionListener(camoButtonListener);
-        setCamoIcon(btnAllyCamo, allyCamoCategory, allyCamoFileName, allyColorIndex);
+        setCamoIcon(btnAllyCamo, allyCamoCategory, allyCamoFileName);
 
         lblEnemyCamo.setText(resourceMap.getString("lblEnemyCamo.text")); // NOI18N
         lblEnemyCamo.setName("lblEnemyCamo"); // NOI18N
@@ -469,7 +465,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         rightPanel.add(btnEnemyCamo, gbc);
         btnEnemyCamo.addActionListener(camoButtonListener);
-        setCamoIcon(btnEnemyCamo, enemyCamoCategory, enemyCamoFileName, enemyColorIndex);
+        setCamoIcon(btnEnemyCamo, enemyCamoCategory, enemyCamoFileName);
 
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
@@ -494,72 +490,30 @@ public class CustomizeAtBContractDialog extends JDialog {
     ActionListener camoButtonListener = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            CamoChoiceDialog ccd;
+            CamoChooserDialog ccd;
             if (e.getSource().equals(btnAllyCamo)) {
-                ccd = new CamoChoiceDialog(frame, true, allyCamoCategory, allyCamoFileName,
-                        allyColorIndex);
-                ccd.setVisible(true);
-                allyCamoCategory = ccd.getCategory();
-                allyCamoFileName = ccd.getFileName();
-                if (ccd.getColorIndex() != -1) {
-                    allyColorIndex = ccd.getColorIndex();
+                ccd = new CamoChooserDialog(frame, new Camouflage(allyCamoCategory, allyCamoFileName));
+                if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
+                    return;
                 }
-                setCamoIcon(btnAllyCamo, allyCamoCategory, allyCamoFileName, allyColorIndex);
+                allyCamoCategory = ccd.getSelectedItem().getCategory();
+                allyCamoFileName = ccd.getSelectedItem().getFilename();
+                setCamoIcon(btnAllyCamo, allyCamoCategory, allyCamoFileName);
             } else {
-                ccd = new CamoChoiceDialog(frame, true, enemyCamoCategory, enemyCamoFileName,
-                        enemyColorIndex);
-                ccd.setVisible(true);
-                enemyCamoCategory = ccd.getCategory();
-                enemyCamoFileName = ccd.getFileName();
-                if (ccd.getColorIndex() != -1) {
-                    enemyColorIndex = ccd.getColorIndex();
+                ccd = new CamoChooserDialog(frame, new Camouflage(enemyCamoCategory, enemyCamoFileName));
+                if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
+                    return;
                 }
-                setCamoIcon(btnEnemyCamo, enemyCamoCategory, enemyCamoFileName, enemyColorIndex);
+                enemyCamoCategory = ccd.getSelectedItem().getCategory();
+                enemyCamoFileName = ccd.getSelectedItem().getFilename();
+                setCamoIcon(btnEnemyCamo, enemyCamoCategory, enemyCamoFileName);
             }
         }
     };
 
     /* Copied from CampaignOptionsDialog */
-    private void setCamoIcon(JButton btnCamo, String camoCategory, String camoFileName, int colorIndex) {
-        if (camoCategory == null) {
-            return;
-        }
-
-        if (Camouflage.NO_CAMOUFLAGE.equals(camoCategory)) {
-            int colorInd = colorIndex;
-            if (colorInd == -1) {
-                colorInd = 0;
-            }
-            BufferedImage tempImage = new BufferedImage(84, 72, BufferedImage.TYPE_INT_RGB);
-            Graphics2D graphics = tempImage.createGraphics();
-            graphics.setColor(PlayerColors.getColor(colorInd));
-            graphics.fillRect(0, 0, 84, 72);
-            btnCamo.setIcon(new ImageIcon(tempImage));
-            return;
-        }
-
-        // Try to get the camo file.
-        try {
-            // Translate the root camo directory name.
-            if (AbstractIcon.ROOT_CATEGORY.equals(camoCategory)) {
-                camoCategory = "";
-            }
-            Image camo = (Image) MHQStaticDirectoryManager.getCamouflage().getItem(camoCategory, camoFileName);
-            btnCamo.setIcon(new ImageIcon(camo));
-        } catch (Exception err) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Cannot find your camo file.\n"
-                    + "Setting to default color.\n"
-                    + "You should browse to the correct camo file,\n"
-                    + "or if it isn't available copy it into MekHQ's"
-                    + "data/images/camo folder.",
-                    "Missing Camo File",
-                    JOptionPane.WARNING_MESSAGE);
-            camoCategory = Camouflage.NO_CAMOUFLAGE;
-            colorIndex = 0;
-            setCamoIcon(btnCamo, camoCategory, camoFileName, colorIndex);
-        }
+    private void setCamoIcon(JButton btnCamo, String camoCategory, String camoFileName) {
+        btnCamo.setIcon(new Camouflage(camoCategory, camoFileName).getImageIcon());
     }
 
     private void btnOKActionPerformed(ActionEvent evt) {
@@ -578,10 +532,10 @@ public class CustomizeAtBContractDialog extends JDialog {
         contract.setEnemyBotName(txtEnemyBotName.getText());
         contract.setAllyCamoCategory(allyCamoCategory);
         contract.setAllyCamoFileName(allyCamoFileName);
-        contract.setAllyColorIndex(allyColorIndex);
+        contract.setAllyColour(allyColour);
         contract.setEnemyCamoCategory(enemyCamoCategory);
         contract.setEnemyCamoFileName(enemyCamoFileName);
-        contract.setEnemyColorIndex(enemyColorIndex);
+        contract.setEnemyColour(enemyColour);
 
         PlanetarySystem canonSystem = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
                 campaign.getLocalDate());
@@ -605,8 +559,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         cbEmployer.removeAllItems();
         cbEnemy.removeAllItems();
         if (allFactions) {
-            cbEmployer.addFactionEntries(Faction.getFactionList(),	campaign.getGameYear());
-            cbEnemy.addFactionEntries(Faction.getFactionList(),	campaign.getGameYear());
+            cbEmployer.addFactionEntries(Factions.getInstance().getFactionList(), campaign.getGameYear());
+            cbEnemy.addFactionEntries(Factions.getInstance().getFactionList(), campaign.getGameYear());
         } else {
             cbEmployer.addFactionEntries(currentFactions, campaign.getGameYear());
             cbEnemy.addFactionEntries(currentFactions, campaign.getGameYear());

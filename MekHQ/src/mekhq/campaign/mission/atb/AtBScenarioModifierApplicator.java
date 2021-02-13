@@ -42,7 +42,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 
 public class AtBScenarioModifierApplicator {
 
@@ -191,7 +191,7 @@ public class AtBScenarioModifierApplicator {
         rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
         rsg.setLevel(adjustedSkill);
 
-        if (Faction.getFaction(scenario.getContract(campaign).getEnemyCode()).isClan()) {
+        if (Factions.getInstance().getFaction(scenario.getContract(campaign).getEnemyCode()).isClan()) {
             rsg.setType(RandomSkillsGenerator.T_CLAN);
         }
 

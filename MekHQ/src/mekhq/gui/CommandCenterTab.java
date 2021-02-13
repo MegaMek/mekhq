@@ -382,7 +382,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
                 }
                 if (procurementModel
                         .getAcquisition(procurementTable.convertRowIndexToModel(procurementTable.getSelectedRow()))
-                        .getQuantity() > 0) {
+                        .map(a -> a.getQuantity())
+                        .orElse(0) > 0) {
                     procurementModel.decrementItem(
                             procurementTable.convertRowIndexToModel(procurementTable.getSelectedRow()));
                 }

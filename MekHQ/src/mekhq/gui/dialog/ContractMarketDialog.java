@@ -46,7 +46,7 @@ import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.view.ContractSummaryPanel;
 
@@ -304,7 +304,7 @@ public class ContractMarketDialog extends JDialog {
         gbc.fill = GridBagConstraints.NONE;
         panelRetainer.add(lblCurrentRetainer, gbc);
         if (null != campaign.getRetainerEmployerCode()) {
-            lblRetainerEmployer.setText(Faction.getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getGameYear()));
+            lblRetainerEmployer.setText(Factions.getInstance().getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getGameYear()));
         }
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -348,7 +348,7 @@ public class ContractMarketDialog extends JDialog {
             lblCurrentRetainer.setVisible(true);
             lblRetainerEmployer.setVisible(true);
             btnEndRetainer.setVisible(true);
-            lblRetainerEmployer.setText(Faction.getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getGameYear()));
+            lblRetainerEmployer.setText(Factions.getInstance().getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getGameYear()));
             //Remove the selected faction and add the previous one, if any
             countSuccessfulContracts();
             lblRetainerAvailable.setVisible(possibleRetainerContracts.size() > 0);

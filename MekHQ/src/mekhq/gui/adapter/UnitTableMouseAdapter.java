@@ -41,9 +41,9 @@ import javax.swing.UIManager;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.util.EncodeControl;
@@ -404,20 +404,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 }
             }
         } else if (command.equals(COMMAND_INDI_CAMO)) { // Single Unit only
-            String category = selectedUnit.getCamoCategory();
-            if (StringUtil.isNullOrEmpty(category)) {
-                category = AbstractIcon.ROOT_CATEGORY;
+            CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(), gui.getCampaign().getCamouflage(), selectedUnit.getCamouflage());
+            if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
+                return;
             }
-            CamoChoiceDialog ccd = new CamoChoiceDialog(gui.getFrame(), true, category,
-                    selectedUnit.getCamoFileName(), gui.getCampaign().getColorIndex());
-            ccd.setLocationRelativeTo(gui.getFrame());
-            ccd.setVisible(true);
-
-            if (ccd.clickedSelect()) {
-                selectedUnit.getEntity().setCamoCategory(ccd.getCategory());
-                selectedUnit.getEntity().setCamoFileName(ccd.getFileName());
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
-            }
+            selectedUnit.getEntity().setCamouflage(ccd.getSelectedItem());
+            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equals(COMMAND_CANCEL_ORDER)) {
             double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
             for (Unit u : units) {
@@ -1098,7 +1090,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
         }
     }
 
-    private void addCustomUnitTag(Unit[] units) {
+    private void addCustomUnitTag(Unit... units) {
         String sCustomsDir = "data/mechfiles/customs/";
         String sCustomsDirCampaign = sCustomsDir + gui.getCampaign().getName() + "/";
         File customsDir = new File(sCustomsDir);

@@ -22,7 +22,6 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
 
 /**
@@ -50,7 +49,7 @@ public class MissingHeatSink extends MissingEquipmentPart {
     }
 
     @Override
-    public Part getNewPart() {
+    public HeatSink getNewPart() {
         return new HeatSink(getUnitTonnage(), type, -1, omniPodded, campaign);
     }
 

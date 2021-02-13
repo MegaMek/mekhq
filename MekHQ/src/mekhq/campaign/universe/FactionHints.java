@@ -478,7 +478,7 @@ public class FactionHints {
 
                 if (nodeName.equals("neutral")) {
                     String fKey = wn.getAttributes().getNamedItem("faction").getTextContent().trim();
-                    Faction f = Faction.getFaction(fKey);
+                    Faction f = Factions.getInstance().getFaction(fKey);
                     if (null != f) {
                         neutralFactions.add(f);
                         addNeutralExceptions(f, wn);
@@ -488,7 +488,7 @@ public class FactionHints {
                     }
                 } else if (nodeName.equals("deepPeriphery")) {
                     for (String fKey : wn.getTextContent().trim().split(",")) {
-                        Faction f = Faction.getFaction(fKey);
+                        Faction f = Factions.getInstance().getFaction(fKey);
                         if (null != f) {
                             deepPeriphery.add(f);
                         } else {
@@ -498,7 +498,7 @@ public class FactionHints {
                     }
                 } else if (nodeName.equals("majorPowers")) {
                     for (String fKey : wn.getTextContent().trim().split(",")) {
-                        Faction f = Faction.getFaction(fKey);
+                        Faction f = Factions.getInstance().getFaction(fKey);
                         if (null != f) {
                             majorPowers.add(f);
                         } else {
@@ -528,15 +528,15 @@ public class FactionHints {
                     for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
                         Node wn2 = wn.getChildNodes().item(j);
                         if (wn2.getNodeName().equals("outer")) {
-                            outer = Faction.getFaction(wn2.getTextContent().trim());
+                            outer = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equals("inner")) {
-                            inner = Faction.getFaction(wn2.getTextContent().trim());
+                            inner = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equals("fraction")) {
                             fraction = Double.parseDouble(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equals("opponents")) {
                             opponents = new ArrayList<>();
                             for (String fKey : wn2.getTextContent().trim().split(",")) {
-                                Faction f = Faction.getFaction(fKey);
+                                Faction f = Factions.getInstance().getFaction(fKey);
                                 if (null != f) {
                                     opponents.add(f);
                                 }
@@ -584,7 +584,7 @@ public class FactionHints {
                 String[] factionKeys = wn.getTextContent().trim().split(",");
                 Faction[] parties = new Faction[factionKeys.length];
                 for (int i = 0; i < factionKeys.length; i++) {
-                    parties[i] = Faction.getFaction(factionKeys[i]);
+                    parties[i] = Factions.getInstance().getFaction(factionKeys[i]);
                     if (null == parties[i]) {
                         MekHQ.getLogger().error(getClass(), METHOD_NAME,
                                 "Invalid faction code in factionhints.xml: " + parties[i]); //$NON-NLS-1$
@@ -617,7 +617,7 @@ public class FactionHints {
                 String[] parties = wn.getTextContent().trim().split(",");
 
                 for (String party : parties) {
-                    final Faction f = Faction.getFaction(party);
+                    final Faction f = Factions.getInstance().getFaction(party);
                     if (null == f) {
                         MekHQ.getLogger().error(getClass(), METHOD_NAME,
                                 "Invalid faction code in factionhints.xml: " + party); //$NON-NLS-1$
