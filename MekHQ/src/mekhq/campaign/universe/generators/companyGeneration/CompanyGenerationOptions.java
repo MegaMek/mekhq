@@ -81,14 +81,14 @@ public class CompanyGenerationOptions implements Serializable {
     // Units
     private boolean generateUnitsAsAttached;
     private boolean assignBestRollToUnitCommander;  // Not Implemented
-    private boolean groupByWeight;  // Buggy
+    private boolean groupByWeight;  // Buggy - Annoyingly Implemented, might need to work on how I've done this one before I open
     private boolean keepOfficerRollsSeparate;
     private int starLeagueYear;
     private boolean assignTechsToUnits;  // Not Implemented
 
     // Unit
     private ForceNamingType forceNamingType;
-    private boolean generateForceIcons; // Buggy
+    private boolean generateForceIcons; // Very Buggy
 
     // Spares
     private boolean generateMothballedSpareUnits;

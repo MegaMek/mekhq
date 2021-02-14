@@ -1849,6 +1849,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         if (getChkGenerateSpareAmmunition().isSelected() != options.isGenerateSpareAmmunition()) {
             getChkGenerateSpareAmmunition().doClick();
         }
+        getSpnNumberReloadsPerWeapon().setValue(options.getNumberReloadsPerWeapon());
         getChkGenerateFractionalMachineGunAmmunition().setSelected(options.isGenerateFractionalMachineGunAmmunition());
 
         // Contracts
