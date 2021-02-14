@@ -57,22 +57,19 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
 
     //region Constructors
     protected BaseDialog(final JFrame parent, final ResourceBundle resources) {
-        this(parent, false, resources, "dialog.text", null);
+        this(parent, false, resources, "dialog.text");
     }
 
-    protected BaseDialog(final JFrame parent, final ResourceBundle resources, final String title,
-                         final Campaign campaign) {
-        this(parent, false, resources, title, campaign);
+    protected BaseDialog(final JFrame parent, final ResourceBundle resources, final String title) {
+        this(parent, false, resources, title);
     }
 
     protected BaseDialog(final JFrame parent, final boolean modal, final ResourceBundle resources,
-                         final String title, final @Nullable Campaign campaign) {
+                         final String title) {
         super(parent, modal);
         setTitle(resources.getString(title));
-        setFrame(frame);
+        setFrame(parent);
         setResources(resources);
-
-        initialize(campaign);
     }
     //endregion Constructors
 
@@ -99,6 +96,10 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
     //endregion Getters/Setters
 
     //region Initialization
+    protected void initialize() {
+        initialize(null);
+    }
+
     /**
      * Initializes the dialog UI and preferences. Needs to be called by
      * child classes for initial setup.

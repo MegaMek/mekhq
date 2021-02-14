@@ -24,6 +24,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.enums.CompanyGenerationType;
 
 public class AtBCompanyGenerator extends AbstractCompanyGenerator {
@@ -114,31 +115,29 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
     /**
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
-     * @param person the person to generate the mech for
+     * @param faction the faction to generate the mech from
      * @return the MechSummary generated from the provided parameters
      */
     @Override
     protected MechSummary generateMechSummary(final Campaign campaign,
                                               final RandomMechParameters parameters,
-                                              final Person person) {
-        if (parameters.isStarLeague() && !person.getOriginFaction().isComStarOrWoB()) {
-            final String faction;
-            if (person.isClanner()) {
+                                              final Faction faction) {
+        if (parameters.isStarLeague() && !faction.isComStarOrWoB()) {
+            if (faction.isClan()) {
                 // Clanners generate from Front Line tables instead of Star League
-                faction = person.getOriginFaction().getShortName();
                 parameters.setQuality(IUnitRating.DRAGOON_B);
+                return generateMechSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
             } else {
                 // Roll on the Star League Royal table if you get a SL mech with A* Rating
-                faction = ((parameters.getQuality() == IUnitRating.DRAGOON_ASTAR) ? "SL.R" : "SL");
+                final String factionCode = ((parameters.getQuality() == IUnitRating.DRAGOON_ASTAR) ? "SL.R" : "SL");
+                return generateMechSummary(campaign, parameters, factionCode, getOptions().getStarLeagueYear());
             }
-            return generateMechSummary(campaign, parameters, faction, getOptions().getStarLeagueYear());
         } else {
             // Clanners Generate from 2nd Line Tables
-            if (person.isClanner()) {
+            if (faction.isClan()) {
                 parameters.setQuality(IUnitRating.DRAGOON_C);
             }
-            return generateMechSummary(campaign, parameters, person.getOriginFaction().getShortName(),
-                    campaign.getGameYear());
+            return generateMechSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
         }
     }
     //endregion Units

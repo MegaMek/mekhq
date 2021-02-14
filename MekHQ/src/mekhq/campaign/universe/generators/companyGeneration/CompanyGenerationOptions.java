@@ -51,7 +51,8 @@ public class CompanyGenerationOptions implements Serializable {
 
     // Base Information
     private CompanyGenerationType type;
-    private Faction faction;
+    private Faction faction;  // Not fully understood/Implemented
+    private boolean specifyStartingPlanet;
     private Planet startingPlanet;
     private boolean generateMercenaryCompanyCommandLance;
     private int companyCount;
@@ -71,46 +72,48 @@ public class CompanyGenerationOptions implements Serializable {
 
     // Personnel Randomization
     private boolean randomizeOrigin;
-    private Planet centralPlanet;
+    private boolean randomizeAroundCentralPlanet;
+    private Planet centralPlanet; // Not Implemented
     private int originSearchRadius;
     private boolean extraRandomOrigin;
     private double originDistanceScale;
 
     // Units
     private boolean generateUnitsAsAttached;
-    private boolean assignBestRollToUnitCommander;
-    private boolean groupByWeight;
+    private boolean assignBestRollToUnitCommander;  // Not Implemented
+    private boolean groupByWeight;  // Buggy
     private boolean keepOfficerRollsSeparate;
     private int starLeagueYear;
-    private boolean assignTechsToUnits;
+    private boolean assignTechsToUnits;  // Not Implemented
 
     // Unit
     private ForceNamingType forceNamingType;
-    private boolean generateForceIcons;
+    private boolean generateForceIcons; // Buggy
 
     // Spares
     private boolean generateMothballedSpareUnits;
     private int sparesPercentOfActiveUnits;
-    private boolean generateSpareParts;
-    private int startingArmourWeight;
-    private boolean generateSpareAmmunition;
-    private int numberReloadsPerWeapon;
-    private boolean generateFractionalMachineGunAmmunition;
+    private boolean generateSpareParts;  // Not Implemented
+    private int startingArmourWeight;  // Not Implemented
+    private boolean generateSpareAmmunition;  // Not Implemented
+    private int numberReloadsPerWeapon;  // Not Implemented
+    private boolean generateFractionalMachineGunAmmunition;  // Not Implemented
 
     // Contracts
-    private boolean selectStartingContract;
+    private boolean selectStartingContract;  // Not Implemented
     private boolean startCourseToContractPlanet;
 
     // Finances
-    private int startingCash;
+    private int startingCash; // Not Implemented
     private boolean randomizeStartingCash;
     private int randomStartingCashDiceCount;
-    private int minimumStartingFloat;
-    private boolean payForSetup;
-    private boolean startingLoan;
+    private int minimumStartingFloat; // Not Implemented
+    private boolean payForSetup; // Not Implemented
+    private boolean startingLoan; // Not Implemented
     private boolean payForPersonnel;
     private boolean payForUnits;
     private boolean payForParts;
+    private boolean payForArmour;
     private boolean payForAmmunition;
     //endregion Variable Declarations
 
@@ -123,6 +126,7 @@ public class CompanyGenerationOptions implements Serializable {
         // Base Information
         setType(type);
         setFaction(campaign.getFaction());
+        setSpecifyStartingPlanet(true);
         setStartingPlanet(Systems.getInstance().getSystems().getOrDefault(
                 getFaction().getStartingPlanet(campaign.getLocalDate()),
                 campaign.getSystemByName("Terra")).getPrimaryPlanet());
@@ -159,6 +163,7 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Personnel Randomization
         setRandomizeOrigin(true);
+        setRandomizeAroundCentralPlanet(true);
         setCentralPlanet(campaign.getSystemByName("Terra").getPrimaryPlanet());
         setOriginSearchRadius(1000);
         setExtraRandomOrigin(false);
@@ -180,7 +185,7 @@ public class CompanyGenerationOptions implements Serializable {
         setGenerateMothballedSpareUnits(false);
         setSparesPercentOfActiveUnits(10);
         setGenerateSpareParts(type.isWindchild());
-        setStartingArmourWeight(25);
+        setStartingArmourWeight(60);
         setGenerateSpareAmmunition(type.isWindchild());
         setNumberReloadsPerWeapon(4);
         setGenerateFractionalMachineGunAmmunition(true);
@@ -199,6 +204,7 @@ public class CompanyGenerationOptions implements Serializable {
         setPayForPersonnel(type.isWindchild());
         setPayForUnits(type.isWindchild());
         setPayForParts(type.isWindchild());
+        setPayForArmour(type.isWindchild());
         setPayForAmmunition(type.isWindchild());
     }
     //endregion Constructors
@@ -219,6 +225,14 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void setFaction(final Faction faction) {
         this.faction = faction;
+    }
+
+    public boolean isSpecifyStartingPlanet() {
+        return specifyStartingPlanet;
+    }
+
+    public void setSpecifyStartingPlanet(final boolean specifyStartingPlanet) {
+        this.specifyStartingPlanet = specifyStartingPlanet;
     }
 
     public Planet getStartingPlanet() {
@@ -343,6 +357,14 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void setRandomizeOrigin(final boolean randomizeOrigin) {
         this.randomizeOrigin = randomizeOrigin;
+    }
+
+    public boolean isRandomizeAroundCentralPlanet() {
+        return randomizeAroundCentralPlanet;
+    }
+
+    public void setRandomizeAroundCentralPlanet(final boolean randomizeAroundCentralPlanet) {
+        this.randomizeAroundCentralPlanet = randomizeAroundCentralPlanet;
     }
 
     public Planet getCentralPlanet() {
@@ -595,6 +617,14 @@ public class CompanyGenerationOptions implements Serializable {
         this.payForParts = payForParts;
     }
 
+    public boolean isPayForArmour() {
+        return payForArmour;
+    }
+
+    public void setPayForArmour(final boolean payForArmour) {
+        this.payForArmour = payForArmour;
+    }
+
     public boolean isPayForAmmunition() {
         return payForAmmunition;
     }
@@ -635,6 +665,7 @@ public class CompanyGenerationOptions implements Serializable {
         // Base Information
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", getType().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "faction", getFaction().getShortName());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "specifyStartingPlanet", isSpecifyStartingPlanet());
         MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "startingPlanet", "systemId",
                 getStartingPlanet().getParentSystem().getId(), getStartingPlanet().getId());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMercenaryCompanyCommandLance", isGenerateMercenaryCompanyCommandLance());
@@ -662,6 +693,7 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Personnel Randomization
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeOrigin", isRandomizeOrigin());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeAroundCentralPlanet", isRandomizeAroundCentralPlanet());
         MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "centralPlanet", "systemId",
                 getCentralPlanet().getParentSystem().getId(), getCentralPlanet().getId());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originSearchRadius", getOriginSearchRadius());
@@ -703,6 +735,7 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForPersonnel", isPayForPersonnel());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForUnits", isPayForUnits());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForParts", isPayForParts());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForArmour", isPayForArmour());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForAmmunition", isPayForAmmunition());
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "companyGenerationOptions");
     }
@@ -746,6 +779,9 @@ public class CompanyGenerationOptions implements Serializable {
                         break;
                     case "faction":
                         options.setFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
+                        break;
+                    case "specifyStartingPlanet":
+                        options.setSpecifyStartingPlanet(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "startingPlanet":
                         String startingPlanetSystemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
@@ -817,6 +853,9 @@ public class CompanyGenerationOptions implements Serializable {
                         break;
                     case "randomizeOrigin":
                         options.setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        break;
+                    case "randomizeAroundCentralPlanet":
+                        options.setRandomizeAroundCentralPlanet(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "centralPlanet":
                         String centralPlanetSystemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
@@ -909,6 +948,9 @@ public class CompanyGenerationOptions implements Serializable {
                         break;
                     case "payForParts":
                         options.setPayForParts(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        break;
+                    case "payForArmour":
+                        options.setPayForArmour(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "payForAmmunition":
                         options.setPayForAmmunition(Boolean.parseBoolean(wn2.getTextContent().trim()));

@@ -85,6 +85,7 @@ public class MekHqOptionsDialog extends BaseDialog {
     //region Constructors
     public MekHqOptionsDialog(JFrame parent) {
         super(parent, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog", new EncodeControl()));
+        initialize();
         setInitialState();
     }
     //endregion Constructors

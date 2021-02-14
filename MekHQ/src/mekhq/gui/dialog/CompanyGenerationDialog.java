@@ -18,26 +18,39 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.common.Entity;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.generators.companyGeneration.AbstractCompanyGenerator;
+import mekhq.campaign.universe.generators.companyGeneration.CompanyGenerationOptions;
 import mekhq.gui.enums.CompanyGenerationPanelType;
 import mekhq.gui.view.CompanyGenerationOptionsPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class CompanyGenerationDialog extends BaseDialog {
     //region Variable Declarations
     private CompanyGenerationPanelType currentPanelType;
     private CompanyGenerationOptionsPanel companyGenerationOptionsPanel;
+    private Campaign campaign; // TODO : Temp value
     //endregion Variable Declarations
 
     //region Constructors
     public CompanyGenerationDialog(final JFrame frame, final Campaign campaign) {
         super(frame, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()),
-                "CompanyGenerationDialog.title", campaign);
+                "CompanyGenerationDialog.title");
+        setCurrentPanelType(CompanyGenerationPanelType.OPTIONS);
+        this.campaign = campaign; // TODO : Temp value
+        initialize(campaign);
     }
     //endregion Constructors
 
@@ -62,12 +75,11 @@ public class CompanyGenerationDialog extends BaseDialog {
     //region Initialization
     /**
      * @param campaign the campaign with which to create the center pane
-     * @return
+     * @return the center pane
      */
     @Override
     protected Container createCenterPane(final Campaign campaign) {
         switch (getCurrentPanelType()) {
-            case OPTIONS:
             case PERSONNEL:
             case UNITS:
             case UNIT:
@@ -75,6 +87,7 @@ public class CompanyGenerationDialog extends BaseDialog {
             case CONTRACTS:
             case FINANCES:
             case OVERVIEW:
+            case OPTIONS:
             default:
                 return new JScrollPane(initializeCompanyGenerationOptionsPanel(campaign));
         }
@@ -88,7 +101,6 @@ public class CompanyGenerationDialog extends BaseDialog {
     @Override
     protected JPanel createButtonPanel() {
         switch (getCurrentPanelType()) {
-            case OPTIONS:
             case PERSONNEL:
             case UNITS:
             case UNIT:
@@ -96,6 +108,7 @@ public class CompanyGenerationDialog extends BaseDialog {
             case CONTRACTS:
             case FINANCES:
             case OVERVIEW:
+            case OPTIONS:
             default:
                 return initializeCompanyGenerationOptionsButtonPanel();
         }
@@ -111,6 +124,7 @@ public class CompanyGenerationDialog extends BaseDialog {
 
         JButton btnExport = new JButton(resources.getString("Export"));
         btnExport.addActionListener(evt -> getCompanyGenerationOptionsPanel().exportOptionsToXML());
+        panel.add(btnExport);
 
         JButton okButton = new JButton(resources.getString("Generate"));
         okButton.setName("okButton");
@@ -125,6 +139,7 @@ public class CompanyGenerationDialog extends BaseDialog {
 
         JButton btnImport = new JButton(resources.getString("Import"));
         btnImport.addActionListener(evt -> getCompanyGenerationOptionsPanel().importOptionsFromXML());
+        panel.add(btnImport);
 
         JButton btnApply = new JButton(resources.getString("Apply"));
         /*
@@ -134,6 +149,7 @@ public class CompanyGenerationDialog extends BaseDialog {
             setVisible(false);
         });
         */
+        panel.add(btnApply);
 
         return panel;
     }
@@ -141,7 +157,18 @@ public class CompanyGenerationDialog extends BaseDialog {
 
     @Override
     protected void okAction() {
-
+        final CompanyGenerationOptions options = getCompanyGenerationOptionsPanel().createOptionsFromPanel();
+        final AbstractCompanyGenerator generator = options.getType().getGenerator(campaign, options);
+        final List<Person> combatPersonnel = generator.generateCombatPersonnel(campaign);
+        final List<Person> supportPersonnel = generator.generateSupportPersonnel(campaign);
+        final List<Entity> entities = generator.generateUnits(campaign, combatPersonnel);
+        final List<Entity> mothballedEntities = generator.generateMothballedEntities(campaign, entities);
+        final List<Part> parts = generator.generateSpareParts();
+        final List<Armor> armour = generator.generateArmour();
+        final List<AmmoStorage> ammunition = generator.generateAmmunition();
+        final Contract contract = null;
+        generator.applyToCampaign(campaign, combatPersonnel, supportPersonnel, entities, mothballedEntities,
+                parts, armour, ammunition, contract);
     }
 
     @Override

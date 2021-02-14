@@ -18,6 +18,8 @@
  */
 package mekhq.gui.enums;
 
+import mekhq.campaign.universe.generators.companyGeneration.CompanyGenerationOptions;
+
 public enum CompanyGenerationPanelType {
     OPTIONS,
     PERSONNEL,
@@ -26,5 +28,51 @@ public enum CompanyGenerationPanelType {
     SPARES,
     CONTRACTS,
     FINANCES,
-    OVERVIEW
+    OVERVIEW;
+
+    public CompanyGenerationPanelType getNextPanelType(final CompanyGenerationOptions options) {
+        switch (this) {
+            case OPTIONS:
+                return PERSONNEL;
+            case PERSONNEL:
+                return UNITS;
+            case UNITS:
+                return UNIT;
+            case UNIT:
+                return SPARES;
+            case SPARES:
+                return options.isSelectStartingContract() ? CONTRACTS
+                        : (options.isRandomizeStartingCash() || options.isPayForSetup()) ? FINANCES
+                        : OVERVIEW;
+            case CONTRACTS:
+                return (options.isRandomizeStartingCash() || options.isPayForSetup()) ? FINANCES
+                        : OVERVIEW;
+            case FINANCES:
+            case OVERVIEW:
+            default:
+                return OVERVIEW;
+        }
+    }
+
+    public CompanyGenerationPanelType getPreviousPanelType(final CompanyGenerationOptions options) {
+        switch (this) {
+            case OPTIONS:
+            case PERSONNEL:
+                return OPTIONS;
+            case UNITS:
+                return PERSONNEL;
+            case UNIT:
+                return UNITS;
+            case SPARES:
+                return UNIT;
+            case CONTRACTS:
+                return SPARES;
+            case FINANCES:
+                return options.isSelectStartingContract() ? CONTRACTS : SPARES;
+            case OVERVIEW:
+            default:
+                return (options.isRandomizeStartingCash() || options.isPayForSetup()) ? FINANCES
+                        : options.isSelectStartingContract() ? CONTRACTS : SPARES;
+        }
+    }
 }

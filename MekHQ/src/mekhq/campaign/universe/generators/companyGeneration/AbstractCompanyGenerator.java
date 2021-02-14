@@ -29,11 +29,13 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -45,6 +47,7 @@ import mekhq.campaign.universe.AbstractFactionSelector;
 import mekhq.campaign.universe.AbstractPlanetSelector;
 import mekhq.campaign.universe.DefaultFactionSelector;
 import mekhq.campaign.universe.DefaultPlanetSelector;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RangedFactionSelector;
 import mekhq.campaign.universe.RangedPlanetSelector;
 import mekhq.campaign.universe.enums.Alphabet;
@@ -56,6 +59,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
@@ -82,18 +86,14 @@ import java.util.stream.Collectors;
  *      Cleanup the dialog, have it disable and enable based on variable values
  *      Implement:
  *          assignBestRollToUnitCommander
- *          startingPlanet
  *          centerPlanet
  *          assignTechsToUnits
- *          generateMothballedSpareUnits
- *          sparesPercentOfActiveUnits
  *          generateSpareParts // 1 for every 3 (round normally) parts in inventory?
  *          startingArmourWeight
  *          generateSpareAmmunition
  *          numberReloadsPerWeapon
  *          generateFractionalMachineGunAmmunition // 50 rounds per machine gun in force?
  *          selectStartingContract
- *          startCourseToContractPlanet
  *
  * FIXME :
  *      Backgrounds don't work
@@ -164,6 +164,8 @@ public abstract class AbstractCompanyGenerator {
         final AbstractFactionSelector factionSelector;
         final AbstractPlanetSelector planetSelector;
 
+        // TODO : central planet/system
+
         if (getOptions().isRandomizeOrigin()) {
             factionSelector = new RangedFactionSelector(getOptions().getOriginSearchRadius());
             ((RangedFactionSelector) factionSelector).setDistanceScale(getOptions().getOriginDistanceScale());
@@ -206,6 +208,18 @@ public abstract class AbstractCompanyGenerator {
         return determineNumberLances() + (getOptions().isCompanyCommanderLanceOfficer() ? 0 : 1);
     }
     //endregion Determination Methods
+
+    //region Base Information
+    /**
+     * This sets the planet to the starting planet specified, if that option is enabled
+     * @param campaign the campaign to apply the location to
+     */
+    private void moveToStartingPlanet(final Campaign campaign) {
+        if (getOptions().isSpecifyStartingPlanet()) {
+            campaign.setLocation(new CurrentLocation(getOptions().getStartingPlanet().getParentSystem(), 0));
+        }
+    }
+    //endregion Base Information
 
     //region Personnel
     //region Combat Personnel
@@ -516,13 +530,13 @@ public abstract class AbstractCompanyGenerator {
      * EntityWeightClass.WEIGHT_ULTRA_LIGHT for none,
      * EntityWeightClass.WEIGHT_SUPER_HEAVY for SL tables
      */
-    protected abstract int determineBattleMechWeight(int roll);
+    protected abstract int determineBattleMechWeight(final int roll);
 
     /**
      * @param roll the modified roll to use
      * @return the generated IUnitRating magic int for Dragoon Quality
      */
-    protected abstract int determineBattleMechQuality(int roll);
+    protected abstract int determineBattleMechQuality(final int roll);
 
     /**
      * @param campaign the campaign to generate for
@@ -535,7 +549,7 @@ public abstract class AbstractCompanyGenerator {
                                           final List<Person> combatPersonnel) {
         List<Entity> entities = new ArrayList<>();
         for (int i = 0; i < parameters.size(); i++) {
-            entities.add(generateEntity(campaign, parameters.get(i), combatPersonnel.get(i)));
+            entities.add(generateEntity(campaign, parameters.get(i), combatPersonnel.get(i).getOriginFaction()));
         }
         return entities;
     }
@@ -544,18 +558,18 @@ public abstract class AbstractCompanyGenerator {
      * This generates a single entity, thus allowing for individual rerolls
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
-     * @param pilot the pilot to generate the Entity for
+     * @param faction the faction to generate the Entity from
      * @return the entity generated, or null otherwise
      */
     public @Nullable Entity generateEntity(final Campaign campaign,
-                                            final RandomMechParameters parameters,
-                                            final Person pilot) {
+                                           final RandomMechParameters parameters,
+                                           final Faction faction) {
         // Ultra-Light means no mech generated
         if (parameters.getWeight() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
             return null;
         }
 
-        final MechSummary mechSummary = generateMechSummary(campaign, parameters, pilot);
+        final MechSummary mechSummary = generateMechSummary(campaign, parameters, faction);
 
         try {
             return new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName()).getEntity();
@@ -569,12 +583,12 @@ public abstract class AbstractCompanyGenerator {
     /**
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
-     * @param person the person to generate the mech for
+     * @param faction the faction to generate the mech from
      * @return the MechSummary generated from the provided parameters
      */
     protected abstract MechSummary generateMechSummary(final Campaign campaign,
                                                        final RandomMechParameters parameters,
-                                                       final Person person);
+                                                       final Faction faction);
 
     /**
      * @param campaign the campaign to generate for
@@ -600,9 +614,13 @@ public abstract class AbstractCompanyGenerator {
      * @param entities the list of generated entities, with null holding spaces without 'Mechs
      * @return the list of created units
      */
-    private List<Unit> createUnits(final Campaign campaign, final List<Person> combatPersonnel,
+    private List<Unit> createUnits(final Campaign campaign, List<Person> combatPersonnel,
                                    final List<Entity> entities) {
-        List<Unit> units = new ArrayList<>();
+        if (!getOptions().isKeepOfficerRollsSeparate()) { // Sorted into individual lances
+            combatPersonnel = sortPersonnelIntoLances(combatPersonnel);
+        }
+
+        final List<Unit> units = new ArrayList<>();
         for (int i = 0; i < entities.size(); i++) {
             if (entities.get(i) != null) {
                 final Unit unit = campaign.addNewUnit(entities.get(i), false, 0);
@@ -732,7 +750,8 @@ public abstract class AbstractCompanyGenerator {
             iconMap.get(LayeredForceIcon.TYPE.getLayerPath()).add("BattleMech.png");
 
             // Background
-            if (!background.isBlank()) {
+            // TODO : Java 11 : isBlank
+            if (!background.trim().isEmpty()) {
                 iconMap.put(LayeredForceIcon.BACKGROUND.getLayerPath(), new Vector<>());
                 iconMap.get(LayeredForceIcon.BACKGROUND.getLayerPath()).add(background);
             }
@@ -842,7 +861,8 @@ public abstract class AbstractCompanyGenerator {
         iconMap.get(LayeredForceIcon.FORMATION.getLayerPath()).add(isLance ? "04 Lance.png" : "06 Company.png");
 
         // Background
-        if (!background.isBlank()) {
+        // TODO : Java 11 : isBlank
+        if (!background.trim().isEmpty()) {
             iconMap.put(LayeredForceIcon.BACKGROUND.getLayerPath(), new Vector<>());
             iconMap.get(LayeredForceIcon.BACKGROUND.getLayerPath()).add(background);
         }
@@ -855,7 +875,7 @@ public abstract class AbstractCompanyGenerator {
     }
 
     /**
-     * This determines the weight class of a force (lance or company) based on the
+     * This determines the weight class of a force (lance or company) based on the units within
      * @param campaign the campaign to determine based on
      * @param force the force to determine the weight class for
      * @param isLance whether the force is a lance or a company
@@ -889,7 +909,89 @@ public abstract class AbstractCompanyGenerator {
     //endregion Unit
 
     //region Spares
+    /**
+     * This generates any mothballed spare entities for the force
+     * @param campaign the campaign to generate for
+     * @param entities the generated combat entities
+     * @return the list of all generated entities to mothball as spares
+     */
+    public List<Entity> generateMothballedEntities(final Campaign campaign, final List<Entity> entities) {
+        // Determine how many entities to generate
+        final int numberMothballedEntities;
+        if (getOptions().isGenerateMothballedSpareUnits()
+                && (getOptions().getSparesPercentOfActiveUnits() > 0)) {
+            // No free units for null rolls!
+            numberMothballedEntities = Math.toIntExact(Math.round(
+                    entities.stream().filter(Objects::nonNull).count()
+                    * (getOptions().getSparesPercentOfActiveUnits() / 100.0)));
+        } else {
+            numberMothballedEntities = 0;
+        }
+
+        // Return if we aren't generating any mothballed entities
+        if (numberMothballedEntities <= 0) {
+            return new ArrayList<>();
+        }
+
+        // Create the return list
+        final List<Entity> mothballedEntities = new ArrayList<>();
+
+        // Create the Faction Selector
+        final AbstractFactionSelector factionSelector;
+        if (getOptions().isRandomizeOrigin()) {
+            factionSelector = new RangedFactionSelector(getOptions().getOriginSearchRadius());
+            ((RangedFactionSelector) factionSelector).setDistanceScale(getOptions().getOriginDistanceScale());
+        } else {
+            factionSelector = new DefaultFactionSelector(getOptions().getFaction());
+        }
+
+        // Create the Mothballed Entities
+        for (int i = 0; i < numberMothballedEntities; i++) {
+            final Faction faction = factionSelector.selectFaction(campaign);
+            if (faction == null) {
+                MekHQ.getLogger().error("Failed to generate a valid faction, and thus cannot generate a mothballed 'Mech");
+                continue;
+            }
+
+            // Create the parameters to generate the 'Mech from
+            final RandomMechParameters parameters = new RandomMechParameters(
+                    determineBattleMechWeight(Utilities.dice(2, 6)),
+                    determineBattleMechQuality(Utilities.dice(2, 6))
+            );
+
+            // We want to ensure we get a 'Mech generated
+            while (parameters.getWeight() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
+                parameters.setWeight(determineBattleMechWeight(Utilities.dice(2, 6)));
+            }
+
+            // Generate the 'Mech, and add it to the mothballed entities list
+            mothballedEntities.add(generateEntity(campaign, parameters, faction));
+        }
+        return mothballedEntities;
+    }
+
+    /**
+     * @param campaign the campaign to add the units to
+     * @param mothballedEntities the list of generated spare 'Mech entities to add and mothball
+     * @return the list of created units
+     */
+    private List<Unit> createMothballedSpareUnits(final Campaign campaign,
+                                                  final List<Entity> mothballedEntities) {
+        List<Unit> mothballedUnits = new ArrayList<>();
+        for (final Entity mothballedEntity : mothballedEntities) {
+            final Unit unit = campaign.addNewUnit(mothballedEntity, false, 0);
+            unit.completeMothball();
+            mothballedUnits.add(unit);
+        }
+        return mothballedUnits;
+    }
+
     public List<Part> generateSpareParts() {
+        // TODO : Implement me
+        return new ArrayList<>();
+    }
+
+    public List<Armor> generateArmour() {
         // TODO : Implement me
         return new ArrayList<>();
     }
@@ -901,9 +1003,18 @@ public abstract class AbstractCompanyGenerator {
     //endregion Spares
 
     //region Contract
+    /**
+     * This processes the selected contract
+     * @param campaign the campaign to apply changes to
+     * @param contract the selected contract, if any
+     */
     private void processContract(final Campaign campaign, final @Nullable Contract contract) {
+        if (contract == null) {
+            return;
+        }
+
         if (getOptions().isStartCourseToContractPlanet()) {
-            // TODO : implement me
+            campaign.getLocation().setJumpPath(contract.getJumpPath(campaign));
         }
     }
     //endregion Contract
@@ -911,8 +1022,10 @@ public abstract class AbstractCompanyGenerator {
     //region Finances
     private void processFinances(final Campaign campaign, final List<Person> personnel,
                                  final List<Unit> units, final List<Part> parts,
-                                 final List<AmmoStorage> ammunition,
+                                 final List<Armor> armour, final List<AmmoStorage> ammunition,
                                  final @Nullable Contract contract) {
+        // TODO : Finish implementation
+
         Money startingCash = getOptions().isRandomizeStartingCash() ? rollRandomStartingCash()
                 : Money.of(getOptions().getStartingCash());
         final Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
@@ -920,8 +1033,8 @@ public abstract class AbstractCompanyGenerator {
             final Money hiringCosts = calculateHiringCosts(personnel);
             final Money unitCosts = calculateUnitCosts(units);
             final Money partCosts = calculatePartCosts(parts);
+            final Money armourCosts = calculateArmourCosts(armour);
             final Money ammunitionCosts = calculateAmmunitionCosts(ammunition);
-            // TODO : Finish implementation
         } else {
             campaign.addReport("");
             startingCash = startingCash.isGreaterOrEqualThan(minimumStartingFloat) ? startingCash
@@ -997,6 +1110,22 @@ public abstract class AbstractCompanyGenerator {
     }
 
     /**
+     * @param armours the list of different armours to get the cost for
+     * @return the cost of the armour, or zero if you aren't paying for armour
+     */
+    private Money calculateArmourCosts(final List<Armor> armours) {
+        if (!getOptions().isPayForArmour()) {
+            return Money.zero();
+        }
+
+        Money armourCosts = Money.zero();
+        for (final Armor armour : armours) {
+            armourCosts = armourCosts.plus(armour.getStickerPrice());
+        }
+        return armourCosts;
+    }
+
+    /**
      * @param ammunition the list of ammunition to get the cost for
      * @return the cost of the ammunition, or zero if you aren't paying for ammunition
      */
@@ -1014,6 +1143,7 @@ public abstract class AbstractCompanyGenerator {
     }
     //endregion Finances
 
+    //region Apply to Campaign
     /**
      * This method takes the campaign and applies all changes to it. No method not directly
      * called from here may alter the campaign.
@@ -1022,17 +1152,45 @@ public abstract class AbstractCompanyGenerator {
      * @param combatPersonnel the list of generated combat personnel
      * @param supportPersonnel the list of generated support personnel
      * @param entities the list of generated entities, with null holding spaces without 'Mechs
+     * @param mothballedEntities the list of generated spare 'Mech entities to mothball
      * @param parts the list of generated parts
+     * @param armour the list of generated armour
      * @param ammunition the list of generated ammunition
      * @param contract the selected contract, or null if one has not been selected
      */
     public void applyToCampaign(final Campaign campaign, final List<Person> combatPersonnel,
                                 final List<Person> supportPersonnel, final List<Entity> entities,
-                                final List<Part> parts, final List<AmmoStorage> ammunition,
+                                final List<Entity> mothballedEntities, final List<Part> parts,
+                                final List<Armor> armour, final List<AmmoStorage> ammunition,
                                 final @Nullable Contract contract) {
+        // Phase One: Personnel, Units, and Unit
+        final List<Person> personnel = new ArrayList<>();
+        final List<Unit> units = new ArrayList<>();
+        applyPhaseOneToCampaign(campaign, combatPersonnel, supportPersonnel, personnel, entities, units);
+
+        // Phase 2: Spares
+        final List<Unit> mothballedUnits = createMothballedSpareUnits(campaign, mothballedEntities);
+        units.addAll(mothballedUnits);
+
+        // Phase 3: Contract
+        moveToStartingPlanet(campaign);
+        processContract(campaign, contract);
+
+        // Phase 4: Finances
+        processFinances(campaign, personnel, units, parts, armour, ammunition, contract);
+
+        // Phase 5: Applying Spares
+        parts.forEach(p -> campaign.getWarehouse().addPart(p, true));
+        armour.forEach(a -> campaign.getWarehouse().addPart(a, true));
+        ammunition.forEach(a -> campaign.getWarehouse().addPart(a, true));
+    }
+
+    private void applyPhaseOneToCampaign(final Campaign campaign, final List<Person> combatPersonnel,
+                                         final List<Person> supportPersonnel, final List<Person> personnel,
+                                         final List<Entity> entities, final List<Unit> units) {
         // Process Personnel
-        List<Person> personnel = new ArrayList<>(supportPersonnel);
         personnel.addAll(combatPersonnel);
+        personnel.addAll(supportPersonnel);
 
         // If we aren't using the pool, generate all of the Astechs and Medics required
         generateAssistants(campaign, personnel);
@@ -1048,27 +1206,19 @@ public abstract class AbstractCompanyGenerator {
         }
 
         // Process Units
-        final List<Unit> units = createUnits(campaign, combatPersonnel, entities);
+        units.addAll(createUnits(campaign, combatPersonnel, entities));
 
         // Assign Techs to Units
         assignTechsToUnits(supportPersonnel, units);
 
         // Generate the Forces and Assign Units to them
         generateUnit(campaign, sortPersonnelIntoLances(combatPersonnel));
-
-        // Process Contract
-        processContract(campaign, contract);
-
-        // Process Finances
-        processFinances(campaign, personnel, units, parts, ammunition, contract);
-
-        // Process Parts - After finances because we want to merge parts together
-        parts.forEach(p -> campaign.getWarehouse().addPart(p, true));
-
-        // Process Ammunition - After finances because we want to merge the ammunition together when
-        // possible
-        ammunition.forEach(a -> campaign.getWarehouse().addPart(a, true));
     }
+    //endregion Apply to Campaign
+
+    //region Revert Application to Campaign
+
+    //endregion Revert Application to Campaign
 
     //region Local Classes
     /**
