@@ -163,12 +163,8 @@ public class CompanyGenerationDialog extends BaseDialog {
         final List<Person> supportPersonnel = generator.generateSupportPersonnel(campaign);
         final List<Entity> entities = generator.generateUnits(campaign, combatPersonnel);
         final List<Entity> mothballedEntities = generator.generateMothballedEntities(campaign, entities);
-        final List<Part> parts = generator.generateSpareParts();
-        final List<Armor> armour = generator.generateArmour();
-        final List<AmmoStorage> ammunition = generator.generateAmmunition();
         final Contract contract = null;
-        generator.applyToCampaign(campaign, combatPersonnel, supportPersonnel, entities, mothballedEntities,
-                parts, armour, ammunition, contract);
+        generator.applyToCampaign(campaign, combatPersonnel, supportPersonnel, entities, mothballedEntities, contract);
     }
 
     @Override

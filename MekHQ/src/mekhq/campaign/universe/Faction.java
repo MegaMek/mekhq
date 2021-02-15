@@ -1,7 +1,7 @@
 /*
  * Faction.java
  *
- * Copyright (C) 2009-2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2021 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -35,6 +35,7 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
+import megamek.common.annotations.Nullable;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,7 +48,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Faction {
@@ -120,13 +120,13 @@ public class Faction {
         return nameGenerator;
     }
 
-    public String getStartingPlanet(LocalDate year) {
-        Map.Entry<LocalDate, String> change = planetChanges.floorEntry(year);
-        if (null == change) {
-            return startingPlanet;
-        } else {
-            return change.getValue();
-        }
+    public @Nullable PlanetarySystem getStartingPlanet(final Campaign campaign, final LocalDate date) {
+        return campaign.getSystemById(getStartingPlanet(date));
+    }
+
+    public String getStartingPlanet(final LocalDate date) {
+        Map.Entry<LocalDate, String> change = planetChanges.floorEntry(date);
+        return (change == null) ? startingPlanet : change.getValue();
     }
 
     public int getEraMod(int year) {

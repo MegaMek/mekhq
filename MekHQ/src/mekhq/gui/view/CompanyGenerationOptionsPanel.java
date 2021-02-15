@@ -775,9 +775,29 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         lblFaction.setToolTipText(resources.getString("lblFaction.toolTipText"));
         lblFaction.setName("lblFaction");
 
-        setComboFaction(new JComboBox<>(getFactionChoices().toArray(new FactionChoice[]{})));
+        setComboFaction(new JComboBox<>(new DefaultComboBoxModel<>(getFactionChoices().toArray(new FactionChoice[]{}))));
         getComboFaction().setToolTipText(resources.getString("lblFaction.toolTipText"));
         getComboFaction().setName("comboFaction");
+        getComboFaction().addActionListener(evt -> {
+            if (getChkStartingSystemFactionSpecific().isSelected()) {
+                if ((getStartingPlanet() != null)
+                        && getStartingSystem().getFactionSet(getCampaign().getLocalDate()).contains(getFaction())) {
+                    final PlanetarySystem startingSystem = getFaction().getStartingPlanet(getCampaign(), getCampaign().getLocalDate());
+                    if (startingSystem != null) {
+                        getComboStartingSystem().setSelectedItem(startingSystem);
+                        getComboStartingPlanet().setSelectedItem(startingSystem.getPrimaryPlanet());
+                    } else {
+                        restoreComboStartingSystem();
+                    }
+                } else {
+                    restoreComboStartingSystem();
+                }
+            }
+
+            if (getChkCentralSystemFactionSpecific().isSelected()) {
+                restoreComboStartingSystem();
+            }
+        });
 
         setChkSpecifyStartingSystem(new JCheckBox(resources.getString("chkSpecifyStartingSystem.text")));
         getChkSpecifyStartingSystem().setToolTipText(resources.getString("chkSpecifyStartingSystem.toolTipText"));
@@ -1747,9 +1767,10 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     private List<FactionChoice> getFactionChoices() {
         final List<FactionChoice> factionChoices = new ArrayList<>();
 
-        // TODO : I shouldn't be all, just those valid during the game year
         for (final Faction faction : Factions.getInstance().getFactions()) {
-            factionChoices.add(new FactionChoice(faction, getCampaign().getGameYear()));
+            if (faction.validIn(getCampaign().getLocalDate())) {
+                factionChoices.add(new FactionChoice(faction, getCampaign().getGameYear()));
+            }
         }
 
         final NaturalOrderComparator noc = new NaturalOrderComparator();

@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.universe.generators.companyGeneration;
 
+import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
@@ -37,6 +38,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -52,6 +54,7 @@ import mekhq.campaign.universe.RangedFactionSelector;
 import mekhq.campaign.universe.RangedPlanetSelector;
 import mekhq.campaign.universe.enums.Alphabet;
 import mekhq.campaign.universe.enums.CompanyGenerationType;
+import mekhq.campaign.work.WorkTime;
 import mekhq.gui.enums.LayeredForceIcon;
 
 import java.util.ArrayList;
@@ -87,12 +90,7 @@ import java.util.stream.Collectors;
  *      Implement:
  *          assignBestRollToUnitCommander
  *          centerPlanet
- *          assignTechsToUnits
  *          generateSpareParts // 1 for every 3 (round normally) parts in inventory?
- *          startingArmourWeight
- *          generateSpareAmmunition
- *          numberReloadsPerWeapon
- *          generateFractionalMachineGunAmmunition // 50 rounds per machine gun in force?
  *          selectStartingContract
  *
  * FIXME :
@@ -102,6 +100,7 @@ import java.util.stream.Collectors;
  *      Dialog Buttons look odd and need fixing
  *      Dialog Modify the buttons, and have them appear or disappear based on the current panel
  *      Panel has odd whitespace usage
+ *      System, Planet text search
  *
  * Class Notes:
  * {{@link AbstractCompanyGenerator#applyToCampaign}} takes the campaign and applies all changes to
@@ -601,9 +600,7 @@ public abstract class AbstractCompanyGenerator {
                                               final RandomMechParameters parameters,
                                               final String faction, int year) {
         Predicate<MechSummary> filter = ms ->
-                (!campaign.getCampaignOptions().limitByYear() || (year > ms.getYear()))
-                        && (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
-                        && (ms.isClan() || campaign.getCampaignOptions().allowISPurchases());
+                (!campaign.getCampaignOptions().limitByYear() || (year > ms.getYear()));
         return campaign.getUnitGenerator().generate(faction, UnitType.MEK,
                 parameters.getWeight(), year, parameters.getQuality(), filter);
     }
@@ -638,11 +635,28 @@ public abstract class AbstractCompanyGenerator {
 
     /**
      * @param supportPersonnel the list of support personnel including the techs to assign to units
-     * @param units the list of units to have techs assigned to
+     * @param units the list of units to have techs assigned to (order does not matter)
      */
     private void assignTechsToUnits(final List<Person> supportPersonnel, final List<Unit> units) {
-        if (getOptions().isAssignTechsToUnits()) {
-            // TODO : Implement me
+        if (!getOptions().isAssignTechsToUnits()) {
+            return;
+        }
+
+        final List<Person> mechTechs = supportPersonnel.parallelStream()
+                .filter(p -> p.getPrimaryRole() == Person.T_MECH_TECH).collect(Collectors.toList());
+        if (mechTechs.size() == 0) {
+            return;
+        }
+
+        units.sort(Comparator.comparingDouble(Unit::getMaintenanceTime));
+        int numberMechTechs = mechTechs.size();
+        for (int i = 0; (i < units.size()) && !mechTechs.isEmpty(); i++) {
+            Person mechTech = mechTechs.get(i % numberMechTechs);
+            if (mechTech.getMaintenanceTimeUsing() + units.get(i).getMaintenanceTime() <= Person.PRIMARY_ROLE_SUPPORT_TIME) {
+                units.get(i).setTech(mechTech);
+            } else {
+                mechTechs.remove(i % numberMechTechs--);
+            }
         }
     }
     //endregion Units
@@ -965,7 +979,10 @@ public abstract class AbstractCompanyGenerator {
             }
 
             // Generate the 'Mech, and add it to the mothballed entities list
-            mothballedEntities.add(generateEntity(campaign, parameters, faction));
+            final Entity entity = generateEntity(campaign, parameters, faction);
+            if (entity != null) {
+                mothballedEntities.add(entity);
+            }
         }
         return mothballedEntities;
     }
@@ -986,19 +1003,101 @@ public abstract class AbstractCompanyGenerator {
         return mothballedUnits;
     }
 
-    public List<Part> generateSpareParts() {
+    public List<Part> generateSpareParts(final List<Unit> units) {
+        if (!getOptions().isGenerateSpareParts()) {
+            return new ArrayList<>();
+        }
         // TODO : Implement me
         return new ArrayList<>();
     }
 
-    public List<Armor> generateArmour() {
-        // TODO : Implement me
-        return new ArrayList<>();
+    public List<Armor> generateArmour(final List<Unit> units) {
+        if (getOptions().getStartingArmourWeight() <= 0) {
+            return new ArrayList<>();
+        }
+
+        final List<Armor> unitAssignedArmour = units.stream()
+                .flatMap(u -> u.getParts().stream())
+                .filter(p -> p instanceof Armor)
+                .map(p -> (Armor) p)
+                .collect(Collectors.toList());
+        final List<Armor> armour = mergeIdenticalArmour(unitAssignedArmour);
+        final double armourTonnageMultiplier = getOptions().getStartingArmourWeight()
+                / armour.stream().mapToDouble(Armor::getTonnage).sum();
+        armour.forEach(a -> a.setAmount(Math.toIntExact(Math.round(a.getAmount() * armourTonnageMultiplier))));
+        return armour;
     }
 
-    public List<AmmoStorage> generateAmmunition() {
-        // TODO : Implement me
-        return new ArrayList<>();
+    private List<Armor> mergeIdenticalArmour(final List<Armor> unmergedArmour) {
+        final List<Armor> mergedArmour = new ArrayList<>();
+        unmergedArmour.forEach(a -> {
+            boolean unmerged = true;
+            for (final Armor armour : mergedArmour) {
+                if (areSameArmour(armour, a)) {
+                    armour.addAmount(a.getAmount());
+                    unmerged = false;
+                    break;
+                }
+            }
+            if (unmerged) {
+                final Armor armour = a.clone();
+                armour.setMode(WorkTime.NORMAL);
+                armour.setOmniPodded(false);
+                mergedArmour.add(armour);
+            }
+        });
+        return mergedArmour;
+    }
+
+    private boolean areSameArmour(final Armor a1, final Armor a2) {
+        return (a1.getClass() == a2.getClass())
+                && a1.isSameType(a2)
+                && (a1.isClan() == a2.isClan())
+                && (a1.getQuality() == a2.getQuality())
+                && (a1.getHits() == a2.getHits())
+                && (a1.getSkillMin() == a2.getSkillMin());
+    }
+
+    public List<AmmoStorage> generateAmmunition(final Campaign campaign, final List<Unit> units) {
+        if (!getOptions().isGenerateSpareAmmunition() || ((getOptions().getNumberReloadsPerWeapon() <= 0)
+                && !getOptions().isGenerateFractionalMachineGunAmmunition())) {
+            return new ArrayList<>();
+        }
+
+        final List<AmmoBin> ammoBins = units.stream()
+                .flatMap(u -> u.getParts().stream())
+                .filter(p -> p instanceof AmmoBin)
+                .map(p -> (AmmoBin) p)
+                .collect(Collectors.toList());
+
+        final List<AmmoStorage> ammunition = new ArrayList<>();
+        final boolean generateReloads = getOptions().getNumberReloadsPerWeapon() > 0;
+        ammoBins.forEach(ammoBin -> {
+            if (getOptions().isGenerateFractionalMachineGunAmmunition()
+                    && ammoBinIsMachineGun(ammoBin)) {
+                ammunition.add(new AmmoStorage(0, ammoBin.getType(), 50, campaign));
+            } else if (generateReloads) {
+                ammunition.add(new AmmoStorage(0, ammoBin.getType(),
+                        ammoBin.getFullShots() * getOptions().getNumberReloadsPerWeapon(), campaign));
+            }
+        });
+
+        return ammunition;
+    }
+
+    /**
+     * @param ammoBin the ammo bin to check
+     * @return whether the ammo bin's ammo type is a machine gun type
+     */
+    private boolean ammoBinIsMachineGun(final AmmoBin ammoBin) {
+        switch (ammoBin.getType().getAmmoType()) {
+            case AmmoType.T_MG:
+            case AmmoType.T_MG_HEAVY:
+            case AmmoType.T_MG_LIGHT:
+                return true;
+            default:
+                return false;
+        }
     }
     //endregion Spares
 
@@ -1026,8 +1125,7 @@ public abstract class AbstractCompanyGenerator {
                                  final @Nullable Contract contract) {
         // TODO : Finish implementation
 
-        Money startingCash = getOptions().isRandomizeStartingCash() ? rollRandomStartingCash()
-                : Money.of(getOptions().getStartingCash());
+        Money startingCash = generateStartingCash();
         final Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
         if (getOptions().isPayForSetup()) {
             final Money hiringCosts = calculateHiringCosts(personnel);
@@ -1044,6 +1142,14 @@ public abstract class AbstractCompanyGenerator {
                         resources.getString(""), campaign.getLocalDate());
             }
         }
+    }
+
+    /**
+     * @return the amount of starting cash generated for the Mercenary Company
+     */
+    public Money generateStartingCash() {
+        return getOptions().isRandomizeStartingCash() ? rollRandomStartingCash()
+                : Money.of(getOptions().getStartingCash());
     }
 
     /**
@@ -1145,6 +1251,7 @@ public abstract class AbstractCompanyGenerator {
 
     //region Apply to Campaign
     /**
+     * TODO : UNFINISHED
      * This method takes the campaign and applies all changes to it. No method not directly
      * called from here may alter the campaign.
      *
@@ -1153,16 +1260,13 @@ public abstract class AbstractCompanyGenerator {
      * @param supportPersonnel the list of generated support personnel
      * @param entities the list of generated entities, with null holding spaces without 'Mechs
      * @param mothballedEntities the list of generated spare 'Mech entities to mothball
-     * @param parts the list of generated parts
-     * @param armour the list of generated armour
-     * @param ammunition the list of generated ammunition
      * @param contract the selected contract, or null if one has not been selected
      */
     public void applyToCampaign(final Campaign campaign, final List<Person> combatPersonnel,
                                 final List<Person> supportPersonnel, final List<Entity> entities,
-                                final List<Entity> mothballedEntities, final List<Part> parts,
-                                final List<Armor> armour, final List<AmmoStorage> ammunition,
-                                final @Nullable Contract contract) {
+                                final List<Entity> mothballedEntities, final @Nullable Contract contract) {
+        moveToStartingPlanet(campaign);
+
         // Phase One: Personnel, Units, and Unit
         final List<Person> personnel = new ArrayList<>();
         final List<Unit> units = new ArrayList<>();
@@ -1172,8 +1276,11 @@ public abstract class AbstractCompanyGenerator {
         final List<Unit> mothballedUnits = createMothballedSpareUnits(campaign, mothballedEntities);
         units.addAll(mothballedUnits);
 
+        final List<Part> parts = generateSpareParts(units);
+        final List<Armor> armour = generateArmour(units);
+        final List<AmmoStorage> ammunition = generateAmmunition(campaign, units);
+
         // Phase 3: Contract
-        moveToStartingPlanet(campaign);
         processContract(campaign, contract);
 
         // Phase 4: Finances
@@ -1217,7 +1324,7 @@ public abstract class AbstractCompanyGenerator {
     //endregion Apply to Campaign
 
     //region Revert Application to Campaign
-
+    // TODO : ADD ME
     //endregion Revert Application to Campaign
 
     //region Local Classes
