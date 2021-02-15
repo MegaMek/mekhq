@@ -19,13 +19,9 @@
 package mekhq.gui.dialog;
 
 import megamek.common.Entity;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.generators.companyGeneration.AbstractCompanyGenerator;
 import mekhq.campaign.universe.generators.companyGeneration.CompanyGenerationOptions;
@@ -35,31 +31,37 @@ import mekhq.gui.view.CompanyGenerationOptionsPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-import java.util.ResourceBundle;
 
 public class CompanyGenerationDialog extends BaseDialog {
     //region Variable Declarations
+    private Campaign campaign;
     private CompanyGenerationPanelType currentPanelType;
     private CompanyGenerationOptionsPanel companyGenerationOptionsPanel;
-    private Campaign campaign; // TODO : Temp value
     //endregion Variable Declarations
 
     //region Constructors
     public CompanyGenerationDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()),
-                "CompanyGenerationDialog.title");
+        super(frame, "CompanyGenerationDialog.title");
+        setCampaign(campaign);
         setCurrentPanelType(CompanyGenerationPanelType.OPTIONS);
-        this.campaign = campaign; // TODO : Temp value
-        initialize(campaign);
+        initialize("CompanyGenerationDialog");
     }
     //endregion Constructors
 
     //region Getters/Setters
+    public Campaign getCampaign() {
+        return campaign;
+    }
+
+    public void setCampaign(final Campaign campaign) {
+        this.campaign = campaign;
+    }
+
     public CompanyGenerationPanelType getCurrentPanelType() {
         return currentPanelType;
     }
 
-    public void setCurrentPanelType(CompanyGenerationPanelType currentPanelType) {
+    public void setCurrentPanelType(final CompanyGenerationPanelType currentPanelType) {
         this.currentPanelType = currentPanelType;
     }
 
@@ -74,11 +76,10 @@ public class CompanyGenerationDialog extends BaseDialog {
 
     //region Initialization
     /**
-     * @param campaign the campaign with which to create the center pane
      * @return the center pane
      */
     @Override
-    protected Container createCenterPane(final Campaign campaign) {
+    protected Container createCenterPane() {
         switch (getCurrentPanelType()) {
             case PERSONNEL:
             case UNITS:
@@ -89,7 +90,7 @@ public class CompanyGenerationDialog extends BaseDialog {
             case OVERVIEW:
             case OPTIONS:
             default:
-                return new JScrollPane(initializeCompanyGenerationOptionsPanel(campaign));
+                return new JScrollPane(initializeCompanyGenerationOptionsPanel(getCampaign()));
         }
     }
 
@@ -158,13 +159,13 @@ public class CompanyGenerationDialog extends BaseDialog {
     @Override
     protected void okAction() {
         final CompanyGenerationOptions options = getCompanyGenerationOptionsPanel().createOptionsFromPanel();
-        final AbstractCompanyGenerator generator = options.getType().getGenerator(campaign, options);
-        final List<Person> combatPersonnel = generator.generateCombatPersonnel(campaign);
-        final List<Person> supportPersonnel = generator.generateSupportPersonnel(campaign);
-        final List<Entity> entities = generator.generateUnits(campaign, combatPersonnel);
-        final List<Entity> mothballedEntities = generator.generateMothballedEntities(campaign, entities);
+        final AbstractCompanyGenerator generator = options.getType().getGenerator(getCampaign(), options);
+        final List<Person> combatPersonnel = generator.generateCombatPersonnel(getCampaign());
+        final List<Person> supportPersonnel = generator.generateSupportPersonnel(getCampaign());
+        final List<Entity> entities = generator.generateUnits(getCampaign(), combatPersonnel);
+        final List<Entity> mothballedEntities = generator.generateMothballedEntities(getCampaign(), entities);
         final Contract contract = null;
-        generator.applyToCampaign(campaign, combatPersonnel, supportPersonnel, entities, mothballedEntities, contract);
+        generator.applyToCampaign(getCampaign(), combatPersonnel, supportPersonnel, entities, mothballedEntities, contract);
     }
 
     @Override

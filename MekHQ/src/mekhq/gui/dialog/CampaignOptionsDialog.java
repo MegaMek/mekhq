@@ -62,6 +62,7 @@ import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
+import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.GameOptions;
@@ -4252,11 +4253,15 @@ public class CampaignOptionsDialog extends JDialog {
 
         btnLoad.setText(resourceMap.getString("btnLoad.text"));
         btnLoad.setName("btnLoad");
-        btnLoad.addActionListener(evt -> btnLoadActionPerformed());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        btnLoad.addActionListener(evt -> {
+            final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(frame);
+            presetSelectionDialog.setVisible(true);
+            applyPreset(presetSelectionDialog.getSelectedPreset());
+        });
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.weightx = 0.25;
         getContentPane().add(btnLoad, gridBagConstraints);
 
@@ -4296,7 +4301,11 @@ public class CampaignOptionsDialog extends JDialog {
         }
     }
 
-    public void applyPreset(GamePreset gamePreset) {
+    public void applyPreset(final @Nullable GamePreset gamePreset) {
+        if (gamePreset == null) {
+            return;
+        }
+
         // Handle CampaignOptions and RandomSkillPreferences
         setOptions(gamePreset.getOptions(), gamePreset.getRandomSkillPreferences());
 
@@ -4763,18 +4772,6 @@ public class CampaignOptionsDialog extends JDialog {
             tableRanks.setRowSelectionInterval(row, row);
         } else {
             tableRanks.setRowSelectionInterval(row - 1, row - 1);
-        }
-    }
-
-    private void btnLoadActionPerformed() {
-        List<GamePreset> presets = GamePreset.getGamePresetsIn();
-
-        if (!presets.isEmpty()) {
-            ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(null, true, presets);
-            cgpd.setVisible(true);
-            if (!cgpd.wasCancelled() && (cgpd.getSelectedPreset() != null)) {
-                applyPreset(cgpd.getSelectedPreset());
-            }
         }
     }
 

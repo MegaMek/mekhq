@@ -1,7 +1,7 @@
 /*
  * DialogResult.java
  *
- * Copyright (c) 2019 MekHQ Team. All rights reserved.
+ * Copyright (c) 2019-2021 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,22 +12,27 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
-package mekhq.gui.dialog;
+package mekhq.gui.enums;
 
 public enum DialogResult {
-    OK(1),
-    CANCEL(-1);
+    //region Enum Declarations
+    CONFIRMED,
+    CANCELLED;
+    //endregion Enum Declarations
 
-    private final int value;
-
-    DialogResult(int value) {
-        this.value = value;
+    //region Boolean Comparison Methods
+    public boolean isConfirmed() {
+        return this == CONFIRMED;
     }
+
+    public boolean isCancelled() {
+        return this == CANCELLED;
+    }
+    //endregion Boolean Comparison Methods
 }

@@ -20,10 +20,8 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.campaign.universe.enums.CompanyGenerationType;
 import mekhq.gui.enums.PersonnelFilterStyle;
@@ -84,8 +82,9 @@ public class MekHqOptionsDialog extends BaseDialog {
 
     //region Constructors
     public MekHqOptionsDialog(JFrame parent) {
-        super(parent, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog", new EncodeControl()));
-        initialize();
+        super(parent, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog",
+                new EncodeControl()), "dialog.text");
+        initialize("MekHQOptionsDialog");
         setInitialState();
     }
     //endregion Constructors
@@ -94,12 +93,9 @@ public class MekHqOptionsDialog extends BaseDialog {
     /**
      * This dialog uses the following Mnemonics:
      * C, D, M, M, S, U, W, Y
-     *
-     * @param campaign this value will always be null for this dialog, unless the constructor is
-     *                 changed first
      */
     @Override
-    protected Container createCenterPane(final @Nullable Campaign campaign) {
+    protected Container createCenterPane() {
         JTabbedPane optionsTabbedPane = new JTabbedPane();
         optionsTabbedPane.setName("optionsTabbedPane");
         optionsTabbedPane.add(resources.getString("displayTab.title"), new JScrollPane(createDisplayTab()));

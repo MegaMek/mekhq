@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 
@@ -215,17 +214,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 setVisible(false);
 
                 // Game Presets
-                GamePreset gamePreset = null;
-                List<GamePreset> presets = GamePreset.getGamePresetsIn();
-                if (!presets.isEmpty()) {
-                    ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(frame, true, presets);
-                    cgpd.setVisible(true);
-                    gamePreset = cgpd.getSelectedPreset();
-                }
+                final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(frame);
+                presetSelectionDialog.setVisible(true);
+                GamePreset gamePreset = presetSelectionDialog.getSelectedPreset();
                 CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign);
-                if (gamePreset != null) {
-                    optionsDialog.applyPreset(gamePreset);
-                }
+                optionsDialog.applyPreset(gamePreset);
                 optionsDialog.setVisible(true);
                 if (optionsDialog.wasCancelled()) {
                     cancelled = true;

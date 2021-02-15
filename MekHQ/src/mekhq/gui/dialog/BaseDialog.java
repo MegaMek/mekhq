@@ -20,9 +20,9 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.common.annotations.Nullable;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
+import mekhq.gui.enums.DialogResult;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
@@ -32,6 +32,7 @@ import java.awt.event.*;
 import java.util.ResourceBundle;
 
 /*
+ * TODO : Windchild : Rewrite all comments
  * Base class for dialogs in MekHQ. This class handles setting the UI,
  * managing the Ok/Cancel buttons, managing the X button, and saving the dialog preferences.
  *
@@ -56,20 +57,25 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
     //endregion Variable Declarations
 
     //region Constructors
-    protected BaseDialog(final JFrame parent, final ResourceBundle resources) {
-        this(parent, false, resources, "dialog.text");
+    protected BaseDialog(final JFrame frame, final String title) {
+        this(frame, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), title);
     }
 
-    protected BaseDialog(final JFrame parent, final ResourceBundle resources, final String title) {
-        this(parent, false, resources, title);
+    protected BaseDialog(final JFrame frame, final boolean modal, final String title) {
+        this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), title);
     }
 
-    protected BaseDialog(final JFrame parent, final boolean modal, final ResourceBundle resources,
+    protected BaseDialog(final JFrame frame, final ResourceBundle resources, final String title) {
+        this(frame, false, resources, title);
+    }
+
+    protected BaseDialog(final JFrame frame, final boolean modal, final ResourceBundle resources,
                          final String title) {
-        super(parent, modal);
+        super(frame, modal);
         setTitle(resources.getString(title));
-        setFrame(parent);
+        setFrame(frame);
         setResources(resources);
+        setResult(DialogResult.CANCELLED); // Default result is cancelled
     }
     //endregion Constructors
 
@@ -96,17 +102,15 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
     //endregion Getters/Setters
 
     //region Initialization
-    protected void initialize() {
-        initialize(null);
-    }
-
     /**
      * Initializes the dialog UI and preferences. Needs to be called by
      * child classes for initial setup.
      */
-    protected void initialize(final @Nullable Campaign campaign) {
+    protected void initialize(final String name) {
+        setName(name);
         setLayout(new BorderLayout());
-        add(createCenterPane(campaign), BorderLayout.CENTER);
+
+        add(createCenterPane(), BorderLayout.CENTER);
         add(createButtonPanel(), BorderLayout.PAGE_END);
 
         pack();
@@ -115,7 +119,7 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
         setPreferences();
     }
 
-    protected abstract Container createCenterPane(final @Nullable Campaign campaign);
+    protected abstract Container createCenterPane();
 
     protected JPanel createButtonPanel() {
         JPanel panel = new JPanel(new GridLayout(1, 2));
@@ -155,7 +159,7 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
 
     protected void okButtonActionPerformed(final ActionEvent evt) {
         okAction();
-        setResult(DialogResult.OK);
+        setResult(DialogResult.CONFIRMED);
         setVisible(false);
     }
 
@@ -173,7 +177,6 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
         } finally {
-            setResult(DialogResult.CANCEL);
             setVisible(false);
         }
     }
@@ -194,8 +197,6 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
             cancelAction();
         } catch (Exception ex) {
             MekHQ.getLogger().error(ex);
-        } finally {
-            setResult(DialogResult.CANCEL);
         }
     }
 
