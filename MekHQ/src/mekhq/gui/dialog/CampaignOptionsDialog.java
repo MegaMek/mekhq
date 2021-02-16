@@ -1662,11 +1662,9 @@ public class CampaignOptionsDialog extends JDialog {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                     super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                    if (isSelected && (index > -1)) {
-                        list.setToolTipText((list.getSelectedValue() instanceof FinancialYearDuration)
-                                ? ((FinancialYearDuration) list.getSelectedValue()).getToolTipText() : "");
+                    if (value instanceof FinancialYearDuration) {
+                        list.setToolTipText(((FinancialYearDuration) value).getToolTipText());
                     }
-
                     return this;
                 }
             });
@@ -3788,6 +3786,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createGeneralPersonnelPanel() {
+        // Create Panel Components
         chkUseTactics = new JCheckBox(resources.getString("chkUseTactics.text"));
         chkUseTactics.setToolTipText(resources.getString("chkUseTactics.toolTipText"));
         chkUseTactics.setName("chkUseTactics");
@@ -3871,10 +3870,11 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createExpandedPersonnelInformationPanel() {
-        // These are initialized first so they can be disabled
+        // Initialize Labels Used in ActionListeners
         JLabel lblTimeInServiceDisplayFormat = new JLabel();
         JLabel lblTimeInRankDisplayFormat = new JLabel();
 
+        // Create Panel Components
         chkUseTimeInService = new JCheckBox(resources.getString("chkUseTimeInService.text"));
         chkUseTimeInService.setToolTipText(resources.getString("chkUseTimeInService.toolTipText"));
         chkUseTimeInService.setName("chkUseTimeInService");
@@ -3919,10 +3919,14 @@ public class CampaignOptionsDialog extends JDialog {
         chkShowOriginFaction.setToolTipText(resources.getString("chkShowOriginFaction.toolTipText"));
         chkShowOriginFaction.setName("chkShowOriginFaction");
 
-        // Disable Time in Service and Time in Rank by default
-        chkUseTimeInService.setEnabled(true);
+        // Programmatically Assign Accessibility Labels
+        lblTimeInServiceDisplayFormat.setLabelFor(comboTimeInServiceDisplayFormat);
+        lblTimeInRankDisplayFormat.setLabelFor(comboTimeInRankDisplayFormat);
+
+        // Disable Panel Portions by Default
+        chkUseTimeInService.setSelected(true);
         chkUseTimeInService.doClick();
-        chkUseTimeInRank.setEnabled(true);
+        chkUseTimeInRank.setSelected(true);
         chkUseTimeInRank.doClick();
 
         // Layout the Panel
@@ -3969,6 +3973,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createMedicalPanel() {
+        // Create Panel Components
         chkUseAdvancedMedical = new JCheckBox(resources.getString("chkUseAdvancedMedical.text"));
         chkUseAdvancedMedical.setToolTipText(resources.getString("chkUseAdvancedMedical.toolTipText"));
         chkUseAdvancedMedical.setName("chkUseAdvancedMedical");
@@ -4005,6 +4010,11 @@ public class CampaignOptionsDialog extends JDialog {
         chkUseTougherHealing = new JCheckBox(resources.getString("chkUseTougherHealing.text"));
         chkUseTougherHealing.setToolTipText(resources.getString("chkUseTougherHealing.toolTipText"));
         chkUseTougherHealing.setName("chkUseTougherHealing");
+
+        // Programmatically Assign Accessibility Labels
+        lblHealWaitingPeriod.setLabelFor(spnHealWaitingPeriod);
+        lblNaturalHealWaitingPeriod.setLabelFor(spnNaturalHealWaitingPeriod);
+        lblMinimumHitsForVehicles.setLabelFor(spnMinimumHitsForVehicles);
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -4052,6 +4062,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createPrisonerPanel() {
+        // Create Panel Components
         JLabel lblPrisonerCaptureStyle = new JLabel(resources.getString("lblPrisonerCaptureStyle.text"));
         lblPrisonerCaptureStyle.setToolTipText(resources.getString("lblPrisonerCaptureStyle.toolTipText"));
         lblPrisonerCaptureStyle.setName("lblPrisonerCaptureStyle");
@@ -4060,13 +4071,13 @@ public class CampaignOptionsDialog extends JDialog {
         comboPrisonerCaptureStyle.setName("comboPrisonerCaptureStyle");
         comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (isSelected && (index > -1) && (list.getSelectedValue() instanceof PrisonerCaptureStyle)) {
-                    list.setToolTipText(((PrisonerCaptureStyle) list.getSelectedValue()).getToolTip());
+                if (value instanceof PrisonerCaptureStyle) {
+                    list.setToolTipText(((PrisonerCaptureStyle) value).getToolTip());
                 }
-
                 return this;
             }
         });
@@ -4092,6 +4103,10 @@ public class CampaignOptionsDialog extends JDialog {
         chkAtBPrisonerRansom = new JCheckBox(resources.getString("chkAtBPrisonerRansom.text"));
         chkAtBPrisonerRansom.setToolTipText(resources.getString("chkAtBPrisonerRansom.toolTipText"));
         chkAtBPrisonerRansom.setName("chkAtBPrisonerRansom");
+
+        // Programmatically Assign Accessibility Labels
+        lblPrisonerCaptureStyle.setLabelFor(comboPrisonerCaptureStyle);
+        lblPrisonerStatus.setLabelFor(comboPrisonerStatus);
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -4133,6 +4148,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createPersonnelRandomizationPanel() {
+        // Create Panel Components
         chkUseDylansRandomXP = new JCheckBox(resources.getString("chkUseDylansRandomXP.text"));
         chkUseDylansRandomXP.setToolTipText(resources.getString("chkUseDylansRandomXP.toolTipText"));
         chkUseDylansRandomXP.setName("chkUseDylansRandomXP");
@@ -4165,10 +4181,11 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createRandomOriginPanel() {
-        // These are initialized first so they can be disabled
+        // Initialize Labels Used in ActionListeners
         JLabel lblOriginSearchRadius = new JLabel();
         JLabel lblOriginDistanceScale = new JLabel();
 
+        // Create Panel Components
         chkRandomizeOrigin = new JCheckBox(resources.getString("chkRandomizeOrigin.text"));
         chkRandomizeOrigin.setToolTipText(resources.getString("chkRandomizeOrigin.toolTipText"));
         chkRandomizeOrigin.setName("chkRandomizeOrigin");
@@ -4206,8 +4223,12 @@ public class CampaignOptionsDialog extends JDialog {
         spnOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
         spnOriginDistanceScale.setName("spnOriginDistanceScale");
 
-        // Disable the panel as default
-        chkRandomizeOrigin.setEnabled(true);
+        // Programmatically Assign Accessibility Labels
+        lblOriginSearchRadius.setLabelFor(spnOriginSearchRadius);
+        lblOriginDistanceScale.setLabelFor(spnOriginDistanceScale);
+
+        // Disable Panel by Default
+        chkRandomizeOrigin.setSelected(true);
         chkRandomizeOrigin.doClick();
 
         // Layout the Panel
@@ -4250,6 +4271,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createFamilyPanel() {
+        // Create Panel Components
         JLabel lblDisplayFamilyLevel = new JLabel(resources.getString("lblDisplayFamilyLevel.text"));
         lblDisplayFamilyLevel.setToolTipText(resources.getString("lblDisplayFamilyLevel.toolTipText"));
         lblDisplayFamilyLevel.setName("lblDisplayFamilyLevel");
@@ -4257,6 +4279,9 @@ public class CampaignOptionsDialog extends JDialog {
         comboDisplayFamilyLevel = new JComboBox<>(FamilialRelationshipDisplayLevel.values());
         comboDisplayFamilyLevel.setToolTipText(resources.getString("lblDisplayFamilyLevel.toolTipText"));
         comboDisplayFamilyLevel.setName("comboDisplayFamilyLevel");
+
+        // Programmatically Assign Accessibility Labels
+        lblDisplayFamilyLevel.setLabelFor(comboDisplayFamilyLevel);
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -4286,6 +4311,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createSalaryPanel() {
+        // Create Panel Components
         JPanel salaryMultiplierPanel = createSalaryMultiplierPanel();
 
         JPanel salaryExperienceModifierPanel = createSalaryExperienceMultiplierPanel();
@@ -4320,6 +4346,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createSalaryMultiplierPanel() {
+        // Create Panel Components
         JLabel lblCommissionedSalary = new JLabel(resources.getString("lblCommissionedSalary.text"));
         lblCommissionedSalary.setToolTipText(resources.getString("lblCommissionedSalary.toolTipText"));
         lblCommissionedSalary.setName("lblCommissionedSalary");
@@ -4343,6 +4370,11 @@ public class CampaignOptionsDialog extends JDialog {
         spnAntiMekSalary = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
         spnAntiMekSalary.setToolTipText(resources.getString("lblAntiMekSalary.toolTipText"));
         spnAntiMekSalary.setName("spnAntiMekSalary");
+
+        // Programmatically Assign Accessibility Labels
+        lblCommissionedSalary.setLabelFor(spnCommissionedSalary);
+        lblEnlistedSalary.setLabelFor(spnEnlistedSalary);
+        lblAntiMekSalary.setLabelFor(spnAntiMekSalary);
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -4381,7 +4413,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createSalaryExperienceMultiplierPanel() {
-        JPanel panel = new JPanel(new GridLayout(1, 10));
+        final JPanel panel = new JPanel(new GridLayout(1, 10));
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("salaryExperienceMultiplierPanel.title")));
         panel.setToolTipText(resources.getString("salaryExperienceMultiplierPanel.toolTipText"));
         panel.setName("salaryExperienceMultiplierPanel");
@@ -4391,7 +4423,7 @@ public class CampaignOptionsDialog extends JDialog {
             final String skillLevel = SkillType.getExperienceLevelName(i);
             final String toolTipText = String.format(resources.getString("lblSalaryExperienceMultiplier.toolTipText"), skillLevel);
 
-            JLabel label = new JLabel(skillLevel);
+            final JLabel label = new JLabel(skillLevel);
             label.setToolTipText(toolTipText);
             label.setName("lbl" + skillLevel);
             panel.add(label);
@@ -4400,23 +4432,24 @@ public class CampaignOptionsDialog extends JDialog {
             spnSalaryExperienceMultipliers[i].setToolTipText(toolTipText);
             spnSalaryExperienceMultipliers[i].setName("spn" + skillLevel);
             panel.add(spnSalaryExperienceMultipliers[i]);
+
+            label.setLabelFor(spnSalaryExperienceMultipliers[i]);
         }
 
         return panel;
     }
 
     private JPanel createBaseSalaryPanel() {
-        JPanel panel = new JPanel(new GridLayout((int) Math.ceil((double) (Person.T_NUM - 1) / 3.0), 6));
+        final JPanel panel = new JPanel(new GridLayout((int) Math.ceil((double) (Person.T_NUM - 1) / 3.0), 6));
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("baseSalaryPanel.title")));
         panel.setPreferredSize(new Dimension(200, 200));
 
         spnBaseSalary = new JSpinner[Person.T_NUM];
-
         for (int i = 1; i < Person.T_NUM; i++) {
             final String roleName = Person.getRoleDesc(i, false);
             final String toolTipText = String.format(resources.getString("lblBaseSalary.toolTipText"), roleName);
 
-            JLabel label = new JLabel(roleName);
+            final JLabel label = new JLabel(roleName);
             label.setToolTipText(toolTipText);
             label.setName("lbl" + roleName);
             panel.add(label);
@@ -4425,12 +4458,15 @@ public class CampaignOptionsDialog extends JDialog {
             spnBaseSalary[i].setToolTipText(toolTipText);
             spnBaseSalary[i].setName("spn" + roleName);
             panel.add(spnBaseSalary[i]);
+
+            label.setLabelFor(spnBaseSalary[i]);
         }
 
         return panel;
     }
 
     private JPanel createMarriagePanel() {
+        // Create Panel Components
         chkUseManualMarriages = new JCheckBox(resources.getString("chkUseManualMarriages.text"));
         chkUseManualMarriages.setToolTipText(resources.getString("chkUseManualMarriages.toolTipText"));
         chkUseManualMarriages.setName("chkUseManualMarriages");
@@ -4458,6 +4494,10 @@ public class CampaignOptionsDialog extends JDialog {
         JPanel marriageSurnameWeightsPanel = createMarriageSurnameWeightsPanel();
 
         JPanel randomMarriagePanel = createRandomMarriagePanel();
+
+        // Programmatically Assign Accessibility Labels
+        lblMinimumMarriageAge.setLabelFor(spnMinimumMarriageAge);
+        lblCheckMutualAncestorsDepth.setLabelFor(spnCheckMutualAncestorsDepth);
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -4504,14 +4544,14 @@ public class CampaignOptionsDialog extends JDialog {
         final Marriage[] marriageStyles = Marriage.values();
         final int surnameWeightLength = marriageStyles.length - 1;
 
-        JPanel panel = new JPanel(new GridLayout((int) Math.ceil(surnameWeightLength / 3.0), 6));
+        final JPanel panel = new JPanel(new GridLayout((int) Math.ceil(surnameWeightLength / 3.0), 6));
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("marriageSurnameWeightsPanel.title")));
         panel.setToolTipText(resources.getString("marriageSurnameWeightsPanel.toolTipText"));
         panel.setName("marriageSurnameWeightsPanel");
 
         spnMarriageSurnameWeights = new JSpinner[surnameWeightLength];
         for (int i = 0; i < surnameWeightLength; i++) {
-            JLabel label = new JLabel(marriageStyles[i].toString());
+            final JLabel label = new JLabel(marriageStyles[i].toString());
             label.setToolTipText(marriageStyles[i].getToolTipText());
             label.setName("lbl" + marriageStyles[i].toString());
             panel.add(label);
@@ -4520,17 +4560,20 @@ public class CampaignOptionsDialog extends JDialog {
             spnMarriageSurnameWeights[i].setToolTipText(marriageStyles[i].getToolTipText());
             spnMarriageSurnameWeights[i].setName("spn" + marriageStyles[i].toString());
             panel.add(spnMarriageSurnameWeights[i]);
+
+            label.setLabelFor(spnMarriageSurnameWeights[i]);
         }
 
         return panel;
     }
 
     private JPanel createRandomMarriagePanel() {
-        // These are initialized first so they can be disabled
+        // Initialize Labels Used in ActionListeners
         JLabel lblChanceRandomMarriages = new JLabel();
         JLabel lblMarriageAgeRange = new JLabel();
         JLabel lblChanceRandomSameSexMarriages = new JLabel();
 
+        // Create Panel Components
         chkUseRandomMarriages = new JCheckBox(resources.getString("chkUseRandomMarriages.text"));
         chkUseRandomMarriages.setToolTipText(resources.getString("chkUseRandomMarriages.toolTipText"));
         chkUseRandomMarriages.setName("chkUseRandomMarriages");
@@ -4578,8 +4621,13 @@ public class CampaignOptionsDialog extends JDialog {
         spnChanceRandomSameSexMarriages.setToolTipText(resources.getString("lblChanceRandomSameSexMarriages.toolTipText"));
         spnChanceRandomSameSexMarriages.setName("spnChanceRandomSameSexMarriages");
 
-        // Disable the panel as default
-        chkUseRandomMarriages.setEnabled(true);
+        // Programmatically Assign Accessibility Labels
+        lblChanceRandomMarriages.setLabelFor(spnChanceRandomMarriages);
+        lblMarriageAgeRange.setLabelFor(spnMarriageAgeRange);
+        lblChanceRandomSameSexMarriages.setLabelFor(spnChanceRandomSameSexMarriages);
+
+        // Disable Panel by Default
+        chkUseRandomMarriages.setSelected(true);
         chkUseRandomMarriages.doClick();
 
         // Layout the Panel
@@ -4626,11 +4674,12 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createProcreationPanel() {
-        // These are initialized first so they can be disabled
+        // Initialize Labels Used in ActionListeners
         JLabel lblChanceProcreation = new JLabel();
         JLabel lblChanceProcreationNoRelationship = new JLabel();
         JLabel lblBabySurnameStyle = new JLabel();
 
+        // Create Panel Components
         chkUseProcreation = new JCheckBox(resources.getString("chkUseProcreation.text"));
         chkUseProcreation.setToolTipText(resources.getString("chkUseProcreation.toolTipText"));
         chkUseProcreation.setName("chkUseProcreation");
@@ -4689,13 +4738,12 @@ public class CampaignOptionsDialog extends JDialog {
         comboBabySurnameStyle.setName("comboBabySurnameStyle");
         comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (isSelected && (index > -1)) {
-                    list.setToolTipText((list.getSelectedValue() instanceof BabySurnameStyle)
-                            ? ((BabySurnameStyle) list.getSelectedValue()).getStyleToolTip()
-                            : resources.getString("lblBabySurnameStyle.toolTipText"));
+                if (value instanceof BabySurnameStyle) {
+                    list.setToolTipText(((BabySurnameStyle) value).getToolTipText());
                 }
                 return this;
             }
@@ -4705,8 +4753,13 @@ public class CampaignOptionsDialog extends JDialog {
         chkDetermineFatherAtBirth.setToolTipText(resources.getString("chkDetermineFatherAtBirth.toolTipText"));
         chkDetermineFatherAtBirth.setName("chkDetermineFatherAtBirth");
 
-        // Disable the panel as default
-        chkUseProcreation.setEnabled(true);
+        // Programmatically Assign Accessibility Labels
+        lblChanceProcreation.setLabelFor(spnChanceProcreation);
+        lblChanceProcreationNoRelationship.setLabelFor(spnChanceProcreationNoRelationship);
+        lblBabySurnameStyle.setLabelFor(comboBabySurnameStyle);
+
+        // Disable Panel by Default
+        chkUseProcreation.setSelected(true);
         chkUseProcreation.doClick();
 
         // Layout the Panel
@@ -4759,6 +4812,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private JPanel createDeathPanel() {
+        // Create Panel Components
         chkKeepMarriedNameUponSpouseDeath = new JCheckBox(resources.getString("chkKeepMarriedNameUponSpouseDeath.text"));
         chkKeepMarriedNameUponSpouseDeath.setToolTipText(resources.getString("chkKeepMarriedNameUponSpouseDeath.toolTipText"));
         chkKeepMarriedNameUponSpouseDeath.setName("chkKeepMarriedNameUponSpouseDeath");
@@ -4788,9 +4842,8 @@ public class CampaignOptionsDialog extends JDialog {
     //endregion Personnel Tab
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CampaignOptionsDialog.class);
-
-        this.setName("dialog");
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
+        setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
 
