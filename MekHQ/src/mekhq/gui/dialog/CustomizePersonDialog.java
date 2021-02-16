@@ -1247,43 +1247,35 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         skillBonus.get(type).setEnabled(skillChks.get(type).isSelected());
     }
 
-    private void btnDateActionPerformed(ActionEvent evt) {
-        // show the date chooser
-        DateChooser dc = new DateChooser(frame, birthdate);
-        // user can either choose a date or cancel by closing
-        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            birthdate = dc.getDate();
+    private void btnDateActionPerformed(final ActionEvent evt) {
+        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, birthdate);
+        if (dateSelectionDialog.showDialog().isConfirmed()) {
+            birthdate = dateSelectionDialog.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(birthdate));
             lblAge.setText(getAge() + " " + resourceMap.getString("age"));
         }
     }
 
-    private void btnServiceDateActionPerformed(ActionEvent evt) {
-        // show the date chooser
-        DateChooser dc = new DateChooser(frame, recruitment);
-        // user can either choose a date or cancel by closing
-        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            recruitment = dc.getDate();
+    private void btnServiceDateActionPerformed(final ActionEvent evt) {
+        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, recruitment);
+        if (dateSelectionDialog.showDialog().isConfirmed()) {
+            recruitment = dateSelectionDialog.getDate();
             btnServiceDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(recruitment));
         }
     }
 
     private void btnRankDateActionPerformed() {
-        // show the date chooser
-        DateChooser dc = new DateChooser(frame, lastRankChangeDate);
-        // user can either choose a date or cancel by closing
-        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            lastRankChangeDate = dc.getDate();
+        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, lastRankChangeDate);
+        if (dateSelectionDialog.showDialog().isConfirmed()) {
+            lastRankChangeDate = dateSelectionDialog.getDate();
             btnRankDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(lastRankChangeDate));
         }
     }
 
     private void btnRetirementDateActionPerformed() {
-        // show the date chooser
-        DateChooser dc = new DateChooser(frame, retirement);
-        // user can either choose a date or cancel by closing
-        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            retirement = dc.getDate();
+        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, retirement);
+        if (dateSelectionDialog.showDialog().isConfirmed()) {
+            retirement = dateSelectionDialog.getDate();
             btnRetirementDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(retirement));
         }
     }

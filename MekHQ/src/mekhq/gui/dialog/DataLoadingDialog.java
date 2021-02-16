@@ -203,10 +203,9 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             setProgress(4);
             if (newCampaign) {
                 // show the date chooser
-                DateChooser dc = new DateChooser(frame, campaign.getLocalDate());
-                // user can either choose a date or cancel by closing
-                if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-                    campaign.setLocalDate(dc.getDate());
+                final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, campaign.getLocalDate());
+                if (dateSelectionDialog.showDialog().isConfirmed()) {
+                    campaign.setLocalDate(dateSelectionDialog.getDate());
                     campaign.getGameOptions().getOption("year").setValue(campaign.getGameYear());
                 }
 

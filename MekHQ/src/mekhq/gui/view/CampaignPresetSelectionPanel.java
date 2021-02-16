@@ -23,7 +23,6 @@ import mekhq.campaign.GamePreset;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 public class CampaignPresetSelectionPanel extends JPanel {
     //region Variable Declarations
@@ -31,8 +30,8 @@ public class CampaignPresetSelectionPanel extends JPanel {
     //endregion Variable Declarations
 
     //region Constructors
-    public CampaignPresetSelectionPanel(final List<GamePreset> presets) {
-        initialize(presets);
+    public CampaignPresetSelectionPanel() {
+        initialize();
     }
     //endregion Constructors
 
@@ -51,14 +50,14 @@ public class CampaignPresetSelectionPanel extends JPanel {
     //endregion Getters/Setters
 
     //region Initialization
-    private void initialize(final List<GamePreset> presets) {
+    private void initialize() {
         setName("campaignPresetSelectionPanel");
         setLayout(new GridLayout(1, 1));
         setMinimumSize(new Dimension(335, 130));
         setPreferredSize(new Dimension(500, 400));
 
         DefaultListModel<GamePreset> listModel = new DefaultListModel<>();
-        listModel.addAll(presets);
+        listModel.addAll(GamePreset.getGamePresetsIn());
 
         setPresets(new JList<>(listModel));
         getPresets().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

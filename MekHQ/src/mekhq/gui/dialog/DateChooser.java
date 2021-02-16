@@ -20,8 +20,6 @@ import javax.swing.*;
 import javax.swing.text.DefaultFormatterFactory;
 
 import mekhq.MekHQ;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
 
 /**
  * Hovanes Gambaryan Henry Demirchian CSUN, CS 585 Professor Mike Barnes
@@ -50,10 +48,6 @@ import mekhq.preferences.PreferencesNode;
  * == DateChooser.OK_OPTION) { date = dc.getDate(); }
  */
 public class DateChooser extends JDialog implements ActionListener, FocusListener, KeyListener {
-    private static final long serialVersionUID = 4353945278962427075L;
-    public static final int OK_OPTION = 1;
-    public static final int CANCEL_OPTION = 2;
-
     private static final List<String> monthNames;
     static {
         monthNames = new ArrayList<>(12);
@@ -66,7 +60,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         monthNames.add("July");
         monthNames.add("August");
         monthNames.add("September");
-        monthNames.add("October ");
+        monthNames.add("October");
         monthNames.add("November");
         monthNames.add("December");
     }
@@ -76,7 +70,6 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     private JLabel monthLabel;
     private JLabel yearLabel;
     private JPanel dayGrid;
-    private boolean ready;
 
     // Stores the user-input date.
     private JFormattedTextField dateField;
@@ -119,6 +112,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
         // build the panel with year and navigation buttons
         yearPane.add(navButton[2] = new JButton("<<"));
+        // Month::getDisplayName
         yearPane.add(
                 yearLabel = new JLabel(String.valueOf(date.getYear()), JLabel.CENTER),
                 BorderLayout.CENTER);
@@ -176,41 +170,10 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         dateField.setColumns(10);
 
         setResizable(false);
-        ready = false;
         pack();
 
         // center this dialog over the owner
         setLocationRelativeTo(owner);
-        setUserPreferences();
-    }
-
-    private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(DateChooser.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
-    }
-
-    /**
-     * Return the last selected date for this instance of DateChooser
-     */
-    public LocalDate getDate() {
-        return date;
-    }
-
-    /**
-     * Displays a DateChooser dialog on the screen. If a new date is selected
-     * returnsor OK_OPTION. If the action is canceled returns CANCEL_OPTION.
-     * Both of the returned values are defined as static constants.
-     */
-    public int showDateChooser() {
-        ready = false;
-        setVisible(true);
-        if (ready) {
-            return OK_OPTION;
-        } else {
-            return CANCEL_OPTION;
-        }
     }
 
     /**
@@ -267,10 +230,8 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                     y = Integer.parseInt(yearLabel.getText());
                     d = Integer.parseInt(label);
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(getClass(), "actionPerformed", e);
                 }
                 date = LocalDate.of(y, m, d);
-                ready = true;
 
                 //Set the date field to the new date.
                 dateField.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
@@ -287,7 +248,6 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      */
     private void setDate(LocalDate date) {
         this.date = date;
-        ready = true;
         monthLabel.setText(monthNames.get(date.getMonth().ordinal()));
         yearLabel.setText(String.valueOf(date.getYear()));
         dateField.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
@@ -492,7 +452,9 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     private void updateDateFromDateField() {
         LocalDate newDate = parseDate(dateField.getText());
         if (newDate == null) {
-            JOptionPane.showMessageDialog(this, "Invalid Date Format\nTry: yyyy-MM-dd", "Date Format", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Invalid Date Format\nTry: yyyy-MM-dd", "Date Format",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         setDate(newDate);

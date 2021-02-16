@@ -32,7 +32,7 @@ import java.awt.event.*;
 import java.util.ResourceBundle;
 
 /*
- * TODO : Windchild : Rewrite all comments
+ * TODO : Windchild : Rewrite this comment
  * Base class for dialogs in MekHQ. This class handles setting the UI,
  * managing the Ok/Cancel buttons, managing the X button, and saving the dialog preferences.
  *
@@ -103,8 +103,8 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
 
     //region Initialization
     /**
-     * Initializes the dialog UI and preferences. Needs to be called by
-     * child classes for initial setup.
+     * Initializes the dialog's UI and preferences. Needs to be called by child classes for initial
+     * setup.
      */
     protected void initialize(final String name) {
         setName(name);
@@ -145,10 +145,10 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
     }
 
     /**
-     * Adds custom preferences to this dialog.
+     * Adds custom preferences to the child dialog.
      *
      * By default, this dialog will track preferences related to the size
-     * and position of the dialog. Other preferences should be added by overriding
+     * and position of the dialog. Other preferences can be added by overriding
      * this method.
      * @param preferences the preference node for this dialog
      */
@@ -164,12 +164,12 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
     }
 
     /**
-     * Action performed when the ok button is clicked.
+     * Action performed when the Ok button is clicked.
      */
     protected abstract void okAction();
 
     /**
-     * Notes: cancelling a dialog should always allow to close the dialog.
+     * Note: Cancelling a dialog should always allow one to close the dialog.
      */
     protected void cancelButtonActionPerformed(final ActionEvent evt) {
         try {
@@ -182,14 +182,23 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
     }
 
     /**
-     * Action performed when the cancel button is clicked or
-     * when the dialog is closed by the X button.
+     * Action performed when the Cancel button is clicked, the dialog is closed by the X button, or
+     * the escape key is pressed
      */
     protected abstract void cancelAction();
 
+    /**
+     * Sets the dialog to be visible, before returning the result
+     * @return the result of showing the dialog
+     */
+    public DialogResult showDialog() {
+        setVisible(true);
+        return getResult();
+    }
+
     //region WindowEvents
     /**
-     * Notes: closing the dialog should always allow you to close the dialog.
+     * Note: Closing the dialog should always allow one to close the dialog.
      */
     @Override
     public void windowClosing(final WindowEvent e) {

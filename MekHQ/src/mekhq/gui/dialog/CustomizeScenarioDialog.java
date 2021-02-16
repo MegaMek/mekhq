@@ -373,21 +373,19 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     }
 
     private void changeDate() {
-        // show the date chooser
-        DateChooser dc = new DateChooser(frame, date);
-        // user can either choose a date or cancel by closing
-        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, date);
+        if (dateSelectionDialog.showDialog().isConfirmed()) {
             if (scenario.isCurrent()) {
-                if (dc.getDate().isBefore(campaign.getLocalDate())) {
+                if (dateSelectionDialog.getDate().isBefore(campaign.getLocalDate())) {
                     JOptionPane.showMessageDialog(frame,
                             "You cannot choose a date before the current date for a pending battle.",
                             "Invalid date",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 } else {
-                    LocalDate nextMonday = campaign.getLocalDate().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+                    final LocalDate nextMonday = campaign.getLocalDate().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
 
-                    if (!dc.getDate().isBefore(nextMonday)) {
+                    if (!dateSelectionDialog.getDate().isBefore(nextMonday)) {
                         JOptionPane.showMessageDialog(frame,
                                 "You cannot choose a date beyond the current week.",
                                 "Invalid date",
@@ -395,14 +393,14 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                         return;
                     }
                 }
-            } else if (dc.getDate().isAfter(campaign.getLocalDate())) {
+            } else if (dateSelectionDialog.getDate().isAfter(campaign.getLocalDate())) {
                 JOptionPane.showMessageDialog(frame,
                         "You cannot choose a date after the current date.",
                         "Invalid date",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            date = dc.getDate();
+            date = dateSelectionDialog.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         }
     }

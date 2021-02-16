@@ -40,7 +40,7 @@ public class CampaignPresetRenderer extends JPanel implements ListCellRenderer<G
         return lblTitle;
     }
 
-    public void setLblTitle(JLabel lblTitle) {
+    public void setLblTitle(final JLabel lblTitle) {
         this.lblTitle = lblTitle;
     }
 
@@ -48,7 +48,7 @@ public class CampaignPresetRenderer extends JPanel implements ListCellRenderer<G
         return description;
     }
 
-    public void setDescription(JTextArea description) {
+    public void setDescription(final JTextArea description) {
         this.description = description;
     }
     //endregion Getters/Setters

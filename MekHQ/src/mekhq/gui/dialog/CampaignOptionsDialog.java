@@ -5232,11 +5232,11 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void btnDateActionPerformed(ActionEvent evt) {
-        // show the date chooser
-        DateChooser dc = new DateChooser(frame, date);
-        // user can either choose a date or cancel by closing
-        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = dc.getDate();
+        final DateSelectionDialog dateSelectionDialog = new DateSelectionDialog(frame, date);
+        // Only overwrite here when it is confirmed with a different date
+        if (dateSelectionDialog.showDialog().isConfirmed()
+                && !date.equals(dateSelectionDialog.getDate())) {
+            date = dateSelectionDialog.getDate();
             btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
             factionModel = new SortedComboBoxModel<>();
             for (String sname : Factions.getInstance().getChoosableFactionCodes()) {

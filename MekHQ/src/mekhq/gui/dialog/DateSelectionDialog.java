@@ -18,47 +18,57 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.GamePreset;
-import mekhq.gui.view.CampaignPresetSelectionPanel;
+import mekhq.gui.view.DateSelectionPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDate;
 
-public class CampaignPresetSelectionDialog extends BaseDialog {
+public class DateSelectionDialog extends BaseDialog {
     //region Variable Declarations
-    private CampaignPresetSelectionPanel presetSelectionPanel;
+    private LocalDate initialDate;
+
+    private DateSelectionPanel dateSelectionPanel;
     //endregion Variable Declarations
 
     //region Constructors
-    protected CampaignPresetSelectionDialog(final JFrame parent) {
-        super(parent, true, "CampaignPresetSelectionDialog.title");
-        initialize("CampaignPresetSelectionDialog");
+    public DateSelectionDialog(final JFrame frame, final LocalDate initialDate) {
+        super(frame, "DateSelectionDialog.title");
+        setInitialDate(initialDate);
+        initialize("DateSelectionDialog");
     }
     //endregion Constructors
 
     //region Getters/Setters
-    public CampaignPresetSelectionPanel getPresetSelectionPanel() {
-        return presetSelectionPanel;
+    public LocalDate getInitialDate() {
+        return initialDate;
     }
 
-    public void setPresetSelectionPanel(final CampaignPresetSelectionPanel presetSelectionPanel) {
-        this.presetSelectionPanel = presetSelectionPanel;
+    public void setInitialDate(LocalDate initialDate) {
+        this.initialDate = initialDate;
+    }
+
+    public DateSelectionPanel getDateSelectionPanel() {
+        return dateSelectionPanel;
+    }
+
+    public void setDateSelectionPanel(final DateSelectionPanel dateSelectionPanel) {
+        this.dateSelectionPanel = dateSelectionPanel;
     }
 
     /**
-     * @return the selected preset, or null if the dialog was cancelled or no preset was selected
+     * @return the specified date
      */
-    public @Nullable GamePreset getSelectedPreset() {
-        return getResult().isConfirmed() ? getPresetSelectionPanel().getSelectedPreset() : null;
+    public LocalDate getDate() {
+        return getResult().isConfirmed() ? getDateSelectionPanel().getDate() : getInitialDate();
     }
     //endregion Getters/Setters
 
     //region Initialization
     @Override
     protected Container createCenterPane() {
-        setPresetSelectionPanel(new CampaignPresetSelectionPanel());
-        return getPresetSelectionPanel();
+        setDateSelectionPanel(new DateSelectionPanel(getInitialDate()));
+        return getDateSelectionPanel();
     }
     //endregion Initialization
 
@@ -70,11 +80,5 @@ public class CampaignPresetSelectionDialog extends BaseDialog {
     @Override
     protected void cancelAction() {
 
-    }
-
-    @Override
-    public void setVisible(final boolean visible) {
-        // Only show if there are presets to select from
-        super.setVisible(visible && (getPresetSelectionPanel().getPresets().getModel().getSize() > 0));
     }
 }
