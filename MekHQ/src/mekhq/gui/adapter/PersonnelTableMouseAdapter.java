@@ -499,7 +499,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements Act
             }
             case CMD_ADD_SPOUSE: {
                 Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
-                Marriage.valueOf(data[2]).marry(selectedPerson, spouse, gui.getCampaign());
+                Marriage.valueOf(data[2]).marry(gui.getCampaign(), selectedPerson, spouse);
                 break;
             }
             case CMD_ADD_AWARD: {

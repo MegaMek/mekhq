@@ -578,7 +578,6 @@ public class CampaignOptions implements Serializable {
         setSalaryXPMultiplier(SkillType.EXP_ULTRA_GREEN, 0.6);
         setSalaryXPMultiplier(SkillType.EXP_GREEN, 0.6);
         setSalaryXPMultiplier(SkillType.EXP_REGULAR, 1.0);
-        setSalaryXPMultiplier(SkillType.EXP_REGULAR, 1.0);
         setSalaryXPMultiplier(SkillType.EXP_VETERAN, 1.6);
         setSalaryXPMultiplier(SkillType.EXP_ELITE, 3.2);
         setRoleBaseSalaries(new Money[Person.T_NUM]);
