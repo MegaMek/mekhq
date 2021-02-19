@@ -24,7 +24,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 
-public class DateSelectionDialog extends BaseDialog {
+public class DateSelectionDialog extends BaseButtonDialog {
     //region Variable Declarations
     private LocalDate initialDate;
 
@@ -71,14 +71,4 @@ public class DateSelectionDialog extends BaseDialog {
         return getDateSelectionPanel();
     }
     //endregion Initialization
-
-    @Override
-    protected void okAction() {
-
-    }
-
-    @Override
-    protected void cancelAction() {
-
-    }
 }

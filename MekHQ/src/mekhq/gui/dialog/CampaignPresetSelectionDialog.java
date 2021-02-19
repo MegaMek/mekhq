@@ -25,14 +25,14 @@ import mekhq.gui.view.CampaignPresetSelectionPanel;
 import javax.swing.*;
 import java.awt.*;
 
-public class CampaignPresetSelectionDialog extends BaseDialog {
+public class CampaignPresetSelectionDialog extends BaseButtonDialog {
     //region Variable Declarations
     private CampaignPresetSelectionPanel presetSelectionPanel;
     //endregion Variable Declarations
 
     //region Constructors
     protected CampaignPresetSelectionDialog(final JFrame parent) {
-        super(parent, true, "CampaignPresetSelectionDialog.title");
+        super(parent, "CampaignPresetSelectionDialog.title");
         initialize("CampaignPresetSelectionDialog");
     }
     //endregion Constructors
@@ -61,16 +61,6 @@ public class CampaignPresetSelectionDialog extends BaseDialog {
         return getPresetSelectionPanel();
     }
     //endregion Initialization
-
-    @Override
-    protected void okAction() {
-
-    }
-
-    @Override
-    protected void cancelAction() {
-
-    }
 
     @Override
     public void setVisible(final boolean visible) {

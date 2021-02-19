@@ -22,7 +22,6 @@ package mekhq.gui.dialog;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.gui.enums.DialogResult;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
@@ -31,42 +30,33 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ResourceBundle;
 
-/*
- * TODO : Windchild : Rewrite this comment
- * Base class for dialogs in MekHQ. This class handles setting the UI,
- * managing the Ok/Cancel buttons, managing the X button, and saving the dialog preferences.
+/**
+ * This is the base class for dialogs in MekHQ. This class handles setting the UI, managing the X
+ * button, managing the escape key, and saving the dialog preferences.
  *
  * A class that inherits from this class needs to at least implement the method
- * setCustomUI which will create the custom UI dialog.
- * The methods setCustomPreferences, okAction, and cancelAction allow to customize
+ * createCenterPane to create the dialog's custom center pane.
+ * The methods setCustomPreferences and cancelAction allow one to customize
  * further the behavior of the dialog by child classes.
  *
  * The dialog will be constructed by the child class calling the initialize method.
- *
- * The resources associated with this dialog need to contain at least the following keys:
- * - dialog.text -> title of the dialog
- * - okButton.text -> text for the ok button
- * - cancelButton.text -> text for the cancel button
  */
 public abstract class BaseDialog extends JDialog implements WindowListener {
     //region Variable Declarations
     private JFrame frame;
-    private DialogResult result;
+
+    protected static final String CLOSE_ACTION = "closeAction";
 
     protected ResourceBundle resources;
     //endregion Variable Declarations
 
     //region Constructors
     protected BaseDialog(final JFrame frame, final String title) {
-        this(frame, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), title);
+        this(frame, false, title);
     }
 
     protected BaseDialog(final JFrame frame, final boolean modal, final String title) {
         this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), title);
-    }
-
-    protected BaseDialog(final JFrame frame, final ResourceBundle resources, final String title) {
-        this(frame, false, resources, title);
     }
 
     protected BaseDialog(final JFrame frame, final boolean modal, final ResourceBundle resources,
@@ -75,7 +65,6 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
         setTitle(resources.getString(title));
         setFrame(frame);
         setResources(resources);
-        setResult(DialogResult.CANCELLED); // Default result is cancelled
     }
     //endregion Constructors
 
@@ -86,14 +75,6 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
 
     public void setFrame(final JFrame frame) {
         this.frame = frame;
-    }
-
-    public DialogResult getResult() {
-        return result;
-    }
-
-    public void setResult(final DialogResult result) {
-        this.result = result;
     }
 
     private void setResources(final ResourceBundle resources) {
@@ -111,31 +92,31 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
         setLayout(new BorderLayout());
 
         add(createCenterPane(), BorderLayout.CENTER);
-        add(createButtonPanel(), BorderLayout.PAGE_END);
-
-        pack();
-        addWindowListener(this);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setPreferences();
+        finalizeInitialization();
     }
 
     protected abstract Container createCenterPane();
 
-    protected JPanel createButtonPanel() {
-        JPanel panel = new JPanel(new GridLayout(1, 2));
+    protected void finalizeInitialization() {
+        pack();
 
-        JButton okButton = new JButton(resources.getString("Ok"));
-        okButton.setName("okButton");
-        okButton.addActionListener(this::okButtonActionPerformed);
-        panel.add(okButton);
+        // Escape keypress
+        final KeyStroke escape = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        //getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(escape, CLOSE_ACTION);
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escape, CLOSE_ACTION);
+        getRootPane().getInputMap(JComponent.WHEN_FOCUSED).put(escape, CLOSE_ACTION);
+        getRootPane().getActionMap().put(CLOSE_ACTION, new AbstractAction() {
+            private static final long serialVersionUID = 95171770700983453L;
 
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                cancelActionPerformed(evt);
+            }
+        });
 
-        JButton cancelButton = new JButton(resources.getString("Cancel"));
-        cancelButton.setName("cancelButton");
-        cancelButton.addActionListener(this::cancelButtonActionPerformed);
-        panel.add(cancelButton);
-
-        return panel;
+        addWindowListener(this);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setPreferences();
     }
 
     private void setPreferences() {
@@ -157,21 +138,10 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
     }
     //endregion Initialization
 
-    protected void okButtonActionPerformed(final ActionEvent evt) {
-        okAction();
-        setResult(DialogResult.CONFIRMED);
-        setVisible(false);
-    }
-
-    /**
-     * Action performed when the Ok button is clicked.
-     */
-    protected abstract void okAction();
-
     /**
      * Note: Cancelling a dialog should always allow one to close the dialog.
      */
-    protected void cancelButtonActionPerformed(final ActionEvent evt) {
+    protected void cancelActionPerformed(final ActionEvent evt) {
         try {
             cancelAction();
         } catch (Exception e) {
@@ -185,15 +155,8 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
      * Action performed when the Cancel button is clicked, the dialog is closed by the X button, or
      * the escape key is pressed
      */
-    protected abstract void cancelAction();
+    protected void cancelAction() {
 
-    /**
-     * Sets the dialog to be visible, before returning the result
-     * @return the result of showing the dialog
-     */
-    public DialogResult showDialog() {
-        setVisible(true);
-        return getResult();
     }
 
     //region WindowEvents

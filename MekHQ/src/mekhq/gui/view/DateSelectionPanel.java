@@ -23,11 +23,13 @@ import java.time.LocalDate;
 
 public class DateSelectionPanel extends JPanel {
     //region Variable Declarations
+    private LocalDate date;
     //endregion Variable Declarations
 
     //region Constructors
     public DateSelectionPanel(final LocalDate date) {
         initialize(date);
+        this.date = date; // remove
     }
     //endregion Constructors
 

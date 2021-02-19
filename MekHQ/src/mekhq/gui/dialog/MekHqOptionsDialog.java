@@ -34,7 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class MekHqOptionsDialog extends BaseDialog {
+public class MekHqOptionsDialog extends BaseButtonDialog {
     //region Variable Declarations
     //region Display
     private JTextField optionDisplayDateFormat;
@@ -81,8 +81,8 @@ public class MekHqOptionsDialog extends BaseDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    public MekHqOptionsDialog(JFrame parent) {
-        super(parent, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog",
+    public MekHqOptionsDialog(final JFrame frame) {
+        super(frame, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog",
                 new EncodeControl()), "dialog.text");
         initialize("MekHQOptionsDialog");
         setInitialState();
@@ -444,11 +444,6 @@ public class MekHqOptionsDialog extends BaseDialog {
         MekHQ.getMekHQOptions().setDefaultCompanyGenerationType((CompanyGenerationType) Objects.requireNonNull(optionDefaultCompanyGenerationType.getSelectedItem()));
 
         MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
-    }
-
-    @Override
-    protected void cancelAction() {
-
     }
 
     private void setInitialState() {

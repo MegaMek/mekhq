@@ -32,7 +32,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class CompanyGenerationDialog extends BaseDialog {
+public class CompanyGenerationDialog extends BaseButtonDialog {
     //region Variable Declarations
     private Campaign campaign;
     private CompanyGenerationPanelType currentPanelType;
@@ -120,7 +120,7 @@ public class CompanyGenerationDialog extends BaseDialog {
 
         JButton cancelButton = new JButton(resources.getString("Cancel"));
         cancelButton.setName("cancelButton");
-        cancelButton.addActionListener(this::cancelButtonActionPerformed);
+        cancelButton.addActionListener(this::cancelActionPerformed);
         panel.add(cancelButton);
 
         JButton btnExport = new JButton(resources.getString("Export"));
@@ -166,10 +166,5 @@ public class CompanyGenerationDialog extends BaseDialog {
         final List<Entity> mothballedEntities = generator.generateMothballedEntities(getCampaign(), entities);
         final Contract contract = null;
         generator.applyToCampaign(getCampaign(), combatPersonnel, supportPersonnel, entities, mothballedEntities, contract);
-    }
-
-    @Override
-    protected void cancelAction() {
-
     }
 }
