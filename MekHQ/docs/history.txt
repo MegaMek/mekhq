@@ -1,6 +1,7 @@
 VERSION HISTORY:
 ----------------
 0.47.18 (RC4)-SNAPSHOT
++ Issue #2427: Exception during maintenance on a new day breaks MekHQ
 
 0.47.17 (RC3) (2021-02-075 2015 UTC)
 + PR #2354: Don't skip ComStar as an origin faction
