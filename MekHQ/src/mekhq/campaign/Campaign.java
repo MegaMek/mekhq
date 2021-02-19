@@ -3322,7 +3322,15 @@ public class Campaign implements Serializable, ITechManager {
 
             if (null != tech) {
                 if (null != tech.getSkillForWorkingOn(part)) {
-                    fixPart(part, tech);
+                    try {
+                        fixPart(part, tech);
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error(String.format(
+                                "Could not perform overnight maintenance on %s (%d) due to an error", 
+                                part.getName(), part.getId()), e);
+                        addReport(String.format("ERROR: an error occurred performing overnight maintenance on %s, check the log",
+                                part.getName()));
+                    }
                 } else {
                     addReport(String.format(
                             "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
@@ -3363,7 +3371,12 @@ public class Campaign implements Serializable, ITechManager {
 
         // Finally, run Mass Repair Mass Salvage if desired
         if (MekHQ.getMekHQOptions().getNewDayMRMS()) {
-            MassRepairService.massRepairSalvageAllUnits(this);
+            try {
+                MassRepairService.massRepairSalvageAllUnits(this);
+            } catch (Exception e) {
+                MekHQ.getLogger().error("Could not perform mass repair/salvage on units due to an error", e);
+                addReport("ERROR: an error occurred performing mass repair/salvage on units, check the log");
+            }
         }
     }
 
