@@ -232,8 +232,8 @@ public class CampaignOptions implements Serializable {
     private double salaryCommissionMultiplier;
     private double salaryEnlistedMultiplier;
     private double salaryAntiMekMultiplier;
-    private double[] salaryXPMultiplier;
-    private Money[] salaryTypeBase;
+    private double[] salaryXPMultipliers;
+    private Money[] roleBaseSalaries;
 
     // Marriage
     private boolean useManualMarriages;
@@ -524,129 +524,130 @@ public class CampaignOptions implements Serializable {
 
         //region Personnel Tab
         // General Personnel
-        useTactics = false;
-        useInitiativeBonus = false;
-        useToughness = false;
-        useArtillery = false;
-        useAbilities = false;
-        useEdge = false;
-        useSupportEdge = false;
-        useImplants = false;
-        alternativeQualityAveraging = false;
-        useTransfers = true;
+        setUseTactics(false);
+        setUseInitiativeBonus(false);
+        setUseToughness(false);
+        setUseArtillery(false);
+        setUseAbilities(false);
+        setUseEdge(false);
+        setUseSupportEdge(false);
+        setUseImplants(false);
+        setAlternativeQualityAveraging(false);
+        setUseTransfers(true);
 
         // Expanded Personnel Information
-        useTimeInService = false;
-        timeInServiceDisplayFormat = TimeInDisplayFormat.YEARS;
-        useTimeInRank = false;
-        timeInRankDisplayFormat = TimeInDisplayFormat.MONTHS_YEARS;
-        useRetirementDateTracking = false;
-        trackTotalEarnings = false;
-        showOriginFaction = true;
+        setUseTimeInService(false);
+        setTimeInServiceDisplayFormat(TimeInDisplayFormat.YEARS);
+        setUseTimeInRank(false);
+        setTimeInRankDisplayFormat(TimeInDisplayFormat.MONTHS_YEARS);
+        setUseRetirementDateTracking(false);
+        setTrackTotalEarnings(false);
+        setShowOriginFaction(true);
 
         // Medical
-        useAdvancedMedical = false;
-        healWaitingPeriod = 1;
-        naturalHealingWaitingPeriod = 15;
-        minimumHitsForVehicles = 1;
-        useRandomHitsForVehicles = false;
-        tougherHealing = false;
+        setUseAdvancedMedical(false);
+        setHealingWaitingPeriod(1);
+        setNaturalHealingWaitingPeriod(15);
+        setMinimumHitsForVehicles(1);
+        setUseRandomHitsForVehicles(false);
+        setTougherHealing(false);
 
         // Prisoners
-        prisonerCaptureStyle = PrisonerCaptureStyle.TAHARQA;
-        defaultPrisonerStatus = PrisonerStatus.PRISONER;
-        prisonerBabyStatus = true;
-        useAtBPrisonerDefection = false;
-        useAtBPrisonerRansom = false;
+        setPrisonerCaptureStyle(PrisonerCaptureStyle.TAHARQA);
+        setDefaultPrisonerStatus(PrisonerStatus.PRISONER);
+        setPrisonerBabyStatus(true);
+        setUseAtBPrisonerDefection(false);
+        setUseAtBPrisonerRansom(false);
 
         // Personnel Randomization
-        useDylansRandomXP = false;
-        randomizeOrigin = false;
-        randomizeDependentOrigin = false;
-        originSearchRadius = 45;
-        extraRandomOrigin = false;
-        originDistanceScale = 0.6;
+        setUseDylansRandomXP(false);
+        setRandomizeOrigin(false);
+        setRandomizeDependentOrigin(false);
+        setOriginSearchRadius(45);
+        setExtraRandomOrigin(false);
+        setOriginDistanceScale(0.6);
 
         // Family
-        displayFamilyLevel = FamilialRelationshipDisplayLevel.SPOUSE;
+        setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.SPOUSE);
 
         // Salary
-        salaryCommissionMultiplier = 1.2;
-        salaryEnlistedMultiplier = 1.0;
-        salaryAntiMekMultiplier = 1.5;
-        salaryXPMultiplier = new double[5];
-        salaryXPMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
-        salaryXPMultiplier[SkillType.EXP_GREEN] = 0.6;
-        salaryXPMultiplier[SkillType.EXP_REGULAR] = 1.0;
-        salaryXPMultiplier[SkillType.EXP_VETERAN] = 1.6;
-        salaryXPMultiplier[SkillType.EXP_ELITE] = 3.2;
-        salaryTypeBase = new Money[Person.T_NUM];
-        salaryTypeBase[Person.T_NONE] = Money.of(0);
-        salaryTypeBase[Person.T_MECHWARRIOR] = Money.of(1500);
-        salaryTypeBase[Person.T_AERO_PILOT] = Money.of(1500);
-        salaryTypeBase[Person.T_VEE_GUNNER] = Money.of(900);
-        salaryTypeBase[Person.T_GVEE_DRIVER] = Money.of(900);
-        salaryTypeBase[Person.T_NVEE_DRIVER] = Money.of(900);
-        salaryTypeBase[Person.T_VTOL_PILOT] = Money.of(900);
-        salaryTypeBase[Person.T_CONV_PILOT] = Money.of(900);
-        salaryTypeBase[Person.T_INFANTRY] = Money.of(750);
-        salaryTypeBase[Person.T_BA] = Money.of(960);
-        salaryTypeBase[Person.T_SPACE_PILOT] = Money.of(1000);
-        salaryTypeBase[Person.T_SPACE_GUNNER] = Money.of(1000);
-        salaryTypeBase[Person.T_SPACE_CREW] = Money.of(1000);
-        salaryTypeBase[Person.T_NAVIGATOR] = Money.of( 1000);
-        salaryTypeBase[Person.T_DOCTOR] = Money.of(1500);
-        salaryTypeBase[Person.T_ADMIN_COM] = Money.of(500);
-        salaryTypeBase[Person.T_ADMIN_HR] = Money.of(500);
-        salaryTypeBase[Person.T_ADMIN_LOG] = Money.of(500);
-        salaryTypeBase[Person.T_ADMIN_TRA] = Money.of(500);
-        salaryTypeBase[Person.T_MECH_TECH] = Money.of(800);
-        salaryTypeBase[Person.T_AERO_TECH] = Money.of(800);
-        salaryTypeBase[Person.T_BA_TECH] = Money.of(800);
-        salaryTypeBase[Person.T_MECHANIC] = Money.of(800);
-        salaryTypeBase[Person.T_ASTECH] = Money.of(400);
-        salaryTypeBase[Person.T_MEDIC] = Money.of(400);
-        salaryTypeBase[Person.T_PROTO_PILOT] = Money.of(960);
-        salaryTypeBase[Person.T_LAM_PILOT] = Money.of(1500);
-        salaryTypeBase[Person.T_VEHICLE_CREW] = Money.of(900);
+        setSalaryCommissionMultiplier(1.2);
+        setSalaryEnlistedMultiplier(1.0);
+        setSalaryAntiMekMultiplier(1.5);
+        setSalaryXPMultipliers(new double[5]);
+        setSalaryXPMultiplier(SkillType.EXP_ULTRA_GREEN, 0.6);
+        setSalaryXPMultiplier(SkillType.EXP_GREEN, 0.6);
+        setSalaryXPMultiplier(SkillType.EXP_REGULAR, 1.0);
+        setSalaryXPMultiplier(SkillType.EXP_REGULAR, 1.0);
+        setSalaryXPMultiplier(SkillType.EXP_VETERAN, 1.6);
+        setSalaryXPMultiplier(SkillType.EXP_ELITE, 3.2);
+        setRoleBaseSalaries(new Money[Person.T_NUM]);
+        setRoleBaseSalary(Person.T_NONE, 0);
+        setRoleBaseSalary(Person.T_MECHWARRIOR, 1500);
+        setRoleBaseSalary(Person.T_AERO_PILOT, 1500);
+        setRoleBaseSalary(Person.T_VEE_GUNNER, 900);
+        setRoleBaseSalary(Person.T_GVEE_DRIVER, 900);
+        setRoleBaseSalary(Person.T_NVEE_DRIVER, 900);
+        setRoleBaseSalary(Person.T_VTOL_PILOT, 900);
+        setRoleBaseSalary(Person.T_CONV_PILOT, 900);
+        setRoleBaseSalary(Person.T_INFANTRY, 750);
+        setRoleBaseSalary(Person.T_BA, 960);
+        setRoleBaseSalary(Person.T_SPACE_PILOT, 1000);
+        setRoleBaseSalary(Person.T_SPACE_GUNNER, 1000);
+        setRoleBaseSalary(Person.T_SPACE_CREW, 1000);
+        setRoleBaseSalary(Person.T_NAVIGATOR, 1000);
+        setRoleBaseSalary(Person.T_DOCTOR, 1500);
+        setRoleBaseSalary(Person.T_ADMIN_COM, 500);
+        setRoleBaseSalary(Person.T_ADMIN_HR, 500);
+        setRoleBaseSalary(Person.T_ADMIN_LOG, 500);
+        setRoleBaseSalary(Person.T_ADMIN_TRA, 500);
+        setRoleBaseSalary(Person.T_MECH_TECH, 800);
+        setRoleBaseSalary(Person.T_AERO_TECH, 800);
+        setRoleBaseSalary(Person.T_BA_TECH, 800);
+        setRoleBaseSalary(Person.T_MECHANIC, 800);
+        setRoleBaseSalary(Person.T_ASTECH, 400);
+        setRoleBaseSalary(Person.T_MEDIC, 400);
+        setRoleBaseSalary(Person.T_PROTO_PILOT, 960);
+        setRoleBaseSalary(Person.T_LAM_PILOT, 1500);
+        setRoleBaseSalary(Person.T_VEHICLE_CREW, 900);
 
         // Marriage
-        useManualMarriages = true;
-        minimumMarriageAge = 16;
-        checkMutualAncestorsDepth = 4;
-        logMarriageNameChange = false;
-        marriageSurnameWeights = new int[Marriage.values().length - 1];
-        marriageSurnameWeights[Marriage.NO_CHANGE.getWeightsNumber()] = 100;
-        marriageSurnameWeights[Marriage.YOURS.getWeightsNumber()] = 55;
-        marriageSurnameWeights[Marriage.SPOUSE.getWeightsNumber()] = 55;
-        marriageSurnameWeights[Marriage.SPACE_YOURS.getWeightsNumber()] = 10;
-        marriageSurnameWeights[Marriage.BOTH_SPACE_YOURS.getWeightsNumber()] = 5;
-        marriageSurnameWeights[Marriage.HYP_YOURS.getWeightsNumber()] = 30;
-        marriageSurnameWeights[Marriage.BOTH_HYP_YOURS.getWeightsNumber()] = 20;
-        marriageSurnameWeights[Marriage.SPACE_SPOUSE.getWeightsNumber()] = 10;
-        marriageSurnameWeights[Marriage.BOTH_SPACE_SPOUSE.getWeightsNumber()] = 5;
-        marriageSurnameWeights[Marriage.HYP_SPOUSE.getWeightsNumber()] = 30;
-        marriageSurnameWeights[Marriage.BOTH_HYP_SPOUSE.getWeightsNumber()] = 20;
-        marriageSurnameWeights[Marriage.MALE.getWeightsNumber()] = 500;
-        marriageSurnameWeights[Marriage.FEMALE.getWeightsNumber()] = 160;
-        useRandomMarriages = false;
-        chanceRandomMarriages = 0.00025;
-        marriageAgeRange = 10;
-        useRandomSameSexMarriages = false;
-        chanceRandomSameSexMarriages = 0.00002;
+        setUseManualMarriages(true);
+        setMinimumMarriageAge(16);
+        setCheckMutualAncestorsDepth(4);
+        setLogMarriageNameChange(false);
+        setMarriageSurnameWeights(new int[Marriage.values().length - 1]);
+        setMarriageSurnameWeight(Marriage.NO_CHANGE.ordinal(), 100);
+        setMarriageSurnameWeight(Marriage.YOURS.ordinal(), 55);
+        setMarriageSurnameWeight(Marriage.SPOUSE.ordinal(), 55);
+        setMarriageSurnameWeight(Marriage.SPACE_YOURS.ordinal(), 10);
+        setMarriageSurnameWeight(Marriage.BOTH_SPACE_YOURS.ordinal(), 5);
+        setMarriageSurnameWeight(Marriage.HYP_YOURS.ordinal(), 30);
+        setMarriageSurnameWeight(Marriage.BOTH_HYP_YOURS.ordinal(), 20);
+        setMarriageSurnameWeight(Marriage.SPACE_SPOUSE.ordinal(), 10);
+        setMarriageSurnameWeight(Marriage.BOTH_SPACE_SPOUSE.ordinal(), 5);
+        setMarriageSurnameWeight(Marriage.HYP_SPOUSE.ordinal(), 30);
+        setMarriageSurnameWeight(Marriage.BOTH_HYP_SPOUSE.ordinal(), 20);
+        setMarriageSurnameWeight(Marriage.MALE.ordinal(), 500);
+        setMarriageSurnameWeight(Marriage.FEMALE.ordinal(), 160);
+        setUseRandomMarriages(false);
+        setChanceRandomMarriages(0.00025);
+        setMarriageAgeRange(10);
+        setUseRandomSameSexMarriages(false);
+        setChanceRandomSameSexMarriages(0.00002);
 
         // Procreation
-        useProcreation = false;
-        chanceProcreation = 0.0005;
-        useProcreationNoRelationship = false;
-        chanceProcreationNoRelationship = 0.00005;
-        displayTrueDueDate = false;
-        logConception = false;
-        babySurnameStyle = BabySurnameStyle.MOTHERS;
-        determineFatherAtBirth = false;
+        setUseProcreation(false);
+        setChanceProcreation(0.0005);
+        setUseProcreationNoRelationship(false);
+        setChanceProcreationNoRelationship(0.00005);
+        setDisplayTrueDueDate(false);
+        setLogConception(false);
+        setBabySurnameStyle(BabySurnameStyle.MOTHERS);
+        setDetermineFatherAtBirth(false);
 
         // Death
-        keepMarriedNameUponSpouseDeath = true;
+        setKeepMarriedNameUponSpouseDeath(true);
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -1314,32 +1315,48 @@ public class CampaignOptions implements Serializable {
         this.salaryAntiMekMultiplier = salaryAntiMekMultiplier;
     }
 
+    public double[] getSalaryXPMultipliers() {
+        return salaryXPMultipliers;
+    }
+
     public double getSalaryXPMultiplier(final int index) {
-        return ((index < 0) || (index >= salaryXPMultiplier.length)) ? 1.0 : salaryXPMultiplier[index];
+        return ((index < 0) || (index >= getSalaryXPMultipliers().length)) ? 1.0 : getSalaryXPMultipliers()[index];
+    }
+
+    public void setSalaryXPMultipliers(final double... salaryXPMultipliers) {
+        this.salaryXPMultipliers = salaryXPMultipliers;
     }
 
     public void setSalaryXPMultiplier(final int index, final double multiplier) {
-        if ((index < 0) || (index >= salaryXPMultiplier.length)) {
+        if ((index < 0) || (index >= getSalaryXPMultipliers().length)) {
             return;
         }
-        this.salaryXPMultiplier[index] = multiplier;
+        getSalaryXPMultipliers()[index] = multiplier;
     }
 
-    public double getBaseSalary(final int role) {
-        return ((role < 0) || (role >= salaryTypeBase.length)) ? 0.0
-                : salaryTypeBase[role].getAmount().doubleValue();
+    public Money[] getRoleBaseSalaries() {
+        return roleBaseSalaries;
     }
 
-    public Money getBaseSalaryMoney(final int role) {
-        return ((role < 0) || (role >= salaryTypeBase.length)) ? Money.zero() : salaryTypeBase[role];
+    public double getRoleBaseSalary(final int role) {
+        return ((role < 0) || (role >= getRoleBaseSalaries().length)) ? 0.0
+                : getRoleBaseSalaries()[role].getAmount().doubleValue();
     }
 
-    public void setBaseSalary(final int role, final double base) {
-        if ((role < 0) || (role >= salaryTypeBase.length)) {
+    public Money getRoleBaseSalaryMoney(final int role) {
+        return ((role < 0) || (role >= getRoleBaseSalaries().length)) ? Money.zero() : getRoleBaseSalaries()[role];
+    }
+
+    public void setRoleBaseSalaries(final Money... roleBaseSalaries) {
+        this.roleBaseSalaries = roleBaseSalaries;
+    }
+
+    public void setRoleBaseSalary(final int role, final double base) {
+        if ((role < 0) || (role >= getRoleBaseSalaries().length)) {
             return;
         }
 
-        this.salaryTypeBase[role] = Money.of(base);
+        getRoleBaseSalaries()[role] = Money.of(base);
     }
     //endregion Salary
 
@@ -1414,8 +1431,15 @@ public class CampaignOptions implements Serializable {
      * @param index the array index to get
      * @return the weight at the index
      */
-    public int getMarriageSurnameWeights(final int index) {
-        return marriageSurnameWeights[index];
+    public int getMarriageSurnameWeight(final int index) {
+        return getMarriageSurnameWeights()[index];
+    }
+
+    /**
+     * @param marriageSurnameWeights the new marriage surname weight array
+     */
+    public void setMarriageSurnameWeights(final int... marriageSurnameWeights) {
+        this.marriageSurnameWeights = marriageSurnameWeights;
     }
 
     /**
@@ -3135,92 +3159,92 @@ public class CampaignOptions implements Serializable {
 
         //region Personnel Tab
         //region General Personnel
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, ++indent, "useTactics", useTactics());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useInitiativeBonus", useInitiativeBonus());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useToughness", useToughness());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useArtillery", useArtillery());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAbilities", useAbilities());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useEdge", useEdge());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useSupportEdge", useSupportEdge());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useImplants", useImplants());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "alternativeQualityAveraging", useAlternativeQualityAveraging());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useTransfers", useTransfers());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, ++indent, "useTactics", useTactics());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useInitiativeBonus", useInitiativeBonus());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useToughness", useToughness());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useArtillery", useArtillery());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useAbilities", useAbilities());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useEdge", useEdge());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useSupportEdge", useSupportEdge());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useImplants", useImplants());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "alternativeQualityAveraging", useAlternativeQualityAveraging());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTransfers", useTransfers());
         //endregion General Personnel
 
         //region Expanded Personnel Information
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useTimeInService", getUseTimeInService());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "timeInServiceDisplayFormat", getTimeInServiceDisplayFormat().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useTimeInRank", getUseTimeInRank());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useRetirementDateTracking", useRetirementDateTracking());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "trackTotalEarnings", trackTotalEarnings());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "showOriginFaction", showOriginFaction());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTimeInService", getUseTimeInService());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "timeInServiceDisplayFormat", getTimeInServiceDisplayFormat().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTimeInRank", getUseTimeInRank());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRetirementDateTracking", useRetirementDateTracking());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalEarnings", trackTotalEarnings());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "showOriginFaction", showOriginFaction());
         //endregion Expanded Personnel Information
 
         //region Medical
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAdvancedMedical", useAdvancedMedical());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "healWaitingPeriod", getHealingWaitingPeriod());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "naturalHealingWaitingPeriod", getNaturalHealingWaitingPeriod());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "minimumHitsForVees", getMinimumHitsForVehicles());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useRandomHitsForVees", useRandomHitsForVehicles());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "tougherHealing", useTougherHealing());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useAdvancedMedical", useAdvancedMedical());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "healWaitingPeriod", getHealingWaitingPeriod());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "naturalHealingWaitingPeriod", getNaturalHealingWaitingPeriod());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "minimumHitsForVehicles", getMinimumHitsForVehicles());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomHitsForVehicles", useRandomHitsForVehicles());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "tougherHealing", useTougherHealing());
         //endregion Medical
 
         //region Prisoners
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "prisonerCaptureStyle", getPrisonerCaptureStyle().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "defaultPrisonerStatus", getDefaultPrisonerStatus().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "prisonerBabyStatus", getPrisonerBabyStatus());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAtBPrisonerDefection", useAtBPrisonerDefection());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useAtBPrisonerRansom", useAtBPrisonerRansom());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "prisonerCaptureStyle", getPrisonerCaptureStyle().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "defaultPrisonerStatus", getDefaultPrisonerStatus().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "prisonerBabyStatus", getPrisonerBabyStatus());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useAtBPrisonerDefection", useAtBPrisonerDefection());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useAtBPrisonerRansom", useAtBPrisonerRansom());
         //endregion Prisoners
 
         //region Personnel Randomization
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useDylansRandomXP", useDylansRandomXP());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "randomizeOrigin", randomizeOrigin());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "randomizeDependentOrigin", getRandomizeDependentOrigin());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "originSearchRadius", getOriginSearchRadius());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "extraRandomOrigin", extraRandomOrigin());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "originDistanceScale", getOriginDistanceScale());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useDylansRandomXP", useDylansRandomXP());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomizeOrigin", randomizeOrigin());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomizeDependentOrigin", getRandomizeDependentOrigin());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "originSearchRadius", getOriginSearchRadius());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "extraRandomOrigin", extraRandomOrigin());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "originDistanceScale", getOriginDistanceScale());
         //endregion Personnel Randomization
 
         //region Family
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "displayFamilyLevel", getDisplayFamilyLevel().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "displayFamilyLevel", getDisplayFamilyLevel().name());
         //endregion Family
 
         //region Salary
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryXPMultiplier", salaryXPMultiplier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salaryTypeBase", Utilities.printMoneyArray(salaryTypeBase));
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryXPMultiplier", getSalaryXPMultipliers());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
 
         //region Marriage
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useManualMarriages", useManualMarriages());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "minimumMarriageAge", getMinimumMarriageAge());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "checkMutualAncestorsDepth", checkMutualAncestorsDepth());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "logMarriageNameChange", logMarriageNameChange());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualMarriages", useManualMarriages());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "minimumMarriageAge", getMinimumMarriageAge());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "checkMutualAncestorsDepth", checkMutualAncestorsDepth());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "logMarriageNameChange", logMarriageNameChange());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomMarriageSurnameWeights", getMarriageSurnameWeights());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useRandomMarriages", useRandomMarriages());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "chanceRandomMarriages", getChanceRandomMarriages());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "marriageAgeRange", getMarriageAgeRange());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useRandomSameSexMarriages", useRandomSameSexMarriages());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "chanceRandomSameSexMarriages", getChanceRandomSameSexMarriages());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomMarriages", useRandomMarriages());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceRandomMarriages", getChanceRandomMarriages());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "marriageAgeRange", getMarriageAgeRange());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomSameSexMarriages", useRandomSameSexMarriages());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceRandomSameSexMarriages", getChanceRandomSameSexMarriages());
         //endregion Marriage
 
         //region Procreation
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useProcreation", useProcreation());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "chanceProcreation", getChanceProcreation());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useProcreationNoRelationship", useProcreationNoRelationship());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "chanceProcreationNoRelationship", getChanceProcreationNoRelationship());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "displayTrueDueDate", getDisplayTrueDueDate());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "logConception", logConception());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "babySurnameStyle", getBabySurnameStyle().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "determineFatherAtBirth", determineFatherAtBirth());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useProcreation", useProcreation());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceProcreation", getChanceProcreation());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useProcreationNoRelationship", useProcreationNoRelationship());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chanceProcreationNoRelationship", getChanceProcreationNoRelationship());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "displayTrueDueDate", getDisplayTrueDueDate());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "logConception", logConception());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "babySurnameStyle", getBabySurnameStyle().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "determineFatherAtBirth", determineFatherAtBirth());
         //endregion Procreation
 
         //region Death
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent--, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent--, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
         //endregion Death
         //endregion Personnel Tab
 
@@ -3634,6 +3658,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("prisonerCaptureStyle")) {
                 retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.valueOf(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
+                // Most of this is legacy - 0.47.X removal
                 String prisonerStatus = wn2.getTextContent().trim();
 
                 try {
@@ -3681,12 +3706,12 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
-                    retVal.salaryXPMultiplier[i] = Double.parseDouble(values[i]);
+                    retVal.setSalaryXPMultiplier(i, Double.parseDouble(values[i]));
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
                 // CAW: we need at least the correct number of salaries as are expected in this version,
                 //      otherwise we'll not be able to set a salary for a role.
-                retVal.salaryTypeBase = Utilities.readMoneyArray(wn2, Person.T_NUM);
+                retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, Person.T_NUM));
             //endregion Salary
 
             //region Marriage

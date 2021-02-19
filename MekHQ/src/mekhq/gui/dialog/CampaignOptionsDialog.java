@@ -5045,7 +5045,7 @@ public class CampaignOptionsDialog extends JDialog {
             spnSalaryExperienceMultipliers[i].setValue(options.getSalaryXPMultiplier(i));
         }
         for (int i = 1; i < spnBaseSalary.length; i++) {
-            spnBaseSalary[i].setValue(options.getBaseSalary(i));
+            spnBaseSalary[i].setValue(options.getRoleBaseSalary(i));
         }
 
         // Marriage
@@ -5059,7 +5059,7 @@ public class CampaignOptionsDialog extends JDialog {
         spnChanceRandomMarriages.setValue(options.getChanceRandomMarriages() * 100.0);
         spnMarriageAgeRange.setValue(options.getMarriageAgeRange());
         for (int i = 0; i < spnMarriageSurnameWeights.length; i++) {
-            spnMarriageSurnameWeights[i].setValue(options.getMarriageSurnameWeights(i) / 10.0);
+            spnMarriageSurnameWeights[i].setValue(options.getMarriageSurnameWeight(i) / 10.0);
         }
         if (chkUseRandomSameSexMarriages.isSelected() != options.useRandomSameSexMarriages()) {
             chkUseRandomSameSexMarriages.doClick();
@@ -5665,7 +5665,7 @@ public class CampaignOptionsDialog extends JDialog {
         }
         for (int i = 1; i < Person.T_NUM; i++) {
             try {
-                options.setBaseSalary(i, (double) spnBaseSalary[i].getValue());
+                options.setRoleBaseSalary(i, (double) spnBaseSalary[i].getValue());
             } catch (Exception ignored) {
 
             }
