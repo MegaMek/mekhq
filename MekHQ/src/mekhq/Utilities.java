@@ -1445,8 +1445,9 @@ public class Utilities {
             for (int i = 0; i < model.getRowCount(); i++) {
                 Object[] toWrite = new String[model.getColumnCount()];
                 for (int j = 0; j < model.getColumnCount(); j++) {
+                    Object value = model.getValueAt(i, j);
                     // use regex to remove any HTML tags
-                    toWrite[j] = model.getValueAt(i,j).toString().replaceAll("<[^>]*>", "");
+                    toWrite[j] = (value != null) ? value.toString().replaceAll("<[^>]*>", "") : "";
                 }
                 csvPrinter.printRecord(toWrite);
             }
