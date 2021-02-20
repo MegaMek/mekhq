@@ -1432,16 +1432,15 @@ public class Utilities {
      * @return a csv formatted export of the table
      */
     public static String exportTableToCSV(JTable table, File file) {
-        String report;
-        try {
-            TableModel model = table.getModel();
-            BufferedWriter writer = Files.newBufferedWriter(Paths.get(file.getPath()));
-            String[] columns = new String[model.getColumnCount()];
-            for (int i = 0; i < model.getColumnCount(); i++) {
-                columns[i] = model.getColumnName(i);
-            }
-            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns));
+        TableModel model = table.getModel();
+        String[] columns = new String[model.getColumnCount()];
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            columns[i] = model.getColumnName(i);
+        }
 
+        String report;
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(file.getPath()));
+                CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns))) {
             for (int i = 0; i < model.getRowCount(); i++) {
                 Object[] toWrite = new String[model.getColumnCount()];
                 for (int j = 0; j < model.getColumnCount(); j++) {
@@ -1453,7 +1452,6 @@ public class Utilities {
             }
 
             csvPrinter.flush();
-            csvPrinter.close();
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
         } catch (Exception ioe) {
