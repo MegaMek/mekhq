@@ -32,10 +32,10 @@ public class JComboBoxPreference extends PreferenceElement implements ItemListen
     //endregion Variable Declarations
 
     //region Constructors
-    public JComboBoxPreference(JComboBox comboBox) {
+    public JComboBoxPreference(final JComboBox comboBox) {
         super(comboBox.getName());
         setSelectedIndex(comboBox.getSelectedIndex());
-        this.weakReference = new WeakReference<>(comboBox);
+        weakReference = new WeakReference<>(comboBox);
         comboBox.addItemListener(this);
     }
     //endregion Constructors

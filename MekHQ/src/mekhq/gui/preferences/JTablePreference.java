@@ -46,7 +46,7 @@ public class JTablePreference extends PreferenceElement implements MouseListener
             setSortOrder(SortOrder.ASCENDING);
         }
 
-        this.weakReference = new WeakReference<>(table);
+        weakReference = new WeakReference<>(table);
         table.getTableHeader().addMouseListener(this);
     }
     //endregion Constructors

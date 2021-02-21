@@ -36,7 +36,7 @@ public class JIntNumberSpinnerPreference extends PreferenceElement implements Ch
         super (spinner.getName());
         assert spinner.getModel() instanceof SpinnerNumberModel;
         setIntValue((Integer) spinner.getValue());
-        this.weakReference = new WeakReference<>(spinner);
+        weakReference = new WeakReference<>(spinner);
         spinner.addChangeListener(this);
     }
     //endregion Constructors

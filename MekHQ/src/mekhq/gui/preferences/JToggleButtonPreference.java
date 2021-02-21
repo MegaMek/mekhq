@@ -32,10 +32,10 @@ public class JToggleButtonPreference extends PreferenceElement implements Change
     //endregion Variable Declarations
 
     //region Constructors
-    public JToggleButtonPreference(JToggleButton toggleButton) {
+    public JToggleButtonPreference(final JToggleButton toggleButton) {
         super(toggleButton.getName());
         setSelected(toggleButton.isSelected());
-        this.weakReference = new WeakReference<>(toggleButton);
+        weakReference = new WeakReference<>(toggleButton);
         toggleButton.addChangeListener(this);
     }
     //endregion Constructors
