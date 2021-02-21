@@ -81,26 +81,6 @@ public class PreferencesNode {
     //endregion Getters/Setters
 
     /**
-     * Adds a new element to be managed by this node.
-     * If there are initial values set for this node, we will try to set an initial value
-     * for this element.
-     * @param element the element to manage.
-     */
-    public void manage(final PreferenceElement element) {
-        final PreferenceElement actual = getElements().get(element.getName());
-        if (actual != null) {
-            getInitialValues().put(actual.getName(), actual.getValue());
-            actual.dispose();
-        }
-
-        getElements().put(element.getName(), element);
-
-        if (getInitialValues().containsKey(element.getName())) {
-            element.initialize(getInitialValues().get(element.getName()));
-        }
-    }
-
-    /**
      * Adds new elements to be managed by this node.
      * If there are initial values set for this node, we will try to set an initial value
      * for each element.
@@ -108,7 +88,17 @@ public class PreferencesNode {
      */
     public void manage(final PreferenceElement... elements) {
         for (final PreferenceElement element : elements) {
-            manage(element);
+            final PreferenceElement actual = getElements().get(element.getName());
+            if (actual != null) {
+                getInitialValues().put(actual.getName(), actual.getValue());
+                actual.dispose();
+            }
+
+            getElements().put(element.getName(), element);
+
+            if (getInitialValues().containsKey(element.getName())) {
+                element.initialize(getInitialValues().get(element.getName()));
+            }
         }
     }
 

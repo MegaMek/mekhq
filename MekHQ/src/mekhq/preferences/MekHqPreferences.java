@@ -58,12 +58,7 @@ public class MekHqPreferences {
     //endregion Getters/Setters
 
     public PreferencesNode forClass(final Class classToManage) {
-        PreferencesNode preferences = getNameToPreferencesMap().getOrDefault(classToManage.getName(), null);
-        if (preferences == null) {
-            preferences = new PreferencesNode(classToManage);
-            getNameToPreferencesMap().put(classToManage.getName(), preferences);
-        }
-        return preferences;
+        return getNameToPreferencesMap().computeIfAbsent(classToManage.getName(), c -> new PreferencesNode(classToManage));
     }
 
     //region File I/O
