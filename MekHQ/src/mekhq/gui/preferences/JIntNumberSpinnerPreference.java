@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.preferences;
 
 import mekhq.preferences.PreferenceElement;
@@ -27,54 +26,75 @@ import javax.swing.event.ChangeListener;
 import java.lang.ref.WeakReference;
 
 public class JIntNumberSpinnerPreference extends PreferenceElement implements ChangeListener {
-    private final WeakReference<JSpinner> weakRef;
-    private int value;
+    //region Variable Declarations
+    private final WeakReference<JSpinner> weakReference;
+    private int intValue;
+    //endregion Variable Declarations
 
-    public JIntNumberSpinnerPreference(JSpinner spinner){
+    //region Constructors
+    public JIntNumberSpinnerPreference(final JSpinner spinner) {
         super (spinner.getName());
         assert spinner.getModel() instanceof SpinnerNumberModel;
-
-        this.value = (Integer)spinner.getValue();
-        this.weakRef = new WeakReference<>(spinner);
+        setIntValue((Integer) spinner.getValue());
+        this.weakReference = new WeakReference<>(spinner);
         spinner.addChangeListener(this);
     }
+    //endregion Constructors
 
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        JSpinner element = weakRef.get();
-        if (element != null) {
-            this.value = (Integer)element.getValue();
-        }
+    //region Getters/Setters
+    public WeakReference<JSpinner> getWeakReference() {
+        return weakReference;
     }
 
+    public int getIntValue() {
+        return intValue;
+    }
+
+    public void setIntValue(final int intValue) {
+        this.intValue = intValue;
+    }
+    //endregion Getters/Setters
+
+    //region PreferenceElement
     @Override
     protected String getValue() {
-        return Integer.toString(this.value);
+        return Integer.toString(getIntValue());
     }
 
     @Override
-    protected void initialize(String value) {
-        assert value != null && value.trim().length() > 0;
+    protected void initialize(final String value) {
+        // TODO : Java 11 : Swap to isBlank
+        assert (value != null) && !value.trim().isEmpty();
 
-        JSpinner element = weakRef.get();
+        final JSpinner element = getWeakReference().get();
         if (element != null) {
-            int newValue = Integer.parseInt(value);
-            SpinnerNumberModel model = ((SpinnerNumberModel)element.getModel());
-            if ((Integer)model.getMinimum() <= newValue &&
-                    (Integer)model.getMaximum() >= newValue) {
-                this.value = newValue;
-                element.setValue(this.value);
+            final int newValue = Integer.parseInt(value);
+            final SpinnerNumberModel model = (SpinnerNumberModel) element.getModel();
+            if (((Integer) model.getMinimum() <= newValue) && ((Integer) model.getMaximum() >= newValue)) {
+                setIntValue(newValue);
+                element.setValue(getIntValue());
             }
         }
     }
 
     @Override
     protected void dispose() {
-        JSpinner element = weakRef.get();
+        final JSpinner element = getWeakReference().get();
         if (element != null) {
             element.removeChangeListener(this);
-            weakRef.clear();
+            getWeakReference().clear();
         }
     }
+    //endregion PreferenceElement
+
+    //region ChangeListener
+    @Override
+    public void stateChanged(final ChangeEvent evt) {
+        final JSpinner element = getWeakReference().get();
+        if (element != null) {
+            setIntValue((Integer) element.getValue());
+        }
+    }
+    //endregion ChangeListener
 }
 

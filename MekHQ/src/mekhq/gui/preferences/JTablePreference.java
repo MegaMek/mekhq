@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.preferences;
 
 import mekhq.preferences.PreferenceElement;
@@ -26,64 +25,74 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 
 public class JTablePreference extends PreferenceElement implements MouseListener {
-    private final WeakReference<JTable> weakRef;
+    //region Variable Declarations
+    private final WeakReference<JTable> weakReference;
     private int columnIndex;
     private SortOrder sortOrder;
+    //endregion Variable Declarations
 
-    public JTablePreference(JTable table){
+    //region Constructors
+    public JTablePreference(final JTable table) {
         super(table.getName());
 
         if (table.getRowSorter().getSortKeys().size() > 0) {
-            this.columnIndex = table.getRowSorter().getSortKeys().get(0).getColumn();
-            this.sortOrder = table.getRowSorter().getSortKeys().get(0).getSortOrder();
+            setColumnIndex(table.getRowSorter().getSortKeys().get(0).getColumn());
+            setSortOrder(table.getRowSorter().getSortKeys().get(0).getSortOrder());
         } else {
-            columnIndex = 0;
-            sortOrder = SortOrder.ASCENDING;
+            setColumnIndex(0);
+            setSortOrder(SortOrder.ASCENDING);
         }
 
-        this.weakRef = new WeakReference<>(table);
+        this.weakReference = new WeakReference<>(table);
         table.getTableHeader().addMouseListener(this);
     }
+    //endregion Constructors
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        JTable table = this.weakRef.get();
-        if (table != null) {
-            int uiIndex = table.getColumnModel().getColumnIndexAtX(e.getX());
-            if (uiIndex == -1) {
-                return;
-            }
-
-            this.columnIndex = table.getColumnModel().getColumn(uiIndex).getModelIndex();
-            for (RowSorter.SortKey key : table.getRowSorter().getSortKeys()) {
-                if (key.getColumn() == this.columnIndex) {
-                    this.sortOrder = key.getSortOrder();
-                    break;
-                }
-            }
-        }
+    //region Getters/Setters
+    public WeakReference<JTable> getWeakReference() {
+        return weakReference;
     }
 
+    public int getColumnIndex() {
+        return columnIndex;
+    }
+
+    public void setColumnIndex(final int columnIndex) {
+        this.columnIndex = columnIndex;
+    }
+
+    public SortOrder getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(final SortOrder sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+    //endregion Getters/Setters
+
+    //region PreferenceElement
     @Override
     protected String getValue() {
-        return String.format("%d|%s", this.columnIndex, this.sortOrder.toString());
+        return String.format("%d|%s", getColumnIndex(), getSortOrder().name());
     }
 
     @Override
-    protected void initialize(String value) {
-        assert value != null && value.trim().length() > 0;
+    protected void initialize(final String value) {
+        // TODO : Java 11 : Swap to isBlank
+        assert (value != null) && !value.trim().isEmpty();
 
-        JTable element = weakRef.get();
+        final JTable element = getWeakReference().get();
         if (element != null) {
-            String[] parts = value.split("\\|", -1);
+            final String[] parts = value.split("\\|", -1);
 
-            this.columnIndex = Integer.parseInt(parts[0]);
-            this.sortOrder = SortOrder.valueOf(parts[1]);
+            setColumnIndex(Integer.parseInt(parts[0]));
+            setSortOrder(SortOrder.valueOf(parts[1]));
 
-            ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
-            sortKeys.add(new RowSorter.SortKey(this.columnIndex, this.sortOrder));
+            final List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+            sortKeys.add(new RowSorter.SortKey(getColumnIndex(), getSortOrder()));
 
             element.getRowSorter().setSortKeys(sortKeys);
         }
@@ -91,26 +100,52 @@ public class JTablePreference extends PreferenceElement implements MouseListener
 
     @Override
     protected void dispose() {
-        JTable element = weakRef.get();
+        final JTable element = getWeakReference().get();
         if (element != null) {
             element.removeMouseListener(this);
-            weakRef.clear();
+            getWeakReference().clear();
+        }
+    }
+    //endregion PreferenceElement
+
+    //region MouseListener
+    @Override
+    public void mouseClicked(final MouseEvent evt) {
+        final JTable table = getWeakReference().get();
+        if (table != null) {
+            final int uiIndex = table.getColumnModel().getColumnIndexAtX(evt.getX());
+            if (uiIndex == -1) {
+                return;
+            }
+
+            setColumnIndex(table.getColumnModel().getColumn(uiIndex).getModelIndex());
+            for (final RowSorter.SortKey key : table.getRowSorter().getSortKeys()) {
+                if (key.getColumn() == getColumnIndex()) {
+                    setSortOrder(key.getSortOrder());
+                    break;
+                }
+            }
         }
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(final MouseEvent evt) {
+
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
+    public void mouseReleased(final MouseEvent evt) {
+
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
+    public void mouseEntered(final MouseEvent evt) {
+
     }
 
     @Override
-    public void mouseExited(MouseEvent e) {
+    public void mouseExited(final MouseEvent evt) {
+
     }
+    //endregion MouseListener
 }

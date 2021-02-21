@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.preferences;
 
 import mekhq.preferences.PreferenceElement;
@@ -27,47 +26,69 @@ import javax.swing.event.ChangeListener;
 import java.lang.ref.WeakReference;
 
 public class JToggleButtonPreference extends PreferenceElement implements ChangeListener {
-    private final WeakReference<JToggleButton>  weakRef;
-    private boolean value;
+    //region Variable Declarations
+    private final WeakReference<JToggleButton> weakReference;
+    private boolean selected;
+    //endregion Variable Declarations
 
-    public JToggleButtonPreference(JToggleButton toggleButton){
+    //region Constructors
+    public JToggleButtonPreference(JToggleButton toggleButton) {
         super(toggleButton.getName());
-
-        this.value = toggleButton.isSelected();
-        this.weakRef = new WeakReference<>(toggleButton);
+        setSelected(toggleButton.isSelected());
+        this.weakReference = new WeakReference<>(toggleButton);
         toggleButton.addChangeListener(this);
     }
+    //endregion Constructors
 
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        JToggleButton element = weakRef.get();
-        if (element != null) {
-            this.value = element.isSelected();
-        }
+    //region Getters/Setters
+    public WeakReference<JToggleButton> getWeakReference() {
+        return weakReference;
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(final boolean selected) {
+        this.selected = selected;
+    }
+    //endregion Getters/Setters
+
+    //region PreferenceElement
     @Override
     protected String getValue() {
-        return Boolean.toString(this.value);
+        return Boolean.toString(isSelected());
     }
 
     @Override
-    protected void initialize(String value) {
-        assert value != null && value.trim().length() > 0;
+    protected void initialize(final String value) {
+        // TODO : Java 11 : Swap to isBlank
+        assert (value != null) && !value.trim().isEmpty();
 
-        JToggleButton element = weakRef.get();
+        final JToggleButton element = getWeakReference().get();
         if (element != null) {
-            this.value = Boolean.parseBoolean(value);
-            element.setSelected(this.value);
+            setSelected(Boolean.parseBoolean(value));
+            element.setSelected(isSelected());
         }
     }
 
     @Override
     protected void dispose() {
-        JToggleButton element = weakRef.get();
+        final JToggleButton element = getWeakReference().get();
         if (element != null) {
             element.removeChangeListener(this);
-            weakRef.clear();
+            getWeakReference().clear();
         }
     }
+    //endregion PreferenceElement
+
+    //region ChangeListener
+    @Override
+    public void stateChanged(final ChangeEvent evt) {
+        final JToggleButton element = getWeakReference().get();
+        if (element != null) {
+            setSelected(element.isSelected());
+        }
+    }
+    //endregion ChangeListener
 }

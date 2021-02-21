@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,112 +10,136 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.preferences;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represents a group of @link PreferenceElement that are part of the same
- * @link Class.
+ * Represents a group of {@link PreferenceElement}s that are part of the same Class.
  *
  * This class is not thread-safe.
  */
 public class PreferencesNode {
+    //region Variable Declarations
     private final Class node;
     private final Map<String, PreferenceElement> elements;
     private Map<String, String> initialValues;
+    private boolean initialized;
+    private boolean finalized;
+    //endregion Variable Declarations
 
-    private boolean initialized = false;
-    private boolean finalized = false;
-
-    PreferencesNode(Class node) {
+    //region Constructors
+    public PreferencesNode(final Class node) {
         assert node != null;
-
         this.node = node;
-        this.initialValues = new HashMap<>();
         this.elements = new HashMap<>();
+        setInitialValues(new HashMap<>());
+        setInitialized(false);
+        setFinalized(false);
     }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public Class getNode() {
+        return node;
+    }
+
+    public Map<String, PreferenceElement> getElements() {
+        return elements;
+    }
+
+    public Map<String, String> getInitialValues() {
+        return initialValues;
+    }
+
+    public void setInitialValues(final Map<String, String> initialValues) {
+        this.initialValues = initialValues;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public void setInitialized(final boolean initialized) {
+        this.initialized = initialized;
+    }
+
+    public boolean isFinalized() {
+        return finalized;
+    }
+
+    public void setFinalized(final boolean finalized) {
+        this.finalized = finalized;
+    }
+    //endregion Getters/Setters
 
     /**
      * Adds a new element to be managed by this node.
-     * If there are initial vales set for this node,
-     * we will try to set an initial value for this element.
-     * @param element element to manage.
+     * If there are initial values set for this node, we will try to set an initial value
+     * for this element.
+     * @param element the element to manage.
      */
-    public void manage(PreferenceElement element) {
-        PreferenceElement actual = this.elements.get(element.getName());
+    public void manage(final PreferenceElement element) {
+        final PreferenceElement actual = getElements().get(element.getName());
         if (actual != null) {
-            this.initialValues.put(actual.getName(), actual.getValue());
+            getInitialValues().put(actual.getName(), actual.getValue());
             actual.dispose();
         }
 
-        this.elements.put(element.getName(), element);
+        getElements().put(element.getName(), element);
 
-        if (this.initialValues.containsKey(element.getName())) {
-            element.initialize(this.initialValues.get(element.getName()));
+        if (getInitialValues().containsKey(element.getName())) {
+            element.initialize(getInitialValues().get(element.getName()));
         }
     }
 
     /**
      * Adds new elements to be managed by this node.
-     * If there are initial vales set for this node,
-     * we will try to set an initial value for each element.
-     * @param elements elements to manage.
+     * If there are initial values set for this node, we will try to set an initial value
+     * for each element.
+     * @param elements the elements to manage.
      */
-    public void manage(PreferenceElement... elements) {
-        for (PreferenceElement element : elements) {
+    public void manage(final PreferenceElement... elements) {
+        for (final PreferenceElement element : elements) {
             manage(element);
         }
     }
 
     /**
-     * The class which preferences we are storing in this node.
-     * @return the class stored in this node.
-     */
-    String getNodeName() {
-        return this.node.getName();
-    }
-
-    /**
      * Sets the initial values for elements managed for this node.
      * This method should only be called once.
-     * @param initialValues initial values for the elements.
+     * @param initialValues the initial values for the elements.
      */
-    void initialize(Map<String, String> initialValues) {
+    public void initialize(final Map<String, String> initialValues) {
         assert initialValues != null;
-        assert !initialized;
-
-        this.initialized = true;
-        this.initialValues = initialValues;
+        assert !isInitialized();
+        setInitialized(true);
+        setInitialValues(initialValues);
     }
 
     /**
-     * Gets the values of all the elements managed by this node.
      * This method should only be called once.
-     * @return
+     * @return the final values of all the elements managed by this node.
      */
-    Map<String, String> getFinalValues() {
-        assert !finalized;
-
-        finalized = true;
-        Map<String, String> finalValues = new HashMap<>(this.elements.size());
+    public Map<String, String> getFinalValues() {
+        assert !isFinalized();
+        setFinalized(true);
+        final Map<String, String> finalValues = new HashMap<>(getElements().size());
 
         // Use the values we had stored from initialization
-        for(Map.Entry<String, String> initialValue : this.initialValues.entrySet()) {
+        for (final Map.Entry<String, String> initialValue : getInitialValues().entrySet()) {
             finalValues.put(initialValue.getKey(), initialValue.getValue());
         }
 
-        // Overwrite the initial values with values generated during this
-        // session
-        for(PreferenceElement wrapper : this.elements.values()) {
+        // Overwrite the initial values with values generated during this session
+        for (final PreferenceElement wrapper : getElements().values()) {
             finalValues.put(wrapper.getName(), wrapper.getValue());
         }
 

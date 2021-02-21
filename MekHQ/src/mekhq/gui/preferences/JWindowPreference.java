@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.preferences;
 
 import mekhq.preferences.PreferenceElement;
@@ -29,79 +28,107 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.lang.ref.WeakReference;
 
-public class JWindowPreference extends PreferenceElement implements WindowStateListener, ComponentListener {
-    private final WeakReference<Window> weakRef;
+public class JWindowPreference extends PreferenceElement implements ComponentListener, WindowStateListener {
+    //region Variable Declarations
+    private final WeakReference<Window> weakReference;
     private int width;
     private int height;
     private int screenX;
     private int screenY;
-    private boolean isMaximized;
+    private boolean maximized;
+    //endregion Variable Declarations
 
-    public JWindowPreference(Window window) {
-        super (window.getName());
+    //region Constructors
+    public JWindowPreference(final Window window) {
+        super(window.getName());
 
-        this.width = window.getWidth();
-        this.height = window.getHeight();
-
+        setWidth(window.getWidth());
+        setHeight(window.getHeight());
         if (window.isVisible()) {
-            this.screenX = window.getLocationOnScreen().x;
-            this.screenY = window.getLocationOnScreen().y;
+            setScreenX(window.getLocationOnScreen().x);
+            setScreenY(window.getLocationOnScreen().y);
         }
+        setMaximized((window instanceof JFrame)
+                && ((((JFrame) window).getExtendedState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH));
 
-        if (window instanceof JFrame) {
-            this.isMaximized = (((JFrame)window).getExtendedState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
-        } else {
-            this.isMaximized = false;
-        }
-
-        this.weakRef = new WeakReference<>(window);
-        window.addWindowStateListener(this);
+        weakReference = new WeakReference<>(window);
         window.addComponentListener(this);
+        window.addWindowStateListener(this);
+    }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public WeakReference<Window> getWeakReference() {
+        return weakReference;
     }
 
-    @Override
-    public void windowStateChanged(WindowEvent e) {
-        this.isMaximized = (e.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
+    public int getWidth() {
+        return width;
     }
 
-    @Override
-    public void componentResized(ComponentEvent e) {
-        this.width = e.getComponent().getWidth();
-        this.height = e.getComponent().getHeight();
+    public void setWidth(final int width) {
+        this.width = width;
     }
 
-    @Override
-    public void componentMoved(ComponentEvent e) {
-        if (e.getComponent().isVisible()) {
-            this.screenX = e.getComponent().getLocationOnScreen().x;
-            this.screenY = e.getComponent().getLocationOnScreen().y;
-        }
+    public int getHeight() {
+        return height;
     }
 
+    public void setHeight(final int height) {
+        this.height = height;
+    }
+
+    public int getScreenX() {
+        return screenX;
+    }
+
+    public void setScreenX(final int screenX) {
+        this.screenX = screenX;
+    }
+
+    public int getScreenY() {
+        return screenY;
+    }
+
+    public void setScreenY(final int screenY) {
+        this.screenY = screenY;
+    }
+
+    public boolean isMaximized() {
+        return maximized;
+    }
+
+    public void setMaximized(final boolean maximized) {
+        this.maximized = maximized;
+    }
+    //endregion Getters/Setters
+
+    //region PreferenceElement
     @Override
     protected String getValue() {
-        return String.format("%d|%d|%d|%d|%s", this.width, this.height, this.screenX, this.screenY, this.isMaximized);
+        return String.format("%d|%d|%d|%d|%s", getWidth(), getHeight(), getScreenX(), getScreenY(), isMaximized());
     }
 
     @Override
-    protected void initialize(String value) {
-        assert value != null && value.trim().length() > 0;
+    protected void initialize(final String value) {
+        // TODO : Java 11 : Swap to isBlank
+        assert (value != null) && !value.trim().isEmpty();
 
-        Window element = weakRef.get();
+        final Window element = getWeakReference().get();
         if (element != null) {
-            String[] parts = value.split("\\|", -1);
+            final String[] parts = value.split("\\|", -1);
 
-            this.width = Integer.parseInt(parts[0]);
-            this.height = Integer.parseInt(parts[1]);
-            this.screenX = Integer.parseInt(parts[2]);
-            this.screenY = Integer.parseInt(parts[3]);
-            this.isMaximized = Boolean.parseBoolean(parts[4]);
+            setWidth(Integer.parseInt(parts[0]));
+            setHeight(Integer.parseInt(parts[1]));
+            setScreenX(Integer.parseInt(parts[2]));
+            setScreenY(Integer.parseInt(parts[3]));
+            setMaximized(Boolean.parseBoolean(parts[4]));
 
-            element.setSize(this.width, this.height);
-            element.setLocation(this.screenX, this.screenY);
-            if (this.isMaximized) {
+            element.setSize(getWidth(), getHeight());
+            element.setLocation(getScreenX(), getScreenY());
+            if (isMaximized()) {
                 if (element instanceof JFrame) {
-                    ((JFrame)element).setExtendedState(((JFrame)element).getExtendedState() | Frame.MAXIMIZED_BOTH);
+                    ((JFrame) element).setExtendedState(((JFrame) element).getExtendedState() | Frame.MAXIMIZED_BOTH);
                 }
             }
         }
@@ -109,19 +136,45 @@ public class JWindowPreference extends PreferenceElement implements WindowStateL
 
     @Override
     protected void dispose() {
-        Window element = weakRef.get();
+        final Window element = getWeakReference().get();
         if (element != null) {
             element.removeWindowStateListener(this);
             element.removeComponentListener(this);
-            weakRef.clear();
+            getWeakReference().clear();
+        }
+    }
+    //endregion PreferenceElement
+
+    //region ComponentListener
+    @Override
+    public void componentResized(final ComponentEvent evt) {
+        setWidth(evt.getComponent().getWidth());
+        setHeight(evt.getComponent().getHeight());
+    }
+
+    @Override
+    public void componentMoved(final ComponentEvent evt) {
+        if (evt.getComponent().isVisible()) {
+            setScreenX(evt.getComponent().getLocationOnScreen().x);
+            setScreenY(evt.getComponent().getLocationOnScreen().y);
         }
     }
 
     @Override
-    public void componentShown(ComponentEvent e) {
+    public void componentShown(final ComponentEvent evt) {
+
     }
 
     @Override
-    public void componentHidden(ComponentEvent e) {
+    public void componentHidden(final ComponentEvent evt) {
+
     }
+    //endregion ComponentListener
+
+    //region WindowStateListener
+    @Override
+    public void windowStateChanged(final WindowEvent evt) {
+        setMaximized((evt.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH);
+    }
+    //endregion WindowStateListener
 }

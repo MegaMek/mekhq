@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.preferences;
 
 import mekhq.preferences.PreferenceElement;
@@ -27,52 +26,74 @@ import java.awt.event.ItemListener;
 import java.lang.ref.WeakReference;
 
 public class JComboBoxPreference extends PreferenceElement implements ItemListener {
-    private final WeakReference<JComboBox> weakRef;
+    //region Variable Declarations
+    private final WeakReference<JComboBox> weakReference;
     private int selectedIndex;
+    //endregion Variable Declarations
 
+    //region Constructors
     public JComboBoxPreference(JComboBox comboBox) {
         super(comboBox.getName());
-
-        this.selectedIndex = comboBox.getSelectedIndex();
-        this.weakRef = new WeakReference<>(comboBox);
+        setSelectedIndex(comboBox.getSelectedIndex());
+        this.weakReference = new WeakReference<>(comboBox);
         comboBox.addItemListener(this);
     }
+    //endregion Constructors
 
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-        if (e.getStateChange() == ItemEvent.SELECTED) {
-            JComboBox element = weakRef.get();
-            if (element != null) {
-                this.selectedIndex = element.getSelectedIndex();
-            }
-        }
+    //region Getters/Setters
+    public WeakReference<JComboBox> getWeakReference() {
+        return weakReference;
     }
 
+    public int getSelectedIndex() {
+        return selectedIndex;
+    }
+
+    public void setSelectedIndex(final int selectedIndex) {
+        this.selectedIndex = selectedIndex;
+    }
+    //endregion Getters/Setters
+
+    //region PreferenceElement
     @Override
     protected String getValue() {
-        return Integer.toString(this.selectedIndex);
+        return Integer.toString(getSelectedIndex());
     }
 
     @Override
-    protected void initialize(String value) {
-        assert value != null && value.trim().length() > 0;
+    protected void initialize(final String value) {
+        // TODO : Java 11 : Swap to isBlank
+        assert (value != null) && !value.trim().isEmpty();
 
-        JComboBox element = weakRef.get();
+        final JComboBox element = getWeakReference().get();
         if (element != null) {
-            int index = Integer.parseInt(value);
-            if (index >= 0 && index < element.getItemCount()) {
-                this.selectedIndex = index;
-                element.setSelectedIndex(this.selectedIndex);
+            final int index = Integer.parseInt(value);
+            if ((index >= 0) && (index < element.getItemCount())) {
+                setSelectedIndex(index);
+                element.setSelectedIndex(getSelectedIndex());
             }
         }
     }
 
     @Override
     protected void dispose() {
-        JComboBox element = weakRef.get();
+        final JComboBox element = getWeakReference().get();
         if (element != null) {
             element.removeItemListener(this);
-            weakRef.clear();
+            getWeakReference().clear();
         }
     }
+    //endregion PreferenceElement
+
+    //region ItemListener
+    @Override
+    public void itemStateChanged(final ItemEvent evt) {
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            final JComboBox element = getWeakReference().get();
+            if (element != null) {
+                setSelectedIndex(element.getSelectedIndex());
+            }
+        }
+    }
+    //endregion ItemListener
 }
