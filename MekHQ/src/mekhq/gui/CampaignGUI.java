@@ -1628,7 +1628,20 @@ public class CampaignGUI extends JPanel {
                 return;
             }
 
-            r.setTech(techHash.get(s));
+            Person selectedTech = techHash.get(s);
+
+            if(!selectedTech.isRightTechTypeFor(r)) {
+                if(JOptionPane.NO_OPTION == JOptionPane
+                    .showConfirmDialog(
+                    null,
+                    "This tech is not appropriate for this unit. Would you like to continue?",
+                    "pending battle",
+                    JOptionPane.YES_NO_OPTION)) {
+                        return;
+                    }
+            }
+
+            r.setTech(selectedTech);
         } else {
             JOptionPane.showMessageDialog(frame,
                     "You have no techs available to work on this refit.",
