@@ -127,7 +127,7 @@ public class MekHqPreferences {
 
                 assert parser.nextToken() == JsonToken.START_OBJECT
                         : "Expected an object start ({)" + getParserInformation(parser);
-                assert (parser.nextToken() == JsonToken.FIELD_NAME) || parser.getCurrentName().equals(PREFERENCES_TOKEN)
+                assert (parser.nextToken() == JsonToken.FIELD_NAME) || PREFERENCES_TOKEN.equals(parser.getCurrentName())
                         : "Expected a field called (" + PREFERENCES_TOKEN + ")" + getParserInformation(parser);
                 assert parser.nextToken() == JsonToken.START_ARRAY
                         : "Expected an array start ([)" + getParserInformation(parser);
@@ -164,13 +164,13 @@ public class MekHqPreferences {
 
     private static void readPreferencesNode(final JsonParser parser, final Map<String, PreferencesNode> nodes) throws IOException {
         if ((parser.currentToken() != JsonToken.START_OBJECT)
-                || ((parser.nextToken() != JsonToken.FIELD_NAME) && !parser.getCurrentName().equals(CLASS_TOKEN))) {
+                || ((parser.nextToken() != JsonToken.FIELD_NAME) && !CLASS_TOKEN.equals(parser.getCurrentName()))) {
             return;
         }
 
         final String className = parser.nextTextValue();
 
-        if (((parser.nextToken() != JsonToken.FIELD_NAME) && !parser.getCurrentName().equals(ELEMENTS_TOKEN))
+        if (((parser.nextToken() != JsonToken.FIELD_NAME) && !ELEMENTS_TOKEN.equals(parser.getCurrentName()))
                 || (parser.nextToken() != JsonToken.START_ARRAY)) {
             return;
         }
@@ -197,13 +197,13 @@ public class MekHqPreferences {
 
     private static void readPreferenceElement(final JsonParser parser, final Map<String, String> elements) throws IOException {
         if ((parser.currentToken() != JsonToken.START_OBJECT)
-                || ((parser.nextToken() != JsonToken.FIELD_NAME) && !parser.getCurrentName().equals(NAME_TOKEN))) {
+                || ((parser.nextToken() != JsonToken.FIELD_NAME) && !NAME_TOKEN.equals(parser.getCurrentName()))) {
             return;
         }
 
         final String name = parser.nextTextValue();
 
-        if ((parser.nextToken() != JsonToken.FIELD_NAME) && !parser.getCurrentName().equals(VALUE_TOKEN)) {
+        if ((parser.nextToken() != JsonToken.FIELD_NAME) && !VALUE_TOKEN.equals(parser.getCurrentName())) {
             return;
         }
 
