@@ -1588,6 +1588,8 @@ public class CampaignGUI extends JPanel {
             int TimePerDay;
 
             List<Person> techs = getCampaign().getTechs();
+            int lastRightTech = 0;
+
             techs.sort(Comparator.comparingInt(Person::getPrimaryRole));
             for (Person tech : techs) {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
@@ -1611,7 +1613,11 @@ public class CampaignGUI extends JPanel {
                         + tech.getMinutesLeft() + "/" + TimePerDay
                         + " minutes";
                 techHash.put(name, tech);
-                techList.add(name);
+                if(tech.isRightTechTypeFor(r)) {
+                    techList.add(lastRightTech++, name);
+                } else {
+                    techList.add(name);
+                }
             }
 
             String s = (String) JOptionPane.showInputDialog(frame,
