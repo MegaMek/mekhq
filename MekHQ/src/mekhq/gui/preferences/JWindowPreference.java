@@ -138,8 +138,8 @@ public class JWindowPreference extends PreferenceElement implements ComponentLis
     protected void dispose() {
         final Window element = getWeakReference().get();
         if (element != null) {
-            element.removeWindowStateListener(this);
             element.removeComponentListener(this);
+            element.removeWindowStateListener(this);
             getWeakReference().clear();
         }
     }

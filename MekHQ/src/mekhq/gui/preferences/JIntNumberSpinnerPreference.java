@@ -97,4 +97,3 @@ public class JIntNumberSpinnerPreference extends PreferenceElement implements Ch
     }
     //endregion ChangeListener
 }
-
