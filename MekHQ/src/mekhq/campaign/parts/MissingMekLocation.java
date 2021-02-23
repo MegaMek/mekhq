@@ -255,14 +255,14 @@ public class MissingMekLocation extends MissingPart {
                         if (unit.findPart(p -> p instanceof MissingLandingGear) != null) {
                             continue;
                         } else {
-                            return "Landing gear in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
+                            return "Landing gear in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
                         }
                     // Skip Avionics if already gone
                     } else if (slot.getIndex() == LandAirMech.LAM_AVIONICS) {
                         if (unit.findPart(p -> p instanceof MissingAvionics) != null) {
                             continue;
                         } else {
-                            return "Avionics in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
+                            return "Avionics in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
                         }
                     }
                 }
@@ -270,17 +270,17 @@ public class MissingMekLocation extends MissingPart {
                 if ((slot.getMount() != null) && !slot.getMount().isDestroyed()) {
                     EquipmentType equipmentType = slot.getMount().getType();
                     if (equipmentType.hasFlag(MiscType.F_NULLSIG)) {
-                        return "Null-Signature System must be salvaged or scrapped first. It can then be re-installed.";
+                        return "Null-Signature System must be salvaged or scrapped first.";
                     } else if (equipmentType.hasFlag(MiscType.F_VOIDSIG)) {
-                        return "Void-Signature System must be salvaged or scrapped first. It can then be re-installed.";
+                        return "Void-Signature System must be salvaged or scrapped first.";
                     } else if (equipmentType.hasFlag(MiscType.F_CHAMELEON_SHIELD)) {
-                        return "Chameleon shield must be salvaged or scrapped first. It can then be re-installed.";
+                        return "Chameleon shield must be salvaged or scrapped first.";
                     }
                 }
             }
 
             if (slot.isRepairable()) {
-                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
+                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
             }
         }
         return null;
