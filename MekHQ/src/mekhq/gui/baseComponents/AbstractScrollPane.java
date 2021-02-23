@@ -21,11 +21,9 @@ package mekhq.gui.baseComponents;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.gui.preferences.JScrollPanePreference;
-import mekhq.gui.preferences.JSplitPanePreference;
 import mekhq.preferences.PreferencesNode;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.ResourceBundle;
 
 /**
