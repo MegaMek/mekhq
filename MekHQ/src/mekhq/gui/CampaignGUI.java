@@ -1587,10 +1587,9 @@ public class CampaignGUI extends JPanel {
             String skillLvl;
             int TimePerDay;
 
-            List<Person> techs = getCampaign().getTechs();
+            List<Person> techs = getCampaign().getTechs(false, null, true, true);
             int lastRightTech = 0;
 
-            techs.sort(Comparator.comparingInt(Person::getPrimaryRole));
             for (Person tech : techs) {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
