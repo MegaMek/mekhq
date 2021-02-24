@@ -55,7 +55,7 @@ public abstract class AbstractScrollPane extends JScrollPane {
 
     protected AbstractScrollPane(final JFrame frame, final ResourceBundle resources, final String name,
                                  final int verticalScrollBarPolicy, final int horizontalScrollBarPolicy) {
-        super(frame, verticalScrollBarPolicy, horizontalScrollBarPolicy);
+        super(verticalScrollBarPolicy, horizontalScrollBarPolicy);
         setName(name);
         setFrame(frame);
         this.resources = resources;

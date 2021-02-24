@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class PreferencesNode {
     //region Variable Declarations
-    private final Class node;
+    private final Class<?> node;
     private final Map<String, PreferenceElement> elements;
     private Map<String, String> initialValues;
     private boolean initialized;
@@ -36,7 +36,7 @@ public class PreferencesNode {
     //endregion Variable Declarations
 
     //region Constructors
-    public PreferencesNode(final Class node) {
+    public PreferencesNode(final Class<?> node) {
         assert node != null;
         this.node = node;
         this.elements = new HashMap<>();
@@ -47,7 +47,7 @@ public class PreferencesNode {
     //endregion Constructors
 
     //region Getters/Setters
-    public Class getNode() {
+    public Class<?> getNode() {
         return node;
     }
 

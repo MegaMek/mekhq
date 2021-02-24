@@ -22,7 +22,6 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 
 import java.io.FileInputStream;
@@ -57,11 +56,10 @@ public class MekHqPreferences {
     }
     //endregion Getters/Setters
 
-    public PreferencesNode forClass(final Class classToManage) {
+    public PreferencesNode forClass(final Class<?> classToManage) {
         return getNameToPreferencesMap().computeIfAbsent(classToManage.getName(), c -> new PreferencesNode(classToManage));
     }
 
-    //region File I/O
     //region Write To File
     public void saveToFile(final String filePath) {
         try {
@@ -93,7 +91,8 @@ public class MekHqPreferences {
         }
     }
 
-    private static void writePreferencesNode(final JsonGenerator writer, final Map.Entry<String, PreferencesNode> nodeInfo) throws IOException {
+    private static void writePreferencesNode(final JsonGenerator writer,
+                                             final Map.Entry<String, PreferencesNode> nodeInfo) throws IOException {
         writer.writeStartObject();
         writer.writeStringField(CLASS_TOKEN, nodeInfo.getKey());
         writer.writeFieldName(ELEMENTS_TOKEN);
@@ -108,7 +107,8 @@ public class MekHqPreferences {
         writer.writeEndObject();
     }
 
-    private static void writePreferenceElement(final JsonGenerator writer, final Map.Entry<String, String> element) throws IOException {
+    private static void writePreferenceElement(final JsonGenerator writer,
+                                               final Map.Entry<String, String> element) throws IOException {
         writer.writeStartObject();
         writer.writeStringField(NAME_TOKEN, element.getKey());
         writer.writeStringField(VALUE_TOKEN, element.getValue());
@@ -125,12 +125,13 @@ public class MekHqPreferences {
                 final JsonFactory factory = new JsonFactory();
                 final JsonParser parser = factory.createParser(input);
 
-                assert parser.nextToken() == JsonToken.START_OBJECT
-                        : "Expected an object start ({)" + getParserInformation(parser);
-                assert (parser.nextToken() == JsonToken.FIELD_NAME) || PREFERENCES_TOKEN.equals(parser.getCurrentName())
-                        : "Expected a field called (" + PREFERENCES_TOKEN + ")" + getParserInformation(parser);
-                assert parser.nextToken() == JsonToken.START_ARRAY
-                        : "Expected an array start ([)" + getParserInformation(parser);
+                if (parser.nextToken() != JsonToken.START_OBJECT) {
+                    throw new IOException("Expected an object start ({)" + getParserInformation(parser));
+                } else if (parser.nextToken() != JsonToken.FIELD_NAME && !parser.getCurrentName().equals(PREFERENCES_TOKEN)) {
+                    throw new IOException("Expected a field called (" + PREFERENCES_TOKEN + ")" + getParserInformation(parser));
+                } else if (parser.nextToken() != JsonToken.START_ARRAY) {
+                    throw new IOException("Expected an array start ([)" + getParserInformation(parser));
+                }
 
                 // Parse all PreferencesNode
                 while (parser.nextToken() != JsonToken.END_ARRAY) {
@@ -152,30 +153,29 @@ public class MekHqPreferences {
         }
     }
 
-    private static String getParserInformation(final @Nullable JsonParser parser) throws IOException {
-        if (parser == null) {
-            return "";
-        }
-
-        return ". Current token: " + parser.getCurrentName() +
+    private static String getParserInformation(final JsonParser parser) throws IOException {
+        return (parser == null) ? "" : ". Current token: " + parser.getCurrentName() +
                 ". Line number: " + parser.getCurrentLocation().getLineNr() +
                 ". Column number: " + parser.getCurrentLocation().getColumnNr();
     }
 
-    private static void readPreferencesNode(final JsonParser parser, final Map<String, PreferencesNode> nodes) throws IOException {
-        if ((parser.currentToken() != JsonToken.START_OBJECT)
-                || ((parser.nextToken() != JsonToken.FIELD_NAME) && !CLASS_TOKEN.equals(parser.getCurrentName()))) {
+    private static void readPreferencesNode(final JsonParser parser,
+                                            final Map<String, PreferencesNode> nodes) throws IOException {
+        if (parser.currentToken() != JsonToken.START_OBJECT) {
+            return;
+        } else if ((parser.nextToken() != JsonToken.FIELD_NAME) && !parser.getCurrentName().equals(CLASS_TOKEN)) {
             return;
         }
 
         final String className = parser.nextTextValue();
 
-        if (((parser.nextToken() != JsonToken.FIELD_NAME) && !ELEMENTS_TOKEN.equals(parser.getCurrentName()))
-                || (parser.nextToken() != JsonToken.START_ARRAY)) {
+        if ((parser.nextToken() != JsonToken.FIELD_NAME) && !parser.getCurrentName().equals(ELEMENTS_TOKEN)) {
+            return;
+        } else if (parser.nextToken() != JsonToken.START_ARRAY) {
             return;
         }
 
-        final HashMap<String, String> elements = new HashMap<>();
+        final Map<String, String> elements = new HashMap<>();
 
         // Parse all PreferenceElement in this node
         while (parser.nextToken() != JsonToken.END_ARRAY) {
@@ -196,14 +196,15 @@ public class MekHqPreferences {
     }
 
     private static void readPreferenceElement(final JsonParser parser, final Map<String, String> elements) throws IOException {
-        if ((parser.currentToken() != JsonToken.START_OBJECT)
-                || ((parser.nextToken() != JsonToken.FIELD_NAME) && !NAME_TOKEN.equals(parser.getCurrentName()))) {
+        if (parser.currentToken() != JsonToken.START_OBJECT) {
+            return;
+        } else if ((parser.nextToken() != JsonToken.FIELD_NAME) && !parser.getCurrentName().equals(NAME_TOKEN)) {
             return;
         }
 
         final String name = parser.nextTextValue();
 
-        if ((parser.nextToken() != JsonToken.FIELD_NAME) && !VALUE_TOKEN.equals(parser.getCurrentName())) {
+        if ((parser.nextToken() != JsonToken.FIELD_NAME) && !parser.getCurrentName().equals(VALUE_TOKEN)) {
             return;
         }
 
