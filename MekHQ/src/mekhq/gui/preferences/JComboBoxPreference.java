@@ -27,12 +27,12 @@ import java.lang.ref.WeakReference;
 
 public class JComboBoxPreference extends PreferenceElement implements ItemListener {
     //region Variable Declarations
-    private final WeakReference<JComboBox> weakReference;
+    private final WeakReference<JComboBox<?>> weakReference;
     private int selectedIndex;
     //endregion Variable Declarations
 
     //region Constructors
-    public JComboBoxPreference(final JComboBox comboBox) {
+    public JComboBoxPreference(final JComboBox<?> comboBox) {
         super(comboBox.getName());
         setSelectedIndex(comboBox.getSelectedIndex());
         weakReference = new WeakReference<>(comboBox);
@@ -41,7 +41,7 @@ public class JComboBoxPreference extends PreferenceElement implements ItemListen
     //endregion Constructors
 
     //region Getters/Setters
-    public WeakReference<JComboBox> getWeakReference() {
+    public WeakReference<JComboBox<?>> getWeakReference() {
         return weakReference;
     }
 
@@ -65,7 +65,7 @@ public class JComboBoxPreference extends PreferenceElement implements ItemListen
         // TODO : Java 11 : Swap to isBlank
         assert (value != null) && !value.trim().isEmpty();
 
-        final JComboBox element = getWeakReference().get();
+        final JComboBox<?> element = getWeakReference().get();
         if (element != null) {
             final int index = Integer.parseInt(value);
             if ((index >= 0) && (index < element.getItemCount())) {
@@ -77,7 +77,7 @@ public class JComboBoxPreference extends PreferenceElement implements ItemListen
 
     @Override
     protected void dispose() {
-        final JComboBox element = getWeakReference().get();
+        final JComboBox<?> element = getWeakReference().get();
         if (element != null) {
             element.removeItemListener(this);
             getWeakReference().clear();
@@ -89,7 +89,7 @@ public class JComboBoxPreference extends PreferenceElement implements ItemListen
     @Override
     public void itemStateChanged(final ItemEvent evt) {
         if (evt.getStateChange() == ItemEvent.SELECTED) {
-            final JComboBox element = getWeakReference().get();
+            final JComboBox<?> element = getWeakReference().get();
             if (element != null) {
                 setSelectedIndex(element.getSelectedIndex());
             }

@@ -28,12 +28,12 @@ import java.lang.ref.WeakReference;
 
 public class JListPreference extends PreferenceElement implements PropertyChangeListener {
     //region Variable Declarations
-    private final WeakReference<JList> weakReference;
+    private final WeakReference<JList<?>> weakReference;
     private int[] selectedIndices;
     //endregion Variable Declarations
 
     //region Constructors
-    public JListPreference(final JList jList) {
+    public JListPreference(final JList<?> jList) {
         super(jList.getName());
         setSelectedIndices(jList.getSelectedIndices());
         weakReference = new WeakReference<>(jList);
@@ -42,7 +42,7 @@ public class JListPreference extends PreferenceElement implements PropertyChange
     //endregion Constructors
 
     //region Getters/Setters
-    public WeakReference<JList> getWeakReference() {
+    public WeakReference<JList<?>> getWeakReference() {
         return weakReference;
     }
 
@@ -66,7 +66,7 @@ public class JListPreference extends PreferenceElement implements PropertyChange
         // TODO : Java 11 : Swap to isBlank
         assert (value != null) && !value.trim().isEmpty();
 
-        final JList element = getWeakReference().get();
+        final JList<?> element = getWeakReference().get();
         if (element != null) {
             final String[] strings = value.split("\\|");
             final int[] indices = new int[strings.length];
@@ -80,7 +80,7 @@ public class JListPreference extends PreferenceElement implements PropertyChange
 
     @Override
     protected void dispose() {
-        final JList element = getWeakReference().get();
+        final JList<?> element = getWeakReference().get();
         if (element != null) {
             element.removePropertyChangeListener(this);
             getWeakReference().clear();
@@ -91,7 +91,7 @@ public class JListPreference extends PreferenceElement implements PropertyChange
     //region PropertyChangeListener
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
-        final JList element = getWeakReference().get();
+        final JList<?> element = getWeakReference().get();
         if (element != null) {
             setSelectedIndices(element.getSelectedIndices());
         }

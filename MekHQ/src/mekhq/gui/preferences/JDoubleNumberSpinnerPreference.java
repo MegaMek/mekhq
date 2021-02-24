@@ -33,7 +33,7 @@ public class JDoubleNumberSpinnerPreference extends PreferenceElement implements
 
     //region Constructors
     public JDoubleNumberSpinnerPreference(final JSpinner spinner) {
-        super (spinner.getName());
+        super(spinner.getName());
         assert spinner.getModel() instanceof SpinnerNumberModel;
         setDoubleValue((Double) spinner.getValue());
         weakReference = new WeakReference<>(spinner);

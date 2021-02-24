@@ -33,7 +33,7 @@ public class JIntNumberSpinnerPreference extends PreferenceElement implements Ch
 
     //region Constructors
     public JIntNumberSpinnerPreference(final JSpinner spinner) {
-        super (spinner.getName());
+        super(spinner.getName());
         assert spinner.getModel() instanceof SpinnerNumberModel;
         setIntValue((Integer) spinner.getValue());
         weakReference = new WeakReference<>(spinner);
