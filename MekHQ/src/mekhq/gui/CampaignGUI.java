@@ -1612,7 +1612,7 @@ public class CampaignGUI extends JPanel {
                         + tech.getMinutesLeft() + "/" + TimePerDay
                         + " minutes";
                 techHash.put(name, tech);
-                if(tech.isRightTechTypeFor(r)) {
+                if (tech.isRightTechTypeFor(r)) {
                     techList.add(lastRightTech++, name);
                 } else {
                     techList.add(name);
@@ -1629,10 +1629,8 @@ public class CampaignGUI extends JPanel {
 
             Person selectedTech = techHash.get(s);
 
-            if(!selectedTech.isRightTechTypeFor(r)) {
-                if(JOptionPane.NO_OPTION == JOptionPane
-                    .showConfirmDialog(
-                    null,
+            if (!selectedTech.isRightTechTypeFor(r)) {
+                if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(null,
                     "This tech is not appropriate for this unit. Would you like to continue?",
                     "pending battle",
                     JOptionPane.YES_NO_OPTION)) {
