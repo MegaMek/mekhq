@@ -3326,7 +3326,7 @@ public class Campaign implements Serializable, ITechManager {
                         fixPart(part, tech);
                     } catch (Exception e) {
                         MekHQ.getLogger().error(String.format(
-                                "Could not perform overnight maintenance on %s (%d) due to an error", 
+                                "Could not perform overnight maintenance on %s (%d) due to an error",
                                 part.getName(), part.getId()), e);
                         addReport(String.format("ERROR: an error occurred performing overnight maintenance on %s, check the log",
                                 part.getName()));
@@ -4362,10 +4362,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public Ranks getRanks() {
         return ranks;
-    }
-
-    public void setRankSystem(int system) {
-        getRanks().setRankSystem(system);
     }
 
     public List<String> getAllRankNamesFor(int p) {
