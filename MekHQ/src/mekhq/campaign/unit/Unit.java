@@ -265,7 +265,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //one gets some of the same things set
         if (null != this.entity) {
             en.setId(this.entity.getId());
-            en.duplicateMarker = this.entity.duplicateMarker;
+            en.setDuplicateMarker(this.entity.getDuplicateMarker());
+            en.generateShortName();
+            en.generateDisplayName();
         }
         this.entity = en;
     }
