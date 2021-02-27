@@ -148,7 +148,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         nameTracker.clear();
 
         List<Entity> entities = new ArrayList<>();
-        for (Entity e : entities) {
+        for (Entity e : entityList) {
             if (e != null) {
                 nameTracker.add(e);
                 entities.add(e);
