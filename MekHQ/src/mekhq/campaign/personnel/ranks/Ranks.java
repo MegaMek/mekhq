@@ -27,10 +27,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.Vector;
 
-import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 
 import megamek.common.annotations.Nullable;
@@ -163,7 +161,7 @@ public class Ranks {
                 // Okay, so what element is it?
                 if (wn.getNodeName().equalsIgnoreCase("rankSystem")) {
                     // Starting to generate rankSystem
-                    value = generateInstanceFromXML(wn, null);
+                    value = generateInstanceFromXML(wn, null, true);
                     rankSystems.put(value.getRankSystem(), value);
                 }
             }
@@ -186,6 +184,10 @@ public class Ranks {
 
     public void setRankSystemName(String rankSystemName) {
         this.rankSystemName = rankSystemName;
+    }
+
+    public boolean isCustom() {
+        return getRankSystem() == Ranks.RS_CUSTOM;
     }
 
     public int getRankNumericFromNameAndProfession(int profession, String name) {
@@ -311,35 +313,6 @@ public class Ranks {
         return 0;
     }
 
-    public void setRankSystem(int system) {
-        if (system < RS_NUM) {
-            rankSystem = system;
-            useRankSystem(rankSystem);
-        }
-    }
-
-    public String getRankNameList(int profession) {
-        StringJoiner joiner = new StringJoiner(",");
-        for (Rank rank : getAllRanks()) {
-            joiner.add(rank.getName(profession));
-        }
-        return joiner.toString();
-    }
-
-    //Keep this for reverse compatibility in loading campaigns
-    public void setRanksFromList(String names, int officerCut) {
-        ArrayList<ArrayList<String>> rankNames = new ArrayList<>();
-        String[] rnames = names.split(",");
-        for (String rname : rnames) {
-            ArrayList<String> temp = new ArrayList<>(RPROF_NUM);
-            for (int i = 0; i < RPROF_NUM; i++) {
-                temp.add(rname);
-            }
-            rankNames.add(temp);
-        }
-        setCustomRanks(rankNames, officerCut);
-    }
-
     private String getRankPostTag(int rankNum) {
         if (rankNum == 0) {
             return " <!-- E0 \"None\" -->";
@@ -359,16 +332,12 @@ public class Ranks {
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXml(pw1, indent, false);
-    }
-
-    public void writeToXml(PrintWriter pw1, int indent, boolean saveAll) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "rankSystem");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "systemId", getRankSystem());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "systemName", getRankSystemName());
 
         // Only write out the ranks if we're using a custom system
-        if ((rankSystem == RS_CUSTOM) || saveAll) {
+        if (rankSystem == RS_CUSTOM) {
             for (int i = 0; i < ranks.size(); i++) {
                 Rank r = ranks.get(i);
                 r.writeToXml(pw1, indent);
@@ -379,67 +348,38 @@ public class Ranks {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "rankSystem");
     }
 
-    public static Ranks generateInstanceFromXML(Node wn, Version version) {
-        Ranks retVal = new Ranks();
-        boolean showMessage = false;
-
+    public static Ranks generateInstanceFromXML(final Node wn, final @Nullable Version version,
+                                                final boolean initialLoad) {
+        final Ranks retVal = new Ranks();
         // Dump the ranks ArrayList so we can re-use it.
         retVal.ranks = new ArrayList<>();
 
         try {
             NodeList nl = wn.getChildNodes();
-
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("system")
-                        || wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
-                    retVal.rankSystem = Integer.parseInt(wn2.getTextContent().trim());
-
-                    if ((version != null) && (retVal.rankSystem != RS_CUSTOM)) {
-                        retVal = Ranks.getRanksFromSystem(retVal.rankSystem);
+                if (wn2.getNodeName().equalsIgnoreCase("system") // Legacy, 0.47.15 removal
+                        || wn2.getNodeName().equalsIgnoreCase("rankSystem") // Legacy, 0.47.15 removal
+                        || wn2.getNodeName().equalsIgnoreCase("systemId")) {
+                    final int rankSystem = Integer.parseInt(wn2.getTextContent().trim());
+                    if (!initialLoad && (retVal.rankSystem != RS_CUSTOM)) {
+                        return Ranks.getRanksFromSystem(retVal.rankSystem);
                     }
-
-                    retVal.setRankSystemName(PersonMigrator.migrateRankSystemName(retVal.getRankSystem()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("systemId")) {
-                    retVal.rankSystem = Integer.parseInt(wn2.getTextContent().trim());
-                    if ((version != null) && (retVal.rankSystem != RS_CUSTOM)) {
-                        retVal = Ranks.getRanksFromSystem(retVal.rankSystem);
-                    }
+                    retVal.rankSystem = rankSystem;
                 } else if (wn2.getNodeName().equalsIgnoreCase("systemName")) {
                     retVal.setRankSystemName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                    // If we're parsing from the XML or using custom ranks, then parse the rank sub-nodes
-                    if (retVal.oldRankSystem == 7) {
-                        showMessage = true;
-                    }
-                    if ((version == null) || (retVal.rankSystem == RS_CUSTOM)) {
-                        retVal.ranks.add(Rank.generateInstanceFromXML(wn2));
-                    } else {
-                        // Otherwise... use the default ranks for this system
-                        int temp = retVal.oldRankSystem;
-                        retVal = Ranks.getRanksFromSystem(retVal.rankSystem);
-                        retVal.oldRankSystem = temp;
-                        return retVal;
-                    }
+                    retVal.ranks.add(Rank.generateInstanceFromXML(wn2));
                 }
             }
 
-            if (showMessage) {
-                JOptionPane.showConfirmDialog(
-                        null,
-                        "You have used a custom rank set in your campaign."
-                        + "\nYou must recreate that system for this version.",
-                        "Custom Ranks",
-                        JOptionPane.OK_CANCEL_OPTION);
+            if ((version != null) && version.isLowerThan("0.48.0")) {
+                retVal.setRankSystemName(PersonMigrator.migrateRankSystemName(retVal.getRankSystem()));
             }
-        } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(ex);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(e);
         }
-
         return retVal;
     }
 
@@ -483,6 +423,6 @@ public class Ranks {
 
     @Override
     public String toString() {
-        return rankSystemName;
+        return getRankSystemName();
     }
 }

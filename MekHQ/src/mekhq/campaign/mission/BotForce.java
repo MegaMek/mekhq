@@ -174,11 +174,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     }
 
     public void setColour(PlayerColour colour) {
-        Objects.requireNonNull(colour, "Colour cannot be set to null");
-        this.colour = colour;
-        if (getCamouflage().isColourCamouflage()) {
-            setCamoFileName(colour.name());
-        }
+        this.colour = Objects.requireNonNull(colour, "Colour cannot be set to null");
     }
 
     public int getTotalBV() {
