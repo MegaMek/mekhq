@@ -21,6 +21,7 @@ package mekhq.campaign.mission;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -38,6 +39,7 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.UnitNameTracker;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -45,6 +47,7 @@ import mekhq.MekHqXmlUtil;
 public class BotForce implements Serializable, MekHqXmlSerializable {
     private static final long serialVersionUID = 8259058549964342518L;
 
+    private final UnitNameTracker nameTracker = new UnitNameTracker();
     private String name;
     private List<Entity> entityList;
     private int team;
@@ -125,12 +128,34 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     }
 
     public List<Entity> getEntityList() {
-        return entityList;
+        return Collections.unmodifiableList(entityList);
+    }
+
+    public boolean removeEntity(int index) {
+        Entity e = null;
+        if ((index >= 0) && (index < entityList.size())) {
+            e = entityList.remove(index);
+            nameTracker.remove(e, updated -> {
+                updated.generateShortName();
+                updated.generateDisplayName();
+            });
+        }
+
+        return e != null;
     }
 
     public void setEntityList(List<Entity> entityList) {
-        // Filter all nulls out of the parameter entityList
-        this.entityList = entityList.stream().filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
+        nameTracker.clear();
+
+        List<Entity> entities = new ArrayList<>();
+        for (Entity e : entities) {
+            if (e != null) {
+                nameTracker.add(e);
+                entities.add(e);
+            }
+        }
+
+        this.entityList = entities;
     }
 
     public int getTeam() {
