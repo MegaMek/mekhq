@@ -7,6 +7,7 @@ VERSION HISTORY:
 + PR #2381: Repair Tab: Adding better information blockers for Null/Void Signature System and Chameleon Shield
 + Issue #2441: Adding Force Icon Pieces: numerous Alphanumerics and the Vehicle Assorted Type.
 + Issue #2429: Awards Documentation: Fixing Minimum Excel Version, Removing Duplicated Images, Double Spacing
++ Issue #2442: Fixing Multiple Ranks Issues
 
 0.47.17 (RC3) (2021-02-075 2015 UTC)
 + PR #2354: Don't skip ComStar as an origin faction
