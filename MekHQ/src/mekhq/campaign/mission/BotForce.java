@@ -80,7 +80,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.team = team;
         this.start = start;
         // Filter all nulls out of the parameter entityList
-        this.entityList = entityList.stream().filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
+        setEntityList(entityList);
         this.camoCategory = camoCategory;
         this.camoFileName = camoFileName;
         this.colour = colour;
