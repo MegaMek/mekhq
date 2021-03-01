@@ -65,7 +65,6 @@ import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
-import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
@@ -5386,9 +5385,7 @@ public class CampaignOptionsDialog extends JDialog {
         campaign.setName(txtName.getText());
         campaign.setLocalDate(date);
         // Ensure that the MegaMek year GameOption matches the campaign year
-        GameOptions gameOpts = campaign.getGameOptions();
-        int campaignYear = campaign.getGameYear();
-        gameOpts.getOption("year").setValue(campaignYear);
+        campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
         campaign.setFactionCode(Factions.getInstance().getFactionFromFullNameAndYear
                 (String.valueOf(comboFaction.getSelectedItem()), date.getYear()).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
@@ -5418,7 +5415,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
         options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
         options.setQuirks(useQuirksBox.isSelected());
-        campaign.getGameOptions().getOption("stratops_quirks").setValue(useQuirksBox.isSelected());
+        campaign.getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).setValue(useQuirksBox.isSelected());
         options.setClanPriceModifier((Double) spnClanPriceModifier.getValue());
         for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
             options.setUsedPartsValue((Double) spnUsedPartsValue[i].getValue(), i);
@@ -5517,7 +5514,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
         options.setAllowISPurchases(allowISPurchasesBox.isSelected());
         options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
-        campaign.getGameOptions().getOption("canon_only").setValue(allowCanonOnlyBox.isSelected());
+        campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_CANON_ONLY).setValue(allowCanonOnlyBox.isSelected());
         campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_ERA_BASED).setValue(variableTechLevelBox.isSelected());
         options.setVariableTechLevel(variableTechLevelBox.isSelected() && options.limitByYear());
         options.setFactionIntroDate(factionIntroDateBox.isSelected());
@@ -5525,7 +5522,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
         options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
         options.setTechLevel(choiceTechLevel.getSelectedIndex());
-        campaign.getGameOptions().getOption("techlevel").setValue((String)choiceTechLevel.getSelectedItem());
+        campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).setValue((String) choiceTechLevel.getSelectedItem());
 
         rSkillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getValue());
         for (int i = 0; i < Person.T_NUM; i++) {
