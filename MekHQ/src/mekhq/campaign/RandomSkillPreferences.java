@@ -198,7 +198,7 @@ public class RandomSkillPreferences implements Serializable {
     }
 
     public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn) {
-        MekHQ.getLogger().debug("Loading Random Skill MMPreferences from XML...");
+        MekHQ.getLogger().debug("Loading Random Skill Preferences from XML...");
 
         wn.normalize();
         RandomSkillPreferences retVal = new RandomSkillPreferences();
@@ -251,7 +251,7 @@ public class RandomSkillPreferences implements Serializable {
             }
         }
 
-        MekHQ.getLogger().debug("Load Random Skill MMPreferences Complete!");
+        MekHQ.getLogger().debug("Load Random Skill Preferences Complete!");
 
         return retVal;
     }
