@@ -48,8 +48,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 public class NewPlanetaryEventDialog extends JDialog {
     private static final long serialVersionUID = 6025304629282204159L;

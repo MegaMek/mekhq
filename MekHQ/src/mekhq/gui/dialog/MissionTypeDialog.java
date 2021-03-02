@@ -13,8 +13,8 @@ import javax.swing.JButton;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  *
@@ -23,7 +23,7 @@ import mekhq.preferences.PreferencesNode;
 public class MissionTypeDialog extends javax.swing.JDialog {
 
 	private boolean contract;
-	
+
 	private static final long serialVersionUID = 8376874926997734492L;
 	/** Creates new form */
     public MissionTypeDialog(Frame parent, boolean modal) {
@@ -38,9 +38,9 @@ public class MissionTypeDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));
-        
+
         getContentPane().setLayout(new java.awt.GridLayout(2,1));
-      
+
         JButton btnMission = new javax.swing.JButton(resourceMap.getString("btnMission.text"));
         btnMission.setToolTipText(resourceMap.getString("btnMission.tooltip"));
         btnMission.setName("btnMission"); // NOI18N
@@ -49,7 +49,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
         	setVisible(false);
         });
         getContentPane().add(btnMission);
-        
+
         JButton btnContract = new javax.swing.JButton(resourceMap.getString("btnContract.text"));
         btnContract.setToolTipText(resourceMap.getString("btnContract.tooltip"));
         btnContract.setName("btnContract"); // NOI18N
@@ -69,7 +69,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
-    
+
     public boolean isContract() {
     	return contract;
     }

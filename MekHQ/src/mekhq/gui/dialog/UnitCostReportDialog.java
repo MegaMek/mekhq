@@ -13,8 +13,8 @@ import javax.swing.JTextPane;
 
 import mekhq.MekHQ;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author pheonixstorm
@@ -24,17 +24,17 @@ import mekhq.preferences.PreferencesNode;
 public class UnitCostReportDialog extends javax.swing.JDialog {
 
     private static final long serialVersionUID = -1423208314297284122L;
-    
+
     private JTextPane txtReport;
 
     public UnitCostReportDialog(java.awt.Frame parent, Unit unit) {
         super(parent, false);
         setTitle("Monthly Cost Report for " + unit.getName());
-        initComponents();     
-        
+        initComponents();
+
         txtReport.setText(unit.displayMonthlyCost());
         txtReport.setCaretPosition(0);
-        
+
         setPreferredSize(new Dimension(700, 500));
         pack();
 
@@ -46,11 +46,11 @@ public class UnitCostReportDialog extends javax.swing.JDialog {
 
         txtReport = new JTextPane();
         txtReport.setContentType("text/html");
-        
+
         setLayout(new java.awt.BorderLayout());
-        
+
         txtReport.setEditable(false);
-        
+
         getContentPane().add(new JScrollPane(txtReport), BorderLayout.CENTER);
     }
 

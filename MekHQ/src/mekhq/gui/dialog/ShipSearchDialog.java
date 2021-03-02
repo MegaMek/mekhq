@@ -38,9 +38,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.preferences.JToggleButtonPreference;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JToggleButtonPreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Manages searches for DropShips or JumpShips for Against the Bot.

@@ -31,26 +31,26 @@ import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.ui.swing.BotConfigDialog;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 public class PrincessBehaviorDialog extends BotConfigDialog implements ActionListener {
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -1697757949925940582L;
 
 	public PrincessBehaviorDialog(JFrame parent, BehaviorSettings princessBehavior, String name) {
 	    super(parent);
-	    
+
 	    try {
 	        this.princessBehavior = princessBehavior.getCopy();
 	    } catch(Exception e) {
 	        handleError("PrincessBehaviorDialog", e);
 	    }
 	    this.setName(name);
-	    
+
 	    this.nameField.setText(name);
 	    super.setPrincessFields();
 	    setUserPreferences();
@@ -62,7 +62,7 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
-	
+
     private void getPrincessFields() {
         LogLevel logLevel = LogLevel.getLogLevel((String) verbosityCombo.getSelectedItem());
         if (null != logLevel) {
