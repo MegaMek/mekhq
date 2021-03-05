@@ -75,7 +75,7 @@ public final class MekHqConstants {
     //region Miscellaneous Options
     public static final String MISCELLANEOUS_NODE = "mekhq/prefs/miscellaneous";
     public static final String START_GAME_DELAY = "startGameDelay";
-    public static final String DEFAULT_COMPANY_GENERATION_TYPE = "defaultCompanyGenerationType";
+    public static final String DEFAULT_COMPANY_GENERATION_METHOD = "defaultCompanyGenerationMethod";
     //endregion Miscellaneous Options
     //endregion MekHQ Options
 

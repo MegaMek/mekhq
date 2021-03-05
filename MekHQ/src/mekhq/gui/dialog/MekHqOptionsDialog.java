@@ -23,7 +23,7 @@ package mekhq.gui.dialog;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
-import mekhq.campaign.universe.enums.CompanyGenerationType;
+import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import javax.swing.*;
@@ -76,7 +76,7 @@ public class MekHqOptionsDialog extends BaseButtonDialog {
 
     //region Miscellaneous
     private JSpinner optionStartGameDelay;
-    private JComboBox<CompanyGenerationType> optionDefaultCompanyGenerationType;
+    private JComboBox<CompanyGenerationMethod> optionDefaultCompanyGenerationMethod;
     //endregion Miscellaneous
     //endregion Variable Declarations
 
@@ -361,17 +361,18 @@ public class MekHqOptionsDialog extends BaseButtonDialog {
         optionStartGameDelay = new JSpinner(new SpinnerNumberModel(0, 0, 2500, 25));
         optionStartGameDelay.setToolTipText(resources.getString("optionStartGameDelay.toolTipText"));
 
-        JLabel labelDefaultCompanyGenerationType = new JLabel(resources.getString("labelDefaultCompanyGenerationType.text"));
-        labelDefaultCompanyGenerationType.setToolTipText(resources.getString("labelDefaultCompanyGenerationType.toolTipText"));
-        optionDefaultCompanyGenerationType = new JComboBox<>(CompanyGenerationType.values());
-        optionDefaultCompanyGenerationType.setRenderer(new DefaultListCellRenderer() {
+        JLabel labelDefaultCompanyGenerationMethod = new JLabel(resources.getString("labelDefaultCompanyGenerationMethod.text"));
+        labelDefaultCompanyGenerationMethod.setToolTipText(resources.getString("labelDefaultCompanyGenerationMethod.toolTipText"));
+
+        optionDefaultCompanyGenerationMethod = new JComboBox<>(CompanyGenerationMethod.values());
+        optionDefaultCompanyGenerationMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                                                           boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (isSelected && (index > -1)) {
-                    list.setToolTipText((list.getSelectedValue() instanceof CompanyGenerationType)
-                            ? ((CompanyGenerationType) list.getSelectedValue()).getToolTipText() : "");
+                    list.setToolTipText((list.getSelectedValue() instanceof CompanyGenerationMethod)
+                            ? ((CompanyGenerationMethod) list.getSelectedValue()).getToolTipText() : "");
                 }
                 return this;
             }
@@ -392,8 +393,8 @@ public class MekHqOptionsDialog extends BaseButtonDialog {
                                 .addComponent(optionStartGameDelay, GroupLayout.DEFAULT_SIZE,
                                         GroupLayout.DEFAULT_SIZE, 40))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(labelDefaultCompanyGenerationType)
-                                .addComponent(optionDefaultCompanyGenerationType))
+                                .addComponent(labelDefaultCompanyGenerationMethod)
+                                .addComponent(optionDefaultCompanyGenerationMethod))
         );
 
         layout.setHorizontalGroup(
@@ -402,8 +403,8 @@ public class MekHqOptionsDialog extends BaseButtonDialog {
                                 .addComponent(labelStartGameDelay)
                                 .addComponent(optionStartGameDelay))
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(labelDefaultCompanyGenerationType)
-                                .addComponent(optionDefaultCompanyGenerationType))
+                                .addComponent(labelDefaultCompanyGenerationMethod)
+                                .addComponent(optionDefaultCompanyGenerationMethod))
         );
 
         return body;
@@ -441,7 +442,7 @@ public class MekHqOptionsDialog extends BaseButtonDialog {
         MekHQ.getMekHQOptions().setSaveCompanyGenerationOptions(optionSaveCompanyGenerationOptions.isSelected());
 
         MekHQ.getMekHQOptions().setStartGameDelay((Integer) optionStartGameDelay.getValue());
-        MekHQ.getMekHQOptions().setDefaultCompanyGenerationType((CompanyGenerationType) Objects.requireNonNull(optionDefaultCompanyGenerationType.getSelectedItem()));
+        MekHQ.getMekHQOptions().setDefaultCompanyGenerationMethod((CompanyGenerationMethod) Objects.requireNonNull(optionDefaultCompanyGenerationMethod.getSelectedItem()));
 
         MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
     }
@@ -472,7 +473,7 @@ public class MekHqOptionsDialog extends BaseButtonDialog {
         optionSaveCompanyGenerationOptions.setSelected(MekHQ.getMekHQOptions().getSaveCompanyGenerationOptions());
 
         optionStartGameDelay.setValue(MekHQ.getMekHQOptions().getStartGameDelay());
-        optionDefaultCompanyGenerationType.setSelectedItem(MekHQ.getMekHQOptions().getDefaultCompanyGenerationType());
+        optionDefaultCompanyGenerationMethod.setSelectedItem(MekHQ.getMekHQOptions().getDefaultCompanyGenerationMethod());
     }
 
     //region Data Validation

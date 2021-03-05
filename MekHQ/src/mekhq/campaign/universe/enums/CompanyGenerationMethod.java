@@ -20,17 +20,17 @@ package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.generators.companyGeneration.AbstractCompanyGenerator;
-import mekhq.campaign.universe.generators.companyGeneration.AtBCompanyGenerator;
-import mekhq.campaign.universe.generators.companyGeneration.CompanyGenerationOptions;
-import mekhq.campaign.universe.generators.companyGeneration.WindchildCompanyGenerator;
+import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
+import mekhq.campaign.universe.generators.companyGenerators.AtBCompanyGenerator;
+import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
+import mekhq.campaign.universe.generators.companyGenerators.WindchildCompanyGenerator;
 
 import java.util.ResourceBundle;
 
-public enum CompanyGenerationType {
+public enum CompanyGenerationMethod {
     //region Enum Declarations
-    AGAINST_THE_BOT("CompanyGenerationType.AGAINST_THE_BOT.text", "CompanyGenerationType.AGAINST_THE_BOT.toolTipText"),
-    WINDCHILD("CompanyGenerationType.WINDCHILD.text", "CompanyGenerationType.WINDCHILD.toolTipText");
+    AGAINST_THE_BOT("CompanyGenerationMethod.AGAINST_THE_BOT.text", "CompanyGenerationMethod.AGAINST_THE_BOT.toolTipText"),
+    WINDCHILD("CompanyGenerationMethod.WINDCHILD.text", "CompanyGenerationMethod.WINDCHILD.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -41,7 +41,7 @@ public enum CompanyGenerationType {
     //endregion Variable Declarations
 
     //region Constructors
-    CompanyGenerationType(String name, String toolTipText) {
+    CompanyGenerationMethod(final String name, final String toolTipText) {
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }

@@ -28,9 +28,10 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.enums.CompanyGenerationType;
-import mekhq.campaign.universe.enums.ForceNamingType;
-import mekhq.campaign.universe.generators.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.enums.CompanyGenerationMethod;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
+import mekhq.campaign.universe.enums.PartGenerationMethod;
+import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
 import mekhq.gui.FileDialogs;
 
 import javax.swing.*;
@@ -51,7 +52,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     private Campaign campaign;
 
     // Base Information
-    private JComboBox<CompanyGenerationType> comboCompanyGenerationType;
+    private JComboBox<CompanyGenerationMethod> comboCompanyGenerationMethod;
     private JComboBox<FactionChoice> comboFaction;
     private JCheckBox chkSpecifyStartingSystem;
     private JCheckBox chkStartingSystemFactionSpecific;
@@ -62,6 +63,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     private JSpinner spnIndividualLanceCount;
     private JSpinner spnLancesPerCompany;
     private JSpinner spnLanceSize;
+    private JSpinner spnStarLeagueYear;
 
     // Personnel
     private JLabel lblTotalSupportPersonnel;
@@ -73,6 +75,11 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     private JCheckBox chkApplyOfficerStatBonusToWorstSkill;
     private JCheckBox chkAssignBestOfficers;
     private JCheckBox chkAutomaticallyAssignRanks;
+    private JCheckBox chkAssignFounderFlag;
+    private JCheckBox chkRunStartingSimulation;
+    private JSpinner spnSimulationDuration;
+    private JCheckBox chkSimulateRandomMarriages;
+    private JCheckBox chkSimulateRandomProcreation;
 
     // Personnel Randomization
     private JCheckBox chkRandomizeOrigin;
@@ -87,19 +94,20 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     // Units
     private JCheckBox chkGenerateUnitsAsAttached;
     private JCheckBox chkAssignBestRollToUnitCommander;
+    private JCheckBox chkSortStarLeagueUnitsFirst;
     private JCheckBox chkGroupByWeight;
+    private JCheckBox chkGroupByQuality;
     private JCheckBox chkKeepOfficerRollsSeparate;
-    private JSpinner spnStarLeagueYear;
     private JCheckBox chkAssignTechsToUnits;
 
     // Unit
-    private JComboBox<ForceNamingType> comboForceNamingType;
+    private JComboBox<ForceNamingMethod> comboForceNamingMethod;
     private JCheckBox chkGenerateForceIcons;
 
     // Spares
     private JCheckBox chkGenerateMothballedSpareUnits;
     private JSpinner spnSparesPercentOfActiveUnits;
-    private JCheckBox chkGenerateSpareParts;
+    private JComboBox<PartGenerationMethod> comboPartGenerationMethod;
     private JSpinner spnStartingArmourWeight;
     private JCheckBox chkGenerateSpareAmmunition;
     private JSpinner spnNumberReloadsPerWeapon;
@@ -122,6 +130,15 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     private JCheckBox chkPayForArmour;
     private JCheckBox chkPayForAmmunition;
 
+    // Surprises
+    private JCheckBox chkGenerateSurprises;
+    private JCheckBox chkGenerateStarLeagueRoyalBox;
+    private JCheckBox chkGenerateStarLeagueRegularBox;
+    private JCheckBox chkGenerateClanKeshikBox;
+    private JCheckBox chkGenerateClanFrontlineBox;
+    private JCheckBox chkGenerateClanSecondLineBox;
+    private JCheckBox chkGenerateExperimentalTechBox;
+
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
@@ -134,7 +151,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         initialize();
 
         if (campaign.getCampaignOptions().getCompanyGenerationOptions() == null) {
-            setOptions(MekHQ.getMekHQOptions().getDefaultCompanyGenerationType());
+            setOptions(MekHQ.getMekHQOptions().getDefaultCompanyGenerationMethod());
         } else {
             setOptions(campaign.getCampaignOptions().getCompanyGenerationOptions());
         }
@@ -159,16 +176,16 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     }
 
     //region Base Information
-    public JComboBox<CompanyGenerationType> getComboCompanyGenerationType() {
-        return comboCompanyGenerationType;
+    public JComboBox<CompanyGenerationMethod> getComboCompanyGenerationMethod() {
+        return comboCompanyGenerationMethod;
     }
 
-    public CompanyGenerationType getCompanyGenerationType() {
-        return (CompanyGenerationType) Objects.requireNonNull(getComboCompanyGenerationType().getSelectedItem());
+    public CompanyGenerationMethod getCompanyGenerationMethod() {
+        return (CompanyGenerationMethod) Objects.requireNonNull(getComboCompanyGenerationMethod().getSelectedItem());
     }
 
-    public void setComboCompanyGenerationType(final JComboBox<CompanyGenerationType> comboCompanyGenerationType) {
-        this.comboCompanyGenerationType = comboCompanyGenerationType;
+    public void setComboCompanyGenerationMethod(final JComboBox<CompanyGenerationMethod> comboCompanyGenerationMethod) {
+        this.comboCompanyGenerationMethod = comboCompanyGenerationMethod;
     }
 
     public JComboBox<FactionChoice> getComboFaction() {
@@ -279,6 +296,14 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     public void setSpnLanceSize(final JSpinner spnLanceSize) {
         this.spnLanceSize = spnLanceSize;
     }
+
+    public JSpinner getSpnStarLeagueYear() {
+        return spnStarLeagueYear;
+    }
+
+    public void setSpnStarLeagueYear(final JSpinner spnStarLeagueYear) {
+        this.spnStarLeagueYear = spnStarLeagueYear;
+    }
     //endregion Base Information
 
     //region Personnel
@@ -370,6 +395,46 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
     public void setChkAutomaticallyAssignRanks(final JCheckBox chkAutomaticallyAssignRanks) {
         this.chkAutomaticallyAssignRanks = chkAutomaticallyAssignRanks;
+    }
+
+    public JCheckBox getChkAssignFounderFlag() {
+        return chkAssignFounderFlag;
+    }
+
+    public void setChkAssignFounderFlag(final JCheckBox chkAssignFounderFlag) {
+        this.chkAssignFounderFlag = chkAssignFounderFlag;
+    }
+
+    public JCheckBox getChkRunStartingSimulation() {
+        return chkRunStartingSimulation;
+    }
+
+    public void setChkRunStartingSimulation(final JCheckBox chkRunStartingSimulation) {
+        this.chkRunStartingSimulation = chkRunStartingSimulation;
+    }
+
+    public JSpinner getSpnSimulationDuration() {
+        return spnSimulationDuration;
+    }
+
+    public void setSpnSimulationDuration(final JSpinner spnSimulationDuration) {
+        this.spnSimulationDuration = spnSimulationDuration;
+    }
+
+    public JCheckBox getChkSimulateRandomMarriages() {
+        return chkSimulateRandomMarriages;
+    }
+
+    public void setChkSimulateRandomMarriages(final JCheckBox chkSimulateRandomMarriages) {
+        this.chkSimulateRandomMarriages = chkSimulateRandomMarriages;
+    }
+
+    public JCheckBox getChkSimulateRandomProcreation() {
+        return chkSimulateRandomProcreation;
+    }
+
+    public void setChkSimulateRandomProcreation(final JCheckBox chkSimulateRandomProcreation) {
+        this.chkSimulateRandomProcreation = chkSimulateRandomProcreation;
     }
     //endregion Personnel
 
@@ -481,6 +546,14 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         this.chkAssignBestRollToUnitCommander = chkAssignBestRollToUnitCommander;
     }
 
+    public JCheckBox getChkSortStarLeagueUnitsFirst() {
+        return chkSortStarLeagueUnitsFirst;
+    }
+
+    public void setChkSortStarLeagueUnitsFirst(final JCheckBox chkSortStarLeagueUnitsFirst) {
+        this.chkSortStarLeagueUnitsFirst = chkSortStarLeagueUnitsFirst;
+    }
+
     public JCheckBox getChkGroupByWeight() {
         return chkGroupByWeight;
     }
@@ -489,20 +562,20 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         this.chkGroupByWeight = chkGroupByWeight;
     }
 
+    public JCheckBox getChkGroupByQuality() {
+        return chkGroupByQuality;
+    }
+
+    public void setChkGroupByQuality(final JCheckBox chkGroupByQuality) {
+        this.chkGroupByQuality = chkGroupByQuality;
+    }
+
     public JCheckBox getChkKeepOfficerRollsSeparate() {
         return chkKeepOfficerRollsSeparate;
     }
 
     public void setChkKeepOfficerRollsSeparate(final JCheckBox chkKeepOfficerRollsSeparate) {
         this.chkKeepOfficerRollsSeparate = chkKeepOfficerRollsSeparate;
-    }
-
-    public JSpinner getSpnStarLeagueYear() {
-        return spnStarLeagueYear;
-    }
-
-    public void setSpnStarLeagueYear(final JSpinner spnStarLeagueYear) {
-        this.spnStarLeagueYear = spnStarLeagueYear;
     }
 
     public JCheckBox getChkAssignTechsToUnits() {
@@ -515,16 +588,16 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     //endregion Units
 
     //region Unit
-    public JComboBox<ForceNamingType> getComboForceNamingType() {
-        return comboForceNamingType;
+    public JComboBox<ForceNamingMethod> getComboForceNamingMethod() {
+        return comboForceNamingMethod;
     }
 
-    public ForceNamingType getForceNamingType() {
-        return (ForceNamingType) Objects.requireNonNull(getComboForceNamingType().getSelectedItem());
+    public ForceNamingMethod getForceNamingMethod() {
+        return (ForceNamingMethod) Objects.requireNonNull(getComboForceNamingMethod().getSelectedItem());
     }
 
-    public void setComboForceNamingType(final JComboBox<ForceNamingType> comboForceNamingType) {
-        this.comboForceNamingType = comboForceNamingType;
+    public void setComboForceNamingMethod(final JComboBox<ForceNamingMethod> comboForceNamingMethod) {
+        this.comboForceNamingMethod = comboForceNamingMethod;
     }
 
     public JCheckBox getChkGenerateForceIcons() {
@@ -553,12 +626,16 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         this.spnSparesPercentOfActiveUnits = spnSparesPercentOfActiveUnits;
     }
 
-    public JCheckBox getChkGenerateSpareParts() {
-        return chkGenerateSpareParts;
+    public JComboBox<PartGenerationMethod> getComboPartGenerationMethod() {
+        return comboPartGenerationMethod;
     }
 
-    public void setChkGenerateSpareParts(final JCheckBox chkGenerateSpareParts) {
-        this.chkGenerateSpareParts = chkGenerateSpareParts;
+    public PartGenerationMethod getPartGenerationMethod() {
+        return (PartGenerationMethod) Objects.requireNonNull(getComboPartGenerationMethod().getSelectedItem());
+    }
+
+    public void setComboPartGenerationMethod(final JComboBox<PartGenerationMethod> comboPartGenerationMethod) {
+        this.comboPartGenerationMethod = comboPartGenerationMethod;
     }
 
     public JSpinner getSpnStartingArmourWeight() {
@@ -701,6 +778,64 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         this.chkPayForAmmunition = chkPayForAmmunition;
     }
     //endregion Finances
+
+    //region Surprises
+    public JCheckBox getChkGenerateSurprises() {
+        return chkGenerateSurprises;
+    }
+
+    public void setChkGenerateSurprises(final JCheckBox chkGenerateSurprises) {
+        this.chkGenerateSurprises = chkGenerateSurprises;
+    }
+
+    public JCheckBox getChkGenerateStarLeagueRoyalBox() {
+        return chkGenerateStarLeagueRoyalBox;
+    }
+
+    public void setChkGenerateStarLeagueRoyalBox(final JCheckBox chkGenerateStarLeagueRoyalBox) {
+        this.chkGenerateStarLeagueRoyalBox = chkGenerateStarLeagueRoyalBox;
+    }
+
+    public JCheckBox getChkGenerateStarLeagueRegularBox() {
+        return chkGenerateStarLeagueRegularBox;
+    }
+
+    public void setChkGenerateStarLeagueRegularBox(final JCheckBox chkGenerateStarLeagueRegularBox) {
+        this.chkGenerateStarLeagueRegularBox = chkGenerateStarLeagueRegularBox;
+    }
+
+    public JCheckBox getChkGenerateClanKeshikBox() {
+        return chkGenerateClanKeshikBox;
+    }
+
+    public void setChkGenerateClanKeshikBox(final JCheckBox chkGenerateClanKeshikBox) {
+        this.chkGenerateClanKeshikBox = chkGenerateClanKeshikBox;
+    }
+
+    public JCheckBox getChkGenerateClanFrontlineBox() {
+        return chkGenerateClanFrontlineBox;
+    }
+
+    public void setChkGenerateClanFrontlineBox(final JCheckBox chkGenerateClanFrontlineBox) {
+        this.chkGenerateClanFrontlineBox = chkGenerateClanFrontlineBox;
+    }
+
+    public JCheckBox getChkGenerateClanSecondLineBox() {
+        return chkGenerateClanSecondLineBox;
+    }
+
+    public void setChkGenerateClanSecondLineBox(final JCheckBox chkGenerateClanSecondLineBox) {
+        this.chkGenerateClanSecondLineBox = chkGenerateClanSecondLineBox;
+    }
+
+    public JCheckBox getChkGenerateExperimentalTechBox() {
+        return chkGenerateExperimentalTechBox;
+    }
+
+    public void setChkGenerateExperimentalTechBox(final JCheckBox chkGenerateExperimentalTechBox) {
+        this.chkGenerateExperimentalTechBox = chkGenerateExperimentalTechBox;
+    }
+    //endregion Surprises
     //endregion Getters/Setters
 
     //region Determination Methods
@@ -745,6 +880,10 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
         gbc.gridx++;
         add(createFinancesPanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        add(createSurprisesPanel(), gbc);
     }
 
     private JPanel createBaseInformationPanel() {
@@ -752,20 +891,20 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         JLabel lblStartingPlanet = new JLabel();
 
         // Create Panel Components
-        JLabel lblCompanyGenerationType = new JLabel(resources.getString("lblCompanyGenerationType.text"));
-        lblCompanyGenerationType.setToolTipText(resources.getString("lblCompanyGenerationType.toolTipText"));
-        lblCompanyGenerationType.setName("lblCompanyGenerationType");
+        JLabel lblCompanyGenerationMethod = new JLabel(resources.getString("lblCompanyGenerationMethod.text"));
+        lblCompanyGenerationMethod.setToolTipText(resources.getString("lblCompanyGenerationMethod.toolTipText"));
+        lblCompanyGenerationMethod.setName("lblCompanyGenerationMethod");
 
-        setComboCompanyGenerationType(new JComboBox<>(CompanyGenerationType.values()));
-        getComboCompanyGenerationType().setName("comboCompanyGenerationType");
-        getComboCompanyGenerationType().setRenderer(new DefaultListCellRenderer() {
+        setComboCompanyGenerationMethod(new JComboBox<>(CompanyGenerationMethod.values()));
+        getComboCompanyGenerationMethod().setName("comboCompanyGenerationMethod");
+        getComboCompanyGenerationMethod().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
                                                           final int index, final boolean isSelected,
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof CompanyGenerationType) {
-                    list.setToolTipText(((CompanyGenerationType) value).getToolTipText());
+                if (value instanceof CompanyGenerationMethod) {
+                    list.setToolTipText(((CompanyGenerationMethod) value).getToolTipText());
                 }
                 return this;
             }
@@ -898,14 +1037,24 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getSpnLanceSize().setToolTipText(resources.getString("lblLanceSize.toolTipText"));
         getSpnLanceSize().setName("spnLanceSize");
 
+        JLabel lblStarLeagueYear = new JLabel(resources.getString("lblStarLeagueYear.text"));
+        lblStarLeagueYear.setToolTipText(resources.getString("lblStarLeagueYear.toolTipText"));
+        lblStarLeagueYear.setName("lblStarLeagueYear");
+
+        setSpnStarLeagueYear(new JSpinner(new SpinnerNumberModel(2765, 2571, 2780, 1)));
+        getSpnStarLeagueYear().setToolTipText(resources.getString("lblStarLeagueYear.toolTipText"));
+        getSpnStarLeagueYear().setName("spnStarLeagueYear");
+        getSpnStarLeagueYear().setEditor(new JSpinner.NumberEditor(getSpnStarLeagueYear(), "#"));
+
         // Programmatically Assign Accessibility Labels
-        lblCompanyGenerationType.setLabelFor(getComboCompanyGenerationType());
+        lblCompanyGenerationMethod.setLabelFor(getComboCompanyGenerationMethod());
         lblFaction.setLabelFor(getComboFaction());
         lblStartingPlanet.setLabelFor(getComboStartingPlanet());
         lblCompanyCount.setLabelFor(getSpnCompanyCount());
         lblIndividualLanceCount.setLabelFor(getSpnIndividualLanceCount());
         lblLancesPerCompany.setLabelFor(getSpnLancesPerCompany());
         lblLanceSize.setLabelFor(getSpnLanceSize());
+        lblStarLeagueYear.setLabelFor(getSpnStarLeagueYear());
 
         // Disable Panel Portions by Default
         getChkSpecifyStartingSystem().setSelected(true);
@@ -924,8 +1073,8 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblCompanyGenerationType)
-                                .addComponent(getComboCompanyGenerationType(), GroupLayout.Alignment.LEADING))
+                                .addComponent(lblCompanyGenerationMethod)
+                                .addComponent(getComboCompanyGenerationMethod(), GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblFaction)
                                 .addComponent(getComboFaction(), GroupLayout.Alignment.LEADING))
@@ -947,13 +1096,16 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                                 .addComponent(getSpnLancesPerCompany())
                                 .addComponent(lblLanceSize)
                                 .addComponent(getSpnLanceSize(), GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblStarLeagueYear)
+                                .addComponent(getSpnStarLeagueYear(), GroupLayout.Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblCompanyGenerationType)
-                                .addComponent(getComboCompanyGenerationType()))
+                                .addComponent(lblCompanyGenerationMethod)
+                                .addComponent(getComboCompanyGenerationMethod()))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblFaction)
                                 .addComponent(getComboFaction()))
@@ -975,11 +1127,17 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                                 .addComponent(getSpnLancesPerCompany())
                                 .addComponent(lblLanceSize)
                                 .addComponent(getSpnLanceSize()))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStarLeagueYear)
+                                .addComponent(getSpnStarLeagueYear()))
         );
         return panel;
     }
 
     private JPanel createPersonnelPanel() {
+        // Initialize Labels Used in ActionListeners
+        JLabel lblSimulationDuration = new JLabel();
+
         // Create Panel Components
         setLblTotalSupportPersonnel(new JLabel());
         updateLblTotalSupportPersonnel(0);
@@ -1016,6 +1174,44 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkAutomaticallyAssignRanks().setToolTipText(resources.getString("chkAutomaticallyAssignRanks.toolTipText"));
         getChkAutomaticallyAssignRanks().setName("chkAutomaticallyAssignRanks");
 
+        setChkAssignFounderFlag(new JCheckBox(resources.getString("chkAssignFounderFlag.text")));
+        getChkAssignFounderFlag().setToolTipText(resources.getString("chkAssignFounderFlag.toolTipText"));
+        getChkAssignFounderFlag().setName("chkAssignFounderFlag");
+
+        setChkRunStartingSimulation(new JCheckBox(resources.getString("chkRunStartingSimulation.text")));
+        getChkRunStartingSimulation().setToolTipText(resources.getString("chkRunStartingSimulation.toolTipText"));
+        getChkRunStartingSimulation().setName("chkRunStartingSimulation");
+        getChkRunStartingSimulation().addActionListener(evt -> {
+            final boolean selected = getChkRunStartingSimulation().isSelected();
+            lblSimulationDuration.setEnabled(selected);
+            getSpnSimulationDuration().setEnabled(selected);
+            getChkSimulateRandomMarriages().setEnabled(selected);
+            getChkSimulateRandomProcreation().setEnabled(selected);
+        });
+
+        lblSimulationDuration.setText(resources.getString("lblSimulationDuration.text"));
+        lblSimulationDuration.setToolTipText(resources.getString("lblSimulationDuration.toolTipText"));
+        lblSimulationDuration.setName("lblSimulationDuration");
+
+        setSpnSimulationDuration(new JSpinner(new SpinnerNumberModel(0, 0, 25, 1)));
+        getSpnSimulationDuration().setToolTipText(resources.getString("lblSimulationDuration.toolTipText"));
+        getSpnSimulationDuration().setName("spnSimulationDuration");
+
+        setChkSimulateRandomMarriages(new JCheckBox(resources.getString("chkSimulateRandomMarriages.text")));
+        getChkSimulateRandomMarriages().setToolTipText(resources.getString("chkSimulateRandomMarriages.toolTipText"));
+        getChkSimulateRandomMarriages().setName("chkSimulateRandomMarriages");
+
+        setChkSimulateRandomProcreation(new JCheckBox(resources.getString("chkSimulateRandomProcreation.text")));
+        getChkSimulateRandomProcreation().setToolTipText(resources.getString("chkSimulateRandomProcreation.toolTipText"));
+        getChkSimulateRandomProcreation().setName("chkSimulateRandomProcreation");
+
+        // Programmatically Assign Accessibility Labels
+        lblSimulationDuration.setLabelFor(getSpnSimulationDuration());
+
+        // Disable Panel Portions by Default
+        getChkRunStartingSimulation().setSelected(true);
+        getChkRunStartingSimulation().doClick();
+
         // Layout the UI
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("personnelPanel.title")));
@@ -1037,6 +1233,13 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                         .addComponent(getChkApplyOfficerStatBonusToWorstSkill())
                         .addComponent(getChkAssignBestOfficers())
                         .addComponent(getChkAutomaticallyAssignRanks())
+                        .addComponent(getChkAssignFounderFlag())
+                        .addComponent(getChkRunStartingSimulation())
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblSimulationDuration)
+                                .addComponent(getSpnSimulationDuration(), GroupLayout.Alignment.LEADING))
+                        .addComponent(getChkSimulateRandomMarriages())
+                        .addComponent(getChkSimulateRandomProcreation())
         );
 
         layout.setHorizontalGroup(
@@ -1050,7 +1253,16 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                         .addComponent(getChkApplyOfficerStatBonusToWorstSkill())
                         .addComponent(getChkAssignBestOfficers())
                         .addComponent(getChkAutomaticallyAssignRanks())
+                        .addComponent(getChkAssignFounderFlag())
+                        .addComponent(getChkRunStartingSimulation())
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblSimulationDuration)
+                                .addComponent(getSpnSimulationDuration()))
+                        .addComponent(getChkSimulateRandomMarriages())
+                        .addComponent(getChkSimulateRandomProcreation())
         );
+
+
         return panel;
     }
 
@@ -1287,6 +1499,8 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
         // Programmatically Assign Accessibility Labels
         lblCentralPlanet.setLabelFor(getComboCentralPlanet());
+        lblOriginSearchRadius.setLabelFor(getSpnOriginSearchRadius());
+        lblOriginDistanceScale.setLabelFor(getSpnOriginDistanceScale());
 
         // Disable Panel by Default
         getChkRandomizeOrigin().setSelected(true);
@@ -1352,29 +1566,25 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkAssignBestRollToUnitCommander().setToolTipText(resources.getString("chkAssignBestRollToUnitCommander.toolTipText"));
         getChkAssignBestRollToUnitCommander().setName("chkAssignBestRollToUnitCommander");
 
+        setChkSortStarLeagueUnitsFirst(new JCheckBox(resources.getString("chkSortStarLeagueUnitsFirst.text")));
+        getChkSortStarLeagueUnitsFirst().setToolTipText(resources.getString("chkSortStarLeagueUnitsFirst.toolTipText"));
+        getChkSortStarLeagueUnitsFirst().setName("chkSortStarLeagueUnitsFirst");
+
         setChkGroupByWeight(new JCheckBox(resources.getString("chkGroupByWeight.text")));
         getChkGroupByWeight().setToolTipText(resources.getString("chkGroupByWeight.toolTipText"));
         getChkGroupByWeight().setName("chkGroupByWeight");
+
+        setChkGroupByQuality(new JCheckBox(resources.getString("chkGroupByQuality.text")));
+        getChkGroupByQuality().setToolTipText(resources.getString("chkGroupByQuality.toolTipText"));
+        getChkGroupByQuality().setName("chkGroupByQuality");
 
         setChkKeepOfficerRollsSeparate(new JCheckBox(resources.getString("chkKeepOfficerRollsSeparate.text")));
         getChkKeepOfficerRollsSeparate().setToolTipText(resources.getString("chkKeepOfficerRollsSeparate.toolTipText"));
         getChkKeepOfficerRollsSeparate().setName("chkKeepOfficerRollsSeparate");
 
-        JLabel lblStarLeagueYear = new JLabel(resources.getString("lblStarLeagueYear.text"));
-        lblStarLeagueYear.setToolTipText(resources.getString("lblStarLeagueYear.toolTipText"));
-        lblStarLeagueYear.setName("lblStarLeagueYear");
-
-        setSpnStarLeagueYear(new JSpinner(new SpinnerNumberModel(2765, 2571, 2780, 1)));
-        getSpnStarLeagueYear().setToolTipText(resources.getString("lblStarLeagueYear.toolTipText"));
-        getSpnStarLeagueYear().setName("spnStarLeagueYear");
-        getSpnStarLeagueYear().setEditor(new JSpinner.NumberEditor(getSpnStarLeagueYear(), "#"));
-
         setChkAssignTechsToUnits(new JCheckBox(resources.getString("chkAssignTechsToUnits.text")));
         getChkAssignTechsToUnits().setToolTipText(resources.getString("chkAssignTechsToUnits.toolTipText"));
         getChkAssignTechsToUnits().setName("chkAssignTechsToUnits");
-
-        // Programmatically Assign Accessibility Labels
-        lblStarLeagueYear.setLabelFor(getSpnStarLeagueYear());
 
         // Layout the UI
         JPanel panel = new JPanel();
@@ -1390,11 +1600,10 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                 layout.createSequentialGroup()
                         .addComponent(getChkGenerateUnitsAsAttached())
                         .addComponent(getChkAssignBestRollToUnitCommander())
+                        .addComponent(getChkSortStarLeagueUnitsFirst())
                         .addComponent(getChkGroupByWeight())
+                        .addComponent(getChkGroupByQuality())
                         .addComponent(getChkKeepOfficerRollsSeparate())
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblStarLeagueYear)
-                                .addComponent(getSpnStarLeagueYear(), GroupLayout.Alignment.LEADING))
                         .addComponent(getChkAssignTechsToUnits())
         );
 
@@ -1402,11 +1611,10 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(getChkGenerateUnitsAsAttached())
                         .addComponent(getChkAssignBestRollToUnitCommander())
+                        .addComponent(getChkSortStarLeagueUnitsFirst())
                         .addComponent(getChkGroupByWeight())
+                        .addComponent(getChkGroupByQuality())
                         .addComponent(getChkKeepOfficerRollsSeparate())
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblStarLeagueYear)
-                                .addComponent(getSpnStarLeagueYear()))
                         .addComponent(getChkAssignTechsToUnits())
         );
         return panel;
@@ -1414,20 +1622,20 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
     private JPanel createUnitPanel() {
         // Create Panel Components
-        JLabel lblForceNamingType = new JLabel(resources.getString("lblForceNamingType.text"));
-        lblForceNamingType.setToolTipText(resources.getString("lblForceNamingType.toolTipText"));
-        lblForceNamingType.setName("lblForceNamingType");
+        JLabel lblForceNamingMethod = new JLabel(resources.getString("lblForceNamingMethod.text"));
+        lblForceNamingMethod.setToolTipText(resources.getString("lblForceNamingMethod.toolTipText"));
+        lblForceNamingMethod.setName("lblForceNamingMethod");
 
-        setComboForceNamingType(new JComboBox<>(ForceNamingType.values()));
-        getComboForceNamingType().setName("comboForceNamingType");
-        getComboForceNamingType().setRenderer(new DefaultListCellRenderer() {
+        setComboForceNamingMethod(new JComboBox<>(ForceNamingMethod.values()));
+        getComboForceNamingMethod().setName("comboForceNamingMethod");
+        getComboForceNamingMethod().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
                                                           final int index, final boolean isSelected,
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof ForceNamingType) {
-                    list.setToolTipText(((ForceNamingType) value).getToolTipText());
+                if (value instanceof ForceNamingMethod) {
+                    list.setToolTipText(((ForceNamingMethod) value).getToolTipText());
                 }
                 return this;
             }
@@ -1438,7 +1646,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkGenerateForceIcons().setName("chkGenerateForceIcons");
 
         // Programmatically Assign Accessibility Labels
-        lblForceNamingType.setLabelFor(getComboForceNamingType());
+        lblForceNamingMethod.setLabelFor(getComboForceNamingMethod());
 
         // Layout the UI
         JPanel panel = new JPanel();
@@ -1453,16 +1661,16 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblForceNamingType)
-                                .addComponent(getComboForceNamingType(), GroupLayout.Alignment.LEADING))
+                                .addComponent(lblForceNamingMethod)
+                                .addComponent(getComboForceNamingMethod(), GroupLayout.Alignment.LEADING))
                         .addComponent(getChkGenerateForceIcons())
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblForceNamingType)
-                                .addComponent(getComboForceNamingType()))
+                                .addComponent(lblForceNamingMethod)
+                                .addComponent(getComboForceNamingMethod()))
                         .addComponent(getChkGenerateForceIcons())
         );
         return panel;
@@ -1491,9 +1699,25 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getSpnSparesPercentOfActiveUnits().setToolTipText(resources.getString("chkGenerateMothballedSpareUnits.toolTipText"));
         getSpnSparesPercentOfActiveUnits().setName("spnGenerateMothballedSpareUnits");
 
-        setChkGenerateSpareParts(new JCheckBox(resources.getString("chkGenerateSpareParts.text")));
-        getChkGenerateSpareParts().setToolTipText(resources.getString("chkGenerateSpareParts.toolTipText"));
-        getChkGenerateSpareParts().setName("chkGenerateSpareParts");
+        JLabel lblPartGenerationMethod = new JLabel(resources.getString("lblPartGenerationMethod.text"));
+        lblPartGenerationMethod.setToolTipText(resources.getString("lblPartGenerationMethod.toolTipText"));
+        lblPartGenerationMethod.setName("lblPartGenerationMethod");
+
+        setComboPartGenerationMethod(new JComboBox<>(PartGenerationMethod.values()));
+        getComboPartGenerationMethod().setToolTipText(resources.getString("lblPartGenerationMethod.toolTipText"));
+        getComboPartGenerationMethod().setName("comboPartGenerationMethod");
+        getComboPartGenerationMethod().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof PartGenerationMethod) {
+                    list.setToolTipText(((PartGenerationMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
 
         JLabel lblStartingArmourWeight = new JLabel(resources.getString("lblStartingArmourWeight.text"));
         lblStartingArmourWeight.setToolTipText(resources.getString("lblStartingArmourWeight.toolTipText"));
@@ -1527,6 +1751,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
         // Programmatically Assign Accessibility Labels
         lblSparesPercentOfActiveUnits.setLabelFor(getSpnSparesPercentOfActiveUnits());
+        lblPartGenerationMethod.setLabelFor(getComboPartGenerationMethod());
         lblStartingArmourWeight.setLabelFor(getSpnStartingArmourWeight());
         lblNumberReloadsPerWeapon.setLabelFor(getSpnNumberReloadsPerWeapon());
 
@@ -1552,7 +1777,9 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblSparesPercentOfActiveUnits)
                                 .addComponent(getSpnSparesPercentOfActiveUnits(), GroupLayout.Alignment.LEADING))
-                        .addComponent(getChkGenerateSpareParts())
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblPartGenerationMethod)
+                                .addComponent(getComboPartGenerationMethod(), GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblStartingArmourWeight)
                                 .addComponent(getSpnStartingArmourWeight(), GroupLayout.Alignment.LEADING))
@@ -1569,7 +1796,9 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblSparesPercentOfActiveUnits)
                                 .addComponent(getSpnSparesPercentOfActiveUnits()))
-                        .addComponent(getChkGenerateSpareParts())
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPartGenerationMethod)
+                                .addComponent(getComboPartGenerationMethod()))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblStartingArmourWeight)
                                 .addComponent(getSpnStartingArmourWeight()))
@@ -1764,6 +1993,84 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return panel;
     }
 
+    private JPanel createSurprisesPanel() {
+        // Create Panel Components
+        setChkGenerateSurprises(new JCheckBox(resources.getString("chkGenerateSurprises.text")));
+        getChkGenerateSurprises().setToolTipText(resources.getString("chkGenerateSurprises.toolTipText"));
+        getChkGenerateSurprises().setName("chkGenerateSurprises");
+        getChkGenerateSurprises().addActionListener(evt -> {
+            final boolean selected = getChkGenerateSurprises().isSelected();
+            getChkGenerateStarLeagueRoyalBox().setEnabled(selected);
+            getChkGenerateStarLeagueRegularBox().setEnabled(selected);
+            getChkGenerateClanKeshikBox().setEnabled(selected);
+            getChkGenerateClanFrontlineBox().setEnabled(selected);
+            getChkGenerateClanSecondLineBox().setEnabled(selected);
+            getChkGenerateExperimentalTechBox().setEnabled(selected);
+        });
+
+        setChkGenerateStarLeagueRoyalBox(new JCheckBox(resources.getString("chkGenerateStarLeagueRoyalBox.text")));
+        getChkGenerateStarLeagueRoyalBox().setToolTipText(resources.getString("chkGenerateStarLeagueRoyalBox.toolTipText"));
+        getChkGenerateStarLeagueRoyalBox().setName("chkGenerateStarLeagueRoyalBox");
+
+        setChkGenerateStarLeagueRegularBox(new JCheckBox(resources.getString("chkGenerateStarLeagueRegularBox.text")));
+        getChkGenerateStarLeagueRegularBox().setToolTipText(resources.getString("chkGenerateStarLeagueRegularBox.toolTipText"));
+        getChkGenerateStarLeagueRegularBox().setName("chkGenerateStarLeagueRegularBox");
+
+        setChkGenerateClanKeshikBox(new JCheckBox(resources.getString("chkGenerateClanKeshikBox.text")));
+        getChkGenerateClanKeshikBox().setToolTipText(resources.getString("chkGenerateClanKeshikBox.toolTipText"));
+        getChkGenerateClanKeshikBox().setName("chkGenerateClanKeshikBox");
+
+        setChkGenerateClanFrontlineBox(new JCheckBox(resources.getString("chkGenerateClanFrontlineBox.text")));
+        getChkGenerateClanFrontlineBox().setToolTipText(resources.getString("chkGenerateClanFrontlineBox.toolTipText"));
+        getChkGenerateClanFrontlineBox().setName("chkGenerateClanFrontlineBox");
+
+        setChkGenerateClanSecondLineBox(new JCheckBox(resources.getString("chkGenerateClanSecondLineBox.text")));
+        getChkGenerateClanSecondLineBox().setToolTipText(resources.getString("chkGenerateClanSecondLineBox.toolTipText"));
+        getChkGenerateClanSecondLineBox().setName("chkGenerateClanSecondLineBox");
+
+        setChkGenerateExperimentalTechBox(new JCheckBox(resources.getString("chkGenerateExperimentalTechBox.text")));
+        getChkGenerateExperimentalTechBox().setToolTipText(resources.getString("chkGenerateExperimentalTechBox.toolTipText"));
+        getChkGenerateExperimentalTechBox().setName("chkGenerateExperimentalTechBox");
+
+        // Disable Panel by Default
+        getChkGenerateSurprises().setSelected(true);
+        getChkGenerateSurprises().doClick();
+
+        // Layout the UI
+        JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("surprisesPanel.title")));
+        panel.setToolTipText(resources.getString("surprisesPanel.toolTipText"));
+        panel.setName("surprisesPanel");
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(getChkGenerateSurprises())
+                        .addComponent(getChkGenerateStarLeagueRoyalBox())
+                        .addComponent(getChkGenerateStarLeagueRegularBox())
+                        .addComponent(getChkGenerateClanKeshikBox())
+                        .addComponent(getChkGenerateClanFrontlineBox())
+                        .addComponent(getChkGenerateClanSecondLineBox())
+                        .addComponent(getChkGenerateExperimentalTechBox())
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(getChkGenerateSurprises())
+                        .addComponent(getChkGenerateStarLeagueRoyalBox())
+                        .addComponent(getChkGenerateStarLeagueRegularBox())
+                        .addComponent(getChkGenerateClanKeshikBox())
+                        .addComponent(getChkGenerateClanFrontlineBox())
+                        .addComponent(getChkGenerateClanSecondLineBox())
+                        .addComponent(getChkGenerateExperimentalTechBox())
+        );
+        return panel;
+    }
+
     private List<FactionChoice> getFactionChoices() {
         final List<FactionChoice> factionChoices = new ArrayList<>();
 
@@ -1789,18 +2096,17 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
     //region Options
     public void setOptions() {
-        setOptions(getCompanyGenerationType());
+        setOptions(getCompanyGenerationMethod());
     }
 
-    public void setOptions(final CompanyGenerationType type) {
-        getComboCompanyGenerationType().setSelectedItem(type);
-        setOptions(new CompanyGenerationOptions(type, getCampaign()));
+    public void setOptions(final CompanyGenerationMethod method) {
+        getComboCompanyGenerationMethod().setSelectedItem(method);
+        setOptions(new CompanyGenerationOptions(method, getCampaign()));
     }
 
     public void setOptions(final CompanyGenerationOptions options) {
         // Base Information
-        getComboCompanyGenerationType().setSelectedItem(options.getType());
-
+        getComboCompanyGenerationMethod().setSelectedItem(options.getMethod());
         getComboFaction().setSelectedIndex(0); // default to 0
         final List<FactionChoice> factionChoices = getFactionChoices();
         for (int i = 0; i < factionChoices.size(); i++) {
@@ -1821,6 +2127,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getSpnIndividualLanceCount().setValue(options.getIndividualLanceCount());
         getSpnLancesPerCompany().setValue(options.getLancesPerCompany());
         getSpnLanceSize().setValue(options.getLanceSize());
+        getSpnStarLeagueYear().setValue(options.getStarLeagueYear());
 
         // Personnel
         updateLblTotalSupportPersonnel(determineMaximumSupportPersonnel());
@@ -1832,6 +2139,13 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkApplyOfficerStatBonusToWorstSkill().setSelected(options.isApplyOfficerStatBonusToWorstSkill());
         getChkAssignBestOfficers().setSelected(options.isAssignBestOfficers());
         getChkAutomaticallyAssignRanks().setSelected(options.isAutomaticallyAssignRanks());
+        getChkAssignFounderFlag().setSelected(options.isAssignFounderFlag());
+        if (getChkRunStartingSimulation().isSelected() != options.isRunStartingSimulation()) {
+            getChkRunStartingSimulation().doClick();
+        }
+        getSpnSimulationDuration().setValue(options.getSimulationDuration());
+        getChkSimulateRandomMarriages().setSelected(options.isSimulateRandomMarriages());
+        getChkSimulateRandomProcreation().setSelected(options.isSimulateRandomProcreation());
 
         // Personnel Randomization
         if (getChkRandomizeOrigin().isSelected() != options.isRandomizeOrigin()) {
@@ -1851,13 +2165,14 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         // Units
         getChkGenerateUnitsAsAttached().setSelected(options.isGenerateUnitsAsAttached());
         getChkAssignBestRollToUnitCommander().setSelected(options.isAssignBestRollToUnitCommander());
+        getChkSortStarLeagueUnitsFirst().setSelected(options.isSortStarLeagueUnitsFirst());
         getChkGroupByWeight().setSelected(options.isGroupByWeight());
+        getChkGroupByQuality().setSelected(options.isGroupByQuality());
         getChkKeepOfficerRollsSeparate().setSelected(options.isKeepOfficerRollsSeparate());
-        getSpnStarLeagueYear().setValue(options.getStarLeagueYear());
         getChkAssignTechsToUnits().setSelected(options.isAssignTechsToUnits());
 
         // Unit
-        getComboForceNamingType().setSelectedItem(options.getForceNamingType());
+        getComboForceNamingMethod().setSelectedItem(options.getForceNamingMethod());
         getChkGenerateForceIcons().setSelected(options.isGenerateForceIcons());
 
         // Spares
@@ -1865,7 +2180,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             getChkGenerateMothballedSpareUnits().doClick();
         }
         getSpnSparesPercentOfActiveUnits().setValue(options.getSparesPercentOfActiveUnits());
-        getChkGenerateSpareParts().setSelected(options.isGenerateSpareParts());
+        getComboPartGenerationMethod().setSelectedItem(options.getPartGenerationMethod());
         getSpnStartingArmourWeight().setValue(options.getStartingArmourWeight());
         if (getChkGenerateSpareAmmunition().isSelected() != options.isGenerateSpareAmmunition()) {
             getChkGenerateSpareAmmunition().doClick();
@@ -1891,6 +2206,15 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkPayForParts().setSelected(options.isPayForParts());
         getChkPayForArmour().setSelected(options.isPayForArmour());
         getChkPayForAmmunition().setSelected(options.isPayForAmmunition());
+
+        // Surprises
+        getChkGenerateSurprises().setSelected(options.isGenerateSurprises());
+        getChkGenerateStarLeagueRoyalBox().setSelected(options.isGenerateStarLeagueRoyalBox());
+        getChkGenerateStarLeagueRegularBox().setSelected(options.isGenerateStarLeagueRegularBox());
+        getChkGenerateClanKeshikBox().setSelected(options.isGenerateClanKeshikBox());
+        getChkGenerateClanFrontlineBox().setSelected(options.isGenerateClanFrontlineBox());
+        getChkGenerateClanSecondLineBox().setSelected(options.isGenerateClanSecondLineBox());
+        getChkGenerateExperimentalTechBox().setSelected(options.isGenerateExperimentalTechBox());
     }
 
     /**
@@ -1899,7 +2223,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     public CompanyGenerationOptions createOptionsFromPanel() {
         final CompanyGenerationOptions options = new CompanyGenerationOptions();
         // Base Information
-        options.setType(getCompanyGenerationType());
+        options.setMethod(getCompanyGenerationMethod());
         options.setFaction(getFaction());
         options.setStartingPlanet(getStartingPlanet());
         options.setGenerateMercenaryCompanyCommandLance(getChkGenerateMercenaryCompanyCommandLance().isSelected());
@@ -1907,6 +2231,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         options.setIndividualLanceCount((Integer) getSpnIndividualLanceCount().getValue());
         options.setLancesPerCompany((Integer) getSpnLancesPerCompany().getValue());
         options.setLanceSize((Integer) getSpnLanceSize().getValue());
+        options.setStarLeagueYear((Integer) getSpnStarLeagueYear().getValue());
 
         // Personnel
         options.setSupportPersonnel(getSupportPersonnelNumbers());
@@ -1917,6 +2242,11 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         options.setApplyOfficerStatBonusToWorstSkill(getChkApplyOfficerStatBonusToWorstSkill().isSelected());
         options.setAssignBestOfficers(getChkAssignBestOfficers().isSelected());
         options.setAutomaticallyAssignRanks(getChkAutomaticallyAssignRanks().isSelected());
+        options.setAssignFounderFlag(getChkAssignFounderFlag().isSelected());
+        options.setRunStartingSimulation(getChkRunStartingSimulation().isSelected());
+        options.setSimulationDuration((Integer) getSpnSimulationDuration().getValue());
+        options.setSimulateRandomMarriages(getChkSimulateRandomMarriages().isSelected());
+        options.setSimulateRandomProcreation(getChkSimulateRandomProcreation().isSelected());
 
         // Personnel Randomization
         options.setRandomizeOrigin(getChkRandomizeOrigin().isSelected());
@@ -1929,19 +2259,20 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         // Units
         options.setGenerateUnitsAsAttached(getChkGenerateUnitsAsAttached().isSelected());
         options.setAssignBestRollToUnitCommander(getChkAssignBestRollToUnitCommander().isSelected());
+        options.setSortStarLeagueUnitsFirst(getChkSortStarLeagueUnitsFirst().isSelected());
         options.setGroupByWeight(getChkGroupByWeight().isSelected());
+        options.setGroupByQuality(getChkGroupByQuality().isSelected());
         options.setKeepOfficerRollsSeparate(getChkKeepOfficerRollsSeparate().isSelected());
-        options.setStarLeagueYear((Integer) getSpnStarLeagueYear().getValue());
         options.setAssignTechsToUnits(getChkAssignTechsToUnits().isSelected());
 
         // Unit
-        options.setForceNamingType(getForceNamingType());
+        options.setForceNamingMethod(getForceNamingMethod());
         options.setGenerateForceIcons(getChkGenerateForceIcons().isSelected());
 
         // Spares
         options.setGenerateMothballedSpareUnits(getChkGenerateMothballedSpareUnits().isSelected());
         options.setSparesPercentOfActiveUnits((Integer) getSpnSparesPercentOfActiveUnits().getValue());
-        options.setGenerateSpareParts(getChkGenerateSpareParts().isSelected());
+        options.setPartGenerationMethod(getPartGenerationMethod());
         options.setStartingArmourWeight((Integer) getSpnStartingArmourWeight().getValue());
         options.setGenerateSpareAmmunition(getChkGenerateSpareAmmunition().isSelected());
         options.setNumberReloadsPerWeapon((Integer) getSpnNumberReloadsPerWeapon().getValue());
@@ -1963,6 +2294,15 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         options.setPayForParts(getChkPayForParts().isSelected());
         options.setPayForArmour(getChkPayForArmour().isSelected());
         options.setPayForAmmunition(getChkPayForAmmunition().isSelected());
+
+        // Surprises
+        options.setGenerateSurprises(getChkGenerateSurprises().isSelected());
+        options.setGenerateStarLeagueRoyalBox(getChkGenerateStarLeagueRoyalBox().isSelected());
+        options.setGenerateStarLeagueRegularBox(getChkGenerateStarLeagueRegularBox().isSelected());
+        options.setGenerateClanKeshikBox(getChkGenerateClanKeshikBox().isSelected());
+        options.setGenerateClanFrontlineBox(getChkGenerateClanFrontlineBox().isSelected());
+        options.setGenerateClanSecondLineBox(getChkGenerateClanSecondLineBox().isSelected());
+        options.setGenerateExperimentalTechBox(getChkGenerateExperimentalTechBox().isSelected());
 
         return options;
     }
@@ -2029,7 +2369,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     //region File I/O
     public void importOptionsFromXML() {
         FileDialogs.openCompanyGenerationOptions(getFrame())
-                .ifPresent(file -> setOptions(CompanyGenerationOptions.parseFromXML(file, getCampaign())));
+                .ifPresent(file -> setOptions(CompanyGenerationOptions.parseFromXML(getCampaign(), file)));
     }
 
     public void exportOptionsToXML() {

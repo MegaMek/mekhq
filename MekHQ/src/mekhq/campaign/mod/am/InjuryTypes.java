@@ -172,7 +172,7 @@ public final class InjuryTypes {
                         new GameEffect(
                                 "certain death",
                                 rnd -> {
-                                    p.changeStatus(c, PersonnelStatus.WOUNDS);
+                                    p.changeStatus(c, PersonnelStatus.WOUNDS, c.getLocalDate());
                                     MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getLocalDate());
                                     MekHQ.getLogger().info(this, entry.toString());
                                 }));
@@ -183,7 +183,7 @@ public final class InjuryTypes {
                     new GameEffect(deathChance + "% chance of death",
                         rnd -> {
                             if (rnd.applyAsInt(6) + hits >= 5) {
-                                p.changeStatus(c, PersonnelStatus.WOUNDS);
+                                p.changeStatus(c, PersonnelStatus.WOUNDS, c.getLocalDate());
                                 MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getLocalDate());
                                 MekHQ.getLogger().info(this, entry.toString());
                         }
@@ -353,9 +353,9 @@ public final class InjuryTypes {
                         new GameEffect(
                                 "certain death",
                                 rnd -> {
-                                    p.changeStatus(c, PersonnelStatus.WOUNDS);
+                                    p.changeStatus(c, PersonnelStatus.WOUNDS, c.getLocalDate());
                                     MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getLocalDate());
-                                    MekHQ.getLogger().info(this, entry.toString());
+                                    MekHQ.getLogger().info(entry.toString());
                                 })
                 );
             } else {
@@ -369,11 +369,11 @@ public final class InjuryTypes {
                                 if (i.getHits() < 3) {
                                     i.setHits(i.getHits() + 1);
                                     MedicalLogEntry entry = MedicalLogger.internalBleedingWorsened(p, c.getLocalDate());
-                                    MekHQ.getLogger().info(this, entry.toString());
+                                    MekHQ.getLogger().info(entry.toString());
                                 } else {
-                                    p.changeStatus(c, PersonnelStatus.WOUNDS);
+                                    p.changeStatus(c, PersonnelStatus.WOUNDS, c.getLocalDate());
                                     MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getLocalDate());
-                                    MekHQ.getLogger().info(this, entry.toString());
+                                    MekHQ.getLogger().info(entry.toString());
                                 }
                             }
                         })
@@ -480,14 +480,14 @@ public final class InjuryTypes {
                     rnd -> {
                         int rib = rnd.applyAsInt(100);
                         if (rib < 1) {
-                            p.changeStatus(c, PersonnelStatus.WOUNDS);
+                            p.changeStatus(c, PersonnelStatus.WOUNDS, c.getLocalDate());
                             MedicalLogEntry entry = MedicalLogger.brokenRibPunctureDead(p, c.getLocalDate());
-                            MekHQ.getLogger().info(this, entry.toString());
+                            MekHQ.getLogger().info(entry.toString());
                         } else if (rib < 10) {
                             Injury puncturedLung = PUNCTURED_LUNG.newInjury(c, p, BodyLocation.CHEST, 1);
                             p.addInjury(puncturedLung);
                             MedicalLogEntry entry = MedicalLogger.brokenRibPuncture(p, c.getLocalDate());
-                            MekHQ.getLogger().info(this, entry.toString());
+                            MekHQ.getLogger().info(entry.toString());
                         }
                     }));
         }

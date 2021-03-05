@@ -27,6 +27,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 public enum Marriage {
@@ -87,7 +88,7 @@ public enum Marriage {
     }
     //endregion Getters
 
-    public void marry(Person origin, Person spouse, Campaign campaign) {
+    public void marry(final Campaign campaign, final Person origin, final Person spouse, final LocalDate today) {
         String surname = origin.getSurname();
         String spouseSurname = spouse.getSurname();
         Marriage surnameStyle = this;
@@ -190,7 +191,7 @@ public enum Marriage {
                 break;
             case WEIGHTED:
             default:
-                MekHQ.getLogger().error(this, String.format("Marriage Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
+                MekHQ.getLogger().error(String.format("Marriage Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
                                 origin.getFullName(), spouse.getFullName()));
                 break;
         }
@@ -203,15 +204,15 @@ public enum Marriage {
         spouse.getGenealogy().setSpouse(origin.getId());
 
         // Then we do the logging
-        PersonalLogger.marriage(origin, spouse, campaign.getLocalDate());
-        PersonalLogger.marriage(spouse, origin, campaign.getLocalDate());
+        PersonalLogger.marriage(origin, spouse, today);
+        PersonalLogger.marriage(spouse, origin, today);
 
         if (campaign.getCampaignOptions().logMarriageNameChange()) {
             if (!spouse.getSurname().equals(spouseSurname)) {
-                PersonalLogger.marriageNameChange(spouse, origin, campaign.getLocalDate());
+                PersonalLogger.marriageNameChange(spouse, origin, today);
             }
             if (!origin.getSurname().equals(surname)) {
-                PersonalLogger.marriageNameChange(origin, spouse, campaign.getLocalDate());
+                PersonalLogger.marriageNameChange(origin, spouse, today);
             }
         }
 

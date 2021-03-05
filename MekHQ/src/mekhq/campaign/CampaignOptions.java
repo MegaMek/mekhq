@@ -31,7 +31,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
-import mekhq.campaign.universe.generators.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
 import mekhq.service.MassRepairOption;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -3956,7 +3956,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
                 retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
             } else if (wn2.getNodeName().equals("companyGenerationOptions")) {
-                retVal.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn2));
+                retVal.setCompanyGenerationOptions(new CompanyGenerationOptions(wn2));
             }
         }
 

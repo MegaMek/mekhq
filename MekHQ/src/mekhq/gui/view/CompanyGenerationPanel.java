@@ -2,9 +2,8 @@ package mekhq.gui.view;
 
 import megamek.common.Entity;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.universe.generators.companyGeneration.AbstractCompanyGenerator;
+import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
 
-import javax.swing.*;
 import java.util.List;
 
 public class CompanyGenerationPanel {
@@ -64,7 +63,7 @@ public class CompanyGenerationPanel {
             return;
         }
 
-        setCompanyGenerator(getCompanyGenerationType().getGenerator(getCampaign(), createOptionsFromPanel()));
+        setCompanyGenerator(getCompanyGenerationMethod().getGenerator(getCampaign(), createOptionsFromPanel()));
 
         setCombatPersonnel(getCompanyGenerator().generateCombatPersonnel(getCampaign()));
         setSupportPersonnel(getCompanyGenerator().generateSupportPersonnel(getCampaign()));

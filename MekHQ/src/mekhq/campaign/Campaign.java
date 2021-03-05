@@ -683,7 +683,7 @@ public class Campaign implements Serializable, ITechManager {
             if (getFinances().debit(totalPayout, Transaction.C_SALARY, "Final Payout", getLocalDate())) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
                     if (getPerson(pid).getStatus().isActive()) {
-                        getPerson(pid).changeStatus(this, PersonnelStatus.RETIRED);
+                        getPerson(pid).changeStatus(this, PersonnelStatus.RETIRED, getLocalDate());
                         addReport(getPerson(pid).getFullName() + " has retired.");
                     }
                     if (Person.T_NONE != getRetirementDefectionTracker().getPayout(pid).getRecruitType()) {
@@ -3206,7 +3206,7 @@ public class Campaign implements Serializable, ITechManager {
 
             // Random Marriages
             if (getCampaignOptions().useRandomMarriages()) {
-                p.randomMarriage(this);
+                p.randomMarriage(this, getLocalDate());
             }
 
             p.resetMinutesLeft();
@@ -3263,13 +3263,13 @@ public class Campaign implements Serializable, ITechManager {
                 if (p.isPregnant()) {
                     if (getCampaignOptions().useUnofficialProcreation()) {
                         if (getLocalDate().compareTo((p.getDueDate())) == 0) {
-                            p.birth(this);
+                            p.birth(this, getLocalDate());
                         }
                     } else {
                         p.removePregnancy();
                     }
                 } else if (getCampaignOptions().useUnofficialProcreation()) {
-                    p.procreate(this);
+                    p.procreate(this, getLocalDate());
                 }
             }
         }

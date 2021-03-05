@@ -18,7 +18,7 @@
  */
 package mekhq;
 
-import mekhq.campaign.universe.enums.CompanyGenerationType;
+import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import java.time.LocalDate;
@@ -251,13 +251,13 @@ public final class MekHQOptions {
         userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).putInt(MekHqConstants.START_GAME_DELAY, startGameDelay);
     }
 
-    public CompanyGenerationType getDefaultCompanyGenerationType() {
-        return CompanyGenerationType.valueOf(userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE)
-                .get(MekHqConstants.DEFAULT_COMPANY_GENERATION_TYPE, CompanyGenerationType.AGAINST_THE_BOT.name()));
+    public CompanyGenerationMethod getDefaultCompanyGenerationMethod() {
+        return CompanyGenerationMethod.valueOf(userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE)
+                .get(MekHqConstants.DEFAULT_COMPANY_GENERATION_METHOD, CompanyGenerationMethod.AGAINST_THE_BOT.name()));
     }
 
-    public void setDefaultCompanyGenerationType(final CompanyGenerationType value) {
-        userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).put(MekHqConstants.DEFAULT_COMPANY_GENERATION_TYPE, value.name());
+    public void setDefaultCompanyGenerationMethod(final CompanyGenerationMethod value) {
+        userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).put(MekHqConstants.DEFAULT_COMPANY_GENERATION_METHOD, value.name());
     }
     //endregion Miscellaneous Options
 }

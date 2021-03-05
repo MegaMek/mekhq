@@ -22,11 +22,11 @@ import megamek.common.util.EncodeControl;
 
 import java.util.ResourceBundle;
 
-public enum ForceNamingType {
+public enum ForceNamingMethod {
     //region Enum Declarations
-    CCB_1943("ForceNamingType.CCB_1943.text", "ForceNamingType.CCB_1943.toolTipText"),
-    ICAO_1956("ForceNamingType.ICAO_1956.text", "ForceNamingType.ICAO_1956.toolTipText"),
-    GREEK_ALPHABET("ForceNamingType.GREEK_ALPHABET.text", "ForceNamingType.GREEK_ALPHABET.toolTipText");
+    CCB_1943("ForceNamingMethod.CCB_1943.text", "ForceNamingMethod.CCB_1943.toolTipText"),
+    ICAO_1956("ForceNamingMethod.ICAO_1956.text", "ForceNamingMethod.ICAO_1956.toolTipText"),
+    GREEK_ALPHABET("ForceNamingMethod.GREEK_ALPHABET.text", "ForceNamingMethod.GREEK_ALPHABET.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -37,7 +37,7 @@ public enum ForceNamingType {
     //endregion Variable Declarations
 
     //region Constructors
-    ForceNamingType(final String name, final String toolTipText) {
+    ForceNamingMethod(final String name, final String toolTipText) {
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.universe.generators.companyGeneration;
+package mekhq.campaign.universe.generators.companyGenerators;
 
 import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
@@ -25,28 +25,27 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.enums.CompanyGenerationType;
+import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 
-public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
+public class AtBCompanyGenerator extends AbstractCompanyGenerator {
     //region Constructors
-    public WindchildCompanyGenerator(final Campaign campaign, final CompanyGenerationOptions options) {
-        super(campaign, CompanyGenerationType.WINDCHILD, options);
+    public AtBCompanyGenerator(final Campaign campaign, final CompanyGenerationOptions options) {
+        super(campaign, CompanyGenerationMethod.AGAINST_THE_BOT, options);
     }
     //endregion Constructors
 
     //region Personnel
     /**
-     * Set based on greater than instead of the greater than or equal to of AtB
      * @param commandingOfficer the commanding officer
      * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
      */
     @Override
-    protected void generateCommandingOfficerRank(Person commandingOfficer, int numMechWarriors) {
-        if (numMechWarriors > 36) {
+    protected void generateCommandingOfficerRank(final Person commandingOfficer, final int numMechWarriors) {
+        if (numMechWarriors >= 36) {
             commandingOfficer.setRankNumeric(Ranks.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 8));
-        } else if (numMechWarriors > 12) {
+        } else if (numMechWarriors >= 12) {
             commandingOfficer.setRankNumeric(Ranks.RWO_MAX + (getOptions().getFaction().isComStarOrWoB() ? 7 : 5));
-        } else if (numMechWarriors > 4) {
+        } else if (numMechWarriors >= 4) {
             commandingOfficer.setRankNumeric(Ranks.RWO_MAX + 4);
         } else {
             commandingOfficer.setRankNumeric(Ranks.RWO_MAX + 3);
@@ -56,8 +55,6 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
 
     //region Units
     /**
-     * This guarantees a BattleMech, and rolls an overall heavier lance
-     *
      * @param roll the modified roll to use
      * @return the generated EntityWeightClass
      * EntityWeightClass.WEIGHT_ULTRA_LIGHT for none,
@@ -68,17 +65,18 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
         switch (roll) {
             case 2:
             case 3:
+                return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
             case 4:
-                return EntityWeightClass.WEIGHT_LIGHT;
             case 5:
             case 6:
+                return EntityWeightClass.WEIGHT_LIGHT;
             case 7:
-                return EntityWeightClass.WEIGHT_MEDIUM;
             case 8:
             case 9:
+                return EntityWeightClass.WEIGHT_MEDIUM;
             case 10:
-                return EntityWeightClass.WEIGHT_HEAVY;
             case 11:
+                return EntityWeightClass.WEIGHT_HEAVY;
             case 12:
                 return EntityWeightClass.WEIGHT_ASSAULT;
             default:
@@ -87,7 +85,6 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
     }
 
     /**
-     * This generates a slightly higher average quality rating
      * @param roll the modified roll to use
      * @return the generated IUnitRating magic int for Dragoon Quality
      */
@@ -97,17 +94,17 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
             case 2:
             case 3:
             case 4:
-                return IUnitRating.DRAGOON_F;
             case 5:
+                return IUnitRating.DRAGOON_F;
             case 6:
-                return IUnitRating.DRAGOON_D;
             case 7:
             case 8:
-                return IUnitRating.DRAGOON_C;
+                return IUnitRating.DRAGOON_D;
             case 9:
             case 10:
-                return IUnitRating.DRAGOON_B;
+                return IUnitRating.DRAGOON_C;
             case 11:
+                return IUnitRating.DRAGOON_B;
             case 12:
                 return IUnitRating.DRAGOON_A;
             default:
@@ -116,8 +113,6 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
     }
 
     /**
-     * This generates clan mech differently, so you can get any of the quality ratings for clanners
-     *
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
      * @param faction the faction to generate the mech from
@@ -127,12 +122,10 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
     protected MechSummary generateMechSummary(final Campaign campaign,
                                               final RandomMechParameters parameters,
                                               final Faction faction) {
-        if (parameters.isStarLeague()) {
+        if (parameters.isStarLeague() && !faction.isComStarOrWoB()) {
             if (faction.isClan()) {
-                // Clanners generate using the Keshik Table if they roll A*, otherwise they roll on
-                // the Front Line tables
-                parameters.setQuality((parameters.getQuality() < IUnitRating.DRAGOON_ASTAR)
-                        ? IUnitRating.DRAGOON_B : parameters.getQuality());
+                // Clanners generate from Front Line tables instead of Star League
+                parameters.setQuality(IUnitRating.DRAGOON_B);
                 return generateMechSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
             } else {
                 // Roll on the Star League Royal table if you get a SL mech with A* Rating
@@ -140,9 +133,8 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
                 return generateMechSummary(campaign, parameters, factionCode, getOptions().getStarLeagueYear());
             }
         } else {
-            // Clanners Generate from 2nd Line (or lesser) Tables (core AtB is just 2nd Line,
-            // but this is more interesting)
-            if (faction.isClan() && (parameters.getQuality() > IUnitRating.DRAGOON_C)) {
+            // Clanners Generate from 2nd Line Tables
+            if (faction.isClan()) {
                 parameters.setQuality(IUnitRating.DRAGOON_C);
             }
             return generateMechSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());

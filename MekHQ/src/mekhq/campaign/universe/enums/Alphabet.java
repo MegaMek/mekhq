@@ -61,7 +61,7 @@ public enum Alphabet {
     //endregion Variable Declarations
 
     //region Constructors
-    Alphabet(String ccb1943, String icao1956, String greek) {
+    Alphabet(final String ccb1943, final String icao1956, final String greek) {
         this.ccb1943 = resources.getString(ccb1943);
         this.icao1956 = resources.getString(icao1956);
         this.greek = resources.getString(greek);

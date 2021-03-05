@@ -23,8 +23,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.universe.generators.companyGeneration.AbstractCompanyGenerator;
-import mekhq.campaign.universe.generators.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
+import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
 import mekhq.gui.enums.CompanyGenerationPanelType;
 import mekhq.gui.view.CompanyGenerationOptionsPanel;
 
@@ -135,7 +135,7 @@ public class CompanyGenerationDialog extends BaseButtonDialog {
         JButton btnRestore = new JButton(resources.getString("RestoreDefaults"));
         btnRestore.setName("btnRestore");
         btnRestore.addActionListener(evt -> getCompanyGenerationOptionsPanel().setOptions(
-                MekHQ.getMekHQOptions().getDefaultCompanyGenerationType()));
+                MekHQ.getMekHQOptions().getDefaultCompanyGenerationMethod()));
         panel.add(btnRestore);
 
         JButton btnImport = new JButton(resources.getString("Import"));
@@ -159,7 +159,7 @@ public class CompanyGenerationDialog extends BaseButtonDialog {
     @Override
     protected void okAction() {
         final CompanyGenerationOptions options = getCompanyGenerationOptionsPanel().createOptionsFromPanel();
-        final AbstractCompanyGenerator generator = options.getType().getGenerator(getCampaign(), options);
+        final AbstractCompanyGenerator generator = options.getMethod().getGenerator(getCampaign(), options);
         final List<Person> combatPersonnel = generator.generateCombatPersonnel(getCampaign());
         final List<Person> supportPersonnel = generator.generateSupportPersonnel(getCampaign());
         final List<Entity> entities = generator.generateUnits(getCampaign(), combatPersonnel);

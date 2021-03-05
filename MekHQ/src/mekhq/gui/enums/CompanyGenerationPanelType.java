@@ -18,7 +18,7 @@
  */
 package mekhq.gui.enums;
 
-import mekhq.campaign.universe.generators.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
 
 public enum CompanyGenerationPanelType {
     OPTIONS,

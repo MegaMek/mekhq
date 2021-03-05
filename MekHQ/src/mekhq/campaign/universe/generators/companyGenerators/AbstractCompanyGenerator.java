@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.universe.generators.companyGeneration;
+package mekhq.campaign.universe.generators.companyGenerators;
 
 import megamek.common.AmmoType;
 import megamek.common.Entity;
@@ -25,6 +25,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
@@ -53,11 +54,15 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RangedFactionSelector;
 import mekhq.campaign.universe.RangedPlanetSelector;
 import mekhq.campaign.universe.enums.Alphabet;
-import mekhq.campaign.universe.enums.CompanyGenerationType;
+import mekhq.campaign.universe.enums.CompanyGenerationMethod;
+import mekhq.campaign.universe.enums.MysteryBoxType;
+import mekhq.campaign.universe.randomEvent.mysteryBoxes.AbstractMysteryBox;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.enums.LayeredForceIcon;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -70,6 +75,13 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
+ * Startup:
+ * First Panel (initial startup only): Client Options
+ * Second Panel: Presets, Date, Starting Faction, Starting Planet, AtB
+ * Third Panel: Campaign Options
+ * Fourth Panel: MegaMek Options
+ * Fifth Panel: Start of the Company Generator
+ *
  * Ideas:
  * First panel is the options panel
  * Second panel is the generated personnel panel, where you can customize and reroll personnel
@@ -88,9 +100,7 @@ import java.util.stream.Collectors;
  *      Finish the personnel randomization overrides
  *      Cleanup the dialog, have it disable and enable based on variable values
  *      Implement:
- *          assignBestRollToUnitCommander
  *          centerPlanet
- *          generateSpareParts // 1 for every 3 (round normally) parts in inventory?
  *          selectStartingContract
  *
  * FIXME :
@@ -108,43 +118,29 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractCompanyGenerator {
     //region Variable Declarations
-    private CompanyGenerationType type;
-    private CompanyGenerationOptions options;
+    private final CompanyGenerationMethod method;
+    private final CompanyGenerationOptions options;
     private AbstractPersonnelGenerator personnelGenerator;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    protected AbstractCompanyGenerator(final Campaign campaign, final CompanyGenerationType type,
+    protected AbstractCompanyGenerator(final Campaign campaign, final CompanyGenerationMethod method,
                                        final CompanyGenerationOptions options) {
-        setType(type);
-        setOptions(options);
+        this.method = method;
+        this.options = options;
         createPersonnelGenerator(campaign);
     }
     //endregion Constructors
 
     //region Getters/Setters
-    public CompanyGenerationType getType() {
-        return type;
-    }
-
-    /**
-     * This is ONLY to be called by constructors
-     */
-    protected void setType(final CompanyGenerationType type) {
-        this.type = type;
+    public CompanyGenerationMethod getMethod() {
+        return method;
     }
 
     public CompanyGenerationOptions getOptions() {
         return options;
-    }
-
-    /**
-     * This is ONLY to be called by constructors
-     */
-    protected void setOptions(final CompanyGenerationOptions options) {
-        this.options = options;
     }
 
     public AbstractPersonnelGenerator getPersonnelGenerator() {
@@ -160,23 +156,40 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the Campaign to generate using
      */
     private void createPersonnelGenerator(final Campaign campaign) {
-        final AbstractFactionSelector factionSelector;
-        final AbstractPlanetSelector planetSelector;
+        setPersonnelGenerator(campaign.getPersonnelGenerator(createFactionSelector(), createPlanetSelector()));
+    }
 
+    /**
+     * @return a newly created Faction Selector based on the provided options
+     */
+    private AbstractFactionSelector createFactionSelector() {
         // TODO : central planet/system
 
+        final AbstractFactionSelector factionSelector;
         if (getOptions().isRandomizeOrigin()) {
             factionSelector = new RangedFactionSelector(getOptions().getOriginSearchRadius());
             ((RangedFactionSelector) factionSelector).setDistanceScale(getOptions().getOriginDistanceScale());
+        } else {
+            factionSelector = new DefaultFactionSelector(getOptions().getFaction());
+        }
+        return factionSelector;
+    }
 
+    /**
+     * @return a newly created Planet Selector based on the provided options
+     */
+    private AbstractPlanetSelector createPlanetSelector() {
+        // TODO : central planet/system
+
+        final AbstractPlanetSelector planetSelector;
+        if (getOptions().isRandomizeOrigin()) {
             planetSelector = new RangedPlanetSelector(getOptions().getOriginSearchRadius(),
                     getOptions().isExtraRandomOrigin());
             ((RangedPlanetSelector) planetSelector).setDistanceScale(getOptions().getOriginDistanceScale());
         } else {
-            factionSelector = new DefaultFactionSelector(getOptions().getFaction());
             planetSelector = new DefaultPlanetSelector();
         }
-        setPersonnelGenerator(campaign.getPersonnelGenerator(factionSelector, planetSelector));
+        return planetSelector;
     }
     //endregion Getters/Setters
 
@@ -234,14 +247,17 @@ public abstract class AbstractCompanyGenerator {
             combatPersonnel.add(campaign.newPerson(Person.T_MECHWARRIOR, getPersonnelGenerator()));
         }
 
+        // Default Sort is Tactical Genius First
+        Comparator<Person> personnelSorter = Comparator.comparing(
+                (Person p) -> p.getOptions().booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
         if (getOptions().isAssignBestOfficers()) {
-            combatPersonnel = combatPersonnel.stream()
-                    .sorted(Comparator.comparingInt((Person p) -> p.getExperienceLevel(false))
-                            .reversed()
-                            .thenComparingInt(p -> p.getSkillLevel(SkillType.S_LEADER)
-                                    + p.getSkillLevel(SkillType.S_STRATEGY) + p.getSkillLevel(SkillType.S_TACTICS)))
-                    .collect(Collectors.toList());
+            personnelSorter = personnelSorter.thenComparingInt((Person p) -> p.getExperienceLevel(false))
+                    .reversed()
+                    .thenComparingInt(p -> p.getSkillLevel(SkillType.S_LEADER)
+                            + p.getSkillLevel(SkillType.S_STRATEGY) + p.getSkillLevel(SkillType.S_TACTICS))
+                    .reversed();
         }
+        combatPersonnel.sort(personnelSorter);
 
         generateCommandingOfficer(combatPersonnel.get(0), numMechWarriors);
 
@@ -464,6 +480,45 @@ public abstract class AbstractCompanyGenerator {
         }
     }
     //endregion Support Personnel
+
+    /**
+     * This does the final personnel processing
+     * @param campaign the campaign to use in processing and to add the personnel to
+     * @param personnel the list of ALL personnel in the campaign
+     */
+    private void finalizePersonnel(final Campaign campaign, final List<Person> personnel) {
+        // Assign the founder flag if we need to
+        if (getOptions().isAssignFounderFlag()) {
+            personnel.forEach(p -> p.setFounder(true));
+        }
+
+        // Recruit all of the personnel, GM-style so that the initial hiring cost is calculated as
+        // part of the financial model
+        personnel.forEach(p -> campaign.recruitPerson(p, true));
+
+        // Now that they are recruited, we can simulate backwards a few years and generate marriages
+        // and children
+        if (getOptions().isRunStartingSimulation()) {
+            LocalDate date = campaign.getLocalDate().minusYears(getOptions().getSimulationDuration()).minusDays(1);
+            while (date.isBefore(campaign.getLocalDate())) {
+                date = date.plusDays(1);
+
+                for (final Person person : personnel) {
+                    if (getOptions().isSimulateRandomMarriages()) {
+                        person.randomMarriage(campaign, date);
+                    }
+
+                    if (getOptions().isSimulateRandomProcreation() && person.getGender().isFemale()) {
+                        if (person.isPregnant() && (date.compareTo(person.getDueDate()) == 0)) {
+                            person.birth(campaign, date);
+                        } else {
+                            person.procreate(campaign, date);
+                        }
+                    }
+                }
+            }
+        }
+    }
     //endregion Personnel
 
     //region Units
@@ -480,26 +535,63 @@ public abstract class AbstractCompanyGenerator {
         // If it is, reroll the weight with a max value of 12
         for (int i = 0; i < combatPersonnel.size(); i++) {
             if (parameters.get(i).isStarLeague()) {
-                parameters.get(i).setWeight(determineBattleMechWeight(Math.max(Utilities.dice(2, 6)
+                parameters.get(i).setWeight(determineBattleMechWeight(Math.min(Utilities.dice(2, 6)
                         + ((i == 0) ? 2 : ((i < firstNonOfficer) ? 1 : 0)), 12)));
             }
         }
 
-        // TODO : Add a sort SL units first option
-        if (getOptions().isGroupByWeight()) {
-            if (getOptions().isKeepOfficerRollsSeparate()) {
-                parameters.subList(0, firstNonOfficer)
-                        .sort(Comparator.comparingInt(RandomMechParameters::getWeight).reversed());
-                parameters.subList(firstNonOfficer, parameters.size())
-                        .sort(Comparator.comparingInt(RandomMechParameters::getWeight).reversed());
-            } else {
-                parameters.sort(Comparator.comparingInt(RandomMechParameters::getWeight).reversed());
-                combatPersonnel = sortPersonnelIntoLances(combatPersonnel);
+        if (getOptions().isAssignBestRollToUnitCommander()) {
+            int bestIndex = 0;
+            RandomMechParameters bestParameters = parameters.get(bestIndex);
+            for (int i = 1; i < parameters.size(); i++) {
+                final RandomMechParameters checkParameters = parameters.get(i);
+                if (bestParameters.isStarLeague() == checkParameters.isStarLeague()) {
+                    if (bestParameters.getWeight() == checkParameters.getWeight()) {
+                        if (bestParameters.getQuality() < checkParameters.getQuality()) {
+                            bestParameters = checkParameters;
+                            bestIndex = i;
+                        }
+                    } else if (bestParameters.getWeight() < checkParameters.getWeight()) {
+                        bestParameters = checkParameters;
+                        bestIndex = i;
+                    }
+                } else if (!bestParameters.isStarLeague() && checkParameters.isStarLeague()) {
+                    bestParameters = checkParameters;
+                    bestIndex = i;
+                }
+            }
+
+            if (bestIndex != 0) {
+                Collections.swap(parameters, 0, bestIndex);
             }
         }
 
-        if (getOptions().isAssignBestRollToUnitCommander()) {
-            // TODO : Implement
+        Comparator<RandomMechParameters> parametersComparator = (o1, o2) -> 0;
+
+        if (getOptions().isSortStarLeagueUnitsFirst()) {
+            parametersComparator = parametersComparator.thenComparing(RandomMechParameters::isStarLeague).reversed();
+        }
+
+        if (getOptions().isGroupByWeight()) {
+            parametersComparator = parametersComparator.thenComparingInt(RandomMechParameters::getWeight).reversed();
+        }
+
+        if (getOptions().isGroupByQuality()) {
+            parametersComparator = parametersComparator.thenComparingInt(RandomMechParameters::getQuality).reversed();
+        }
+
+        if (getOptions().isKeepOfficerRollsSeparate()) {
+            parameters.subList(getOptions().isAssignBestRollToUnitCommander() ? 1 : 0, firstNonOfficer).sort(parametersComparator);
+            parameters.subList(firstNonOfficer, parameters.size()).sort(parametersComparator);
+        } else {
+            // Officer Rolls are not separated. However, if the unit commander is assigned the best
+            // roll we don't sort the unit commander, just the rest of the rolls
+            if (getOptions().isAssignBestRollToUnitCommander()) {
+                parameters.subList(1, parameters.size()).sort(parametersComparator);
+            } else {
+                parameters.sort(parametersComparator);
+            }
+            combatPersonnel = sortPersonnelIntoLances(combatPersonnel);
         }
 
         return generateEntities(campaign, parameters, combatPersonnel);
@@ -787,7 +879,7 @@ public abstract class AbstractCompanyGenerator {
 
         // Create Companies
         for (int i = 0; i < getOptions().getCompanyCount(); i++) {
-            final Force company = new Force(getOptions().getForceNamingType().getValue(alphabet[i])
+            final Force company = new Force(getOptions().getForceNamingMethod().getValue(alphabet[i])
                     + resources.getString("AbstractCompanyGenerator.company.text"));
             campaign.addForce(company, originForce);
             for (int y = 0; y < getOptions().getLancesPerCompany(); y++) {
@@ -816,7 +908,7 @@ public abstract class AbstractCompanyGenerator {
     private void createLance(final Campaign campaign, final Force head, final List<Person> personnel,
                              final Alphabet alphabet, final String background) {
         createLance(campaign, head, personnel,
-                getOptions().getForceNamingType().getValue(alphabet)
+                getOptions().getForceNamingMethod().getValue(alphabet)
                         + resources.getString("AbstractCompanyGenerator.lance.text"),
                 background);
     }
@@ -951,13 +1043,7 @@ public abstract class AbstractCompanyGenerator {
         final List<Entity> mothballedEntities = new ArrayList<>();
 
         // Create the Faction Selector
-        final AbstractFactionSelector factionSelector;
-        if (getOptions().isRandomizeOrigin()) {
-            factionSelector = new RangedFactionSelector(getOptions().getOriginSearchRadius());
-            ((RangedFactionSelector) factionSelector).setDistanceScale(getOptions().getOriginDistanceScale());
-        } else {
-            factionSelector = new DefaultFactionSelector(getOptions().getFaction());
-        }
+        final AbstractFactionSelector factionSelector = createFactionSelector();
 
         // Create the Mothballed Entities
         for (int i = 0; i < numberMothballedEntities; i++) {
@@ -1003,14 +1089,19 @@ public abstract class AbstractCompanyGenerator {
         return mothballedUnits;
     }
 
+    /**
+     * @param units the list of units to generate spare parts based on
+     * @return the list of randomly generated parts
+     */
     public List<Part> generateSpareParts(final List<Unit> units) {
-        if (!getOptions().isGenerateSpareParts()) {
-            return new ArrayList<>();
-        }
-        // TODO : Implement me
-        return new ArrayList<>();
+        return getOptions().getPartGenerationMethod().isDisabled() ? new ArrayList<>()
+                : getOptions().getPartGenerationMethod().getGenerator().generate(units, false, false);
     }
 
+    /**
+     * @param units the list of units to generate spare armour based on
+     * @return the generated armour
+     */
     public List<Armor> generateArmour(final List<Unit> units) {
         if (getOptions().getStartingArmourWeight() <= 0) {
             return new ArrayList<>();
@@ -1028,6 +1119,11 @@ public abstract class AbstractCompanyGenerator {
         return armour;
     }
 
+    /**
+     * This clones and merges armour determined by the custom check below together
+     * @param unmergedArmour the unmerged list of armour, which may be assigned to a unit
+     * @return the merged list of armour
+     */
     private List<Armor> mergeIdenticalArmour(final List<Armor> unmergedArmour) {
         final List<Armor> mergedArmour = new ArrayList<>();
         unmergedArmour.forEach(a -> {
@@ -1049,6 +1145,14 @@ public abstract class AbstractCompanyGenerator {
         return mergedArmour;
     }
 
+    /**
+     * This is a custom equals comparison utilized by this class to determine if two Armour Parts
+     * are the same
+     * @param a1 the first Armour part
+     * @param a2 the second Armour part
+     * @return whether this class considers both types of Armour to be the same. This DIFFERS
+     * from Armor::equals
+     */
     private boolean areSameArmour(final Armor a1, final Armor a2) {
         return (a1.getClass() == a2.getClass())
                 && a1.isSameType(a2)
@@ -1058,6 +1162,11 @@ public abstract class AbstractCompanyGenerator {
                 && (a1.getSkillMin() == a2.getSkillMin());
     }
 
+    /**
+     * @param campaign the campaign to generate ammunition for
+     * @param units the list of units to generate ammunition for
+     * @return the generated ammunition
+     */
     public List<AmmoStorage> generateAmmunition(final Campaign campaign, final List<Unit> units) {
         if (!getOptions().isGenerateSpareAmmunition() || ((getOptions().getNumberReloadsPerWeapon() <= 0)
                 && !getOptions().isGenerateFractionalMachineGunAmmunition())) {
@@ -1249,6 +1358,42 @@ public abstract class AbstractCompanyGenerator {
     }
     //endregion Finances
 
+    //region Surprises
+    private void generateSurprises(final Campaign campaign) {
+        if (!getOptions().isGenerateSurprises()) {
+            return;
+        }
+
+        final MysteryBoxType[] mysteryBoxTypes = MysteryBoxType.values();
+        final List<AbstractMysteryBox> mysteryBoxes = new ArrayList<>();
+        for (int i = 0; i < )
+
+        if (getOptions().isGenerateStarLeagueRoyalBox()) {
+
+        }
+
+        if (getOptions().isGenerateStarLeagueRegularBox()) {
+
+        }
+
+        if (getOptions().isGenerateClanKeshikBox()) {
+
+        }
+
+        if (getOptions().isGenerateClanFrontlineBox()) {
+
+        }
+
+        if (getOptions().isGenerateClanSecondLineBox()) {
+
+        }
+
+        if (getOptions().isGenerateExperimentalTechBox()) {
+
+        }
+    }
+    //endregion Surprises
+
     //region Apply to Campaign
     /**
      * TODO : UNFINISHED
@@ -1273,8 +1418,7 @@ public abstract class AbstractCompanyGenerator {
         applyPhaseOneToCampaign(campaign, combatPersonnel, supportPersonnel, personnel, entities, units);
 
         // Phase 2: Spares
-        final List<Unit> mothballedUnits = createMothballedSpareUnits(campaign, mothballedEntities);
-        units.addAll(mothballedUnits);
+        units.addAll(createMothballedSpareUnits(campaign, mothballedEntities));
 
         final List<Part> parts = generateSpareParts(units);
         final List<Armor> armour = generateArmour(units);
@@ -1302,9 +1446,9 @@ public abstract class AbstractCompanyGenerator {
         // If we aren't using the pool, generate all of the Astechs and Medics required
         generateAssistants(campaign, personnel);
 
-        // Recruit all of the personnel, GM-style so that the initial hiring cost is calculated as
-        // part of the financial model
-        personnel.forEach(p -> campaign.recruitPerson(p, true));
+        // This does all of the final personnel processing, including recruitment and running random
+        // marriages
+        finalizePersonnel(campaign, personnel);
 
         // We can only fill the pool after recruiting our support personnel
         if (getOptions().isPoolAssistants()) {
@@ -1352,7 +1496,7 @@ public abstract class AbstractCompanyGenerator {
             return weight;
         }
 
-        public void setWeight(int weight) {
+        public void setWeight(final int weight) {
             this.weight = weight;
         }
 
@@ -1360,7 +1504,7 @@ public abstract class AbstractCompanyGenerator {
             return quality;
         }
 
-        public void setQuality(int quality) {
+        public void setQuality(final int quality) {
             this.quality = quality;
         }
 
@@ -1368,7 +1512,7 @@ public abstract class AbstractCompanyGenerator {
             return starLeague;
         }
 
-        public void setStarLeague(boolean starLeague) {
+        public void setStarLeague(final boolean starLeague) {
             this.starLeague = starLeague;
         }
         //endregion Getters/Setters
