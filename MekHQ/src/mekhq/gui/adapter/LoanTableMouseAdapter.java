@@ -1,8 +1,7 @@
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.swing.JMenu;
@@ -10,7 +9,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-import javax.swing.event.MouseInputAdapter;
 
 import mekhq.MekHQ;
 import mekhq.campaign.event.LoanRemovedEvent;
@@ -21,18 +19,20 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PayCollateralDialog;
 import mekhq.gui.model.LoanTableModel;
 
-public class LoanTableMouseAdapter extends MouseInputAdapter implements
-        ActionListener {
+public class LoanTableMouseAdapter extends JPopupMenuAdapter {
     private CampaignGUI gui;
     private JTable loanTable;
     private LoanTableModel loanModel;
 
-    public LoanTableMouseAdapter(CampaignGUI gui, JTable loanTable,
-            LoanTableModel loanModel) {
-        super();
+    protected LoanTableMouseAdapter(CampaignGUI gui, JTable loanTable, LoanTableModel loanModel) {
         this.gui = gui;
         this.loanTable = loanTable;
         this.loanModel = loanModel;
+    }
+    
+    public static void connect(CampaignGUI gui, JTable loanTable, LoanTableModel loanModel) {
+        new LoanTableMouseAdapter(gui, loanTable, loanModel)
+                .connect(loanTable);
     }
 
     public void actionPerformed(ActionEvent action) {
@@ -89,49 +89,41 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
-        maybeShowPopup(e);
-    }
+    protected Optional<JPopupMenu> createPopupMenu() {
+        if (loanTable.getSelectedRowCount() == 0) {
+            return Optional.empty();
+        }
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        maybeShowPopup(e);
-    }
-
-    private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
-        if (e.isPopupTrigger()) {
-            if (loanTable.getSelectedRowCount() == 0) {
-                return;
-            }
-            int row = loanTable.getSelectedRow();
-            Loan loan = loanModel.getLoan(loanTable
-                    .convertRowIndexToModel(row));
-            JMenuItem menuItem = null;
-            JMenu menu = null;
-            // **lets fill the pop up menu**//
-            menuItem = new JMenuItem("Pay Off Full Balance ("
-                    + loan.getRemainingValue().toAmountAndSymbolString() + ")");
-            menuItem.setActionCommand("PAY_BALANCE");
-            menuItem.setEnabled(gui.getCampaign().getFunds().isGreaterOrEqualThan(loan.getRemainingValue()));
-            menuItem.addActionListener(this);
-            popup.add(menuItem);
-            menuItem = new JMenuItem("Default on This Loan");
-            menuItem.setActionCommand("DEFAULT");
-            menuItem.addActionListener(this);
-            popup.add(menuItem);
+
+        Loan loan = loanModel.getLoan(loanTable.convertRowIndexToModel(loanTable.getSelectedRow()));
+        JMenuItem menuItem = null;
+        JMenu menu = null;
+        // **lets fill the pop up menu**//
+        menuItem = new JMenuItem("Pay Off Full Balance ("
+                + loan.getRemainingValue().toAmountAndSymbolString() + ")");
+        menuItem.setActionCommand("PAY_BALANCE");
+        menuItem.setEnabled(gui.getCampaign().getFunds().isGreaterOrEqualThan(loan.getRemainingValue()));
+        menuItem.addActionListener(this);
+        popup.add(menuItem);
+        menuItem = new JMenuItem("Default on This Loan");
+        menuItem.setActionCommand("DEFAULT");
+        menuItem.addActionListener(this);
+        popup.add(menuItem);
+
+        if (gui.getCampaign().isGM()) {
             // GM mode
             menu = new JMenu("GM Mode");
             // remove part
             menuItem = new JMenuItem("Remove Loan");
             menuItem.setActionCommand("REMOVE");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
             menu.add(menuItem);
             // end
             popup.addSeparator();
             popup.add(menu);
-            popup.show(e.getComponent(), e.getX(), e.getY());
         }
+
+        return Optional.of(popup);
     }
 }
