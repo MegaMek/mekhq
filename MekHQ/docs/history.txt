@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-0.47.18 (RC4)-SNAPSHOT
+0.48.0 (Stable) - (2021-03-05 1530 UT
 + Issue #2427: Exception during maintenance on a new day breaks MekHQ
 + Issue #2431: Fix exception exporting personnel to CSV
 + PR #2437: Hangar Report: Fixing Wrong Node Addition for Medium Wheeled
@@ -480,7 +480,7 @@ v0.47.0 (2019-08-21 0300 UTC)
 + PR #1227: Dropships can now load alternate munitions into artillery base if the game is configured for it
 + PR #1226: [Feature] Campaign Subset Export: export a subset of your current campaign into another, either new or existing, campaign file. Overwrites units and personnel with the same guid. Option to remove exported personnel from source campaign. Obviously make backups before using on an existing campaign.
 
-0.46.0 (2019-08-12 1900 UTC)
+0.46.0 (Stable) (2019-08-12 1900 UTC)
 + Issue 1249: Tech Names Missing in Event Log
 
 0.46.0-rc.2 (2019-08-12 0100 UTC)
