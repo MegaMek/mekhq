@@ -230,7 +230,7 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator());
         scenarioTable.setRowSorter(scenarioSorter);
         scenarioTable.setShowGrid(false);
-        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(getCampaignGui(), scenarioTable, scenarioModel));
+        ScenarioTableMouseAdapter.connect(getCampaignGui(), scenarioTable, scenarioModel);
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(ev -> refreshScenarioView());
 

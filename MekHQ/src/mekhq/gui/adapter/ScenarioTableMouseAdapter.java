@@ -18,14 +18,13 @@
  */
 package mekhq.gui.adapter;
 
-import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-import javax.swing.event.MouseInputAdapter;
 
 import mekhq.MekHQ;
 import mekhq.campaign.event.ScenarioChangedEvent;
@@ -35,61 +34,56 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
 import mekhq.gui.model.ScenarioTableModel;
 
-public class ScenarioTableMouseAdapter extends MouseInputAdapter {
+public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
     private CampaignGUI gui;
     private JTable scenarioTable;
     private ScenarioTableModel scenarioModel;
     //endregion Variable Declarations
 
-    public ScenarioTableMouseAdapter(CampaignGUI gui, JTable scenarioTable, ScenarioTableModel scenarioModel) {
-        super();
+    protected ScenarioTableMouseAdapter(CampaignGUI gui, JTable scenarioTable, ScenarioTableModel scenarioModel) {
         this.gui = gui;
         this.scenarioTable = scenarioTable;
         this.scenarioModel = scenarioModel;
     }
 
-    @Override
-    public void mousePressed(MouseEvent e) {
-        maybeShowPopup(e);
+    public static void connect(CampaignGUI gui, JTable scenarioTable, ScenarioTableModel scenarioModel) {
+        new ScenarioTableMouseAdapter(gui, scenarioTable, scenarioModel)
+                .connect(scenarioTable);
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
-        maybeShowPopup(e);
-    }
-
-    private void maybeShowPopup(MouseEvent e) {
-        JPopupMenu popup = new JPopupMenu();
-        if (e.isPopupTrigger() && (scenarioTable.getSelectedRowCount() > 0)) {
-            int row = scenarioTable.getSelectedRow();
-            if (row < 0) {
-                return;
-            }
-            Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-            JMenuItem menuItem;
-            JMenu menu;
-
-            // lets fill the pop up menu
-            menuItem = new JMenuItem("Edit...");
-            menuItem.addActionListener(evt -> editScenario(scenario));
-            popup.add(menuItem);
-
-            //region GM mode
-            if (gui.getCampaign().isGM()) {
-                popup.addSeparator();
-
-                menu = new JMenu("GM Mode");
-                // remove scenario
-                menuItem = new JMenuItem("Remove Scenario");
-                menuItem.addActionListener(evt -> removeScenario(scenario));
-                menu.add(menuItem);
-
-                popup.add(menu);
-            }
-
-            popup.show(e.getComponent(), e.getX(), e.getY());
+    protected Optional<JPopupMenu> createPopupMenu() {
+        int row = scenarioTable.getSelectedRow();
+        if (row < 0) {
+            return Optional.empty();
         }
+        
+        JPopupMenu popup = new JPopupMenu();
+
+        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        JMenuItem menuItem;
+        JMenu menu;
+
+        // lets fill the pop up menu
+        menuItem = new JMenuItem("Edit...");
+        menuItem.addActionListener(evt -> editScenario(scenario));
+        popup.add(menuItem);
+
+        //region GM mode
+        if (gui.getCampaign().isGM()) {
+            popup.addSeparator();
+
+            menu = new JMenu("GM Mode");
+            // remove scenario
+            menuItem = new JMenuItem("Remove Scenario");
+            menuItem.addActionListener(evt -> removeScenario(scenario));
+            menu.add(menuItem);
+
+            popup.add(menu);
+        }
+
+        return Optional.of(popup);
     }
 
     private void editScenario(Scenario scenario) {
