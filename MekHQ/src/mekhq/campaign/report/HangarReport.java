@@ -660,7 +660,7 @@ public class HangarReport extends Report {
         DefaultMutableTreeNode sSupportWheeledLarge = new DefaultMutableTreeNode();
         sSupportWheeled.add(sSupportWheeledLarge);
         DefaultMutableTreeNode sSupportWheeledMedium = new DefaultMutableTreeNode();
-        sSupportWheeled.add(sWheeledMedium);
+        sSupportWheeled.add(sSupportWheeledMedium);
         DefaultMutableTreeNode sSupportWheeledSmall = new DefaultMutableTreeNode();
         sSupportWheeled.add(sSupportWheeledSmall);
 

@@ -224,8 +224,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             filterTechs();
             updateTechTarget();
         });
-        partsTable.addMouseListener(new PartsTableMouseAdapter(getCampaignGui(),
-                partsTable, partsModel));
+        PartsTableMouseAdapter.connect(getCampaignGui(), partsTable, partsModel);
 
         JScrollPane scrollPartsTable = new JScrollPane(partsTable);
         gridBagConstraints = new java.awt.GridBagConstraints();
