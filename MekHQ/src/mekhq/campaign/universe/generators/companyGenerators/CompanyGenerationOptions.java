@@ -127,6 +127,7 @@ public class CompanyGenerationOptions implements Serializable {
 
     // Surprises
     private boolean generateSurprises;
+    private boolean generateMysteryBoxes;
     private boolean[] generateMysteryBoxTypes;
     //endregion Variable Declarations
 
@@ -1116,6 +1117,9 @@ public class CompanyGenerationOptions implements Serializable {
                     //region Surprises
                     case "generateSurprises":
                         setGenerateSurprises(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        break;
+                    case "generateMysteryBoxes":
+                        setGenerateMysteryBoxes(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "generateMysteryBoxTypes":
                         final String[] values = wn2.getTextContent().trim().split(",");

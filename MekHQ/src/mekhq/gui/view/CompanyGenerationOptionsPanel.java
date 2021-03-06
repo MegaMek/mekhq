@@ -30,6 +30,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
+import mekhq.campaign.universe.enums.MysteryBoxType;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
 import mekhq.gui.FileDialogs;
@@ -132,12 +133,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
     // Surprises
     private JCheckBox chkGenerateSurprises;
-    private JCheckBox chkGenerateStarLeagueRoyalBox;
-    private JCheckBox chkGenerateStarLeagueRegularBox;
-    private JCheckBox chkGenerateClanKeshikBox;
-    private JCheckBox chkGenerateClanFrontlineBox;
-    private JCheckBox chkGenerateClanSecondLineBox;
-    private JCheckBox chkGenerateExperimentalTechBox;
+    private JCheckBox[] chkGenerateMysteryBoxTypes;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
@@ -788,52 +784,12 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         this.chkGenerateSurprises = chkGenerateSurprises;
     }
 
-    public JCheckBox getChkGenerateStarLeagueRoyalBox() {
-        return chkGenerateStarLeagueRoyalBox;
+    public JCheckBox[] getChkGenerateMysteryBoxTypes() {
+        return chkGenerateMysteryBoxTypes;
     }
 
-    public void setChkGenerateStarLeagueRoyalBox(final JCheckBox chkGenerateStarLeagueRoyalBox) {
-        this.chkGenerateStarLeagueRoyalBox = chkGenerateStarLeagueRoyalBox;
-    }
-
-    public JCheckBox getChkGenerateStarLeagueRegularBox() {
-        return chkGenerateStarLeagueRegularBox;
-    }
-
-    public void setChkGenerateStarLeagueRegularBox(final JCheckBox chkGenerateStarLeagueRegularBox) {
-        this.chkGenerateStarLeagueRegularBox = chkGenerateStarLeagueRegularBox;
-    }
-
-    public JCheckBox getChkGenerateClanKeshikBox() {
-        return chkGenerateClanKeshikBox;
-    }
-
-    public void setChkGenerateClanKeshikBox(final JCheckBox chkGenerateClanKeshikBox) {
-        this.chkGenerateClanKeshikBox = chkGenerateClanKeshikBox;
-    }
-
-    public JCheckBox getChkGenerateClanFrontlineBox() {
-        return chkGenerateClanFrontlineBox;
-    }
-
-    public void setChkGenerateClanFrontlineBox(final JCheckBox chkGenerateClanFrontlineBox) {
-        this.chkGenerateClanFrontlineBox = chkGenerateClanFrontlineBox;
-    }
-
-    public JCheckBox getChkGenerateClanSecondLineBox() {
-        return chkGenerateClanSecondLineBox;
-    }
-
-    public void setChkGenerateClanSecondLineBox(final JCheckBox chkGenerateClanSecondLineBox) {
-        this.chkGenerateClanSecondLineBox = chkGenerateClanSecondLineBox;
-    }
-
-    public JCheckBox getChkGenerateExperimentalTechBox() {
-        return chkGenerateExperimentalTechBox;
-    }
-
-    public void setChkGenerateExperimentalTechBox(final JCheckBox chkGenerateExperimentalTechBox) {
-        this.chkGenerateExperimentalTechBox = chkGenerateExperimentalTechBox;
+    public void setChkGenerateMysteryBoxTypes(JCheckBox... chkGenerateMysteryBoxTypes) {
+        this.chkGenerateMysteryBoxTypes = chkGenerateMysteryBoxTypes;
     }
     //endregion Surprises
     //endregion Getters/Setters
@@ -1994,43 +1950,20 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     }
 
     private JPanel createSurprisesPanel() {
+        // Initialize Labels Used in ActionListeners
+        final JPanel mysteryBoxPanel = new JPanel();
+
         // Create Panel Components
         setChkGenerateSurprises(new JCheckBox(resources.getString("chkGenerateSurprises.text")));
         getChkGenerateSurprises().setToolTipText(resources.getString("chkGenerateSurprises.toolTipText"));
         getChkGenerateSurprises().setName("chkGenerateSurprises");
         getChkGenerateSurprises().addActionListener(evt -> {
             final boolean selected = getChkGenerateSurprises().isSelected();
-            getChkGenerateStarLeagueRoyalBox().setEnabled(selected);
-            getChkGenerateStarLeagueRegularBox().setEnabled(selected);
-            getChkGenerateClanKeshikBox().setEnabled(selected);
-            getChkGenerateClanFrontlineBox().setEnabled(selected);
-            getChkGenerateClanSecondLineBox().setEnabled(selected);
-            getChkGenerateExperimentalTechBox().setEnabled(selected);
+            mysteryBoxPanel.setEnabled(selected);
+            for (final JCheckBox checkBox : getChkGenerateMysteryBoxTypes()) {
+                checkBox.setEnabled(selected);
+            }
         });
-
-        setChkGenerateStarLeagueRoyalBox(new JCheckBox(resources.getString("chkGenerateStarLeagueRoyalBox.text")));
-        getChkGenerateStarLeagueRoyalBox().setToolTipText(resources.getString("chkGenerateStarLeagueRoyalBox.toolTipText"));
-        getChkGenerateStarLeagueRoyalBox().setName("chkGenerateStarLeagueRoyalBox");
-
-        setChkGenerateStarLeagueRegularBox(new JCheckBox(resources.getString("chkGenerateStarLeagueRegularBox.text")));
-        getChkGenerateStarLeagueRegularBox().setToolTipText(resources.getString("chkGenerateStarLeagueRegularBox.toolTipText"));
-        getChkGenerateStarLeagueRegularBox().setName("chkGenerateStarLeagueRegularBox");
-
-        setChkGenerateClanKeshikBox(new JCheckBox(resources.getString("chkGenerateClanKeshikBox.text")));
-        getChkGenerateClanKeshikBox().setToolTipText(resources.getString("chkGenerateClanKeshikBox.toolTipText"));
-        getChkGenerateClanKeshikBox().setName("chkGenerateClanKeshikBox");
-
-        setChkGenerateClanFrontlineBox(new JCheckBox(resources.getString("chkGenerateClanFrontlineBox.text")));
-        getChkGenerateClanFrontlineBox().setToolTipText(resources.getString("chkGenerateClanFrontlineBox.toolTipText"));
-        getChkGenerateClanFrontlineBox().setName("chkGenerateClanFrontlineBox");
-
-        setChkGenerateClanSecondLineBox(new JCheckBox(resources.getString("chkGenerateClanSecondLineBox.text")));
-        getChkGenerateClanSecondLineBox().setToolTipText(resources.getString("chkGenerateClanSecondLineBox.toolTipText"));
-        getChkGenerateClanSecondLineBox().setName("chkGenerateClanSecondLineBox");
-
-        setChkGenerateExperimentalTechBox(new JCheckBox(resources.getString("chkGenerateExperimentalTechBox.text")));
-        getChkGenerateExperimentalTechBox().setToolTipText(resources.getString("chkGenerateExperimentalTechBox.toolTipText"));
-        getChkGenerateExperimentalTechBox().setName("chkGenerateExperimentalTechBox");
 
         // Disable Panel by Default
         getChkGenerateSurprises().setSelected(true);
@@ -2050,25 +1983,30 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(getChkGenerateSurprises())
-                        .addComponent(getChkGenerateStarLeagueRoyalBox())
-                        .addComponent(getChkGenerateStarLeagueRegularBox())
-                        .addComponent(getChkGenerateClanKeshikBox())
-                        .addComponent(getChkGenerateClanFrontlineBox())
-                        .addComponent(getChkGenerateClanSecondLineBox())
-                        .addComponent(getChkGenerateExperimentalTechBox())
+                        .addComponent(mysteryBoxPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(getChkGenerateSurprises())
-                        .addComponent(getChkGenerateStarLeagueRoyalBox())
-                        .addComponent(getChkGenerateStarLeagueRegularBox())
-                        .addComponent(getChkGenerateClanKeshikBox())
-                        .addComponent(getChkGenerateClanFrontlineBox())
-                        .addComponent(getChkGenerateClanSecondLineBox())
-                        .addComponent(getChkGenerateExperimentalTechBox())
+                        .addComponent(mysteryBoxPanel)
         );
         return panel;
+    }
+
+    private void createMysteryBoxPanel(final JPanel panel) {
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("mysteryBoxPanel.title")));
+        panel.setToolTipText(resources.getString("mysteryBoxPanel.toolTipText"));
+        panel.setName("mysteryBoxPanel");
+        panel.setLayout(new GridLayout(0, 1));
+        final MysteryBoxType[] mysteryBoxTypes = MysteryBoxType.values();
+        setChkGenerateMysteryBoxTypes(new JCheckBox[mysteryBoxTypes.length]);
+        for (int i = 0; i < mysteryBoxTypes.length; i++) {
+            getChkGenerateMysteryBoxTypes()[i] = new JCheckBox(mysteryBoxTypes[i].toString());
+            getChkGenerateMysteryBoxTypes()[i].setToolTipText(mysteryBoxTypes[i].getToolTipText());
+            getChkGenerateMysteryBoxTypes()[i].setName("lbl" + mysteryBoxTypes[i].name());
+            panel.add(getChkGenerateMysteryBoxTypes()[i]);
+        }
     }
 
     private List<FactionChoice> getFactionChoices() {

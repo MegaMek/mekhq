@@ -1366,31 +1366,13 @@ public abstract class AbstractCompanyGenerator {
 
         final MysteryBoxType[] mysteryBoxTypes = MysteryBoxType.values();
         final List<AbstractMysteryBox> mysteryBoxes = new ArrayList<>();
-        for (int i = 0; i < )
-
-        if (getOptions().isGenerateStarLeagueRoyalBox()) {
-
+        for (int i = 0; i < getOptions().getGenerateMysteryBoxTypes().length; i++) {
+            if (getOptions().getGenerateMysteryBoxTypes()[i]) {
+                mysteryBoxes.add(mysteryBoxTypes[i].getMysteryBox());
+            }
         }
 
-        if (getOptions().isGenerateStarLeagueRegularBox()) {
-
-        }
-
-        if (getOptions().isGenerateClanKeshikBox()) {
-
-        }
-
-        if (getOptions().isGenerateClanFrontlineBox()) {
-
-        }
-
-        if (getOptions().isGenerateClanSecondLineBox()) {
-
-        }
-
-        if (getOptions().isGenerateExperimentalTechBox()) {
-
-        }
+        // TODO : Processing of mystery boxes
     }
     //endregion Surprises
 
@@ -1434,6 +1416,9 @@ public abstract class AbstractCompanyGenerator {
         parts.forEach(p -> campaign.getWarehouse().addPart(p, true));
         armour.forEach(a -> campaign.getWarehouse().addPart(a, true));
         ammunition.forEach(a -> campaign.getWarehouse().addPart(a, true));
+
+        // Phase 6: Surprises!
+        generateSurprises(campaign);
     }
 
     private void applyPhaseOneToCampaign(final Campaign campaign, final List<Person> combatPersonnel,
