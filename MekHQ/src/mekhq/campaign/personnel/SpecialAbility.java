@@ -34,6 +34,10 @@ import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.common.Mounted;
+import megamek.common.annotations.Nullable;
+import megamek.common.util.WeightedMap;
+import mekhq.campaign.CampaignOptions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -568,53 +572,80 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return implants.get(name);
     }
 
-    public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year, boolean clusterOnly) {
-        ArrayList<String> candidates = new ArrayList<>();
-        for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
-            EquipmentType et = e.nextElement();
-
-            if (!isWeaponEligibleForSPA(et, type, clusterOnly)) {
-                continue;
-            }
-
-            WeaponType wt = (WeaponType) et;
-
-            if (TechConstants.isClan(wt.getTechLevel(year)) != isClan) {
-                continue;
-            }
-
-            int lvl = wt.getTechLevel(year);
-            if (lvl < 0) {
-                continue;
-            }
-
-            if (techLvl < Utilities.getSimpleTechLevel(lvl)) {
-                continue;
-            }
-
-            if (techLvl == TechConstants.T_IS_UNOFFICIAL) {
-                continue;
-            }
-
-            int ntimes = 10;
-            if (techLvl >= TechConstants.T_IS_ADVANCED) {
-                ntimes = 1;
-            }
-
-            while (ntimes > 0) {
-                candidates.add(et.getName());
-                ntimes--;
+    /**
+     * This return a random weapon to specialize in, selected based on weightings. Introtech
+     * weaponry is weighted at 50, standard weaponry at 25, advanced weaponry at 5, while experimental
+     * and unofficial weaponry are both weighted at 1.
+     *
+     * @param person the person to generate the weapon specialization for
+     * @param techLevel the maximum tech level to generate a weapon for
+     * @param year the year to generate the specialization for
+     * @param clusterOnly whether to only consider cluster weapons or not
+     * @return the name of the selected weapon, or null if there are no weapons that can be selected
+     */
+    public static @Nullable String chooseWeaponSpecialization(final Person person, final int techLevel,
+                                                              final int year, final boolean clusterOnly) {
+        final WeightedMap<EquipmentType> weapons = new WeightedMap<>();
+        // First try to generate based on the person's unit
+        if ((person.getUnit() != null) && (person.getUnit().getEntity() != null)) {
+            for (final Mounted mounted : person.getUnit().getEntity().getEquipment()) {
+                addValidWeaponryToMap(mounted.getType(), person, techLevel, year, clusterOnly, weapons);
             }
         }
-        if (candidates.isEmpty()) {
-            return "??";
+
+        // If that doesn't generate a valid weapon, then turn to the wider list
+        if (weapons.isEmpty()) {
+            for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements(); ) {
+                final EquipmentType equipmentType = e.nextElement();
+                addValidWeaponryToMap(equipmentType, person, techLevel, year, clusterOnly, weapons);
+            }
         }
-        return Utilities.getRandomItem(candidates);
+        return weapons.isEmpty() ? null : weapons.randomItem().getName();
     }
 
     /**
-     * Worker function that determines if a piece of equipment is eligible
-     * for being selected for an SPA.
+     * This is a worker method to add any valid weaponry to the weighted map used to generate a
+     * random weapon specialization
+     *
+     * @param equipmentType the equipment type to test for validity
+     * @param person the person to generate the weapon specialization for
+     * @param techLevel the maximum tech level to generate a weapon for
+     * @param year the year to generate the specialization for
+     * @param clusterOnly whether to only consider cluster weapons or not
+     * @param weapons the weighted map of weaponry to add the equipmentType to if valid
+     */
+    private static void addValidWeaponryToMap(final EquipmentType equipmentType,
+                                              final Person person, final int techLevel,
+                                              final int year, final boolean clusterOnly,
+                                              final WeightedMap<EquipmentType> weapons) {
+        // Ensure it is a weapon eligible for the SPA in question, and the tech level is IS for
+        // IS personnel and Clan for Clan personnel
+        if (!isWeaponEligibleForSPA(equipmentType, person.getPrimaryRole(), clusterOnly)
+                || (TechConstants.isClan(equipmentType.getTechLevel(year)) != person.isClanner())) {
+            return;
+        }
+
+        // Ensure the weapon's tech level is valid (zero or above)
+        int weaponTechLevel = equipmentType.getTechLevel(year);
+        if (weaponTechLevel < 0) {
+            return;
+        }
+        // Ensure that the weapon's tech level is lower than that of the specified tech level
+        weaponTechLevel = Utilities.getSimpleTechLevel(weaponTechLevel);
+        if (techLevel < weaponTechLevel) {
+            return;
+        }
+
+        // Determine the weight based on the tech level
+        final int weight = (weaponTechLevel < CampaignOptions.TECH_STANDARD) ? 50
+                : (weaponTechLevel < CampaignOptions.TECH_ADVANCED) ? 25
+                : (weaponTechLevel < CampaignOptions.TECH_EXPERIMENTAL) ? 5
+                : 1;
+        weapons.add(weight, equipmentType);
+    }
+
+    /**
+     * Worker function that determines if a piece of equipment is eligible for being selected for an SPA.
      * @param et Equipment type to check
      * @param type Person role, e.g. Person.T_MECHWARRIOR. This check is ignored if Person.T_NONE is passed in.
      * @param clusterOnly All weapon types or just ones that do rolls on the cluster table
