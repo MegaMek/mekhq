@@ -48,11 +48,9 @@ public class ScrollablePanel extends JPanel implements Scrollable{
     }
 
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-        if (SwingConstants.VERTICAL == orientation) {
-            return visibleRect.height;
-        } else {
-            return visibleRect.width;
-        }
+        return (SwingConstants.VERTICAL == orientation)
+                ? visibleRect.height
+                : visibleRect.width;
     }
 
     public void setScrollableTracksViewportWidth(boolean value) {
