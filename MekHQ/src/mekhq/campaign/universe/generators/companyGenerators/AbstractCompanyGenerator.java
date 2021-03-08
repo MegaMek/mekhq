@@ -102,6 +102,8 @@ import java.util.stream.Collectors;
  *      Implement:
  *          centerPlanet
  *          selectStartingContract
+ *          All of the Surprises
+ *          Finish Finances
  *
  * FIXME :
  *      Backgrounds don't work
@@ -952,7 +954,7 @@ public abstract class AbstractCompanyGenerator {
 
         // Type
         // FIXME : I'm not working properly to determine the filename
-        final int weightClass = determineLanceWeightClass(campaign, force, isLance);
+        final int weightClass = determineForceWeightClass(campaign, force, isLance);
         final String weightClassName = EntityWeightClass.getClassName(weightClass);
         String filename = String.format("BattleMech %s.png", weightClassName);
         MekHQ.getLogger().warning(filename);
@@ -987,7 +989,7 @@ public abstract class AbstractCompanyGenerator {
      * @param isLance whether the force is a lance or a company
      * @return the weight class of the force
      */
-    private int determineLanceWeightClass(final Campaign campaign, final Force force,
+    private int determineForceWeightClass(final Campaign campaign, final Force force,
                                           final boolean isLance) {
         double weight = 0.0;
         for (final UUID unitId : force.getAllUnits(true)) {
@@ -1233,15 +1235,50 @@ public abstract class AbstractCompanyGenerator {
                                  final List<Armor> armour, final List<AmmoStorage> ammunition,
                                  final @Nullable Contract contract) {
         // TODO : Finish implementation
-
         Money startingCash = generateStartingCash();
-        final Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
+        Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
         if (getOptions().isPayForSetup()) {
+            final Money initialContractPayment = (contract == null) ? Money.zero() : contract.getTotalAdvanceAmount();
+            startingCash = startingCash.plus(initialContractPayment);
+            minimumStartingFloat = minimumStartingFloat.plus(initialContractPayment);
+
+            Money maximumPreLoanCost = startingCash.minus(minimumStartingFloat);
+            Money loan = Money.zero();
+
             final Money hiringCosts = calculateHiringCosts(personnel);
+            if (maximumPreLoanCost.isGreaterOrEqualThan(hiringCosts)) {
+                maximumPreLoanCost = maximumPreLoanCost.minus(hiringCosts);
+            } else if (getOptions().isStartingLoan()) {
+                loan = loan.plus(hiringCosts);
+            }
+
             final Money unitCosts = calculateUnitCosts(units);
+            if (maximumPreLoanCost.isGreaterOrEqualThan(unitCosts)) {
+                maximumPreLoanCost = maximumPreLoanCost.minus(unitCosts);
+            } else if (getOptions().isStartingLoan()) {
+                loan = loan.plus(unitCosts);
+            }
+
             final Money partCosts = calculatePartCosts(parts);
+            if (maximumPreLoanCost.isGreaterOrEqualThan(partCosts)) {
+                maximumPreLoanCost = maximumPreLoanCost.minus(partCosts);
+            } else if (getOptions().isStartingLoan()) {
+                loan = loan.plus(partCosts);
+            }
+
             final Money armourCosts = calculateArmourCosts(armour);
+            if (maximumPreLoanCost.isGreaterOrEqualThan(armourCosts)) {
+                maximumPreLoanCost = maximumPreLoanCost.minus(armourCosts);
+            } else if (getOptions().isStartingLoan()) {
+                loan = loan.plus(armourCosts);
+            }
+
             final Money ammunitionCosts = calculateAmmunitionCosts(ammunition);
+            if (maximumPreLoanCost.isGreaterOrEqualThan(ammunitionCosts)) {
+                maximumPreLoanCost = maximumPreLoanCost.minus(ammunitionCosts);
+            } else if (getOptions().isStartingLoan()) {
+                loan = loan.plus(ammunitionCosts);
+            }
         } else {
             campaign.addReport("");
             startingCash = startingCash.isGreaterOrEqualThan(minimumStartingFloat) ? startingCash
@@ -1361,6 +1398,14 @@ public abstract class AbstractCompanyGenerator {
     //region Surprises
     private void generateSurprises(final Campaign campaign) {
         if (!getOptions().isGenerateSurprises()) {
+            return;
+        }
+
+        generateMysteryBoxes(campaign);
+    }
+
+    private void generateMysteryBoxes(final Campaign campaign) {
+        if (!getOptions().isGenerateMysteryBoxes()) {
             return;
         }
 

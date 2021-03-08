@@ -18,7 +18,7 @@
  */
 package mekhq.gui.dialog;
 
-import mekhq.gui.view.DateSelectionPanel;
+import mekhq.gui.panels.DateSelectionPanel;
 
 import javax.swing.*;
 import java.awt.*;

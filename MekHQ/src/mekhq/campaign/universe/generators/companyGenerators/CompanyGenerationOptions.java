@@ -127,12 +127,15 @@ public class CompanyGenerationOptions implements Serializable {
 
     // Surprises
     private boolean generateSurprises;
-    private boolean generateMysteryBoxes;
-    private boolean[] generateMysteryBoxTypes;
+    private boolean generateMysteryBoxes; // Not Implemented
+    private boolean[] generateMysteryBoxTypes; // Not Implemented
     //endregion Variable Declarations
 
     //region Constructors
-    public CompanyGenerationOptions() {
+    /**
+     * This is only to be used when reading from XML
+     */
+    private CompanyGenerationOptions() {
 
     }
 
@@ -230,11 +233,9 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Surprises
         setGenerateSurprises(true);
+        setGenerateMysteryBoxes(true);
         setGenerateMysteryBoxTypes(new boolean[MysteryBoxType.values().length]);
-    }
-
-    public CompanyGenerationOptions(final Node wn) {
-        fillFromXML(wn);
+        getGenerateMysteryBoxTypes()[MysteryBoxType.STAR_LEAGUE_REGULAR.ordinal()] = true;
     }
     //endregion Constructors
 
@@ -728,6 +729,14 @@ public class CompanyGenerationOptions implements Serializable {
         this.generateSurprises = generateSurprises;
     }
 
+    public boolean isGenerateMysteryBoxes() {
+        return generateMysteryBoxes;
+    }
+
+    public void setGenerateMysteryBoxes(final boolean generateMysteryBoxes) {
+        this.generateMysteryBoxes = generateMysteryBoxes;
+    }
+
     public boolean[] getGenerateMysteryBoxTypes() {
         return generateMysteryBoxTypes;
     }
@@ -851,6 +860,7 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Surprises
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateSurprises", isGenerateSurprises());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMysteryBoxes", isGenerateMysteryBoxes());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMysteryBoxTypes", getGenerateMysteryBoxTypes());
 
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "companyGenerationOptions");
@@ -875,14 +885,15 @@ public class CompanyGenerationOptions implements Serializable {
         for (int i = 0; i < nl.getLength(); i++) {
             final Node wn = nl.item(i);
             if ("companyGenerationOptions".equals(wn.getNodeName())) {
-                return new CompanyGenerationOptions(wn);
+                return parseFromXML(wn);
             }
         }
         MekHQ.getLogger().error("Failed to parse file, returning the default AtB options");
         return new CompanyGenerationOptions(CompanyGenerationMethod.AGAINST_THE_BOT, campaign);
     }
 
-    public void fillFromXML(final Node wn) {
+    public static CompanyGenerationOptions parseFromXML(final Node wn) {
+        final CompanyGenerationOptions options = new CompanyGenerationOptions();
         final NodeList nl = wn.getChildNodes();
         try {
             for (int x = 0; x < nl.getLength(); x++) {
@@ -890,42 +901,42 @@ public class CompanyGenerationOptions implements Serializable {
                 switch (wn2.getNodeName()) {
                     //region Base Information
                     case "method":
-                        setMethod(CompanyGenerationMethod.valueOf(wn2.getTextContent().trim()));
+                        options.setMethod(CompanyGenerationMethod.valueOf(wn2.getTextContent().trim()));
                         break;
                     case "faction":
-                        setFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
+                        options.setFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
                         break;
                     case "specifyStartingPlanet":
-                        setSpecifyStartingPlanet(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setSpecifyStartingPlanet(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "startingPlanet":
                         String startingPlanetSystemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
                         String startingPlanetPlanetId = wn2.getTextContent().trim();
-                        setStartingPlanet(Systems.getInstance().getSystemById(startingPlanetSystemId).getPlanetById(startingPlanetPlanetId));
+                        options.setStartingPlanet(Systems.getInstance().getSystemById(startingPlanetSystemId).getPlanetById(startingPlanetPlanetId));
                         break;
                     case "generateMercenaryCompanyCommandLance":
-                        setGenerateMercenaryCompanyCommandLance(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setGenerateMercenaryCompanyCommandLance(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "companyCount":
-                        setCompanyCount(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setCompanyCount(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "individualLanceCount":
-                        setIndividualLanceCount(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setIndividualLanceCount(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "lancesPerCompany":
-                        setLancesPerCompany(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setLancesPerCompany(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "lanceSize":
-                        setLanceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setLanceSize(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "starLeagueYear":
-                        setStarLeagueYear(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setStarLeagueYear(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     //endregion Base Information
 
                     //region Personnel
                     case "supportPersonnel": {
-                        setSupportPersonnel(new HashMap<>());
+                        options.setSupportPersonnel(new HashMap<>());
                         final NodeList nl2 = wn.getChildNodes();
                         for (int y = 0; y < nl2.getLength(); y++) {
                             final Node wn3 = nl2.item(y);
@@ -945,196 +956,197 @@ public class CompanyGenerationOptions implements Serializable {
                                     }
                                 }
                                 if ((role != -1) && (number != -1)) {
-                                    getSupportPersonnel().put(role, number);
+                                    options.getSupportPersonnel().put(role, number);
                                 }
                             }
                         }
                         break;
                     }
                     case "poolAssistants":
-                        setPoolAssistants(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setPoolAssistants(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "generateCaptains":
-                        setGenerateCaptains(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setGenerateCaptains(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "assignCompanyCommanderFlag":
-                        setAssignCompanyCommanderFlag(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setAssignCompanyCommanderFlag(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "companyCommanderLanceOfficer":
-                        setCompanyCommanderLanceOfficer(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setCompanyCommanderLanceOfficer(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "applyOfficerStatBonusToWorstSkill":
-                        setApplyOfficerStatBonusToWorstSkill(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setApplyOfficerStatBonusToWorstSkill(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "assignBestOfficers":
-                        setAssignBestOfficers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setAssignBestOfficers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "automaticallyAssignRanks":
-                        setAutomaticallyAssignRanks(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setAutomaticallyAssignRanks(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "assignFounderFlag":
-                        setAssignFounderFlag(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setAssignFounderFlag(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "runStartingSimulation":
-                        setRunStartingSimulation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setRunStartingSimulation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "simulationDuration":
-                        setSimulationDuration(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setSimulationDuration(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "simulateRandomMarriages":
-                        setSimulateRandomMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setSimulateRandomMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "simulateRandomProcreation":
-                        setSimulateRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setSimulateRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     //endregion Personnel
 
                     //region Personnel Randomization
                     case "randomizeOrigin":
-                        setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "randomizeAroundCentralPlanet":
-                        setRandomizeAroundCentralPlanet(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setRandomizeAroundCentralPlanet(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "centralPlanet":
                         String centralPlanetSystemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
                         String centralPlanetPlanetId = wn2.getTextContent().trim();
-                        setCentralPlanet(Systems.getInstance().getSystemById(centralPlanetSystemId).getPlanetById(centralPlanetPlanetId));
+                        options.setCentralPlanet(Systems.getInstance().getSystemById(centralPlanetSystemId).getPlanetById(centralPlanetPlanetId));
                         break;
                     case "originSearchRadius":
-                        setOriginSearchRadius(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setOriginSearchRadius(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "extraRandomOrigin":
-                        setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "originDistanceScale":
-                        setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
+                        options.setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
                         break;
                     //endregion Personnel Randomization
 
                     //region Units
                     case "generateUnitsAsAttached":
-                        setGenerateUnitsAsAttached(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setGenerateUnitsAsAttached(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "assignBestRollToUnitCommander":
-                        setAssignBestRollToUnitCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setAssignBestRollToUnitCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "sortStarLeagueUnitsFirst":
-                        setSortStarLeagueUnitsFirst(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setSortStarLeagueUnitsFirst(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "groupByWeight":
-                        setGroupByWeight(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setGroupByWeight(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "groupByQuality":
-                        setGroupByQuality(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setGroupByQuality(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "keepOfficerRollsSeparate":
-                        setKeepOfficerRollsSeparate(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setKeepOfficerRollsSeparate(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "assignTechsToUnits":
-                        setAssignTechsToUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setAssignTechsToUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     //endregion Units
 
                     //region Unit
                     case "ForceNamingMethod":
-                        setForceNamingMethod(ForceNamingMethod.valueOf(wn2.getTextContent().trim()));
+                        options.setForceNamingMethod(ForceNamingMethod.valueOf(wn2.getTextContent().trim()));
                         break;
                     case "generateForceIcons":
-                        setGenerateForceIcons(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setGenerateForceIcons(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     //endregion Units
 
                     //region Spares
                     case "generateMothballedSpareUnits":
-                        setGenerateMothballedSpareUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setGenerateMothballedSpareUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "sparesPercentOfActiveUnits":
-                        setSparesPercentOfActiveUnits(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setSparesPercentOfActiveUnits(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "partGenerationMethod":
-                        setPartGenerationMethod(PartGenerationMethod.valueOf(wn2.getTextContent().trim()));
+                        options.setPartGenerationMethod(PartGenerationMethod.valueOf(wn2.getTextContent().trim()));
                         break;
                     case "startingArmourWeight":
-                        setStartingArmourWeight(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setStartingArmourWeight(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "generateSpareAmmunition":
-                        setGenerateSpareAmmunition(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setGenerateSpareAmmunition(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "numberReloadsPerWeapon":
-                        setNumberReloadsPerWeapon(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setNumberReloadsPerWeapon(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "generateFractionalMachineGunAmmunition":
-                        setGenerateFractionalMachineGunAmmunition(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setGenerateFractionalMachineGunAmmunition(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     //endregion Spares
 
                     //region Contracts
                     case "selectStartingContract":
-                        setSelectStartingContract(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setSelectStartingContract(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "startCourseToContractPlanet":
-                        setStartCourseToContractPlanet(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setStartCourseToContractPlanet(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     //endregion Contracts
 
                     //region Finances
                     case "startingCash":
-                        setStartingCash(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setStartingCash(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "randomizeStartingCash":
-                        setRandomizeStartingCash(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setRandomizeStartingCash(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "randomStartingCashDiceCount":
-                        setRandomStartingCashDiceCount(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setRandomStartingCashDiceCount(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "minimumStartingFloat":
-                        setMinimumStartingFloat(Integer.parseInt(wn2.getTextContent().trim()));
+                        options.setMinimumStartingFloat(Integer.parseInt(wn2.getTextContent().trim()));
                         break;
                     case "payForSetup":
-                        setPayForSetup(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setPayForSetup(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "startingLoan":
-                        setStartingLoan(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setStartingLoan(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "payForPersonnel":
-                        setPayForPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setPayForPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "payForUnits":
-                        setPayForUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setPayForUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "payForParts":
-                        setPayForParts(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setPayForParts(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "payForArmour":
-                        setPayForArmour(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setPayForArmour(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "payForAmmunition":
-                        setPayForAmmunition(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setPayForAmmunition(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     //endregion Finances
 
                     //region Surprises
                     case "generateSurprises":
-                        setGenerateSurprises(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setGenerateSurprises(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "generateMysteryBoxes":
-                        setGenerateMysteryBoxes(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                        options.setGenerateMysteryBoxes(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
                     case "generateMysteryBoxTypes":
                         final String[] values = wn2.getTextContent().trim().split(",");
-                        final boolean[] booleans = new boolean[values.length];
-                        for (int i = 0; i < values.length; i++) {
-                            booleans[i] = Boolean.parseBoolean(values[i]);
+                        for (int i = 0; i < Math.min(values.length, options.getGenerateMysteryBoxTypes().length); i++) {
+                            options.getGenerateMysteryBoxTypes()[i] = Boolean.parseBoolean(values[i]);
                         }
-                        setGenerateMysteryBoxTypes(booleans);
                         break;
                     //endregion Surprises
                 }
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
+            return null;
         }
+
+        return options;
     }
     //endregion File IO
 }

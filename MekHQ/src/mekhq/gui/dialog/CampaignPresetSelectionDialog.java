@@ -20,7 +20,7 @@ package mekhq.gui.dialog;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.GamePreset;
-import mekhq.gui.view.CampaignPresetSelectionPanel;
+import mekhq.gui.panels.CampaignPresetSelectionPanel;
 
 import javax.swing.*;
 import java.awt.*;

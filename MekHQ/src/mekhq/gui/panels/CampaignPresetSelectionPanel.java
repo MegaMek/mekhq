@@ -16,10 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.view;
+package mekhq.gui.panels;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.GamePreset;
+import mekhq.gui.renderers.CampaignPresetRenderer;
 
 import javax.swing.*;
 import java.awt.*;

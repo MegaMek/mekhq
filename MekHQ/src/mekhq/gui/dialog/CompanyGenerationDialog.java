@@ -26,7 +26,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
 import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
 import mekhq.gui.enums.CompanyGenerationPanelType;
-import mekhq.gui.view.CompanyGenerationOptionsPanel;
+import mekhq.gui.panels.companyGeneration.CompanyGenerationOptionsPanel;
 
 import javax.swing.*;
 import java.awt.*;

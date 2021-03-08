@@ -3954,7 +3954,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
                 retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
             } else if (wn2.getNodeName().equals("companyGenerationOptions")) {
-                retVal.setCompanyGenerationOptions(new CompanyGenerationOptions(wn2));
+                retVal.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn2));
             }
         }
 

@@ -38,7 +38,7 @@ public enum MysteryBoxType {
     STAR_LEAGUE_REGULAR("MysteryBoxType.STAR_LEAGUE_REGULAR.text", "MysteryBoxType.STAR_LEAGUE_REGULAR.toolTipText"),
     INNER_SPHERE_EXPERIMENTAL("MysteryBoxType.INNER_SPHERE_EXPERIMENTAL.text", "MysteryBoxType.INNER_SPHERE_EXPERIMENTAL.toolTipText"),
     CLAN_KESHIK("MysteryBoxType.CLAN_KESHIK.text", "MysteryBoxType.CLAN_KESHIK.toolTipText"),
-    CLAN_FRONTLINE("MysteryBoxType.CLAN_FRONTLINE.text", "MysteryBoxType.CLAN_FRONTLINE.toolTipText"),
+    CLAN_FRONT_LINE("MysteryBoxType.CLAN_FRONT_LINE.text", "MysteryBoxType.CLAN_FRONT_LINE.toolTipText"),
     CLAN_SECOND_LINE("MysteryBoxType.CLAN_SECOND_LINE.text", "MysteryBoxType.CLAN_SECOND_LINE.toolTipText"),
     CLAN_EXPERIMENTAL("MysteryBoxType.CLAN_EXPERIMENTAL.text", "MysteryBoxType.CLAN_EXPERIMENTAL.toolTipText");
     //endregion Enum Declarations
@@ -63,9 +63,6 @@ public enum MysteryBoxType {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
-    //endregion Boolean Comparisons
-
     public AbstractMysteryBox getMysteryBox() {
         switch (this) {
             case STAR_LEAGUE_ROYAL:
@@ -76,7 +73,7 @@ public enum MysteryBoxType {
                 return new InnerSphereExperimentalMysteryBox();
             case CLAN_KESHIK:
                 return new ClanKeshikMysteryBox();
-            case CLAN_FRONTLINE:
+            case CLAN_FRONT_LINE:
                 return new ClanFrontlineMysteryBox();
             case CLAN_SECOND_LINE:
                 return new ClanSecondLineMysteryBox();

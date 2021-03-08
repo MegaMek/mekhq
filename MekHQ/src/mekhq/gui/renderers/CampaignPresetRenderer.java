@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.view;
+package mekhq.gui.renderers;
 
 import mekhq.campaign.GamePreset;
 
@@ -73,6 +73,7 @@ public class CampaignPresetRenderer extends JPanel implements ListCellRenderer<G
         getDescription().setWrapStyleWord(true);
         add(getDescription());
     }
+    //endregion Initialization
 
     @Override
     public Component getListCellRendererComponent(final JList<? extends GamePreset> list,
@@ -95,7 +96,6 @@ public class CampaignPresetRenderer extends JPanel implements ListCellRenderer<G
 
         return this;
     }
-    //endregion Initialization
 
     @Override
     public Dimension getMinimumSize() {

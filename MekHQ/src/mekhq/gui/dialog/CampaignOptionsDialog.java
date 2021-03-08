@@ -107,7 +107,7 @@ import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.preferences.JWindowPreference;
-import mekhq.gui.view.CompanyGenerationOptionsPanel;
+import mekhq.gui.panels.companyGeneration.CompanyGenerationOptionsPanel;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 import mekhq.preferences.PreferencesNode;
