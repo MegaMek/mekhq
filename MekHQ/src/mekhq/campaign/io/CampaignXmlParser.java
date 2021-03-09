@@ -703,12 +703,8 @@ public class CampaignXmlParser {
                     retVal.updateTechFactionCode();
                 } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
                     retVal.setRetainerEmployerCode(wn.getTextContent());
-                } else if (xn.equalsIgnoreCase("officerCut")) {
-                    officerCut = Integer.parseInt(wn.getTextContent().trim());
-                } else if (xn.equalsIgnoreCase("rankNames")) {
-                    rankNames = wn.getTextContent().trim();
                 } else if (xn.equalsIgnoreCase("ranks") || xn.equalsIgnoreCase("rankSystem")) {
-                    Ranks r = Ranks.generateInstanceFromXML(wn, version);
+                    Ranks r = Ranks.generateInstanceFromXML(wn, version, false);
                     if (r != null) {
                         retVal.setRanks(r);
                     }
@@ -727,8 +723,7 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("overtime")) {
                     retVal.setOvertime(Boolean.parseBoolean(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("astechPool")) {
-                    retVal.setAstechPool(Integer.parseInt(wn.getTextContent()
-                            .trim()));
+                    retVal.setAstechPool(Integer.parseInt(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("astechPoolMinutes")) {
                     retVal.setAstechPoolMinutes(Integer.parseInt(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("astechPoolOvertime")) {
@@ -741,10 +736,6 @@ public class CampaignXmlParser {
                     retVal.setId(UUID.fromString(wn.getTextContent().trim()));
                 }
             }
-        }
-        if (null != rankNames) {
-            //backwards compatibility
-            retVal.getRanks().setRanksFromList(rankNames, officerCut);
         }
 
         // TODO: this could probably be better

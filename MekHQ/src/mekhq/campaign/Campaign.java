@@ -1741,6 +1741,7 @@ public class Campaign implements Serializable, ITechManager {
         return parts.getPart(id);
     }
 
+    @Nullable
     public Force getForce(int id) {
         return forceIds.get(id);
     }
@@ -3263,13 +3264,21 @@ public class Campaign implements Serializable, ITechManager {
         // get sucked up by other stuff. This is also a good place to ensure that a
         // unit's engineer gets reset and updated.
         for (Unit u : getUnits()) {
-            u.resetEngineer();
-            if (null != u.getEngineer()) {
-                u.getEngineer().resetMinutesLeft();
-            }
-
             // do maintenance checks
-            doMaintenance(u);
+            try {
+                u.resetEngineer();
+                if (null != u.getEngineer()) {
+                    u.getEngineer().resetMinutesLeft();
+                }
+
+                doMaintenance(u);
+            } catch (Exception e) {
+                MekHQ.getLogger().error(String.format(
+                        "Unable to perform maintenance on %s (%s) due to an error",
+                        u.getName(), u.getId().toString()), e);
+                addReport(String.format("ERROR: An error occurred performing maintenance on %s, check the log",
+                        u.getName()));
+            }
         }
 
         // need to check for assigned tasks in two steps to avoid
@@ -3313,7 +3322,15 @@ public class Campaign implements Serializable, ITechManager {
 
             if (null != tech) {
                 if (null != tech.getSkillForWorkingOn(part)) {
-                    fixPart(part, tech);
+                    try {
+                        fixPart(part, tech);
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error(String.format(
+                                "Could not perform overnight maintenance on %s (%d) due to an error",
+                                part.getName(), part.getId()), e);
+                        addReport(String.format("ERROR: an error occurred performing overnight maintenance on %s, check the log",
+                                part.getName()));
+                    }
                 } else {
                     addReport(String.format(
                             "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
@@ -3354,7 +3371,12 @@ public class Campaign implements Serializable, ITechManager {
 
         // Finally, run Mass Repair Mass Salvage if desired
         if (MekHQ.getMekHQOptions().getNewDayMRMS()) {
-            MassRepairService.massRepairSalvageAllUnits(this);
+            try {
+                MassRepairService.massRepairSalvageAllUnits(this);
+            } catch (Exception e) {
+                MekHQ.getLogger().error("Could not perform mass repair/salvage on units due to an error", e);
+                addReport("ERROR: an error occurred performing mass repair/salvage on units, check the log");
+            }
         }
     }
 
@@ -4332,10 +4354,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public Ranks getRanks() {
         return ranks;
-    }
-
-    public void setRankSystem(int system) {
-        getRanks().setRankSystem(system);
     }
 
     public List<String> getAllRankNamesFor(int p) {
@@ -6346,122 +6364,18 @@ public class Campaign implements Serializable, ITechManager {
             Map<Part, Integer> partsToDamage = new HashMap<>();
             StringBuilder maintenanceReport = new StringBuilder("<emph>" + techName + " performing maintenance</emph><br><br>");
             for (Part p : u.getParts()) {
-                String partReport = "<b>" + p.getName() + "</b> (Quality " + p.getQualityName() + ")";
-                if (!p.needsMaintenance()) {
-                    continue;
-                }
-                int oldQuality = p.getQuality();
-                TargetRoll target = getTargetForMaintenance(p, tech);
-                if (!paidMaintenance) {
-                    // TODO : Make this modifier user inputtable
-                    target.addModifier(1, "did not pay for maintenance");
-                }
-
-                partReport += ", TN " + target.getValue() + "[" + target.getDesc() + "]";
-                int roll = Compute.d6(2);
-                int margin = roll - target.getValue();
-                partReport += " rolled a " + roll + ", margin of " + margin;
-
-                switch (p.getQuality()) {
-                    case Part.QUALITY_A: {
-                        if (margin >= 4) {
-                            p.improveQuality();
-                        }
-                        if (!campaignOptions.useUnofficialMaintenance()) {
-                            if (margin < -6) {
-                                partsToDamage.put(p, 4);
-                            } else if (margin < -4) {
-                                partsToDamage.put(p, 3);
-                            } else if (margin == -4) {
-                                partsToDamage.put(p, 2);
-                            } else if (margin < -1) {
-                                partsToDamage.put(p, 1);
-                            }
-                        } else if (margin < -6) {
-                            partsToDamage.put(p, 1);
-                        }
-                        break;
+                try {
+                    String partReport = doMaintenanceOnUnitPart(u, p, partsToDamage, paidMaintenance);
+                    if (partReport != null) {
+                        maintenanceReport.append(partReport).append("<br>");
                     }
-                    case Part.QUALITY_B: {
-                        if (margin >= 4) {
-                            p.improveQuality();
-                        } else if (margin < -5) {
-                            p.decreaseQuality();
-                        }
-                        if (!campaignOptions.useUnofficialMaintenance()) {
-                            if (margin < -6) {
-                                partsToDamage.put(p, 2);
-                            } else if (margin < -2) {
-                                partsToDamage.put(p, 1);
-                            }
-                        }
-                        break;
-                    }
-                    case Part.QUALITY_C: {
-                        if (margin < -4) {
-                            p.decreaseQuality();
-                        } else if (margin >= 5) {
-                            p.improveQuality();
-                        }
-                        if (!campaignOptions.useUnofficialMaintenance()) {
-                            if (margin < -6) {
-                                partsToDamage.put(p, 2);
-                            } else if (margin < -3) {
-                                partsToDamage.put(p, 1);
-                            }
-                        }
-                        break;
-                    }
-                    case Part.QUALITY_D: {
-                        if (margin < -3) {
-                            p.decreaseQuality();
-                            if ((margin < -4) && !campaignOptions.useUnofficialMaintenance()) {
-                                partsToDamage.put(p, 1);
-                            }
-                        } else if (margin >= 5) {
-                            p.improveQuality();
-                        }
-                        break;
-                    }
-                    case Part.QUALITY_E:
-                        if (margin < -2) {
-                            p.decreaseQuality();
-                            if ((margin < -5) && !campaignOptions.useUnofficialMaintenance()) {
-                                partsToDamage.put(p, 1);
-                            }
-                        } else if (margin >= 6) {
-                            p.improveQuality();
-                        }
-                        break;
-                    case Part.QUALITY_F:
-                    default:
-                        if (margin < -2) {
-                            p.decreaseQuality();
-                            if (margin < -6 && !campaignOptions.useUnofficialMaintenance()) {
-                                partsToDamage.put(p, 1);
-                            }
-                        }
-                        // TODO: award XP point if margin >= 6 (make this optional)
-                        //if (margin >= 6) {
-                        //
-                        //}
-                        break;
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(String.format(
+                            "Could not perform maintenance on part %s (%d) for %s (%s) due to an error",
+                            p.getName(), p.getId(), u.getName(), u.getId().toString()), e);
+                    addReport(String.format("ERROR: An error occurred performing maintenance on %s for unit %s, check the log",
+                            p.getName(), u.getName()));
                 }
-                if (p.getQuality() > oldQuality) {
-                    partReport += ": <font color='green'>new quality is " + p.getQualityName() + "</font>";
-                } else if (p.getQuality() < oldQuality) {
-                    partReport += ": <font color='red'>new quality is " + p.getQualityName() + "</font>";
-                } else {
-                    partReport += ": quality remains " + p.getQualityName();
-                }
-                if (null != partsToDamage.get(p)) {
-                    if (partsToDamage.get(p) > 3) {
-                        partReport += ", <font color='red'><b>part destroyed</b></font>";
-                    } else {
-                        partReport += ", <font color='red'><b>part damaged</b></font>";
-                    }
-                }
-                maintenanceReport.append(partReport).append("<br>");
             }
 
             int nDamage = 0;
@@ -6480,7 +6394,7 @@ public class Campaign implements Serializable, ITechManager {
             u.setLastMaintenanceReport(maintenanceReport.toString());
 
             if (getCampaignOptions().logMaintenance()) {
-                MekHQ.getLogger().info(getClass(), "doMaintenance", maintenanceReport.toString());
+                MekHQ.getLogger().info(maintenanceReport.toString());
             }
 
             int quality = u.getQuality();
@@ -6518,6 +6432,126 @@ public class Campaign implements Serializable, ITechManager {
 
             u.resetDaysSinceMaintenance();
         }
+    }
+
+    private String doMaintenanceOnUnitPart(Unit u, Part p, Map<Part, Integer> partsToDamage, boolean paidMaintenance) {
+        String partReport = "<b>" + p.getName() + "</b> (Quality " + p.getQualityName() + ")";
+        if (!p.needsMaintenance()) {
+            return null;
+        }
+        int oldQuality = p.getQuality();
+        TargetRoll target = getTargetForMaintenance(p, u.getTech());
+        if (!paidMaintenance) {
+            // TODO : Make this modifier user inputtable
+            target.addModifier(1, "did not pay for maintenance");
+        }
+
+        partReport += ", TN " + target.getValue() + "[" + target.getDesc() + "]";
+        int roll = Compute.d6(2);
+        int margin = roll - target.getValue();
+        partReport += " rolled a " + roll + ", margin of " + margin;
+
+        switch (p.getQuality()) {
+            case Part.QUALITY_A: {
+                if (margin >= 4) {
+                    p.improveQuality();
+                }
+                if (!campaignOptions.useUnofficialMaintenance()) {
+                    if (margin < -6) {
+                        partsToDamage.put(p, 4);
+                    } else if (margin < -4) {
+                        partsToDamage.put(p, 3);
+                    } else if (margin == -4) {
+                        partsToDamage.put(p, 2);
+                    } else if (margin < -1) {
+                        partsToDamage.put(p, 1);
+                    }
+                } else if (margin < -6) {
+                    partsToDamage.put(p, 1);
+                }
+                break;
+            }
+            case Part.QUALITY_B: {
+                if (margin >= 4) {
+                    p.improveQuality();
+                } else if (margin < -5) {
+                    p.decreaseQuality();
+                }
+                if (!campaignOptions.useUnofficialMaintenance()) {
+                    if (margin < -6) {
+                        partsToDamage.put(p, 2);
+                    } else if (margin < -2) {
+                        partsToDamage.put(p, 1);
+                    }
+                }
+                break;
+            }
+            case Part.QUALITY_C: {
+                if (margin < -4) {
+                    p.decreaseQuality();
+                } else if (margin >= 5) {
+                    p.improveQuality();
+                }
+                if (!campaignOptions.useUnofficialMaintenance()) {
+                    if (margin < -6) {
+                        partsToDamage.put(p, 2);
+                    } else if (margin < -3) {
+                        partsToDamage.put(p, 1);
+                    }
+                }
+                break;
+            }
+            case Part.QUALITY_D: {
+                if (margin < -3) {
+                    p.decreaseQuality();
+                    if ((margin < -4) && !campaignOptions.useUnofficialMaintenance()) {
+                        partsToDamage.put(p, 1);
+                    }
+                } else if (margin >= 5) {
+                    p.improveQuality();
+                }
+                break;
+            }
+            case Part.QUALITY_E:
+                if (margin < -2) {
+                    p.decreaseQuality();
+                    if ((margin < -5) && !campaignOptions.useUnofficialMaintenance()) {
+                        partsToDamage.put(p, 1);
+                    }
+                } else if (margin >= 6) {
+                    p.improveQuality();
+                }
+                break;
+            case Part.QUALITY_F:
+            default:
+                if (margin < -2) {
+                    p.decreaseQuality();
+                    if (margin < -6 && !campaignOptions.useUnofficialMaintenance()) {
+                        partsToDamage.put(p, 1);
+                    }
+                }
+                // TODO: award XP point if margin >= 6 (make this optional)
+                //if (margin >= 6) {
+                //
+                //}
+                break;
+        }
+        if (p.getQuality() > oldQuality) {
+            partReport += ": <font color='green'>new quality is " + p.getQualityName() + "</font>";
+        } else if (p.getQuality() < oldQuality) {
+            partReport += ": <font color='red'>new quality is " + p.getQualityName() + "</font>";
+        } else {
+            partReport += ": quality remains " + p.getQualityName();
+        }
+        if (null != partsToDamage.get(p)) {
+            if (partsToDamage.get(p) > 3) {
+                partReport += ", <font color='red'><b>part destroyed</b></font>";
+            } else {
+                partReport += ", <font color='red'><b>part damaged</b></font>";
+            }
+        }
+
+        return partReport;
     }
 
     public void initTimeInService() {
