@@ -1780,6 +1780,7 @@ public class Campaign implements Serializable, ITechManager {
         return parts.getPart(id);
     }
 
+    @Nullable
     public Force getForce(int id) {
         return forceIds.get(id);
     }

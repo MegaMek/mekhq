@@ -227,7 +227,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public boolean isEligible(Campaign c) {
         // ensure the lance is marked as a combat force
-        if (!c.getForce(forceId).isCombatForce()) {
+        final Force force = c.getForce(forceId);
+        if ((force == null) || !force.isCombatForce()) {
             return false;
         }
 
@@ -247,7 +248,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         }
 
         boolean hasGround = false;
-        for (UUID id : c.getForce(forceId).getUnits()) {
+        for (UUID id : force.getUnits()) {
             Unit unit = c.getUnit(id);
             if (null != unit) {
                 Entity entity = unit.getEntity();
