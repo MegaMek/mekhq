@@ -36,7 +36,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
 
     public UnitAssignmentTableModel(Campaign c) {
         this.campaign = c;
-        data = new ArrayList<UUID>();
+        data = new ArrayList<>();
     }
 
     public void setData(ArrayList<UUID> data) {
@@ -163,8 +163,8 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
                     }
                     desc += "<br>" + u.getStatus() + "";
                     setText(desc);
-                    Image mekImage = getImageFor(u);
-                    if(null != mekImage) {
+                    Image mekImage = u.getImage(this);
+                    if (null != mekImage) {
                         setImage(mekImage);
                     } else {
                         clearImage();

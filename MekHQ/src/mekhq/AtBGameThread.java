@@ -41,7 +41,6 @@ import megamek.common.IGame;
 import megamek.common.MapSettings;
 import megamek.common.PlanetaryConditions;
 import megamek.common.UnitType;
-import megamek.common.icons.Camouflage;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -110,15 +109,15 @@ public class AtBGameThread extends GameThread {
             // phase
             for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().error("Thread in unknown stage" );
+                MekHQ.getLogger().error("Thread in unknown stage");
             }
 
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-                MekHQ.getLogger().info("Thread in lounge" );
+                MekHQ.getLogger().info("Thread in lounge");
 
                 client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
-                client.getLocalPlayer().setColorIndex(app.getCampaign().getColorIndex());
+                client.getLocalPlayer().setColour(app.getCampaign().getColour());
 
                 if (started) {
                     client.getGame().getOptions().loadOptions();
@@ -393,14 +392,9 @@ public class AtBGameThread extends GameThread {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-                if (Camouflage.NO_CAMOUFLAGE.equals(botForce.getCamoCategory())) {
-                    if (botForce.getColorIndex() >= 0) {
-                        botClient.getLocalPlayer().setColorIndex(botForce.getColorIndex());
-                    }
-                } else {
-                    botClient.getLocalPlayer().setCamoCategory(botForce.getCamoCategory());
-                    botClient.getLocalPlayer().setCamoFileName(botForce.getCamoFileName());
-                }
+                botClient.getLocalPlayer().setCamoCategory(botForce.getCamoCategory());
+                botClient.getLocalPlayer().setCamoFileName(botForce.getCamoFileName());
+                botClient.getLocalPlayer().setColour(botForce.getColour());
 
                 botClient.sendPlayerInfo();
 

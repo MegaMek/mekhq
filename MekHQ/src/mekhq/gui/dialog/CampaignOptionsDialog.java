@@ -22,7 +22,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -32,7 +31,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -45,6 +43,7 @@ import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -60,7 +59,8 @@ import javax.swing.table.TableColumn;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.swing.util.PlayerColors;
+import megamek.client.ui.swing.dialog.imageChooser.CamoChooserDialog;
+import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.icons.AbstractIcon;
@@ -106,7 +106,6 @@ import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.preferences.JWindowPreference;
-import mekhq.gui.utilities.TableCellListener;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 import mekhq.preferences.PreferencesNode;
@@ -125,7 +124,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JFrame frame;
     private String camoCategory;
     private String camoFileName;
-    private int colorIndex;
+    private PlayerColour colour;
     private String iconCategory;
     private String iconFileName;
     private Hashtable<String, JSpinner> hashSkillTargets;
@@ -382,7 +381,7 @@ public class CampaignOptionsDialog extends JDialog {
 
     //region Rank System Tab
     private JPanel panRank;
-    private JComboBox<String> comboRanks;
+    private JComboBox<Ranks> comboRanks;
     @SuppressWarnings("unused")
     private JButton btnAddRank; // FIXME: Unused
     @SuppressWarnings("unused")
@@ -501,7 +500,7 @@ public class CampaignOptionsDialog extends JDialog {
         this.date = campaign.getLocalDate();
         this.camoCategory = campaign.getCamoCategory();
         this.camoFileName = campaign.getCamoFileName();
-        this.colorIndex = campaign.getColorIndex();
+        this.colour = campaign.getColour();
         this.iconCategory = campaign.getIconCategory();
         this.iconFileName = campaign.getIconFileName();
         hashSkillTargets = new Hashtable<>();
@@ -527,7 +526,6 @@ public class CampaignOptionsDialog extends JDialog {
     private void initComponents() {
         //region Variable Declaration and Initialisation
         tabOptions = new JTabbedPane();
-        comboRanks = new JComboBox<>();
         comboFactionNames = new JComboBox<>();
         sldGender = new JSlider(SwingConstants.HORIZONTAL);
         panRepair = new JPanel();
@@ -3094,54 +3092,22 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRank.add(lblRank, gridBagConstraints);
 
-        DefaultComboBoxModel<String> rankModel = new DefaultComboBoxModel<>();
+        DefaultComboBoxModel<Ranks> rankModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < Ranks.RS_NUM; i++) {
             final Ranks ranks = Ranks.getRanksFromSystem(i);
             if (ranks != null) {
-                rankModel.addElement(ranks.getRankSystemName());
+                rankModel.addElement(ranks);
             }
         }
-        comboRanks.setModel(rankModel);
-        comboRanks.setSelectedIndex(campaign.getRanks().getRankSystem());
+        comboRanks = new JComboBox<>(rankModel);
         comboRanks.setName("comboRanks");
-        comboRanks.setActionCommand("fillRanks");
-        comboRanks.addActionListener(evt -> {
-            if (evt.getActionCommand().equals("fillRanks")) {
-                fillRankInfo();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        comboRanks.addActionListener(evt -> fillRankInfo());
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panRank.add(comboRanks, gridBagConstraints);
-
-        /*btnAddRank = new JButton("Add Rank");
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRank.add(btnAddRank, gridBagConstraints);
-        btnAddRank.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addRank();
-            }
-        });
-
-
-        btnDeleteRank = new JButton("Remove Rank");
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRank.add(btnDeleteRank, gridBagConstraints);
-        btnDeleteRank.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                removeRank();
-            }
-        });
-        btnDeleteRank.setEnabled(false);*/
 
         ranksModel = new RankTableModel(campaign.getRanks().getRanksForModel(), rankColNames);
         tableRanks = new JTable(ranksModel);
@@ -3162,22 +3128,6 @@ public class CampaignOptionsDialog extends JDialog {
             }
         }
         tableRanks.getSelectionModel().addListSelectionListener(this::tableRanksValueChanged);
-        AbstractAction rankCellAction = new AbstractAction() {
-            private static final long serialVersionUID = -7586376360964669234L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                TableCellListener tcl = (TableCellListener)e.getSource();
-                if (!(tcl.getOldValue().equals(tcl.getNewValue()))) {
-                    comboRanks.setActionCommand("noFillRanks");
-                    comboRanks.setSelectedIndex(Ranks.RS_CUSTOM);
-                    comboRanks.setActionCommand("fillRanks");
-                }
-            }
-
-        };
-        @SuppressWarnings(value = "unused") // FIXME:
-        TableCellListener rankCellListener = new TableCellListener(tableRanks, rankCellAction);
         scrRanks.setViewportView(tableRanks);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -4270,7 +4220,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void fillRankInfo() {
-        final Ranks ranks = Ranks.getRanksFromSystem(comboRanks.getSelectedIndex());
+        final Ranks ranks = (Ranks) comboRanks.getSelectedItem();
         if (ranks != null) {
             ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
             TableColumn column;
@@ -4834,13 +4784,13 @@ public class CampaignOptionsDialog extends JDialog {
             RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
-        campaign.setRankSystem(comboRanks.getSelectedIndex());
-        if (comboRanks.getSelectedIndex() == Ranks.RS_CUSTOM) {
+        campaign.setRanks((Ranks) Objects.requireNonNull(comboRanks.getSelectedItem()));
+        if (campaign.getRanks().isCustom()) {
             campaign.getRanks().setRanksFromModel(ranksModel);
         }
         campaign.setCamoCategory(camoCategory);
         campaign.setCamoFileName(camoFileName);
-        campaign.setColorIndex(colorIndex);
+        campaign.setColour(colour);
 
         campaign.setIconCategory(iconCategory);
         campaign.setIconFileName(iconFileName);
@@ -5241,13 +5191,12 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     private void btnCamoActionPerformed(ActionEvent evt) {
-        CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex);
-        ccd.setVisible(true);
-        camoCategory = ccd.getCategory();
-        camoFileName = ccd.getFileName();
-        if (ccd.getColorIndex() != -1) {
-            colorIndex = ccd.getColorIndex();
+        CamoChooserDialog ccd = new CamoChooserDialog(frame, new Camouflage(camoCategory, camoFileName));
+        if ((ccd.showDialog() == JOptionPane.CANCEL_OPTION) || (ccd.getSelectedItem() == null)) {
+            return;
         }
+        camoCategory = ccd.getSelectedItem().getCategory();
+        camoFileName = ccd.getSelectedItem().getFilename();
         setCamoIcon();
     }
 
@@ -5342,45 +5291,7 @@ public class CampaignOptionsDialog extends JDialog {
     }
 
     public void setCamoIcon() {
-        if (null == camoCategory) {
-            return;
-        }
-
-        if (Camouflage.NO_CAMOUFLAGE.equals(camoCategory)) {
-            int colorInd = colorIndex;
-            if (colorInd == -1) {
-                colorInd = 0;
-            }
-            BufferedImage tempImage = new BufferedImage(84, 72, BufferedImage.TYPE_INT_RGB);
-            Graphics2D graphics = tempImage.createGraphics();
-            graphics.setColor(PlayerColors.getColor(colorInd));
-            graphics.fillRect(0, 0, 84, 72);
-            btnCamo.setIcon(new ImageIcon(tempImage));
-            return;
-        }
-
-        // Try to get the camo file.
-        try {
-            // Translate the root camo directory name.
-            if (AbstractIcon.ROOT_CATEGORY.equals(camoCategory)) {
-                camoCategory = "";
-            }
-            Image camo = (Image) MHQStaticDirectoryManager.getCamouflage().getItem(camoCategory, camoFileName);
-            btnCamo.setIcon(new ImageIcon(camo));
-        } catch (Exception err) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Cannot find your camo file.\n"
-                    + "Setting to default color.\n"
-                    + "You should browse to the correct camo file,\n"
-                    + "or if it isn't available copy it into MekHQ's"
-                    + "data/images/camo folder.",
-                    "Missing Camo File",
-                    JOptionPane.WARNING_MESSAGE);
-            camoCategory = Camouflage.NO_CAMOUFLAGE;
-            colorIndex = 0;
-            setCamoIcon();
-        }
+        btnCamo.setIcon(new Camouflage(camoCategory, camoFileName).getImageIcon());
     }
 
     public void setForceIcon() {

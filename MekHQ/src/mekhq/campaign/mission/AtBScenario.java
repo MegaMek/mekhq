@@ -35,10 +35,10 @@ import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.Vector;
 
-import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.*;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
+import mekhq.MekHqConstants;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -49,7 +49,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.market.UnitMarket;
@@ -706,8 +705,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 externalIDLookup.put(en.getExternalIdAsString(), en);
 
                 if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
-                    en.setCamoCategory(Camouflage.NO_CAMOUFLAGE);
-                    en.setCamoFileName(PlayerColors.COLOR_NAMES[getContract(campaign).getAllyColorIndex()]);
+                    en.setCamoCategory(Camouflage.COLOUR_CAMOUFLAGE);
+                    en.setCamoFileName(getContract(campaign).getAllyColour().name());
                 }
             } else {
                 MekHQ.getLogger().error("Entity for player-controlled allies is null");
@@ -1310,11 +1309,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 .contains(contract.getEnemyCode());
 
         boolean spawnConventional = opForOwnsPlanet && Compute.d6() >=
-                CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance();
+                MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance();
 
         // aerotechs are rarer, so spawn them less often
         boolean spawnAerotech = !opForOwnsPlanet && Compute.d6() >
-                CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance() / 2;
+                MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance() / 2;
 
         ArrayList<Entity> aircraft = new ArrayList<>();
         Entity aero;
@@ -1378,13 +1377,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean opForOwnsPlanet = contract.getSystem().getFactions(campaign.getLocalDate())
                                     .contains(contract.getEnemyCode());
         boolean spawnTurrets = opForOwnsPlanet &&
-                Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
+                Compute.d6() >= MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
         boolean spawnConventionalInfantry = opForOwnsPlanet &&
-                Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
+                Compute.d6() >= MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
 
         // battle armor is more rare
         boolean spawnBattleArmor = !opForOwnsPlanet &&
-                Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance() / 2;
+                Compute.d6() >= MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance() / 2;
 
         boolean isTurretAppropriateTerrain = (terrainType == TER_HEAVYURBAN) || (terrainType == TER_LIGHTURBAN);
         boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || terrainType == TER_WOODED;
@@ -1474,9 +1473,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /* Convenience methods for frequently-used arguments */
     protected BotForce getAllyBotForce(AtBContract c, int start, int home, List<Entity> entities) {
         return new BotForce(c.getAllyBotName(), 1, start, home, entities,
-                c.getAllyCamoCategory(),
-                c.getAllyCamoFileName(),
-                c.getAllyColorIndex());
+                c.getAllyCamoCategory(), c.getAllyCamoFileName(), c.getAllyColour());
     }
 
     protected BotForce getEnemyBotForce(AtBContract c, int start, List<Entity> entities) {
@@ -1485,9 +1482,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     protected BotForce getEnemyBotForce(AtBContract c, int start, int home, List<Entity> entities) {
         return new BotForce(c.getEnemyBotName(), 2, start, home, entities,
-                c.getEnemyCamoCategory(),
-                c.getEnemyCamoFileName(),
-                c.getEnemyColorIndex());
+                c.getEnemyCamoCategory(), c.getEnemyCamoFileName(), c.getEnemyColour());
     }
 
     public List<String> generateEntityStub(List<Entity> entities) {
@@ -1748,7 +1743,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         try {
                             en = MekHqXmlUtil.getEntityFromXmlString(wn3);
                         } catch (Exception e) {
-                            MekHQ.getLogger().error(this, "Error loading allied unit in scenario", e);
+                            MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                         }
                         if (en != null) {
                             alliesPlayer.add(en);
@@ -1767,7 +1762,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         try {
                             en = MekHqXmlUtil.getEntityFromXmlString(wn3);
                         } catch (Exception e) {
-                            MekHQ.getLogger().error(this, "Error loading allied unit in scenario", e);
+                            MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                         }
                         if (en != null) {
                             bigBattleAllies.add(en);
@@ -1794,7 +1789,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 try {
                                     en = MekHqXmlUtil.getEntityFromXmlString(wn4);
                                 } catch (Exception e) {
-                                    MekHQ.getLogger().error(this, "Error loading allied unit in scenario", e);
+                                    MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                                 }
                                 if (null != en) {
                                     specMissionEnemies.get(weightClass).add(en);
@@ -1810,7 +1805,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 try {
                     bf.setFieldsFromXmlNode(wn2);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(this, "Error loading allied unit in scenario", e);
+                    MekHQ.getLogger().error("Error loading allied unit in scenario", e);
                     bf = null;
                 }
                 if (null != bf) {
@@ -1844,7 +1839,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
          * remove the entry from the list of entities that give survival bonuses
          * to avoid an critical error that prevents battle resolution.
          */
-        ArrayList<UUID> toRemove = new ArrayList<UUID>();
+        ArrayList<UUID> toRemove = new ArrayList<>();
         for (UUID uid : survivalBonus) {
             if (!entityIds.containsKey(uid)) {
                 toRemove.add(uid);

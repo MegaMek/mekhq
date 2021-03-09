@@ -121,8 +121,7 @@ public final class FinancesTab extends CampaignGuiTab {
         financeModel = new FinanceTableModel();
         financeTable = new JTable(financeModel);
         financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        financeTable.addMouseListener(new FinanceTableMouseAdapter(getCampaignGui(),
-                financeTable, financeModel));
+        FinanceTableMouseAdapter.connect(getCampaignGui(), financeTable, financeModel);
         financeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column;
         for (int i = 0; i < FinanceTableModel.N_COL; i++) {
@@ -136,8 +135,7 @@ public final class FinancesTab extends CampaignGuiTab {
         loanModel = new LoanTableModel();
         loanTable = new JTable(loanModel);
         loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        loanTable.addMouseListener(new LoanTableMouseAdapter(getCampaignGui(),
-                loanTable, loanModel));
+        LoanTableMouseAdapter.connect(getCampaignGui(), loanTable, loanModel);
         loanTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         for (int i = 0; i < LoanTableModel.N_COL; i++) {
             column = loanTable.getColumnModel().getColumn(i);
