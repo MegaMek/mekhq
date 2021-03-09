@@ -1462,8 +1462,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 ? Utilities.nonNull(getGenealogy().getSpouse(), father) : father;
 
         // Determine Prisoner Status
-        PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
-                ? PrisonerStatus.FREE : getPrisonerStatus();
+        final PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
+                ? getPrisonerStatus() : PrisonerStatus.FREE;
 
         // Output a specific report to the campaign if they are giving birth to multiple children
         if (PREGNANCY_MULTIPLE_NAMES[size] != null) {

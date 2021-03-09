@@ -24,6 +24,7 @@ import java.awt.Rectangle;
 
 import javax.swing.JPanel;
 import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
 
 /**
  * This is an extension of JPanel that implements scrollable so that all of our ViewPanel objects 
@@ -47,11 +48,13 @@ public class ScrollablePanel extends JPanel implements Scrollable{
     }
 
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-        return 16;
+        return (SwingConstants.VERTICAL == orientation)
+                ? visibleRect.height
+                : visibleRect.width;
     }
 
     public void setScrollableTracksViewportWidth(boolean value) {
-        trackViewportWidth = false;
+        trackViewportWidth = value;
     }
     
     public boolean getScrollableTracksViewportWidth() {

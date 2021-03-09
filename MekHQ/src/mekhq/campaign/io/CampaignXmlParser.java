@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -359,6 +360,17 @@ public class CampaignXmlParser {
                     if (f.isDeployed()) {
                         u.setScenarioId(f.getScenarioId());
                     }
+                }
+            }
+        }
+
+        // determine if we've missed any lances and add those back into the campaign
+        if (retVal.getCampaignOptions().getUseAtB()) {
+            Hashtable<Integer, Lance> lances = retVal.getLances();
+            for (Force f : retVal.getAllForces()) {
+                if ((f.getUnits().size() > 0) && (null == lances.get(f.getId()))) {
+                    lances.put(f.getId(), new Lance(f.getId(), retVal));
+                    MekHQ.getLogger().warning(String.format("Added missing Lance %s to AtB list", f.getName()));
                 }
             }
         }
@@ -699,12 +711,8 @@ public class CampaignXmlParser {
                     retVal.updateTechFactionCode();
                 } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
                     retVal.setRetainerEmployerCode(wn.getTextContent());
-                } else if (xn.equalsIgnoreCase("officerCut")) {
-                    officerCut = Integer.parseInt(wn.getTextContent().trim());
-                } else if (xn.equalsIgnoreCase("rankNames")) {
-                    rankNames = wn.getTextContent().trim();
                 } else if (xn.equalsIgnoreCase("ranks") || xn.equalsIgnoreCase("rankSystem")) {
-                    Ranks r = Ranks.generateInstanceFromXML(wn, version);
+                    Ranks r = Ranks.generateInstanceFromXML(wn, version, false);
                     if (r != null) {
                         retVal.setRanks(r);
                     }
@@ -723,8 +731,7 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("overtime")) {
                     retVal.setOvertime(Boolean.parseBoolean(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("astechPool")) {
-                    retVal.setAstechPool(Integer.parseInt(wn.getTextContent()
-                            .trim()));
+                    retVal.setAstechPool(Integer.parseInt(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("astechPoolMinutes")) {
                     retVal.setAstechPoolMinutes(Integer.parseInt(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("astechPoolOvertime")) {
@@ -737,10 +744,6 @@ public class CampaignXmlParser {
                     retVal.setId(UUID.fromString(wn.getTextContent().trim()));
                 }
             }
-        }
-        if (null != rankNames) {
-            //backwards compatibility
-            retVal.getRanks().setRanksFromList(rankNames, officerCut);
         }
 
         // TODO: this could probably be better
