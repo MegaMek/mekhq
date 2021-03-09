@@ -663,7 +663,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     areAllSalvageFlagged = false;
                 }
 
-                if (u.getEntity().isConventionalInfantry()) {
+                if (u.isConventionalInfantry()) {
                     noConventionalInfantry = false;
                 } else {
                     areAllConventionalInfantry = false;
