@@ -33,8 +33,6 @@ import org.apache.commons.text.RandomStringGenerator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.BattleArmor;
-import megamek.common.Infantry;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -603,9 +601,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                                 .multipliedBy(straightSupport)
                                 .dividedBy(100);
         } else {
-            Money maintCosts = c.getHangar().getUnitCosts(
-                u -> !(u.getEntity() instanceof Infantry) || (u.getEntity() instanceof BattleArmor),
-                Unit::getWeeklyMaintenanceCost);
+            Money maintCosts = c.getHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
+                    Unit::getWeeklyMaintenanceCost);
             maintCosts = maintCosts.multipliedBy(4);
             supportAmount = maintCosts
                                 .multipliedBy(getLength())

@@ -4869,11 +4869,9 @@ public class Campaign implements Serializable, ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
         }
         // if this is an infantry refit, then automatic success
-        if (partWork instanceof Refit && null != partWork.getUnit()
-                && partWork.getUnit().getEntity() instanceof Infantry
-                && !(partWork.getUnit().getEntity() instanceof BattleArmor)) {
-            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS,
-                    "infantry refit");
+        if ((partWork instanceof Refit) && (partWork.getUnit() != null)
+                && partWork.getUnit().isConventionalInfantry()) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "infantry refit");
         }
 
         //if we are using the MoF rule, then we will ignore mode penalty here

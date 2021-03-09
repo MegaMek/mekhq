@@ -1513,6 +1513,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 driverEntityWeightMenu.add(cbMenuItem);
                             }
                         }
+
                         if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                             cbMenuItem.setSelected(unit.equals(person.getUnit()));
@@ -1520,6 +1521,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             cbMenuItem.addActionListener(this);
                             gunnerEntityWeightMenu.add(cbMenuItem);
                         }
+
                         if (unit.canTakeMoreVesselCrew()
                                 && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
                                 || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
@@ -1529,6 +1531,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             cbMenuItem.addActionListener(this);
                             crewEntityWeightMenu.add(cbMenuItem);
                         }
+
                         if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                             cbMenuItem.setSelected(unit.equals(person.getUnit()));
@@ -1536,6 +1539,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             cbMenuItem.addActionListener(this);
                             navEntityWeightMenu.add(cbMenuItem);
                         }
+
                         if (unit.canTakeTechOfficer()) {
                             //For a vehicle command console we will require the commander to be a driver or a gunner, but not necessarily both
                             if (unit.getEntity() instanceof Tank) {
@@ -1624,9 +1628,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
 
                     if (StaticChecks.areAllInfantry(selected)) {
-                        if (!(unit.getEntity() instanceof Infantry) || unit.getEntity() instanceof BattleArmor) {
+                        if (!unit.isConventionalInfantry()) {
                             continue;
                         }
+
                         if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                             cbMenuItem.setSelected(unit.equals(person.getUnit()));
