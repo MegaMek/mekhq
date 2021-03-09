@@ -158,19 +158,21 @@ public class ShoppingList implements MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        if (!getShoppingList().isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "shoppingList");
-            for (IAcquisitionWork shoppingItem : getShoppingList()) {
-                //don't write refits to the shopping list - we will add them manually
-                //when we parse units and find refit kits that have not been found
-                if ((shoppingItem instanceof Part) && !(shoppingItem instanceof Refit)) {
-                    ((Part) shoppingItem).writeToXml(pw1, indent);
-                } else if (shoppingItem instanceof UnitOrder) {
-                    ((UnitOrder) shoppingItem).writeToXml(pw1, indent);
-                }
-            }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "shoppingList");
+        if (getShoppingList().isEmpty()) {
+            return;
         }
+
+        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "shoppingList");
+        for (IAcquisitionWork shoppingItem : getShoppingList()) {
+            //don't write refits to the shopping list - we will add them manually
+            //when we parse units and find refit kits that have not been found
+            if ((shoppingItem instanceof Part) && !(shoppingItem instanceof Refit)) {
+                ((Part) shoppingItem).writeToXml(pw1, indent);
+            } else if (shoppingItem instanceof UnitOrder) {
+                ((UnitOrder) shoppingItem).writeToXml(pw1, indent);
+            }
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "shoppingList");
     }
 
     public static ShoppingList generateInstanceFromXML(Node wn, Campaign c, Version version) {
