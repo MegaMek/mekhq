@@ -81,8 +81,6 @@ public class CampaignOptions implements Serializable {
     public static final int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
     public static final int REPAIR_SYSTEM_GENERIC_PARTS = 2;
 
-    public static final int MAXIMUM_D6_VALUE = 6;
-
     public static final double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
     public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;

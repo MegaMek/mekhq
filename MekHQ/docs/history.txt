@@ -1,6 +1,25 @@
 VERSION HISTORY:
 ----------------
-0.47.18 (RC4)-SNAPSHOT
+0.49.0-SNAPSHOT
++ Issue #338 Parts 1 and 2: Improved Refit Technician Selection Sort
++ Issue #2418: Ensure context menu shortcut works on our tables
++ PR #2361: Use MML's CConfig.load instead of new CConfig()
++ Issue #2415: Implementing Unit Weapon SPA Generation and Fixing Tech Level Comparisons
++ PR #2260: Implementing Save and Quit in the MekHQ exit option pane
++ Issue #2446: Calculate the scrollable block increment correctly
++ Issue #2452: Ensure a Lance's Force assignment is still valid
++ Data: New Graphical Force Icon Type Pieces
++ PR #2379: Repair Bay: Adding part name to the report when GM repairing
++ PR #2337: Shopping List No Longer Writes to XML While Empty
+
+0.48.0 (Stable) - (2021-03-05 1530 UT
++ Issue #2427: Exception during maintenance on a new day breaks MekHQ
++ Issue #2431: Fix exception exporting personnel to CSV
++ PR #2437: Hangar Report: Fixing Wrong Node Addition for Medium Wheeled
++ PR #2381: Repair Tab: Adding better information blockers for Null/Void Signature System and Chameleon Shield
++ Issue #2441: Adding Force Icon Pieces: numerous Alphanumerics and the Vehicle Assorted Type.
++ Issue #2429: Awards Documentation: Fixing Minimum Excel Version, Removing Duplicated Images, Double Spacing
++ Issue #2442: Fixing Multiple Ranks Issues
 
 0.47.17 (RC3) (2021-02-075 2015 UTC)
 + PR #2354: Don't skip ComStar as an origin faction
@@ -473,7 +492,7 @@ v0.47.0 (2019-08-21 0300 UTC)
 + PR #1227: Dropships can now load alternate munitions into artillery base if the game is configured for it
 + PR #1226: [Feature] Campaign Subset Export: export a subset of your current campaign into another, either new or existing, campaign file. Overwrites units and personnel with the same guid. Option to remove exported personnel from source campaign. Obviously make backups before using on an existing campaign.
 
-0.46.0 (2019-08-12 1900 UTC)
+0.46.0 (Stable) (2019-08-12 1900 UTC)
 + Issue 1249: Tech Names Missing in Event Log
 
 0.46.0-rc.2 (2019-08-12 0100 UTC)
