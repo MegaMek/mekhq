@@ -2139,7 +2139,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public ShoppingList goShopping(ShoppingList sList) {
         // loop through shopping items and decrement days to wait
-        for (IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {
+        for (IAcquisitionWork shoppingItem : sList.getShoppingList()) {
             shoppingItem.decrementDaysToWait();
         }
 
@@ -2161,7 +2161,7 @@ public class Campaign implements Serializable, ITechManager {
      *         acquired.
      */
     private ShoppingList goShoppingAutomatically(ShoppingList sList) {
-        List<IAcquisitionWork> currentList = new ArrayList<>(sList.getAllShoppingItems());
+        List<IAcquisitionWork> currentList = new ArrayList<>(sList.getShoppingList());
 
         List<IAcquisitionWork> remainingItems = new ArrayList<>(currentList.size());
         for (IAcquisitionWork shoppingItem : currentList) {
@@ -2196,7 +2196,7 @@ public class Campaign implements Serializable, ITechManager {
             return sList;
         }
 
-        List<IAcquisitionWork> currentList = new ArrayList<>(sList.getAllShoppingItems());
+        List<IAcquisitionWork> currentList = new ArrayList<>(sList.getShoppingList());
         for (Person person : logisticsPersonnel) {
             if (currentList.isEmpty()) {
                 // Nothing left to shop for!
@@ -2240,7 +2240,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // we are shopping by planets, so more involved
-        List<IAcquisitionWork> currentList = sList.getAllShoppingItems();
+        List<IAcquisitionWork> currentList = sList.getShoppingList();
         LocalDate currentDate = getLocalDate();
 
         // a list of items than can be taken out of the search and put back on the
