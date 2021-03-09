@@ -86,7 +86,6 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
-import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -366,7 +365,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 // the old parts list here.
                 if (oPart instanceof LargeCraftAmmoBin
                         && part instanceof LargeCraftAmmoBin
-                        && ((LargeCraftAmmoBin) oPart).getType() == ((LargeCraftAmmoBin) part).getType()) {
+                        && ((LargeCraftAmmoBin) oPart).getType().equals(((LargeCraftAmmoBin) part).getType())) {
                     lcBinsToChange.add(oPart);
                 }
 
@@ -551,40 +550,21 @@ public class Refit extends Part implements IAcquisitionWork {
                 //armor always gets added to the shopping list - it will be checked for differently
                 //NOT ANYMORE - I think this is overkill, lets just reuse existing armor parts
             } else if (nPart instanceof AmmoBin) {
-                AmmoType type = (AmmoType) ((AmmoBin) nPart).getType();
+                AmmoBin ammoBin = (AmmoBin) nPart;
+                AmmoType type = ammoBin.getType();
+
+                ammoNeeded.merge(type, ammoBin.getFullShots(), Integer::sum);
+                shoppingList.add(nPart);
+
                 if (nPart instanceof LargeCraftAmmoBin) {
-                    ammoNeeded.merge(type, ((LargeCraftAmmoBin) nPart).getFullShots(), Integer::sum);
                     // Adding ammo requires base 15 minutes per ton of ammo or 60 minutes per capital missile
                     if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE) || type.hasFlag(AmmoType.F_SCREEN)) {
-                        time += 60 * ((LargeCraftAmmoBin) nPart).getFullShots();
+                        time += 60 * ammoBin.getFullShots();
                     } else {
                         time += (int) Math.ceil(15 * Math.max(1, nPart.getTonnage()));
                     }
-                    shoppingList.add(nPart);
                 } else {
                     time += 120;
-                    ammoNeeded.merge(type, type.getShots(), Integer::sum);
-                    //check for ammo bins in storage to avoid the proliferation of infinite ammo bins
-                    MissingAmmoBin mab = (MissingAmmoBin)nPart.getMissingPart();
-                    Part replacement = mab.findReplacement(true);
-                    //check quantity
-                    //TODO: the one weakness here is that we will not pick up damaged parts
-                    if ((null != replacement) && (null == partQuantity.get(replacement))) {
-                        partQuantity.put(replacement, replacement.getQuantity());
-                    }
-
-                    if ((null != replacement) && (partQuantity.get(replacement) > 0)) {
-                        newUnitParts.add(replacement);
-                        //adjust quantity
-                        partQuantity.put(replacement, partQuantity.get(replacement)-1);
-                        //If the quantity is now 0 set usedForRefitPlanning flag so findReplacement ignores this item
-                        if (partQuantity.get(replacement) == 0) {
-                            replacement.setUsedForRefitPlanning(true);
-                            plannedReplacementParts.add(replacement);
-                        }
-                    } else {
-                        shoppingList.add(nPart);
-                    }
                 }
             } else if (nPart instanceof SpacecraftCoolingSystem) {
                 int sinkType = ((SpacecraftCoolingSystem)nPart).getSinkType();
@@ -805,7 +785,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
             if (oPart instanceof AmmoBin) {
                 int remainingShots = ((AmmoBin)oPart).getFullShots() - ((AmmoBin)oPart).getShotsNeeded();
-                AmmoType type = (AmmoType)((AmmoBin)oPart).getType();
+                AmmoType type = ((AmmoBin) oPart).getType();
                 if (remainingShots > 0) {
                     if (oPart instanceof LargeCraftAmmoBin) {
                         if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE) || type.hasFlag(AmmoType.F_SCREEN)) {
@@ -862,7 +842,7 @@ public class Refit extends Part implements IAcquisitionWork {
         //TODO: use ammo removed from the old unit in the case of changing between full ton and half
         //ton MG or OS/regular.
         for (AmmoType type : ammoNeeded.keySet()) {
-            int shotsNeeded = Math.max(ammoNeeded.get(type) - AmmoBin.getAmountAvailable(campaign, type), 0);
+            int shotsNeeded = Math.max(ammoNeeded.get(type) - campaign.getQuartermaster().getAmmoAvailable(type), 0);
             int shotsPerTon = type.getShots();
             if ((shotsNeeded > 0) && (shotsPerTon > 0)) {
                 cost = cost.plus(Money.of(type.getCost(newEntity, false, -1) * ((double) shotsNeeded / shotsPerTon)));
@@ -1052,7 +1032,7 @@ public class Refit extends Part implements IAcquisitionWork {
             if (part instanceof AmmoBin) {
                 AmmoBin bin = (AmmoBin) part;
                 bin.setShotsNeeded(bin.getFullShots());
-                shotsNeeded.merge((AmmoType) bin.getType(), bin.getShotsNeeded(), Integer::sum);
+                shotsNeeded.merge(bin.getType(), bin.getShotsNeeded(), Integer::sum);
             }
         }
 
@@ -1065,42 +1045,35 @@ public class Refit extends Part implements IAcquisitionWork {
                 newUnitParts.add(part);
                 AmmoBin bin = (AmmoBin) part;
                 bin.setShotsNeeded(bin.getFullShots());
-                shotsNeeded.merge((AmmoType) bin.getType(), bin.getShotsNeeded(), Integer::sum);
+                shotsNeeded.merge(bin.getType(), bin.getShotsNeeded(), Integer::sum);
                 iter.remove();
             }
         }
 
         // If we need ammunition, put it into two buckets:
-        // 1. Shots to buy
-        // 2. Shots from the warehouse
+        // 1. Shots from the warehouse
+        // 2. Shots to buy
         for (AmmoType atype : shotsNeeded.keySet()) {
-            int needed = shotsNeeded.get(atype);
-            int available = AmmoBin.getAmountAvailable(campaign, atype);
+            int shotsToBuy = shotsNeeded.get(atype);
 
-            // Add to our shopping list however many shots we need to purchase
-            int shotsToBuy = Math.max(0, shotsNeeded.get(atype) - available);
-            if (shotsToBuy > 0) {
-                int tons = (int) Math.ceil((double) shotsToBuy / atype.getShots());
-                AmmoStorage ammo = new AmmoStorage(0, atype, atype.getShots() * tons, campaign);
+            // Try pulling from our stock ...
+            int shotsRemoved = campaign.getQuartermaster().removeAmmo(atype, shotsToBuy);
+            if (shotsRemoved > 0) {
+                shotsToBuy -= shotsRemoved;
 
-                newUnitParts.add(ammo);
-                shoppingList.add(ammo);
-
-                // Reduce the amount we need by the amount we bought
-                needed -= shotsToBuy;
-            }
-
-            // Now we can go through our available inventory and snag them
-            if (needed > 0) {
-                // pull from our stock...
-                AmmoBin.changeAmountAvailable(campaign, -needed, atype);
-
-                // ...and add that to our list of new unit parts
-                int tons = (int) Math.ceil((double) needed / atype.getShots());
-                AmmoStorage ammo = new AmmoStorage(tons, atype, atype.getShots() * tons, campaign);
+                // ... and add that to our list of new unit parts.
+                AmmoStorage ammo = new AmmoStorage(0, atype, shotsRemoved, campaign);
                 ammo.setRefitUnit(oldUnit);
                 campaign.getQuartermaster().addPart(ammo, 0);
                 newUnitParts.add(ammo);
+            }
+
+            // Add to our shopping list however many shots we need to purchase
+            if (shotsToBuy > 0) {
+                int tons = (int) Math.ceil((double) shotsToBuy / atype.getShots());
+                AmmoStorage ammo = new AmmoStorage(0, atype, tons * atype.getShots(), campaign);
+                newUnitParts.add(ammo);
+                shoppingList.add(ammo);
             }
         }
 
@@ -1127,8 +1100,10 @@ public class Refit extends Part implements IAcquisitionWork {
                     part.setRefitUnit(oldUnit);
                     getCampaign().getQuartermaster().addPart(part, 0);
                     newUnitParts.add(part);
+
+                    // Check if we need more ammo
                     if (bin.needsFixing()) {
-                        getCampaign().getShoppingList().addShoppingItem(bin, 1, getCampaign());
+                        getCampaign().getShoppingList().addShoppingItem(bin.getNewPart(), 1, getCampaign());
                     }
                 }
                 else if (part instanceof IAcquisitionWork) {
@@ -1300,16 +1275,6 @@ public class Refit extends Part implements IAcquisitionWork {
     public void cancel() {
         oldUnit.setRefit(null);
 
-        // Return our reserved ammo back to the campaign
-        for (Part part : newUnitParts) {
-            if (part instanceof AmmoStorage) {
-                // merge back into the campaign
-                AmmoStorage ammoStorage = (AmmoStorage) part;
-                AmmoBin.changeAmountAvailable(campaign, ammoStorage.getShots(), (AmmoType) ammoStorage.getType());
-                getCampaign().getWarehouse().removePart(part);
-            }
-        }
-
         for (Part part : newUnitParts) {
             part.setRefitUnit(null);
 
@@ -1320,11 +1285,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     ((AmmoBin) part).unload();
                     getCampaign().getWarehouse().removePart(part);
                 } else {
-                    Part spare = getCampaign().getWarehouse().checkForExistingSparePart(part);
-                    if (null != spare) {
-                        spare.incrementQuantity();
-                        getCampaign().getWarehouse().removePart(part);
-                    }
+                    getCampaign().getQuartermaster().addPart(part, 0);
                 }
             }
         }
@@ -1485,9 +1446,10 @@ public class Refit extends Part implements IAcquisitionWork {
                     continue;
                 }
             } else if (part instanceof AmmoStorage) {
+                // FIXME: why are we merging this back in?!
                 // merge back into the campaign before completing the refit
                 AmmoStorage ammoStorage = (AmmoStorage) part;
-                AmmoBin.changeAmountAvailable(campaign, ammoStorage.getShots(), (AmmoType) ammoStorage.getType());
+                getCampaign().getQuartermaster().addAmmo(ammoStorage.getType(), ammoStorage.getShots());
                 getCampaign().getWarehouse().removePart(part);
                 continue;
             }
@@ -1517,15 +1479,17 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         for (Part p : newParts) {
-            if (p instanceof LargeCraftAmmoBin) {
+            if (p instanceof AmmoBin) {
                 //All large craft ammo got unloaded into the warehouse earlier, though the part IDs have now changed.
                 //Consider all LC ammobins empty and load them back up.
-                ((AmmoBin) p).setShotsNeeded(((AmmoBin) p).getFullShots());
-                ((AmmoBin) p).loadBin();
-            } else if (p instanceof AmmoBin) {
+                if (p instanceof LargeCraftAmmoBin) {
+                    ((AmmoBin) p).setShotsNeeded(((AmmoBin) p).getFullShots());
+                }
+
                 ((AmmoBin) p).loadBin();
             }
         }
+        
         if (null != newArmorSupplies) {
             getCampaign().getWarehouse().removePart(newArmorSupplies);
         }
@@ -1594,23 +1558,23 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
+        String fileNameCampaign;
         try {
             if (newEntity instanceof Mech) {
-                //if this file already exists then don't overwrite it or we will end up with a bunch of copies
+                // if this file already exists then don't overwrite it or we will end up with a bunch of copies
                 String fileOutName = sCustomsDir + File.separator + fileName + ".mtf";
-                String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
+                fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
                 if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
                     throw new IOException("A file already exists with the custom name "+fileNameCampaign+". Please choose a different name. (Unit name and/or model)");
                 }
-                FileOutputStream out = new FileOutputStream(fileNameCampaign);
-                PrintStream p = new PrintStream(out);
-                p.println(((Mech) newEntity).getMtf());
-                p.close();
-                out.close();
+                try (FileOutputStream out = new FileOutputStream(fileNameCampaign);
+                    PrintStream p = new PrintStream(out)) {
+                    p.println(((Mech) newEntity).getMtf());
+                }
             } else {
-                //if this file already exists then don't overwrite it or we will end up with a bunch of copies
+                // if this file already exists then don't overwrite it or we will end up with a bunch of copies
                 String fileOutName = sCustomsDir + File.separator + fileName + ".blk";
-                String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
+                fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
                 if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
                     throw new IOException("A file already exists with the custom name "+fileNameCampaign+". Please choose a different name. (Unit name and/or model)");
                 }
@@ -1618,17 +1582,43 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
-        }
-        getCampaign().addCustom(newEntity.getChassis() + " " + newEntity.getModel());
-        MechSummaryCache.getInstance().loadMechData();
-        //I need to change the new entity to the one from the mtf file now, so that equip
-        //numbers will match
-        MechSummary summary = MechSummaryCache.getInstance().getMech(newEntity.getChassis() + " " + newEntity.getModel());
-        if (null == summary) {
-            throw(new EntityLoadingException());
+            fileNameCampaign = null;
         }
 
-        newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+        getCampaign().addCustom(newEntity.getChassis() + " " + newEntity.getModel());
+
+        try {
+            MechSummaryCache.getInstance().loadMechData();
+
+            // I need to change the new entity to the one from the mtf file now, so that equipment numbers will match
+
+            MechSummary summary = MechSummaryCache.getInstance().getMech(newEntity.getChassis() + " " + newEntity.getModel());
+            if (null == summary) {
+                throw new EntityLoadingException(String.format("Could not load %s %s from the mech cache",
+                        newEntity.getChassis(), newEntity.getModel()));
+            }
+
+            newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+            MekHQ.getLogger().info(String.format("Saved %s %s to %s",
+                    newEntity.getChassis(), newEntity.getModel(), summary.getSourceFile()));
+        } catch (EntityLoadingException e) {
+            MekHQ.getLogger().error(String.format("Could not read back refit entity %s %s", 
+                    newEntity.getChassis(), newEntity.getModel()), e);
+
+            if (fileNameCampaign != null) {
+                MekHQ.getLogger().warning("Deleting invalid refit file " + fileNameCampaign);
+                try {
+                    new File(fileNameCampaign).delete();
+                } catch (SecurityException se) {
+                    MekHQ.getLogger().warning("Could not clean up bad refit file " + fileNameCampaign, se);
+                }
+            }
+
+            // Reload the mech cache if we had to delete the file
+            MechSummaryCache.getInstance().loadMechData();
+
+            throw e;
+        }
     }
 
     private int getTimeMultiplier() {

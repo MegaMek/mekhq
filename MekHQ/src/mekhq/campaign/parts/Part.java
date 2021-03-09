@@ -23,14 +23,17 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.finances.Money;
 
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -67,7 +70,7 @@ import mekhq.campaign.work.WorkTime;
  * calls to unit, you should always check to make sure it is not null.
  *
  * There are two kinds of parts: Part and MissingPart. The latter is used as a placeholder on a unit to
- * indicate it is missing the given part. When parts are removed from a unit, they shold be replaced
+ * indicate it is missing the given part. When parts are removed from a unit, they should be replaced
  * with the appropriate missing part which will remind MHQ that a replacement needs to be done.
  *
  * Parts implement IPartWork and MissingParts also implement IAcquisitionWork. These interfaces allow for
@@ -77,20 +80,6 @@ import mekhq.campaign.work.WorkTime;
  */
 public abstract class Part implements Serializable, MekHqXmlSerializable, IPartWork, ITechnology {
     private static final long serialVersionUID = 6185232893259168810L;
-    public static final int PART_TYPE_ARMOR = 0;
-    public static final int PART_TYPE_WEAPON = 1;
-    public static final int PART_TYPE_AMMO = 2;
-    public static final int PART_TYPE_EQUIPMENT_PART = 3;
-    public static final int PART_TYPE_MEK_ACTUATOR = 4;
-    public static final int PART_TYPE_MEK_ENGINE = 5;
-    public static final int PART_TYPE_MEK_GYRO = 6;
-    public static final int PART_TYPE_MEK_LIFE_SUPPORT = 7;
-    public static final int PART_TYPE_MEK_BODY_PART = 8;
-    public static final int PART_TYPE_MEK_SENSOR = 9;
-    public static final int PART_TYPE_GENERIC_SPARE_PART = 10;
-    public static final int PART_TYPE_OTHER = 11;
-    public static final int PART_TYPE_MEK_COCKPIT = 12;
-    public static final int PART_TYPE_OMNI_SPACE = 13;
 
     public static final int T_UNKNOWN = -1;
     public static final int T_BOTH = 0;
@@ -104,28 +93,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public static final int QUALITY_E = 4;
     public static final int QUALITY_F = 5;
 
-    public interface REPAIR_PART_TYPE {
-        int ARMOR = 0;
-        int AMMO = 1;
-        int WEAPON = 2;
-        int GENERAL_LOCATION = 3;
-        int ENGINE = 4;
-        int GYRO = 5;
-        int ACTUATOR = 6;
-        int ELECTRONICS = 7;
-        int GENERAL = 8;
-        int HEATSINK = 9;
-        int MEK_LOCATION = 10;
-        int PHYSICAL_WEAPON = 11;
-        int POD_SPACE = 12;
-    }
-
     protected static final String NL = System.lineSeparator();
-
-    private static final String[] partTypeLabels = { "Armor", "Weapon", "Ammo",
-            "Equipment Part", "Mek Actuator", "Mek Engine", "Mek Gyro",
-            "Mek Life Support", "Mek Body Part", "Mek Sensor",
-            "Generic Spare Part", "Other", "Mek Cockpit", "Pod Space" };
 
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
@@ -133,10 +101,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
             .setTechRating(RATING_C).setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
-
-    public static String[] getPartTypeLabels() {
-        return partTypeLabels;
-    }
 
     protected String name;
     protected int id;
@@ -220,6 +184,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     /** The part which will be used as a replacement */
     private Part replacementPart;
+
+    protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
+            new EncodeControl());
 
     public Part() {
         this(0, false, null);
@@ -437,8 +404,23 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return toReturn;
     }
 
+    /**
+     * Gets the number of hits on the part.
+     */
     public int getHits() {
         return hits;
+    }
+
+    /**
+     * Sets the number of hits on the part.
+     * 
+     * NOTE: It is the caller's responsibilty to update the condition
+     * of the part and any attached unit.
+     * 
+     * @param hits The number of hits on the part.
+     */
+    public void setHits(int hits) {
+        this.hits = Math.max(hits, 0);
     }
 
     public String getDesc() {
@@ -962,23 +944,23 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         }
         if (null != tech
                 && tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
-                && (IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.WEAPON
-                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON)) {
+                && (IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON
+                || IPartWork.findCorrectMassRepairType(this) == PartRepairType.PHYSICAL_WEAPON)) {
             mods.addModifier(-1, "Weapon specialist");
         }
         if (null != tech
                 && tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
-                        && IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.ARMOR) {
+                        && IPartWork.findCorrectRepairType(this) == PartRepairType.ARMOR) {
             mods.addModifier(-1, "Armor specialist");
         }
         if (null != tech
                 && tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
-                && (IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.ACTUATOR
-                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.ELECTRONICS
-                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.ENGINE
-                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.GYRO
-                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.MEK_LOCATION
-                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.GENERAL_LOCATION)) {
+                && (IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR
+                || IPartWork.findCorrectMassRepairType(this) == PartRepairType.ELECTRONICS
+                || IPartWork.findCorrectMassRepairType(this) == PartRepairType.ENGINE
+                || IPartWork.findCorrectMassRepairType(this) == PartRepairType.GYRO
+                || IPartWork.findCorrectMassRepairType(this) == PartRepairType.MEK_LOCATION
+                || IPartWork.findCorrectMassRepairType(this) == PartRepairType.GENERAL_LOCATION)) {
             mods.addModifier(-1, "Internal specialist");
         }
 
@@ -1096,18 +1078,18 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return REPAIR_PART_TYPE.GENERAL;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.GENERAL;
     }
 
     @Override
-    public int getRepairPartType() {
+    public PartRepairType getRepairPartType() {
         return getMassRepairOptionType();
     }
 
     @Override
     public void fix() {
-        hits = 0;
+        setHits(0);
         resetRepairSettings();
     }
 
@@ -1429,7 +1411,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public void doMaintenanceDamage(int d) {
-        hits += d;
+        setHits(getHits() + d);
         updateConditionFromPart();
         updateConditionFromEntity(false);
     }
@@ -1561,73 +1543,50 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(getName());
-        sb.append(" "); //$NON-NLS-1$
+        sb.append(" ");
         sb.append(getDetails());
-        sb.append(", q: "); //$NON-NLS-1$
+        sb.append(", q: ");
         sb.append(quantity);
         if (null != unit) {
-            sb.append(", mounted: "); //$NON-NLS-1$
+            sb.append(", mounted: ");
             sb.append(unit);
         }
         return sb.toString();
     }
 
-    public static String getRepairTypeShortName(int type) {
-        switch (type) {
-            case Part.REPAIR_PART_TYPE.ARMOR:
-                return "Armor";
-            case Part.REPAIR_PART_TYPE.AMMO:
-                return "Ammo";
-            case Part.REPAIR_PART_TYPE.WEAPON:
-                return "Weapons";
-            case Part.REPAIR_PART_TYPE.GENERAL_LOCATION:
-                return "Locations";
-            case Part.REPAIR_PART_TYPE.ENGINE:
-                return "Engines";
-            case Part.REPAIR_PART_TYPE.GYRO:
-                return "Gyros";
-            case Part.REPAIR_PART_TYPE.ACTUATOR:
-                return "Actuators";
-            case Part.REPAIR_PART_TYPE.ELECTRONICS:
-                return "Cockpit/Life Support/Sensors";
-            default:
-                return "Other Items";
-        }
-    }
-
     public static String[] findPartImage(IPartWork part) {
         String imgBase = null;
-        int repairType = IPartWork.findCorrectRepairType(part);
+        PartRepairType repairType = IPartWork.findCorrectRepairType(part);
 
         switch (repairType) {
-            case Part.REPAIR_PART_TYPE.ARMOR:
+            case ARMOR:
                 imgBase = "armor";
                 break;
-            case Part.REPAIR_PART_TYPE.AMMO:
+            case AMMO:
                 imgBase = "ammo";
                 break;
-            case Part.REPAIR_PART_TYPE.ACTUATOR:
+            case ACTUATOR:
                 imgBase = "actuator";
                 break;
-            case Part.REPAIR_PART_TYPE.ENGINE:
+            case ENGINE:
                 imgBase = "engine";
                 break;
-            case Part.REPAIR_PART_TYPE.ELECTRONICS:
+            case ELECTRONICS:
                 imgBase = "electronics";
                 break;
-            case Part.REPAIR_PART_TYPE.HEATSINK:
+            case HEAT_SINK:
                 imgBase = "heatsink";
                 break;
-            case Part.REPAIR_PART_TYPE.WEAPON:
+            case WEAPON:
                 EquipmentType equipmentType = null;
 
                 if (part instanceof EquipmentPart) {
-                    equipmentType = ((EquipmentPart)part).getType();
+                    equipmentType = ((EquipmentPart) part).getType();
                 } else if (part instanceof MissingEquipmentPart) {
-                    equipmentType = ((MissingEquipmentPart)part).getType();
+                    equipmentType = ((MissingEquipmentPart) part).getType();
                 }
 
-                if (null != equipmentType) {
+                if (equipmentType != null) {
                     if (equipmentType.hasFlag(WeaponType.F_LASER)) {
                         imgBase = "laser";
                     } else if (equipmentType.hasFlag(WeaponType.F_MISSILE)) {
@@ -1640,16 +1599,18 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 }
 
                 break;
-            case Part.REPAIR_PART_TYPE.MEK_LOCATION:
-            case Part.REPAIR_PART_TYPE.POD_SPACE:
+            case MEK_LOCATION:
+            case POD_SPACE:
                 imgBase = "location_mek";
                 break;
-            case Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON:
+            case PHYSICAL_WEAPON:
                 imgBase = "melee";
+                break;
+            default:
                 break;
         }
 
-        if (null == imgBase) {
+        if (imgBase == null) {
             imgBase = "equipment";
         }
 
@@ -1853,8 +1814,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             int id = parentPart.getId();
             parentPart = campaign.getWarehouse().getPart(id);
             if ((parentPart == null) && (id > 0)) {
-                MekHQ.getLogger().error(
-                    String.format("Part %d ('%s') references missing parent part %d",
+                MekHQ.getLogger().error(String.format("Part %d ('%s') references missing parent part %d",
                         getId(), getName(), id));
             }
         }
@@ -1866,8 +1826,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 if (realPart != null) {
                     childParts.set(ii, realPart);
                 } else if (childPart.getId() > 0) {
-                    MekHQ.getLogger().error(
-                        String.format("Part %d ('%s') references missing child part %d",
+                    MekHQ.getLogger().error(String.format("Part %d ('%s') references missing child part %d",
                             getId(), getName(), childPart.getId()));
                     childParts.remove(ii);
                 }
@@ -1878,8 +1837,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             UUID id = tech.getId();
             tech = campaign.getPerson(id);
             if (tech == null) {
-                MekHQ.getLogger().error(
-                    String.format("Part %d ('%s') references missing tech %s",
+                MekHQ.getLogger().error(String.format("Part %d ('%s') references missing tech %s",
                         getId(), getName(), id));
             }
         }
@@ -1887,8 +1845,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             UUID id = reservedBy.getId();
             reservedBy = campaign.getPerson(id);
             if (reservedBy == null) {
-                MekHQ.getLogger().error(
-                    String.format("Part %d ('%s') references missing tech (reservation) %s",
+                MekHQ.getLogger().error(String.format("Part %d ('%s') references missing tech (reservation) %s",
                         getId(), getName(), id));
             }
         }
@@ -2003,7 +1960,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public static class PartPersonRef extends Person {
-
         private static final long serialVersionUID = 1L;
 
         private PartPersonRef(UUID id) {

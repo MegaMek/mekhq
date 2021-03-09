@@ -56,7 +56,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
         // from there.
         for (Part part : unit.getParts()) {
             if ((part instanceof InfantryAmmoBin)
-                    && (((AmmoType) ((InfantryAmmoBin) part).getType()).getMunitionType() == AmmoType.M_INFERNO)) {
+                    && (((InfantryAmmoBin) part).getType().getMunitionType() == AmmoType.M_INFERNO)) {
                 WeaponRow row = new WeaponRow((InfantryAmmoBin) part);
                 rows.add(row);
                 panMain.add(row);
@@ -102,14 +102,14 @@ public class SmallSVAmmoSwapDialog extends JDialog {
             this.infernoBin = infernoBin;
             this.standardBin = infernoBin.findPartnerBin();
             if (standardBin != null) {
-                totalClips = (int) (infernoBin.getSize() + standardBin.getSize());
+                totalClips = infernoBin.getClips() + standardBin.getClips();
             }
             initUI(String.format("%s (%s)", infernoBin.getWeaponType().getName(),
                     infernoBin.getUnit().getEntity().getLocationAbbr(infernoBin.getLocation())));
         }
 
         private void initUI(String title) {
-            spnInferno.setModel(new SpinnerNumberModel((int) infernoBin.getSize(), 0, totalClips, 1));
+            spnInferno.setModel(new SpinnerNumberModel(infernoBin.getClips(), 0, totalClips, 1));
             setLayout(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.anchor = GridBagConstraints.WEST;
@@ -130,7 +130,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
             if (standardBin != null) {
                 add(new JLabel(resourceMap.getString("standard")), gbc);
                 gbc.gridx++;
-                lblStandardClips.setText(String.valueOf((int) standardBin.getSize()));
+                lblStandardClips.setText(String.valueOf(standardBin.getClips()));
                 add(lblStandardClips, gbc);
                 gbc.gridx++;
                 add(new JLabel(resourceMap.getString("inferno")), gbc);

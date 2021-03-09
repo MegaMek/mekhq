@@ -12,18 +12,18 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -38,12 +38,7 @@ import mekhq.campaign.Campaign;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-
 public class InfantryArmorPart extends Part {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 8298691936947743373L;
 
     private double damageDivisor;
@@ -72,15 +67,15 @@ public class InfantryArmorPart extends Part {
 
     private void assignName() {
         String heavyString = "";
-        if(damageDivisor > 1) {
+        if (damageDivisor > 1) {
             heavyString = "Heavy ";
         }
         String baseName = "Armor Kit";
-        if(isDest()) {
+        if (isDest()) {
             baseName = "DEST Infiltration Suit";
-        } else if(isSneakCamo() || isSneakECM() || isSneakIR()) {
+        } else if (isSneakCamo() || isSneakECM() || isSneakIR()) {
             baseName = "Sneak Suit";
-        } else if(isSpaceSuit()) {
+        } else if (isSpaceSuit()) {
             baseName = "Space Suit";
         }
 
@@ -95,23 +90,23 @@ public class InfantryArmorPart extends Part {
     @Override
     public String getDetails(boolean includeRepairDetails) {
         String details = "";
-        if(isEncumbering()) {
+        if (isEncumbering()) {
             details += "encumbering";
         }
-        if(isSneakCamo()) {
-            if(!details.equals("")) {
+        if (isSneakCamo()) {
+            if (!details.equals("")) {
                 details += ", ";
             }
             details += "camo";
         }
-        if(isSneakECM()) {
-            if(!details.equals("")) {
+        if (isSneakECM()) {
+            if (!details.equals("")) {
                 details += ", ";
             }
             details += "ECM";
         }
-        if(isSneakIR()) {
-            if(!details.equals("")) {
+        if (isSneakIR()) {
+            if (!details.equals("")) {
                 details += ", ";
             }
             details += "IR";
@@ -141,13 +136,13 @@ public class InfantryArmorPart extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit) {
+        if (null != unit) {
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 int number = quantity;
-                while(number > 0) {
+                while (number > 0) {
                     spare.incrementQuantity();
                     number--;
                 }
@@ -176,38 +171,35 @@ public class InfantryArmorPart extends Part {
     @Override
     public Money getStickerPrice() {
         double price = 0;
-        if(damageDivisor > 1) {
-            if(isEncumbering()) {
+        if (damageDivisor > 1) {
+            if (isEncumbering()) {
                 price += 1600;
             } else {
                 price += 4300;
             }
         }
         int nSneak = 0;
-        if(isSneakCamo()) {
+        if (isSneakCamo()) {
             nSneak++;
         }
-        if(isSneakECM()) {
+        if (isSneakECM()) {
             nSneak++;
         }
-        if(isSneakIR()) {
+        if (isSneakIR()) {
             nSneak++;
         }
 
-        if(isDest()) {
+        if (isDest()) {
             price += 50000;
-        }
-        else if(nSneak == 1) {
+        } else if (nSneak == 1) {
             price += 7000;
-        }
-        else if(nSneak == 2) {
+        } else if (nSneak == 2) {
             price += 21000;
-        }
-        else if(nSneak == 3) {
+        } else if (nSneak == 3) {
             price += 28000;
         }
 
-        if(isSpaceSuit()) {
+        if (isSpaceSuit()) {
             price += 5000;
         }
 
@@ -222,7 +214,7 @@ public class InfantryArmorPart extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof InfantryArmorPart
+        return getClass().equals(part.getClass())
                 && damageDivisor == ((InfantryArmorPart)part).getDamageDivisor()
                 && dest == ((InfantryArmorPart)part).isDest()
                 && encumbering == ((InfantryArmorPart)part).isEncumbering()
@@ -351,8 +343,8 @@ public class InfantryArmorPart extends Part {
     }
 
     @Override
-    public int getMassRepairOptionType() {
-        return Part.REPAIR_PART_TYPE.ARMOR;
+    public PartRepairType getMassRepairOptionType() {
+        return PartRepairType.ARMOR;
     }
 }
 

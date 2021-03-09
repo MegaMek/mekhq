@@ -22,11 +22,11 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import mekhq.Version;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
@@ -79,8 +79,6 @@ public class CampaignOptions implements Serializable {
     public static final int REPAIR_SYSTEM_STRATOPS = 0;
     public static final int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
     public static final int REPAIR_SYSTEM_GENERIC_PARTS = 2;
-
-    public static final int MAXIMUM_D6_VALUE = 6;
 
     public static final double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
     public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
@@ -232,7 +230,6 @@ public class CampaignOptions implements Serializable {
     private BabySurnameStyle babySurnameStyle;
     private boolean determineFatherAtBirth;
     private FamilialRelationshipDisplayLevel displayFamilyLevel;
-    private boolean useRandomDeaths;
     private boolean keepMarriedNameUponSpouseDeath;
 
     //salary
@@ -417,8 +414,8 @@ public class CampaignOptions implements Serializable {
         massRepairReplacePod = true;
         massRepairOptions = new ArrayList<>();
 
-        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-            massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
+        for (PartRepairType type : PartRepairType.values()) {
+            massRepairOptions.add(new MassRepairOption(type));
         }
         //endregion Unlisted Variables
 
@@ -576,7 +573,6 @@ public class CampaignOptions implements Serializable {
         babySurnameStyle = BabySurnameStyle.MOTHERS;
         determineFatherAtBirth = false;
         displayFamilyLevel = FamilialRelationshipDisplayLevel.SPOUSE;
-        useRandomDeaths = true;
         keepMarriedNameUponSpouseDeath = true;
 
         //Salary
@@ -1504,22 +1500,6 @@ public class CampaignOptions implements Serializable {
      */
     public void setDisplayFamilyLevel(FamilialRelationshipDisplayLevel displayFamilyLevel) {
         this.displayFamilyLevel = displayFamilyLevel;
-    }
-
-    /**
-     * TODO : Finish implementing me
-     * @return whether or not to use random deaths
-     */
-    public boolean useRandomDeaths() {
-        return useRandomDeaths;
-    }
-
-    /**
-     * TODO : Finish implementing me
-     * @param b whether or not to use random deaths
-     */
-    public void setUseRandomDeaths(boolean b) {
-        useRandomDeaths = b;
     }
 
     /**
@@ -3014,27 +2994,12 @@ public class CampaignOptions implements Serializable {
     }
 
     public void addMassRepairOption(MassRepairOption mro) {
-        if (mro.getType() == -1) {
+        if (mro.getType() == PartRepairType.UNKNOWN_LOCATION) {
             return;
         }
 
-        int foundIdx = -1;
-
-        for (int i = 0; i < massRepairOptions.size(); i++) {
-            if (massRepairOptions.get(i).getType() == mro.getType()) {
-                foundIdx = i;
-                break;
-            }
-        }
-
-        if (foundIdx == -1) {
-            massRepairOptions.add(mro);
-        } else {
-            massRepairOptions.add(foundIdx, mro);
-            massRepairOptions.remove(foundIdx + 1);
-        }
-
-        massRepairOptions.sort(Comparator.comparingInt(MassRepairOption::getType));
+        getMassRepairOptions().removeIf(massRepairOption -> massRepairOption.getType() == mro.getType());
+        getMassRepairOptions().add(mro);
     }
     //endregion Mass Repair/ Mass Salvage
 
@@ -3196,7 +3161,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "determineFatherAtBirth", determineFatherAtBirth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomDeaths", useRandomDeaths);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "keepMarriedNameUponSpouseDeath", keepMarriedNameUponSpouseDeath);
         //endregion family
 
@@ -3670,8 +3634,6 @@ public class CampaignOptions implements Serializable {
                 retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
                 retVal.setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDeaths")) {
-                retVal.useRandomDeaths = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
                 retVal.keepMarriedNameUponSpouseDeath = Boolean.parseBoolean(wn2.getTextContent().trim());
             //endregion Family
@@ -3976,7 +3938,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
                 retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
-                retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2));
+                retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
             }
         }
 

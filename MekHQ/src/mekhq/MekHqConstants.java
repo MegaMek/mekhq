@@ -64,6 +64,11 @@ public final class MekHqConstants {
     public static final String SAVE_MOTHBALL_STATE = "saveMothballState";
     //endregion Campaign XML Save Options
 
+    //region File Paths
+    public static final String FILE_PATH_NODE = "mekhq/prefs/filepaths";
+    public static final String AWARDS_DIRECTORY_PATH = "awardsDirectoryPath";
+    //endregion File Paths
+
     //region Miscellaneous Options
     public static final String MISCELLANEOUS_NODE = "mekhq/prefs/miscellaneous";
     public static final String START_GAME_DELAY = "startGameDelay";
@@ -72,4 +77,6 @@ public final class MekHqConstants {
 
     /** This is used in creating the name of save files, e.g. the MekHQ campaign file */
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
+
+    public static final int MAXIMUM_D6_VALUE = 6;
 }

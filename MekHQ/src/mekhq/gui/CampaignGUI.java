@@ -569,7 +569,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem menuSave = new JMenuItem(resourceMap.getString("menuSave.text")); // NOI18N
         menuSave.setMnemonic(KeyEvent.VK_S);
-        menuSave.addActionListener(this::menuSaveXmlActionPerformed);
+        menuSave.addActionListener(this::saveCampaign);
         menuFile.add(menuSave);
 
         JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
@@ -1074,8 +1074,7 @@ public class CampaignGUI extends JPanel {
             Method method = clazz.getMethod(methodName, Window.class, boolean.class);
             method.invoke(null, window, true);
         } catch (Throwable t) {
-            MekHQ.getLogger().error(CampaignGUI.class, "enableFullScreenMode",
-                    "Full screen mode is not supported", t);
+            MekHQ.getLogger().error("Full screen mode is not supported", t);
         }
     }
 
@@ -1276,16 +1275,16 @@ public class CampaignGUI extends JPanel {
         ssd.setVisible(true);
     }
 
-    private void menuSaveXmlActionPerformed(ActionEvent evt) {
-        MekHQ.getLogger().info(this, "Saving campaign...");
+    public boolean saveCampaign(ActionEvent evt) {
+        MekHQ.getLogger().info("Saving campaign...");
         // Choose a file...
         File file = selectSaveCampaignFile();
         if (file == null) {
             // I want a file, y'know!
-            return;
+            return false;
         }
 
-        saveCampaign(getFrame(), getCampaign(), file);
+        return saveCampaign(getFrame(), getCampaign(), file);
     }
 
     /**
@@ -1326,9 +1325,9 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.getLogger().info(CampaignGUI.class, "Campaign saved to " + file);
+            MekHQ.getLogger().info("Campaign saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(CampaignGUI.class, ex);
+            MekHQ.getLogger().error(ex);
             JOptionPane.showMessageDialog(frame,
                     "Oh no! The program was unable to correctly save your game. We know this\n"
                             + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -1588,8 +1587,9 @@ public class CampaignGUI extends JPanel {
             String skillLvl;
             int TimePerDay;
 
-            List<Person> techs = getCampaign().getTechs();
-            techs.sort(Comparator.comparingInt(Person::getPrimaryRole));
+            List<Person> techs = getCampaign().getTechs(false, null, true, true);
+            int lastRightTech = 0;
+
             for (Person tech : techs) {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
@@ -1612,7 +1612,11 @@ public class CampaignGUI extends JPanel {
                         + tech.getMinutesLeft() + "/" + TimePerDay
                         + " minutes";
                 techHash.put(name, tech);
-                techList.add(name);
+                if (tech.isRightTechTypeFor(r)) {
+                    techList.add(lastRightTech++, name);
+                } else {
+                    techList.add(name);
+                }
             }
 
             String s = (String) JOptionPane.showInputDialog(frame,
@@ -1623,7 +1627,18 @@ public class CampaignGUI extends JPanel {
                 return;
             }
 
-            r.setTech(techHash.get(s));
+            Person selectedTech = techHash.get(s);
+
+            if (!selectedTech.isRightTechTypeFor(r)) {
+                if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(null,
+                    "This tech is not appropriate for this unit. Would you like to continue?",
+                    "pending battle",
+                    JOptionPane.YES_NO_OPTION)) {
+                        return;
+                    }
+            }
+
+            r.setTech(selectedTech);
         } else {
             JOptionPane.showMessageDialog(frame,
                     "You have no techs available to work on this refit.",
@@ -1921,12 +1936,12 @@ public class CampaignGUI extends JPanel {
             try (InputStream is = new FileInputStream(unitFile)) {
                 parser.parse(is);
             } catch (Exception e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
 
             // Was there any error in parsing?
             if (parser.hasWarningMessage()) {
-                MekHQ.getLogger().warning(this, parser.getWarningMessage());
+                MekHQ.getLogger().warning(parser.getWarningMessage());
             }
 
             // Add the units from the file.
@@ -1948,7 +1963,7 @@ public class CampaignGUI extends JPanel {
         File personnelFile = FileDialogs.openPersonnel(frame).orElse(null);
 
         if (personnelFile != null) {
-            MekHQ.getLogger().info(this, "Starting load of personnel file from XML...");
+            MekHQ.getLogger().info("Starting load of personnel file from XML...");
             // Initialize variables.
             Document xmlDoc;
 
@@ -1960,7 +1975,7 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(is);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(this, "Cannot load person XML", ex);
+                MekHQ.getLogger().error("Cannot load person XML", ex);
                 return; // otherwise we NPE out in the next line
             }
 
@@ -1986,14 +2001,14 @@ public class CampaignGUI extends JPanel {
                 if (!wn2.getNodeName().equalsIgnoreCase("person")) {
                     // Error condition of sorts!
                     // Errr, what should we do here?
-                    MekHQ.getLogger().error(this, "Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
+                    MekHQ.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
                     continue;
                 }
 
                 Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
                 if (getCampaign().getPerson(p.getId()) != null
                         && getCampaign().getPerson(p.getId()).getFullName().equals(p.getFullName())) {
-                    MekHQ.getLogger().error(this, "ERROR: Cannot load person who exists, ignoring. (Name: " + p.getFullName() + ")");
+                    MekHQ.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: " + p.getFullName() + ")");
                     p = null;
                 }
 
@@ -2245,7 +2260,7 @@ public class CampaignGUI extends JPanel {
 
         File optionsFile = maybeFile.get();
 
-        MekHQ.getLogger().info(this, "Starting load of options file from XML...");
+        MekHQ.getLogger().info("Starting load of options file from XML...");
         // Initialize variables.
         Document xmlDoc;
 
@@ -2257,7 +2272,7 @@ public class CampaignGUI extends JPanel {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(this, ex);
+            MekHQ.getLogger().error(ex);
             return;
         }
 
@@ -2476,7 +2491,7 @@ public class CampaignGUI extends JPanel {
             try {
                 lab.refreshRefitSummary();
             } catch (Exception e) {
-                MekHQ.getLogger().error(this, e);
+                MekHQ.getLogger().error(e);
             }
         }
     }

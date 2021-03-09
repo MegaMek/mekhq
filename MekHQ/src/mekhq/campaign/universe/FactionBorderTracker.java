@@ -249,7 +249,7 @@ public class FactionBorderTracker {
                 Thread.currentThread().interrupt();
             }
         }
-        Faction f = Faction.getFaction(fKey);
+        Faction f = Factions.getInstance().getFaction(fKey);
         if (null != f) {
             return borders.get(f);
         }

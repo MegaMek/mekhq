@@ -39,6 +39,8 @@ import java.io.PrintWriter;
  */
 public class MissingInfantryAmmoBin extends MissingAmmoBin {
 
+    private static final long serialVersionUID = -8347830017130134295L;
+
     private InfantryWeapon weaponType;
 
     // Used in deserialization
@@ -54,14 +56,15 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
      * @param ammoType    The type of ammo
      * @param equipNum    The equipment index on the unit
      * @param weaponType  The weapon this ammo is for
+     * @param clips       The number of clips of ammo
      * @param omniPodded  Whether the weapon is pod-mounted on an omnivehicle
      * @param c           The campaign instance
      */
     public MissingInfantryAmmoBin(int tonnage, @Nullable AmmoType ammoType, int equipNum,
-            @Nullable InfantryWeapon weaponType, double size, boolean omniPodded, @Nullable Campaign c) {
+            @Nullable InfantryWeapon weaponType, int clips, boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, ammoType, equipNum, false, omniPodded, c);
         this.weaponType = weaponType;
-        this.size = size;
+        this.size = clips;
         if (weaponType != null) {
             name = weaponType.getName() + " Ammo Bin";
         }
@@ -79,6 +82,13 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
 
     public @Nullable InfantryWeapon getWeaponType() {
         return weaponType;
+    }
+
+    /**
+     * Gets the number of clips stored in this ammo bin.
+     */
+    public int getClips() {
+        return (int) getSize();
     }
 
     @Override
@@ -103,40 +113,37 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
         return Entity.LOC_NONE;
     }
 
-    protected Part getActualReplacement(AmmoBin found) {
-        //Check to see if munition types are different
-        if (getType() == found.getType()) {
-            return found.clone();
-        } else {
-            return new InfantryAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(),
-                    getFullShots(), getWeaponType(), getSize(), isOmniPodded(), campaign);
-        }
-    }
-
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if (part instanceof InfantryAmmoBin) {
+        // Do not try to replace a MissingInfantryAmmoBin with anything other
+        // than an InfantryAmmoBin. Subclasses should use a similar check, which
+        // breaks Composability to a degree but in this case we've used
+        // subclasses where they're not truly composable.
+        if ((part instanceof InfantryAmmoBin)
+                && (part.getClass() == InfantryAmmoBin.class)) {
             InfantryAmmoBin bin = (InfantryAmmoBin) part;
-            return getType().equals(bin.getType()) && getWeaponType().equals(bin.getWeaponType())
-                    && (bin.getFullShots() == getFullShots());
+            return getType().equals(bin.getType())
+                    && getWeaponType().equals(bin.getWeaponType())
+                    && (getClips() == bin.getClips());
         }
         return false;
     }
 
     @Override
     protected int getFullShots() {
-        return getWeaponType().getShots() * (int) size;
+        return getWeaponType().getShots() * getClips();
     }
 
     @Override
-    public Part getNewPart() {
+    public InfantryAmmoBin getNewPart() {
         return new InfantryAmmoBin(getUnitTonnage(), getType(), -1, getFullShots(),
-                getWeaponType(), size, omniPodded, campaign);
+                getWeaponType(), getClips(), omniPodded, campaign);
     }
 
     @Override
     public void writeToXmlEnd(PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "weaponType", getWeaponType().getInternalName());
+
         super.writeToXmlEnd(pw, indent);
     }
 
@@ -150,6 +157,8 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
                 this.weaponType = (InfantryWeapon) EquipmentType.get(wn.getTextContent().trim());
             }
         }
+
+        super.loadFieldsFromXmlNode(node);
     }
 
 }
