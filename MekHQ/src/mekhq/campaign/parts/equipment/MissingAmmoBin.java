@@ -21,6 +21,7 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
@@ -122,12 +123,11 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return (part instanceof AmmoBin)
-                // Do not try to replace a MissingAmmoBin with anything other
-                // than an AmmoBin. Subclasses should use a similar check, which
-                // breaks Composability to a degree but in this case we've used
-                // subclasses where they're not truly composable.
-                && (part.getClass() == AmmoBin.class)
+        // Do not try to replace a MissingAmmoBin with anything other
+        // than an AmmoBin. Subclasses should use a similar check, which
+        // breaks Composability to a degree but in this case we've used
+        // subclasses where they're not truly composable.
+        return Objects.equals(part.getClass(), AmmoBin.class)
                 && getType().equals(((AmmoBin) part).getType())
                 && (isOneShot() == ((AmmoBin) part).isOneShot());
     }

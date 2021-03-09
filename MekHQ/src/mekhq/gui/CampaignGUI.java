@@ -569,7 +569,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem menuSave = new JMenuItem(resourceMap.getString("menuSave.text")); // NOI18N
         menuSave.setMnemonic(KeyEvent.VK_S);
-        menuSave.addActionListener(this::menuSaveXmlActionPerformed);
+        menuSave.addActionListener(this::saveCampaign);
         menuFile.add(menuSave);
 
         JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
@@ -1275,16 +1275,16 @@ public class CampaignGUI extends JPanel {
         ssd.setVisible(true);
     }
 
-    private void menuSaveXmlActionPerformed(ActionEvent evt) {
-        MekHQ.getLogger().info(this, "Saving campaign...");
+    public boolean saveCampaign(ActionEvent evt) {
+        MekHQ.getLogger().info("Saving campaign...");
         // Choose a file...
         File file = selectSaveCampaignFile();
         if (file == null) {
             // I want a file, y'know!
-            return;
+            return false;
         }
 
-        saveCampaign(getFrame(), getCampaign(), file);
+        return saveCampaign(getFrame(), getCampaign(), file);
     }
 
     /**
@@ -1587,8 +1587,9 @@ public class CampaignGUI extends JPanel {
             String skillLvl;
             int TimePerDay;
 
-            List<Person> techs = getCampaign().getTechs();
-            techs.sort(Comparator.comparingInt(Person::getPrimaryRole));
+            List<Person> techs = getCampaign().getTechs(false, null, true, true);
+            int lastRightTech = 0;
+
             for (Person tech : techs) {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
@@ -1611,7 +1612,11 @@ public class CampaignGUI extends JPanel {
                         + tech.getMinutesLeft() + "/" + TimePerDay
                         + " minutes";
                 techHash.put(name, tech);
-                techList.add(name);
+                if (tech.isRightTechTypeFor(r)) {
+                    techList.add(lastRightTech++, name);
+                } else {
+                    techList.add(name);
+                }
             }
 
             String s = (String) JOptionPane.showInputDialog(frame,
@@ -1622,7 +1627,18 @@ public class CampaignGUI extends JPanel {
                 return;
             }
 
-            r.setTech(techHash.get(s));
+            Person selectedTech = techHash.get(s);
+
+            if (!selectedTech.isRightTechTypeFor(r)) {
+                if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(null,
+                    "This tech is not appropriate for this unit. Would you like to continue?",
+                    "pending battle",
+                    JOptionPane.YES_NO_OPTION)) {
+                        return;
+                    }
+            }
+
+            r.setTech(selectedTech);
         } else {
             JOptionPane.showMessageDialog(frame,
                     "You have no techs available to work on this refit.",
