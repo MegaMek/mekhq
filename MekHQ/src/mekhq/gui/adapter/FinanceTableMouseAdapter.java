@@ -19,14 +19,12 @@
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-import javax.swing.event.MouseInputAdapter;
 
 import mekhq.MekHQ;
 import mekhq.campaign.event.TransactionChangedEvent;
@@ -36,16 +34,20 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.model.FinanceTableModel;
 
-public class FinanceTableMouseAdapter extends MouseInputAdapter implements ActionListener {
+public class FinanceTableMouseAdapter extends JPopupMenuAdapter {
     private CampaignGUI gui;
     private JTable financeTable;
     private FinanceTableModel financeModel;
 
-    public FinanceTableMouseAdapter(CampaignGUI gui, JTable financeTable, FinanceTableModel financeModel) {
-        super();
+    protected FinanceTableMouseAdapter(CampaignGUI gui, JTable financeTable, FinanceTableModel financeModel) {
         this.gui = gui;
         this.financeTable = financeTable;
         this.financeModel = financeModel;
+    }
+
+    public static void connect(CampaignGUI gui, JTable financeTable, FinanceTableModel financeModel) {
+        new FinanceTableMouseAdapter(gui, financeTable, financeModel)
+                .connect(financeTable);
     }
 
     @Override
@@ -72,38 +74,27 @@ public class FinanceTableMouseAdapter extends MouseInputAdapter implements Actio
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
-        maybeShowPopup(e);
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        maybeShowPopup(e);
-    }
-
-    private void maybeShowPopup(MouseEvent e) {
-        JPopupMenu popup = new JPopupMenu();
-        if (e.isPopupTrigger()) {
-            int row = financeTable.getSelectedRow();
-            if (row < 0) {
-                return;
-            }
-            JMenu menu = new JMenu("GM Mode");
-            popup.add(menu);
-
-            JMenuItem deleteItem = new JMenuItem("Delete Transaction");
-            deleteItem.setActionCommand("DELETE");
-            deleteItem.addActionListener(this);
-            deleteItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(deleteItem);
-
-            JMenuItem editItem = new JMenuItem("Edit Transaction");
-            editItem.setActionCommand("EDIT");
-            editItem.addActionListener(this);
-            editItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(editItem);
-
-            popup.show(e.getComponent(), e.getX(), e.getY());
+    protected Optional<JPopupMenu> createPopupMenu() {
+        int row = financeTable.getSelectedRow();
+        if ((row < 0) || !gui.getCampaign().isGM()) {
+            return Optional.empty();
         }
+
+        JPopupMenu popup = new JPopupMenu();
+
+        JMenu menu = new JMenu("GM Mode");
+        popup.add(menu);
+
+        JMenuItem deleteItem = new JMenuItem("Delete Transaction");
+        deleteItem.setActionCommand("DELETE");
+        deleteItem.addActionListener(this);
+        menu.add(deleteItem);
+
+        JMenuItem editItem = new JMenuItem("Edit Transaction");
+        editItem.setActionCommand("EDIT");
+        editItem.addActionListener(this);
+        menu.add(editItem);
+
+        return Optional.of(popup);
     }
 }

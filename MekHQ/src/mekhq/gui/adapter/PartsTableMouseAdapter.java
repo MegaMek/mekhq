@@ -1,8 +1,7 @@
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -10,7 +9,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-import javax.swing.event.MouseInputAdapter;
 
 import megamek.common.TargetRoll;
 import mekhq.MekHQ;
@@ -28,17 +26,21 @@ import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.service.MassRepairMassSalvageMode;
 
-public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionListener {
+public class PartsTableMouseAdapter extends JPopupMenuAdapter {
 
     private CampaignGUI gui;
     private JTable partsTable;
     private PartsTableModel partsModel;
 
-    public PartsTableMouseAdapter(CampaignGUI gui, JTable partsTable, PartsTableModel partsModel) {
-        super();
+    protected PartsTableMouseAdapter(CampaignGUI gui, JTable partsTable, PartsTableModel partsModel) {
         this.gui = gui;
         this.partsTable = partsTable;
         this.partsModel = partsModel;
+    }
+        
+    public static void connect(CampaignGUI gui, JTable partsTable, PartsTableModel partsModel) {
+        new PartsTableMouseAdapter(gui, partsTable, partsModel)
+                .connect(partsTable);
     }
 
     public void actionPerformed(ActionEvent action) {
@@ -186,16 +188,6 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
         }
     }
 
-    @Override
-    public void mousePressed(MouseEvent e) {
-        maybeShowPopup(e);
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        maybeShowPopup(e);
-    }
-
     public boolean areAllPartsArmor(Part[] parts) {
         for (Part p : parts) {
             if (!(p instanceof Armor)) {
@@ -250,170 +242,172 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
         return true;
     }
 
-    private void maybeShowPopup(MouseEvent e) {
+    @Override
+    protected Optional<JPopupMenu> createPopupMenu() {
+        if (partsTable.getSelectedRowCount() == 0) {
+            return Optional.empty();
+        }
+
         JPopupMenu popup = new JPopupMenu();
-        if (e.isPopupTrigger()) {
-            if (partsTable.getSelectedRowCount() == 0) {
-                return;
-            }
-            int[] rows = partsTable.getSelectedRows();
-            JMenuItem menuItem = null;
-            JMenu menu = null;
-            JCheckBoxMenuItem cbMenuItem = null;
-            Part[] parts = new Part[rows.length];
-            boolean oneSelected = false;
-            for (int i = 0; i < rows.length; i++) {
-                parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
-            }
-            Part part = null;
-            if (parts.length == 1) {
-                oneSelected = true;
-                part = parts[0];
-            }
-            // **lets fill the pop up menu**//
-            // sell part
-            if (gui.getCampaign().getCampaignOptions().canSellParts() && areAllPartsPresent(parts)) {
-                menu = new JMenu("Sell");
-                if (areAllPartsAmmo(parts)) {
-                    menuItem = new JMenuItem("Sell All Ammo of This Type");
-                    menuItem.setActionCommand("SELL_ALL");
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
-                    if (oneSelected && ((AmmoStorage) part).getShots() > 1) {
-                        menuItem = new JMenuItem("Sell # Ammo of This Type...");
-                        menuItem.setActionCommand("SELL_N");
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
-                } else if (areAllPartsArmor(parts)) {
-                    menuItem = new JMenuItem("Sell All Armor of This Type");
-                    menuItem.setActionCommand("SELL_ALL");
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
-                    if (oneSelected && ((Armor) part).getAmount() > 1) {
-                        menuItem = new JMenuItem("Sell # Armor points of This Type...");
-                        menuItem.setActionCommand("SELL_N");
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
-                } else if (areAllPartsNotAmmo(parts)) {
-                    menuItem = new JMenuItem("Sell Single Part of This Type");
-                    menuItem.setActionCommand("SELL");
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem("Sell All Parts of This Type");
-                    menuItem.setActionCommand("SELL_ALL");
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
-                    if (oneSelected && part.getQuantity() > 2) {
-                        menuItem = new JMenuItem("Sell # Parts of This Type...");
-                        menuItem.setActionCommand("SELL_N");
-                        menuItem.addActionListener(this);
-                        menu.add(menuItem);
-                    }
-                } else {
-                    // when armor, ammo, and non-ammo only allow sell all
-                    menuItem = new JMenuItem("Sell All Parts of This Type");
-                    menuItem.setActionCommand("SELL_ALL");
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
-                }
-                popup.add(menu);
-            }
 
-            // also add the ability to order one or many parts, if we have at least one part selected
-            if(rows.length > 0) {
-                menu = new JMenu("Buy");
-                menuItem = new JMenuItem("Buy Single Part of This Type");
-                menuItem.setActionCommand("BUY");
+        int[] rows = partsTable.getSelectedRows();
+        JMenuItem menuItem = null;
+        JMenu menu = null;
+        JCheckBoxMenuItem cbMenuItem = null;
+        Part[] parts = new Part[rows.length];
+        boolean oneSelected = false;
+        for (int i = 0; i < rows.length; i++) {
+            parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
+        }
+        Part part = null;
+        if (parts.length == 1) {
+            oneSelected = true;
+            part = parts[0];
+        }
+        // **lets fill the pop up menu**//
+        // sell part
+        if (gui.getCampaign().getCampaignOptions().canSellParts() && areAllPartsPresent(parts)) {
+            menu = new JMenu("Sell");
+            if (areAllPartsAmmo(parts)) {
+                menuItem = new JMenuItem("Sell All Ammo of This Type");
+                menuItem.setActionCommand("SELL_ALL");
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
-
-                if(oneSelected) {
-                    menuItem = new JMenuItem ("Buy # Parts of This Type...");
-                    menuItem.setActionCommand("BUY_N");
+                if (oneSelected && ((AmmoStorage) part).getShots() > 1) {
+                    menuItem = new JMenuItem("Sell # Ammo of This Type...");
+                    menuItem.setActionCommand("SELL_N");
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
                 }
-
-                popup.add(menu);
-            }
-
-            if (oneSelected && part.needsFixing() && part.isPresent()) {
-                menu = new JMenu("Repair Mode");
-                for (WorkTime wt : WorkTime.DEFAULT_TIMES) {
-                    cbMenuItem = new JCheckBoxMenuItem(wt.name);
-                    if (part.getMode() == wt) {
-                        cbMenuItem.setSelected(true);
-                    } else {
-                        cbMenuItem.setActionCommand("CHANGE_MODE:" + wt.id);
-                        cbMenuItem.addActionListener(this);
-                    }
-                    cbMenuItem.setEnabled(!part.isBeingWorkedOn());
-                    menu.add(cbMenuItem);
-                }
-                popup.add(menu);
-
-                menuItem = new JMenuItem("Mass Repair");
-                menuItem.setActionCommand("MASS_REPAIR");
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
-            }
-            if (areAllPartsInTransit(parts)) {
-                menuItem = new JMenuItem("Cancel This Delivery");
-                menuItem.setActionCommand("CANCEL_ORDER");
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
-            }
-            menuItem = new JMenuItem("Export Parts");
-            menuItem.addActionListener(ev -> gui.miExportPartsActionPerformed(ev));
-            menuItem.setEnabled(true);
-            popup.add(menuItem);
-
-            // remove from omnipods
-            if (areAllPartsPodded(parts)) {
-                menu = new JMenu("Remove Pod");
-                menuItem = new JMenuItem("Remove Single Pod of This Type");
-                menuItem.setActionCommand("DEPOD");
+            } else if (areAllPartsArmor(parts)) {
+                menuItem = new JMenuItem("Sell All Armor of This Type");
+                menuItem.setActionCommand("SELL_ALL");
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
-                menuItem = new JMenuItem("Remove All Pods of This Type");
-                menuItem.setActionCommand("DEPOD_ALL");
+                if (oneSelected && ((Armor) part).getAmount() > 1) {
+                    menuItem = new JMenuItem("Sell # Armor points of This Type...");
+                    menuItem.setActionCommand("SELL_N");
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+            } else if (areAllPartsNotAmmo(parts)) {
+                menuItem = new JMenuItem("Sell Single Part of This Type");
+                menuItem.setActionCommand("SELL");
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Sell All Parts of This Type");
+                menuItem.setActionCommand("SELL_ALL");
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
                 if (oneSelected && part.getQuantity() > 2) {
-                    menuItem = new JMenuItem("Remove # Pods of This Type...");
-                    menuItem.setActionCommand("DEPOD_N");
+                    menuItem = new JMenuItem("Sell # Parts of This Type...");
+                    menuItem.setActionCommand("SELL_N");
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
                 }
-                popup.add(menu);
+            } else {
+                // when armor, ammo, and non-ammo only allow sell all
+                menuItem = new JMenuItem("Sell All Parts of This Type");
+                menuItem.setActionCommand("SELL_ALL");
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
             }
+            popup.add(menu);
+        }
+
+        // also add the ability to order one or many parts, if we have at least one part selected
+        if(rows.length > 0) {
+            menu = new JMenu("Buy");
+            menuItem = new JMenuItem("Buy Single Part of This Type");
+            menuItem.setActionCommand("BUY");
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            if(oneSelected) {
+                menuItem = new JMenuItem ("Buy # Parts of This Type...");
+                menuItem.setActionCommand("BUY_N");
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+            }
+
+            popup.add(menu);
+        }
+
+        if (oneSelected && part.needsFixing() && part.isPresent()) {
+            menu = new JMenu("Repair Mode");
+            for (WorkTime wt : WorkTime.DEFAULT_TIMES) {
+                cbMenuItem = new JCheckBoxMenuItem(wt.name);
+                if (part.getMode() == wt) {
+                    cbMenuItem.setSelected(true);
+                } else {
+                    cbMenuItem.setActionCommand("CHANGE_MODE:" + wt.id);
+                    cbMenuItem.addActionListener(this);
+                }
+                cbMenuItem.setEnabled(!part.isBeingWorkedOn());
+                menu.add(cbMenuItem);
+            }
+            popup.add(menu);
+
+            menuItem = new JMenuItem("Mass Repair");
+            menuItem.setActionCommand("MASS_REPAIR");
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+        }
+        if (areAllPartsInTransit(parts)) {
+            menuItem = new JMenuItem("Cancel This Delivery");
+            menuItem.setActionCommand("CANCEL_ORDER");
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+        }
+        menuItem = new JMenuItem("Export Parts");
+        menuItem.addActionListener(ev -> gui.miExportPartsActionPerformed(ev));
+        menuItem.setEnabled(true);
+        popup.add(menuItem);
+
+        // remove from omnipods
+        if (areAllPartsPodded(parts)) {
+            menu = new JMenu("Remove Pod");
+            menuItem = new JMenuItem("Remove Single Pod of This Type");
+            menuItem.setActionCommand("DEPOD");
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+            menuItem = new JMenuItem("Remove All Pods of This Type");
+            menuItem.setActionCommand("DEPOD_ALL");
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+            if (oneSelected && part.getQuantity() > 2) {
+                menuItem = new JMenuItem("Remove # Pods of This Type...");
+                menuItem.setActionCommand("DEPOD_N");
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+            }
+            popup.add(menu);
+        }
+
+        if (gui.getCampaign().isGM()) {
             // GM mode
             menu = new JMenu("GM Mode");
             if (areAllPartsInTransit(parts)) {
                 menuItem = new JMenuItem("Deliver Part Now");
                 menuItem.setActionCommand("ARRIVE");
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM());
                 menu.add(menuItem);
             }
             // remove part
             menuItem = new JMenuItem("Remove Part");
             menuItem.setActionCommand("REMOVE");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
             menu.add(menuItem);
             // set part quality
             menuItem = new JMenuItem("Set Quality...");
             menuItem.setActionCommand("SET_QUALITY");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
             menu.add(menuItem);
             // end
             popup.addSeparator();
             popup.add(menu);
-            popup.show(e.getComponent(), e.getX(), e.getY());
         }
+
+        return Optional.of(popup);
     }
 }
