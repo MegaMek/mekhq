@@ -35,8 +35,8 @@ public class StratconTrackState {
     private boolean gmRevealed;
     
     private Map<StratconCoords, StratconFacility> facilities;   
-    private Map<StratconCoords, StratconScenario> scenarios;    
-    private Map<StratconCoords, Integer> assignedCoordForces; 
+    private Map<StratconCoords, StratconScenario> scenarios;
+    private Map<StratconCoords, HashSet<Integer>> assignedCoordForces; 
     private Map<Integer, StratconCoords> assignedForceCoords;
     private Map<Integer, LocalDate> assignedForceReturnDates;
     private Map<Integer, String> assignedForceReturnDatesForStorage;
@@ -178,17 +178,23 @@ public class StratconTrackState {
     public void assignForce(int forceID, StratconCoords coords, LocalDate date) {
         assignedForceCoords.put(forceID, coords);
         assignedForceReturnDates.put(forceID, date.plusDays(deploymentTime));
-        assignedCoordForces.put(coords, forceID);
+        
+        assignedCoordForces.putIfAbsent(coords, new HashSet<>());
+        assignedCoordForces.get(coords).add(forceID);
+        
         getAssignedForceReturnDatesForStorage().put(forceID, date.plusDays(deploymentTime).toString());
     }
     
     public void unassignForce(int forceID) {
-        assignedCoordForces.remove(assignedForceCoords.get(forceID));
+        assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
         assignedForceCoords.remove(forceID);
         assignedForceReturnDates.remove(forceID);
         getAssignedForceReturnDatesForStorage().remove(forceID);
     }
     
+    /**
+     * Restores the look up table of force IDs to return dates
+     */
     public void restoreReturnDates() {
         for (int forceID : getAssignedForceReturnDatesForStorage().keySet()) {
             assignedForceReturnDates.put(forceID, MekHqXmlUtil.parseDate(getAssignedForceReturnDatesForStorage().get(forceID)));
@@ -203,12 +209,23 @@ public class StratconTrackState {
         this.assignedForceCoords = assignedForceCoords;
     }
     
-    public Map<StratconCoords, Integer> getAssignedCoordForces() {
+    @XmlTransient
+    public Map<StratconCoords, HashSet<Integer>> getAssignedCoordForces() {
         return assignedCoordForces;
     }
 
-    public void setAssignedCoordForces(Map<StratconCoords, Integer> assignedCoordForces) {
+    public void setAssignedCoordForces(Map<StratconCoords, HashSet<Integer>> assignedCoordForces) {
         this.assignedCoordForces = assignedCoordForces;
+    }
+    
+    /**
+     * Restores the look up table of coordinates to force lists
+     */
+    public void restoreAssignedCoordForces() {
+        for (int forceID : assignedForceCoords.keySet()) {
+            assignedCoordForces.putIfAbsent(assignedForceCoords.get(forceID), new HashSet<>());
+            assignedCoordForces.get(assignedForceCoords.get(forceID)).add(forceID);
+        }
     }
 
     @XmlTransient

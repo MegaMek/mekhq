@@ -224,6 +224,7 @@ public class StratconCampaignState {
         if (resultingCampaignState != null) {
             for (StratconTrackState track : resultingCampaignState.getTracks()) {
                 track.restoreReturnDates();
+                track.restoreAssignedCoordForces();
             }
         }
         

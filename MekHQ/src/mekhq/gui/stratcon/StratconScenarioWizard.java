@@ -411,7 +411,14 @@ public class StratconScenarioWizard extends JDialog {
     private void btnCommitClicked(ActionEvent e) {
         // go through all the force lists and add the selected forces to the scenario
         for(String templateID : availableForceLists.keySet()) {
-            for(Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
+            for(Force force : availableForceLists.get(templateID).getSelectedValuesList()) {                
+                // if we are assigning reinforcements, pay the price if appropriate
+                if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
+                    ReinforcementEligibilityType reinforcementType = 
+                            StratconRulesManager.getReinforcementType(force.getId(), currentTrackState, campaign);
+                    StratconRulesManager.processReinforcementDeployment(reinforcementType, currentCampaignState);
+                }
+                
                 currentScenario.addForce(force.getId(), templateID);
                 force.setScenarioId(currentScenario.getBackingScenarioID());
                 MekHQ.triggerEvent(new DeploymentChangedEvent(force, currentScenario.getBackingScenario()));
@@ -435,13 +442,6 @@ public class StratconScenarioWizard extends JDialog {
         // every force that's been deployed to this scenario gets assigned to the track
         for(int forceID : currentScenario.getAssignedForces()) {
             StratconRulesManager.processForceDeployment(currentScenario.getCoords(), forceID, campaign, currentTrackState);
-            
-            // if we are assigning reinforcements, pay the price if appropriate
-            if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
-                ReinforcementEligibilityType reinforcementType = 
-                        StratconRulesManager.getReinforcementType(forceID, currentTrackState, campaign);
-                StratconRulesManager.processReinforcementDeployment(reinforcementType, currentCampaignState);
-            }
         }
         
         // scenarios that haven't had primary forces committed yet get those committed now
@@ -461,6 +461,8 @@ public class StratconScenarioWizard extends JDialog {
             currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
             setVisible(false);
         }
+        
+        this.getParent().repaint();
     }
     
     /**

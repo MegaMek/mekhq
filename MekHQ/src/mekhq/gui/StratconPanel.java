@@ -14,6 +14,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -69,6 +71,10 @@ public class StratconPanel extends JPanel implements ActionListener {
     private JMenuItem menuItemManageForceAssignments;
     private JMenuItem menuItemManageScenario;
     private JMenuItem menuItemGMReveal;
+    
+    // data structure holding how many unit/scenario/base icons have been drawn in the hex
+    // used to control how low the text description goes.
+    private Map<StratconCoords, Integer> numIconsInHex = new HashMap<>();
     
     private StratconScenarioWizard scenarioWizard;
     private TrackForceAssignmentUI assignmentUI;
@@ -135,6 +141,8 @@ public class StratconPanel extends JPanel implements ActionListener {
         if(campaignState == null || currentTrack == null) {
             return;
         }
+        
+        numIconsInHex.clear();
 
         Graphics2D g2D = (Graphics2D) g;
         AffineTransform initialTransform = g2D.getTransform();
@@ -150,6 +158,9 @@ public class StratconPanel extends JPanel implements ActionListener {
         g2D.setTransform(originTransform);
         g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
         drawFacilities(g2D);
+        g2D.setTransform(originTransform);
+        g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
+        drawForces(g2D);
 
         g2D.setTransform(initialTransform);
         if(clickedPoint != null) {
@@ -275,7 +286,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                     g2D.setColor(Color.RED);
                     g2D.drawPolygon(scenarioMarker);
                     if(currentTrack.getFacility(currentCoords) == null) {
-                        drawTextEffect(g2D, scenarioMarker, "Hostile Force Detected");
+                        drawTextEffect(g2D, scenarioMarker, "Hostile Force Detected", currentCoords);
                     }
                 }
 
@@ -300,12 +311,13 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         for(int x = 0; x < currentTrack.getWidth(); x++) {            
             for(int y = 0; y < currentTrack.getHeight(); y++) {
-                StratconFacility facility = currentTrack.getFacility(new StratconCoords(x, y));
+                StratconCoords currentCoords = new StratconCoords(x, y);
+                StratconFacility facility = currentTrack.getFacility(currentCoords);
                 
                 if((facility != null) && (facility.isVisible() || currentTrack.isGmRevealed())) {
                     g2D.setColor(facility.getOwner() == ForceAlignment.Allied ? Color.GREEN : Color.RED);
                     g2D.drawPolygon(facilityMarker);
-                    drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName());
+                    drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -317,16 +329,53 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
     }
     
-    private void drawTextEffect(Graphics2D g2D, Polygon marker, String text) {
+    private void drawForces(Graphics2D g2D) {
+        Polygon forceMarker = new Polygon();
+        int xRadius = HEX_X_RADIUS / 3;
+        int yRadius = HEX_Y_RADIUS / 3;
+
+        forceMarker.addPoint(-xRadius, -yRadius);
+        forceMarker.addPoint(-xRadius, yRadius);
+        forceMarker.addPoint(xRadius, yRadius);
+        forceMarker.addPoint(xRadius, -yRadius);
+
+        for(int x = 0; x < currentTrack.getWidth(); x++) {            
+            for(int y = 0; y < currentTrack.getHeight(); y++) {
+                StratconCoords currentCoords = new StratconCoords(x, y);
+                
+                if (currentTrack.getAssignedCoordForces().containsKey(currentCoords)) {
+                    for (int forceID : currentTrack.getAssignedCoordForces().get(currentCoords)) {                   
+                        g2D.setColor(Color.BLUE);
+                        g2D.drawPolygon(forceMarker);
+                        drawTextEffect(g2D, forceMarker, campaign.getForce(forceID).getName(), currentCoords);
+                    }
+                }
+
+                int[] downwardVector = getDownwardYVector();
+                forceMarker.translate(downwardVector[0], downwardVector[1]);
+            }
+
+            int[] translationVector = getRightAndUPVector(x % 2 == 0);
+            forceMarker.translate(translationVector[0], translationVector[1]);
+        }
+    }
+    
+    private void drawTextEffect(Graphics2D g2D, Polygon marker, String text, StratconCoords coords) {
+        int verticalOffsetIndex = numIconsInHex.containsKey(coords) ? numIconsInHex.get(coords) : 0;
+        
         double startX = marker.getBounds().getMaxX();
         double startY = marker.getBounds().getMinY();
         double midPointX = startX + HEX_X_RADIUS / 4;
-        double midPointY = startY - HEX_Y_RADIUS / 4;
+        double midPointY = startY - HEX_Y_RADIUS / 4 + g2D.getFontMetrics().getHeight() * verticalOffsetIndex;
         double endPointX = midPointX + HEX_X_RADIUS / 2;
         
         g2D.drawLine((int) startX, (int) startY, (int) midPointX, (int) midPointY);
         g2D.drawLine((int) midPointX, (int) midPointY, (int) endPointX, (int) midPointY);
         g2D.drawString(text, (int) endPointX, (int) midPointY);
+        
+        // register that we drew text off of this hex
+        verticalOffsetIndex++;
+        numIconsInHex.put(coords, verticalOffsetIndex);
     }
 
     /**
@@ -433,9 +482,12 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
         
         if (currentTrack.getAssignedCoordForces().containsKey(boardState.getSelectedCoords())) {
-            Force force = campaign.getForce(currentTrack.getAssignedCoordForces().get(boardState.getSelectedCoords()));
-            infoBuilder.append(force.getName()).append(" assigned<br/>");
-            infoBuilder.append("Returns on ").append(campaign.getLocalDate());
+            for (int forceID : currentTrack.getAssignedCoordForces().get(boardState.getSelectedCoords())) {
+                Force force = campaign.getForce(forceID);
+                infoBuilder.append(force.getName()).append(" assigned<br/>");
+                infoBuilder.append("Returns on ").append(currentTrack.getAssignedForceReturnDates().get(forceID));
+                infoBuilder.append("<br/>");
+            }
         }
         
         if (coordsRevealed || currentTrack.isGmRevealed()) {

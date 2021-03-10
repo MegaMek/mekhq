@@ -113,7 +113,8 @@ public class AtBScenarioModifier implements Cloneable {
     public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
         if(eventTiming == this.getEventTiming()) {
             if(getAdditionalBriefingText() != null && getAdditionalBriefingText().length() > 0) {
-                AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, getAdditionalBriefingText());
+                AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, 
+                        String.format("%s: %s", getModifierName(), getAdditionalBriefingText()));
             }
             
             if(getForceDefinition() != null) {

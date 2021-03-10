@@ -270,7 +270,6 @@ public class StratconRulesManager {
         // 9+ = deploy
         // 6+ = deploy, if lance != fight, track scenario odds up
         // 2+ = apply negative modifier to scenario
-        
         switch(reinforcementType) {
         case FightLance:
             //if 9
