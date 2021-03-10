@@ -58,7 +58,12 @@ public class CampaignPresetSelectionPanel extends JPanel {
         setPreferredSize(new Dimension(500, 400));
 
         DefaultListModel<GamePreset> listModel = new DefaultListModel<>();
-        listModel.addAll(GamePreset.getGamePresetsIn());
+        // TODO : Java 11
+        //listModel.addAll(GamePreset.getGamePresetsIn());
+
+        for (GamePreset preset : GamePreset.getGamePresetsIn()) {
+            listModel.addElement(preset);
+        }
 
         setPresets(new JList<>(listModel));
         getPresets().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
