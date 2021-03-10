@@ -113,10 +113,6 @@ import java.util.stream.Collectors;
  *      Dialog Modify the buttons, and have them appear or disappear based on the current panel
  *      Panel has odd whitespace usage
  *      System, Planet text search
- *
- * Class Notes:
- * {{@link AbstractCompanyGenerator#applyToCampaign}} takes the campaign and applies all changes to
- * it. No method not directly called from there may alter the campaign.
  */
 public abstract class AbstractCompanyGenerator {
     //region Variable Declarations
@@ -228,7 +224,7 @@ public abstract class AbstractCompanyGenerator {
      * This sets the planet to the starting planet specified, if that option is enabled
      * @param campaign the campaign to apply the location to
      */
-    private void moveToStartingPlanet(final Campaign campaign) {
+    public void moveToStartingPlanet(final Campaign campaign) {
         if (getOptions().isSpecifyStartingPlanet()) {
             campaign.setLocation(new CurrentLocation(getOptions().getStartingPlanet().getParentSystem(), 0));
         }
@@ -446,7 +442,7 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to use in creating the assistants
      * @param personnel the list of personnel to add the newly created assistants to
      */
-    private void generateAssistants(final Campaign campaign, final List<Person> personnel) {
+    public void generateAssistants(final Campaign campaign, final List<Person> personnel) {
         // If you don't want to use pooled assistants, then this generates them as personnel instead
         if (!getOptions().isPoolAssistants()) {
             final int assistantRank;
@@ -488,7 +484,7 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to use in processing and to add the personnel to
      * @param personnel the list of ALL personnel in the campaign
      */
-    private void finalizePersonnel(final Campaign campaign, final List<Person> personnel) {
+    public void finalizePersonnel(final Campaign campaign, final List<Person> personnel) {
         // Assign the founder flag if we need to
         if (getOptions().isAssignFounderFlag()) {
             personnel.forEach(p -> p.setFounder(true));
@@ -705,8 +701,8 @@ public abstract class AbstractCompanyGenerator {
      * @param entities the list of generated entities, with null holding spaces without 'Mechs
      * @return the list of created units
      */
-    private List<Unit> createUnits(final Campaign campaign, List<Person> combatPersonnel,
-                                   final List<Entity> entities) {
+    public List<Unit> createUnits(final Campaign campaign, List<Person> combatPersonnel,
+                                  final List<Entity> entities) {
         if (!getOptions().isKeepOfficerRollsSeparate()) { // Sorted into individual lances
             combatPersonnel = sortPersonnelIntoLances(combatPersonnel);
         }
@@ -731,7 +727,7 @@ public abstract class AbstractCompanyGenerator {
      * @param supportPersonnel the list of support personnel including the techs to assign to units
      * @param units the list of units to have techs assigned to (order does not matter)
      */
-    private void assignTechsToUnits(final List<Person> supportPersonnel, final List<Unit> units) {
+    public void assignTechsToUnits(final List<Person> supportPersonnel, final List<Unit> units) {
         if (!getOptions().isAssignTechsToUnits()) {
             return;
         }
@@ -760,7 +756,7 @@ public abstract class AbstractCompanyGenerator {
      * @param personnel the combat personnel to sort into their lances
      * @return a new List containing the sorted personnel
      */
-    private List<Person> sortPersonnelIntoLances(final List<Person> personnel) {
+    public List<Person> sortPersonnelIntoLances(final List<Person> personnel) {
         final Person commander = personnel.get(0);
         List<Person> officers = new ArrayList<>(personnel.subList(1, determineFirstNonOfficer()));
         final List<Person> standardMechWarriors = new ArrayList<>(personnel.subList(determineFirstNonOfficer(), personnel.size()));
@@ -824,7 +820,7 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to generate the unit within
      * @param personnel a CLONED list of personnel properly organized into lances
      */
-    private void generateUnit(final Campaign campaign, final List<Person> personnel) {
+    public void generateUnit(final Campaign campaign, final List<Person> personnel) {
         final Force originForce = campaign.getForce(0);
         final Alphabet[] alphabet = Alphabet.values();
         String background = "";
@@ -1080,8 +1076,8 @@ public abstract class AbstractCompanyGenerator {
      * @param mothballedEntities the list of generated spare 'Mech entities to add and mothball
      * @return the list of created units
      */
-    private List<Unit> createMothballedSpareUnits(final Campaign campaign,
-                                                  final List<Entity> mothballedEntities) {
+    public List<Unit> createMothballedSpareUnits(final Campaign campaign,
+                                                 final List<Entity> mothballedEntities) {
         List<Unit> mothballedUnits = new ArrayList<>();
         for (final Entity mothballedEntity : mothballedEntities) {
             final Unit unit = campaign.addNewUnit(mothballedEntity, false, 0);
@@ -1218,7 +1214,7 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to apply changes to
      * @param contract the selected contract, if any
      */
-    private void processContract(final Campaign campaign, final @Nullable Contract contract) {
+    public void processContract(final Campaign campaign, final @Nullable Contract contract) {
         if (contract == null) {
             return;
         }
@@ -1230,10 +1226,10 @@ public abstract class AbstractCompanyGenerator {
     //endregion Contract
 
     //region Finances
-    private void processFinances(final Campaign campaign, final List<Person> personnel,
-                                 final List<Unit> units, final List<Part> parts,
-                                 final List<Armor> armour, final List<AmmoStorage> ammunition,
-                                 final @Nullable Contract contract) {
+    public void processFinances(final Campaign campaign, final List<Person> personnel,
+                                final List<Unit> units, final List<Part> parts,
+                                final List<Armor> armour, final List<AmmoStorage> ammunition,
+                                final @Nullable Contract contract) {
         // TODO : Finish implementation
         Money startingCash = generateStartingCash();
         Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
@@ -1396,7 +1392,7 @@ public abstract class AbstractCompanyGenerator {
     //endregion Finances
 
     //region Surprises
-    private void generateSurprises(final Campaign campaign) {
+    public void generateSurprises(final Campaign campaign) {
         if (!getOptions().isGenerateSurprises()) {
             return;
         }
@@ -1420,86 +1416,6 @@ public abstract class AbstractCompanyGenerator {
         // TODO : Processing of mystery boxes
     }
     //endregion Surprises
-
-    //region Apply to Campaign
-    /**
-     * TODO : UNFINISHED
-     * This method takes the campaign and applies all changes to it. No method not directly
-     * called from here may alter the campaign.
-     *
-     * @param campaign the campaign to apply the generation to
-     * @param combatPersonnel the list of generated combat personnel
-     * @param supportPersonnel the list of generated support personnel
-     * @param entities the list of generated entities, with null holding spaces without 'Mechs
-     * @param mothballedEntities the list of generated spare 'Mech entities to mothball
-     * @param contract the selected contract, or null if one has not been selected
-     */
-    public void applyToCampaign(final Campaign campaign, final List<Person> combatPersonnel,
-                                final List<Person> supportPersonnel, final List<Entity> entities,
-                                final List<Entity> mothballedEntities, final @Nullable Contract contract) {
-        moveToStartingPlanet(campaign);
-
-        // Phase One: Personnel, Units, and Unit
-        final List<Person> personnel = new ArrayList<>();
-        final List<Unit> units = new ArrayList<>();
-        applyPhaseOneToCampaign(campaign, combatPersonnel, supportPersonnel, personnel, entities, units);
-
-        // Phase 2: Spares
-        units.addAll(createMothballedSpareUnits(campaign, mothballedEntities));
-
-        final List<Part> parts = generateSpareParts(units);
-        final List<Armor> armour = generateArmour(units);
-        final List<AmmoStorage> ammunition = generateAmmunition(campaign, units);
-
-        // Phase 3: Contract
-        processContract(campaign, contract);
-
-        // Phase 4: Finances
-        processFinances(campaign, personnel, units, parts, armour, ammunition, contract);
-
-        // Phase 5: Applying Spares
-        parts.forEach(p -> campaign.getWarehouse().addPart(p, true));
-        armour.forEach(a -> campaign.getWarehouse().addPart(a, true));
-        ammunition.forEach(a -> campaign.getWarehouse().addPart(a, true));
-
-        // Phase 6: Surprises!
-        generateSurprises(campaign);
-    }
-
-    private void applyPhaseOneToCampaign(final Campaign campaign, final List<Person> combatPersonnel,
-                                         final List<Person> supportPersonnel, final List<Person> personnel,
-                                         final List<Entity> entities, final List<Unit> units) {
-        // Process Personnel
-        personnel.addAll(combatPersonnel);
-        personnel.addAll(supportPersonnel);
-
-        // If we aren't using the pool, generate all of the Astechs and Medics required
-        generateAssistants(campaign, personnel);
-
-        // This does all of the final personnel processing, including recruitment and running random
-        // marriages
-        finalizePersonnel(campaign, personnel);
-
-        // We can only fill the pool after recruiting our support personnel
-        if (getOptions().isPoolAssistants()) {
-            campaign.fillAstechPool();
-            campaign.fillMedicPool();
-        }
-
-        // Process Units
-        units.addAll(createUnits(campaign, combatPersonnel, entities));
-
-        // Assign Techs to Units
-        assignTechsToUnits(supportPersonnel, units);
-
-        // Generate the Forces and Assign Units to them
-        generateUnit(campaign, sortPersonnelIntoLances(combatPersonnel));
-    }
-    //endregion Apply to Campaign
-
-    //region Revert Application to Campaign
-    // TODO : ADD ME
-    //endregion Revert Application to Campaign
 
     //region Local Classes
     /**

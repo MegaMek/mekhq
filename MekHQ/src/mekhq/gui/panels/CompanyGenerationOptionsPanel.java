@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.panels.companyGeneration;
+package mekhq.gui.panels;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
@@ -37,6 +37,7 @@ import mekhq.gui.FileDialogs;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -49,8 +50,8 @@ import java.util.stream.Stream;
 
 public class CompanyGenerationOptionsPanel extends JPanel {
     //region Variable Declarations
-    private JFrame frame;
-    private Campaign campaign;
+    private final JFrame frame;
+    private final Campaign campaign;
 
     // Base Information
     private JComboBox<CompanyGenerationMethod> comboCompanyGenerationMethod;
@@ -142,8 +143,8 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     //region Constructors
     public CompanyGenerationOptionsPanel(final JFrame frame, final Campaign campaign) {
         super(new GridBagLayout());
-        setFrame(frame);
-        setCampaign(campaign);
+        this.frame = frame;
+        this.campaign = campaign;
 
         initialize();
 
@@ -160,16 +161,8 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         return frame;
     }
 
-    public void setFrame(final JFrame frame) {
-        this.frame = frame;
-    }
-
     public Campaign getCampaign() {
         return campaign;
-    }
-
-    public void setCampaign(final Campaign campaign) {
-        this.campaign = campaign;
     }
 
     //region Base Information
@@ -2051,7 +2044,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
         for (final Faction faction : Factions.getInstance().getFactions()) {
             if (faction.validIn(getCampaign().getLocalDate())) {
-                factionChoices.add(new FactionChoice(faction, getCampaign().getGameYear()));
+                factionChoices.add(new FactionChoice(faction, getCampaign().getLocalDate()));
             }
         }
 
@@ -2358,39 +2351,21 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     //region Static Classes
     private static class FactionChoice {
         //region Variable Declarations
-        private Faction faction;
-        private int year;
-        private String displayName;
+        private final Faction faction;
+        private final String displayName;
         //endregion Variable Declarations
 
         //region Constructors
-        public FactionChoice(final Faction faction, final int year) {
-            setFaction(faction);
-            setYear(year);
-            setDisplayName();
+        public FactionChoice(final Faction faction, final LocalDate today) {
+            this.faction = faction;
+            this.displayName = String.format("%s [%s]", getFaction().getFullName(today.getYear()),
+                    getFaction().getShortName());
         }
         //endregion Constructors
 
         //region Getters/Setters
         public Faction getFaction() {
             return faction;
-        }
-
-        public void setFaction(final Faction faction) {
-            this.faction = faction;
-        }
-
-        public int getYear() {
-            return year;
-        }
-
-        public void setYear(final int year) {
-            this.year = year;
-        }
-
-        private void setDisplayName() {
-            this.displayName = String.format("%s [%s]", getFaction().getFullName(getYear()),
-                    getFaction().getShortName());
         }
         //endregion Getters/Setters
 
@@ -2402,14 +2377,14 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
     private static class RoleToSpinner {
         //region Variable Declarations
-        private int role;
-        private JSpinner spinner;
+        private final int role;
+        private final JSpinner spinner;
         //endregion Variable Declarations
 
         //region Constructors
         public RoleToSpinner(final int role, final JSpinner spinner) {
-            setRole(role);
-            setSpinner(spinner);
+            this.role = role;
+            this.spinner = spinner;
         }
         //endregion Constructors
 
@@ -2418,20 +2393,12 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             return role;
         }
 
-        public void setRole(final int role) {
-            this.role = role;
-        }
-
         public JSpinner getSpinner() {
             return spinner;
         }
 
         public int getValue() {
             return (Integer) getSpinner().getValue();
-        }
-
-        public void setSpinner(final JSpinner spinner) {
-            this.spinner = spinner;
         }
         //endregion Getters/Setters
     }

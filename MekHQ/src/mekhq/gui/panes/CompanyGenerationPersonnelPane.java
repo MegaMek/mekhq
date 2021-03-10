@@ -16,7 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.panels.companyGeneration;
+package mekhq.gui.panes;
 
-public class CompanyGenerationPersonnelPanel {
+import javax.swing.*;
+
+public class CompanyGenerationPersonnelPane extends JScrollPane {
+    
 }
