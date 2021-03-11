@@ -68,7 +68,6 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean poolAssistants;
     private boolean generateCaptains;
     private boolean assignCompanyCommanderFlag;
-    private boolean companyCommanderLanceOfficer;
     private boolean applyOfficerStatBonusToWorstSkill;
     private boolean assignBestOfficers;
     private boolean automaticallyAssignRanks;
@@ -126,7 +125,7 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean payForAmmunition;
 
     // Surprises
-    private boolean generateSurprises;
+    private boolean generateSurprises; // Not Implemented
     private boolean generateMysteryBoxes; // Not Implemented
     private boolean[] generateMysteryBoxTypes; // Not Implemented
     //endregion Variable Declarations
@@ -174,7 +173,6 @@ public class CompanyGenerationOptions implements Serializable {
         setPoolAssistants(true);
         setGenerateCaptains(method.isWindchild());
         setAssignCompanyCommanderFlag(true);
-        setCompanyCommanderLanceOfficer(method.isWindchild());
         setApplyOfficerStatBonusToWorstSkill(method.isWindchild());
         setAssignBestOfficers(method.isWindchild());
         setAutomaticallyAssignRanks(true);
@@ -353,14 +351,6 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void setAssignCompanyCommanderFlag(final boolean assignCompanyCommanderFlag) {
         this.assignCompanyCommanderFlag = assignCompanyCommanderFlag;
-    }
-
-    public boolean isCompanyCommanderLanceOfficer() {
-        return companyCommanderLanceOfficer;
-    }
-
-    public void setCompanyCommanderLanceOfficer(final boolean companyCommanderLanceOfficer) {
-        this.companyCommanderLanceOfficer = companyCommanderLanceOfficer;
     }
 
     public boolean isApplyOfficerStatBonusToWorstSkill() {
@@ -800,7 +790,6 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "poolAssistants", isPoolAssistants());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateCaptains", isGenerateCaptains());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignCompanyCommanderFlag", isAssignCompanyCommanderFlag());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "companyCommanderLanceOfficer", isCompanyCommanderLanceOfficer());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "applyOfficerStatBonusToWorstSkill", isApplyOfficerStatBonusToWorstSkill());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignBestOfficers", isAssignBestOfficers());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "automaticallyAssignRanks", isAutomaticallyAssignRanks());
@@ -829,7 +818,7 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignTechsToUnits", isAssignTechsToUnits());
 
         // Unit
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "ForceNamingMethod", getForceNamingMethod().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceNamingMethod", getForceNamingMethod().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateForceIcons", isGenerateForceIcons());
 
         // Spares
@@ -971,9 +960,6 @@ public class CompanyGenerationOptions implements Serializable {
                     case "assignCompanyCommanderFlag":
                         options.setAssignCompanyCommanderFlag(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
-                    case "companyCommanderLanceOfficer":
-                        options.setCompanyCommanderLanceOfficer(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                        break;
                     case "applyOfficerStatBonusToWorstSkill":
                         options.setApplyOfficerStatBonusToWorstSkill(Boolean.parseBoolean(wn2.getTextContent().trim()));
                         break;
@@ -1048,7 +1034,7 @@ public class CompanyGenerationOptions implements Serializable {
                     //endregion Units
 
                     //region Unit
-                    case "ForceNamingMethod":
+                    case "forceNamingMethod":
                         options.setForceNamingMethod(ForceNamingMethod.valueOf(wn2.getTextContent().trim()));
                         break;
                     case "generateForceIcons":

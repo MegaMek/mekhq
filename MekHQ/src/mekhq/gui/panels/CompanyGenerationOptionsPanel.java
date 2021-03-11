@@ -73,7 +73,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
     private JCheckBox chkPoolAssistants;
     private JCheckBox chkGenerateCaptains;
     private JCheckBox chkAssignCompanyCommanderFlag;
-    private JCheckBox chkCompanyCommanderLanceOfficer;
     private JCheckBox chkApplyOfficerStatBonusToWorstSkill;
     private JCheckBox chkAssignBestOfficers;
     private JCheckBox chkAutomaticallyAssignRanks;
@@ -353,14 +352,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
 
     public void setChkAssignCompanyCommanderFlag(final JCheckBox chkAssignCompanyCommanderFlag) {
         this.chkAssignCompanyCommanderFlag = chkAssignCompanyCommanderFlag;
-    }
-
-    public JCheckBox getChkCompanyCommanderLanceOfficer() {
-        return chkCompanyCommanderLanceOfficer;
-    }
-
-    public void setChkCompanyCommanderLanceOfficer(final JCheckBox chkCompanyCommanderLanceOfficer) {
-        this.chkCompanyCommanderLanceOfficer = chkCompanyCommanderLanceOfficer;
     }
 
     public JCheckBox getChkApplyOfficerStatBonusToWorstSkill() {
@@ -1116,10 +1107,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkAssignCompanyCommanderFlag().setToolTipText(resources.getString("chkAssignCompanyCommanderFlag.toolTipText"));
         getChkAssignCompanyCommanderFlag().setName("chkAssignCompanyCommanderFlag");
 
-        setChkCompanyCommanderLanceOfficer(new JCheckBox(resources.getString("chkCompanyCommanderLanceOfficer.text")));
-        getChkCompanyCommanderLanceOfficer().setToolTipText(resources.getString("chkCompanyCommanderLanceOfficer.toolTipText"));
-        getChkCompanyCommanderLanceOfficer().setName("chkCompanyCommanderLanceOfficer");
-
         setChkApplyOfficerStatBonusToWorstSkill(new JCheckBox(resources.getString("chkApplyOfficerStatBonusToWorstSkill.text")));
         getChkApplyOfficerStatBonusToWorstSkill().setToolTipText(resources.getString("chkApplyOfficerStatBonusToWorstSkill.toolTipText"));
         getChkApplyOfficerStatBonusToWorstSkill().setName("chkApplyOfficerStatBonusToWorstSkill");
@@ -1187,7 +1174,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                         .addComponent(getChkPoolAssistants())
                         .addComponent(getChkGenerateCaptains())
                         .addComponent(getChkAssignCompanyCommanderFlag())
-                        .addComponent(getChkCompanyCommanderLanceOfficer())
                         .addComponent(getChkApplyOfficerStatBonusToWorstSkill())
                         .addComponent(getChkAssignBestOfficers())
                         .addComponent(getChkAutomaticallyAssignRanks())
@@ -1207,7 +1193,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
                         .addComponent(getChkPoolAssistants())
                         .addComponent(getChkGenerateCaptains())
                         .addComponent(getChkAssignCompanyCommanderFlag())
-                        .addComponent(getChkCompanyCommanderLanceOfficer())
                         .addComponent(getChkApplyOfficerStatBonusToWorstSkill())
                         .addComponent(getChkAssignBestOfficers())
                         .addComponent(getChkAutomaticallyAssignRanks())
@@ -1980,12 +1965,14 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         // Disable Panel by Default
         getChkGenerateSurprises().setSelected(true);
         getChkGenerateSurprises().doClick();
+        getChkGenerateSurprises().setEnabled(false);
 
         // Layout the UI
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("surprisesPanel.title")));
         panel.setToolTipText(resources.getString("surprisesPanel.toolTipText"));
         panel.setName("surprisesPanel");
+        panel.setEnabled(false);
         GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
@@ -2103,7 +2090,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         getChkPoolAssistants().setSelected(options.isPoolAssistants());
         getChkGenerateCaptains().setSelected(options.isGenerateCaptains());
         getChkAssignCompanyCommanderFlag().setSelected(options.isAssignCompanyCommanderFlag());
-        getChkCompanyCommanderLanceOfficer().setSelected(options.isCompanyCommanderLanceOfficer());
         getChkApplyOfficerStatBonusToWorstSkill().setSelected(options.isApplyOfficerStatBonusToWorstSkill());
         getChkAssignBestOfficers().setSelected(options.isAssignBestOfficers());
         getChkAutomaticallyAssignRanks().setSelected(options.isAutomaticallyAssignRanks());
@@ -2209,7 +2195,6 @@ public class CompanyGenerationOptionsPanel extends JPanel {
         options.setPoolAssistants(getChkPoolAssistants().isSelected());
         options.setGenerateCaptains(getChkGenerateCaptains().isSelected());
         options.setAssignCompanyCommanderFlag(getChkAssignCompanyCommanderFlag().isSelected());
-        options.setCompanyCommanderLanceOfficer(getChkCompanyCommanderLanceOfficer().isSelected());
         options.setApplyOfficerStatBonusToWorstSkill(getChkApplyOfficerStatBonusToWorstSkill().isSelected());
         options.setAssignBestOfficers(getChkAssignBestOfficers().isSelected());
         options.setAutomaticallyAssignRanks(getChkAutomaticallyAssignRanks().isSelected());

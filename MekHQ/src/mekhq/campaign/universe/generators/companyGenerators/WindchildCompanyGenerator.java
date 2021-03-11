@@ -125,7 +125,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
      */
     @Override
     protected MechSummary generateMechSummary(final Campaign campaign,
-                                              final RandomMechParameters parameters,
+                                              final AtBRandomMechParameters parameters,
                                               final Faction faction) {
         if (parameters.isStarLeague()) {
             if (faction.isClan()) {

@@ -55,8 +55,7 @@ import mekhq.campaign.universe.RangedFactionSelector;
 import mekhq.campaign.universe.RangedPlanetSelector;
 import mekhq.campaign.universe.enums.Alphabet;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
-import mekhq.campaign.universe.enums.MysteryBoxType;
-import mekhq.campaign.universe.randomEvent.mysteryBoxes.AbstractMysteryBox;
+import mekhq.campaign.universe.enums.CompanyGenerationPersonType;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.enums.LayeredForceIcon;
 
@@ -76,10 +75,8 @@ import java.util.stream.Collectors;
 
 /**
  * Startup:
- * First Panel (initial startup only): Client Options
  * Second Panel: Presets, Date, Starting Faction, Starting Planet, AtB
  * Third Panel: Campaign Options
- * Fourth Panel: MegaMek Options
  * Fifth Panel: Start of the Company Generator
  *
  * Ideas:
@@ -95,10 +92,8 @@ import java.util.stream.Collectors;
  * Button that lets you pop out the options panel with everything disabled
  *
  * TODO :
- *      Mercenaries may customize their mechs, with clantech if enabled only post-3055
- *      Unit weight sorting needs more options and variants... like an isolate SL units, keep SL units to highest ranked officers, that kind of thing
+ *      Mercenaries may customize their 'Mechs, with clantech if enabled only post-3055
  *      Finish the personnel randomization overrides
- *      Cleanup the dialog, have it disable and enable based on variable values
  *      Implement:
  *          centerPlanet
  *          selectStartingContract
@@ -113,11 +108,18 @@ import java.util.stream.Collectors;
  *      Dialog Modify the buttons, and have them appear or disappear based on the current panel
  *      Panel has odd whitespace usage
  *      System, Planet text search
+ *
+ * Phase Two:
+ * TODO:
+ *      Implement Surprises
+ *      Implement Mystery Boxes
+ *      Add MekHQ Options as a panel during the startup, but only for the first load (use a MekHQ Option to track it)
+ *      Add MegaMek Options as a panel during the startup
  */
 public abstract class AbstractCompanyGenerator {
     //region Variable Declarations
     private final CompanyGenerationMethod method;
-    private final CompanyGenerationOptions options;
+    private CompanyGenerationOptions options;
     private AbstractPersonnelGenerator personnelGenerator;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
@@ -127,7 +129,7 @@ public abstract class AbstractCompanyGenerator {
     protected AbstractCompanyGenerator(final Campaign campaign, final CompanyGenerationMethod method,
                                        final CompanyGenerationOptions options) {
         this.method = method;
-        this.options = options;
+        setOptions(options);
         createPersonnelGenerator(campaign);
     }
     //endregion Constructors
@@ -139,6 +141,10 @@ public abstract class AbstractCompanyGenerator {
 
     public CompanyGenerationOptions getOptions() {
         return options;
+    }
+
+    public void setOptions(final CompanyGenerationOptions options) {
+        this.options = options;
     }
 
     public AbstractPersonnelGenerator getPersonnelGenerator() {
@@ -195,7 +201,7 @@ public abstract class AbstractCompanyGenerator {
     /**
      * @return the number of lances to generate
      */
-    private int determineNumberLances() {
+    private int determineNumberOfLances() {
         return (getOptions().getCompanyCount() * getOptions().getLancesPerCompany())
                 + getOptions().getIndividualLanceCount()
                 + (getOptions().isGenerateMercenaryCompanyCommandLance() ? 1 : 0);
@@ -204,18 +210,11 @@ public abstract class AbstractCompanyGenerator {
     /**
      * @return the number of Captains
      */
-    private int determineNumberCaptains() {
+    private int determineNumberOfCaptains() {
         return getOptions().isGenerateCaptains()
                 ? Math.max((getOptions().getCompanyCount()
                         - (getOptions().isGenerateMercenaryCompanyCommandLance() ? 0 : 1)), 0)
                 : 0;
-    }
-
-    /**
-     * @return the index of the first non-officer
-     */
-    private int determineFirstNonOfficer() {
-        return determineNumberLances() + (getOptions().isCompanyCommanderLanceOfficer() ? 0 : 1);
     }
     //endregion Determination Methods
 
@@ -224,7 +223,7 @@ public abstract class AbstractCompanyGenerator {
      * This sets the planet to the starting planet specified, if that option is enabled
      * @param campaign the campaign to apply the location to
      */
-    public void moveToStartingPlanet(final Campaign campaign) {
+    private void moveToStartingPlanet(final Campaign campaign) {
         if (getOptions().isSpecifyStartingPlanet()) {
             campaign.setLocation(new CurrentLocation(getOptions().getStartingPlanet().getParentSystem(), 0));
         }
@@ -232,38 +231,49 @@ public abstract class AbstractCompanyGenerator {
     //endregion Base Information
 
     //region Personnel
+    /**
+     * @param campaign the campaign to use to generate the personnel
+     * @return the list of generated personnel within their individual trackers
+     */
+    public List<CompanyGenerationPersonTracker> generatePersonnel(final Campaign campaign) {
+        final List<CompanyGenerationPersonTracker> trackers = generateCombatPersonnel(campaign);
+        trackers.addAll(generateSupportPersonnel(campaign));
+        return trackers;
+    }
+
     //region Combat Personnel
     /**
      * @param campaign the campaign to use to generate the combat personnel
-     * @return the list of generated combat personnel
+     * @return the list of generated combat personnel within their individual trackers
      */
-    public List<Person> generateCombatPersonnel(final Campaign campaign) {
-        List<Person> combatPersonnel = new ArrayList<>();
-        final int numMechWarriors = determineNumberLances() * getOptions().getLanceSize();
+    private List<CompanyGenerationPersonTracker> generateCombatPersonnel(final Campaign campaign) {
+        final List<CompanyGenerationPersonTracker> trackers = new ArrayList<>();
+        final int numMechWarriors = determineNumberOfLances() * getOptions().getLanceSize();
 
         for (int i = 0; i < numMechWarriors; i++) {
-            combatPersonnel.add(campaign.newPerson(Person.T_MECHWARRIOR, getPersonnelGenerator()));
+            trackers.add(new CompanyGenerationPersonTracker(
+                    campaign.newPerson(Person.T_MECHWARRIOR, getPersonnelGenerator())));
         }
 
         // Default Sort is Tactical Genius First
-        Comparator<Person> personnelSorter = Comparator.comparing(
-                (Person p) -> p.getOptions().booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
+        Comparator<CompanyGenerationPersonTracker> personnelSorter = Comparator.comparing(
+                t -> t.getPerson().getOptions().booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
         if (getOptions().isAssignBestOfficers()) {
-            personnelSorter = personnelSorter.thenComparingInt((Person p) -> p.getExperienceLevel(false))
+            personnelSorter = personnelSorter.thenComparingInt(t -> t.getPerson().getExperienceLevel(false))
                     .reversed()
-                    .thenComparingInt(p -> p.getSkillLevel(SkillType.S_LEADER)
-                            + p.getSkillLevel(SkillType.S_STRATEGY) + p.getSkillLevel(SkillType.S_TACTICS))
+                    .thenComparingInt(t -> t.getPerson().getSkillLevel(SkillType.S_LEADER)
+                            + t.getPerson().getSkillLevel(SkillType.S_STRATEGY) + t.getPerson().getSkillLevel(SkillType.S_TACTICS))
                     .reversed();
         }
-        combatPersonnel.sort(personnelSorter);
+        trackers.sort(personnelSorter);
 
-        generateCommandingOfficer(combatPersonnel.get(0), numMechWarriors);
+        generateCommandingOfficer(trackers.get(0), numMechWarriors);
 
-        generateOfficers(combatPersonnel);
+        generateOfficers(trackers);
 
-        generateStandardMechWarriors(combatPersonnel);
+        generateStandardMechWarriors(trackers);
 
-        return combatPersonnel;
+        return trackers;
     }
 
     /**
@@ -273,17 +283,19 @@ public abstract class AbstractCompanyGenerator {
      * 3) Gets two random officer skill increases
      * 4) Gets the highest rank possible assigned to them
      *
-     * @param commandingOfficer the commanding officer
+     * @param commandingOfficer the commanding officer's tracker
      * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
      */
-    private void generateCommandingOfficer(final Person commandingOfficer, final int numMechWarriors) {
-        commandingOfficer.setCommander(getOptions().isAssignCompanyCommanderFlag());
-        commandingOfficer.improveSkill(SkillType.S_GUN_MECH);
-        commandingOfficer.improveSkill(SkillType.S_PILOT_MECH);
-        assignRandomOfficerSkillIncrease(commandingOfficer, 2);
+    private void generateCommandingOfficer(final CompanyGenerationPersonTracker commandingOfficer,
+                                           final int numMechWarriors) {
+        commandingOfficer.setPersonType(CompanyGenerationPersonType.COMPANY_COMMANDER);
+        commandingOfficer.getPerson().setCommander(getOptions().isAssignCompanyCommanderFlag());
+        commandingOfficer.getPerson().improveSkill(SkillType.S_GUN_MECH);
+        commandingOfficer.getPerson().improveSkill(SkillType.S_PILOT_MECH);
+        assignRandomOfficerSkillIncrease(commandingOfficer.getPerson(), 2);
 
         if (getOptions().isAutomaticallyAssignRanks()) {
-            generateCommandingOfficerRank(commandingOfficer, numMechWarriors);
+            generateCommandingOfficerRank(commandingOfficer.getPerson(), numMechWarriors);
         }
     }
 
@@ -294,7 +306,25 @@ public abstract class AbstractCompanyGenerator {
     protected abstract void generateCommandingOfficerRank(final Person commandingOfficer, final int numMechWarriors);
 
     /**
-     * This generates officers based on the provided options.
+     * This generates the initial officer list and assigns the type
+     *
+     * @param trackers the list of all generated personnel in their trackers
+     */
+    private void generateOfficers(final List<CompanyGenerationPersonTracker> trackers) {
+        // First, we need to determine the captain threshold
+        final int captainThreshold = determineNumberOfCaptains() + 1;
+        // Starting at 1, as 0 is the mercenary company commander
+        for (int i = 1; i < determineNumberOfLances(); i++) {
+            // Set the Person Type on the tracker, so we can properly reroll later
+            trackers.get(i).setPersonType((i < captainThreshold) ? CompanyGenerationPersonType.CAPTAIN
+                    : CompanyGenerationPersonType.LIEUTENANT);
+            // Generate the individual officer
+            generateOfficer(trackers.get(i).getPerson(), trackers.get(i).getPersonType());
+        }
+    }
+
+    /**
+     * This generates an officer based on the provided options.
      *
      * Custom addition for larger generation:
      * For every company (with a mercenary company command lance) or for every company
@@ -308,50 +338,47 @@ public abstract class AbstractCompanyGenerator {
      * 2) Two random officer skill increases if they are a Captain, otherwise they get one
      * 3) A rank of O4 - Captain for Captains, otherwise O3 - Lieutenant
      *
-     * @param personnel the list of all generated personnel
+     * @param officer the officer to generate
+     * @param type the type of the officer (Captain or Lieutenant)
      */
-    private void generateOfficers(final List<Person> personnel) {
-        int captains = determineNumberCaptains();
-        // Starting at 1, as 0 is the mercenary company commander
-        for (int i = 1; i < determineFirstNonOfficer(); i++) {
-            final Person officer = personnel.get(i);
+    private void generateOfficer(final Person officer, final CompanyGenerationPersonType type) {
+        if (!type.isOfficer()) {
+            MekHQ.getLogger().error(officer.getFullTitle() + " is not a valid officer for the officer generation, cannot generate them as an officer.");
+            return;
+        }
 
-            // Improve Skills
-            final Skill gunnery = officer.getSkill(SkillType.S_GUN_MECH);
-            final Skill piloting = officer.getSkill(SkillType.S_PILOT_MECH);
-            if ((gunnery == null) && (piloting != null)) {
-                officer.improveSkill(SkillType.S_GUN_MECH);
-            } else if ((gunnery != null) && (piloting == null)) {
-                officer.improveSkill(SkillType.S_PILOT_MECH);
-            } else if (gunnery == null) {
-                // Both are null... this shouldn't occur. In this case, boost both
-                officer.improveSkill(SkillType.S_GUN_MECH);
-                officer.improveSkill(SkillType.S_PILOT_MECH);
-            } else {
-                officer.improveSkill((gunnery.getLevel() > piloting.getLevel()
-                        && getOptions().isApplyOfficerStatBonusToWorstSkill() ? piloting : gunnery)
-                        .getType().getName());
+        // Improve Skills
+        final Skill gunnery = officer.getSkill(SkillType.S_GUN_MECH);
+        final Skill piloting = officer.getSkill(SkillType.S_PILOT_MECH);
+        if ((gunnery == null) && (piloting != null)) {
+            officer.improveSkill(SkillType.S_GUN_MECH);
+        } else if ((gunnery != null) && (piloting == null)) {
+            officer.improveSkill(SkillType.S_PILOT_MECH);
+        } else if (gunnery == null) {
+            // Both are null... this shouldn't occur. In this case, boost both
+            officer.improveSkill(SkillType.S_GUN_MECH);
+            officer.improveSkill(SkillType.S_PILOT_MECH);
+        } else {
+            officer.improveSkill((((gunnery.getLevel() > piloting.getLevel())
+                    && getOptions().isApplyOfficerStatBonusToWorstSkill()) ? piloting : gunnery)
+                    .getType().getName());
+        }
+
+        if (type.isCaptain()) {
+            // Assign Random Officer Skill Increase
+            assignRandomOfficerSkillIncrease(officer, 2);
+
+            if (getOptions().isAutomaticallyAssignRanks()) {
+                // Assign Rank of O4 - Captain
+                officer.setRankNumeric(Ranks.RWO_MAX + 4);
             }
+        } else {
+            // Assign Random Officer Skill Increase
+            assignRandomOfficerSkillIncrease(officer, 1);
 
-            if (captains > 0) {
-                // Assign Random Officer Skill Increase
-                assignRandomOfficerSkillIncrease(officer, 2);
-
-                if (getOptions().isAutomaticallyAssignRanks()) {
-                    // Assign Rank of O4 - Captain
-                    officer.setRankNumeric(Ranks.RWO_MAX + 4);
-                }
-
-                // Decrement the number of captains left to generate
-                captains--;
-            } else {
-                // Assign Random Officer Skill Increase
-                assignRandomOfficerSkillIncrease(officer, 1);
-
-                if (getOptions().isAutomaticallyAssignRanks()) {
-                    // Assign Rank of O3 - Lieutenant
-                    officer.setRankNumeric(Ranks.RWO_MAX + 3);
-                }
+            if (getOptions().isAutomaticallyAssignRanks()) {
+                // Assign Rank of O3 - Lieutenant
+                officer.setRankNumeric(Ranks.RWO_MAX + 3);
             }
         }
     }
@@ -389,18 +416,30 @@ public abstract class AbstractCompanyGenerator {
         }
     }
     /**
-     * Sets up a standard MechWarrior
+     * Sets up standard MechWarriors from the provided trackers
+     *
+     * @param trackers the list of all generated trackers
+     */
+    private void generateStandardMechWarriors(final List<CompanyGenerationPersonTracker> trackers) {
+        for (final CompanyGenerationPersonTracker tracker : trackers) {
+            if (!tracker.getPersonType().isMechWarrior()) {
+                continue;
+            }
+
+            generateStandardMechWarrior(tracker.getPerson());
+        }
+    }
+
+    /**
+     * This sets up a standard MechWarrior
      * 1) Assigns rank of E12 - Sergeant, or E4 for Clan, WoB, and ComStar
      *
-     * @param personnel the list of all generated personnel
+     * @param person the MechWarrior to set up
      */
-    private void generateStandardMechWarriors(final List<Person> personnel) {
-        final boolean isClanComStarOrWoB = getOptions().getFaction().isComStarOrWoB()
-                || getOptions().getFaction().isClan();
-        for (int i = determineFirstNonOfficer(); i < personnel.size(); i++) {
-            if (getOptions().isAutomaticallyAssignRanks()) {
-                personnel.get(i).setRankNumeric(isClanComStarOrWoB ? 4 : 12);
-            }
+    private void generateStandardMechWarrior(final Person person) {
+        if (getOptions().isAutomaticallyAssignRanks()) {
+            person.setRankNumeric((getOptions().getFaction().isComStarOrWoB()
+                    || getOptions().getFaction().isClan()) ? 4 : 12);
         }
     }
     //endregion Combat Personnel
@@ -410,71 +449,84 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to generate from
      * @return a list of all support personnel
      */
-    public List<Person> generateSupportPersonnel(final Campaign campaign) {
-        final List<Person> supportPersonnel = new ArrayList<>();
+    private List<CompanyGenerationPersonTracker> generateSupportPersonnel(final Campaign campaign) {
+        final List<CompanyGenerationPersonTracker> trackers = new ArrayList<>();
 
         for (final Map.Entry<Integer, Integer> entry : getOptions().getSupportPersonnel().entrySet()) {
             for (int i = 0; i < entry.getValue(); i++) {
-                final Person person = campaign.newPerson(entry.getKey(), getPersonnelGenerator());
-                // All support personnel get assigned is their rank
-                if (getOptions().isAutomaticallyAssignRanks()) {
-                    switch (campaign.getRanks().getRankSystem()) {
-                        case Ranks.RS_CCWH:
-                        case Ranks.RS_CL:
-                            break;
-                        case Ranks.RS_COM:
-                        case Ranks.RS_WOB:
-                        case Ranks.RS_MOC:
-                            person.setRankNumeric(4);
-                            break;
-                        default:
-                            person.setRankNumeric(8);
-                            break;
-                    }
-                }
-                supportPersonnel.add(person);
+                trackers.add(new CompanyGenerationPersonTracker(
+                        generateSupportPerson(campaign, entry.getKey()), CompanyGenerationPersonType.SUPPORT));
             }
         }
-        return supportPersonnel;
+        return trackers;
     }
 
     /**
-     * @param campaign the campaign to use in creating the assistants
-     * @param personnel the list of personnel to add the newly created assistants to
+     * @param campaign the campaign to generate from
+     * @param role the created person's primary role
+     * @return the newly created support person with the provided role
      */
-    public void generateAssistants(final Campaign campaign, final List<Person> personnel) {
-        // If you don't want to use pooled assistants, then this generates them as personnel instead
-        if (!getOptions().isPoolAssistants()) {
-            final int assistantRank;
+    private Person generateSupportPerson(final Campaign campaign, final int role) {
+        final Person person = campaign.newPerson(role, getPersonnelGenerator());
+        // All support personnel get assigned Corporal or equivalent as their rank
+        if (getOptions().isAutomaticallyAssignRanks()) {
             switch (campaign.getRanks().getRankSystem()) {
                 case Ranks.RS_CCWH:
                 case Ranks.RS_CL:
-                    assistantRank = 0;
                     break;
                 case Ranks.RS_COM:
                 case Ranks.RS_WOB:
                 case Ranks.RS_MOC:
-                    assistantRank = 4;
+                    person.setRankNumeric(4);
                     break;
                 default:
-                    assistantRank = 2;
+                    person.setRankNumeric(8);
                     break;
             }
+        }
+        return person;
+    }
 
-            for (int i = 0; i < campaign.getAstechNeed(); i++) {
-                final Person astech = campaign.newPerson(Person.T_ASTECH, getPersonnelGenerator());
-                if (getOptions().isAutomaticallyAssignRanks()) {
-                    astech.setRankNumeric(assistantRank);
-                }
-                personnel.add(astech);
+    /**
+     * @param campaign the campaign to use in creating the assistants
+     * @param trackers the trackers to add the newly created assistants to
+     */
+    private void generateAssistants(final Campaign campaign, final List<CompanyGenerationPersonTracker> trackers) {
+        // If you don't want to use pooled assistants, then this generates them as personnel instead
+        if (getOptions().isPoolAssistants()) {
+            return;
+        }
+
+        final int assistantRank;
+        switch (campaign.getRanks().getRankSystem()) {
+            case Ranks.RS_CCWH:
+            case Ranks.RS_CL:
+                assistantRank = 0;
+                break;
+            case Ranks.RS_COM:
+            case Ranks.RS_WOB:
+            case Ranks.RS_MOC:
+                assistantRank = 4;
+                break;
+            default:
+                assistantRank = 2;
+                break;
+        }
+
+        for (int i = 0; i < campaign.getAstechNeed(); i++) {
+            final Person astech = campaign.newPerson(Person.T_ASTECH, getPersonnelGenerator());
+            if (getOptions().isAutomaticallyAssignRanks()) {
+                astech.setRankNumeric(assistantRank);
             }
-            for (int i = 0; i < campaign.getMedicsNeed(); i++) {
-                final Person medic = campaign.newPerson(Person.T_MEDIC, getPersonnelGenerator());
-                if (getOptions().isAutomaticallyAssignRanks()) {
-                    medic.setRankNumeric(assistantRank);
-                }
-                personnel.add(medic);
+            trackers.add(new CompanyGenerationPersonTracker(astech, CompanyGenerationPersonType.ASSISTANT));
+        }
+
+        for (int i = 0; i < campaign.getMedicsNeed(); i++) {
+            final Person medic = campaign.newPerson(Person.T_MEDIC, getPersonnelGenerator());
+            if (getOptions().isAutomaticallyAssignRanks()) {
+                medic.setRankNumeric(assistantRank);
             }
+            trackers.add(new CompanyGenerationPersonTracker(medic, CompanyGenerationPersonType.ASSISTANT));
         }
     }
     //endregion Support Personnel
@@ -482,17 +534,17 @@ public abstract class AbstractCompanyGenerator {
     /**
      * This does the final personnel processing
      * @param campaign the campaign to use in processing and to add the personnel to
-     * @param personnel the list of ALL personnel in the campaign
+     * @param trackers ALL trackers for the campaign
      */
-    public void finalizePersonnel(final Campaign campaign, final List<Person> personnel) {
+    private void finalizePersonnel(final Campaign campaign, final List<CompanyGenerationPersonTracker> trackers) {
         // Assign the founder flag if we need to
         if (getOptions().isAssignFounderFlag()) {
-            personnel.forEach(p -> p.setFounder(true));
+            trackers.forEach(t -> t.getPerson().setFounder(true));
         }
 
         // Recruit all of the personnel, GM-style so that the initial hiring cost is calculated as
         // part of the financial model
-        personnel.forEach(p -> campaign.recruitPerson(p, true));
+        trackers.forEach(t -> campaign.recruitPerson(t.getPerson(), true));
 
         // Now that they are recruited, we can simulate backwards a few years and generate marriages
         // and children
@@ -501,16 +553,16 @@ public abstract class AbstractCompanyGenerator {
             while (date.isBefore(campaign.getLocalDate())) {
                 date = date.plusDays(1);
 
-                for (final Person person : personnel) {
+                for (final CompanyGenerationPersonTracker tracker : trackers) {
                     if (getOptions().isSimulateRandomMarriages()) {
-                        person.randomMarriage(campaign, date);
+                        tracker.getPerson().randomMarriage(campaign, date);
                     }
 
-                    if (getOptions().isSimulateRandomProcreation() && person.getGender().isFemale()) {
-                        if (person.isPregnant() && (date.compareTo(person.getDueDate()) == 0)) {
-                            person.birth(campaign, date);
+                    if (getOptions().isSimulateRandomProcreation() && tracker.getPerson().getGender().isFemale()) {
+                        if (tracker.getPerson().isPregnant() && (date.compareTo(tracker.getPerson().getDueDate()) == 0)) {
+                            tracker.getPerson().birth(campaign, date);
                         } else {
-                            person.procreate(campaign, date);
+                            tracker.getPerson().procreate(campaign, date);
                         }
                     }
                 }
@@ -520,29 +572,22 @@ public abstract class AbstractCompanyGenerator {
     //endregion Personnel
 
     //region Units
+    //region Unit Generation Parameters
     /**
-     * @param campaign the campaign to generate for
-     * @param combatPersonnel the list of all combat personnel
-     * @return the list of all generated entities, with null holding spaces without 'Mechs
+     * This generates the unit generation parameters and assigns them to their trackers
+     *
+     * @param trackers the list of all personnel trackers
      */
-    public List<Entity> generateUnits(final Campaign campaign, List<Person> combatPersonnel) {
-        final int firstNonOfficer = determineFirstNonOfficer();
-        final List<RandomMechParameters> parameters = createUnitGenerationParameters(combatPersonnel, firstNonOfficer);
+    public void generateUnitGenerationParameters(List<CompanyGenerationPersonTracker> trackers) {
+        // First, we need to create the unit generation parameters
+        final List<AtBRandomMechParameters> parameters = createUnitGenerationParameters(trackers);
 
-        // This parses through all combat personnel and checks if the roll is SL.
-        // If it is, reroll the weight with a max value of 12
-        for (int i = 0; i < combatPersonnel.size(); i++) {
-            if (parameters.get(i).isStarLeague()) {
-                parameters.get(i).setWeight(determineBattleMechWeight(Math.min(Utilities.dice(2, 6)
-                        + ((i == 0) ? 2 : ((i < firstNonOfficer) ? 1 : 0)), 12)));
-            }
-        }
-
+        // Then, we need to separate out the best roll for the unit commander if that option is enabled
         if (getOptions().isAssignBestRollToUnitCommander()) {
             int bestIndex = 0;
-            RandomMechParameters bestParameters = parameters.get(bestIndex);
+            AtBRandomMechParameters bestParameters = parameters.get(bestIndex);
             for (int i = 1; i < parameters.size(); i++) {
-                final RandomMechParameters checkParameters = parameters.get(i);
+                final AtBRandomMechParameters checkParameters = parameters.get(i);
                 if (bestParameters.isStarLeague() == checkParameters.isStarLeague()) {
                     if (bestParameters.getWeight() == checkParameters.getWeight()) {
                         if (bestParameters.getQuality() < checkParameters.getQuality()) {
@@ -564,21 +609,23 @@ public abstract class AbstractCompanyGenerator {
             }
         }
 
-        Comparator<RandomMechParameters> parametersComparator = (o1, o2) -> 0;
+        // Now, we need to apply the various sorts based on the provided options
+        Comparator<AtBRandomMechParameters> parametersComparator = (p1, p2) -> 0;
 
         if (getOptions().isSortStarLeagueUnitsFirst()) {
-            parametersComparator = parametersComparator.thenComparing(RandomMechParameters::isStarLeague).reversed();
+            parametersComparator = parametersComparator.thenComparing(AtBRandomMechParameters::isStarLeague).reversed();
         }
 
         if (getOptions().isGroupByWeight()) {
-            parametersComparator = parametersComparator.thenComparingInt(RandomMechParameters::getWeight).reversed();
+            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMechParameters::getWeight).reversed();
         }
 
         if (getOptions().isGroupByQuality()) {
-            parametersComparator = parametersComparator.thenComparingInt(RandomMechParameters::getQuality).reversed();
+            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMechParameters::getQuality).reversed();
         }
 
         if (getOptions().isKeepOfficerRollsSeparate()) {
+            final int firstNonOfficer = determineNumberOfLances();
             parameters.subList(getOptions().isAssignBestRollToUnitCommander() ? 1 : 0, firstNonOfficer).sort(parametersComparator);
             parameters.subList(firstNonOfficer, parameters.size()).sort(parametersComparator);
         } else {
@@ -589,28 +636,78 @@ public abstract class AbstractCompanyGenerator {
             } else {
                 parameters.sort(parametersComparator);
             }
-            combatPersonnel = sortPersonnelIntoLances(combatPersonnel);
+
+            trackers = sortPersonnelIntoLances(trackers);
         }
 
-        return generateEntities(campaign, parameters, combatPersonnel);
+        // Now that everything is nicely sorted, we can set the parameters. Parameters will ALWAYS
+        // be of a length equal to or less than that of trackers, as we don't generate parameters
+        // for support personnel.
+        for (int i = 0; i < parameters.size(); i++) {
+            trackers.get(i).setParameters(parameters.get(i));
+        }
     }
 
     /**
-     * @param combatPersonnel the list of all combat personnel
-     * @param firstNonOfficer the index of the first non-officer
-     * @return a list of RandomMechParameters
+     * @param trackers the list of all personnel trackers
+     * @return a list of the generated RandomMechParameters. These have NOT been assigned to the
+     * individual trackers
      */
-    protected List<RandomMechParameters> createUnitGenerationParameters(
-            final List<Person> combatPersonnel, final int firstNonOfficer) {
-        List<RandomMechParameters> parameters = new ArrayList<>();
-        for (int i = 0; i < combatPersonnel.size(); i++) {
-            final int modifier = (i == 0) ? 2 : ((i < firstNonOfficer) ? 1 : 0);
-            parameters.add(new RandomMechParameters(
-                    determineBattleMechWeight(Utilities.dice(2, 6) + modifier),
-                    determineBattleMechQuality(Utilities.dice(2, 6) + modifier)
-            ));
+    private List<AtBRandomMechParameters> createUnitGenerationParameters(
+            final List<CompanyGenerationPersonTracker> trackers) {
+        final List<AtBRandomMechParameters> parameters = new ArrayList<>();
+        trackers.forEach(tracker -> {
+            if (tracker.getPersonType().isCombat()) {
+                parameters.add(createUnitGenerationParameter(tracker));
+            }
+        });
+        return parameters;
+    }
+
+    /**
+     * Creates an individual set of parameters, rerolling the weight if Star League is rolled originally
+     * @param tracker the tracker to generate the parameters based on
+     * @return the created parameters
+     */
+    private AtBRandomMechParameters createUnitGenerationParameter(final CompanyGenerationPersonTracker tracker) {
+        final AtBRandomMechParameters parameters = new AtBRandomMechParameters(
+                rollBattleMechWeight(tracker, true), rollBattleMechQuality(tracker));
+        if (parameters.isStarLeague()) {
+            parameters.setWeight(rollBattleMechWeight(tracker, false));
         }
         return parameters;
+    }
+
+    /**
+     * @param tracker the tracker to get the unit generation parameter modifier for
+     * @return the modifier value
+     */
+    private int getUnitGenerationParameterModifier(final CompanyGenerationPersonTracker tracker) {
+        switch (tracker.getPersonType()) {
+            case COMPANY_COMMANDER:
+                return 2;
+            case CAPTAIN:
+            case LIEUTENANT:
+                return 1;
+            case MECHWARRIOR:
+                return 0;
+            default:
+                // Shouldn't be hit, but a safety for attempting non-combat generation
+                return -20;
+        }
+    }
+
+    /**
+     * @param tracker the tracker to roll based on
+     * @param initialRoll if this isn't the initial roll, then we need to cap the value at 12
+     * @return the weight to use in generating the BattleMech
+     */
+    private int rollBattleMechWeight(final CompanyGenerationPersonTracker tracker, final boolean initialRoll) {
+        int roll = Utilities.dice(2, 6) + getUnitGenerationParameterModifier(tracker);
+        if (!initialRoll) {
+            roll = Math.min(roll, 12);
+        }
+        return determineBattleMechWeight(roll);
     }
 
     /**
@@ -622,25 +719,103 @@ public abstract class AbstractCompanyGenerator {
     protected abstract int determineBattleMechWeight(final int roll);
 
     /**
+     * @param tracker the tracker to roll based on
+     * @return the quality to use in generating the BattleMech
+     */
+    private int rollBattleMechQuality(final CompanyGenerationPersonTracker tracker) {
+        return determineBattleMechQuality(Utilities.dice(2, 6)
+                + getUnitGenerationParameterModifier(tracker));
+    }
+
+    /**
      * @param roll the modified roll to use
      * @return the generated IUnitRating magic int for Dragoon Quality
      */
     protected abstract int determineBattleMechQuality(final int roll);
+    /**
+     * @param trackers the trackers to sort into their lances
+     * @return a new List containing the sorted personnel
+     */
+    private List<CompanyGenerationPersonTracker> sortPersonnelIntoLances(
+            final List<CompanyGenerationPersonTracker> trackers) {
+        // We start by creating the return list, the Captains list, the Lieutenants list
+        // and the MechWarriors list
+        final List<CompanyGenerationPersonTracker> sortedTrackers = new ArrayList<>();
+        final List<CompanyGenerationPersonTracker> captains = trackers.stream().filter(tracker ->
+                tracker.getPersonType().isCaptain()).collect(Collectors.toList());
+        final List<CompanyGenerationPersonTracker> lieutenants = trackers.stream().filter(tracker ->
+                tracker.getPersonType().isLieutenant()).collect(Collectors.toList());
+        final List<CompanyGenerationPersonTracker> standardMechWarriors = trackers.stream().filter(tracker ->
+                tracker.getPersonType().isMechWarrior()).collect(Collectors.toList());
+
+        // Sort Command Lance
+        sortedTrackers.addAll(organizeTrackersIntoLance(trackers.get(0), standardMechWarriors));
+
+        // If the command lance is part of a company, we sort the rest of that company immediately
+        if (!getOptions().isGenerateMercenaryCompanyCommandLance() && (getOptions().getCompanyCount() > 0)) {
+            for (int i = 1; i < getOptions().getLancesPerCompany(); i++) {
+                sortedTrackers.addAll(organizeTrackersIntoLance(lieutenants.remove(0), standardMechWarriors));
+            }
+        }
+
+        // Sort into Companies
+        while (!captains.isEmpty()) {
+            // Assign the Captain's Lance
+            sortedTrackers.addAll(organizeTrackersIntoLance(captains.remove(0), standardMechWarriors));
+            // Then assign the other lances
+            for (int y = 1; y < getOptions().getLancesPerCompany(); y++) {
+                sortedTrackers.addAll(organizeTrackersIntoLance(lieutenants.remove(0), standardMechWarriors));
+            }
+        }
+
+        // Sort any individual lances
+        while (!lieutenants.isEmpty()) {
+            sortedTrackers.addAll(organizeTrackersIntoLance(lieutenants.remove(0), standardMechWarriors));
+        }
+
+        return sortedTrackers;
+    }
 
     /**
-     * @param campaign the campaign to generate for
-     * @param parameters the list of all parameters to use in generation
-     * @param combatPersonnel the list of all combat personnel
-     * @return the list of all generated entities, with null holding spaces without 'Mechs
+     *
+     * @param officer
+     * @param standardMechWarriors
+     * @return
      */
-    private List<Entity> generateEntities(final Campaign campaign,
-                                          final List<RandomMechParameters> parameters,
-                                          final List<Person> combatPersonnel) {
-        List<Entity> entities = new ArrayList<>();
-        for (int i = 0; i < parameters.size(); i++) {
-            entities.add(generateEntity(campaign, parameters.get(i), combatPersonnel.get(i).getOriginFaction()));
+    private List<CompanyGenerationPersonTracker> organizeTrackersIntoLance(
+            final CompanyGenerationPersonTracker officer,
+            final List<CompanyGenerationPersonTracker> standardMechWarriors) {
+        final List<CompanyGenerationPersonTracker> trackers = new ArrayList<>();
+        trackers.add(officer);
+        if (standardMechWarriors.size() <= getOptions().getLanceSize() - 1) {
+            trackers.addAll(standardMechWarriors);
+            standardMechWarriors.clear();
+        } else {
+            for (int i = 1; (i < getOptions().getLanceSize()) && !standardMechWarriors.isEmpty(); i++) {
+                trackers.add(standardMechWarriors.remove(0));
+            }
         }
-        return entities;
+        return trackers;
+    }
+    //endregion Unit Generation Parameters
+
+    //region Entities
+    /**
+     * @param campaign the campaign to generate for
+     * @param trackers the list of all personnel trackers
+     */
+    public void generateEntities(final Campaign campaign,
+                                 final List<CompanyGenerationPersonTracker> trackers) {
+        trackers.forEach(tracker -> generateEntity(campaign, tracker));
+    }
+
+    /**
+     * This generates a single entity and assigns it to the specified tracker.
+     * @param campaign the campaign to generate for
+     * @param tracker the tracker to generate based on the parameters and to assign the result to
+     */
+    private void generateEntity(final Campaign campaign, final CompanyGenerationPersonTracker tracker) {
+        tracker.setEntity(generateEntity(campaign, tracker.getParameters(), tracker.getPerson().getOriginFaction()));
     }
 
     /**
@@ -650,9 +825,9 @@ public abstract class AbstractCompanyGenerator {
      * @param faction the faction to generate the Entity from
      * @return the entity generated, or null otherwise
      */
-    public @Nullable Entity generateEntity(final Campaign campaign,
-                                           final RandomMechParameters parameters,
-                                           final Faction faction) {
+    private @Nullable Entity generateEntity(final Campaign campaign,
+                                            final AtBRandomMechParameters parameters,
+                                            final Faction faction) {
         // Ultra-Light means no mech generated
         if (parameters.getWeight() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
             return null;
@@ -676,7 +851,7 @@ public abstract class AbstractCompanyGenerator {
      * @return the MechSummary generated from the provided parameters
      */
     protected abstract MechSummary generateMechSummary(final Campaign campaign,
-                                                       final RandomMechParameters parameters,
+                                                       final AtBRandomMechParameters parameters,
                                                        final Faction faction);
 
     /**
@@ -687,53 +862,51 @@ public abstract class AbstractCompanyGenerator {
      * @return the MechSummary generated from the provided parameters
      */
     protected MechSummary generateMechSummary(final Campaign campaign,
-                                              final RandomMechParameters parameters,
+                                              final AtBRandomMechParameters parameters,
                                               final String faction, int year) {
         Predicate<MechSummary> filter = ms ->
                 (!campaign.getCampaignOptions().limitByYear() || (year > ms.getYear()));
         return campaign.getUnitGenerator().generate(faction, UnitType.MEK,
                 parameters.getWeight(), year, parameters.getQuality(), filter);
     }
+    //endregion Entities
 
     /**
      * @param campaign the campaign to add the units to
-     * @param combatPersonnel the list of combat personnel to assign to units
-     * @param entities the list of generated entities, with null holding spaces without 'Mechs
+     * @param trackers the list of trackers to assign to their units
      * @return the list of created units
      */
-    public List<Unit> createUnits(final Campaign campaign, List<Person> combatPersonnel,
-                                  final List<Entity> entities) {
-        if (!getOptions().isKeepOfficerRollsSeparate()) { // Sorted into individual lances
-            combatPersonnel = sortPersonnelIntoLances(combatPersonnel);
-        }
-
+    private List<Unit> createUnits(final Campaign campaign,
+                                   final List<CompanyGenerationPersonTracker> trackers) {
         final List<Unit> units = new ArrayList<>();
-        for (int i = 0; i < entities.size(); i++) {
-            if (entities.get(i) != null) {
-                final Unit unit = campaign.addNewUnit(entities.get(i), false, 0);
-                if (i < combatPersonnel.size()) {
-                    unit.addPilotOrSoldier(combatPersonnel.get(i));
-                    if (getOptions().isGenerateUnitsAsAttached()) {
-                        combatPersonnel.get(i).setOriginalUnit(unit);
-                    }
-                }
-                units.add(unit);
+        for (final CompanyGenerationPersonTracker tracker : trackers) {
+            if (tracker.getEntity() == null) {
+                continue;
             }
+
+            final Unit unit = campaign.addNewUnit(tracker.getEntity(), false, 0);
+            unit.addPilotOrSoldier(tracker.getPerson());
+            if (getOptions().isGenerateUnitsAsAttached()) {
+                tracker.getPerson().setOriginalUnit(unit);
+            }
+            units.add(unit);
         }
         return units;
     }
 
     /**
-     * @param supportPersonnel the list of support personnel including the techs to assign to units
+     * @param trackers the list of trackers including the support 'Mech techs
      * @param units the list of units to have techs assigned to (order does not matter)
      */
-    public void assignTechsToUnits(final List<Person> supportPersonnel, final List<Unit> units) {
+    private void assignTechsToUnits(final List<CompanyGenerationPersonTracker> trackers, final List<Unit> units) {
         if (!getOptions().isAssignTechsToUnits()) {
             return;
         }
 
-        final List<Person> mechTechs = supportPersonnel.parallelStream()
-                .filter(p -> p.getPrimaryRole() == Person.T_MECH_TECH).collect(Collectors.toList());
+        final List<CompanyGenerationPersonTracker> mechTechs = trackers.parallelStream()
+                .filter(tracker -> tracker.getPersonType().isSupport())
+                .filter(tracker -> tracker.getPerson().getPrimaryRole() == Person.T_MECH_TECH)
+                .collect(Collectors.toList());
         if (mechTechs.size() == 0) {
             return;
         }
@@ -741,7 +914,7 @@ public abstract class AbstractCompanyGenerator {
         units.sort(Comparator.comparingDouble(Unit::getMaintenanceTime));
         int numberMechTechs = mechTechs.size();
         for (int i = 0; (i < units.size()) && !mechTechs.isEmpty(); i++) {
-            Person mechTech = mechTechs.get(i % numberMechTechs);
+            final Person mechTech = mechTechs.get(i % numberMechTechs).getPerson();
             if (mechTech.getMaintenanceTimeUsing() + units.get(i).getMaintenanceTime() <= Person.PRIMARY_ROLE_SUPPORT_TIME) {
                 units.get(i).setTech(mechTech);
             } else {
@@ -753,74 +926,11 @@ public abstract class AbstractCompanyGenerator {
 
     //region Unit
     /**
-     * @param personnel the combat personnel to sort into their lances
-     * @return a new List containing the sorted personnel
-     */
-    public List<Person> sortPersonnelIntoLances(final List<Person> personnel) {
-        final Person commander = personnel.get(0);
-        List<Person> officers = new ArrayList<>(personnel.subList(1, determineFirstNonOfficer()));
-        final List<Person> standardMechWarriors = new ArrayList<>(personnel.subList(determineFirstNonOfficer(), personnel.size()));
-        final List<Person> sortedPersonnel = new ArrayList<>();
-
-        // Sort Command Lance
-        sortedPersonnel.add(commander);
-        if (!getOptions().isCompanyCommanderLanceOfficer()) {
-            // This removes the first non-Captain officer, as Captains each get their own companies
-            sortedPersonnel.add(officers.remove(determineNumberCaptains()));
-        }
-        for (int i = sortedPersonnel.size() - 1; i < getOptions().getLanceSize(); i++) {
-            sortedPersonnel.add(standardMechWarriors.remove(0));
-        }
-
-        // If the command lance is part of a company, we sort the rest of that company immediately
-        if (!getOptions().isGenerateMercenaryCompanyCommandLance() && (getOptions().getCompanyCount() > 0)) {
-            for (int i = 1; i < getOptions().getLancesPerCompany(); i++) {
-                // This removes the first non-Captain officer, as Captains each get their own companies
-                sortedPersonnel.add(officers.remove(determineNumberCaptains()));
-                for (int y = 1; (y < getOptions().getLanceSize()) && !standardMechWarriors.isEmpty(); y++) {
-                    sortedPersonnel.add(standardMechWarriors.remove(0));
-                }
-            }
-        }
-
-        // Sort into Companies
-        int numberCaptains = determineNumberCaptains();
-        for (int i = 0; i < determineNumberCaptains(); i++) {
-            // Assign the Captain's Lance
-            sortedPersonnel.add(officers.remove(0));
-            numberCaptains--;
-            for (int y = 1; (y < getOptions().getLanceSize()) && !standardMechWarriors.isEmpty(); y++) {
-                sortedPersonnel.add(standardMechWarriors.remove(0));
-            }
-            // Then assign the other lances
-            for (int y = 1; y < getOptions().getLancesPerCompany(); y++) {
-                // This removes the first non-Captain officer, as Captains each get their own companies
-                sortedPersonnel.add(officers.remove(numberCaptains));
-                for (int z = 1; (z < getOptions().getLanceSize()) && !standardMechWarriors.isEmpty(); z++) {
-                    sortedPersonnel.add(standardMechWarriors.remove(0));
-                }
-            }
-        }
-
-        // Sort any individual lances
-        final int originalOfficersSize = officers.size();
-        for (int i = 0; i < originalOfficersSize; i++) {
-            sortedPersonnel.add(officers.remove(0));
-            for (int y = 1; (y < getOptions().getLanceSize()) && !standardMechWarriors.isEmpty(); y++) {
-                sortedPersonnel.add(standardMechWarriors.remove(0));
-            }
-        }
-
-        return sortedPersonnel;
-    }
-
-    /**
      * This generates the TO&E structure, and assigns personnel to their individual lances.
-     * This is called after all dialog modifications to personnel.
      * @param campaign the campaign to generate the unit within
-     * @param personnel a CLONED list of personnel properly organized into lances
+     * @param trackers a CLONED list of trackers properly organized into lances
      */
-    public void generateUnit(final Campaign campaign, final List<Person> personnel) {
+    private void generateUnit(final Campaign campaign, final List<CompanyGenerationPersonTracker> trackers) {
         final Force originForce = campaign.getForce(0);
         final Alphabet[] alphabet = Alphabet.values();
         String background = "";
@@ -869,7 +979,7 @@ public abstract class AbstractCompanyGenerator {
 
         // Generate the Mercenary Company Command Lance
         if (getOptions().isGenerateMercenaryCompanyCommandLance()) {
-            Force commandLance = createLance(campaign, originForce, personnel, campaign.getName()
+            Force commandLance = createLance(campaign, originForce, trackers, campaign.getName()
                     + resources.getString("AbstractCompanyGenerator.commandLance.text"), background);
             commandLance.getIconMap().put(LayeredForceIcon.SPECIAL_MODIFIER.getLayerPath(), new Vector<>());
             commandLance.getIconMap().get(LayeredForceIcon.SPECIAL_MODIFIER.getLayerPath()).add("HQ indicator.png");
@@ -881,7 +991,7 @@ public abstract class AbstractCompanyGenerator {
                     + resources.getString("AbstractCompanyGenerator.company.text"));
             campaign.addForce(company, originForce);
             for (int y = 0; y < getOptions().getLancesPerCompany(); y++) {
-                createLance(campaign, company, personnel, alphabet[y], background);
+                createLance(campaign, company, trackers, alphabet[y], background);
             }
 
             if (getOptions().isGenerateForceIcons()) {
@@ -891,7 +1001,7 @@ public abstract class AbstractCompanyGenerator {
 
         // Create Individual Lances
         for (int i = 0 ; i < getOptions().getIndividualLanceCount(); i++) {
-            createLance(campaign, originForce, personnel, alphabet[i + getOptions().getCompanyCount()], background);
+            createLance(campaign, originForce, trackers, alphabet[i + getOptions().getCompanyCount()], background);
         }
     }
 
@@ -899,13 +1009,14 @@ public abstract class AbstractCompanyGenerator {
      * This creates a lance with a standard name
      * @param campaign the campaign to generate the unit within
      * @param head the force to append the new lance to
-     * @param personnel the list of personnel, properly ordered to be assigned to the lance
+     * @param trackers the list of trackers, properly ordered to be assigned to the lance
      * @param alphabet the alphabet value to determine the lance name from
      * @param background the background filename
      */
-    private void createLance(final Campaign campaign, final Force head, final List<Person> personnel,
+    private void createLance(final Campaign campaign, final Force head,
+                             final List<CompanyGenerationPersonTracker> trackers,
                              final Alphabet alphabet, final String background) {
-        createLance(campaign, head, personnel,
+        createLance(campaign, head, trackers,
                 getOptions().getForceNamingMethod().getValue(alphabet)
                         + resources.getString("AbstractCompanyGenerator.lance.text"),
                 background);
@@ -914,17 +1025,18 @@ public abstract class AbstractCompanyGenerator {
     /**
      * @param campaign the campaign to generate the unit within
      * @param head the force to append the new lance to
-     * @param personnel the list of personnel, properly ordered to be assigned to the lance
+     * @param trackers the list of trackers, properly ordered to be assigned to the lance
      * @param name the lance's name
      * @param background the background filename
      * @return the newly created lance
      */
-    private Force createLance(final Campaign campaign, final Force head, final List<Person> personnel,
+    private Force createLance(final Campaign campaign, final Force head,
+                              final List<CompanyGenerationPersonTracker> trackers,
                               final String name, final String background) {
         Force lance = new Force(name);
         campaign.addForce(lance, head);
-        for (int i = 0; (i < getOptions().getLanceSize()) && !personnel.isEmpty(); i++) {
-            campaign.addUnitToForce(personnel.remove(0).getUnit(), lance);
+        for (int i = 0; (i < getOptions().getLanceSize()) && !trackers.isEmpty(); i++) {
+            campaign.addUnitToForce(trackers.remove(0).getPerson().getUnit(), lance);
         }
 
         if (getOptions().isGenerateForceIcons()) {
@@ -1016,17 +1128,19 @@ public abstract class AbstractCompanyGenerator {
     /**
      * This generates any mothballed spare entities for the force
      * @param campaign the campaign to generate for
-     * @param entities the generated combat entities
+     * @param trackers the trackers containing the generated combat entities
      * @return the list of all generated entities to mothball as spares
      */
-    public List<Entity> generateMothballedEntities(final Campaign campaign, final List<Entity> entities) {
+    public List<Entity> generateMothballedEntities(final Campaign campaign,
+                                                   final List<CompanyGenerationPersonTracker> trackers) {
         // Determine how many entities to generate
         final int numberMothballedEntities;
         if (getOptions().isGenerateMothballedSpareUnits()
                 && (getOptions().getSparesPercentOfActiveUnits() > 0)) {
             // No free units for null rolls!
             numberMothballedEntities = Math.toIntExact(Math.round(
-                    entities.stream().filter(Objects::nonNull).count()
+                    trackers.stream().map(CompanyGenerationPersonTracker::getEntity)
+                            .filter(Objects::nonNull).count()
                     * (getOptions().getSparesPercentOfActiveUnits() / 100.0)));
         } else {
             numberMothballedEntities = 0;
@@ -1052,7 +1166,7 @@ public abstract class AbstractCompanyGenerator {
             }
 
             // Create the parameters to generate the 'Mech from
-            final RandomMechParameters parameters = new RandomMechParameters(
+            final AtBRandomMechParameters parameters = new AtBRandomMechParameters(
                     determineBattleMechWeight(Utilities.dice(2, 6)),
                     determineBattleMechQuality(Utilities.dice(2, 6))
             );
@@ -1076,9 +1190,9 @@ public abstract class AbstractCompanyGenerator {
      * @param mothballedEntities the list of generated spare 'Mech entities to add and mothball
      * @return the list of created units
      */
-    public List<Unit> createMothballedSpareUnits(final Campaign campaign,
-                                                 final List<Entity> mothballedEntities) {
-        List<Unit> mothballedUnits = new ArrayList<>();
+    private List<Unit> createMothballedSpareUnits(final Campaign campaign,
+                                                  final List<Entity> mothballedEntities) {
+        final List<Unit> mothballedUnits = new ArrayList<>();
         for (final Entity mothballedEntity : mothballedEntities) {
             final Unit unit = campaign.addNewUnit(mothballedEntity, false, 0);
             unit.completeMothball();
@@ -1180,8 +1294,7 @@ public abstract class AbstractCompanyGenerator {
         final List<AmmoStorage> ammunition = new ArrayList<>();
         final boolean generateReloads = getOptions().getNumberReloadsPerWeapon() > 0;
         ammoBins.forEach(ammoBin -> {
-            if (getOptions().isGenerateFractionalMachineGunAmmunition()
-                    && ammoBinIsMachineGun(ammoBin)) {
+            if (getOptions().isGenerateFractionalMachineGunAmmunition() && ammoBinIsMachineGun(ammoBin)) {
                 ammunition.add(new AmmoStorage(0, ammoBin.getType(), 50, campaign));
             } else if (generateReloads) {
                 ammunition.add(new AmmoStorage(0, ammoBin.getType(),
@@ -1214,7 +1327,7 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to apply changes to
      * @param contract the selected contract, if any
      */
-    public void processContract(final Campaign campaign, final @Nullable Contract contract) {
+    private void processContract(final Campaign campaign, final @Nullable Contract contract) {
         if (contract == null) {
             return;
         }
@@ -1226,10 +1339,11 @@ public abstract class AbstractCompanyGenerator {
     //endregion Contract
 
     //region Finances
-    public void processFinances(final Campaign campaign, final List<Person> personnel,
-                                final List<Unit> units, final List<Part> parts,
-                                final List<Armor> armour, final List<AmmoStorage> ammunition,
-                                final @Nullable Contract contract) {
+    private void processFinances(final Campaign campaign,
+                                 final List<CompanyGenerationPersonTracker> trackers,
+                                 final List<Unit> units, final List<Part> parts,
+                                 final List<Armor> armour, final List<AmmoStorage> ammunition,
+                                 final @Nullable Contract contract) {
         // TODO : Finish implementation
         Money startingCash = generateStartingCash();
         Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
@@ -1241,7 +1355,7 @@ public abstract class AbstractCompanyGenerator {
             Money maximumPreLoanCost = startingCash.minus(minimumStartingFloat);
             Money loan = Money.zero();
 
-            final Money hiringCosts = calculateHiringCosts(personnel);
+            final Money hiringCosts = calculateHiringCosts(trackers);
             if (maximumPreLoanCost.isGreaterOrEqualThan(hiringCosts)) {
                 maximumPreLoanCost = maximumPreLoanCost.minus(hiringCosts);
             } else if (getOptions().isStartingLoan()) {
@@ -1289,7 +1403,7 @@ public abstract class AbstractCompanyGenerator {
     /**
      * @return the amount of starting cash generated for the Mercenary Company
      */
-    public Money generateStartingCash() {
+    private Money generateStartingCash() {
         return getOptions().isRandomizeStartingCash() ? rollRandomStartingCash()
                 : Money.of(getOptions().getStartingCash());
     }
@@ -1304,17 +1418,17 @@ public abstract class AbstractCompanyGenerator {
     }
 
     /**
-     * @param personnel the list of personnel to get the hiring cost for
+     * @param trackers the trackers containing the personnel to get the hiring cost for
      * @return the cost of hiring the personnel, or zero if you aren't paying for hiring costs
      */
-    private Money calculateHiringCosts(final List<Person> personnel) {
+    private Money calculateHiringCosts(final List<CompanyGenerationPersonTracker> trackers) {
         if (!getOptions().isPayForPersonnel()) {
             return Money.zero();
         }
 
         Money hiringCosts = Money.zero();
-        for (final Person person : personnel) {
-            hiringCosts = hiringCosts.plus(person.getSalary().multipliedBy(2));
+        for (final CompanyGenerationPersonTracker tracker : trackers) {
+            hiringCosts = hiringCosts.plus(tracker.getPerson().getSalary().multipliedBy(2));
         }
         return hiringCosts;
     }
@@ -1392,7 +1506,8 @@ public abstract class AbstractCompanyGenerator {
     //endregion Finances
 
     //region Surprises
-    public void generateSurprises(final Campaign campaign) {
+/*
+    private void generateSurprises(final Campaign campaign) {
         if (!getOptions().isGenerateSurprises()) {
             return;
         }
@@ -1415,129 +1530,98 @@ public abstract class AbstractCompanyGenerator {
 
         // TODO : Processing of mystery boxes
     }
+ */
     //endregion Surprises
 
     //region Apply to Campaign
     /**
-     * TODO : UNFINISHED
-     * This method takes the campaign and applies all changes to it. No method not directly
-     * called from here may alter the campaign.
+     * Phase Zero: Anything that is to be run BEFORE starting generation
      *
      * @param campaign the campaign to apply the generation to
-     * @param combatPersonnel the list of generated combat personnel
-     * @param supportPersonnel the list of generated support personnel
-     * @param entities the list of generated entities, with null holding spaces without 'Mechs
-     * @param mothballedEntities the list of generated spare 'Mech entities to mothball
-     * @param contract the selected contract, or null if one has not been selected
      */
-    public void applyToCampaign(final Campaign campaign, final List<Person> combatPersonnel,
-                                final List<Person> supportPersonnel, final List<Entity> entities,
-                                final List<Entity> mothballedEntities, final @Nullable Contract contract) {
+    public void applyPhaseZeroToCampaign(final Campaign campaign) {
+        // Move to Starting Planet
         moveToStartingPlanet(campaign);
-
-        // Phase One: Personnel, Units, and Unit
-        final List<Person> personnel = new ArrayList<>();
-        final List<Unit> units = new ArrayList<>();
-        applyPhaseOneToCampaign(campaign, combatPersonnel, supportPersonnel, personnel, entities, units);
-
-        // Phase 2: Spares
-        units.addAll(createMothballedSpareUnits(campaign, mothballedEntities));
-
-        final List<Part> parts = generateSpareParts(units);
-        final List<Armor> armour = generateArmour(units);
-        final List<AmmoStorage> ammunition = generateAmmunition(campaign, units);
-
-        // Phase 3: Contract
-        processContract(campaign, contract);
-
-        // Phase 4: Finances
-        processFinances(campaign, personnel, units, parts, armour, ammunition, contract);
-
-        // Phase 5: Applying Spares
-        parts.forEach(p -> campaign.getWarehouse().addPart(p, true));
-        armour.forEach(a -> campaign.getWarehouse().addPart(a, true));
-        ammunition.forEach(a -> campaign.getWarehouse().addPart(a, true));
-
-        // Phase 6: Surprises!
-        generateSurprises(campaign);
     }
 
-    private void applyPhaseOneToCampaign(final Campaign campaign, final List<Person> combatPersonnel,
-                                         final List<Person> supportPersonnel, final List<Person> personnel,
-                                         final List<Entity> entities, final List<Unit> units) {
+    /**
+     * Phase One: Starting Planet and Finalizing Personnel, Unit, and Units
+     *
+     * @param campaign the campaign to apply the generation to
+     * @param trackers the trackers containing all of the data required for Phase One
+     * @return a list of the newly created units to add to the campaign
+     */
+    public List<Unit> applyPhaseOneToCampaign(final Campaign campaign,
+                                              final List<CompanyGenerationPersonTracker> trackers) {
         // Process Personnel
-        personnel.addAll(combatPersonnel);
-        personnel.addAll(supportPersonnel);
-
         // If we aren't using the pool, generate all of the Astechs and Medics required
-        generateAssistants(campaign, personnel);
+        generateAssistants(campaign, trackers);
 
         // This does all of the final personnel processing, including recruitment and running random
         // marriages
-        finalizePersonnel(campaign, personnel);
+        finalizePersonnel(campaign, trackers);
 
-        // We can only fill the pool after recruiting our support personnel
+        // We can only fill the pool after finalizing and recruiting our support personnel
         if (getOptions().isPoolAssistants()) {
             campaign.fillAstechPool();
             campaign.fillMedicPool();
         }
 
         // Process Units
-        units.addAll(createUnits(campaign, combatPersonnel, entities));
+        final List<Unit> units = createUnits(campaign, trackers);
 
         // Assign Techs to Units
-        assignTechsToUnits(supportPersonnel, units);
+        assignTechsToUnits(trackers, units);
 
         // Generate the Forces and Assign Units to them
-        generateUnit(campaign, sortPersonnelIntoLances(combatPersonnel));
+        generateUnit(campaign, trackers);
+
+        return units;
+    }
+
+    /**
+     * Phase Two: Finalizing Spares
+     *
+     * @param campaign the campaign to apply the generation to
+     * @param mothballedEntities the generated mothballed spare entities
+     * @param parts the generated spare parts
+     * @param armour the generated spare armour
+     * @param ammunition the generated spare armour
+     * @return a list of the generated mothballed spare units
+     */
+    public List<Unit> applyPhaseTwoToCampaign(final Campaign campaign, final List<Entity> mothballedEntities,
+                                              final List<Part> parts, final List<Armor> armour,
+                                              final List<AmmoStorage> ammunition) {
+        final List<Unit> mothballedUnits = createMothballedSpareUnits(campaign, mothballedEntities);
+        parts.forEach(p -> campaign.getWarehouse().addPart(p, true));
+        armour.forEach(a -> campaign.getWarehouse().addPart(a, true));
+        ammunition.forEach(a -> campaign.getWarehouse().addPart(a, true));
+        return mothballedUnits;
+    }
+
+
+    /**
+     * Phase Three: Finalizing Contract and Finances
+     *
+     * @param campaign the campaign to apply the generation to
+     * @param trackers the trackers containing all of the data required for Phase One, which
+     *                 includes all Personnel
+     * @param units the units added to the campaign, including any mothballed units
+     * @param parts the spare parts generated
+     * @param armour the spare armour generated
+     * @param ammunition the spare ammunition generated
+     * @param contract the contract selected, if any
+     */
+    public void applyPhaseThreeToCampaign(final Campaign campaign,
+                                          final List<CompanyGenerationPersonTracker> trackers,
+                                          final List<Unit> units, final List<Part> parts,
+                                          final List<Armor> armour, final List<AmmoStorage> ammunition,
+                                          final @Nullable Contract contract) {
+        // Process Contract
+        processContract(campaign, contract);
+
+        // Process Finances
+        processFinances(campaign, trackers, units, parts, armour, ammunition, contract);
     }
     //endregion Apply to Campaign
-
-    //region Local Classes
-    /**
-     * This class contains the parameters used to generate a random mech, and allows sorting and
-     * swapping the order of rolled parameters while keeping them connected.
-     */
-    protected static class RandomMechParameters {
-        //region Variable Declarations
-        private int weight;
-        private int quality;
-        private boolean starLeague;
-        //endregion Variable Declarations
-
-        //region Constructors
-        public RandomMechParameters(final int weight, final int quality) {
-            setWeight(weight);
-            setQuality(quality);
-            setStarLeague(weight == EntityWeightClass.WEIGHT_SUPER_HEAVY);
-        }
-        //endregion Constructors
-
-        //region Getters/Setters
-        public int getWeight() {
-            return weight;
-        }
-
-        public void setWeight(final int weight) {
-            this.weight = weight;
-        }
-
-        public int getQuality() {
-            return quality;
-        }
-
-        public void setQuality(final int quality) {
-            this.quality = quality;
-        }
-
-        public boolean isStarLeague() {
-            return starLeague;
-        }
-
-        public void setStarLeague(final boolean starLeague) {
-            this.starLeague = starLeague;
-        }
-        //endregion Getters/Setters
-    }
-    //endregion Local Classes
 }

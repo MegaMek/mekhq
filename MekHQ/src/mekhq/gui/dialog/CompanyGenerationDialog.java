@@ -22,9 +22,13 @@ import megamek.common.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
 import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
+import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationPersonTracker;
 import mekhq.gui.enums.CompanyGenerationPanelType;
 import mekhq.gui.panels.CompanyGenerationOptionsPanel;
 
@@ -160,11 +164,21 @@ public class CompanyGenerationDialog extends BaseButtonDialog {
     protected void okAction() {
         final CompanyGenerationOptions options = getCompanyGenerationOptionsPanel().createOptionsFromPanel();
         final AbstractCompanyGenerator generator = options.getMethod().getGenerator(getCampaign(), options);
-        final List<Person> combatPersonnel = generator.generateCombatPersonnel(getCampaign());
-        final List<Person> supportPersonnel = generator.generateSupportPersonnel(getCampaign());
-        final List<Entity> entities = generator.generateUnits(getCampaign(), combatPersonnel);
-        final List<Entity> mothballedEntities = generator.generateMothballedEntities(getCampaign(), entities);
+
+        generator.applyPhaseZeroToCampaign(getCampaign());
+
+        final List<CompanyGenerationPersonTracker> trackers = generator.generatePersonnel(getCampaign());
+        generator.generateUnitGenerationParameters(trackers);
+        generator.generateEntities(getCampaign(), trackers);
+        final List<Unit> units = generator.applyPhaseOneToCampaign(getCampaign(), trackers);
+
+        final List<Entity> mothballedEntities = generator.generateMothballedEntities(getCampaign(), trackers);
+        final List<Part> parts = generator.generateSpareParts(units);
+        final List<Armor> armour = generator.generateArmour(units);
+        final List<AmmoStorage> ammunition = generator.generateAmmunition(getCampaign(), units);
+        units.addAll(generator.applyPhaseTwoToCampaign(getCampaign(), mothballedEntities, parts, armour, ammunition));
+
         final Contract contract = null;
-        generator.applyToCampaign(getCampaign(), combatPersonnel, supportPersonnel, entities, mothballedEntities, contract);
+        generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, contract);
     }
 }

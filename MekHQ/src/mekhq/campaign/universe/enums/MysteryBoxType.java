@@ -19,15 +19,6 @@
 package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.universe.randomEvent.mysteryBoxes.AbstractMysteryBox;
-import mekhq.campaign.universe.randomEvent.mysteryBoxes.ClanExperimentalMysteryBox;
-import mekhq.campaign.universe.randomEvent.mysteryBoxes.ClanFrontlineMysteryBox;
-import mekhq.campaign.universe.randomEvent.mysteryBoxes.ClanKeshikMysteryBox;
-import mekhq.campaign.universe.randomEvent.mysteryBoxes.ClanSecondLineMysteryBox;
-import mekhq.campaign.universe.randomEvent.mysteryBoxes.InnerSphereExperimentalMysteryBox;
-import mekhq.campaign.universe.randomEvent.mysteryBoxes.StarLeagueRegularMysteryBox;
-import mekhq.campaign.universe.randomEvent.mysteryBoxes.StarLeagueRoyalMysteryBox;
-import mekhq.campaign.universe.randomEvent.mysteryBoxes.ThirdSuccessionWarMysteryBox;
 
 import java.util.ResourceBundle;
 
@@ -63,6 +54,7 @@ public enum MysteryBoxType {
     }
     //endregion Getters
 
+/*
     public AbstractMysteryBox getMysteryBox() {
         switch (this) {
             case STAR_LEAGUE_ROYAL:
@@ -74,7 +66,7 @@ public enum MysteryBoxType {
             case CLAN_KESHIK:
                 return new ClanKeshikMysteryBox();
             case CLAN_FRONT_LINE:
-                return new ClanFrontlineMysteryBox();
+                return new ClanFrontLineMysteryBox();
             case CLAN_SECOND_LINE:
                 return new ClanSecondLineMysteryBox();
             case CLAN_EXPERIMENTAL:
@@ -84,6 +76,7 @@ public enum MysteryBoxType {
                 return new ThirdSuccessionWarMysteryBox();
         }
     }
+*/
 
     @Override
     public String toString() {
