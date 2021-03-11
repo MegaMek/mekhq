@@ -218,10 +218,10 @@ public class StratconScenarioWizard extends JDialog {
 
         ScenarioWizardLanceModel lanceModel;
         
-        // if we're waiting to assign primary forces, we can only do so from the current track 
         lanceModel = new ScenarioWizardLanceModel(campaign, 
                 StratconRulesManager.getAvailableForceIDs(forceTemplate.getAllowedUnitType(), 
-                        campaign, forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS));
+                        campaign, currentTrackState,
+                        forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS));
         
         JList<Force> availableForceList = new JList<>();
         availableForceList.setModel(lanceModel);
@@ -416,7 +416,7 @@ public class StratconScenarioWizard extends JDialog {
                 if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
                     ReinforcementEligibilityType reinforcementType = 
                             StratconRulesManager.getReinforcementType(force.getId(), currentTrackState, campaign);
-                    StratconRulesManager.processReinforcementDeployment(reinforcementType, currentCampaignState);
+                    StratconRulesManager.processReinforcementDeployment(reinforcementType, currentCampaignState, currentScenario, campaign);
                 }
                 
                 currentScenario.addForce(force.getId(), templateID);

@@ -4,12 +4,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -22,7 +16,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.StratconPanel;
 
 /**
@@ -59,7 +52,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.BOTH;
         
-        JLabel forceAssignmentInstructions = new JLabel("Select force to assign to this sector.");
+        JLabel forceAssignmentInstructions = new JLabel("Select force to assign to this track.");
         getContentPane().add(forceAssignmentInstructions, gbc);
         gbc.gridy++;
 
@@ -70,7 +63,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         // if we're waiting to assign primary forces, we can only do so from the current track 
         lanceModel = new ScenarioWizardLanceModel(campaign, 
                 StratconRulesManager.getAvailableForceIDs(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX, 
-                        campaign, false));
+                        campaign, currentCampaignState.getTrack(currentTrackIndex), false));
         
         availableForceList.setModel(lanceModel);
         availableForceList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));

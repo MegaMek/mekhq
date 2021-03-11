@@ -186,10 +186,12 @@ public class StratconTrackState {
     }
     
     public void unassignForce(int forceID) {
-        assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
-        assignedForceCoords.remove(forceID);
-        assignedForceReturnDates.remove(forceID);
-        getAssignedForceReturnDatesForStorage().remove(forceID);
+        if (assignedForceCoords.containsKey(forceID)) {
+            assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
+            assignedForceCoords.remove(forceID);
+            assignedForceReturnDates.remove(forceID);
+            getAssignedForceReturnDatesForStorage().remove(forceID);
+        }
     }
     
     /**

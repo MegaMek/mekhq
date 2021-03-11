@@ -31,6 +31,8 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
+import mekhq.campaign.mission.atb.AtBScenarioModifierApplicator;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
@@ -176,6 +178,7 @@ public class StratconRulesManager {
             if(scenario.getBackingScenario().getTemplate().isFacilityScenario()) {
                 StratconFacility facility = scenario.getBackingScenario().getTemplate().isHostileFacility() ?
                         StratconFacilityFactory.getRandomHostileFacility() : StratconFacilityFactory.getRandomAlliedFacility();
+                facility.setVisible(true);
                 track.addFacility(coords, facility);
                 setupFacilityScenario(scenario, track, coords, facility);
             }
@@ -258,32 +261,76 @@ public class StratconRulesManager {
             }
         }
         
+        // the force may be located in other places on the track - clear it out
+        track.unassignForce(forceID);
         track.assignForce(forceID, coords, campaign.getLocalDate());
     }
     
-    public static void processReinforcementDeployment(ReinforcementEligibilityType reinforcementType, 
-            StratconCampaignState campaignState) {
+    /**
+     * Worker function that processes the effects of deploying a reinforcement force to a scenario
+     */
+    public static boolean processReinforcementDeployment(ReinforcementEligibilityType reinforcementType, 
+            StratconCampaignState campaignState, StratconScenario scenario, Campaign campaign) {
         // if the force is already deployed to the track, we're done
+        // if the force is a fight lance or we're using a support point
         // if there is an SP to burn, burn it and we're done
         // if there is a VP to burn, burn it and we're done
         // now, roll 2d6 + lance commander tactics
         // 9+ = deploy
         // 6+ = deploy, if lance != fight, track scenario odds up
         // 2+ = apply negative modifier to scenario
-        switch(reinforcementType) {
-        case FightLance:
-            //if 9
-            break;
-        case SupportPoint:
+        
+        if ((reinforcementType == ReinforcementEligibilityType.FightLance) ||
+                (reinforcementType == ReinforcementEligibilityType.SupportPoint)) {
+            
             if (campaignState.getSupportPoints() > 0) {
                 campaignState.useSupportPoint();
-                return;
-            } else {
+                return true;
+            } else if (campaignState.getVictoryPoints() > 0) {
                 campaignState.updateVictoryPoints(-1);
-                return;
+                return true;
             }
-        default:
+            
+            int tactics = scenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_TACTICS, campaign);
+            int roll = 7;//Compute.d6(2);
+            int result = roll + tactics;
+
+            String reportStatus = String.format("Attempting to reinforce scenario %s without SP/VP, roll 2d6 + %d: %d",
+                    scenario.getName(), tactics, result);
+            
+            // fail to reinforce
+            if (result < 6) {
+                reportStatus += " - reinforcement attempt failed.";
+                campaign.addReport(reportStatus);
+                return false;
+            // succeed but get an extra negative event added to the scenario
+            } else if ((result < 9) && (reinforcementType != ReinforcementEligibilityType.FightLance)) {
+                MapLocation mapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
+                AtBScenarioModifier scenarioModifier = AtBScenarioModifier.getRandomBattleModifier(mapLocation, false);
+                
+                // keep rolling until we get an applicable one
+                // todo: have the AtBScenarioModifier sort these out instead for performance?
+                while (scenarioModifier.getEventTiming() != EventTiming.PostForceGeneration) {
+                    scenarioModifier = AtBScenarioModifier.getRandomBattleModifier(mapLocation, false);
+                }
+                
+                scenarioModifier.processModifier(scenario.getBackingScenario(), campaign, EventTiming.PostForceGeneration);
+                
+                reportStatus += String.format(" - reinforcement attempt succeeded; extra negative modifier (%s) applied to scenario.",
+                        scenarioModifier.getModifierName());
+                campaign.addReport(reportStatus);
+                return true;
+            // succeed without reservation
+            } else {
+                reportStatus += " - reinforcement attempt succeeded;";
+                campaign.addReport(reportStatus);
+                return true;
+            }
+        } else if (reinforcementType == ReinforcementEligibilityType.None) {
+            return false;
         }
+        
+        return true;
     }
     
     /**
@@ -451,8 +498,9 @@ public class StratconRulesManager {
     private static StratconScenario generateScenario(Campaign campaign, AtBContract contract, StratconTrackState track, 
             int forceID, StratconCoords coords) {
         int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
-        //ScenarioTemplate template = StratconScenarioFactory.getRandomScenario(unitType);
-        ScenarioTemplate template = StratconScenarioFactory.getSpecificScenario("Convoy Escort.xml");
+        ScenarioTemplate template = StratconScenarioFactory.getRandomScenario(unitType);
+        // useful for debugging specific scenario types
+        //ScenarioTemplate template = StratconScenarioFactory.getSpecificScenario("Hostile Facility.xml");
         
         return generateScenario(campaign, contract, track, forceID, coords, template);
     }
@@ -730,16 +778,19 @@ public class StratconRulesManager {
      * a) have not been assigned to a track
      * b) are combat-capable
      * c) are not deployed to a scenario
-     * @return
      */
-    public static List<Integer> getAvailableForceIDs(int unitType, Campaign campaign, boolean reinforcements) {
+    public static List<Integer> getAvailableForceIDs(int unitType, Campaign campaign, StratconTrackState currentTrack, 
+            boolean reinforcements) {
         List<Integer> retVal = new ArrayList<>();
         
         Set<Integer> forcesInTracks = new HashSet<>();
-        for(Contract contract : campaign.getActiveContracts()) {
-            if(contract instanceof AtBContract) {
-                for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
-                    forcesInTracks.addAll(track.getAssignedForceCoords().keySet());
+        // assemble a set of all force IDs that are currently assigned to tracks that are not this one
+        for (Contract contract : campaign.getActiveContracts()) {
+            if (contract instanceof AtBContract) {
+                for (StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
+                    if ((track != currentTrack) || !reinforcements) {
+                        forcesInTracks.addAll(track.getAssignedForceCoords().keySet());
+                    }
                 }
             }
         }
