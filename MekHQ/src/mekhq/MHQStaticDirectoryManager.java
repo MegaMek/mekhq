@@ -183,9 +183,11 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     if (iconMap.containsKey(layer)) {
                         for (String value : iconMap.get(layer)) {
                             // Load up the image piece
-                            BufferedImage img = (BufferedImage) getForceIcons().getItem(layer, value);
-                            width = Math.max(img.getWidth(), width);
-                            height = Math.max(img.getHeight(), height);
+                            BufferedImage image = (BufferedImage) getForceIcons().getItem(layer, value);
+                            if (image != null) {
+                                width = Math.max(image.getWidth(), width);
+                                height = Math.max(image.getHeight(), height);
+                            }
                         }
                     }
                 }
