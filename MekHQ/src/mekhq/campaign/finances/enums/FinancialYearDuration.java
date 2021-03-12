@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,17 +10,20 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.finances.enums;
 
 import megamek.common.util.EncodeControl;
 
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public enum FinancialYearDuration {
@@ -34,29 +37,30 @@ public enum FinancialYearDuration {
     //endregion Enum Declarations
 
     //region Variable Declarations
-    private final String typeName;
+    private final String name;
     private final String toolTipText;
 
     public final static FinancialYearDuration DEFAULT_TYPE = ANNUAL;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-            new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    FinancialYearDuration(String typeName, String toolTipText) {
-        this.typeName = resources.getString(typeName);
+    FinancialYearDuration(final String name, final String toolTipText) {
+        this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
 
+    //region Getters
     public String getToolTipText() {
         return toolTipText;
     }
+    //endregion Getters
 
-    public boolean isEndOfFinancialYear(LocalDate today) {
+    public boolean isEndOfFinancialYear(final LocalDate today) {
         switch (this) {
             case SEMIANNUAL:
-                return (today.getDayOfYear() == 1) || (today.getDayOfYear() == 183);
+                return (today.getDayOfYear() == 1) || ((today.getMonthValue() == 7) && (today.getDayOfMonth() == 1));
             case BIANNUAL:
                 return (today.getDayOfYear() == 1) && (today.getYear() % 2 == 0);
             case QUINQUENNIAL:
@@ -71,8 +75,38 @@ public enum FinancialYearDuration {
         }
     }
 
+    /**
+     * @param tomorrow tomorrow's date. Because of how this is passed in, we are provided that
+     *                 instead of today
+     * @return the filename to use for the date during financial export
+     */
+    public String getExportFilenameDateString(final LocalDate tomorrow) {
+        final int year = tomorrow.getYear() - 1;
+        switch (this) {
+            case SEMIANNUAL:
+                final boolean isStartOfYear = tomorrow.getDayOfYear() == 1;
+                return isStartOfYear
+                        ? String.format("%d %s - %s", year,
+                                Month.JULY.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                                Month.DECEMBER.getDisplayName(TextStyle.SHORT, Locale.getDefault()))
+                        : String.format("%d %s - %s", year + 1,
+                                Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                                Month.JUNE.getDisplayName(TextStyle.SHORT, Locale.getDefault()));
+            case BIANNUAL:
+                return String.format("%d - %d", year - 1, year);
+            case QUINQUENNIAL:
+                return String.format("%d - %d", year - 4, year);
+            case DECENNIAL:
+                return String.format("%d - %d", year - 9, year);
+            case FOREVER:
+            case ANNUAL:
+            default:
+                return Integer.toString(year);
+        }
+    }
+
     @Override
     public String toString() {
-        return typeName;
+        return name;
     }
 }
