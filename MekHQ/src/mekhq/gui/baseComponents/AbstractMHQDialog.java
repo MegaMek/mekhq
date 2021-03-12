@@ -42,7 +42,8 @@ public abstract class AbstractMHQDialog extends AbstractDialog {
     }
 
     /**
-     * This creates an AbstractMHQDialog using the default MHQ resource bundle
+     * This creates an AbstractMHQDialog using the default MHQ resource bundle. It allows one
+     * to create modal dialogs.
      */
     protected AbstractMHQDialog(final JFrame frame, final boolean modal, final String name, final String title) {
         this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), name, title);

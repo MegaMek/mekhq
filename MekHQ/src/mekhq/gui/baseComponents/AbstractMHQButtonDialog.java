@@ -50,7 +50,7 @@ public abstract class AbstractMHQButtonDialog extends AbstractButtonDialog {
 
     /**
      * This creates an AbstractMHQButtonDialog using the default MHQ resource bundle. It allows one
-     * to create non-modal button dialogs, which is not recommended by default
+     * to create non-modal button dialogs, which is not recommended by default.
      */
     protected AbstractMHQButtonDialog(final JFrame frame, final boolean modal, final String name,
                                       final String title) {
@@ -58,8 +58,8 @@ public abstract class AbstractMHQButtonDialog extends AbstractButtonDialog {
     }
 
     /**
-     * This creates an AbstractMHQButtonDialog using the specified resource bundle. This is not recommended
-     * by default.
+     * This creates an AbstractMHQButtonDialog using the specified resource bundle. This is not
+     * recommended by default.
      */
     protected AbstractMHQButtonDialog(final JFrame frame, final boolean modal, final ResourceBundle resources,
                                       final String name, final String title) {
