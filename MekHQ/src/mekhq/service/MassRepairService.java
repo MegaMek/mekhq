@@ -199,6 +199,7 @@ public class MassRepairService {
             return;
         } else if (campaign.getAstechNeed() > 0) {
             campaign.addReport(resources.getString("MRMS.InsufficientAstechs.report"));
+            return;
         }
 
         List<Unit> units = new ArrayList<>();
