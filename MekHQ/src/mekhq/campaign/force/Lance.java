@@ -39,7 +39,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -91,17 +90,9 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         forceId = fid;
         role = AtBLanceRole.UNASSIGNED;
         missionId = -1;
-        for (Mission m : c.getSortedMissions()) {
-            if (!m.isActive()) {
-                break;
-            }
-            if (m instanceof AtBContract) {
-                if (null == ((AtBContract)m).getParentContract()) {
-                    missionId = m.getId();
-                } else {
-                    missionId = ((AtBContract)m).getParentContract().getId();
-                }
-            }
+        for (AtBContract contract : c.getActiveAtBContracts()) {
+            missionId = ((contract.getParentContract() == null)
+                    ? contract : contract.getParentContract()).getId();
         }
         commanderId = findCommander(forceId, c);
     }

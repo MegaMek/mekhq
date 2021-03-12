@@ -49,7 +49,6 @@ import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.MekHqColors;
 import mekhq.gui.model.DataTableModel;
@@ -215,20 +214,14 @@ public class LanceAssignmentView extends JPanel {
 
     public void refresh() {
         cbContract.removeAllItems();
-        List<AtBContract> activeContracts = new ArrayList<>();
-        for (Mission m : campaign.getMissions()) {
-            if ((m instanceof AtBContract) && m.isActive()
-                    && !((AtBContract) m).getStartDate().isAfter(campaign.getLocalDate())) {
-                activeContracts.add((AtBContract)m);
-                cbContract.addItem((AtBContract)m);
-            }
+        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        for (AtBContract contract : activeContracts) {
+            cbContract.addItem(contract);
         }
-        AtBContract defaultContract = null;
-        if (activeContracts.size() > 0) {
-            defaultContract = activeContracts.get(0);
-        }
+        AtBContract defaultContract = activeContracts.isEmpty() ? null : activeContracts.get(0);
         for (Lance l : campaign.getLances().values()) {
-            if ((l.getContract(campaign) == null) || !l.getContract(campaign).isActive()) {
+            if ((l.getContract(campaign) == null)
+                    || !l.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
                 l.setContract(defaultContract);
             }
         }
@@ -348,11 +341,11 @@ class RequiredLancesTableModel extends DataTableModel {
             return ((AtBContract) data.get(row)).getName();
         }
         if (data.get(row) instanceof AtBContract) {
-            AtBContract contract = (AtBContract)data.get(row);
+            AtBContract contract = (AtBContract) data.get(row);
             if (column == COL_TOTAL) {
                 int t = 0;
                 for (Lance l : campaign.getLanceList()) {
-                    if (l.getContract(campaign).equals(data.get(row))
+                    if (data.get(row).equals(l.getContract(campaign))
                             && (l.getRole() != AtBLanceRole.UNASSIGNED)
                             && l.isEligible(campaign)) {
                         t++;
@@ -365,8 +358,8 @@ class RequiredLancesTableModel extends DataTableModel {
             } else if (contract.getRequiredLanceType().ordinal() == column - 2) {
                 int t = 0;
                 for (Lance l : campaign.getLanceList()) {
-                    if (l.getContract(campaign).equals(data.get(row))
-                            && l.getRole() == l.getContract(campaign).getRequiredLanceType()
+                    if (data.get(row).equals(l.getContract(campaign))
+                            && (l.getRole() == l.getContract(campaign).getRequiredLanceType())
                             && l.isEligible(campaign)) {
                         t++;
                     }

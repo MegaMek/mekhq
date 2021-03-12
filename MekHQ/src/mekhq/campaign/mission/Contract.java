@@ -406,6 +406,12 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         cachedJumpPath = null;
     }
 
+    @Override
+    public boolean isActiveOn(LocalDate date, boolean excludeEndDateCheck) {
+        return super.isActiveOn(date, excludeEndDateCheck) && !date.isBefore(getStartDate())
+                && (excludeEndDateCheck || !date.isAfter(getEndingDate()));
+    }
+
     /**
      * Gets the currently calculated jump path for this contract,
      * only recalculating if it's not valid any longer or hasn't been calculated yet.
