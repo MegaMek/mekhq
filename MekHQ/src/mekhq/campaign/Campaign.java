@@ -5290,11 +5290,22 @@ public class Campaign implements Serializable, ITechManager {
         return medicPool;
     }
 
+    public int getAstechNeed() {
+        return (getTechs().size() * 6) - getNumberAstechs();
+    }
+
     public void increaseAstechPool(int i) {
         astechPool += i;
         astechPoolMinutes += (480 * i);
         astechPoolOvertime += (240 * i);
         MekHQ.triggerEvent(new AstechPoolChangedEvent(this, i));
+    }
+
+    public void fillAstechPool() {
+        final int need = getAstechNeed();
+        if (need > 0) {
+            increaseAstechPool(need);
+        }
     }
 
     public void decreaseAstechPool(int i) {
@@ -5409,9 +5420,20 @@ public class Campaign implements Serializable, ITechManager {
         return medics;
     }
 
+    public int getMedicsNeed() {
+        return (getDoctors().size() * 4) - getNumberMedics();
+    }
+
     public void increaseMedicPool(int i) {
         medicPool += i;
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, i));
+    }
+
+    public void fillMedicPool() {
+        final int need = getMedicsNeed();
+        if (need > 0) {
+            increaseMedicPool(need);
+        }
     }
 
     public void decreaseMedicPool(int i) {

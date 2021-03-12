@@ -134,6 +134,10 @@ public class MassRepairService {
                     unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair"));
             campaign.addReport(msg);
             return msg;
+        } else if (campaign.getAstechNeed() > 0) {
+            String message = resources.getString("MRMS.InsufficientAstechs.report");
+            campaign.addReport(message);
+            return message;
         }
 
         List<MassRepairOption> activeMROList = configuredOptions.getActiveMassRepairOptions();
@@ -193,6 +197,8 @@ public class MassRepairService {
         if (!configuredOptions.isEnabled()) {
             campaign.addReport(resources.getString("MRMS.CompleteDisabled.report"));
             return;
+        } else if (campaign.getAstechNeed() > 0) {
+            campaign.addReport(resources.getString("MRMS.InsufficientAstechs.report"));
         }
 
         List<Unit> units = new ArrayList<>();
