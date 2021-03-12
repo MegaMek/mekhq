@@ -248,7 +248,9 @@ public class CampaignGUI extends JPanel {
         addStandardTab(GuiTabType.COMMAND);
         addStandardTab(GuiTabType.TOE);
         addStandardTab(GuiTabType.BRIEFING);
-        addStandardTab(GuiTabType.STRATCON);
+        if(this.getCampaign().getCampaignOptions().getUseStratCon()) {
+            addStandardTab(GuiTabType.STRATCON);
+        }
         addStandardTab(GuiTabType.MAP);
         addStandardTab(GuiTabType.PERSONNEL);
         addStandardTab(GuiTabType.HANGAR);
@@ -2605,6 +2607,13 @@ public class CampaignGUI extends JPanel {
 
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
+        if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(GuiTabType.STRATCON) != null)) {
+            removeStandardTab(GuiTabType.STRATCON);
+        } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(GuiTabType.STRATCON) == null)) {
+            addStandardTab(GuiTabType.STRATCON);
+        }
+        
+        refreshAllTabs();
         fundsScheduler.schedule();
         refreshPartsAvailability();
     }

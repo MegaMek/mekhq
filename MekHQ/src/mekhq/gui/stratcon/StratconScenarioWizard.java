@@ -349,14 +349,14 @@ public class StratconScenarioWizard extends JDialog {
         
         switch(StratconRulesManager.getReinforcementType(forceID, currentTrackState, campaign)) {
         case SupportPoint:
-            costBuilder.append("supportPoint.text");
+            costBuilder.append(resourceMap.getString("supportPoint.text"));
             if(currentCampaignState.getSupportPoints() <= 0) {
                 costBuilder.append(", ");
                 if(currentCampaignState.getVictoryPoints() <= 1) {
                     costBuilder.append("<span color='red'>");
                 }
                 
-                costBuilder.append("supportPointConvert.text");
+                costBuilder.append(resourceMap.getString("supportPointConvert.text"));
                 
                 if(currentCampaignState.getVictoryPoints() <= 1) {
                     costBuilder.append("</span>");
@@ -364,8 +364,7 @@ public class StratconScenarioWizard extends JDialog {
             }
             break;
         case ChainedScenario:
-            costBuilder.append(String.format("", 
-                    "scenarioname", "unitsfromscenario[stratconscenarioid]"));
+            costBuilder.append(resourceMap.getString("fromChainedScenario.text"));
             break;
         case FightLance:
             costBuilder.append("lanceInFightRole.text");

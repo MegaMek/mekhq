@@ -420,6 +420,7 @@ public class CampaignOptionsDialog extends JDialog {
     //region Against the Bot Tab
     private JPanel panAtB;
     private JCheckBox chkUseAtB;
+    private JCheckBox chkUseStratCon;
     private JComboBox<String> cbSkillLevel;
 
     //unit administration
@@ -3566,7 +3567,7 @@ public class CampaignOptionsDialog extends JDialog {
             enableAtBComponents(panSubAtBRat,
                     chkUseAtB.isSelected() && btnStaticRATs.isSelected());
         });
-
+        
         JLabel lblSkillLevel = new JLabel(resourceMap.getString("lblSkillLevel.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -3609,6 +3610,13 @@ public class CampaignOptionsDialog extends JDialog {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
         panAtB.add(panSubAtBScenario, gridBagConstraints);
+        
+        chkUseStratCon = new JCheckBox(resourceMap.getString("chkUseStratCon.text"));
+        chkUseStratCon.setToolTipText(resourceMap.getString("chkUseStratCon.toolTipText"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        panAtB.add(chkUseStratCon, gridBagConstraints);
 
         // AtB options: "Unit Administration" frame controls
         chkUseShareSystem.setText(resourceMap.getString("chkUseShareSystem.text"));
@@ -4566,6 +4574,7 @@ public class CampaignOptionsDialog extends JDialog {
         if (chkUseAtB.isSelected() != options.getUseAtB()) {
             chkUseAtB.doClick();
         }
+        chkUseStratCon.setSelected(options.getUseStratCon());
         cbSkillLevel.setSelectedIndex(options.getSkillLevel());
 
         chkUseShareSystem.setSelected(options.getUseShareSystem());
@@ -5040,6 +5049,7 @@ public class CampaignOptionsDialog extends JDialog {
 
         // Start Against the Bot
         options.setUseAtB(chkUseAtB.isSelected());
+        options.setUseStratCon(chkUseStratCon.isSelected());
         options.setSkillLevel(cbSkillLevel.getSelectedIndex());
         options.setUseAtBUnitMarket(chkUseAtB.isSelected()); // TODO : add fully modular capabilities
         options.setUseShareSystem(chkUseShareSystem.isSelected());

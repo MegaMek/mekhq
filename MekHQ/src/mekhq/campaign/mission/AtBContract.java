@@ -1543,8 +1543,10 @@ public class AtBContract extends Contract implements Serializable {
 
     @Override
     public void acceptContract(Campaign campaign) {
-        StratconContractInitializer.InitializeCampaignState(this, campaign, 
-                StratconContractDefinition.getContractDefinition(getMissionType()));
+        if (campaign.getCampaignOptions().getUseStratCon()) {
+            StratconContractInitializer.InitializeCampaignState(this, campaign, 
+                    StratconContractDefinition.getContractDefinition(getMissionType()));
+        }
     }
     
     public AtBContract(Contract c, Campaign campaign) {
