@@ -18,7 +18,15 @@
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
+import megamek.common.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.Unit;
+
+import java.util.List;
 
 public class CompanyGenerationWizard {
     //region Variable Declarations
@@ -42,6 +50,25 @@ public class CompanyGenerationWizard {
         return generator;
     }
     //endregion Getters/Setters
+
+    public void set() {
+        generator.applyPhaseZeroToCampaign(getCampaign());
+
+        final List<CompanyGenerationPersonTracker> trackers = generator.generatePersonnel(getCampaign());
+        generator.generateUnitGenerationParameters(trackers);
+        generator.generateEntities(getCampaign(), trackers);
+        final List<Unit> units = generator.applyPhaseOneToCampaign(getCampaign(), trackers);
+
+        final List<Entity> mothballedEntities = generator.generateMothballedEntities(getCampaign(), trackers);
+        final List<Part> parts = generator.generateSpareParts(units);
+        final List<Armor> armour = generator.generateArmour(units);
+        final List<AmmoStorage> ammunition = generator.generateAmmunition(getCampaign(), units);
+        units.addAll(generator.applyPhaseTwoToCampaign(getCampaign(), mothballedEntities, parts, armour, ammunition));
+
+        final Contract contract = null;
+        generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, contract);
+    }
+
 
 
     /*

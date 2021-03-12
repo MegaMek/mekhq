@@ -165,20 +165,6 @@ public class CompanyGenerationDialog extends BaseButtonDialog {
         final CompanyGenerationOptions options = getCompanyGenerationOptionsPanel().createOptionsFromPanel();
         final AbstractCompanyGenerator generator = options.getMethod().getGenerator(getCampaign(), options);
 
-        generator.applyPhaseZeroToCampaign(getCampaign());
 
-        final List<CompanyGenerationPersonTracker> trackers = generator.generatePersonnel(getCampaign());
-        generator.generateUnitGenerationParameters(trackers);
-        generator.generateEntities(getCampaign(), trackers);
-        final List<Unit> units = generator.applyPhaseOneToCampaign(getCampaign(), trackers);
-
-        final List<Entity> mothballedEntities = generator.generateMothballedEntities(getCampaign(), trackers);
-        final List<Part> parts = generator.generateSpareParts(units);
-        final List<Armor> armour = generator.generateArmour(units);
-        final List<AmmoStorage> ammunition = generator.generateAmmunition(getCampaign(), units);
-        units.addAll(generator.applyPhaseTwoToCampaign(getCampaign(), mothballedEntities, parts, armour, ammunition));
-
-        final Contract contract = null;
-        generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, contract);
     }
 }
