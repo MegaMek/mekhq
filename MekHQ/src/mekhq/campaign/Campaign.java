@@ -950,6 +950,13 @@ public class Campaign implements Serializable, ITechManager {
                 .collect(Collectors.toList());
     }
 
+    public List<AtBContract> getCompletedAtBContracts() {
+        return getMissions().stream()
+                .filter(c -> (c instanceof AtBContract) && c.getStatus().isCompleted())
+                .map(c -> (AtBContract) c)
+                .collect(Collectors.toList());
+    }
+
     /**
      * @return whether or not the current campaign has an active contract for the current date
      */
@@ -3003,7 +3010,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return the current deployment deficit for the contract
      */
     public int getDeploymentDeficit(AtBContract contract) {
-        if (contract.getStartDate().compareTo(getLocalDate()) >= 0) {
+        if (contract.isActiveOn(getLocalDate())) {
             // Do not check for deficits if the contract has not started or
             // it is the first day of the contract, as players won't have
             // had time to assign forces to the contract yet

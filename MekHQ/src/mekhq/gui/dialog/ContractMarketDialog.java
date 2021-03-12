@@ -103,9 +103,8 @@ public class ContractMarketDialog extends JDialog {
      */
     private void countSuccessfulContracts() {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
-        for (AtBContract contract : campaign.getAtBContracts()) {
-            if (contract.getStatus().isActive()
-                    || contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
+        for (AtBContract contract : campaign.getCompletedAtBContracts()) {
+            if (contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
                 continue;
             }
             int num;
