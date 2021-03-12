@@ -28,8 +28,6 @@ import java.time.temporal.ChronoUnit;
 
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
-import org.apache.commons.text.CharacterPredicate;
-import org.apache.commons.text.RandomStringGenerator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -453,21 +451,6 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                 .minus(getTotalEstimatedOverheadExpenses(c))
                 .minus(getTotalEstimatedMaintenanceExpenses(c))
                 .minus(getTotalEstimatedPayrollExpenses(c));
-    }
-
-    public static String generateRandomContractName() {
-        RandomStringGenerator generator = new RandomStringGenerator.Builder().withinRange('0', 'Z')
-                .filteredBy(UpperCaseAndDigits.UPPERANDDIGITS).build();
-        return generator.generate(15);
-    }
-
-    public enum UpperCaseAndDigits implements CharacterPredicate {
-        UPPERANDDIGITS {
-            @Override
-            public boolean test(int codePoint) {
-                return (Character.isDigit(codePoint) || Character.isUpperCase(codePoint));
-            }
-        }
     }
 
     private int getTravelDays(Campaign c) {
