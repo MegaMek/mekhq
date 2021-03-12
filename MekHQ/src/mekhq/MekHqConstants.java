@@ -77,4 +77,6 @@ public final class MekHqConstants {
 
     /** This is used in creating the name of save files, e.g. the MekHQ campaign file */
     public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
+
+    public static final int MAXIMUM_D6_VALUE = 6;
 }

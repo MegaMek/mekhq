@@ -22,7 +22,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.MouseEvent;
 import java.util.*;
 
 import javax.swing.DefaultComboBoxModel;
@@ -186,22 +185,6 @@ public final class HangarTab extends CampaignGuiTab {
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_WCLASS, SortOrder.DESCENDING));
         unitSorter.setSortKeys(sortKeys);
-        unitTable.addMouseListener(new UnitTableMouseAdapter(getCampaignGui(),
-                unitTable, unitModel) {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-                    if ((splitUnit.getSize().width - splitUnit.getDividerLocation() + splitUnit
-                            .getDividerSize()) < HangarTab.UNIT_VIEW_WIDTH) {
-                        // expand
-                        splitUnit.resetToPreferredSizes();
-                    } else {
-                        // collapse
-                        splitUnit.setDividerLocation(1.0);
-                    }
-                }
-            }
-        });
         unitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
@@ -234,6 +217,8 @@ public final class HangarTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(splitUnit, gridBagConstraints);
+
+        UnitTableMouseAdapter.connect(getCampaignGui(), unitTable, unitModel, splitUnit);
     }
 
     private void setUserPreferences() {

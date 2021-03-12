@@ -387,16 +387,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     BigDecimal getUnitValue(Unit u) {
         BigDecimal value = BigDecimal.ONE;
-        if (isConventionalInfantry(u) &&
-            (((Infantry) u.getEntity()).getSquadN() == 1)) {
+        if (u.isConventionalInfantry() && (((Infantry) u.getEntity()).getSquadN() == 1)) {
             value = new BigDecimal("0.25");
         }
         return value;
-    }
-
-    boolean isConventionalInfantry(Unit u) {
-        return (u.getEntity() instanceof Infantry) &&
-               !(u.getEntity() instanceof BattleArmor);
     }
 
     /**

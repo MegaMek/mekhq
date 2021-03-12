@@ -238,8 +238,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         servicedUnitTable.setIntercellSpacing(new Dimension(0, 0));
         servicedUnitTable.setShowGrid(false);
         servicedUnitTable.getSelectionModel().addListSelectionListener(this::servicedUnitTableValueChanged);
-        servicedUnitTable.addMouseListener(new ServicedUnitsTableMouseAdapter(getCampaignGui(),
-                servicedUnitTable, servicedUnitModel));
+        ServicedUnitsTableMouseAdapter.connect(getCampaignGui(), servicedUnitTable, servicedUnitModel);
         JScrollPane scrollServicedUnitTable = new JScrollPane(servicedUnitTable);
         scrollServicedUnitTable.setMinimumSize(new java.awt.Dimension(350, 200));
         scrollServicedUnitTable.setPreferredSize(new java.awt.Dimension(350, 200));
@@ -393,7 +392,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         taskSorter.setSortKeys(sortKeys);
-        taskTable.addMouseListener(new TaskTableMouseAdapter(getCampaignGui(), taskTable, taskModel));
+        TaskTableMouseAdapter.connect(getCampaignGui(), taskTable, taskModel);
         JScrollPane scrollTaskTable = new JScrollPane(taskTable);
         scrollTaskTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollTaskTable.setPreferredSize(new java.awt.Dimension(300, 300));
