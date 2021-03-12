@@ -207,9 +207,8 @@ public class AtBScenarioFactory {
                     // Don't generate scenarios for any lances already assigned, those assigned to a
                     // different contract, those not assigned to a contract, or for illegible lances
                     if (assignedLances.contains(lance.getForceId()) || (lance.getContract(c) == null)
-                            || !lance.isEligible(c) || !lance.getContract(c).isActive()
-                            || (lance.getMissionId() != atbContract.getId())
-                            || c.getLocalDate().isBefore(lance.getContract(c).getStartDate())) {
+                            || !lance.isEligible(c) || (lance.getMissionId() != atbContract.getId())
+                            || !lance.getContract(c).isActiveOn(c.getLocalDate(), true)) {
                         continue;
                     }
 

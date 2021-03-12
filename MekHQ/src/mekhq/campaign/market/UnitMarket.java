@@ -43,7 +43,6 @@ import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -100,13 +99,8 @@ public class UnitMarket implements Serializable {
         if ((method == UnitMarketMethod.ATB_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1)) {
             offers.clear();
 
-            AtBContract contract = null;
-            for (Mission m : campaign.getMissions()) {
-                if (m.isActive() && m instanceof AtBContract) {
-                    contract = (AtBContract)m;
-                    break;
-                }
-            }
+            List<AtBContract> contracts = campaign.getActiveAtBContracts();
+            AtBContract contract = contracts.isEmpty() ? null : contracts.get(0);
 
             addOffers(campaign, Compute.d6() - 2, UnitMarketType.OPEN, UnitType.MEK,
                     null, IUnitRating.DRAGOON_F, 7);
