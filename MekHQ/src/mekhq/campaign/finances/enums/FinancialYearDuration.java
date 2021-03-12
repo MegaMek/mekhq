@@ -87,11 +87,11 @@ public enum FinancialYearDuration {
                 final boolean isStartOfYear = tomorrow.getDayOfYear() == 1;
                 return isStartOfYear
                         ? String.format("%d %s - %s", year,
-                                Month.JULY.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
-                                Month.DECEMBER.getDisplayName(TextStyle.SHORT, Locale.getDefault()))
+                                Month.JULY.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]", ""),
+                                Month.DECEMBER.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]", ""))
                         : String.format("%d %s - %s", year + 1,
-                                Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
-                                Month.JUNE.getDisplayName(TextStyle.SHORT, Locale.getDefault()));
+                                Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]", ""),
+                                Month.JUNE.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]", ""));
             case BIANNUAL:
                 return String.format("%d - %d", year - 1, year);
             case QUINQUENNIAL:
