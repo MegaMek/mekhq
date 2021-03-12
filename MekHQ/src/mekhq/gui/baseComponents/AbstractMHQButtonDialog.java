@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
  * button panel with base Ok and Cancel buttons. It also includes an enum tracker for the result of
  * the dialog.
  *
- * Inheriting classes must call initialize() in their constructor and override createCenterPane()
+ * Inheriting classes must call initialize() in their constructors and override createCenterPane()
  *
  * The resources associated with this dialog need to contain at least the following keys:
  * - "Ok.text" -> text for the ok button
@@ -40,26 +40,36 @@ import java.util.ResourceBundle;
  */
 public abstract class AbstractMHQButtonDialog extends AbstractButtonDialog {
     //region Constructors
+    /**
+     * This creates a modal AbstractMHQButtonDialog using the default MHQ resource bundle. This is
+     * the normal constructor to use for an AbstractMHQButtonDialog.
+     */
     protected AbstractMHQButtonDialog(final JFrame frame, final String name, final String title) {
         this(frame, true, name, title);
     }
 
+    /**
+     * This creates an AbstractMHQButtonDialog using the default MHQ resource bundle. It allows one
+     * to create non-modal button dialogs, which is not recommended by default
+     */
     protected AbstractMHQButtonDialog(final JFrame frame, final boolean modal, final String name,
                                       final String title) {
         this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), name, title);
     }
 
-    protected AbstractMHQButtonDialog(final JFrame frame, final ResourceBundle resources,
-                                      final String name, final String title) {
-        this(frame, true, resources, name, title);
-    }
-
+    /**
+     * This creates an AbstractMHQButtonDialog using the specified resource bundle. This is not recommended
+     * by default.
+     */
     protected AbstractMHQButtonDialog(final JFrame frame, final boolean modal, final ResourceBundle resources,
                                       final String name, final String title) {
         super(frame, modal, resources, name, title);
     }
     //endregion Constructors
 
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek
+     */
     @Override
     protected void setPreferences() {
         setPreferences(MekHQ.getPreferences().forClass(getClass()));

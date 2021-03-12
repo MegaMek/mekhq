@@ -29,24 +29,38 @@ import java.util.ResourceBundle;
  * This is the base class for dialogs in MegaMek. This class handles setting the UI, managing the X
  * button, managing the escape key, and saving the dialog preferences.
  *
- * Inheriting classes must call initialize() in their constructor and override createCenterPane()
+ * Inheriting classes must call initialize() in their constructors and override createCenterPane()
  */
 public abstract class AbstractMHQDialog extends AbstractDialog {
     //region Constructors
+    /**
+     * This creates a non-modal AbstractMHQDialog using the default MHQ resource bundle. This is
+     * the normal constructor to use for an AbstractMHQDialog.
+     */
     protected AbstractMHQDialog(final JFrame frame, final String name, final String title) {
         this(frame, false, name, title);
     }
 
+    /**
+     * This creates an AbstractMHQDialog using the default MHQ resource bundle
+     */
     protected AbstractMHQDialog(final JFrame frame, final boolean modal, final String name, final String title) {
         this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), name, title);
     }
 
+    /**
+     * This creates an AbstractMHQDialog using the specified resource bundle. This is not recommended
+     * by default.
+     */
     protected AbstractMHQDialog(final JFrame frame, final boolean modal, final ResourceBundle resources,
                                 final String name, final String title) {
         super(frame, modal, resources, name, title);
     }
     //endregion Constructors
 
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek
+     */
     @Override
     protected void setPreferences() {
         setPreferences(MekHQ.getPreferences().forClass(getClass()));

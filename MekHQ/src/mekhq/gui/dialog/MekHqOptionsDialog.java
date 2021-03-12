@@ -77,7 +77,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
     //region Constructors
     public MekHqOptionsDialog(final JFrame frame) {
-        super(frame, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog",
+        super(frame, true, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog",
                 new EncodeControl()), "MekHQOptionsDialog", "MekHQOptionsDialog.title");
         initialize();
         setInitialState();

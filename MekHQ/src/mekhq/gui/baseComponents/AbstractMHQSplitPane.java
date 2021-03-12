@@ -28,20 +28,31 @@ import java.util.ResourceBundle;
 /**
  * This is the default SplitPane. It handles preferences, resources, the frame, and setup.
  *
- * Inheriting classes must call initialize() in their constructor and override createLeftComponent()
+ * Inheriting classes must call initialize() in their constructors and override createLeftComponent()
  * and createRightComponent()
  */
 public abstract class AbstractMHQSplitPane extends AbstractSplitPane {
     //region Constructors
+    /**
+     * This creates an AbstractMHQSplitPane using the default MHQ resource bundle. This is the
+     * normal constructor to use for an AbstractMHQSplitPane.
+     */
     protected AbstractMHQSplitPane(final JFrame frame, final String name) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), name);
     }
 
+    /**
+     * This creates an AbstractMHQSplitPane using the specified resource bundle. This is not recommended
+     * by default.
+     */
     protected AbstractMHQSplitPane(final JFrame frame, final ResourceBundle resources, final String name) {
         super(frame, resources, name);
     }
     //endregion Constructors
 
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek
+     */
     @Override
     protected void setPreferences() {
         setPreferences(MekHQ.getPreferences().forClass(getClass()));
