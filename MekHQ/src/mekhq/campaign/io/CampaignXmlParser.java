@@ -1159,11 +1159,8 @@ public class CampaignXmlParser {
         }
 
         // Restore references on AtBContracts
-        for (Mission m : retVal.getMissions()) {
-            if (m instanceof AtBContract) {
-                final AtBContract atbContract = (AtBContract) m;
-                atbContract.restore(retVal);
-            }
+        for (AtBContract contract : retVal.getAtBContracts()) {
+            contract.restore(retVal);
         }
 
         MekHQ.getLogger().info("Load Mission Nodes Complete!");
