@@ -719,7 +719,7 @@ public class CampaignGUI extends JPanel {
         miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
         miUnitMarket.setMnemonic(KeyEvent.VK_U);
         miUnitMarket.addActionListener(evt -> showUnitMarket());
-        miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        miUnitMarket.setVisible(getCampaign().getUnitMarket() != null);
         menuMarket.add(miUnitMarket);
 
         miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
@@ -1257,8 +1257,11 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showUnitMarket() {
-        UnitMarketDialog umd = new UnitMarketDialog(getFrame(), getCampaign());
-        umd.setVisible(true);
+        if (getCampaign().getUnitMarket() == null) {
+            MekHQ.getLogger().error("Attempted to show the unit market while it is disabled");
+        } else {
+            new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
+        }
     }
 
     public void showShipSearch() {
@@ -1417,6 +1420,8 @@ public class CampaignGUI extends JPanel {
             }
         }
 
+        miUnitMarket.setVisible(getCampaign().getUnitMarket() != null);
+
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 getCampaign().initAtB(false);
@@ -1424,7 +1429,6 @@ public class CampaignGUI extends JPanel {
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
             miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
             miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
             miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
             if (getCampaign().getCampaignOptions().getUseAtB()) {
@@ -2558,9 +2562,12 @@ public class CampaignGUI extends JPanel {
     }
 
     @Subscribe
-    public void handle(OptionsChangedEvent ev) {
+    public void handle(final OptionsChangedEvent evt) {
         fundsScheduler.schedule();
         refreshPartsAvailability();
+
+        // TODO : I'm technically equal to Campaign::getUnitMarket == null, but might not be in the future
+        miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
     }
 
     @Subscribe

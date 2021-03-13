@@ -27,7 +27,7 @@ import javax.swing.SwingConstants;
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 
 /**
  * Model for displaying offers on the UnitMarket
@@ -37,23 +37,27 @@ import mekhq.campaign.market.UnitMarket;
  * @author Neoancient
  */
 public class UnitMarketTableModel extends DataTableModel {
-	private static final long serialVersionUID = -6275443301484277495L;
+    //region Variable Declarations
+    private static final long serialVersionUID = -6275443301484277495L;
 
-	public static final int COL_MARKET = 0;
-	public static final int COL_UNITTYPE = 1;
-	public static final int COL_WEIGHTCLASS = 2;
-	public static final int COL_UNIT = 3;
-	public static final int COL_PRICE = 4;
-	public static final int COL_PERCENT = 5;
-	public static final int COL_NUM = 6;
+    public static final int COL_MARKET = 0;
+    public static final int COL_UNITTYPE = 1;
+    public static final int COL_WEIGHTCLASS = 2;
+    public static final int COL_UNIT = 3;
+    public static final int COL_PRICE = 4;
+    public static final int COL_PERCENT = 5;
+    public static final int COL_NUM = 6;
+    //endregion Variable Declarations
 
-	public UnitMarketTableModel() {
+    //region Constructors
+    public UnitMarketTableModel() {
         columnNames = new String[] { "Market", "Type", "Weight Class", "Unit", "Price", "Percent" };
-        data = new ArrayList<UnitMarket.MarketOffer>();
-	}
+        data = new ArrayList<UnitMarketOffer>();
+    }
+    //endregion Constructors
 
-    public int getColumnWidth(int c) {
-        switch (c) {
+    public int getColumnWidth(final int column) {
+        switch (column) {
             case COL_MARKET:
             case COL_UNIT:
                 return 100;
@@ -67,8 +71,8 @@ public class UnitMarketTableModel extends DataTableModel {
         }
     }
 
-    public int getAlignment(int col) {
-        switch (col) {
+    public int getAlignment(final int column) {
+        switch (column) {
             case COL_PRICE:
             case COL_PERCENT:
                 return SwingConstants.RIGHT;
@@ -82,51 +86,36 @@ public class UnitMarketTableModel extends DataTableModel {
         }
     }
 
-    public UnitMarket.MarketOffer getOffer(int i) {
-        if (i >= data.size()) {
-            return null;
-        } else {
-            return (UnitMarket.MarketOffer) data.get(i);
-        }
+    public UnitMarketOffer getOffer(final int index) {
+        return (index < getData().size()) ? (UnitMarketOffer) data.get(index) : null;
     }
 
     @Override
-    public Object getValueAt(int row, int col) {
-        if (data.isEmpty()) {
+    public Object getValueAt(final int row, final int column) {
+        if (getData().isEmpty()) {
             return "";
         }
-        UnitMarket.MarketOffer o = getOffer(row);
-        if (o == null) {
+        UnitMarketOffer offer = getOffer(row);
+        if (offer == null) {
             return "?";
         }
 
-        if (col == COL_MARKET) {
-            return o.market;
-        } else if (col == COL_UNITTYPE) {
-            return UnitType.getTypeName(o.unitType);
-        } else if (col == COL_WEIGHTCLASS) {
-            if (o.unit != null) {
-                return EntityWeightClass.getClassName(o.unitWeight,
-                        o.unit.getUnitType(), o.unit.isSupport());
-            }
-        } else if (col == COL_UNIT) {
-        	if (o.unit != null) {
-        		return o.unit.getName();
-        	} else {
-                return "";
-            }
-        } else if (col == COL_PRICE) {
-        	if (null == o.unit) {
-        		return "";
-        	}
-            return Money.of((double) o.unit.getCost())
-                    .multipliedBy(o.pct)
-                    .dividedBy(100)
-                    .toAmountAndSymbolString();
-        } else if (col == COL_PERCENT) {
-       		return o.pct + "%";
+        if (column == COL_MARKET) {
+            return offer.getMarketType();
+        } else if (column == COL_UNITTYPE) {
+            return UnitType.getTypeName(offer.getUnitType());
+        } else if (column == COL_WEIGHTCLASS) {
+            return EntityWeightClass.getClassName(offer.getUnit().getWeightClass(),
+                    offer.getUnit().getUnitType(), offer.getUnit().isSupport());
+        } else if (column == COL_UNIT) {
+            return offer.getUnit().getName();
+        } else if (column == COL_PRICE) {
+            return Money.of((double) offer.getUnit().getCost()).multipliedBy(offer.getPercent())
+                    .dividedBy(100).toAmountAndSymbolString();
+        } else if (column == COL_PERCENT) {
+            return offer.getPercent() + "%";
+        } else {
+            return "?";
         }
-
-        return "?";
-	}
+    }
 }

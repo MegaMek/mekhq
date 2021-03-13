@@ -43,6 +43,7 @@ import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
+import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -99,7 +100,6 @@ import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
-import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
@@ -252,7 +252,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private PersonnelMarket personnelMarket;
     private ContractMarket contractMarket; //AtB
-    private UnitMarket unitMarket; //AtB
+    private AbstractUnitMarket unitMarket;
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
@@ -309,9 +309,9 @@ public class Campaign implements Serializable, ITechManager {
         customs = new ArrayList<>();
         shoppingList = new ShoppingList();
         news = new News(getGameYear(), id.getLeastSignificantBits());
-        personnelMarket = new PersonnelMarket();
-        contractMarket = new ContractMarket();
-        unitMarket = new UnitMarket();
+        setPersonnelMarket(new PersonnelMarket());
+        setContractMarket(new ContractMarket());
+        setUnitMarket(null);
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
@@ -437,41 +437,33 @@ public class Campaign implements Serializable, ITechManager {
         return shoppingList;
     }
 
-    public void setPersonnelMarket(PersonnelMarket pm) {
-        personnelMarket = pm;
-    }
-
+    //region Markets
     public PersonnelMarket getPersonnelMarket() {
         return personnelMarket;
     }
 
-    public void generateNewPersonnelMarket() {
-        personnelMarket.generatePersonnelForDay(this);
+    public void setPersonnelMarket(final PersonnelMarket personnelMarket) {
+        this.personnelMarket = personnelMarket;
     }
 
-    public void setContractMarket(ContractMarket cm) {
-        contractMarket = cm;
-    }
-
+    // TODO : AbstractContractMarket : Add @Nullable and Swap to AbstractContract Market
     public ContractMarket getContractMarket() {
         return contractMarket;
     }
 
-    public void generateNewContractMarket() {
-        contractMarket.generateContractOffers(this);
+    // TODO : AbstractContractMarket : Add @Nullable and Swap to AbstractContract Market
+    public void setContractMarket(final ContractMarket contractMarket) {
+        this.contractMarket = contractMarket;
     }
 
-    public void setUnitMarket(UnitMarket um) {
-        unitMarket = um;
-    }
-
-    public UnitMarket getUnitMarket() {
+    public @Nullable AbstractUnitMarket getUnitMarket() {
         return unitMarket;
     }
 
-    public void generateNewUnitMarket() {
-        unitMarket.generateUnitOffers(this);
+    public void setUnitMarket(final @Nullable AbstractUnitMarket unitMarket) {
+        this.unitMarket = unitMarket;
     }
+    //endregion Markets
 
     public void setRetirementDefectionTracker(RetirementDefectionTracker rdt) {
         retirementDefectionTracker = rdt;
@@ -3166,8 +3158,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private void processNewDayATB() {
-        contractMarket.generateContractOffers(this);
-        unitMarket.generateUnitOffers(this);
+        contractMarket.generateContractOffers(this); // TODO : AbstractContractMarket : Remove
 
         if ((getShipSearchExpiration() != null) && !getShipSearchExpiration().isAfter(getLocalDate())) {
             setShipSearchExpiration(null);
@@ -3444,7 +3435,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Autosave based on the previous day's information
-        this.autosaveService.requestDayAdvanceAutosave(this);
+        autosaveService.requestDayAdvanceAutosave(this);
 
         // Advance the day by one
         currentDay = currentDay.plus(1, ChronoUnit.DAYS);
@@ -3467,15 +3458,24 @@ public class Campaign implements Serializable, ITechManager {
             reloadNews();
 
             // Change Year Game Option
-            getGameOptions().getOption("year").setValue(getGameYear());
+            getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
         }
 
         readNews();
 
         getLocation().newDay(this);
 
-        // Manage the personnel market
+        // Manage the Markets
         getPersonnelMarket().generatePersonnelForDay(this);
+
+        // TODO : AbstractContractMarket : Uncomment
+        //if (getContractMarket() != null) {
+        //    getContractMarket().processNewDay(this);
+        //}
+
+        if (getUnitMarket() != null) {
+            getUnitMarket().processNewDay(this);
+        }
 
         // Process New Day for AtB
         if (getCampaignOptions().getUseAtB()) {
@@ -3934,7 +3934,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Faction getFaction() {
-        return Factions.getInstance().getFaction(factionCode);
+        return Factions.getInstance().getFaction(getFactionCode());
     }
 
     public String getFactionName() {
@@ -3948,6 +3948,10 @@ public class Campaign implements Serializable, ITechManager {
 
     public String getFactionCode() {
         return factionCode;
+    }
+
+    public Faction getRetainerEmployer() {
+        return Factions.getInstance().getFaction(getRetainerEmployerCode());
     }
 
     public String getRetainerEmployerCode() {
@@ -4184,15 +4188,26 @@ public class Campaign implements Serializable, ITechManager {
 
         writeGameOptions(pw1);
 
-        // Personnel Market
-        personnelMarket.writeToXml(pw1, indent);
+        // Markets
+        getPersonnelMarket().writeToXml(pw1, indent);
+
+        // TODO : AbstractContractMarket : Uncomment
+        //if (getContractMarket() != null) {
+        //    // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
+        //    contractMarket.writeToXml(pw1, indent);
+        //    getContractMarket().writeToXML(pw1, indent);
+        //}
+
+        if (getUnitMarket() != null) {
+            getUnitMarket().writeToXML(pw1, indent);
+        }
 
         // Against the Bot
         if (getCampaignOptions().getUseAtB()) {
+            // TODO : AbstractContractMarket : Remove next two lines
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
             contractMarket.writeToXml(pw1, indent);
 
-            unitMarket.writeToXml(pw1, indent);
             if (lances.size() > 0)   {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "lances");
                 for (Lance l : lances.values()) {
@@ -6711,8 +6726,7 @@ public class Campaign implements Serializable, ITechManager {
 
         setAtBConfig(AtBConfiguration.loadFromXml());
         RandomFactionGenerator.getInstance().startup(this);
-        getContractMarket().generateContractOffers(this, newCampaign);
-        getUnitMarket().generateUnitOffers(this);
+        getContractMarket().generateContractOffers(this, newCampaign); // TODO : AbstractContractMarket : Remove
         setAtBEventProcessor(new AtBEventProcessor(this));
     }
 

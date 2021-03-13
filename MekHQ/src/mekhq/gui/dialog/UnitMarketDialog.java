@@ -36,6 +36,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import megamek.client.ui.baseComponents.AbstractButtonDialog;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -64,7 +65,7 @@ import megamek.client.ui.preferences.PreferencesNode;
  *
  * @author Neoancient
  */
-public class UnitMarketDialog extends JDialog {
+public class UnitMarketDialog extends AbstractButtonDialog {
     private static final long serialVersionUID = -7668601227249317220L;
 
     private static boolean showMeks = true;
@@ -339,7 +340,7 @@ public class UnitMarketDialog extends JDialog {
                     campaign.addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
                 }
             }
-            UnitMarket.MarketOffer selected = ((UnitMarketTableModel) tableUnits.getModel())
+            UnitMarketOffer selected = ((UnitMarketTableModel) tableUnits.getModel())
                     .getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
             unitMarket.removeOffer(selected);
             ((UnitMarketTableModel) tableUnits.getModel()).setData(unitMarket.getOffers());
