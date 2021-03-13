@@ -49,9 +49,9 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.gui.enums.LayeredForceIcon;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author  Jay Lawson <jaylawson39 at yahoo.com>

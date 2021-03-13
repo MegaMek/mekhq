@@ -77,12 +77,12 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JTablePreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Displays all spare parts in stock, parts on order, and permits repair of damaged

@@ -31,9 +31,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.view.PersonViewPanel;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 public class NewRecruitDialog extends javax.swing.JDialog {
     /**
