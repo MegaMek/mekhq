@@ -47,6 +47,9 @@ public class StratconFacilityFactory {
         reloadFacilities();
     }
     
+    /**
+     * Worker function that reloads all the facilities from disk
+     */
     public static void reloadFacilities() {
         stratconFacilityList.clear();
         hostileFacilities.clear();
@@ -54,10 +57,10 @@ public class StratconFacilityFactory {
         stratconFacilityMap.clear();
         
         // load dynamic scenarios
-        StratconFacilityManifest facilityManifest = StratconFacilityManifest.Deserialize("./data/stratconfacilities/facilitymanifest.xml");
+        StratconFacilityManifest facilityManifest = StratconFacilityManifest.deserialize("./data/stratconfacilities/facilitymanifest.xml");
         
         // load user-specified scenario list
-        StratconFacilityManifest userManifest = StratconFacilityManifest.Deserialize("./data/stratconfacilities/userfacilitymanifest.xml");
+        StratconFacilityManifest userManifest = StratconFacilityManifest.deserialize("./data/stratconfacilities/userfacilitymanifest.xml");
         
         if(facilityManifest != null) {
             loadFacilitiesFromManifest(facilityManifest);
@@ -81,7 +84,7 @@ public class StratconFacilityFactory {
             String filePath = String.format("./data/stratconfacilities/%s", fileName.trim());
             
             try {
-                StratconFacility facility = StratconFacility.Deserialize(filePath);
+                StratconFacility facility = StratconFacility.deserialize(filePath);
                 
                 if(facility != null) {
                     stratconFacilityList.add(facility);
@@ -94,8 +97,7 @@ public class StratconFacilityFactory {
                     }
                 }
             } catch(Exception e) {
-                MekHQ.getLogger().error(StratconFacilityFactory.class, "loadFacilitiesFromManifest", 
-                        String.format("Error loading file: %s", filePath), e);
+                MekHQ.getLogger().error(String.format("Error loading file: %s", filePath), e);
             }
         }
     }

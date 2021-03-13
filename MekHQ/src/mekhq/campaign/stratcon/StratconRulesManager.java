@@ -1,3 +1,17 @@
+/*
+* MegaMek - Copyright (C) 2020 - The MegaMek Team
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU General Public License as published by the Free Software
+* Foundation; either version 2 of the License, or (at your option) any later
+* version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+* details.
+*/
+
 package mekhq.campaign.stratcon;
 
 import java.time.DayOfWeek;
@@ -32,7 +46,6 @@ import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
-import mekhq.campaign.mission.atb.AtBScenarioModifierApplicator;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
@@ -40,21 +53,36 @@ import mekhq.campaign.unit.Unit;
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
  * @author NickAragua
- *
  */
 public class StratconRulesManager {
+    /**
+     * What makes a particular lance eligible to be reinforcements for a scenario
+     * @author NickAragua
+     */
     public enum ReinforcementEligibilityType {
+        /**
+         * Nothing
+         */
         None,
+        
+        /**
+         * Lance is already deployed to the track
+         */
         ChainedScenario,
+        
+        /**
+         * We pay a support point or convert a victory point to a support point
+         */
         SupportPoint,
+        
+        /**
+         * The lance's deployment orders are "Fight"
+         */
         FightLance
     }
     
     /**
      * This function potentially generates non-player-initiated scenarios for the given track.
-     * @param campaign
-     * @param contract
-     * @param track
      */
     public static void generateScenariosForTrack(Campaign campaign, AtBContract contract, StratconTrackState track) {
         // maps scenarios to force IDs
@@ -70,9 +98,9 @@ public class StratconRulesManager {
         // if a scenario occurs, then we pick a random non-deployed lance and use it to drive the opfor generation later
         // once we've determined that scenarios occur, we loop through the ones that we generated
         // and use the random force to drive opfor generation (#required lances multiplies the BV budget of all 
-        for(int scenarioIndex = 0; scenarioIndex < track.getRequiredLanceCount(); scenarioIndex++) {
+        for (int scenarioIndex = 0; scenarioIndex < track.getRequiredLanceCount(); scenarioIndex++) {
             // if we haven't already used all the player forces and are required to randomly generate a scenario
-            if((availableForceIDs.size() > 0) &&
+            if ((availableForceIDs.size() > 0) &&
                     (Compute.randomInt(100) <= track.getScenarioOdds())) {
                 // pick random coordinates and force to drive the scenario
                 int x = Compute.randomInt(track.getWidth());
@@ -92,7 +120,7 @@ public class StratconRulesManager {
                 sortedAvailableForceIDs.get(MapLocation.Space).remove((Integer) randomForceID);
                 
                 // two scenarios on the same coordinates wind up increasing in size
-                if(track.getScenarios().containsKey(scenarioCoords)) {
+                if (track.getScenarios().containsKey(scenarioCoords)) {
                     track.getScenarios().get(scenarioCoords).incrementRequiredPlayerLances();
                     assignAppropriateExtraForceToScenario(track.getScenarios().get(scenarioCoords), sortedAvailableForceIDs, campaign);
                     continue;
@@ -102,7 +130,7 @@ public class StratconRulesManager {
                 generatedScenarios.add(scenario);
                 
                 // if we're auto-assigning lances, deploy the force to the track as well
-                if(autoAssignLances) {
+                if (autoAssignLances) {
                     processForceDeployment(scenarioCoords, randomForceID, campaign, track);
                 }
             }
@@ -110,7 +138,7 @@ public class StratconRulesManager {
         
         // if under liaison command, pick a random scenario from the ones generated
         // to set as required and attach liaison
-        if(contract.getCommandRights() == AtBContract.COM_LIAISON) {
+        if (contract.getCommandRights() == AtBContract.COM_LIAISON) {
             int scenarioIndex = Compute.randomInt(generatedScenarios.size() - 1);
             generatedScenarios.get(scenarioIndex).setRequiredScenario(true);
             setAttachedUnitsModifier(generatedScenarios.get(scenarioIndex), contract);
@@ -119,7 +147,7 @@ public class StratconRulesManager {
         // now, we loop through all the scenarios we set up
         // and generate the opfors / events / etc
         // if not auto-assigning lances, we then back out the lance assignments.
-        for(StratconScenario scenario : generatedScenarios) {
+        for (StratconScenario scenario : generatedScenarios) {
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
             
             if(!autoAssignLances) {
@@ -151,7 +179,7 @@ public class StratconRulesManager {
         boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != ForceAlignment.Allied);
         boolean spawnScenario = (facility == null) && (Compute.randomInt(100) <= track.getScenarioOdds());
 
-        if(isNonAlliedFacility || spawnScenario) {
+        if (isNonAlliedFacility || spawnScenario) {
             StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
             commitPrimaryForces(campaign, contract, scenario, track);
@@ -164,7 +192,7 @@ public class StratconRulesManager {
     private static StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign, AtBContract contract, StratconTrackState track) {
         StratconScenario scenario = null;
         
-        if(track.getFacilities().containsKey(coords)) {
+        if (track.getFacilities().containsKey(coords)) {
             StratconFacility facility = track.getFacility(coords);
             boolean alliedFacility = facility.getOwner() == ForceAlignment.Allied;
             ScenarioTemplate template = StratconScenarioFactory.getFacilityScenario(alliedFacility);
@@ -175,7 +203,7 @@ public class StratconRulesManager {
             
             // we may generate a facility scenario randomly - if so, do the facility-related stuff
             // and add a new facility to the track
-            if(scenario.getBackingScenario().getTemplate().isFacilityScenario()) {
+            if (scenario.getBackingScenario().getTemplate().isFacilityScenario()) {
                 StratconFacility facility = scenario.getBackingScenario().getTemplate().isHostileFacility() ?
                         StratconFacilityFactory.getRandomHostileFacility() : StratconFacilityFactory.getRandomAlliedFacility();
                 facility.setVisible(true);
@@ -202,20 +230,20 @@ public class StratconRulesManager {
         AtBScenarioModifier objectiveModifier = null;
         boolean alliedFacility = facility.getOwner() == ForceAlignment.Allied;
         
-        if(alliedFacility) {
+        if (alliedFacility) {
             objectiveModifier = AtBScenarioModifier.getRandomAlliedFacilityModifier();
         } else {            
             objectiveModifier = AtBScenarioModifier.getRandomHostileFacilityModifier();
         }
         
-        if(objectiveModifier != null) {
+        if (objectiveModifier != null) {
             scenario.getBackingScenario().addScenarioModifier(objectiveModifier);
             scenario.getBackingScenario().setName(String.format("%s - %s - %s", 
                     facility.getFacilityType(), alliedFacility ? "Allied" : "Hostile", objectiveModifier.getModifierName()));
         }
         
         // add the "fixed" hostile facility modifiers after the primary ones
-        if(!alliedFacility) {
+        if (!alliedFacility) {
             for(AtBScenarioModifier modifier : AtBScenarioModifier.getRequiredHostileFacilityModifiers()) {
                 if(!scenario.getBackingScenario().alreadyHasModifier(modifier)) {
                     scenario.getBackingScenario().addScenarioModifier(modifier);
@@ -225,7 +253,7 @@ public class StratconRulesManager {
     }
     
     private static void processFacilityEffects(StratconTrackState track) {
-        // todo: these are "weekly"? effects that a stratcon facility has on the campaign/track state
+        // TODO: these are "weekly"? effects that a stratcon facility has on the campaign/track state
         // currrently, that's 
         // supply depot - allied - +1 sp
         // supply depot - hostile - +5% BV budget to all scenarios on track (shared modifier, so should be implemented there)
@@ -244,11 +272,11 @@ public class StratconRulesManager {
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign, StratconTrackState track) {
         track.getRevealedCoords().add(coords);
         StratconFacility facility = track.getFacility(coords);
-        if(facility != null) {
+        if (facility != null) {
             facility.setVisible(true);
         }
         
-        if(campaign.getLances().get(forceID).getRole() == AtBLanceRole.SCOUTING) {
+        if (campaign.getLances().get(forceID).getRole() == AtBLanceRole.SCOUTING) {
             for(int direction = 0; direction < 6; direction++) {
                 StratconCoords checkCoords = coords.translate(direction);
                 
@@ -292,16 +320,17 @@ public class StratconRulesManager {
             }
             
             int tactics = scenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_TACTICS, campaign);
-            int roll = 7;//Compute.d6(2);
+            int roll = Compute.d6(2);
             int result = roll + tactics;
 
-            String reportStatus = String.format("Attempting to reinforce scenario %s without SP/VP, roll 2d6 + %d: %d",
-                    scenario.getName(), tactics, result);
+            StringBuilder reportStatus = new StringBuilder(); 
+            reportStatus.append(String.format("Attempting to reinforce scenario %s without SP/VP, roll 2d6 + %d: %d",
+                    scenario.getName(), tactics, result));
             
             // fail to reinforce
             if (result < 6) {
-                reportStatus += " - reinforcement attempt failed.";
-                campaign.addReport(reportStatus);
+                reportStatus.append(" - reinforcement attempt failed.");
+                campaign.addReport(reportStatus.toString());
                 return false;
             // succeed but get an extra negative event added to the scenario
             } else if ((result < 9) && (reinforcementType != ReinforcementEligibilityType.FightLance)) {
@@ -309,21 +338,21 @@ public class StratconRulesManager {
                 AtBScenarioModifier scenarioModifier = AtBScenarioModifier.getRandomBattleModifier(mapLocation, false);
                 
                 // keep rolling until we get an applicable one
-                // todo: have the AtBScenarioModifier sort these out instead for performance?
+                // TODO: have the AtBScenarioModifier sort these out instead for performance?
                 while (scenarioModifier.getEventTiming() != EventTiming.PostForceGeneration) {
                     scenarioModifier = AtBScenarioModifier.getRandomBattleModifier(mapLocation, false);
                 }
                 
                 scenarioModifier.processModifier(scenario.getBackingScenario(), campaign, EventTiming.PostForceGeneration);
                 
-                reportStatus += String.format(" - reinforcement attempt succeeded; extra negative modifier (%s) applied to scenario.",
-                        scenarioModifier.getModifierName());
-                campaign.addReport(reportStatus);
+                reportStatus.append(String.format(" - reinforcement attempt succeeded; extra negative modifier (%s) applied to scenario.",
+                        scenarioModifier.getModifierName()));
+                campaign.addReport(reportStatus.toString());
                 return true;
             // succeed without reservation
             } else {
-                reportStatus += " - reinforcement attempt succeeded;";
-                campaign.addReport(reportStatus);
+                reportStatus.append(" - reinforcement attempt succeeded;");
+                campaign.addReport(reportStatus.toString());
                 return true;
             }
         } else if (reinforcementType == ReinforcementEligibilityType.None) {
@@ -348,11 +377,11 @@ public class StratconRulesManager {
         
         MapLocation scenarioMapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
         
-        if(scenarioMapLocation == MapLocation.LowAtmosphere) {
+        if (scenarioMapLocation == MapLocation.LowAtmosphere) {
             mapLocations.add(MapLocation.LowAtmosphere); // can add conventional fighters to ground or low atmo battles
         }
         
-        if((scenarioMapLocation == MapLocation.AllGroundTerrain) || 
+        if ((scenarioMapLocation == MapLocation.AllGroundTerrain) || 
                 (scenarioMapLocation == MapLocation.SpecificGroundTerrain)) {
             mapLocations.add(MapLocation.AllGroundTerrain); // can only add ground units to ground battles
         }
@@ -379,11 +408,11 @@ public class StratconRulesManager {
         trackState.addScenario(scenario);
         
         // set up dates for the scenario if doesn't have them already
-        if(scenario.getDeploymentDate() == null) {
+        if (scenario.getDeploymentDate() == null) {
             scenario.setDeploymentDate(campaign.getLocalDate());
         }
         
-        if(scenario.getActionDate() == null) {
+        if (scenario.getActionDate() == null) {
             scenario.setActionDate(campaign.getLocalDate());
         }
         
@@ -441,7 +470,7 @@ public class StratconRulesManager {
         retVal.put(MapLocation.LowAtmosphere, new ArrayList<>());
         retVal.put(MapLocation.Space, new ArrayList<>());
         
-        for(int forceID : forceIDs) {
+        for (int forceID : forceIDs) {
             switch(campaign.getForce(forceID).getPrimaryUnitType(campaign)) {
             case UnitType.BATTLE_ARMOR:
             case UnitType.INFANTRY:
@@ -474,7 +503,7 @@ public class StratconRulesManager {
         
         // check every track attached to an active contract for unresolved scenarios
         // to which the player must deploy forces today
-        for(Contract contract : campaign.getActiveContracts()) {
+        for (Contract contract : campaign.getActiveContracts()) {
             if(contract instanceof AtBContract) {
                 for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
                     for(StratconScenario scenario : track.getScenarios().values()) {
@@ -522,7 +551,7 @@ public class StratconRulesManager {
         applyFacilityModifiers(scenario, track, coords);
         applyGlobalModifiers(scenario, contract.getStratconCampaignState());
         
-        if((contract.getCommandRights() == AtBContract.COM_HOUSE) ||
+        if ((contract.getCommandRights() == AtBContract.COM_HOUSE) ||
                 (contract.getCommandRights() == AtBContract.COM_INTEGRATED)) {
             scenario.setRequiredScenario(true);
         }
@@ -572,7 +601,7 @@ public class StratconRulesManager {
             
             if (scenarioAtFacility) {
                 modifierIDs = facility.getLocalModifiers();
-            } else if (facility.isVisible() || (Compute.randomInt(100) < facility.getAggroRating())) {
+            } else if (facility.isVisible() || (Compute.randomInt(100) <= facility.getAggroRating())) {
                 modifierIDs = facility.getSharedModifiers();
             }
             
@@ -638,8 +667,8 @@ public class StratconRulesManager {
                 (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.Space);
         
         // if we're on cadre duty, we're getting three trainees, period
-        if(contract.getMissionType() == AtBContract.MT_CADREDUTY) {
-            if(airBattle) {
+        if (contract.getMissionType() == AtBContract.MT_CADREDUTY) {
+            if (airBattle) {
                 backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_TRAINEES_AIR));                
             } else {
                 backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_TRAINEES_GROUND));
@@ -648,38 +677,35 @@ public class StratconRulesManager {
         }
         
         // if we're under non-independent command rights, a supervisor may come along
-        switch(contract.getCommandRights()) {
-        case AtBContract.COM_INTEGRATED:
-            if(airBattle) {
-                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR));                
-            } else {
-                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
-            }
-            break;
-        case AtBContract.COM_HOUSE:
-            if(airBattle) {
-                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_HOUSE_CO_AIR));
-            } else {
-                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
-            }            
-            break;
-        case AtBContract.COM_LIAISON:
-            if(scenario.isRequiredScenario()) {
-                if(airBattle) {
-                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_LIAISON_AIR));
+        switch (contract.getCommandRights()) {
+            case AtBContract.COM_INTEGRATED:
+                if (airBattle) {
+                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR));                
                 } else {
-                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_LIAISON_GROUND));
-                } 
-            }
-            break;
+                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
+                }
+                break;
+            case AtBContract.COM_HOUSE:
+                if (airBattle) {
+                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_HOUSE_CO_AIR));
+                } else {
+                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
+                }            
+                break;
+            case AtBContract.COM_LIAISON:
+                if (scenario.isRequiredScenario()) {
+                    if(airBattle) {
+                        backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_LIAISON_AIR));
+                    } else {
+                        backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_LIAISON_GROUND));
+                    } 
+                }
+                break;
         }
     }
     
     /**
      * Worker function that sets scenario deploy/battle/return dates based on the track's properties and current campaign date
-     * @param track
-     * @param campaign
-     * @param scenario
      */
     private static void setScenarioDates(StratconTrackState track, Campaign campaign, StratconScenario scenario) {
      // set up deployment day, battle day, return day here
@@ -703,8 +729,6 @@ public class StratconRulesManager {
     /**
      * Helper function that determines if the unit type specified in the given scenario force template
      * would start out airborne on a ground map (hot dropped units aside)
-     * @param template
-     * @return
      */
     private static boolean unitTypeIsAirborne(ScenarioForceTemplate template) {
         int unitType = template.getAllowedUnitType();
@@ -722,7 +746,7 @@ public class StratconRulesManager {
      */
     public static boolean forceCompositionMatchesDeclaredUnitType(int primaryUnitType, int unitType, boolean reinforcements) {        
         // special cases are "ATB_MIX" and "ATB_AERO_MIX", which encompass multiple unit types
-        if(unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
+        if (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
             // "AtB mix" is usually ground units, but air units can sub in
             return primaryUnitType == UnitType.MEK ||
                     primaryUnitType == UnitType.TANK ||
@@ -750,7 +774,7 @@ public class StratconRulesManager {
         
         // first, we gather a set of all forces that are already deployed to a track so we eliminate those later
         Set<Integer> forcesInTracks = new HashSet<>();
-        for(Contract contract : campaign.getActiveContracts()) {
+        for (Contract contract : campaign.getActiveContracts()) {
             if(contract instanceof AtBContract) {
                 for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
                     forcesInTracks.addAll(track.getAssignedForceCoords().keySet());
@@ -760,11 +784,10 @@ public class StratconRulesManager {
         
         // now, we get all the forces that qualify as "lances", and filter out those that are
         // deployed to a scenario and not in a track already
-        for(int key : campaign.getLances().keySet()) {
+        for (int key : campaign.getLances().keySet()) {
             Force force = campaign.getForce(key);
-            if(force != null && 
-                    !force.isDeployed() && 
-                    (force.getScenarioId() <= 0) &&
+            if (force != null && 
+                    !force.isDeployed() &&
                     !forcesInTracks.contains(force.getId())) {
                 retVal.add(force.getId());
             }
@@ -823,15 +846,15 @@ public class StratconRulesManager {
     public static List<Unit> getEligibleDefensiveUnits(Campaign campaign) {
         List<Unit> retVal = new ArrayList<>();
         
-        for(Unit u : campaign.getUnits()) {
+        for (Unit u : campaign.getUnits()) {
             // "defensive" units are infantry, battle armor and (Weisman help you) gun emplacements
-            if(((u.getEntity().getUnitType() == UnitType.INFANTRY) || 
+            if (((u.getEntity().getUnitType() == UnitType.INFANTRY) || 
                     (u.getEntity().getUnitType() == UnitType.BATTLE_ARMOR) ||
                     (u.getEntity().getUnitType() == UnitType.GUN_EMPLACEMENT)) &&
-                    (u.getScenarioId() <= 0)) {
+                    !u.isDeployed()) {
                 
                 // this is a little inefficient, but probably there aren't too many active AtB contracts at a time
-                for(Contract contract : campaign.getActiveContracts()) {
+                for (Contract contract : campaign.getActiveContracts()) {
                     if((contract instanceof AtBContract) &&
                             ((AtBContract) contract).getStratconCampaignState().isForceDeployedHere(u.getForceId())) {
                         continue;
@@ -862,7 +885,7 @@ public class StratconRulesManager {
         }
         
         // if the force is deployed elsewhere, it cannot be deployed as reinforcements
-        for(Contract contract : campaign.getActiveContracts()) {
+        for (Contract contract : campaign.getActiveContracts()) {
             if(contract instanceof AtBContract) {
                 for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
                     if(track != trackState && track.getAssignedForceCoords().containsKey(forceID)) {
@@ -880,7 +903,7 @@ public class StratconRulesManager {
      * Removes the facility associated with the given scenario from the relevant track/
      */
     public static void updateFacilityForScenario(AtBScenario scenario, AtBContract contract, boolean destroy, boolean capture) {
-        if(contract.getStratconCampaignState() == null) {
+        if (contract.getStratconCampaignState() == null) {
             return;
         }
         
@@ -888,12 +911,12 @@ public class StratconRulesManager {
         // TODO: introduce mapping in contract or at least trackstate
         // basically, we're looping through all scenarios on all the contract's tracks
         // if we find one with the same ID as the one being resolved, that's our facility: get rid of it.
-        for(StratconTrackState trackState : contract.getStratconCampaignState().getTracks()) {
-            for(StratconCoords coords : trackState.getScenarios().keySet()) {
+        for (StratconTrackState trackState : contract.getStratconCampaignState().getTracks()) {
+            for (StratconCoords coords : trackState.getScenarios().keySet()) {
                 StratconScenario potentialScenario = trackState.getScenario(coords);
-                if(potentialScenario.getBackingScenarioID() == scenario.getId()) {
+                if (potentialScenario.getBackingScenarioID() == scenario.getId()) {
                     
-                    if(destroy) {
+                    if (destroy) {
                         trackState.removeFacility(coords);
                     } else {
                         StratconFacility facility = trackState.getFacility(coords);
@@ -902,7 +925,7 @@ public class StratconRulesManager {
                             continue;
                         }
                         
-                        if(capture) {
+                        if (capture) {
                             facility.incrementOwnershipChangeScore();
                         } else {
                             facility.decrementOwnershipChangeScore();
@@ -940,7 +963,7 @@ public class StratconRulesManager {
                     StratconFacility facility = track.getFacility(scenario.getCoords());
                     
                     if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
-                        if(facility.getOwner() == ForceAlignment.Allied) {
+                        if (facility.getOwner() == ForceAlignment.Allied) {
                             facility.setOwner(ForceAlignment.Opposing);
                         } else {
                             facility.setOwner(ForceAlignment.Allied);
@@ -978,14 +1001,14 @@ public class StratconRulesManager {
     public static void processTrackForceReturnDates(StratconTrackState track, LocalDate date) {
         List<Integer> forcesToUndeploy = new ArrayList<>();
         
-        for(int forceID : track.getAssignedForceReturnDates().keySet()) {
-            if(track.getAssignedForceReturnDates().get(forceID).equals(date) ||
+        for (int forceID : track.getAssignedForceReturnDates().keySet()) {
+            if (track.getAssignedForceReturnDates().get(forceID).equals(date) ||
                     track.getAssignedForceReturnDates().get(forceID).isBefore(date)) {
                 forcesToUndeploy.add(forceID);
             }
         }
         
-        for(int forceID : forcesToUndeploy) {
+        for (int forceID : forcesToUndeploy) {
             track.unassignForce(forceID);
         }
     }
@@ -994,21 +1017,21 @@ public class StratconRulesManager {
      * Processes an ignored Stratcon scenario
      */
     public static void processIgnoredScenario(StratconScenario scenario, StratconCampaignState campaignState) {
-        for(StratconTrackState track : campaignState.getTracks()) {
-            if(track.getScenarios().containsKey(scenario.getCoords())) {                
+        for (StratconTrackState track : campaignState.getTracks()) {
+            if (track.getScenarios().containsKey(scenario.getCoords())) {                
                 // subtract VP if scenario is 'required'
-                if(scenario.isRequiredScenario()) {
+                if (scenario.isRequiredScenario()) {
                     campaignState.updateVictoryPoints(-1);
                 }
                 
                 StratconFacility localFacility = track.getFacility(scenario.getCoords());
-                if(localFacility != null) {
+                if (localFacility != null) {
                     // if the ignored scenario was on top of an allied facility
                     // then it'll get captured, and the player will possibly lose a SO
-                    if(localFacility.getOwner() == ForceAlignment.Allied) {
+                    if (localFacility.getOwner() == ForceAlignment.Allied) {
                         localFacility.setOwner(ForceAlignment.Opposing);
                         
-                        if(localFacility.isStrategicObjective()) {
+                        if (localFacility.isStrategicObjective()) {
                             campaignState.decrementStrategicObjectiveCompletedCount();
                         }
                     }
@@ -1017,7 +1040,7 @@ public class StratconRulesManager {
                     // move scenario towards nearest allied facility
                     StratconCoords closestAlliedFacilityCoords = track.findClosestAlliedFacilityCoords(scenario.getCoords());
                     
-                    if(closestAlliedFacilityCoords != null) {
+                    if (closestAlliedFacilityCoords != null) {
                         StratconCoords newCoords = scenario.getCoords().translate(scenario.getCoords().direction(closestAlliedFacilityCoords));
                         scenario.setCoords(newCoords);
                         //scenario.setDeploymentDate(scenario.getDeploymentDate().plusDays(daysToAdd));

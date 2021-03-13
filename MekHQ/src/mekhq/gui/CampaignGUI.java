@@ -248,7 +248,7 @@ public class CampaignGUI extends JPanel {
         addStandardTab(GuiTabType.COMMAND);
         addStandardTab(GuiTabType.TOE);
         addStandardTab(GuiTabType.BRIEFING);
-        if(this.getCampaign().getCampaignOptions().getUseStratCon()) {
+        if (getCampaign().getCampaignOptions().getUseStratCon()) {
             addStandardTab(GuiTabType.STRATCON);
         }
         addStandardTab(GuiTabType.MAP);
@@ -1248,26 +1248,17 @@ public class CampaignGUI extends JPanel {
         return false;
     }
 
+    /**
+     * Displays a nag if the StratCon UI has unresolved hostile forces
+     */
     public boolean nagUnresolvedStratconContacts() {
         String nagText = StratconRulesManager.nagUnresolvedContacts(getCampaign());
         
-        if(!nagText.isEmpty()) {
+        if (!nagText.isEmpty()) {
             return 0 != JOptionPane.showConfirmDialog(null, 
                     String.format("You have unresolved contacts on the StratCon interface:\n%s\nAdvance day anyway?", nagText), 
                     "Unresolved Stratcon Contacts", JOptionPane.YES_NO_OPTION);
         }
-        
-        return false;
-    }
-    
-    public boolean nagInsufficientStratconAssignments() {
-        /*String nagText = StratconRulesManager.nagInsufficientTrackForces(getCampaign());
-        
-        if(!nagText.isEmpty()) {
-            return 0 != JOptionPane.showConfirmDialog(null, 
-                    String.format("You have insufficient forces assigned on the StratCon interface:\n%s\nAdvance day anyway?", nagText), 
-                    "Unresolved Stratcon Contacts", JOptionPane.YES_NO_OPTION);
-        }*/
         
         return false;
     }

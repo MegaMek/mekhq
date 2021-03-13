@@ -32,7 +32,6 @@ import mekhq.MekHqXmlUtil;
 /**
  * A manifest containing IDs and file names of scenario template definitions
  * @author NickAragua
- *
  */
 @XmlRootElement(name="scenarioManifest")
 public class AtBScenarioManifest {
@@ -47,7 +46,7 @@ public class AtBScenarioManifest {
     public static AtBScenarioManifest Deserialize(String fileName) {
         AtBScenarioManifest resultingManifest = null;
         File inputFile = new File(fileName);
-        if(!inputFile.exists()) {
+        if (!inputFile.exists()) {
             MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
             return null;
         }

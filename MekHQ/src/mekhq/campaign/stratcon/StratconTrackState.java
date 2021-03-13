@@ -1,3 +1,17 @@
+/*
+* MegaMek - Copyright (C) 2020 - The MegaMek Team
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU General Public License as published by the Free Software
+* Foundation; either version 2 of the License, or (at your option) any later
+* version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+* details.
+*/
+
 package mekhq.campaign.stratcon;
 
 import java.time.LocalDate;
@@ -14,11 +28,9 @@ import javax.xml.bind.annotation.XmlTransient;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 
-
 /**
  * Track-level state object for a stratcon campaign.
  * @author NickAragua
- *
  */
 @XmlRootElement(name="campaignTrack")
 public class StratconTrackState {
@@ -100,7 +112,6 @@ public class StratconTrackState {
     /**
      * Used for serialization/deserialization.
      * Do not manipulate directly, or things get unpleasant.
-     * @return
      */
     @XmlElementWrapper(name="trackScenarios")
     @XmlElement(name="scenario")
@@ -175,6 +186,9 @@ public class StratconTrackState {
         this.gmRevealed = gmRevealed;
     }
 
+    /**
+     * Handles the assignment of a force to the given coordinates on this track on the given date.
+     */
     public void assignForce(int forceID, StratconCoords coords, LocalDate date) {
         assignedForceCoords.put(forceID, coords);
         assignedForceReturnDates.put(forceID, date.plusDays(deploymentTime));
@@ -185,6 +199,9 @@ public class StratconTrackState {
         getAssignedForceReturnDatesForStorage().put(forceID, date.plusDays(deploymentTime).toString());
     }
     
+    /**
+     * Handles the unassignment of a force from this track.
+     */
     public void unassignForce(int forceID) {
         if (assignedForceCoords.containsKey(forceID)) {
             assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);

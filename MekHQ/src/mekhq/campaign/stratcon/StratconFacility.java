@@ -68,19 +68,8 @@ public class StratconFacility implements Cloneable {
      */
     private transient int ownershipChangeScore;
     
-    public static StratconFacility createTestFacility() {
-        StratconFacility test = new StratconFacility();
-        test.displayableName = "test facility";
-        test.facilityType = FacilityType.TankBase;
-        test.sharedModifiers.add("AlliedTankGarrison.xml");
-        test.localModifiers.add("AlliedTankGarrison.xml");
-        test.localModifiers.add("AlliedTankGarrison.xml");
-        test.fixedGarrisonUnitStates.put("Griffin GRF-1N", 0);
-        test.owner = ForceAlignment.Opposing;
-        return test;
-    }
-    
-    public Object clone() {
+    @Override
+    public StratconFacility clone() {
         StratconFacility clone = new StratconFacility();
         clone.owner = owner;
         clone.displayableName = displayableName;
@@ -189,10 +178,10 @@ public class StratconFacility implements Cloneable {
      * Attempt to deserialize an instance of a StratconFacility from the passed-in file name
      * @return Possibly an instance of a StratconFacility
      */
-    public static StratconFacility Deserialize(String fileName) {
+    public static StratconFacility deserialize(String fileName) {
         StratconFacility resultingManifest = null;
         File inputFile = new File(fileName);
-        if(!inputFile.exists()) {
+        if (!inputFile.exists()) {
             MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
             return null;
         }
@@ -205,7 +194,7 @@ public class StratconFacility implements Cloneable {
                 JAXBElement<StratconFacility> manifestElement = um.unmarshal(inputSource, StratconFacility.class);
                 resultingManifest = manifestElement.getValue();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             MekHQ.getLogger().error(String.format("Error Deserializing Facility %s", fileName), e);
         }
 

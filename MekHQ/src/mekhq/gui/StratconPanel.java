@@ -1,3 +1,17 @@
+/*
+* MegaMek - Copyright (C) 2020 - The MegaMek Team
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU General Public License as published by the Free Software
+* Foundation; either version 2 of the License, or (at your option) any later
+* version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+* details.
+*/
+
 package mekhq.gui;
 
 import java.awt.BasicStroke;
@@ -10,7 +24,6 @@ import java.awt.Polygon;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -37,7 +50,6 @@ import mekhq.gui.stratcon.TrackForceAssignmentUI;
 /**
  * This panel handles AtB-Stratcon GUI interactions with a specific scenario track.
  * @author NickAragua
- *
  */
 public class StratconPanel extends JPanel implements ActionListener {
     /**
@@ -52,9 +64,24 @@ public class StratconPanel extends JPanel implements ActionListener {
     private static final String RCLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";
     private static final String RCLICK_COMMAND_REVEAL_TRACK = "RevealTrack";
 
+    /**
+     * What to do when drawing a hex
+     */
     private enum DrawHexType {
+        /**
+         * The interior of a hex
+         */
         Hex,
+        
+        /**
+         * The outline of a hex
+         */
         Outline,
+        
+        /**
+         * Pretend we're drawing a hex, but don't actually do it, useful for 
+         * figuring out which hex a mouse click landed in, etc.
+         */
         Dryrun
     }
 
@@ -81,6 +108,9 @@ public class StratconPanel extends JPanel implements ActionListener {
     
     private JLabel infoArea;
 
+    /**
+     * Constructs a StratconPanel instance, given a parent campaign GUI and a pointer to an info area.
+     */
     StratconPanel(CampaignGUI gui, JLabel infoArea) {
         campaign = gui.getCampaign();
         scenarioWizard = new StratconScenarioWizard(campaign);
@@ -99,15 +129,21 @@ public class StratconPanel extends JPanel implements ActionListener {
         });
     }
 
+    /**
+     * Handler for when a specific track is selected - switches rendering to that track.
+     */
     public void selectTrack(StratconCampaignState campaignState, StratconTrackState track) {
         this.campaignState = campaignState;
         currentTrack = track;
         
         menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Track" : "Reveal Track");
         
-        this.repaint();
+        repaint();
     }
     
+    /**
+     * Constructs the right-click context menu, optionally for a scenario
+     */
     private void buildRightClickMenu(StratconScenario scenario) {
         rightClickMenu = new JPopupMenu();
         
@@ -117,13 +153,11 @@ public class StratconPanel extends JPanel implements ActionListener {
         menuItemManageForceAssignments.addActionListener(this);
         rightClickMenu.add(menuItemManageForceAssignments);
         
-        //if(scenario != null) {
-            menuItemManageScenario = new JMenuItem();
-            menuItemManageScenario.setText("Manage Scenario");
-            menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_SCENARIO);
-            menuItemManageScenario.addActionListener(this);
-            rightClickMenu.add(menuItemManageScenario);
-        //}
+        menuItemManageScenario = new JMenuItem();
+        menuItemManageScenario.setText("Manage Scenario");
+        menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_SCENARIO);
+        menuItemManageScenario.addActionListener(this);
+        rightClickMenu.add(menuItemManageScenario);
             
             
         rightClickMenu.addSeparator();
@@ -135,10 +169,13 @@ public class StratconPanel extends JPanel implements ActionListener {
         rightClickMenu.add(menuItemGMReveal);
     }
 
+    /**
+     * Renders the panel, hexes, forces, facilities and all that.
+     */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if(campaignState == null || currentTrack == null) {
+        if (campaignState == null || currentTrack == null) {
             return;
         }
         
@@ -163,7 +200,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         drawForces(g2D);
 
         g2D.setTransform(initialTransform);
-        if(clickedPoint != null) {
+        if (clickedPoint != null) {
             g2D.setColor(Color.BLUE);
             g2D.drawRect((int) clickedPoint.getX(), (int) clickedPoint.getY(), 2, 2);
         }
@@ -200,7 +237,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         // b) subtract an additional Y_RADIUS x 2 (Y_DIAMETER)
         // this gets us the point within the clicked hex
         // it's probably finicky, so any major changes to the rendering mechanism will likely break the detection
-        if(clickedPoint != null) {
+        if (clickedPoint != null) {
             translatedClickedPoint = (Point) clickedPoint.clone();
             
             // since we have the possibility of scrolling, we need to convert the on-screen clicked coordinates
@@ -214,21 +251,21 @@ public class StratconPanel extends JPanel implements ActionListener {
             translatedClickedPoint.translate(0, -(HEX_Y_RADIUS * 2));
         }
 
-        for(int x = 0; x < currentTrack.getWidth(); x++) {            
-            for(int y = 0; y < currentTrack.getHeight(); y++) {
+        for (int x = 0; x < currentTrack.getWidth(); x++) {            
+            for (int y = 0; y < currentTrack.getHeight(); y++) {
                 if(drawHexType == DrawHexType.Outline) {
                     g2D.setColor(new Color(0, 0, 0));
                     g2D.drawPolygon(graphHex);                    
-                } else if(drawHexType == DrawHexType.Hex) {
+                } else if (drawHexType == DrawHexType.Hex) {
                     
-                    if(currentTrack.coordsRevealed(x, y) || currentTrack.isGmRevealed()) {
+                    if (currentTrack.coordsRevealed(x, y) || currentTrack.isGmRevealed()) {
                         g2D.setColor(Color.LIGHT_GRAY);
                     } else {
                         g2D.setColor(Color.DARK_GRAY);
                     }
                     g2D.fillPolygon(graphHex);
                     
-                    if(translatedClickedPoint != null && graphHex.contains(translatedClickedPoint)) {
+                    if (translatedClickedPoint != null && graphHex.contains(translatedClickedPoint)) {
                         g2D.setColor(Color.WHITE);
                         BasicStroke s = new BasicStroke((float) 8.0);
                         Stroke push = g2D.getStroke();
@@ -240,15 +277,15 @@ public class StratconPanel extends JPanel implements ActionListener {
                         pointFound = true;
                         g2D.setStroke(push);
                     }
-                } else if(drawHexType == DrawHexType.Dryrun) {
-                    if(translatedClickedPoint != null && graphHex.contains(translatedClickedPoint)) {
+                } else if (drawHexType == DrawHexType.Dryrun) {
+                    if (translatedClickedPoint != null && graphHex.contains(translatedClickedPoint)) {
                         boardState.selectedX = x;
                         boardState.selectedY = y;
                         pointFound = true;
                     }
                 }
 
-                if(drawHexType == DrawHexType.Hex) {
+                if (drawHexType == DrawHexType.Hex) {
                     g2D.setColor(Color.GREEN);
                     g2D.drawString(x + "," + y, graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + yRadius);
                 }
@@ -264,6 +301,9 @@ public class StratconPanel extends JPanel implements ActionListener {
         return pointFound;
     }
 
+    /**
+     * Worker function to render icons representing scenarios to the given surface.
+     */
     private void drawScenarios(Graphics2D g2D) {
         Polygon scenarioMarker = new Polygon();
         int xRadius = HEX_X_RADIUS / 3;
@@ -274,14 +314,14 @@ public class StratconPanel extends JPanel implements ActionListener {
         scenarioMarker.addPoint(xRadius, yRadius);
         scenarioMarker.addPoint(xRadius, -yRadius);
 
-        for(int x = 0; x < currentTrack.getWidth(); x++) {            
-            for(int y = 0; y < currentTrack.getHeight(); y++) {
+        for (int x = 0; x < currentTrack.getWidth(); x++) {            
+            for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
                 StratconScenario scenario = currentTrack.getScenario(currentCoords);
                 
                 // if there's a scenario here that has a deployment/battle date
                 // or if there's a scenario here and we've gm-revealed everything
-                if((scenario != null) &&
+                if ((scenario != null) &&
                         ((scenario.getDeploymentDate() != null) || currentTrack.isGmRevealed())) {
                     g2D.setColor(Color.RED);
                     g2D.drawPolygon(scenarioMarker);
@@ -299,6 +339,9 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
     }
     
+    /**
+     * Worker function to render facility icons to the given surface.
+     */
     private void drawFacilities(Graphics2D g2D) {
         Polygon facilityMarker = new Polygon();
         int xRadius = HEX_X_RADIUS / 3;
@@ -309,12 +352,12 @@ public class StratconPanel extends JPanel implements ActionListener {
         facilityMarker.addPoint(xRadius, yRadius);
         facilityMarker.addPoint(xRadius, -yRadius);
 
-        for(int x = 0; x < currentTrack.getWidth(); x++) {            
-            for(int y = 0; y < currentTrack.getHeight(); y++) {
+        for (int x = 0; x < currentTrack.getWidth(); x++) {            
+            for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
                 StratconFacility facility = currentTrack.getFacility(currentCoords);
                 
-                if((facility != null) && (facility.isVisible() || currentTrack.isGmRevealed())) {
+                if ((facility != null) && (facility.isVisible() || currentTrack.isGmRevealed())) {
                     g2D.setColor(facility.getOwner() == ForceAlignment.Allied ? Color.GREEN : Color.RED);
                     g2D.drawPolygon(facilityMarker);
                     drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
@@ -329,6 +372,9 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
     }
     
+    /**
+     * Worker function to render force icons to the given surface.
+     */
     private void drawForces(Graphics2D g2D) {
         Polygon forceMarker = new Polygon();
         int xRadius = HEX_X_RADIUS / 3;
@@ -339,8 +385,8 @@ public class StratconPanel extends JPanel implements ActionListener {
         forceMarker.addPoint(xRadius, yRadius);
         forceMarker.addPoint(xRadius, -yRadius);
 
-        for(int x = 0; x < currentTrack.getWidth(); x++) {            
-            for(int y = 0; y < currentTrack.getHeight(); y++) {
+        for (int x = 0; x < currentTrack.getWidth(); x++) {            
+            for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
                 
                 if (currentTrack.getAssignedCoordForces().containsKey(currentCoords)) {
@@ -360,6 +406,10 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
     }
     
+    /**
+     * Draws some text and line to it from a given polygon. 
+     * Smart enough not to layer multiple strings on top of each other if they're all drawn in the same hex.
+     */
     private void drawTextEffect(Graphics2D g2D, Polygon marker, String text, StratconCoords coords) {
         int verticalOffsetIndex = numIconsInHex.containsKey(coords) ? numIconsInHex.get(coords) : 0;
         
@@ -397,7 +447,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         int xRadius = (int) (HEX_X_RADIUS);
 
         int yTranslation = currentTrack.getHeight() * yRadius * 2;
-        if(evenColumn) {
+        if (evenColumn) {
             yTranslation += yRadius;
         } else {
             yTranslation -= yRadius;
@@ -406,6 +456,9 @@ public class StratconPanel extends JPanel implements ActionListener {
         return new int[] {(int) (xRadius * 1.5), -yTranslation};
     }
 
+    /**
+     * Go to the origin of the hex board and reset the scaling.
+     */
     private void performInitialTransform(Graphics2D g2D) {
         g2D.translate(0, 0 + HEX_Y_RADIUS);
         g2D.scale(scale, scale);
@@ -430,12 +483,16 @@ public class StratconPanel extends JPanel implements ActionListener {
         return pointFoundOnBoard;
     }
 
+    /**
+     * Event handler for when a mouse button is released.
+     */
     public void mouseReleasedHandler(MouseEvent e) {
         if(e.getSource() != this) {
             return;
         }
 
-        if(e.getButton() == MouseEvent.BUTTON1) {        
+        // left button generally selects a hex
+        if (e.getButton() == MouseEvent.BUTTON1) {        
             clickedPoint = e.getPoint();
             boolean pointFoundOnBoard = detectClickedHex();
             
@@ -444,17 +501,18 @@ public class StratconPanel extends JPanel implements ActionListener {
             }
 
             repaint();
-        } else if(e.getButton() == MouseEvent.BUTTON3) {
+        // right button generally pops up a context menu
+        } else if (e.getButton() == MouseEvent.BUTTON3) {
             clickedPoint = new Point(e.getX(), e.getY());
             boolean pointFoundOnBoard = detectClickedHex();
 
             StratconCoords selectedCoords = boardState.getSelectedCoords();
-            if(selectedCoords == null) {
+            if (selectedCoords == null) {
                 return;
             }
             
             StratconScenario selectedScenario = null;
-            if(pointFoundOnBoard) {
+            if (pointFoundOnBoard) {
                 selectedScenario = currentTrack.getScenario(selectedCoords);
             }
              
@@ -471,7 +529,10 @@ public class StratconPanel extends JPanel implements ActionListener {
         return currentTrack.getScenario(boardState.getSelectedCoords());
     }
     
-    
+    /**
+     * Worker function that outputs html representing the status of a selected hex,
+     * containing info such as whether it's been revealed, assigned forces, scenarios, facilities, etc.
+     */
     private String buildSelectedHexInfo() {
         StringBuilder infoBuilder = new StringBuilder();
         infoBuilder.append("<html>");
@@ -521,15 +582,12 @@ public class StratconPanel extends JPanel implements ActionListener {
         return infoBuilder.toString();
     }
 
-    public void focusLostHandler(FocusEvent e) {
-        //clickedPoint = null;
-        //repaint();
-    }
-
+    /**
+     * Data structure containing current state of the board.
+     */
     private class BoardState {
         public Integer selectedX;
         public Integer selectedY;
-        public int selectedTrack;
         
         public StratconCoords getSelectedCoords() {
             if((selectedX == null) || (selectedY == null)) {
@@ -540,6 +598,9 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
     }
 
+    /**
+     * Event handler for various button and menu item presses.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         StratconCoords selectedCoords = boardState.getSelectedCoords();

@@ -1640,16 +1640,16 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
         
         if (numPlayerMinefields.size() > 0) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<numPlayerMinefields>");
+            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "numPlayerMinefields");
 
             for (int key : numPlayerMinefields.keySet()) {
-                pw1.println(MekHqXmlUtil.indentStr(indent+2) + "<numPlayerMinefield>");
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 2, "numPlayerMinefield");
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "minefieldType", key);
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "minefieldCount", numPlayerMinefields.get(key).toString());
-                pw1.println(MekHqXmlUtil.indentStr(indent+2) + "</numPlayerMinefield>");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 2, "numPlayerMinefield");
             }
 
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</numPlayerMinefields>");
+            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "numPlayerMinefields");
         }
 
         super.writeToXmlEnd(pw1, indent);
@@ -1904,18 +1904,34 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
     
+    /**
+     * Worker function that loads the minefield counts for the player
+     */
     private void loadMinefieldCounts(Node wn) {
-        // TODO: Fix this to load minefields without XPath
-        /*XPath xp = MekHqXmlUtil.getXPathInstance();
-        NodeList minefieldTypes = (NodeList) xp.evaluate("numPlayerMinefields/minefieldType", wn, XPathConstants.NODESET);
-        NodeList minefieldCounts = (NodeList) xp.evaluate("numPlayerMinefields/minefieldCount", wn, XPathConstants.NODESET);
+        NodeList nl = wn.getChildNodes();
 
-        for (int x = 0; x < minefieldTypes.getLength(); x++) {
-            int minefieldType = Integer.parseInt(minefieldTypes.item(x).getTextContent());
-            int minefieldCount = Integer.parseInt(minefieldCounts.item(x).getTextContent());
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
             
-            numPlayerMinefields.put(minefieldType, minefieldCount);
-        }*/
+            if (wn2.getNodeName().equalsIgnoreCase("numPlayerMinefield")) {
+                NodeList minefieldNodes = wn2.getChildNodes();
+                
+                int minefieldType = 0;
+                int minefieldCount = 0;
+                
+                for (int minefieldIndex = 0; minefieldIndex < minefieldNodes.getLength(); minefieldIndex++) {
+                    Node wn3 = minefieldNodes.item(minefieldIndex);
+                    
+                    if (wn3.getNodeName().equalsIgnoreCase("minefieldType")) {
+                        minefieldType = Integer.parseInt(wn3.getTextContent());
+                    } else if (wn3.getNodeName().equalsIgnoreCase("minefieldCount")) {
+                        minefieldCount = Integer.parseInt(wn3.getTextContent());
+                    }
+                }
+                
+                numPlayerMinefields.put(minefieldType, minefieldCount);
+            }
+        }
     }
 
     private List<String> getEntityStub(Node wn) {

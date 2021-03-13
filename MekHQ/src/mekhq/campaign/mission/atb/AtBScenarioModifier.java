@@ -94,16 +94,6 @@ public class AtBScenarioModifier implements Cloneable {
     
     private Map<String, String> linkedModifiers = new HashMap<>(); 
     
-    public static AtBScenarioModifier generateTestModifier() {
-        AtBScenarioModifier sm = new AtBScenarioModifier();
-        sm.objectives = new ArrayList<>();
-        ScenarioObjective sob = new ScenarioObjective();
-        sob.addDetail("BARFO");
-        sm.objectives.add(sob);
-        
-        return sm;
-    }
-    
     /**
      * Process this scenario modifier for a particular scenario, given a particular timing indicator.
      * @param scenario
@@ -111,41 +101,41 @@ public class AtBScenarioModifier implements Cloneable {
      * @param eventTiming Whether this is occurring before or after primary forces have been generated.
      */
     public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
-        if(eventTiming == this.getEventTiming()) {
-            if(getAdditionalBriefingText() != null && getAdditionalBriefingText().length() > 0) {
+        if(eventTiming == getEventTiming()) {
+            if (getAdditionalBriefingText() != null && getAdditionalBriefingText().length() > 0) {
                 AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, 
                         String.format("%s: %s", getModifierName(), getAdditionalBriefingText()));
             }
             
-            if(getForceDefinition() != null) {
+            if (getForceDefinition() != null) {
                 AtBScenarioModifierApplicator.addForce(campaign, scenario, getForceDefinition(), eventTiming);
             }
             
-            if(getSkillAdjustment() != null && getEventRecipient() != null) {
+            if (getSkillAdjustment() != null && getEventRecipient() != null) {
                 AtBScenarioModifierApplicator.adjustSkill(scenario, campaign, getEventRecipient(), getSkillAdjustment());
             }
             
-            if(getQualityAdjustment() != null && getEventRecipient() != null) {
+            if (getQualityAdjustment() != null && getEventRecipient() != null) {
                 AtBScenarioModifierApplicator.adjustQuality(scenario, campaign, getEventRecipient(), getQualityAdjustment());
             }
             
-            if(getBattleDamageIntensity() != null && getEventRecipient() != null) {
+            if (getBattleDamageIntensity() != null && getEventRecipient() != null) {
                 AtBScenarioModifierApplicator.inflictBattleDamage(scenario, campaign, getEventRecipient(), getBattleDamageIntensity());
             }
             
-            if(getAmmoExpenditureIntensity() != null && getEventRecipient() != null) {
+            if (getAmmoExpenditureIntensity() != null && getEventRecipient() != null) {
                 AtBScenarioModifierApplicator.expendAmmo(scenario, campaign, getEventRecipient(), getAmmoExpenditureIntensity());
             }
             
-            if(getUnitRemovalCount() != null && getEventRecipient() != null) {
+            if (getUnitRemovalCount() != null && getEventRecipient() != null) {
                 AtBScenarioModifierApplicator.removeUnits(scenario, campaign, getEventRecipient(), getUnitRemovalCount());
             }
             
-            if(getUseAmbushLogic() != null && getEventRecipient() != null) {
+            if (getUseAmbushLogic() != null && getEventRecipient() != null) {
                 AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, getEventRecipient());
             }
             
-            if(getSwitchSides() != null && getEventRecipient() != null) {
+            if (getSwitchSides() != null && getEventRecipient() != null) {
                 AtBScenarioModifierApplicator.switchSides(scenario, getEventRecipient());
             }
             
@@ -197,13 +187,13 @@ public class AtBScenarioModifier implements Cloneable {
      * @return The scenario modifier, if any.
      */
     public static AtBScenarioModifier getScenarioModifier(String key) {
-        if(!scenarioModifiers.containsKey(key)) {
+        if (!scenarioModifiers.containsKey(key)) {
             MekHQ.getLogger().error("Scenario modifier " + key + " does not exist.");
             return null;
         }
         
         // clone it to avoid calling code changing the modifier
-        return (AtBScenarioModifier) scenarioModifiers.get(key).clone();
+        return scenarioModifiers.get(key).clone();
     }
     
     /**
@@ -211,8 +201,8 @@ public class AtBScenarioModifier implements Cloneable {
      */
     public static List<AtBScenarioModifier> getRequiredHostileFacilityModifiers() {
         List<AtBScenarioModifier> retval = new ArrayList<>();
-        for(String key : requiredHostileFacilityModifierKeys) {
-            retval.add((AtBScenarioModifier) scenarioModifiers.get(key).clone());
+        for (String key : requiredHostileFacilityModifierKeys) {
+            retval.add(scenarioModifiers.get(key).clone());
         }
         
         return retval;
@@ -238,6 +228,9 @@ public class AtBScenarioModifier implements Cloneable {
         return getScenarioModifier(alliedFacilityModifierKeys.get(modIndex));
     }
     
+    /**
+     * Get a random modifier, appropriate for the map location (space, atmo, ground)
+     */
     public static AtBScenarioModifier getRandomBattleModifier(MapLocation mapLocation) {
         return getRandomBattleModifier(mapLocation, null);
     }
@@ -431,7 +424,7 @@ public class AtBScenarioModifier implements Cloneable {
     }
     
     @Override
-    public Object clone() {
+    public AtBScenarioModifier clone() {
         final AtBScenarioModifier copy = new AtBScenarioModifier();
         copy.additionalBriefingText = additionalBriefingText;
         copy.allowedMapLocations = allowedMapLocations == null ? new ArrayList<>() : new ArrayList<>(allowedMapLocations);
@@ -635,7 +628,7 @@ class ScenarioModifierManifest {
                 JAXBElement<ScenarioModifierManifest> templateElement = um.unmarshal(inputSource, ScenarioModifierManifest.class);
                 resultingList = templateElement.getValue();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             MekHQ.getLogger().error("Error Deserializing Scenario Modifier List", e);
         }
 

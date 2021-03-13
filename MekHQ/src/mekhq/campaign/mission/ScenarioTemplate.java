@@ -54,6 +54,7 @@ public class ScenarioTemplate implements Cloneable {
     @XmlElement(name="scenarioObjective")
     public List<ScenarioObjective> scenarioObjectives = new ArrayList<>();
     
+    @Override
     public ScenarioTemplate clone() {
         ScenarioTemplate st = new ScenarioTemplate();
         st.name = this.name;

@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.stratcon;
 
 import java.io.PrintWriter;
@@ -20,9 +39,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.mission.AtBContract;
 
 /**
- * Contract-level state object for a stratcon campaign.
+ * Contract-level state object for a StratCon campaign.
  * @author NickAragua
- *
  */
 @XmlRootElement(name="StratconCampaignState")
 public class StratconCampaignState {
@@ -62,7 +80,7 @@ public class StratconCampaignState {
     
     public StratconCampaignState(AtBContract contract) {
         tracks = new ArrayList<>();
-        this.setContract(contract);
+        setContract(contract);
     }
 
     /**
@@ -142,7 +160,7 @@ public class StratconCampaignState {
     }
     
     public void incrementPendingStrategicObjectiveCount(int increment) {
-        this.pendingStrategicObjectiveCount += increment;
+        pendingStrategicObjectiveCount += increment;
     }
     
     public void incrementPendingStrategicObjectiveCount() {
@@ -176,7 +194,7 @@ public class StratconCampaignState {
      * @return Deployed or not.
      */
     public boolean isForceDeployedHere(int forceID) {
-        for(StratconTrackState trackState : tracks) {
+        for (StratconTrackState trackState : tracks) {
             if(trackState.getAssignedForceCoords().containsKey(forceID)) {
                 return true;
             }
@@ -198,7 +216,7 @@ public class StratconCampaignState {
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(stateElement, pw);
-        } catch(Exception e) {
+        } catch (Exception e) {
             MekHQ.getLogger().error(e);
         }
     }
@@ -220,7 +238,8 @@ public class StratconCampaignState {
             MekHQ.getLogger().error("Error Deserializing Campaign State", e);
         }
         
-        // hack: localdate doesn't serialize/deserialize nicely within a map, so we store it as a int-string map instead
+        // Hack: LocalDate doesn't serialize/deserialize nicely within a map, so we store it as a int-string map instead
+        // while we're here, manually restore the coordinate-force lookup
         if (resultingCampaignState != null) {
             for (StratconTrackState track : resultingCampaignState.getTracks()) {
                 track.restoreReturnDates();

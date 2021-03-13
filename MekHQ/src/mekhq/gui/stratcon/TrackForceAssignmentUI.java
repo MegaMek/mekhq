@@ -1,3 +1,17 @@
+/*
+* MegaMek - Copyright (C) 2020 - The MegaMek Team
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU General Public License as published by the Free Software
+* Foundation; either version 2 of the License, or (at your option) any later
+* version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+* details.
+*/
+
 package mekhq.gui.stratcon;
 
 import java.awt.GridBagConstraints;
@@ -20,21 +34,23 @@ import mekhq.gui.StratconPanel;
 
 /**
  * This class handles the "assign force to track" interaction, 
- * where a user may assign a force to a track directly, either to a facility or 
+ * where a user may assign a force to a track directly, either to a facility or to an empty hex
  * @author NickAragua
- *
  */
 public class TrackForceAssignmentUI extends JDialog implements ActionListener {
     private final static String CMD_CONFIRM = "CMD_TRACK_FORCE_CONFIRM";
     
-    Campaign campaign;
-    StratconCampaignState currentCampaignState;
-    int currentTrackIndex;
-    StratconCoords selectedCoords;
+    private Campaign campaign;
+    private StratconCampaignState currentCampaignState;
+    private int currentTrackIndex;
+    private StratconCoords selectedCoords;
     private JList<Force> availableForceList = new JList<>();
     private JButton btnConfirm = new JButton();
     private StratconPanel ownerPanel;
     
+    /**
+     * Constructor, given a parent StratCon panel.
+     */
     public TrackForceAssignmentUI(StratconPanel parent) {
         ownerPanel = parent;
         btnConfirm = new JButton("Confirm");
@@ -42,6 +58,9 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         btnConfirm.addActionListener(this);
     }
     
+    /**
+     * Worker function that initializes UI elements
+     */
     private void initializeUI() {
         getContentPane().removeAll();
         getContentPane().setLayout(new GridBagLayout());
@@ -72,7 +91,6 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
 
         getContentPane().add(forceListContainer, gbc);
         
-
         gbc.gridy++;
         
         getContentPane().add(btnConfirm, gbc);
@@ -84,9 +102,6 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
     
     /**
      * Display the track force assignment UI.
-     * @param campaign
-     * @param campaignState
-     * @param currentTrackIndex
      */
     public void display(Campaign campaign, StratconCampaignState campaignState, int currentTrackIndex, StratconCoords coords) {
         this.campaign = campaign;
@@ -97,15 +112,17 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         initializeUI();
     }
 
-    
+    /**
+     * Event handler for button commands.    
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
-        switch(e.getActionCommand()) {
+        switch (e.getActionCommand()) {
             case CMD_CONFIRM:
                 // sometimes the scenario templates take a little while to load, we don't want the user
                 // clicking the button fifty times and getting a bunch of scenarios.
                 btnConfirm.setEnabled(false);                
-                for(Force force : availableForceList.getSelectedValuesList()) {
+                for (Force force : availableForceList.getSelectedValuesList()) {
                     StratconRulesManager.deployForceToCoords(selectedCoords, force.getId(), 
                             campaign, currentCampaignState.getContract(), currentCampaignState.getTrack(currentTrackIndex));
                 }

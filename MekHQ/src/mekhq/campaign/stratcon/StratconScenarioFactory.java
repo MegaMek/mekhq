@@ -30,7 +30,6 @@ import mekhq.campaign.mission.atb.AtBScenarioManifest;
 /**
  * This class handles functionality related to loading and sorting scenario templates.
  * @author NickAragua
- *
  */
 public class StratconScenarioFactory {
     // loaded dynamic scenario templates, sorted by location (ground, low atmosphere, space)
@@ -57,11 +56,11 @@ public class StratconScenarioFactory {
         // load user-specified scenario list
         AtBScenarioManifest userManifest = AtBScenarioManifest.Deserialize("./data/scenariotemplates/UserScenarioManifest.xml");
         
-        if(scenarioManifest != null) {
+        if (scenarioManifest != null) {
             loadScenariosFromManifest(scenarioManifest);
         }
         
-        if(userManifest != null) {
+        if (userManifest != null) {
             loadScenariosFromManifest(userManifest);
         }
     }
@@ -71,22 +70,22 @@ public class StratconScenarioFactory {
      * @param manifest The manifest to process
      */
     private static void loadScenariosFromManifest(AtBScenarioManifest manifest) {
-        if(manifest == null) {
+        if (manifest == null) {
             return;
         }
         
-        for(int key : manifest.scenarioFileNames.keySet()) {
+        for (int key : manifest.scenarioFileNames.keySet()) {
             String fileName = manifest.scenarioFileNames.get(key).trim();
             String filePath = String.format("./data/ScenarioTemplates/%s", manifest.scenarioFileNames.get(key).trim());
             
             try {
                 ScenarioTemplate template = ScenarioTemplate.Deserialize(filePath);
                 
-                if(template != null) {
+                if (template != null) {
                     MapLocation locationKey = template.mapParameters.getMapLocation();
                     
                     // sort templates by location
-                    if(!dynamicScenarioLocationMap.containsKey(locationKey)) {
+                    if (!dynamicScenarioLocationMap.containsKey(locationKey)) {
                         dynamicScenarioLocationMap.put(locationKey, new ArrayList<>());
                     }
                     
@@ -94,7 +93,7 @@ public class StratconScenarioFactory {
                     
                     // sort templates by primary force unit type
                     int playerForceUnitType = template.getPrimaryPlayerForce().getAllowedUnitType();
-                    if(!dynamicScenarioUnitTypeMap.containsKey(playerForceUnitType)) {
+                    if (!dynamicScenarioUnitTypeMap.containsKey(playerForceUnitType)) {
                         dynamicScenarioUnitTypeMap.put(playerForceUnitType, new ArrayList<>());
                     }
                     
@@ -102,7 +101,7 @@ public class StratconScenarioFactory {
                     
                     dynamicScenarioNameMap.put(fileName, template);
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 MekHQ.getLogger().error(String.format("Error loading file: %s", filePath), e);
             }
         }
@@ -135,10 +134,10 @@ public class StratconScenarioFactory {
         
         // if the specific unit type doesn't have any scenario templates for it
         // then try a more generic unit type.
-        if(!dynamicScenarioUnitTypeMap.containsKey(unitType)) {
+        if (!dynamicScenarioUnitTypeMap.containsKey(unitType)) {
             actualUnitType = convertSpecificUnitTypeToGeneral(unitType);
             
-            if(!dynamicScenarioUnitTypeMap.containsKey(actualUnitType)) {            
+            if (!dynamicScenarioUnitTypeMap.containsKey(actualUnitType)) {            
                 MekHQ.getLogger().warning(String.format("No scenarios configured for unit type %d", unitType));
                 return null;
             }
@@ -149,10 +148,10 @@ public class StratconScenarioFactory {
     }
     
     /**
-     * Get an allied or hostile facilit scenario, depending on passed on parameter.
+     * Get an allied or hostile facility scenario, depending on passed on parameter.
      */
     public static ScenarioTemplate getFacilityScenario(boolean allied) {
-        if(allied) {
+        if (allied) {
             return dynamicScenarioNameMap.get(ALLIED_FACILITY_SCENARIO);
         } else {
             return dynamicScenarioNameMap.get(HOSTILE_FACILITY_SCENARIO);
@@ -165,7 +164,7 @@ public class StratconScenarioFactory {
      * @return Generic unit type.
      */
     private static int convertSpecificUnitTypeToGeneral(int unitType) {
-        switch(unitType)
+        switch (unitType)
         {
             case UnitType.AERO:
             case UnitType.CONV_FIGHTER:

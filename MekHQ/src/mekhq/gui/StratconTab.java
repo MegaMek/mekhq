@@ -1,3 +1,18 @@
+/*
+* MegaMek - Copyright (C) 2020 - The MegaMek Team
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU General Public License as published by the Free Software
+* Foundation; either version 2 of the License, or (at your option) any later
+* version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+* details.
+*/
+
+
 package mekhq.gui;
 
 import java.awt.GridBagConstraints;
@@ -32,10 +47,16 @@ public class StratconTab extends CampaignGuiTab {
     private JLabel infoPanelText;
     private JLabel campaignStatusText;
 
+    /**
+     * Creates an instance of the StratconTab.
+     */
     StratconTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
     }
 
+    /**
+     * Override of the base initTab method. Populates the tab.
+     */
     @Override
     public void initTab() { 
         removeAll();
@@ -63,6 +84,9 @@ public class StratconTab extends CampaignGuiTab {
         MekHQ.registerHandler(this);
     }
 
+    /**
+     * Worker function that sets up the layout of the right-side info panel.
+     */
     private void initializeInfoPanel() {
         infoPanel = new JPanel();        
         infoPanel.setLayout(new GridBagLayout()); 
@@ -121,6 +145,10 @@ public class StratconTab extends CampaignGuiTab {
         return GuiTabType.STRATCON;
     }
     
+    /**
+     * Worker function that updates the campaign state section of the info panel
+     * with such info as current objective status, VP/SP totals, etc.
+     */
     private void updateCampaignState() {
         if ((cboCurrentTrack == null) || (campaignStatusText == null)) {
             return;
@@ -131,7 +159,7 @@ public class StratconTab extends CampaignGuiTab {
         // current VP
         // current support points
         TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
-        if(currentTDI == null) {
+        if (currentTDI == null) {
             return;
         }
         AtBContract currentContract = currentTDI.contract;
@@ -161,18 +189,21 @@ public class StratconTab extends CampaignGuiTab {
         campaignStatusText.setText(sb.toString());
     }
     
+    /**
+     * Refreshes the list of tracks
+     */
     private void repopulateTrackList() {
         TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
         cboCurrentTrack.removeAllItems();
         
         // track dropdown is populated with all tracks across all active contracts
-        for(Contract contract : getCampaignGui().getCampaign().getActiveContracts()) {
-            if((contract instanceof AtBContract) && contract.isActive() && (((AtBContract) contract).getStratconCampaignState() != null)) {
-                for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
+        for (Contract contract : getCampaignGui().getCampaign().getActiveContracts()) {
+            if ((contract instanceof AtBContract) && contract.isActive() && (((AtBContract) contract).getStratconCampaignState() != null)) {
+                for (StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
                     TrackDropdownItem tdi = new TrackDropdownItem((AtBContract) contract, track);
                     cboCurrentTrack.addItem(tdi);
                     
-                    if((currentTDI != null) && currentTDI.equals(tdi)) {
+                    if ((currentTDI != null) && currentTDI.equals(tdi)) {
                         currentTDI = tdi;
                         cboCurrentTrack.setSelectedItem(tdi);
                     } else if (currentTDI == null) {
@@ -183,7 +214,7 @@ public class StratconTab extends CampaignGuiTab {
             }
         }
         
-        if((cboCurrentTrack.getItemCount() > 0) && (currentTDI != null) && (currentTDI.contract != null)) {
+        if ((cboCurrentTrack.getItemCount() > 0) && (currentTDI != null) && (currentTDI.contract != null)) {
             TrackDropdownItem selectedTrack = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
             
             stratconPanel.selectTrack(selectedTrack.contract.getStratconCampaignState(), currentTDI.track);
@@ -233,7 +264,7 @@ public class StratconTab extends CampaignGuiTab {
         
         @Override
         public boolean equals(Object other) {
-            if(!(other instanceof TrackDropdownItem)) {
+            if (!(other instanceof TrackDropdownItem)) {
                 return false;
             } else {
                 TrackDropdownItem otherTDI = (TrackDropdownItem) other;
