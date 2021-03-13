@@ -59,12 +59,12 @@ import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JToggleButtonPreference;
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JToggleButtonPreference;
 import mekhq.gui.sorter.*;
 import mekhq.gui.view.PersonViewPanel;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Tab for interacting with all personnel

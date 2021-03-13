@@ -910,10 +910,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menu = new JMenu("Deploy Force");
                 menu.setEnabled(false);
                 JMenu missionMenu;
-                for (Mission m : gui.getCampaign().getMissions()) {
-                    if (!m.isActive()) {
-                        continue;
-                    }
+                for (Mission m : gui.getCampaign().getActiveMissions()) {
                     missionMenu = new JMenu(m.getName());
                     for (Scenario s : m.getScenarios()) {
                         if (s.isCurrent()) {
@@ -1266,10 +1263,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 //Deploy unit to a scenario - includes submenus for scenario selection
                 menu = new JMenu("Deploy Unit");
                 JMenu missionMenu;
-                for (Mission m : gui.getCampaign().getMissions()) {
-                    if (!m.isActive()) {
-                        continue;
-                    }
+                for (Mission m : gui.getCampaign().getActiveMissions()) {
                     missionMenu = new JMenu(m.getName());
                     for (Scenario s : m.getScenarios()) {
                         if (s.isCurrent()) {
@@ -1299,7 +1293,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     MenuScroller.createScrollBarsOnMenus(menu);
                     popup.add(menu);
                 }
-
 
                 //First, only display the Assign to Ship command if your command has at least 1 valid transport
                 //and if your selection does not include a transport

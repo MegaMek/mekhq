@@ -41,8 +41,8 @@ import megamek.common.Mounted;
 import megamek.common.options.IOption;
 import megamek.common.options.WeaponQuirks;
 import mekhq.MekHQ;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
@@ -52,7 +52,7 @@ import mekhq.preferences.PreferencesNode;
 public class QuirksDialog extends JDialog implements DialogOptionListener, ActionListener {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -5030866602278329622L;
     private QuirksPanel qpanel;

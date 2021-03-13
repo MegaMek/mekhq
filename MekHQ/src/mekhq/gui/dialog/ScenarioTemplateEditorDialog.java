@@ -75,8 +75,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.

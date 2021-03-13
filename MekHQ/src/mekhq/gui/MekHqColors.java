@@ -24,7 +24,7 @@ import javax.swing.UIManager;
 
 import mekhq.MekHQ;
 import mekhq.gui.preferences.ColorPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 public class MekHqColors {
 
