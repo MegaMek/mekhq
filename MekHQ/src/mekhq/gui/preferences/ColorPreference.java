@@ -22,7 +22,7 @@ import java.awt.Color;
 import java.util.Optional;
 
 import megamek.common.annotations.Nullable;
-import mekhq.preferences.PreferenceElement;
+import megamek.client.ui.preferences.PreferenceElement;
 
 /**
  * Represents a preference which can manage a color and

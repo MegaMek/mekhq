@@ -40,6 +40,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -63,10 +64,7 @@ import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
 /**
- * Created with IntelliJ IDEA.
- *
- * @version %Id%
- * @lastEditBy Deric "Netzilla" Page (deric dot page at usa dot net)
+ * @author Deric "Netzilla" Page (deric dot page at usa dot net)
  * @since 9/28/13 11:20 AM
  */
 @SuppressWarnings(value = "FieldCanBeLocal")
@@ -79,6 +77,7 @@ public class CampaignOpsReputationTest {
     private List<Person> personnelList;
     private List<Person> activePersonnelList;
     private List<Mission> missionList;
+    private List<Mission> completedMissionList;
 
     // Mothballed units.
     private Unit mockMechMothballed;
@@ -225,6 +224,7 @@ public class CampaignOpsReputationTest {
         personnelList = new ArrayList<>();
         activePersonnelList = new ArrayList<>();
         missionList = new ArrayList<>();
+        completedMissionList = new ArrayList<>();
 
         mockMothballed();
         mockSkills();
@@ -302,6 +302,7 @@ public class CampaignOpsReputationTest {
         doCallRealMethod().when(mockCampaign).getAdmins();
         doReturn(mockGrasshopper2Pilot).when(mockCampaign).getFlaggedCommander();
         doReturn(missionList).when(mockCampaign).getMissions();
+        doReturn(completedMissionList).when(mockCampaign).getCompletedMissions();
         doReturn(mockFinances).when(mockCampaign).getFinances();
     }
 
@@ -401,24 +402,23 @@ public class CampaignOpsReputationTest {
 
         // Add a few missions.
         Mission winOne = mock(Mission.class);
-        when(winOne.isActive()).thenReturn(false);
-        when(winOne.getStatus()).thenReturn(Mission.S_SUCCESS);
+        when(winOne.getStatus()).thenReturn(MissionStatus.SUCCESS);
         missionList.add(winOne);
+        completedMissionList.add(winOne);
         Mission winTwo = mock(Mission.class);
-        when(winTwo.isActive()).thenReturn(false);
-        when(winTwo.getStatus()).thenReturn(Mission.S_SUCCESS);
+        when(winTwo.getStatus()).thenReturn(MissionStatus.SUCCESS);
         missionList.add(winTwo);
+        completedMissionList.add(winTwo);
         Mission winThree = mock(Mission.class);
-        when(winThree.isActive()).thenReturn(false);
-        when(winThree.getStatus()).thenReturn(Mission.S_SUCCESS);
+        when(winThree.getStatus()).thenReturn(MissionStatus.SUCCESS);
         missionList.add(winThree);
+        completedMissionList.add(winThree);
         Mission lossOne = mock(Mission.class);
-        when(lossOne.isActive()).thenReturn(false);
-        when(lossOne.getStatus()).thenReturn(Mission.S_FAILED);
+        when(lossOne.getStatus()).thenReturn(MissionStatus.FAILED);
         missionList.add(lossOne);
+        completedMissionList.add(lossOne);
         Mission active = mock(Mission.class);
-        when(active.isActive()).thenReturn(true);
-        when(active.getStatus()).thenReturn(Mission.S_ACTIVE);
+        when(active.getStatus()).thenReturn(MissionStatus.ACTIVE);
         missionList.add(active);
         assertEquals(5, spyReputation.getCombatRecordValue());
     }

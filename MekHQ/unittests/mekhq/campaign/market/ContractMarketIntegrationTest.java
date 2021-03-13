@@ -29,7 +29,6 @@ import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -49,7 +48,9 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.rating.UnitRatingMethod;
@@ -97,7 +98,7 @@ public class ContractMarketIntegrationTest {
         ContractMarket market = new ContractMarket();
 
         // Simulate clicking GM Add on the contract market three times
-        for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ++ii) {
+        for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ii++) {
             market.addAtBContract(campaign);
         }
 
@@ -110,7 +111,7 @@ public class ContractMarketIntegrationTest {
 
         // Simulate three months of contract generation ...
         boolean foundContract = false;
-        for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ++ii) {
+        for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ii++) {
             market.generateContractOffers(campaign, true);
 
             // ... and one of these three should get us a contract!
@@ -127,7 +128,7 @@ public class ContractMarketIntegrationTest {
         ContractMarket market = new ContractMarket();
 
         // Simulate clicking GM Add on the contract market three times
-        for (int ii = 0; ii < 3; ++ii) {
+        for (int ii = 0; ii < 3; ii++) {
             market.addAtBContract(campaign);
         }
 
@@ -142,7 +143,7 @@ public class ContractMarketIntegrationTest {
 
         // Simulate three months of contract generation ...
         boolean foundContract = false;
-        for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ++ii) {
+        for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ii++) {
             market.generateContractOffers(campaign, true);
 
             // ... and one of these three should get us a contract!
@@ -157,11 +158,13 @@ public class ContractMarketIntegrationTest {
         AtBContract existing = mock(AtBContract.class);
         when(existing.getId()).thenReturn(1);
         when(existing.getScenarios()).thenReturn(new ArrayList<>());
-        when(existing.isActive()).thenReturn(true);
+        when(existing.getStatus()).thenReturn(MissionStatus.ACTIVE);
         when(existing.getEmployerCode()).thenReturn("FWL");
         when(existing.getEnemyCode()).thenReturn("CC");
         when(existing.getSystemId()).thenReturn("Sian");
+        when(existing.getStartDate()).thenReturn(campaign.getLocalDate().minusDays(3000));
         when(existing.getEndingDate()).thenReturn(campaign.getLocalDate().plusDays(3000));
+        when(existing.isActiveOn(campaign.getLocalDate(), false)).thenCallRealMethod();
         campaign.importMission(existing);
 
         ContractMarket market = new ContractMarket();
