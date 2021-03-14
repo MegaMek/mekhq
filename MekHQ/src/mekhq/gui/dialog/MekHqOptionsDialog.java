@@ -1,6 +1,4 @@
 /*
- * MekHqOptionsDialog.java
- *
  * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -24,6 +22,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
+import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import javax.swing.*;
@@ -34,8 +33,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class MekHqOptionsDialog extends BaseButtonDialog {
-    //region Variable Declarations
+public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
+    //region Variable Declaration
     //region Display
     private JTextField optionDisplayDateFormat;
     private JTextField optionLongDisplayDateFormat;
@@ -82,9 +81,9 @@ public class MekHqOptionsDialog extends BaseButtonDialog {
 
     //region Constructors
     public MekHqOptionsDialog(final JFrame frame) {
-        super(frame, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog",
-                new EncodeControl()), "dialog.text");
-        initialize("MekHQOptionsDialog");
+        super(frame, true, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog",
+                new EncodeControl()), "MekHQOptionsDialog", "MekHQOptionsDialog.title");
+        initialize();
         setInitialState();
     }
     //endregion Constructors

@@ -18,25 +18,18 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.common.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
 import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationOptions;
-import mekhq.campaign.universe.generators.companyGenerators.CompanyGenerationPersonTracker;
+import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.CompanyGenerationPanelType;
 import mekhq.gui.panels.CompanyGenerationOptionsPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
-public class CompanyGenerationDialog extends BaseButtonDialog {
+public class CompanyGenerationDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
     private Campaign campaign;
     private CompanyGenerationPanelType currentPanelType;
@@ -45,10 +38,10 @@ public class CompanyGenerationDialog extends BaseButtonDialog {
 
     //region Constructors
     public CompanyGenerationDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "CompanyGenerationDialog.title");
+        super(frame, "CompanyGenerationDialog", "CompanyGenerationDialog.title");
         setCampaign(campaign);
         setCurrentPanelType(CompanyGenerationPanelType.OPTIONS);
-        initialize("CompanyGenerationDialog");
+        initialize();
     }
     //endregion Constructors
 
@@ -122,31 +115,31 @@ public class CompanyGenerationDialog extends BaseButtonDialog {
     private JPanel initializeCompanyGenerationOptionsButtonPanel() {
         JPanel panel = new JPanel(new GridLayout(2, 3));
 
-        JButton cancelButton = new JButton(resources.getString("Cancel"));
+        JButton cancelButton = new JButton(resources.getString("Cancel.text"));
         cancelButton.setName("cancelButton");
         cancelButton.addActionListener(this::cancelActionPerformed);
         panel.add(cancelButton);
 
-        JButton btnExport = new JButton(resources.getString("Export"));
+        JButton btnExport = new JButton(resources.getString("Export.text"));
         btnExport.addActionListener(evt -> getCompanyGenerationOptionsPanel().exportOptionsToXML());
         panel.add(btnExport);
 
-        JButton okButton = new JButton(resources.getString("Generate"));
+        JButton okButton = new JButton(resources.getString("Generate.text"));
         okButton.setName("okButton");
         okButton.addActionListener(this::okButtonActionPerformed);
         panel.add(okButton);
 
-        JButton btnRestore = new JButton(resources.getString("RestoreDefaults"));
+        JButton btnRestore = new JButton(resources.getString("RestoreDefaults.text"));
         btnRestore.setName("btnRestore");
         btnRestore.addActionListener(evt -> getCompanyGenerationOptionsPanel().setOptions(
                 MekHQ.getMekHQOptions().getDefaultCompanyGenerationMethod()));
         panel.add(btnRestore);
 
-        JButton btnImport = new JButton(resources.getString("Import"));
+        JButton btnImport = new JButton(resources.getString("Import.text"));
         btnImport.addActionListener(evt -> getCompanyGenerationOptionsPanel().importOptionsFromXML());
         panel.add(btnImport);
 
-        JButton btnApply = new JButton(resources.getString("Apply"));
+        JButton btnApply = new JButton(resources.getString("Apply.text"));
         /*
         btnApply.addActionListener(evt -> {
             getCompanyGenerationOptionsPanel().apply();
@@ -164,7 +157,6 @@ public class CompanyGenerationDialog extends BaseButtonDialog {
     protected void okAction() {
         final CompanyGenerationOptions options = getCompanyGenerationOptionsPanel().createOptionsFromPanel();
         final AbstractCompanyGenerator generator = options.getMethod().getGenerator(getCampaign(), options);
-
-
+        // TODO : I'm a bit missing
     }
 }

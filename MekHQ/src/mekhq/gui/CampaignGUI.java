@@ -1,7 +1,8 @@
 /*
  * CampaignGUI.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,8 +43,8 @@ import mekhq.MekHqConstants;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.dialog.*;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -82,7 +83,6 @@ import mekhq.campaign.event.TransactionEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -666,7 +666,7 @@ public class CampaignGUI extends JPanel {
         menuFile.add(menuExport);
         //endregion menuExport
 
-        JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text")); // NOI18N
+        JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text"));
         miMercRoster.setMnemonic(KeyEvent.VK_U);
         miMercRoster.addActionListener(evt -> showMercRosterDialog());
         menuFile.add(miMercRoster);
@@ -1186,8 +1186,7 @@ public class CampaignGUI extends JPanel {
             minutesAvail += getCampaign().getPossibleAstechPoolOvertime();
         }
         if (minutesAvail < totalAstechMinutesNeeded) {
-            int needed = (int) Math
-                    .ceil((totalAstechMinutesNeeded - minutesAvail) / 480D);
+            int needed = (int) Math.ceil((totalAstechMinutesNeeded - minutesAvail) / 480D);
             return JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(null,
                     "You do not have enough astechs to provide for full maintenance. You need "
                             + needed + " more astech(s). Do you wish to proceed?",
@@ -1201,38 +1200,30 @@ public class CampaignGUI extends JPanel {
         if (getCampaign().getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY) {
             return false;
         }
-        for (Mission m : getCampaign().getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract)
-                    || !getCampaign().getLocation().isOnPlanet()) {
+        for (AtBContract contract : getCampaign().getActiveAtBContracts()) {
+            if (!getCampaign().getLocation().isOnPlanet()) {
                 continue;
             }
-            if (getCampaign().getDeploymentDeficit((AtBContract) m) > 0) {
-                return 0 != JOptionPane
-                        .showConfirmDialog(
-                                null,
-                                "You have not met the deployment levels required by contract. Do your really wish to advance the day?",
-                                "Unmet deployment requirements",
-                                JOptionPane.YES_NO_OPTION);
+
+            if (getCampaign().getDeploymentDeficit(contract) > 0) {
+                return 0 != JOptionPane.showConfirmDialog(null,
+                        "You have not met the deployment levels required by contract. Do your really wish to advance the day?",
+                        "Unmet deployment requirements", JOptionPane.YES_NO_OPTION);
             }
         }
         return false;
     }
 
     public boolean nagOutstandingScenarios() {
-        for (Mission m : getCampaign().getMissions()) {
-            if (!m.isActive() || !(m instanceof AtBContract)) {
-                continue;
-            }
-            for (Scenario s : m.getScenarios()) {
+        for (AtBContract contract : getCampaign().getActiveAtBContracts(true)) {
+            for (Scenario s : contract.getScenarios()) {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
                     continue;
                 }
                 if (getCampaign().getLocalDate().equals(s.getDate())) {
-                    return 0 != JOptionPane
-                            .showConfirmDialog(
-                                    null,
-                                    "You have a pending battle. Failure to deploy will result in a defeat and a minor contract breach. Do your really wish to advance the day?",
-                                    "Pending battle", JOptionPane.YES_NO_OPTION);
+                    return 0 != JOptionPane.showConfirmDialog(null,
+                            "You have a pending battle. Failure to deploy will result in a defeat and a minor contract breach. Do your really wish to advance the day?",
+                            "Pending battle", JOptionPane.YES_NO_OPTION);
                 }
             }
         }
@@ -1346,10 +1337,6 @@ public class CampaignGUI extends JPanel {
 
     private File selectSaveCampaignFile() {
         return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
-    }
-
-    private String getExtensionForSaveFile(Campaign c) {
-        return MekHQ.getMekHQOptions().getPreferGzippedOutput() ? ".cpnx.gz" : ".cpnx";
     }
 
     private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {

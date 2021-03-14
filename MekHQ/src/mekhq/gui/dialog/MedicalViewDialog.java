@@ -60,9 +60,9 @@ import javax.swing.UIManager;
 import megamek.common.util.EncodeControl;
 
 import mekhq.campaign.log.LogEntryType;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.view.Paperdoll;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;

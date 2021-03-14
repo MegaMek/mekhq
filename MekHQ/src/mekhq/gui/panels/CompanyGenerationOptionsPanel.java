@@ -859,7 +859,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             }
         });
 
-        JLabel lblFaction = new JLabel(resources.getString("Faction"));
+        JLabel lblFaction = new JLabel(resources.getString("Faction.text"));
         lblFaction.setToolTipText(resources.getString("lblFaction.toolTipText"));
         lblFaction.setName("lblFaction");
 
@@ -898,7 +898,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             getComboStartingPlanet().setEnabled(selected);
         });
 
-        setChkStartingSystemFactionSpecific(new JCheckBox(resources.getString("FactionSpecific")));
+        setChkStartingSystemFactionSpecific(new JCheckBox(resources.getString("FactionSpecific.text")));
         getChkStartingSystemFactionSpecific().setToolTipText(resources.getString("chkStartingSystemFactionSpecific.toolTipText"));
         getChkStartingSystemFactionSpecific().setName("chkStartingSystemFactionSpecific");
         getChkStartingSystemFactionSpecific().addActionListener(evt -> {
@@ -1368,7 +1368,7 @@ public class CompanyGenerationOptionsPanel extends JPanel {
             getComboCentralPlanet().setEnabled(selected);
         });
 
-        setChkCentralSystemFactionSpecific(new JCheckBox(resources.getString("FactionSpecific")));
+        setChkCentralSystemFactionSpecific(new JCheckBox(resources.getString("FactionSpecific.text")));
         getChkCentralSystemFactionSpecific().setToolTipText(resources.getString("chkCentralSystemFactionSpecific.toolTipText"));
         getChkCentralSystemFactionSpecific().setName("chkCentralSystemFactionSpecific");
         getChkCentralSystemFactionSpecific().addActionListener(evt -> {
