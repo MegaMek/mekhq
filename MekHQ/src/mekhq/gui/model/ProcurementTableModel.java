@@ -20,6 +20,7 @@ package mekhq.gui.model;
 
 import java.awt.Component;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.stream.IntStream;
 
 import javax.swing.JTable;
@@ -27,6 +28,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import megamek.common.TargetRoll;
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.UnitOrder;
@@ -50,12 +52,15 @@ public class ProcurementTableModel extends DataTableModel {
     public final static int COL_NEXT      =  5;
     public final static int COL_QUEUE     =  6;
     public final static int N_COL          = 7;
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     public ProcurementTableModel(final Campaign campaign) {
         this.campaign = campaign;
         setData(campaign.getShoppingList().getPartList());
+        columnNames = resources.getString("ProcurementTableModel.columnNames").split(",");
     }
     //endregion Constructors
 
@@ -67,28 +72,6 @@ public class ProcurementTableModel extends DataTableModel {
     @Override
     public int getColumnCount() {
         return N_COL;
-    }
-
-    @Override
-    public String getColumnName(final int column) {
-        switch (column) {
-            case COL_NAME:
-                return "Name";
-            case COL_TYPE:
-                return "Type";
-            case COL_COST:
-                return "Cost per Unit";
-            case COL_TOTAL_COST:
-                return "Total Cost";
-            case COL_TARGET:
-                return "Target";
-            case COL_QUEUE:
-                return "Quantity";
-            case COL_NEXT:
-                return "Next Check";
-            default:
-                return "?";
-        }
     }
 
     public void incrementItem(final int row) {
@@ -116,11 +99,11 @@ public class ProcurementTableModel extends DataTableModel {
                 return shoppingItem.getAcquisitionName();
             case COL_TYPE:
                 if (shoppingItem instanceof UnitOrder) {
-                    return "Unit";
+                    return resources.getString("Unit.text");
                 } else if (shoppingItem instanceof Part) {
-                    return "Part";
+                    return resources.getString("Part.text");
                 } else {
-                    return "Other";
+                    return "?";
                 }
             case COL_COST:
                 return shoppingItem.getBuyCost().toAmountAndSymbolString();
@@ -136,7 +119,7 @@ public class ProcurementTableModel extends DataTableModel {
                 return value;
             case COL_NEXT:
                 final int days = shoppingItem.getDaysToWait();
-                return String.format("%d %s", days, (days == 1) ? "day" : "days");
+                return String.format("%d %s", days, resources.getString((days == 1) ? "Day.text" : "Days.text"));
             case COL_QUEUE:
                 return shoppingItem.getQuantity();
             default:
@@ -203,7 +186,7 @@ public class ProcurementTableModel extends DataTableModel {
                 return getCampaign().getTargetForAcquisition(shoppingItem,
                         getCampaign().getLogisticsPerson(), false).getDesc();
             default:
-                return "<html>You can increase or decrease the quantity with the left/right arrows keys or the plus/minus keys.<br>Quantities reduced to zero will remain on the list until the next procurement cycle.</html>";
+                return resources.getString("ProcurementTableModel.defaultToolTip.toolTipText");
         }
     }
 

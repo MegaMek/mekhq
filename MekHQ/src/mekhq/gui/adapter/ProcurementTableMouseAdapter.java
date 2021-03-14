@@ -19,6 +19,7 @@
 package mekhq.gui.adapter;
 
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -26,6 +27,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import megamek.common.Entity;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;
@@ -39,6 +41,8 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     private final CampaignGUI gui;
     private final JTable table;
     private final ProcurementTableModel model;
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -72,9 +76,12 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
 
         // lets fill the pop up menu
         // GM mode
-        menu = new JMenu("GM Mode");
+        menu = new JMenu(resources.getString("GMMode.text"));
+        menu.setToolTipText(resources.getString("GMMode.toolTipText"));
 
-        menuItem = new JMenuItem("Procure single item now");
+        menuItem = new JMenuItem(resources.getString("miProcureSingleItemImmediately.text"));
+        menuItem.setToolTipText(resources.getString("miProcureSingleItemImmediately.toolTipText"));
+        menuItem.setName("miProcureSingleItemImmediately");
         menuItem.addActionListener(evt -> {
             if (row < 0) {
                 return;
@@ -95,7 +102,9 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         });
         menu.add(menuItem);
 
-        menuItem = new JMenuItem("Procure all items now");
+        menuItem = new JMenuItem(resources.getString("miProcureAllItemsImmediately.text"));
+        menuItem.setToolTipText(resources.getString("miProcureAllItemsImmediately.toolTipText"));
+        menuItem.setName("miProcureAllItemsImmediately");
         menuItem.addActionListener(evt -> {
             if (row < 0) {
                 return;
@@ -116,7 +125,9 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         });
         menu.add(menuItem);
 
-        menuItem = new JMenuItem("Clear From the List");
+        menuItem = new JMenuItem(resources.getString("miClearItems.text"));
+        menuItem.setToolTipText(resources.getString("miClearItems.toolTipText"));
+        menuItem.setName("miClearItems");
         menuItem.addActionListener(evt -> {
             if (row < 0) {
                 return;
@@ -146,7 +157,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         return Optional.of(popup);
     }
 
-    private void procureAllItems(IAcquisitionWork acquisition) {
+    private void procureAllItems(final IAcquisitionWork acquisition) {
         while (acquisition.getQuantity() > 0) {
             if (!tryProcureOneItem(acquisition)) {
                 break;
@@ -154,9 +165,9 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         }
     }
 
-    private boolean tryProcureOneItem(IAcquisitionWork acquisition) {
-        Object equipment = acquisition.getNewEquipment();
-        int transitTime = gui.getCampaign().calculatePartTransitTime(0);
+    private boolean tryProcureOneItem(final IAcquisitionWork acquisition) {
+        final Object equipment = acquisition.getNewEquipment();
+        final int transitTime = gui.getCampaign().calculatePartTransitTime(0);
         if (equipment instanceof Part) {
             if (gui.getCampaign().getQuartermaster().buyPart((Part) equipment, transitTime)) {
                 reportAcquisitionSuccess(acquisition);
@@ -178,13 +189,13 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         return false;
     }
 
-    private void reportAcquisitionSuccess(IAcquisitionWork acquisition) {
-        gui.getCampaign().addReport(String.format("<font color='Green'><b>Procured %s</b></font>",
+    private void reportAcquisitionSuccess(final IAcquisitionWork acquisition) {
+        gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report"),
                 acquisition.getAcquisitionName()));
     }
 
-    private void reportAcquisitionFailure(IAcquisitionWork acquisition) {
-        gui.getCampaign().addReport(String.format("<font color='red'><b>You cannot afford to purchase %s</b></font>",
+    private void reportAcquisitionFailure(final IAcquisitionWork acquisition) {
+        gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report"),
                 acquisition.getAcquisitionName()));
     }
 }
