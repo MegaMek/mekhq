@@ -18,13 +18,14 @@
  */
 package mekhq.gui.dialog;
 
+import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panels.DateSelectionPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 
-public class DateSelectionDialog extends BaseButtonDialog {
+public class DateSelectionDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
     private LocalDate initialDate;
 
@@ -33,9 +34,9 @@ public class DateSelectionDialog extends BaseButtonDialog {
 
     //region Constructors
     public DateSelectionDialog(final JFrame frame, final LocalDate initialDate) {
-        super(frame, "DateSelectionDialog.title");
+        super(frame, "DateSelectionDialog", "DateSelectionDialog.title");
         setInitialDate(initialDate);
-        initialize("DateSelectionDialog");
+        initialize();
     }
     //endregion Constructors
 

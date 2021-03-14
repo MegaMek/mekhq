@@ -20,20 +20,21 @@ package mekhq.gui.dialog;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.GamePreset;
+import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panels.CampaignPresetSelectionPanel;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class CampaignPresetSelectionDialog extends BaseButtonDialog {
+public class CampaignPresetSelectionDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
     private CampaignPresetSelectionPanel presetSelectionPanel;
     //endregion Variable Declarations
 
     //region Constructors
     protected CampaignPresetSelectionDialog(final JFrame parent) {
-        super(parent, "CampaignPresetSelectionDialog.title");
-        initialize("CampaignPresetSelectionDialog");
+        super(parent, "CampaignPresetSelectionDialog", "CampaignPresetSelectionDialog.title");
+        initialize();
     }
     //endregion Constructors
 
