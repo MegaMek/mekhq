@@ -44,8 +44,11 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 
+/**
+ * Class that handles the application of scenario modifier actions to AtBDynamicScenarios
+ * @author NickAragua
+ */
 public class AtBScenarioModifierApplicator {
-
     /**
      * Adds the given force to the given scenario at the appropriate point in time.
      */

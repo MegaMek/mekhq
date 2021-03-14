@@ -152,9 +152,9 @@ public class StratconScenarioFactory {
      */
     public static ScenarioTemplate getFacilityScenario(boolean allied) {
         if (allied) {
-            return dynamicScenarioNameMap.get(ALLIED_FACILITY_SCENARIO);
+            return getSpecificScenario(ALLIED_FACILITY_SCENARIO);
         } else {
-            return dynamicScenarioNameMap.get(HOSTILE_FACILITY_SCENARIO);
+            return getSpecificScenario(HOSTILE_FACILITY_SCENARIO);
         }
     }
     
