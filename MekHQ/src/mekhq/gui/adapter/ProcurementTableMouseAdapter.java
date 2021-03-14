@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2014-2021 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.adapter;
 
 import java.util.Optional;
@@ -14,22 +32,29 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.ProcurementTableModel;
+import mekhq.gui.utilities.JMenuHelpers;
 
 public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
+    //region Variable Declarations
     private final CampaignGUI gui;
     private final JTable table;
     private final ProcurementTableModel model;
+    //endregion Variable Declarations
 
-    protected ProcurementTableMouseAdapter(CampaignGUI gui, JTable table, ProcurementTableModel model) {
+    //region Constructors
+    protected ProcurementTableMouseAdapter(final CampaignGUI gui, final JTable table,
+                                           final ProcurementTableModel model) {
         this.gui = gui;
         this.table = table;
         this.model = model;
     }
+    //endregion Constructors
 
-    public static void connect(CampaignGUI gui, JTable table, ProcurementTableModel model) {
-        new ProcurementTableMouseAdapter(gui, table, model)
-                .connect(table);
+    //region Initialization
+    public static void connect(final CampaignGUI gui, final JTable table, final ProcurementTableModel model) {
+        new ProcurementTableMouseAdapter(gui, table, model).connect(table);
     }
+    //endregion Initialization
 
     @Override
     protected Optional<JPopupMenu> createPopupMenu() {
@@ -38,14 +63,14 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
             return Optional.empty();
         }
 
-        JPopupMenu popup = new JPopupMenu();
+        final JPopupMenu popup = new JPopupMenu();
         JMenuItem menuItem;
         JMenu menu;
         final int row = table.convertRowIndexToModel(table.getSelectedRow());
         final int[] rows = table.getSelectedRows();
         final boolean oneSelected = table.getSelectedRowCount() == 1;
-        
-        // **lets fill the pop up menu**//
+
+        // lets fill the pop up menu
         // GM mode
         menu = new JMenu("GM Mode");
 
@@ -54,6 +79,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
             if (row < 0) {
                 return;
             }
+
             if (oneSelected) {
                 model.getAcquisition(row)
                         .ifPresent(ProcurementTableMouseAdapter.this::tryProcureOneItem);
@@ -68,11 +94,13 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
             }
         });
         menu.add(menuItem);
+
         menuItem = new JMenuItem("Procure all items now");
         menuItem.addActionListener(evt -> {
             if (row < 0) {
                 return;
             }
+
             if (oneSelected) {
                 model.getAcquisition(row)
                         .ifPresent(ProcurementTableMouseAdapter.this::procureAllItems);
@@ -87,11 +115,13 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
             }
         });
         menu.add(menuItem);
+
         menuItem = new JMenuItem("Clear From the List");
         menuItem.addActionListener(evt -> {
             if (row < 0) {
                 return;
             }
+
             if (oneSelected) {
                 model.getAcquisition(row).ifPresent(a -> {
                     model.removeRow(row);
@@ -102,17 +132,16 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
                     if (curRow < 0) {
                         continue;
                     }
-                    model.getAcquisition(table.convertRowIndexToModel(curRow))
-                            .ifPresent(a -> {
-                                model.removeRow(row);
-                                MekHQ.triggerEvent(new ProcurementEvent(a));
-                            });
+                    model.getAcquisition(table.convertRowIndexToModel(curRow)).ifPresent(a -> {
+                        model.removeRow(row);
+                        MekHQ.triggerEvent(new ProcurementEvent(a));
+                    });
                 }
             }
         });
         menu.add(menuItem);
-        // end
-        popup.add(menu);
+
+        JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
         return Optional.of(popup);
     }
@@ -150,14 +179,12 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private void reportAcquisitionSuccess(IAcquisitionWork acquisition) {
-        gui.getCampaign()
-                .addReport(String.format("<font color='Green'><b>Procured %s</b></font>",
-                        acquisition.getAcquisitionName()));
+        gui.getCampaign().addReport(String.format("<font color='Green'><b>Procured %s</b></font>",
+                acquisition.getAcquisitionName()));
     }
 
     private void reportAcquisitionFailure(IAcquisitionWork acquisition) {
-        gui.getCampaign()
-                .addReport(String.format("<font color='red'><b>You cannot afford to purchase %s</b></font>",
-                        acquisition.getAcquisitionName()));
+        gui.getCampaign().addReport(String.format("<font color='red'><b>You cannot afford to purchase %s</b></font>",
+                acquisition.getAcquisitionName()));
     }
 }
