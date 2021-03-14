@@ -107,7 +107,7 @@ public class EditPersonnelLogControl extends JPanel {
     }
 
     private void addEntry() {
-        AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, true, campaign.getLocalDate());
+        AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, true, person, campaign.getLocalDate());
         dialog.setVisible(true);
         if (dialog.getEntry().isPresent()) {
             person.addLogEntry(dialog.getEntry().get());
@@ -118,7 +118,7 @@ public class EditPersonnelLogControl extends JPanel {
     private void editEntry() {
         LogEntry entry = logModel.getEntry(logsTable.getSelectedRow());
         if (null != entry) {
-            AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, true, entry);
+            AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, true, person, entry);
             dialog.setVisible(true);
             refreshTable();
         }

@@ -28,6 +28,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.*;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
@@ -63,20 +64,19 @@ public class AddOrEditPersonnelEntryDialog extends JDialog {
 
     //region Constructors
     public AddOrEditPersonnelEntryDialog(final JFrame parent, final boolean modal,
-                                         final Person person, final LocalDate entryDate) {
+                                         final @Nullable Person person, final LocalDate entryDate) {
         this(parent, modal, ADD_OPERATION, person, new PersonalLogEntry(entryDate, ""));
     }
 
-    public AddOrEditPersonnelEntryDialog(final JFrame parent, final boolean modal, final Person person,
-                                         final LogEntry entry) {
+    public AddOrEditPersonnelEntryDialog(final JFrame parent, final boolean modal,
+                                         final @Nullable Person person, final LogEntry entry) {
         this(parent, modal, EDIT_OPERATION, person, entry);
     }
 
     private AddOrEditPersonnelEntryDialog(final JFrame parent, final boolean modal, final int operationType,
-                                          final Person person, final LogEntry entry) {
+                                          final @Nullable Person person, final LogEntry entry) {
         super(parent, modal);
         assert entry != null;
-        assert person != null;
 
         this.frame = parent;
         this.operationType = operationType;
@@ -94,7 +94,7 @@ public class AddOrEditPersonnelEntryDialog extends JDialog {
     //endregion Constructors
 
     //region Getters/Setter
-    public Person getPerson() {
+    public @Nullable Person getPerson() {
         return person;
     }
     //endregion Getters/Setter

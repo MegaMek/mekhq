@@ -947,7 +947,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_LOG_ENTRY: {
                 AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(
-                        gui.getFrame(), true, gui.getCampaign().getLocalDate());
+                        gui.getFrame(), true, null, gui.getCampaign().getLocalDate());
                 addPersonnelLogDialog.setVisible(true);
                 Optional<LogEntry> personnelEntry = addPersonnelLogDialog.getEntry();
                 if (personnelEntry.isPresent()) {
