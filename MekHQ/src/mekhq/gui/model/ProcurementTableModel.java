@@ -84,8 +84,8 @@ public class ProcurementTableModel extends DataTableModel {
         fireTableCellUpdated(row, COL_QUEUE);
     }
 
-    public void removeRow(final int row) {
-        getNewEquipmentAt(row).ifPresent(getCampaign().getShoppingList()::removeItem);
+    public void removeRow(final IAcquisitionWork acquisition) {
+        getCampaign().getShoppingList().removeItem(acquisition.getNewEquipment());
     }
 
     @Override
@@ -136,10 +136,6 @@ public class ProcurementTableModel extends DataTableModel {
     @Override
     public Class<?> getColumnClass(final int column) {
         return getValueAt(0, column).getClass();
-    }
-
-    public Optional<Object> getNewEquipmentAt(final int row) {
-        return getAcquisition(row).map(IAcquisitionWork::getNewEquipment);
     }
 
     public Optional<IAcquisitionWork> getAcquisition(final int row) {
