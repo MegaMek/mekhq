@@ -20,10 +20,8 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -36,54 +34,70 @@ import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PersonalLogEntry;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import mekhq.campaign.personnel.Person;
 
 /**
  * @author  Taharqa
  */
-public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
+public class AddOrEditPersonnelEntryDialog extends JDialog {
+    //region Variable Declarations
 	private static final long serialVersionUID = -8038099101234445018L;
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
-    private JFrame frame;
-    private int operationType;
+    private final JFrame frame;
+    private final int operationType;
+    private final Person person;
     private LogEntry entry;
     private LocalDate date;
     private LocalDate originalDate;
     private String originalDescription;
 
-    private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JTextArea txtDesc;
-    private javax.swing.JButton btnDate;
-    private javax.swing.JPanel panBtn;
-    private javax.swing.JPanel panMain;
+    private JButton btnClose;
+    private JButton btnOK;
+    private JTextArea txtDesc;
+    private JButton btnDate;
+    private JPanel panBtn;
+    private JPanel panMain;
+    //endregion Variable Declarations
 
-    public AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, LocalDate entryDate) {
-        this(parent, modal, ADD_OPERATION, new PersonalLogEntry(entryDate, ""));
+    //region Constructors
+    public AddOrEditPersonnelEntryDialog(final JFrame parent, final boolean modal,
+                                         final Person person, final LocalDate entryDate) {
+        this(parent, modal, ADD_OPERATION, person, new PersonalLogEntry(entryDate, ""));
     }
 
-    public AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, LogEntry entry) {
-        this(parent, modal, EDIT_OPERATION, entry);
+    public AddOrEditPersonnelEntryDialog(final JFrame parent, final boolean modal, final Person person,
+                                         final LogEntry entry) {
+        this(parent, modal, EDIT_OPERATION, person, entry);
     }
 
-    private AddOrEditPersonnelEntryDialog(JFrame parent, boolean modal, int operationType, LogEntry entry) {
+    private AddOrEditPersonnelEntryDialog(final JFrame parent, final boolean modal, final int operationType,
+                                          final Person person, final LogEntry entry) {
         super(parent, modal);
-
         assert entry != null;
+        assert person != null;
 
         this.frame = parent;
         this.operationType = operationType;
+        this.person = person;
         this.entry = entry;
 
-        this.date = this.entry.getDate();
-        this.originalDate = this.entry.getDate();
-        this.originalDescription = this.entry.getDesc();
+        this.date = entry.getDate();
+        this.originalDate = entry.getDate();
+        this.originalDescription = entry.getDesc();
 
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
+    //endregion Constructors
+
+    //region Getters/Setter
+    public Person getPerson() {
+        return person;
+    }
+    //endregion Getters/Setter
 
     public Optional<LogEntry> getEntry() {
         return Optional.ofNullable(entry);
@@ -91,18 +105,18 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
 
     private void initComponents() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditPersonnelEntryDialog", new EncodeControl());
-    	java.awt.GridBagConstraints gridBagConstraints;
+    	GridBagConstraints gridBagConstraints;
 
-        panMain = new javax.swing.JPanel();
-        btnDate = new javax.swing.JButton();
-        txtDesc = new javax.swing.JTextArea();
+        panMain = new JPanel();
+        btnDate = new JButton();
+        txtDesc = new JTextArea();
 
-        panBtn = new javax.swing.JPanel();
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
+        panBtn = new JPanel();
+        btnOK = new JButton();
+        btnClose = new JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setName("Form");
         if (this.operationType == ADD_OPERATION) {
             setTitle(resourceMap.getString("dialogAdd.title"));
         } else {
@@ -112,17 +126,17 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
         panBtn.setLayout(new GridLayout(0,2));
         panMain.setLayout(new GridBagLayout());
 
-        btnDate = new javax.swing.JButton();
+        btnDate = new JButton();
         btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(evt -> changeDate());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(btnDate, gridBagConstraints);
 
         txtDesc.setText(entry.getDesc());
@@ -135,23 +149,23 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         txtDesc.setPreferredSize(new Dimension(250,75));
         txtDesc.setMinimumSize(new Dimension(250,75));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(txtDesc, gridBagConstraints);
 
-        btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText(resourceMap.getString("btnOkay.text"));
+        btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
         panBtn.add(btnOK);
 
-        btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
+        btnClose.setText(resourceMap.getString("btnCancel.text"));
+        btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
         panBtn.add(btnClose);
 
@@ -161,20 +175,20 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(AddOrEditPersonnelEntryDialog.class);
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
 
-        this.setName("dialog");
+        this.setName("AddOrEditPersonnelEntryDialog");
         preferences.manage(new JWindowPreference(this));
     }
 
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnOKActionPerformed(final ActionEvent evt) {
     	entry.setDate(date);
     	entry.setDesc(txtDesc.getText());
-    	entry.onLogEntryEdited(originalDate, date, originalDescription, txtDesc.getText(), null);
+    	entry.onLogEntryEdited(originalDate, date, originalDescription, txtDesc.getText(), getPerson());
     	this.setVisible(false);
     }
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnCloseActionPerformed(final ActionEvent evt) {
     	entry = null;
     	this.setVisible(false);
     }
