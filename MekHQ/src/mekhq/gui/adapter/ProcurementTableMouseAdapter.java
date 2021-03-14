@@ -63,7 +63,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     @Override
     protected Optional<JPopupMenu> createPopupMenu() {
         // GM Only (for now)
-        if ((table.getSelectedRowCount() == 0) || !gui.getCampaign().isGM()) {
+        if (table.getSelectedRowCount() == 0) {
             return Optional.empty();
         }
 
@@ -74,57 +74,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         final int[] rows = table.getSelectedRows();
         final boolean oneSelected = table.getSelectedRowCount() == 1;
 
-        // lets fill the pop up menu
-        // GM mode
-        menu = new JMenu(resources.getString("GMMode.text"));
-        menu.setToolTipText(resources.getString("GMMode.toolTipText"));
-
-        menuItem = new JMenuItem(resources.getString("miProcureSingleItemImmediately.text"));
-        menuItem.setToolTipText(resources.getString("miProcureSingleItemImmediately.toolTipText"));
-        menuItem.setName("miProcureSingleItemImmediately");
-        menuItem.addActionListener(evt -> {
-            if (row < 0) {
-                return;
-            }
-
-            if (oneSelected) {
-                model.getAcquisition(row)
-                        .ifPresent(ProcurementTableMouseAdapter.this::tryProcureOneItem);
-            } else {
-                for (int curRow : rows) {
-                    if (curRow < 0) {
-                        continue;
-                    }
-                    model.getAcquisition(table.convertRowIndexToModel(curRow))
-                            .ifPresent(ProcurementTableMouseAdapter.this::tryProcureOneItem);
-                }
-            }
-        });
-        menu.add(menuItem);
-
-        menuItem = new JMenuItem(resources.getString("miProcureAllItemsImmediately.text"));
-        menuItem.setToolTipText(resources.getString("miProcureAllItemsImmediately.toolTipText"));
-        menuItem.setName("miProcureAllItemsImmediately");
-        menuItem.addActionListener(evt -> {
-            if (row < 0) {
-                return;
-            }
-
-            if (oneSelected) {
-                model.getAcquisition(row)
-                        .ifPresent(ProcurementTableMouseAdapter.this::procureAllItems);
-            } else {
-                for (int curRow : rows) {
-                    if (curRow < 0) {
-                        continue;
-                    }
-                    model.getAcquisition(table.convertRowIndexToModel(curRow))
-                            .ifPresent(ProcurementTableMouseAdapter.this::procureAllItems);
-                }
-            }
-        });
-        menu.add(menuItem);
-
+        // Lets fill the popup menu
         menuItem = new JMenuItem(resources.getString("miClearItems.text"));
         menuItem.setToolTipText(resources.getString("miClearItems.toolTipText"));
         menuItem.setName("miClearItems");
@@ -150,9 +100,65 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         });
-        menu.add(menuItem);
+        popup.add(menuItem);
 
-        JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+        //region GM Menu
+        if (gui.getCampaign().isGM()) {
+            popup.addSeparator();
+
+            menu = new JMenu(resources.getString("GMMode.text"));
+            menu.setToolTipText(resources.getString("GMMode.toolTipText"));
+            menu.setName("menuGMMode");
+
+            menuItem = new JMenuItem(resources.getString("miProcureSingleItemImmediately.text"));
+            menuItem.setToolTipText(resources.getString("miProcureSingleItemImmediately.toolTipText"));
+            menuItem.setName("miProcureSingleItemImmediately");
+            menuItem.addActionListener(evt -> {
+                if (row < 0) {
+                    return;
+                }
+
+                if (oneSelected) {
+                    model.getAcquisition(row)
+                            .ifPresent(ProcurementTableMouseAdapter.this::tryProcureOneItem);
+                } else {
+                    for (int curRow : rows) {
+                        if (curRow < 0) {
+                            continue;
+                        }
+                        model.getAcquisition(table.convertRowIndexToModel(curRow))
+                                .ifPresent(ProcurementTableMouseAdapter.this::tryProcureOneItem);
+                    }
+                }
+            });
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("miProcureAllItemsImmediately.text"));
+            menuItem.setToolTipText(resources.getString("miProcureAllItemsImmediately.toolTipText"));
+            menuItem.setName("miProcureAllItemsImmediately");
+            menuItem.addActionListener(evt -> {
+                if (row < 0) {
+                    return;
+                }
+
+                if (oneSelected) {
+                    model.getAcquisition(row)
+                            .ifPresent(ProcurementTableMouseAdapter.this::procureAllItems);
+                } else {
+                    for (int curRow : rows) {
+                        if (curRow < 0) {
+                            continue;
+                        }
+                        model.getAcquisition(table.convertRowIndexToModel(curRow))
+                                .ifPresent(ProcurementTableMouseAdapter.this::procureAllItems);
+                    }
+                }
+            });
+            menu.add(menuItem);
+
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+        }
+        //endregion GM Menu
 
         return Optional.of(popup);
     }
