@@ -62,7 +62,6 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
 
     @Override
     protected Optional<JPopupMenu> createPopupMenu() {
-        // GM Only (for now)
         if (table.getSelectedRowCount() == 0) {
             return Optional.empty();
         }
