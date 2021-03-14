@@ -107,8 +107,8 @@ public class EquipmentPart extends Part {
     @Override
     public void setUnit(Unit u) {
         super.setUnit(u);
-        if (null != unit) {
-            equipTonnage = type.getTonnage(unit.getEntity(), size);
+        if ((u != null) && (type != null)) {
+            equipTonnage = type.getTonnage(u.getEntity(), size);
         }
     }
 

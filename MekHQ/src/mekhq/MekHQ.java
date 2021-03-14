@@ -39,6 +39,7 @@ import megamek.MegaMek;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ui.preferences.MMPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.common.event.EventBus;
@@ -85,8 +86,7 @@ import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
-import mekhq.preferences.MekHqPreferences;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 
@@ -107,7 +107,7 @@ public class MekHQ implements GameListener {
     private static ObservableString selectedTheme;
 
     private static MMLogger logger = null;
-    private static MekHqPreferences preferences = null;
+    private static MMPreferences preferences = null;
     private static MekHQOptions mekHQOptions = new MekHQOptions();
 
     // Directory options
@@ -180,9 +180,9 @@ public class MekHQ implements GameListener {
         return logger;
     }
 
-    public static MekHqPreferences getPreferences() {
-        if (null == preferences) {
-            preferences = new MekHqPreferences();
+    public static MMPreferences getPreferences() {
+        if (preferences == null) {
+            preferences = new MMPreferences();
         }
 
         return preferences;

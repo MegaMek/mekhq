@@ -34,6 +34,7 @@ import megamek.common.icons.Camouflage;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
+import mekhq.campaign.mission.enums.MissionStatus;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1629,7 +1630,7 @@ public class AtBContract extends Contract implements Serializable {
         retVal.setType(c.getType());
         retVal.setSystemId(c.getSystemId());
         retVal.setDesc(c.getDescription());
-        retVal.setStatus(Mission.S_ACTIVE);
+        retVal.setStatus(MissionStatus.ACTIVE);
         retVal.setLength(length);
         retVal.setStartDate(campaign.getLocalDate());
         /*Set ending date; the other calculated values will be replaced

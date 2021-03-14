@@ -58,14 +58,14 @@ import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.RankTableModel;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JIntNumberSpinnerPreference;
-import mekhq.gui.preferences.JToggleButtonPreference;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.JToggleButtonPreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 public final class BatchXPDialog extends JDialog {
     private static final long serialVersionUID = -7897406116865495209L;

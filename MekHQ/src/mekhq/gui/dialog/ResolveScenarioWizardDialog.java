@@ -56,10 +56,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author  Taharqa

@@ -21,7 +21,6 @@
 
 package mekhq.gui.dialog;
 
-import java.awt.Frame;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -35,8 +34,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  *

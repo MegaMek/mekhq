@@ -63,8 +63,8 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.campaign.universe.Systems;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
