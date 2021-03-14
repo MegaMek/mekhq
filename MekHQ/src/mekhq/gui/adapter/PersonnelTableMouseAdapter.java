@@ -946,13 +946,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_LOG_ENTRY: {
-                AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(
-                        gui.getFrame(), true, null, gui.getCampaign().getLocalDate());
-                addPersonnelLogDialog.setVisible(true);
-                Optional<LogEntry> personnelEntry = addPersonnelLogDialog.getEntry();
-                if (personnelEntry.isPresent()) {
+                final AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(
+                        gui.getFrame(), null, gui.getCampaign().getLocalDate());
+                if (addPersonnelLogDialog.showDialog().isConfirmed()) {
                     for (Person person : people) {
-                        person.addLogEntry(personnelEntry.get().clone());
+                        person.addLogEntry(addPersonnelLogDialog.getEntry().clone());
                         MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                     }
                 }
