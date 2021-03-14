@@ -52,14 +52,18 @@ public class StratconContractDefinition {
     private static ContractDefinitionManifest definitionManifest;
     private static Map<Integer, StratconContractDefinition> loadedDefinitions = new HashMap<>();
     
-    static {
-        definitionManifest = ContractDefinitionManifest.Deserialize("./data/stratconcontractdefinitions/ContractDefinitionManifest.xml");
-        
-        // load user-specified modifier list
-        ContractDefinitionManifest userDefinitionList = ContractDefinitionManifest.Deserialize("./data/scenariomodifiers/UserContractDefinitionManifest.xml");
-        if (userDefinitionList != null) {
-            definitionManifest.definitionFileNames.putAll(userDefinitionList.definitionFileNames);
+    private static ContractDefinitionManifest getContractDefinitionManifest() {
+        if (definitionManifest == null) {
+            definitionManifest = ContractDefinitionManifest.Deserialize("./data/stratconcontractdefinitions/ContractDefinitionManifest.xml");
+            
+            // load user-specified modifier list
+            ContractDefinitionManifest userDefinitionList = ContractDefinitionManifest.Deserialize("./data/scenariomodifiers/UserContractDefinitionManifest.xml");
+            if (userDefinitionList != null) {
+                definitionManifest.definitionFileNames.putAll(userDefinitionList.definitionFileNames);
+            }
         }
+        
+        return definitionManifest;
     }
     
     /**
@@ -67,12 +71,9 @@ public class StratconContractDefinition {
      * as defined in AtBContract.java
      */
     public static StratconContractDefinition getContractDefinition(int atbContractType) {
-        definitionManifest = ContractDefinitionManifest.Deserialize("./data/stratconcontractdefinitions/ContractDefinitionManifest.xml");
-        loadedDefinitions.clear();
-        
         if (!loadedDefinitions.containsKey(atbContractType)) {
             String filePath = String.format("./data/stratconcontractdefinitions/%s", 
-                    definitionManifest.definitionFileNames.get(atbContractType));
+                    getContractDefinitionManifest().definitionFileNames.get(atbContractType));
             StratconContractDefinition def = Deserialize(new File(filePath));
             
             if (def == null) {
@@ -276,6 +277,10 @@ public class StratconContractDefinition {
         this.deploymentTimes = deploymentTimes;
     }
 
+    /**
+     * Data structure that deals with the characteristics that a StratCon scenario objective may have
+     *
+     */
     public static class ObjectiveParameters {
         /**
          * The type of objective this is; 

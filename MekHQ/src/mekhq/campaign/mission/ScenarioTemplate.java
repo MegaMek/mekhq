@@ -60,15 +60,15 @@ public class ScenarioTemplate implements Cloneable {
         st.name = this.name;
         st.shortBriefing = this.shortBriefing;
         st.detailedBriefing = this.detailedBriefing;
-        for(ScenarioForceTemplate sft : scenarioForces.values()) {
+        for (ScenarioForceTemplate sft : scenarioForces.values()) {
             st.scenarioForces.put(sft.getForceName(), sft.clone());
         }
         
-        for(String mod : scenarioModifiers) {
+        for (String mod : scenarioModifiers) {
             st.scenarioModifiers.add(mod);
         }
         
-        for(ScenarioObjective obj : scenarioObjectives) {
+        for (ScenarioObjective obj : scenarioObjectives) {
             st.scenarioObjectives.add(new ScenarioObjective(obj));
         }
         
@@ -136,8 +136,8 @@ public class ScenarioTemplate implements Cloneable {
     public List<ScenarioForceTemplate> getAllPlayerReinforcementForces() {
         List<ScenarioForceTemplate> retVal = new ArrayList<>();
         
-        for(ScenarioForceTemplate forceTemplate : scenarioForces.values()) {
-            if((forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
+        for (ScenarioForceTemplate forceTemplate : scenarioForces.values()) {
+            if ((forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
                     (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) &&
                     ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) ||
                      (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()))) {
@@ -190,7 +190,7 @@ public class ScenarioTemplate implements Cloneable {
      */
     public static ScenarioTemplate Deserialize(String filePath) {
         File inputFile = new File(filePath);
-        if(!inputFile.exists()) {
+        if (!inputFile.exists()) {
             MekHQ.getLogger().error(String.format("Cannot deserialize file %s, does not exist", filePath));
             return null;
         }

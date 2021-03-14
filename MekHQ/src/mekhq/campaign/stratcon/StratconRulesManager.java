@@ -1061,7 +1061,7 @@ public class StratconRulesManager {
         }
     }
     
-    public StratconRulesManager() {
+    public void startup() {
         MekHQ.registerHandler(this);
     }
     

@@ -99,7 +99,6 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -127,9 +126,8 @@ import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.HangarStatistics;
@@ -549,6 +547,7 @@ public class Campaign implements Serializable, ITechManager {
     
     public void initStratcon() {
         stratconRulesManager = new StratconRulesManager();
+        stratconRulesManager.startup();
     }
     
     public void shutdownStratcon() {
@@ -893,26 +892,7 @@ public class Campaign implements Serializable, ITechManager {
 
         addMissionWithoutId(m);
         
-        if(m instanceof AtBContract) {
-            // having loaded scenarios and such, we now need to go through any stratcon scenarios for this contract
-            // and set their backing scenario pointers to the existing scenarios stored in the campaign for this contract
-            AtBContract atbContract = (AtBContract) m;
-            if(atbContract.getStratconCampaignState() != null) {
-                for(StratconTrackState track : atbContract.getStratconCampaignState().getTracks()) {
-                    for(StratconScenario scenario : track.getScenarios().values()) {
-                        Scenario campaignScenario = getScenario(scenario.getBackingScenarioID());
-                        
-                        if(campaignScenario != null && campaignScenario instanceof AtBDynamicScenario) {
-                            scenario.setBackingScenario((AtBDynamicScenario) campaignScenario);
-                        } else {
-                            MekHQ.getLogger().warning(Campaign.class, "importMission", 
-                                    String.format("Unable to set backing scenario for stratcon scenario in track %s ID %d", 
-                                            track.getDisplayableName(), scenario.getBackingScenarioID()));
-                        }
-                    }
-                }
-            }
-        }
+        StratconContractInitializer.restoreTransientStratconInformation(m, this);
     }
 
     private void addMissionWithoutId(Mission m) {

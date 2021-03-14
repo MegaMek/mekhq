@@ -24,9 +24,13 @@ import java.util.Collections;
 import java.util.List;
 
 import megamek.common.Compute;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
@@ -305,6 +309,32 @@ public class StratconContractInitializer {
             return "Complete strategic objectives to fulfill contract conditions.";
         default:
             return "";
+        }
+    }
+
+    /**
+     * Given a mission (that's an AtB contract), restore track state information,
+     * such as pointers from StratCon scenario objects to AtB scenario objects.
+     */
+    public static void restoreTransientStratconInformation(Mission m, Campaign campaign) {
+        if (m instanceof AtBContract) {
+            // Having loaded scenarios and such, we now need to go through any StratCon scenarios for this contract
+            // and set their backing scenario pointers to the existing scenarios stored in the campaign for this contract
+            AtBContract atbContract = (AtBContract) m;
+            if (atbContract.getStratconCampaignState() != null) {
+                for (StratconTrackState track : atbContract.getStratconCampaignState().getTracks()) {
+                    for (StratconScenario scenario : track.getScenarios().values()) {
+                        Scenario campaignScenario = campaign.getScenario(scenario.getBackingScenarioID());
+                        
+                        if (campaignScenario != null && campaignScenario instanceof AtBDynamicScenario) {
+                            scenario.setBackingScenario((AtBDynamicScenario) campaignScenario);
+                        } else {
+                            MekHQ.getLogger().warning(String.format("Unable to set backing scenario for stratcon scenario in track %s ID %d", 
+                                            track.getDisplayableName(), scenario.getBackingScenarioID()));
+                        }
+                    }
+                }
+            }
         }
     }
 }

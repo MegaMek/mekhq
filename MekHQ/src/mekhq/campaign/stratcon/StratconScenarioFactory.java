@@ -164,8 +164,7 @@ public class StratconScenarioFactory {
      * @return Generic unit type.
      */
     private static int convertSpecificUnitTypeToGeneral(int unitType) {
-        switch (unitType)
-        {
+        switch (unitType) {
             case UnitType.AERO:
             case UnitType.CONV_FIGHTER:
             case UnitType.DROPSHIP:

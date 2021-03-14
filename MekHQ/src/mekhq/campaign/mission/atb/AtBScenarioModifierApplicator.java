@@ -48,10 +48,6 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Adds the given force to the given scenario at the appropriate point in time.
-     * @param campaign
-     * @param scenario
-     * @param forceToApply
-     * @param eventTiming
      */
     public static void addForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate forceToApply, EventTiming eventTiming) {
         preAddForce(campaign, scenario, forceToApply);
@@ -85,9 +81,6 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Adds the given force to the scenario template prior to primary force generation.
-     * @param campaign
-     * @param scenario
-     * @param forceToApply
      */
     private static void preAddForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate forceToApply) {
         if (scenario.getTemplate() != null) {
@@ -97,8 +90,6 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Worker function that removes the number of units from the specified side.
-     * @param scenario
-     * @param campaign
      */
     public static void removeUnits(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient, int unitRemovalCount) {
         int actualUnitsToRemove = unitRemovalCount;
@@ -128,8 +119,6 @@ public class AtBScenarioModifierApplicator {
     /**
      * Worker function that inflicts battle damage on all units belonging to the side specified in this modifier.
      * May theoretically result in a crippled or destroyed unit (?)
-     * @param scenario
-     * @param campaign
      */
     public static void inflictBattleDamage(AtBDynamicScenario scenario, Campaign campaign,
                                            ForceAlignment eventRecipient, int battleDamageIntensity) {
@@ -154,8 +143,6 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Worker function that expends ammo from all units belonging to the side specified in this modifier.
-     * @param scenario
-     * @param campaign
      */
     public static void expendAmmo(AtBDynamicScenario scenario, Campaign campaign,
             ForceAlignment eventRecipient, int ammoExpenditureIntensity) {
@@ -176,8 +163,6 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Helper function that re-generates skill levels for all existing units in the scenario
-     * @param scenario
-     * @param campaign
      */
     public static void adjustSkill(AtBDynamicScenario scenario, Campaign campaign,
             ForceAlignment eventRecipient, int skillAdjustment) {
@@ -214,14 +199,10 @@ public class AtBScenarioModifierApplicator {
      * Worker function that adjusts the scenario's unit quality by the indicated amount,
      * capped between 0 and 5. Only effective for units generated after the adjustment has taken place.
      * Only capable of being applied to opfor.
-     * @param scenario Scenario to modify.
-     * @param c Working campaign
-     * @param eventRecipient Whose
-     * @param qualityAdjustment
      */
     public static void adjustQuality(AtBDynamicScenario scenario, Campaign c, ForceAlignment eventRecipient, int qualityAdjustment) {
         if(eventRecipient != ForceAlignment.Opposing) {
-            MekHQ.getLogger().warning(AtBScenarioModifierApplicator.class, "adjustQuality", "Can only adjust opfor unit quality");
+            MekHQ.getLogger().warning( "Can only adjust opfor unit quality");
             return;
         }
 
@@ -239,9 +220,6 @@ public class AtBScenarioModifierApplicator {
      * that will be on the battlefield at the start of the scenario
      *
      * Also marks any such forces as able to deploy "anywhere".
-     * @param scenario
-     * @param campaign
-     * @param eventRecipient
      */
     public static void setupAmbush(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient) {
         if (eventRecipient == ForceAlignment.Player) {

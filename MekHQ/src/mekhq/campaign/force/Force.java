@@ -391,9 +391,7 @@ public class Force implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scenarioId", scenarioId);
         
-        if(techId != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", techId);
-        }
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", techId);
 
         if (units.size() > 0) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "units");
@@ -613,13 +611,12 @@ public class Force implements Serializable {
         int biggestBucketID = -1;
         int biggestBucketCount = 0;
         
-        for(UUID id : getUnits()) {
+        for (UUID id : getUnits()) {
             int unitType = c.getUnit(id).getEntity().getUnitType();
 
-            unitTypeBuckets.putIfAbsent(unitType, 0);
-            unitTypeBuckets.put(unitType, unitTypeBuckets.get(unitType) + 1);
+            unitTypeBuckets.merge(unitType, 1, (oldCount, value) -> oldCount + value);
             
-            if(unitTypeBuckets.get(unitType) > biggestBucketCount) {
+            if (unitTypeBuckets.get(unitType) > biggestBucketCount) {
                 biggestBucketCount = unitTypeBuckets.get(unitType);
                 biggestBucketID = unitType;
             }

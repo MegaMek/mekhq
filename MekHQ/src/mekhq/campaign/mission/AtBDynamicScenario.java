@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
@@ -14,6 +33,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Entity;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -24,7 +44,6 @@ import mekhq.campaign.personnel.SkillType;
 /**
  * Data structure intended to hold data relevant to AtB Dynamic Scenarios (AtB 3.0)
  * @author NickAragua
- *
  */
 public class AtBDynamicScenario extends AtBScenario {
 
@@ -164,7 +183,7 @@ public class AtBDynamicScenario extends AtBScenario {
         botForceTemplates.put(botForce, forceTemplate);
         
         // put all bot units into the external ID lookup.
-        for(Entity entity : botForce.getEntityList()) {
+        for (Entity entity : botForce.getEntityList()) {
             getExternalIDLookup().put(entity.getExternalIdAsString(), entity);
         }
     }
@@ -175,7 +194,7 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public void removeBotForce(int x) {
         // safety check, just in case
-        if((x >= 0) && (x < botForces.size())) {
+        if ((x >= 0) && (x < botForces.size())) {
             BotForce botToRemove = botForces.get(x);
 
             botForceTemplates.remove(botToRemove);
@@ -255,7 +274,7 @@ public class AtBDynamicScenario extends AtBScenario {
     public List<Integer> getPrimaryPlayerForceIDs() {
         List<Integer> retval = new ArrayList<>();
 
-        for(int forceID : getForceIDs()) {
+        for (int forceID : getForceIDs()) {
             if(getPlayerForceTemplates().containsKey(forceID)) {
                 retval.add(forceID);
             }
@@ -269,13 +288,13 @@ public class AtBDynamicScenario extends AtBScenario {
      * @return
      */
     public Person getLanceCommander(Campaign campaign) {
-        if(getForceIDs().isEmpty()) {
+        if (getForceIDs().isEmpty()) {
             return null; // if we don't have forces, just a bunch of units, then get the highest-ranked?
         }
 
         Lance lance = campaign.getLances().get(getForceIDs().get(0));
 
-        if(lance != null) {
+        if (lance != null) {
             lance.refreshCommander(campaign);
             return lance.getCommander(campaign);
         } else {
@@ -294,7 +313,7 @@ public class AtBDynamicScenario extends AtBScenario {
         Person commander = getLanceCommander(campaign);
         int skillValue = SkillType.SKILL_NONE;
 
-        if((commander != null) &&
+        if ((commander != null) &&
                 commander.hasSkill(skillType)) {
             skillValue = commander.getSkill(skillType).getLevel();
         }
@@ -315,23 +334,23 @@ public class AtBDynamicScenario extends AtBScenario {
      * Adds a scenario modifier and any linked modifiers to this scenario,
      * provided that the modifier exists and can be applied to the scenario (e.g. ground units on air map)
      */
-    public void addScenarioModifier(AtBScenarioModifier modifier) {
+    public void addScenarioModifier(@Nullable AtBScenarioModifier modifier) {
         if (modifier == null) {
             return;
         }
         
-        if ((modifier.getAllowedMapLocations() != null) && !modifier.getAllowedMapLocations().isEmpty() &&
+        if ((modifier.getAllowedMapLocations() != null) &&
                 !modifier.getAllowedMapLocations().contains(getTemplate().mapParameters.getMapLocation())) {
             return;
         }
         
         scenarioModifiers.add(modifier);
         
-        for(String modifierKey : modifier.getLinkedModifiers().keySet()) {
+        for (String modifierKey : modifier.getLinkedModifiers().keySet()) {
             AtBScenarioModifier subMod = AtBScenarioModifier.getScenarioModifier(modifierKey);
             
             // if the modifier exists and has not already been added (to avoid infinite loops, as it's possible to define those in data)
-            if((subMod != null) && !alreadyHasModifier(subMod)) {
+            if ((subMod != null) && !alreadyHasModifier(subMod)) {
                 // set the briefing text of the alternate modifier to the 'alternate' text supplied here
                 subMod.setAdditionalBriefingText(modifier.getLinkedModifiers().get(modifierKey));
                 addScenarioModifier(subMod);
@@ -343,8 +362,8 @@ public class AtBDynamicScenario extends AtBScenario {
      * Check if the modifier list already has a modifier with the given modifier's name.
      */
     public boolean alreadyHasModifier(AtBScenarioModifier modifier) {
-        for(AtBScenarioModifier existingModifier : scenarioModifiers) {
-            if(existingModifier.getModifierName().equals(modifier.getModifierName())) {
+        for (AtBScenarioModifier existingModifier : scenarioModifiers) {
+            if (existingModifier.getModifierName().equals(modifier.getModifierName())) {
                 return true;
             }
         }
@@ -371,7 +390,7 @@ public class AtBDynamicScenario extends AtBScenario {
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
         // if we have a scenario template and haven't played the scenario out yet, serialize the template
         // in its current state
-        if(template != null && isCurrent()) {
+        if (template != null && isCurrent()) {
             template.Serialize(pw1);
         }
 

@@ -254,7 +254,6 @@ public class CrewSkillUpgrader {
     private String pickRandomGunnerySpecialization(Entity entity) {
         // if you've got no weapons, tough
         if (entity.getIndividualWeaponList().size() <= 0) {
-
             return Crew.SPECIAL_NONE;
         }
         

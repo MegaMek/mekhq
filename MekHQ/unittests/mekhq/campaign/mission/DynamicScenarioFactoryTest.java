@@ -19,7 +19,6 @@ import megamek.common.UnitType;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 /**
  * Tests relevant to the AtBDynamicScenarioFactory
@@ -64,23 +63,23 @@ public class DynamicScenarioFactoryTest {
         
         // the number of conv fighters is randomly generated, but should be between 2 and 6, inclusively
         // we run it a bunch of times, all but guaranteeing that we hit the extremes
-        for(int x = 0; x < 40; x++) {
+        for (int x = 0; x < 40; x++) {
             int numConvFighters = AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.CONV_FIGHTER, true, "FC");
             Assert.assertTrue(String.format("Conv Fighter count: %d for FC faction not between 2 and 6 inclusive", numConvFighters), 
-                    numConvFighters >= 2 && numConvFighters <= 6);
+                    (numConvFighters >= 2) && (numConvFighters <= 6));
             
             // for capellans, between 3 and 9
             numConvFighters = AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.CONV_FIGHTER, true, "CC");
             Assert.assertTrue(String.format("Conv Fighter count: %d for CC faction not between 3 and 9 inclusive", numConvFighters),
-                    numConvFighters >= 3 && numConvFighters <= 9);
+                    (numConvFighters >= 3) && (numConvFighters <= 9));
             
             numConvFighters = AtBDynamicScenarioFactory.getAeroLanceSize(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX, true, "FC");
             Assert.assertTrue(String.format("Conv Fighter count: %d for FC faction not between 2 and 6 inclusive", numConvFighters),
-                    numConvFighters >= 2 && numConvFighters <= 6);
+                    (numConvFighters >= 2) && (numConvFighters <= 6));
             
             numConvFighters = AtBDynamicScenarioFactory.getAeroLanceSize(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX, true, "CC");
             Assert.assertTrue(String.format("Conv Fighter count: %d for CC faction not between 3 and 9 inclusive", numConvFighters),
-                    numConvFighters >= 3 && numConvFighters <= 9);
+                    (numConvFighters >= 3) && (numConvFighters <= 9));
         }
     }
 }

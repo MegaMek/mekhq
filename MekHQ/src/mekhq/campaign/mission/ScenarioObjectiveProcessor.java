@@ -34,11 +34,18 @@ import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.stratcon.StratconRulesManager;
 
+/**
+ * Handles processing for objectives for a scenario that has them
+ * @author NickAragua
+ */
 public class ScenarioObjectiveProcessor {
 
     private Map<ScenarioObjective, Set<String>> qualifyingObjectiveUnits;
     private Map<ScenarioObjective, Set<String>> potentialObjectiveUnits;
 
+    /**
+     * Blank constructor
+     */
     public ScenarioObjectiveProcessor() {
         qualifyingObjectiveUnits = new HashMap<>();
         potentialObjectiveUnits = new HashMap<>();
@@ -371,7 +378,7 @@ public class ScenarioObjectiveProcessor {
                 if (tracker.getMission() instanceof AtBContract) {
                     AtBContract contract = (AtBContract) tracker.getMission();
                     
-                    if(contract.getStratconCampaignState() != null) {
+                    if (contract.getStratconCampaignState() != null) {
                         int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                         int numSupportPoints = effect.howMuch * effectMultiplier;
                         if (dryRun) {
@@ -417,8 +424,7 @@ public class ScenarioObjectiveProcessor {
                     }
                 }
             case FacilityRemains:
-                if ((tracker.getMission() instanceof AtBContract) &&
-                        (tracker.getScenario() instanceof AtBScenario)) {
+                if ((tracker.getMission() instanceof AtBContract) && (tracker.getScenario() instanceof AtBScenario)) {
                     if (dryRun) {
                         return "This facility will not be captured.";
                     } else {
@@ -427,8 +433,7 @@ public class ScenarioObjectiveProcessor {
                 }
                 break;
             case FacilityRemoved:
-                if ((tracker.getMission() instanceof AtBContract) &&
-                        (tracker.getScenario() instanceof AtBScenario)) {
+                if ((tracker.getMission() instanceof AtBContract) && (tracker.getScenario() instanceof AtBScenario)) {
                     if (dryRun) {
                         return "This facility will be destroyed.";
                     } else {

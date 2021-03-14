@@ -295,7 +295,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("scenario")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.getLogger().error(Mission.class, "Unknown node type not loaded in Scenario nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().error("Unknown node type not loaded in Scenario nodes: " + wn3.getNodeName());
 
                             continue;
                         }
@@ -311,7 +311,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(Mission.class, ex);
+            MekHQ.getLogger().error(ex);
         }
         
         return retVal;
