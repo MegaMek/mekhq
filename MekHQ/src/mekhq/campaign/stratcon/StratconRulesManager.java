@@ -1074,7 +1074,9 @@ public class StratconRulesManager {
         for (Contract contract : ev.getCampaign().getActiveContracts()) {
             StratconCampaignState campaignState = ((AtBContract) contract).getStratconCampaignState();
             
-            if ((contract instanceof AtBContract) && contract.isActive() && (campaignState != null)) {
+            if ((contract instanceof AtBContract) && 
+            		contract.isActiveOn(ev.getCampaign().getLocalDate()) && 
+            		(campaignState != null)) {
                 for (StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
                     // loop through scenarios - if we haven't deployed in time, fail it and apply consequences
                     for (StratconScenario scenario : track.getScenarios().values()) {

@@ -198,7 +198,9 @@ public class StratconTab extends CampaignGuiTab {
         
         // track dropdown is populated with all tracks across all active contracts
         for (Contract contract : getCampaignGui().getCampaign().getActiveContracts()) {
-            if ((contract instanceof AtBContract) && contract.isActive() && (((AtBContract) contract).getStratconCampaignState() != null)) {
+            if ((contract instanceof AtBContract) && 
+            		contract.isActiveOn(getCampaignGui().getCampaign().getLocalDate()) && 
+            		(((AtBContract) contract).getStratconCampaignState() != null)) {
                 for (StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
                     TrackDropdownItem tdi = new TrackDropdownItem((AtBContract) contract, track);
                     cboCurrentTrack.addItem(tdi);
