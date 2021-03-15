@@ -184,7 +184,7 @@ public class RestoreUnitAction implements IUnitAction {
     public interface IEntityCopyFactory {
         /**
          * Gets a copy of the entity.
-         * @param en The entity to copy.
+         * @param entity The entity to copy.
          * @return A copy of the entity, or {@code null} if a copy could not be made.
          */
         @Nullable
@@ -198,18 +198,18 @@ public class RestoreUnitAction implements IUnitAction {
     private static class FileSystemEntityCopyFactory implements IEntityCopyFactory {
         /**
          * Get a copy of the entity from the {@link MechSummaryCache}.
-         * @param en The entity to copy.
+         * @param entity The entity to copy.
          * @return A copy of the entity, or {@code null} if a copy could not be made.
          */
         @Nullable
-        public Entity copy(Entity en) {
-            final MechSummary ms = MechSummaryCache.getInstance().getMech(en.getShortNameRaw());
+        public Entity copy(Entity entity) {
+            final MechSummary ms = MechSummaryCache.getInstance().getMech(entity.getShortNameRaw());
             try {
                 if (ms != null) {
                     return new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
                 }
             } catch (EntityLoadingException e) {
-                MekHQ.getLogger().error("Cannot restore unit from entity, could not find: " + ms.getName(), e);
+                MekHQ.getLogger().error("Cannot restore unit from entity, could not find: " + entity.getShortNameRaw(), e);
             }
 
             return null;
