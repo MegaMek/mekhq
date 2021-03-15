@@ -87,6 +87,8 @@ public class RestoreUnitAction implements IUnitAction {
         newEntity.setExternalIdAsString(unit.getId().toString());
         campaign.getGame().addEntity(newEntity.getId(), newEntity);
 
+        copyC3Networks(oldEntity, newEntity);
+
         unit.setEntity(newEntity);
 
         unit.removeParts();
@@ -97,6 +99,15 @@ public class RestoreUnitAction implements IUnitAction {
         unit.runDiagnostic(false);
         unit.setSalvage(false);
         unit.resetPilotAndEntity();
+    }
+
+    /**
+     * Copies the C3 network setup from the source to the target.
+     * @param source The source {@link Entity}.
+     * @param target The target {@link Entity}.
+     */
+    private static void copyC3Networks(Entity source, Entity target) {
+        target.setC3Master(source.getC3Master(), false);
     }
 
     /**
