@@ -36,19 +36,28 @@ import mekhq.campaign.unit.Unit;
  */
 public class RestoreUnitAction implements IUnitAction {
 
-    private final MechSummaryCache mechSummaryCache;
+    private final IEntityCopyFactory entityCopyFactory;
 
+    /**
+     * Creates a new {@code RestoreUnitAction} instance using
+     * the default means of creating entity copies.
+     */
     public RestoreUnitAction() {
-        this(MechSummaryCache.getInstance());
+        this(new FileSystemEntityCopyFactory());
     }
 
-    public RestoreUnitAction(MechSummaryCache mechSummaryCache) {
-        this.mechSummaryCache = Objects.requireNonNull(mechSummaryCache);
+    /**
+     * Creates a new {@code RestoreUnitAction} instance using
+     * the provided {@link IEntityCopyFactory}.
+     * @param entityCopyFactory The factory to create entity copies with.
+     */
+    public RestoreUnitAction(IEntityCopyFactory entityCopyFactory) {
+        this.entityCopyFactory = Objects.requireNonNull(entityCopyFactory);
     }
 
     @Override
     public void execute(Campaign campaign, Unit unit) {
-        Entity newEntity = getCopyOfEntity(unit.getEntity());
+        Entity newEntity = entityCopyFactory.copy(unit.getEntity());
         if (newEntity != null) {
             restoreUnit(campaign, unit, newEntity);
         } else {
@@ -88,25 +97,6 @@ public class RestoreUnitAction implements IUnitAction {
         unit.runDiagnostic(false);
         unit.setSalvage(false);
         unit.resetPilotAndEntity();
-    }
-
-    /**
-     * Get a copy of the entity from the {@link MechSummaryCache}.
-     * @param en The entity to copy.
-     * @return A copy of the entity, or {@code null} if a copy could not be made.
-     */
-    @Nullable
-    private Entity getCopyOfEntity(Entity en) {
-        final MechSummary ms = mechSummaryCache.getMech(en.getShortNameRaw());
-        try {
-            if (ms != null) {
-                return new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
-            }
-        } catch (EntityLoadingException e) {
-            MekHQ.getLogger().error("Cannot restore unit from entity, could not find: " + ms.getName(), e);
-        }
-
-        return null;
     }
 
     /**
@@ -185,6 +175,44 @@ public class RestoreUnitAction implements IUnitAction {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Implementations allow copies of entities to be created.
+     */
+    public interface IEntityCopyFactory {
+        /**
+         * Gets a copy of the entity.
+         * @param en The entity to copy.
+         * @return A copy of the entity, or {@code null} if a copy could not be made.
+         */
+        @Nullable
+        public Entity copy(Entity entity);
+    }
+
+    /**
+     * Gets a copy of the entity from the file system, via {@link MechSummaryCache}
+     * and {@link MechFileParser}.
+     */
+    private static class FileSystemEntityCopyFactory implements IEntityCopyFactory {
+        /**
+         * Get a copy of the entity from the {@link MechSummaryCache}.
+         * @param en The entity to copy.
+         * @return A copy of the entity, or {@code null} if a copy could not be made.
+         */
+        @Nullable
+        public Entity copy(Entity en) {
+            final MechSummary ms = MechSummaryCache.getInstance().getMech(en.getShortNameRaw());
+            try {
+                if (ms != null) {
+                    return new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
+                }
+            } catch (EntityLoadingException e) {
+                MekHQ.getLogger().error("Cannot restore unit from entity, could not find: " + ms.getName(), e);
+            }
+
+            return null;
         }
     }
 }
