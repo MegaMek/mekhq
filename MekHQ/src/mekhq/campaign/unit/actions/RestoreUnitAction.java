@@ -22,6 +22,8 @@ package mekhq.campaign.unit.actions;
 import java.util.*;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
+import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.UnitChangedEvent;
@@ -34,8 +36,87 @@ import mekhq.campaign.unit.Unit;
  */
 public class RestoreUnitAction implements IUnitAction {
 
+    private final MechSummaryCache mechSummaryCache;
+
+    public RestoreUnitAction() {
+        this(MechSummaryCache.getInstance());
+    }
+
+    public RestoreUnitAction(MechSummaryCache mechSummaryCache) {
+        this.mechSummaryCache = Objects.requireNonNull(mechSummaryCache);
+    }
+
     @Override
     public void execute(Campaign campaign, Unit unit) {
+        Entity newEntity = getCopyOfEntity(unit.getEntity());
+        if (newEntity != null) {
+            restoreUnit(campaign, unit, newEntity);
+        } else {
+            // Fall back to the old way of restoring a unit if we could not
+            // create a copy of the entity from the summary cache
+            oldUnitRestoration(campaign, unit);
+        }
+
+        MekHQ.triggerEvent(new UnitChangedEvent(unit));
+    }
+
+    /**
+     * Restore a unit by swapping out its entity and replacing its parts.
+     * @param campaign The campaign which owns the unit.
+     * @param unit The unit to restore.
+     * @param newEntity The new entity to assign to the unit.
+     */
+    private void restoreUnit(Campaign campaign, Unit unit, Entity newEntity) {
+        // CAW: this logic is broadly similar to Campaign::addNewUnit
+        final Entity oldEntity = unit.getEntity();
+        newEntity.setId(oldEntity.getId());
+
+        campaign.getGame().removeEntity(oldEntity.getId(), 0);
+
+        newEntity.setOwner(campaign.getPlayer());
+        newEntity.setGame(campaign.getGame());
+        newEntity.setExternalIdAsString(unit.getId().toString());
+        campaign.getGame().addEntity(newEntity.getId(), newEntity);
+
+        unit.setEntity(newEntity);
+
+        unit.removeParts();
+
+        unit.initializeBaySpace();
+
+        unit.initializeParts(true);
+        unit.runDiagnostic(false);
+        unit.setSalvage(false);
+        unit.resetPilotAndEntity();
+    }
+
+    /**
+     * Get a copy of the entity from the {@link MechSummaryCache}.
+     * @param en The entity to copy.
+     * @return A copy of the entity, or {@code null} if a copy could not be made.
+     */
+    @Nullable
+    private Entity getCopyOfEntity(Entity en) {
+        final MechSummary ms = mechSummaryCache.getMech(en.getShortNameRaw());
+        try {
+            if (ms != null) {
+                return new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
+            }
+        } catch (EntityLoadingException e) {
+            MekHQ.getLogger().error("Cannot restore unit from entity, could not find: " + ms.getName(), e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Restores a unit using the old per-part logic.
+     * @param campaign The campaign which owns the unit.
+     * @param unit The unit to restore.
+     */
+    private void oldUnitRestoration(Campaign campaign, Unit unit) {
+        MekHQ.getLogger().warning("Falling back to old unit restoration logic");
+
         unit.setSalvage(false);
 
         boolean needsCheck = true;
@@ -105,7 +186,5 @@ public class RestoreUnitAction implements IUnitAction {
                 }
             }
         }
-
-        MekHQ.triggerEvent(new UnitChangedEvent(unit));
     }
 }
