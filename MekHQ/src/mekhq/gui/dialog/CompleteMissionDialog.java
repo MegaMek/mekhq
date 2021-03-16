@@ -27,8 +27,8 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 
 public class CompleteMissionDialog extends javax.swing.JDialog {
     //region Variable Declarations

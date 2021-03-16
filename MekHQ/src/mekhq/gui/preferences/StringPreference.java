@@ -20,7 +20,7 @@
 package mekhq.gui.preferences;
 
 import mekhq.gui.utilities.ObservableString;
-import mekhq.preferences.PreferenceElement;
+import megamek.client.ui.preferences.PreferenceElement;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

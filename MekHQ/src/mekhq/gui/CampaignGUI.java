@@ -1,7 +1,8 @@
 /*
  * CampaignGUI.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,8 +42,8 @@ import megamek.common.*;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.dialog.*;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -665,24 +666,24 @@ public class CampaignGUI extends JPanel {
         menuFile.add(menuExport);
         //endregion menuExport
 
-        JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text")); // NOI18N
+        JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text"));
         miMercRoster.setMnemonic(KeyEvent.VK_U);
         miMercRoster.addActionListener(evt -> showMercRosterDialog());
         menuFile.add(miMercRoster);
 
-        JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text")); // NOI18N
+        JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text"));
         menuOptions.setMnemonic(KeyEvent.VK_C);
         menuOptions.addActionListener(this::menuOptionsActionPerformed);
         menuFile.add(menuOptions);
 
-        JMenuItem menuOptionsMM = new JMenuItem(resourceMap.getString("menuOptionsMM.text")); // NOI18N
+        JMenuItem menuOptionsMM = new JMenuItem(resourceMap.getString("menuOptionsMM.text"));
         menuOptionsMM.setMnemonic(KeyEvent.VK_M);
         menuOptionsMM.addActionListener(this::menuOptionsMMActionPerformed);
         menuFile.add(menuOptionsMM);
 
         JMenuItem menuMekHqOptions = new JMenuItem(resourceMap.getString("menuMekHqOptions.text"));
         menuMekHqOptions.setMnemonic(KeyEvent.VK_H);
-        menuMekHqOptions.addActionListener(this::menuMekHqOptionsActionPerformed);
+        menuMekHqOptions.addActionListener(evt -> new MekHqOptionsDialog(getFrame()).setVisible(true));
         menuFile.add(menuMekHqOptions);
 
         menuThemes = new JMenu(resourceMap.getString("menuThemes.text"));
@@ -790,12 +791,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthAstechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
         miFullStrengthAstechs.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthAstechs.addActionListener(evt -> {
-            int need = (getCampaign().getTechs().size() * 6) - getCampaign().getNumberAstechs();
-            if (need > 0) {
-                getCampaign().increaseAstechPool(need);
-            }
-        });
+        miFullStrengthAstechs.addActionListener(evt -> getCampaign().fillAstechPool());
         menuAstechPool.add(miFullStrengthAstechs);
 
         JMenuItem miFireAllAstechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
@@ -839,12 +835,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
         miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthMedics.addActionListener(evt -> {
-            int need = (getCampaign().getDoctors().size() * 4) - getCampaign().getNumberMedics();
-            if (need > 0) {
-                getCampaign().increaseMedicPool(need);
-            }
-        });
+        miFullStrengthMedics.addActionListener(evt -> getCampaign().fillMedicPool());
         menuMedicPool.add(miFullStrengthMedics);
 
         JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
@@ -1341,10 +1332,6 @@ public class CampaignGUI extends JPanel {
         return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
     }
 
-    private String getExtensionForSaveFile(Campaign c) {
-        return MekHQ.getMekHQOptions().getPreferGzippedOutput() ? ".cpnx.gz" : ".cpnx";
-    }
-
     private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {
         File f = selectLoadCampaignFile();
         if (null == f) {
@@ -1466,11 +1453,6 @@ public class CampaignGUI extends JPanel {
             setCampaignOptionsFromGameOptions();
             refreshCalendar();
         }
-    }
-
-    private void menuMekHqOptionsActionPerformed(ActionEvent evt) {
-        MekHqOptionsDialog dialog = new MekHqOptionsDialog(getFrame());
-        dialog.setVisible(true);
     }
 
     private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {
