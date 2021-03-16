@@ -1,7 +1,6 @@
 /*
- * AddOrEditPersonnelEntryDialog.java
- *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,8 +43,6 @@ public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
     private final Person person;
     private final LogEntry entry;
     private LocalDate date;
-    private final LocalDate originalDate;
-    private final String originalDescription;
 
     private JTextArea txtDescription;
     private JButton btnDate;
@@ -72,8 +69,6 @@ public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
         this.entry = entry;
 
         setDate(entry.getDate());
-        originalDate = entry.getDate();
-        originalDescription = entry.getDesc();
 
         initialize();
     }
@@ -95,14 +90,6 @@ public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
     public void setDate(final LocalDate date) {
         this.date = date;
     }
-
-    public LocalDate getOriginalDate() {
-        return originalDate;
-    }
-
-    public String getOriginalDescription() {
-        return originalDescription;
-    }
     //endregion Getters/Setters
 
     //region Initialization
@@ -115,7 +102,7 @@ public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
 
         txtDescription = new JTextArea(getEntry().getDesc());
         txtDescription.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Description"),
+                BorderFactory.createTitledBorder(resources.getString("txtDescription.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         txtDescription.setName("txtDescription");
         txtDescription.setMinimumSize(new Dimension(250,75));
@@ -151,9 +138,11 @@ public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
 
     @Override
     protected void okAction() {
+        final LocalDate originalDate = getEntry().getDate();
+        final String originalDescription = getEntry().getDesc();
         getEntry().setDate(getDate());
         getEntry().setDesc(txtDescription.getText());
-        getEntry().onLogEntryEdited(getOriginalDate(), getDate(), getOriginalDescription(),
+        getEntry().onLogEntryEdited(originalDate, getDate(), originalDescription,
                 txtDescription.getText(), getPerson());
     }
 
