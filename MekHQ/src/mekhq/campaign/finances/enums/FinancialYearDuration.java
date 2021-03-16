@@ -19,6 +19,7 @@
 package mekhq.campaign.finances.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -30,7 +31,7 @@ public enum FinancialYearDuration {
     //region Enum Declarations
     SEMIANNUAL("FinancialYearDuration.SEMIANNUAL.text", "FinancialYearDuration.SEMIANNUAL.toolTipText"),
     ANNUAL("FinancialYearDuration.ANNUAL.text", "FinancialYearDuration.ANNUAL.toolTipText"),
-    BIANNUAL("FinancialYearDuration.BIANNUAL.text", "FinancialYearDuration.BIANNUAL.toolTipText"),
+    BIENNIAL("FinancialYearDuration.BIENNIAL.text", "FinancialYearDuration.BIENNIAL.toolTipText"),
     QUINQUENNIAL("FinancialYearDuration.QUINQUENNIAL.text", "FinancialYearDuration.QUINQUENNIAL.toolTipText"),
     DECENNIAL("FinancialYearDuration.DECENNIAL.text", "FinancialYearDuration.DECENNIAL.toolTipText"),
     FOREVER("FinancialYearDuration.FOREVER.text", "FinancialYearDuration.FOREVER.toolTipText");
@@ -40,7 +41,6 @@ public enum FinancialYearDuration {
     private final String name;
     private final String toolTipText;
 
-    public final static FinancialYearDuration DEFAULT_TYPE = ANNUAL;
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances", new EncodeControl());
     //endregion Variable Declarations
 
@@ -61,7 +61,7 @@ public enum FinancialYearDuration {
         switch (this) {
             case SEMIANNUAL:
                 return (today.getDayOfYear() == 1) || ((today.getMonthValue() == 7) && (today.getDayOfMonth() == 1));
-            case BIANNUAL:
+            case BIENNIAL:
                 return (today.getDayOfYear() == 1) && (today.getYear() % 2 == 0);
             case QUINQUENNIAL:
                 return (today.getDayOfYear() == 1) && (today.getYear() % 5 == 0);
@@ -76,6 +76,9 @@ public enum FinancialYearDuration {
     }
 
     /**
+     * This is called to get the export after the financial year has concluded according to the
+     * previous check returns true. Because of that, this is called with tomorrow's date.
+     *
      * @param tomorrow tomorrow's date. Because of how this is passed in, we are provided that
      *                 instead of today
      * @return the filename to use for the date during financial export
@@ -92,7 +95,7 @@ public enum FinancialYearDuration {
                         : String.format("%d %s - %s", year + 1,
                                 Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]", ""),
                                 Month.JUNE.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]", ""));
-            case BIANNUAL:
+            case BIENNIAL:
                 return String.format("%d - %d", year - 1, year);
             case QUINQUENNIAL:
                 return String.format("%d - %d", year - 4, year);
@@ -104,6 +107,28 @@ public enum FinancialYearDuration {
                 return Integer.toString(year);
         }
     }
+
+    //region File I/O
+    /**
+     * This allows for the legacy parsing method of financial durations, outdated in 0.49.X
+     */
+    public static FinancialYearDuration parseFromString(final String text) {
+        try {
+            return valueOf(text);
+        } catch (Exception ignored) {
+
+        }
+
+        // Legacy Parsing format
+        if ("BIANNUAL".equals(text)) {
+            return BIENNIAL;
+        }
+
+        MekHQ.getLogger().error("Failed to parse the FinancialYearDuration from text " + text + ", returning ANNUAL.");
+
+        return ANNUAL;
+    }
+    //endregion File I/O
 
     @Override
     public String toString() {
