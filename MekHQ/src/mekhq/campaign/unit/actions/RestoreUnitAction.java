@@ -111,6 +111,22 @@ public class RestoreUnitAction implements IUnitAction {
         target.setC3Master(source.getC3Master(), false);
         target.setC3MasterIsUUIDAsString(source.getC3MasterIsUUIDAsString());
 
+        // Reassign the C3NetId
+        // TODO: Add Entity::setC3NetId(String)
+        String c3NetId = source.getC3NetId();
+        if (c3NetId != null) {
+            for (Entity entity : target.getGame().getEntitiesVector()) {
+                if (target.getId() == entity.getId()) {
+                    continue;
+                }
+
+                if (c3NetId.equals(entity.getC3NetId())) {
+                    target.setC3NetId(entity);
+                    break;
+                }
+            }
+        }
+
         for (int pos = 0; pos < Entity.MAX_C3i_NODES; ++pos) {
             target.setC3iNextUUIDAsString(pos, source.getC3iNextUUIDAsString(pos));
             target.setNC3NextUUIDAsString(pos, source.getNC3NextUUIDAsString(pos));
