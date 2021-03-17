@@ -3840,9 +3840,6 @@ public class CampaignOptions implements Serializable {
                 retVal.tougherHealing = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
                 retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBUnitMarket")) { // Legacy - 0.49.X removal
-                retVal.setUnitMarketMethod(Boolean.parseBoolean(wn2.getTextContent())
-                        ? UnitMarketMethod.ATB_MONTHLY : UnitMarketMethod.NONE);
             } else if (wn2.getNodeName().equalsIgnoreCase("useAero")) {
                 retVal.useAero = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useVehicles")) {
@@ -3987,6 +3984,12 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
                 retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
             }
+        }
+
+        // Fixing Old Data
+        if (version.isLowerThan("0.49.0") && retVal.getUseAtB()) {
+            retVal.setUnitMarketMethod(UnitMarketMethod.ATB_MONTHLY);
+            retVal.setContractMarketMethod(ContractMarketMethod.ATB_MONTHLY);
         }
 
         MekHQ.getLogger().debug("Load Campaign Options Complete!");

@@ -51,10 +51,6 @@ public enum ContractMarketMethod {
     public boolean isNone() {
         return this == NONE;
     }
-
-    public boolean isAtB() {
-        return this == ATB_MONTHLY;
-    }
     //endregion Boolean Comparison Methods
 
     // TODO : AbstractContractMarket : Uncomment
