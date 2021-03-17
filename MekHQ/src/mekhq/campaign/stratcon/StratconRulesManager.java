@@ -28,6 +28,7 @@ import megamek.common.Minefield;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.againstTheBot.enums.AtBLanceRole;
@@ -139,9 +140,9 @@ public class StratconRulesManager {
         // if under liaison command, pick a random scenario from the ones generated
         // to set as required and attach liaison
         if (contract.getCommandRights() == AtBContract.COM_LIAISON) {
-            int scenarioIndex = Compute.randomInt(generatedScenarios.size() - 1);
-            generatedScenarios.get(scenarioIndex).setRequiredScenario(true);
-            setAttachedUnitsModifier(generatedScenarios.get(scenarioIndex), contract);
+        	StratconScenario randomScenario = Utilities.getRandomItem(generatedScenarios);
+        	randomScenario.setRequiredScenario(true);
+            setAttachedUnitsModifier(randomScenario, contract);
         }
 
         // now, we loop through all the scenarios we set up
