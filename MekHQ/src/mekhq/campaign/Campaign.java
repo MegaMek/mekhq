@@ -4193,11 +4193,12 @@ public class Campaign implements Serializable, ITechManager {
 
         // TODO : AbstractContractMarket : Uncomment
         //if (getContractMarket() != null) {
-        //    // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
+        //    // CAW: implicit DEPENDS-ON to the <missions> and <campaignOptions> node, do not move this above it
         //    contractMarket.writeToXml(pw1, indent);
         //    getContractMarket().writeToXML(pw1, indent);
         //}
 
+        // Windchild: implicit DEPENDS-ON to the <campaignOptions> node, do not move this above it
         if (getUnitMarket() != null) {
             getUnitMarket().writeToXML(pw1, indent);
         }

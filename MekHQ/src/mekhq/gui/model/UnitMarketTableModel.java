@@ -20,13 +20,19 @@
  */
 package mekhq.gui.model;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
-import javax.swing.SwingConstants;
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
-import mekhq.campaign.finances.Money;
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 
 /**
@@ -47,12 +53,14 @@ public class UnitMarketTableModel extends DataTableModel {
     public static final int COL_PRICE = 4;
     public static final int COL_PERCENT = 5;
     public static final int COL_NUM = 6;
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    public UnitMarketTableModel() {
-        columnNames = new String[] { "Market", "Type", "Weight Class", "Unit", "Price", "Percent" };
-        data = new ArrayList<UnitMarketOffer>();
+    public UnitMarketTableModel(final List<UnitMarketOffer> offers) {
+        columnNames = resources.getString("UnitMarketTableModel.columnNames").split(",");
+        setData(offers);
     }
     //endregion Constructors
 
@@ -86,36 +94,48 @@ public class UnitMarketTableModel extends DataTableModel {
         }
     }
 
-    public UnitMarketOffer getOffer(final int index) {
-        return (index < getData().size()) ? (UnitMarketOffer) data.get(index) : null;
+    public Optional<UnitMarketOffer> getOffer(final int row) {
+        return ((row >= 0) && (row < getData().size())) ? Optional.of((UnitMarketOffer) getData().get(row))
+                : Optional.empty();
     }
 
     @Override
     public Object getValueAt(final int row, final int column) {
-        if (getData().isEmpty()) {
-            return "";
-        }
-        UnitMarketOffer offer = getOffer(row);
-        if (offer == null) {
-            return "?";
-        }
+        return getData().isEmpty() ? "" : getOffer(row).map(o -> getValueFor(o, column)).orElse("?");
+    }
 
-        if (column == COL_MARKET) {
-            return offer.getMarketType();
-        } else if (column == COL_UNITTYPE) {
-            return UnitType.getTypeName(offer.getUnitType());
-        } else if (column == COL_WEIGHTCLASS) {
-            return EntityWeightClass.getClassName(offer.getUnit().getWeightClass(),
-                    offer.getUnit().getUnitType(), offer.getUnit().isSupport());
-        } else if (column == COL_UNIT) {
-            return offer.getUnit().getName();
-        } else if (column == COL_PRICE) {
-            return Money.of((double) offer.getUnit().getCost()).multipliedBy(offer.getPercent())
-                    .dividedBy(100).toAmountAndSymbolString();
-        } else if (column == COL_PERCENT) {
-            return offer.getPercent() + "%";
-        } else {
-            return "?";
+    private Object getValueFor(final UnitMarketOffer offer, final int column) {
+        switch (column) {
+            case COL_MARKET:
+                return offer.getMarketType();
+            case COL_UNITTYPE:
+                return UnitType.getTypeName(offer.getUnitType());
+            case COL_WEIGHTCLASS:
+                return EntityWeightClass.getClassName(offer.getUnit().getWeightClass(),
+                        offer.getUnit().getUnitType(), offer.getUnit().isSupport());
+            case COL_UNIT:
+                return offer.getUnit().getName();
+            case COL_PRICE:
+                return offer.getPrice().toAmountAndSymbolString();
+            case COL_PERCENT:
+                return offer.getPercent() + "%";
+            default:
+                return "?";
+        }
+    }
+
+    public TableCellRenderer getRenderer() {
+        return new Renderer();
+    }
+
+    public class Renderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(final JTable table, final Object value,
+                                                       final boolean isSelected, final boolean hasFocus,
+                                                       final int row, final int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setHorizontalAlignment(getAlignment(table.convertColumnIndexToModel(column)));
+            return this;
         }
     }
 }

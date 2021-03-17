@@ -41,6 +41,8 @@ import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
 import mekhq.MekHqConstants;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.market.enums.UnitMarketMethod;
+import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.gui.dialog.*;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -1371,7 +1373,7 @@ public class CampaignGUI extends JPanel {
         getCampaign().setOvertime(btnOvertime.isSelected());
     }
 
-    private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {
+    private void menuOptionsActionPerformed(final ActionEvent evt) {
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
         boolean timeIn = getCampaign().getCampaignOptions().getUseTimeInService();
         boolean rankIn = getCampaign().getCampaignOptions().getUseTimeInRank();
@@ -1410,7 +1412,15 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        miUnitMarket.setVisible(getCampaign().getUnitMarket() != null);
+        final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
+        if (getCampaign().getCampaignOptions().getUnitMarketMethod()
+                != ((unitMarket == null) ? UnitMarketMethod.NONE : unitMarket.getMethod())) {
+            getCampaign().setUnitMarket(getCampaign().getCampaignOptions().getUnitMarketMethod().getUnitMarket());
+            if ((unitMarket != null) && (getCampaign().getUnitMarket() != null)) {
+                getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
+            }
+            miUnitMarket.setVisible(getCampaign().getUnitMarket() != null);
+        }
 
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
@@ -2555,8 +2565,6 @@ public class CampaignGUI extends JPanel {
     public void handle(final OptionsChangedEvent evt) {
         fundsScheduler.schedule();
         refreshPartsAvailability();
-
-        // TODO : I'm technically equal to Campaign::getUnitMarket == null, but might not be in the future
         miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
     }
 

@@ -20,14 +20,15 @@ package mekhq.gui.panes;
 
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Entity;
-import megamek.common.MechView;
 import megamek.common.annotations.Nullable;
 import megamek.common.templates.TROView;
-import mekhq.MekHQ;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 
 import javax.swing.*;
 
+/**
+ * The EntityViewPane displays the Entity Summary and the TRO panels within a Tabbed Pane.
+ */
 public class EntityViewPane extends AbstractMHQTabbedPane {
     //region Variable Declarations
     private MechViewPanel entityPanel;
@@ -61,17 +62,20 @@ public class EntityViewPane extends AbstractMHQTabbedPane {
     //endregion Getters/Setters
 
     //region Initialization
+    /**
+     * This purposefully does not set preferences, as it may be used on differing panes for
+     * differing uses and thus you don't want to remember the selected tab between the different
+     * locations.
+     */
     @Override
     protected void initialize() {
         setEntityPanel(new MechViewPanel());
         getEntityPanel().setName("entityPanel");
-        addTab("Summary", getEntityPanel());
+        addTab(resources.getString("Summary.title"), getEntityPanel());
 
         setTROPanel(new MechViewPanel());
         getTROPanel().setName("troPanel");
-        addTab("TRO", getTROPanel());
-
-        setPreferences();
+        addTab(resources.getString("TRO.title"), getTROPanel());
     }
     //endregion Initialization
 
@@ -80,25 +84,13 @@ public class EntityViewPane extends AbstractMHQTabbedPane {
      * @param entity the entity to update to, or null if the panels are to be reset.
      */
     public void updateDisplayedEntity(final @Nullable Entity entity) {
-        // null entity, which means to reset the panels
+        // Null entity, which means to reset the panels
         if (entity == null) {
             getEntityPanel().reset();
             getTROPanel().reset();
-            return;
-        }
-
-        try {
-            getEntityPanel().setMech(entity, new MechView(entity, false));
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-            getEntityPanel().reset();
-        }
-
-        try {
+        } else {
+            getEntityPanel().setMech(entity, true);
             getTROPanel().setMech(entity, TROView.createView(entity, true));
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-            getTROPanel().reset();
         }
     }
 }

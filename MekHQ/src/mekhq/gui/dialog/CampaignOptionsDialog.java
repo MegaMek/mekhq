@@ -108,7 +108,6 @@ import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 import megamek.client.ui.preferences.JWindowPreference;
-import mekhq.gui.utilities.TableCellListener;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -4047,6 +4046,7 @@ public class CampaignOptionsDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTH;
         marketsPanel.add(createPersonnelMarketPanel(), gbc);
 
         gbc.gridx++;
@@ -4307,12 +4307,13 @@ public class CampaignOptionsDialog extends JDialog {
         JLabel lblContractMarketMethod = new JLabel(resources.getString("lblContractMarketMethod.text"));
         lblContractMarketMethod.setToolTipText(resources.getString("lblContractMarketMethod.toolTipText"));
         lblContractMarketMethod.setName("lblContractMarketMethod");
-        lblContractMarketMethod.setEnabled(false); // TODO : AbstractContractMarket : Remove
+        lblContractMarketMethod.setVisible(false); // TODO : AbstractContractMarket : Remove
 
         comboContractMarketMethod = new JComboBox<>(ContractMarketMethod.values());
         comboContractMarketMethod.setToolTipText(resources.getString("lblContractMarketMethod.toolTipText"));
         comboContractMarketMethod.setName("comboContractMarketMethod");
-        comboContractMarketMethod.setEnabled(false); // TODO : AbstractContractMarket : Remove
+        comboContractMarketMethod.setVisible(false); // TODO : AbstractContractMarket : Remove
+        /*
         comboContractMarketMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -4329,6 +4330,7 @@ public class CampaignOptionsDialog extends JDialog {
             final boolean enabled = !((ContractMarketMethod) Objects.requireNonNull(comboContractMarketMethod.getSelectedItem())).isNone();
             chkContractMarketReportRefresh.setEnabled(enabled);
         });
+         */
 
         chkContractMarketReportRefresh = new JCheckBox(resources.getString("chkContractMarketReportRefresh.text"));
         chkContractMarketReportRefresh.setToolTipText(resources.getString("chkContractMarketReportRefresh.toolTipText"));

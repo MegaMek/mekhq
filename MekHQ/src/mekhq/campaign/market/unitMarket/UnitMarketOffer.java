@@ -18,10 +18,14 @@
  */
 package mekhq.campaign.market.unitMarket;
 
+import megamek.common.Entity;
+import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -82,6 +86,26 @@ public class UnitMarketOffer {
         this.percent = percent;
     }
     //endregion Getters/Setters
+
+    /**
+     * @return the Entity offered in this UnitMarketOffer
+     */
+    public @Nullable Entity getEntity() {
+        try {
+            return new MechFileParser(getUnit().getSourceFile(), getUnit().getEntryName()).getEntity();
+        } catch (Exception e) {
+            MekHQ.getLogger().error("Unable to load entity: " + getUnit().getSourceFile()
+                    + ": " + getUnit().getEntryName() + ". Returning null.", e);
+            return null;
+        }
+    }
+
+    /**
+     * @return the final price of this Offer
+     */
+    public Money getPrice() {
+        return Money.of((double) getUnit().getCost()).multipliedBy(getPercent()).dividedBy(100);
+    }
 
     //region File I/O
     public void writeToXML(final PrintWriter pw1, int indent) {
