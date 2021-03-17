@@ -184,7 +184,7 @@ public class Campaign implements Serializable, ITechManager {
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private Map<UUID, List<Kill>> kills = new HashMap<>();
 
-    private Map<String, Integer> duplicateNameHash = new HashMap<>();
+    private final UnitNameTracker unitNameTracker = new UnitNameTracker();
 
     private int astechPool;
     private int astechPoolMinutes;
@@ -5569,42 +5569,21 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * borrowed from megamek.client
      */
-    private void checkDuplicateNamesDuringAdd(Entity entity) {
-        if (duplicateNameHash.get(entity.getShortName()) == null) {
-            duplicateNameHash.put(entity.getShortName(), 1);
-        } else {
-            int count = duplicateNameHash.get(entity.getShortName());
-            count++;
-            duplicateNameHash.put(entity.getShortName(), count);
-            entity.duplicateMarker = count;
-            entity.generateShortName();
-            entity.generateDisplayName();
-        }
+    private synchronized void checkDuplicateNamesDuringAdd(Entity entity) {
+        unitNameTracker.add(entity);
     }
 
     /**
-     * If we remove a unit, we may need to update the duplicate identifier. TODO: This function is super slow :(
+     * If we remove a unit, we may need to update the duplicate identifier.
      *
      * @param entity This is the entity whose name is checked for any duplicates
      */
-    private void checkDuplicateNamesDuringDelete(Entity entity) {
-        Integer o = duplicateNameHash.get(entity.getShortNameRaw());
-        if (o != null) {
-            int count = o;
-            if (count > 1) {
-                for (Unit u : getUnits()) {
-                    Entity e = u.getEntity();
-                    if (e.getShortNameRaw().equals(entity.getShortNameRaw()) && (e.duplicateMarker > entity.duplicateMarker)) {
-                        e.duplicateMarker--;
-                        e.generateShortName();
-                        e.generateDisplayName();
-                    }
-                }
-                duplicateNameHash.put(entity.getShortNameRaw(), count - 1);
-            } else {
-                duplicateNameHash.remove(entity.getShortNameRaw());
-            }
-        }
+    private synchronized void checkDuplicateNamesDuringDelete(Entity entity) {
+        unitNameTracker.remove(entity, e -> {
+            // Regenerate entity names after a deletion
+            e.generateShortName();
+            e.generateDisplayName();
+        });
     }
 
     public String getUnitRatingText() {

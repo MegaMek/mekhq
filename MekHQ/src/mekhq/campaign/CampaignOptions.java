@@ -645,7 +645,7 @@ public class CampaignOptions implements Serializable {
         usePeacetimeCost = false;
         useExtendedPartsModifier = false;
         showPeacetimeCost = false;
-        financialYearDuration = FinancialYearDuration.DEFAULT_TYPE;
+        setFinancialYearDuration(FinancialYearDuration.ANNUAL);
         newFinancialYearFinancesToCSVExport = false;
         clanPriceModifier = 1.0;
         usedPartsValue = new double[6];
@@ -3725,7 +3725,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("showPeacetimeCost")) {
                 retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("financialYearDuration")) {
-                retVal.financialYearDuration = FinancialYearDuration.valueOf(wn2.getTextContent().trim());
+                retVal.setFinancialYearDuration(FinancialYearDuration.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
                 retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {

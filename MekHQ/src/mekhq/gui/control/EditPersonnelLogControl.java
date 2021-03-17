@@ -107,19 +107,17 @@ public class EditPersonnelLogControl extends JPanel {
     }
 
     private void addEntry() {
-        AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, true, campaign.getLocalDate());
-        dialog.setVisible(true);
-        if (dialog.getEntry().isPresent()) {
-            person.addLogEntry(dialog.getEntry().get());
+        final AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, person, campaign.getLocalDate());
+        if (dialog.showDialog().isConfirmed()) {
+            person.addLogEntry(dialog.getEntry());
+            refreshTable();
         }
-        refreshTable();
     }
 
     private void editEntry() {
-        LogEntry entry = logModel.getEntry(logsTable.getSelectedRow());
-        if (null != entry) {
-            AddOrEditPersonnelEntryDialog dialog = new AddOrEditPersonnelEntryDialog(parent, true, entry);
-            dialog.setVisible(true);
+        final LogEntry entry = logModel.getEntry(logsTable.getSelectedRow());
+        if (entry != null) {
+            new AddOrEditPersonnelEntryDialog(parent, person, entry).showDialog();
             refreshTable();
         }
     }
