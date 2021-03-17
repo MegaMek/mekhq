@@ -307,9 +307,7 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("unitMarket")) {
                     // Windchild: implicit DEPENDS ON to the <campaignOptions> nodes
                     retVal.setUnitMarket(retVal.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
-                    if (retVal.getUnitMarket() != null) {
-                        retVal.getUnitMarket().fillFromXML(wn);
-                    }
+                    retVal.getUnitMarket().fillFromXML(wn);
                     foundUnitMarket = true;
                 } else if (xn.equalsIgnoreCase("lances")) {
                     processLanceNodes(retVal, wn);

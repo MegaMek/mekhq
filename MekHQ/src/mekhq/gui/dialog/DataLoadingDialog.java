@@ -235,13 +235,9 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     campaign.setStartingSystem();
                     campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
                     // TODO : AbstractContractMarket : Uncomment
-                    //campaign.setContractMarket(campaign.getCampaignOptions().getContractMarketMethod().getContractMarket());
-                    //if (campaign.getContractMarket() != null) {
-                    //    campaign.getContractMarket().generateContractOffers(campaign, 2);
-                    //}
-                    if (campaign.getUnitMarket() != null) {
-                        campaign.getUnitMarket().generateUnitOffers(campaign);
-                    }
+                    //campaign.getContractMarket().generateContractOffers(campaign, 2);
+                    campaign.getUnitMarket().generateUnitOffers(campaign);
+
                     campaign.reloadNews();
                     campaign.readNews();
                     if (campaign.getCampaignOptions().getUseAtB()) {

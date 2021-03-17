@@ -721,7 +721,7 @@ public class CampaignGUI extends JPanel {
         miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
         miUnitMarket.setMnemonic(KeyEvent.VK_U);
         miUnitMarket.addActionListener(evt -> showUnitMarket());
-        miUnitMarket.setVisible(getCampaign().getUnitMarket() != null);
+        miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         menuMarket.add(miUnitMarket);
 
         miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
@@ -1249,7 +1249,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showUnitMarket() {
-        if (getCampaign().getUnitMarket() == null) {
+        if (getCampaign().getUnitMarket().getMethod().isNone()) {
             MekHQ.getLogger().error("Attempted to show the unit market while it is disabled");
         } else {
             new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
@@ -1413,13 +1413,10 @@ public class CampaignGUI extends JPanel {
         }
 
         final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
-        if (getCampaign().getCampaignOptions().getUnitMarketMethod()
-                != ((unitMarket == null) ? UnitMarketMethod.NONE : unitMarket.getMethod())) {
+        if (getCampaign().getCampaignOptions().getUnitMarketMethod() != unitMarket.getMethod()) {
             getCampaign().setUnitMarket(getCampaign().getCampaignOptions().getUnitMarketMethod().getUnitMarket());
-            if ((unitMarket != null) && (getCampaign().getUnitMarket() != null)) {
-                getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
-            }
-            miUnitMarket.setVisible(getCampaign().getUnitMarket() != null);
+            getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
+            miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         }
 
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {

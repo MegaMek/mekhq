@@ -44,6 +44,7 @@ import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
+import mekhq.campaign.market.unitMarket.EmptyUnitMarket;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -304,14 +305,14 @@ public class Campaign implements Serializable, ITechManager {
         partsStore = new PartsStore(this);
         gameOptions = new GameOptions();
         gameOptions.initialize();
-        gameOptions.getOption("year").setValue(getGameYear());
+        gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
         game.setOptions(gameOptions);
         customs = new ArrayList<>();
         shoppingList = new ShoppingList();
         news = new News(getGameYear(), id.getLeastSignificantBits());
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new ContractMarket());
-        setUnitMarket(null);
+        setUnitMarket(new EmptyUnitMarket());
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
@@ -446,21 +447,21 @@ public class Campaign implements Serializable, ITechManager {
         this.personnelMarket = personnelMarket;
     }
 
-    // TODO : AbstractContractMarket : Add @Nullable and Swap to AbstractContract Market
+    // TODO : AbstractContractMarket : Swap to AbstractContractMarket
     public ContractMarket getContractMarket() {
         return contractMarket;
     }
 
-    // TODO : AbstractContractMarket : Add @Nullable and Swap to AbstractContract Market
+    // TODO : AbstractContractMarket : Swap to AbstractContractMarket
     public void setContractMarket(final ContractMarket contractMarket) {
         this.contractMarket = contractMarket;
     }
 
-    public @Nullable AbstractUnitMarket getUnitMarket() {
+    public AbstractUnitMarket getUnitMarket() {
         return unitMarket;
     }
 
-    public void setUnitMarket(final @Nullable AbstractUnitMarket unitMarket) {
+    public void setUnitMarket(final AbstractUnitMarket unitMarket) {
         this.unitMarket = unitMarket;
     }
     //endregion Markets
@@ -3469,13 +3470,8 @@ public class Campaign implements Serializable, ITechManager {
         getPersonnelMarket().generatePersonnelForDay(this);
 
         // TODO : AbstractContractMarket : Uncomment
-        //if (getContractMarket() != null) {
-        //    getContractMarket().processNewDay(this);
-        //}
-
-        if (getUnitMarket() != null) {
-            getUnitMarket().processNewDay(this);
-        }
+        //getContractMarket().processNewDay(this);
+        getUnitMarket().processNewDay(this);
 
         // Process New Day for AtB
         if (getCampaignOptions().getUseAtB()) {
@@ -4192,14 +4188,13 @@ public class Campaign implements Serializable, ITechManager {
         getPersonnelMarket().writeToXml(pw1, indent);
 
         // TODO : AbstractContractMarket : Uncomment
-        //if (getContractMarket() != null) {
+        //if (!getContractMarket().getMethod().isNone()) {
         //    // CAW: implicit DEPENDS-ON to the <missions> and <campaignOptions> node, do not move this above it
-        //    contractMarket.writeToXml(pw1, indent);
         //    getContractMarket().writeToXML(pw1, indent);
         //}
 
         // Windchild: implicit DEPENDS-ON to the <campaignOptions> node, do not move this above it
-        if (getUnitMarket() != null) {
+        if (!getUnitMarket().getMethod().isNone()) {
             getUnitMarket().writeToXML(pw1, indent);
         }
 

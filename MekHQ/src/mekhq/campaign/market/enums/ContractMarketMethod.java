@@ -58,13 +58,13 @@ public enum ContractMarketMethod {
     //endregion Boolean Comparison Methods
 
     // TODO : AbstractContractMarket : Uncomment
-    //public @Nullable AbstractContractMarket getContractMarket() {
+    //public AbstractContractMarket getContractMarket() {
     //    switch (this) {
     //        case ATB_MONTHLY:
     //            return new AtBMonthlyContractMarket();
     //        case NONE:
     //        default:
-    //            return null;
+    //            return new EmptyContractMarket();
     //    }
     //}
 

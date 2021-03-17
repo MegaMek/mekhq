@@ -534,7 +534,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     private void getUnit() {
         if (MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket()
-                && (getCampaign().getUnitMarket() != null)) {
+                && !getCampaign().getUnitMarket().getMethod().isNone()) {
             new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
         } else {
             UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(getFrame());
