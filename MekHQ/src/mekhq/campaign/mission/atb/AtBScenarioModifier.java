@@ -39,6 +39,7 @@ import javax.xml.transform.Source;
 
 import megamek.common.Compute;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -279,12 +280,12 @@ public class AtBScenarioModifier implements Cloneable {
         loadManifest();
         loadScenarioModifiers();
 
-        initializeSpecificManifest("./data/scenariomodifiers/requiredHostileFacilityModifiers.xml", requiredHostileFacilityModifierKeys);
-        initializeSpecificManifest("./data/scenariomodifiers/hostileFacilityModifiers.xml", hostileFacilityModifierKeys);
-        initializeSpecificManifest("./data/scenariomodifiers/alliedFacilityModifiers.xml", alliedFacilityModifierKeys);
-        initializeSpecificManifest("./data/scenariomodifiers/groundBattleModifiers.xml", groundBattleModifierKeys);
-        initializeSpecificManifest("./data/scenariomodifiers/airBattleModifiers.xml", airBattleModifierKeys);
-        initializeSpecificManifest("./data/scenariomodifiers/primaryPlayerForceModifiers.xml", primaryPlayerForceModifierKeys);
+        initializeSpecificManifest(MekHqConstants.STRATCON_REQUIRED_HOSTILE_FACILITY_MODS, requiredHostileFacilityModifierKeys);
+        initializeSpecificManifest(MekHqConstants.STRATCON_HOSTILE_FACILITY_MODS, hostileFacilityModifierKeys);
+        initializeSpecificManifest(MekHqConstants.STRATCON_ALLIED_FACILITY_MODS, alliedFacilityModifierKeys);
+        initializeSpecificManifest(MekHqConstants.STRATCON_GROUND_MODS, groundBattleModifierKeys);
+        initializeSpecificManifest(MekHqConstants.STRATCON_AIR_MODS, airBattleModifierKeys);
+        initializeSpecificManifest(MekHqConstants.STRATCON_PRIMARY_PLAYER_FORCE_MODS, primaryPlayerForceModifierKeys);
         
         initializePositiveNegativeManifests(groundBattleModifierKeys, positiveGroundBattleModifierKeys, negativeGroundBattleModifierKeys);
         initializePositiveNegativeManifests(airBattleModifierKeys, positiveAirBattleModifierKeys, negativeAirBattleModifierKeys);

@@ -21,6 +21,7 @@ package mekhq.campaign.stratcon;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
 
 /**
@@ -54,10 +56,10 @@ public class StratconContractDefinition {
     
     private static ContractDefinitionManifest getContractDefinitionManifest() {
         if (definitionManifest == null) {
-            definitionManifest = ContractDefinitionManifest.Deserialize("./data/stratconcontractdefinitions/ContractDefinitionManifest.xml");
+            definitionManifest = ContractDefinitionManifest.Deserialize(MekHqConstants.STRATCON_CONTRACT_MANIFEST);
             
             // load user-specified modifier list
-            ContractDefinitionManifest userDefinitionList = ContractDefinitionManifest.Deserialize("./data/scenariomodifiers/UserContractDefinitionManifest.xml");
+            ContractDefinitionManifest userDefinitionList = ContractDefinitionManifest.Deserialize(MekHqConstants.STRATCON_USER_CONTRACT_MANIFEST);
             if (userDefinitionList != null) {
                 definitionManifest.definitionFileNames.putAll(userDefinitionList.definitionFileNames);
             }
@@ -72,8 +74,8 @@ public class StratconContractDefinition {
      */
     public static StratconContractDefinition getContractDefinition(int atbContractType) {
         if (!loadedDefinitions.containsKey(atbContractType)) {
-            String filePath = String.format("./data/stratconcontractdefinitions/%s", 
-                    getContractDefinitionManifest().definitionFileNames.get(atbContractType));
+            String filePath = Paths.get(MekHqConstants.STRATCON_CONTRACT_PATH, 
+                    getContractDefinitionManifest().definitionFileNames.get(atbContractType)).toString();
             StratconContractDefinition def = Deserialize(new File(filePath));
             
             if (def == null) {

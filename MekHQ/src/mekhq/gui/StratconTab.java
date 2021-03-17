@@ -112,8 +112,7 @@ public class StratconTab extends CampaignGuiTab {
         cboCurrentTrack.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                TrackDropdownItem tdi = (TrackDropdownItem) e.getItem();
-                stratconPanel.selectTrack(tdi.contract.getStratconCampaignState(), tdi.track);
+            	trackSelectionHandler();
             }
         });
 
@@ -121,12 +120,22 @@ public class StratconTab extends CampaignGuiTab {
         
         // have a default selected
         if(cboCurrentTrack.getItemCount() > 0) {
-            TrackDropdownItem tdi = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
-            stratconPanel.selectTrack(tdi.contract.getStratconCampaignState(), tdi.track);
+        	trackSelectionHandler();
         }
         
         gbc.gridy++;
         infoPanel.add(infoPanelText, gbc);
+    }
+    
+    /**
+     * Worker that handles track selection.
+     */
+    private void trackSelectionHandler() {
+    	TrackDropdownItem tdi = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
+    	if (tdi != null) {
+	        stratconPanel.selectTrack(tdi.contract.getStratconCampaignState(), tdi.track);
+	        updateCampaignState();
+    	}
     }
     
     @Override

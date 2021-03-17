@@ -14,6 +14,7 @@
 
 package mekhq.campaign.stratcon;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,8 @@ import java.util.Map;
 
 import megamek.common.Compute;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
+import mekhq.Utilities;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 
 /**
@@ -57,10 +60,10 @@ public class StratconFacilityFactory {
         stratconFacilityMap.clear();
         
         // load dynamic scenarios
-        StratconFacilityManifest facilityManifest = StratconFacilityManifest.deserialize("./data/stratconfacilities/facilitymanifest.xml");
+        StratconFacilityManifest facilityManifest = StratconFacilityManifest.deserialize(MekHqConstants.STRATCON_FACILITY_MANIFEST);
         
         // load user-specified scenario list
-        StratconFacilityManifest userManifest = StratconFacilityManifest.deserialize("./data/stratconfacilities/userfacilitymanifest.xml");
+        StratconFacilityManifest userManifest = StratconFacilityManifest.deserialize(MekHqConstants.STRATCON_USER_FACILITY_MANIFEST);
         
         if(facilityManifest != null) {
             loadFacilitiesFromManifest(facilityManifest);
@@ -81,7 +84,7 @@ public class StratconFacilityFactory {
         }
         
         for(String fileName : manifest.facilityFileNames) {
-            String filePath = String.format("./data/stratconfacilities/%s", fileName.trim());
+            String filePath = Paths.get(MekHqConstants.STRATCON_FACILITY_PATH, fileName.trim()).toString();
             
             try {
                 StratconFacility facility = StratconFacility.deserialize(filePath);
@@ -113,17 +116,14 @@ public class StratconFacilityFactory {
      * Retrieves a random facility
      */
     public static StratconFacility getRandomFacility() {
-        int facilityIndex = Compute.randomInt(stratconFacilityList.size());
-        return (StratconFacility) stratconFacilityList.get(facilityIndex).clone();
+    	return Utilities.getRandomItem(stratconFacilityList).clone();
     }
     
     public static StratconFacility getRandomHostileFacility() {
-        int facilityIndex = Compute.randomInt(hostileFacilities.size());
-        return (StratconFacility) hostileFacilities.get(facilityIndex).clone();
+        return Utilities.getRandomItem(hostileFacilities).clone();
     }
     
     public static StratconFacility getRandomAlliedFacility() {
-        int facilityIndex = Compute.randomInt(alliedFacilities.size());
-        return (StratconFacility) alliedFacilities.get(facilityIndex).clone();
+    	return Utilities.getRandomItem(alliedFacilities).clone();
     }
 }

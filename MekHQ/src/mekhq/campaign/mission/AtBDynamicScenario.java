@@ -71,7 +71,7 @@ public class AtBDynamicScenario extends AtBScenario {
     private Map<UUID, ScenarioForceTemplate> playerUnitTemplates;
 
     private List<AtBScenarioModifier> scenarioModifiers;
-    
+
     private boolean finalized;
 
     public AtBDynamicScenario() {
@@ -181,7 +181,7 @@ public class AtBDynamicScenario extends AtBScenario {
     public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate) {
         super.addBotForce(botForce);
         botForceTemplates.put(botForce, forceTemplate);
-        
+
         // put all bot units into the external ID lookup.
         for (Entity entity : botForce.getEntityList()) {
             getExternalIDLookup().put(entity.getExternalIdAsString(), entity);
@@ -338,17 +338,18 @@ public class AtBDynamicScenario extends AtBScenario {
         if (modifier == null) {
             return;
         }
-        
-        if ((modifier.getAllowedMapLocations() != null) &&
+
+        // the default is that this modifier is allowed to apply to any map
+        if ((modifier.getAllowedMapLocations() != null) && !modifier.getAllowedMapLocations().isEmpty() &&
                 !modifier.getAllowedMapLocations().contains(getTemplate().mapParameters.getMapLocation())) {
             return;
         }
-        
+
         scenarioModifiers.add(modifier);
-        
+
         for (String modifierKey : modifier.getLinkedModifiers().keySet()) {
             AtBScenarioModifier subMod = AtBScenarioModifier.getScenarioModifier(modifierKey);
-            
+
             // if the modifier exists and has not already been added (to avoid infinite loops, as it's possible to define those in data)
             if ((subMod != null) && !alreadyHasModifier(subMod)) {
                 // set the briefing text of the alternate modifier to the 'alternate' text supplied here
@@ -357,7 +358,7 @@ public class AtBDynamicScenario extends AtBScenario {
             }
         }
     }
-    
+
     /**
      * Check if the modifier list already has a modifier with the given modifier's name.
      */
@@ -367,7 +368,7 @@ public class AtBDynamicScenario extends AtBScenario {
                 return true;
             }
         }
-        
+
         return false;
     }
 

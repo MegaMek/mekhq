@@ -28,6 +28,7 @@ sourceSets {
 
 configurations {
     jarbundler
+    all*.exclude group: 'xml-apis', module: 'xml-apis'
 }
 
 dependencies {

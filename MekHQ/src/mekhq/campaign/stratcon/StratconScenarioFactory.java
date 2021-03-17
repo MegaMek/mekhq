@@ -14,16 +14,18 @@
 
 package mekhq.campaign.stratcon;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.Compute;
 import megamek.common.UnitType;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.MekHQ;
+import mekhq.MekHqConstants;
+import mekhq.Utilities;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioManifest;
 
@@ -51,10 +53,10 @@ public class StratconScenarioFactory {
         dynamicScenarioUnitTypeMap.clear();
         
         // load dynamic scenarios
-        AtBScenarioManifest scenarioManifest = AtBScenarioManifest.Deserialize("./data/scenariotemplates/ScenarioManifest.xml");
+        AtBScenarioManifest scenarioManifest = AtBScenarioManifest.Deserialize(MekHqConstants.STRATCON_SCENARIO_MANIFEST);
         
         // load user-specified scenario list
-        AtBScenarioManifest userManifest = AtBScenarioManifest.Deserialize("./data/scenariotemplates/UserScenarioManifest.xml");
+        AtBScenarioManifest userManifest = AtBScenarioManifest.Deserialize(MekHqConstants.STRATCON_USER_SCENARIO_MANIFEST);
         
         if (scenarioManifest != null) {
             loadScenariosFromManifest(scenarioManifest);
@@ -76,7 +78,8 @@ public class StratconScenarioFactory {
         
         for (int key : manifest.scenarioFileNames.keySet()) {
             String fileName = manifest.scenarioFileNames.get(key).trim();
-            String filePath = String.format("./data/ScenarioTemplates/%s", manifest.scenarioFileNames.get(key).trim());
+            String filePath = Paths.get(MekHqConstants.STRATCON_SCENARIO_TEMPLATE_PATH, 
+            		manifest.scenarioFileNames.get(key).trim()).toString();
             
             try {
                 ScenarioTemplate template = ScenarioTemplate.Deserialize(filePath);
@@ -113,8 +116,7 @@ public class StratconScenarioFactory {
      * @return Random scenario template.
      */
     public static ScenarioTemplate getRandomScenario(MapLocation location) {
-        int scenarioIndex = Compute.randomInt(dynamicScenarioLocationMap.get(location).size());
-        return (ScenarioTemplate) dynamicScenarioLocationMap.get(location).get(scenarioIndex).clone();
+    	return Utilities.getRandomItem(dynamicScenarioLocationMap.get(location)).clone();
     }
     
     /**
@@ -143,8 +145,7 @@ public class StratconScenarioFactory {
             }
         }
         
-        int scenarioIndex = Compute.randomInt(dynamicScenarioUnitTypeMap.get(actualUnitType).size());
-        return (ScenarioTemplate) dynamicScenarioUnitTypeMap.get(actualUnitType).get(scenarioIndex).clone();
+        return Utilities.getRandomItem(dynamicScenarioUnitTypeMap.get(actualUnitType)).clone();
     }
     
     /**
