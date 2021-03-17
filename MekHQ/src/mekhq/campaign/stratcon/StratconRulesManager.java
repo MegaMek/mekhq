@@ -849,12 +849,17 @@ public class StratconRulesManager {
         for (Unit u : campaign.getUnits()) {
             // "defensive" units are infantry, battle armor and (Weisman help you) gun emplacements
         	// and also said unit should be intact/alive/etc
-            if (((u.getEntity().getUnitType() == UnitType.INFANTRY) ||
-                    (u.getEntity().getUnitType() == UnitType.BATTLE_ARMOR) ||
-                    (u.getEntity().getUnitType() == UnitType.GUN_EMPLACEMENT)) &&
-                    !u.isDeployed() &&
+        	boolean isEligibleInfantry = 
+        			((u.getEntity().getUnitType() == UnitType.INFANTRY) ||
+                    (u.getEntity().getUnitType() == UnitType.BATTLE_ARMOR)) &&
+                    !u.isUnmanned();
+        	
+        	boolean isEligibleGunEmplacement = u.getEntity().getUnitType() == UnitType.GUN_EMPLACEMENT;
+        	
+        	if ((isEligibleInfantry || isEligibleGunEmplacement) && 
+            		!u.isDeployed() &&
                     !u.isMothballed() &&
-                    !u.isUnmanned()) {
+                    u.isFunctional()) {
 
                 // this is a little inefficient, but probably there aren't too many active AtB contracts at a time
                 for (Contract contract : campaign.getActiveContracts()) {
