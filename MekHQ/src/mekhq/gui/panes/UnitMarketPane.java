@@ -390,7 +390,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
             final Money price = offer.getPrice();
             if (getCampaign().getFunds().isLessThan(price)) {
-                getCampaign().addReport(String.format("<font color='red'><b>You cannot afford %s. Transaction cancelled.</b></font>", entity.getShortName()));
+                getCampaign().addReport(String.format(resources.getString("UnitMarketPane.CannotAfford.report"),
+                        entity.getShortName()));
                 offersIterator.remove();
                 continue;
             }
@@ -398,18 +399,19 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             final int roll = Compute.d6();
             if (offer.getMarketType().isBlackMarket() && (roll < 3)) {
                 getCampaign().getFinances().debit(price.dividedBy(roll), Transaction.C_UNIT,
-                        "Purchased " + entity.getShortName() + " (lost on black market)",
-                        getCampaign().getLocalDate());
-                getCampaign().addReport("<font color='red'>Swindled! money was paid, but no unit delivered.</font>");
+                        String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
+                                entity.getShortName()), getCampaign().getLocalDate());
+                getCampaign().addReport(resources.getString("UnitMarketPane.BlackMarketSwindled.report"));
                 offersIterator.remove();
                 continue;
             }
 
             getCampaign().getFinances().debit(price, Transaction.C_UNIT,
-                    "Purchased " + entity.getShortName(), getCampaign().getLocalDate());
+                    String.format(resources.getString("UnitMarketPane.PurchasedUnit.finances"),
+                            entity.getShortName()), getCampaign().getLocalDate());
         }
 
-        finalizeEntityAcquisition(offers, getCampaign().getCampaignOptions().getInstantUnitMarketDelivery());
+        finalizeEntityAcquisition(offers, !getCampaign().getCampaignOptions().getInstantUnitMarketDelivery());
     }
 
     public void addSelectedOffers() {
@@ -428,7 +430,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                     ? getCampaign().calculatePartTransitTime(Compute.d6(2) - 2) : 0;
             getCampaign().addNewUnit(offer.getEntity(), false, transitDays);
             if (determineTransitDays) {
-                getCampaign().addReport(String.format("<font color='green'>Unit will be delivered in %s days.</font>", transitDays));
+                getCampaign().addReport(String.format(resources.getString("UnitMarketPane.UnitDeliveryLength.report"),
+                        transitDays));
             }
             getCampaign().getUnitMarket().getOffers().remove(offer);
         }
