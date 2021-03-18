@@ -162,7 +162,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
      * @return the generated weight
      */
     @Override
-    public int generateWeight(final Campaign campaign, final int unitType, final Faction faction) {
+    protected int generateWeight(final Campaign campaign, final int unitType, final Faction faction) {
         return getRandomWeight(unitType, faction, campaign.getCampaignOptions().useUnitMarketRegionalMechVariations());
     }
 
@@ -185,7 +185,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
      * @param regionVariations whether to generate 'Mech weights based on hardcoded regional variations
      * @return the generated weight
      */
-    public static int getRandomWeight(final int unitType, final Faction faction, final boolean regionVariations) {
+    private static int getRandomWeight(final int unitType, final Faction faction, final boolean regionVariations) {
         if (unitType == UnitType.AERO) {
             return getRandomAerospaceWeight();
         } else if ((unitType == UnitType.MEK) && regionVariations) {
@@ -198,7 +198,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     /**
      * @return the generated weight for a BattleMech
      */
-    public static int getRandomMechWeight() {
+    private static int getRandomMechWeight() {
         final int roll = Compute.randomInt(10);
         if (roll < 3) {
             return EntityWeightClass.WEIGHT_LIGHT;
@@ -215,7 +215,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
      * @param faction the faction to determine the regional BattleMech weight for
      * @return the generated weight for a BattleMech
      */
-    public static int getRegionalMechWeight(final Faction faction) {
+    private static int getRegionalMechWeight(final Faction faction) {
         final int roll = Compute.randomInt(100);
         switch (faction.getShortName()) {
             case "DC":
@@ -264,7 +264,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     /**
      * @return the generated random weight for an Aerospace Fighter
      */
-    public static int getRandomAerospaceWeight() {
+    private static int getRandomAerospaceWeight() {
         final int roll = Compute.randomInt(8);
         if (roll < 3) {
             return EntityWeightClass.WEIGHT_LIGHT;

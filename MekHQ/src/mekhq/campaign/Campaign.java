@@ -4188,15 +4188,11 @@ public class Campaign implements Serializable, ITechManager {
         getPersonnelMarket().writeToXml(pw1, indent);
 
         // TODO : AbstractContractMarket : Uncomment
-        //if (!getContractMarket().getMethod().isNone()) {
-        //    // CAW: implicit DEPENDS-ON to the <missions> and <campaignOptions> node, do not move this above it
-        //    getContractMarket().writeToXML(pw1, indent);
-        //}
+        // CAW: implicit DEPENDS-ON to the <missions> and <campaignOptions> node, do not move this above it
+        //getContractMarket().writeToXML(pw1, indent);
 
         // Windchild: implicit DEPENDS-ON to the <campaignOptions> node, do not move this above it
-        if (!getUnitMarket().getMethod().isNone()) {
-            getUnitMarket().writeToXML(pw1, indent);
-        }
+        getUnitMarket().writeToXML(pw1, indent);
 
         // Against the Bot
         if (getCampaignOptions().getUseAtB()) {

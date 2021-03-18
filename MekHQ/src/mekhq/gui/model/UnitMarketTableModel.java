@@ -51,7 +51,8 @@ public class UnitMarketTableModel extends DataTableModel {
     public static final int COL_UNIT = 3;
     public static final int COL_PRICE = 4;
     public static final int COL_PERCENT = 5;
-    public static final int COL_NUM = 6;
+    public static final int COL_DELIVERY = 6;
+    public static final int COL_NUM = 7;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
     //endregion Variable Declarations
@@ -66,13 +67,14 @@ public class UnitMarketTableModel extends DataTableModel {
     public int getColumnWidth(final int column) {
         switch (column) {
             case COL_MARKET:
-            case COL_UNIT:
-                return 100;
+            case COL_PRICE:
+                return 90;
             case COL_UNITTYPE:
+                return 15;
+            case COL_UNIT:
+                return 175;
             case COL_WEIGHTCLASS:
                 return 50;
-            case COL_PRICE:
-                return 70;
             default:
                 return 20;
         }
@@ -82,6 +84,7 @@ public class UnitMarketTableModel extends DataTableModel {
         switch (column) {
             case COL_PRICE:
             case COL_PERCENT:
+            case COL_DELIVERY:
                 return SwingConstants.RIGHT;
             case COL_MARKET:
             case COL_UNITTYPE:
@@ -118,6 +121,8 @@ public class UnitMarketTableModel extends DataTableModel {
                 return offer.getPrice().toAmountAndSymbolString();
             case COL_PERCENT:
                 return offer.getPercent() + "%";
+            case COL_DELIVERY:
+                return offer.getTransitDuration();
             default:
                 return "?";
         }

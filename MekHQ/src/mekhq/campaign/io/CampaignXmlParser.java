@@ -307,7 +307,7 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("unitMarket")) {
                     // Windchild: implicit DEPENDS ON to the <campaignOptions> nodes
                     retVal.setUnitMarket(retVal.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
-                    retVal.getUnitMarket().fillFromXML(wn);
+                    retVal.getUnitMarket().fillFromXML(wn, retVal, version);
                     foundUnitMarket = true;
                 } else if (xn.equalsIgnoreCase("lances")) {
                     processLanceNodes(retVal, wn);
@@ -324,7 +324,6 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
                 }
-
             } else {
                 // If it's a text node or attribute or whatever at this level,
                 // it's probably white-space.

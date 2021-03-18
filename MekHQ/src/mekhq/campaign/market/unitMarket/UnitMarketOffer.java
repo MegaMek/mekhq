@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.market.unitMarket;
 
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -25,6 +26,8 @@ import megamek.common.MechSummaryCache;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Version;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import org.w3c.dom.Node;
@@ -37,6 +40,7 @@ public class UnitMarketOffer {
     private int unitType;
     private MechSummary unit;
     private int percent;
+    private int transitDuration;
     //endregion Variable Declarations
 
     //region Constructors
@@ -45,11 +49,12 @@ public class UnitMarketOffer {
     }
 
     public UnitMarketOffer(final UnitMarketType marketType, final int unitType,
-                           final MechSummary unit, final int percent) {
+                           final MechSummary unit, final int percent, final int transitDuration) {
         setMarketType(marketType);
         setUnitType(unitType);
         setUnit(unit);
         setPercent(percent);
+        setTransitDuration(transitDuration);
     }
     //endregion Constructors
 
@@ -85,6 +90,14 @@ public class UnitMarketOffer {
     public void setPercent(final int percent) {
         this.percent = percent;
     }
+
+    public int getTransitDuration() {
+        return transitDuration;
+    }
+
+    public void setTransitDuration(final int transitDuration) {
+        this.transitDuration = transitDuration;
+    }
     //endregion Getters/Setters
 
     /**
@@ -114,10 +127,12 @@ public class UnitMarketOffer {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitType", getUnitType());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unit", getUnit().getName());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percent", getPercent());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "transitDuration", getTransitDuration());
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "offer");
     }
 
-    public static UnitMarketOffer generateInstanceFromXML(final Node wn) {
+    public static UnitMarketOffer generateInstanceFromXML(final Node wn, final Campaign campaign,
+                                                          final Version version) {
         UnitMarketOffer retVal = new UnitMarketOffer();
         NodeList nl = wn.getChildNodes();
 
@@ -137,10 +152,17 @@ public class UnitMarketOffer {
                 } else if (wn3.getNodeName().equalsIgnoreCase("pct") // Legacy, 0.49.X removal
                         || wn3.getNodeName().equalsIgnoreCase("percent")) {
                     retVal.setPercent(Integer.parseInt(wn3.getTextContent().trim()));
+                } else if (wn3.getNodeName().equalsIgnoreCase("transitDuration")) {
+                    retVal.setTransitDuration(Integer.parseInt(wn3.getTextContent().trim()));
                 }
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(e);
+        }
+
+        if (version.isLowerThan("0.49.0")) {
+            retVal.setTransitDuration(campaign.getCampaignOptions().getInstantUnitMarketDelivery()
+                    ? 0 : campaign.calculatePartTransitTime(Compute.d6(2) - 2));
         }
 
         return retVal;

@@ -19,10 +19,16 @@
 package mekhq.campaign.market.unitMarket;
 
 import megamek.common.annotations.Nullable;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.universe.Faction;
+import org.w3c.dom.Node;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is a completely empty unit market, which is used when the market is disabled.
@@ -35,14 +41,22 @@ public class EmptyUnitMarket extends AbstractUnitMarket {
     //region Constructors
     public EmptyUnitMarket() {
         super(UnitMarketMethod.NONE);
+        super.setOffers(new ArrayList<>());
     }
     //endregion Constructors
+
+    //region Getters/Setters
+    @Override
+    public void setOffers(final List<UnitMarketOffer> offers) {
+
+    }
+    //endregion Getters/Setters
 
     //region Process New Day
     //region Generate Offers
     @Override
     public void processNewDay(final Campaign campaign) {
-        removeUnitOffers(campaign);
+
     }
 
     @Override
@@ -73,8 +87,20 @@ public class EmptyUnitMarket extends AbstractUnitMarket {
     //region Offer Removal
     @Override
     public void removeUnitOffers(final Campaign campaign) {
-        getOffers().clear();
+
     }
     //endregion Offer Removal
     //endregion Process New Day
+
+    //region File I/O
+    @Override
+    public void writeToXML(final PrintWriter pw, int indent) {
+
+    }
+
+    @Override
+    public void fillFromXML(Node wn, Campaign campaign, Version version) {
+
+    }
+    //endregion File I/O
 }

@@ -18,11 +18,13 @@
  */
 package mekhq.campaign.market.unitMarket;
 
+import megamek.common.Compute;
 import megamek.common.MechSummary;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
@@ -118,30 +120,33 @@ public abstract class AbstractUnitMarket implements Serializable {
     }
 
     /**
-     * @param campaign the campaign to use to generate the unit
+     * @param campaign the campaign to use to generate the unit offer
      * @param market the market type the unit is being offered in
      * @param unitType the unit type to generate the unit with
      * @param parameters the parameters with which to generate the unit
      * @param percent the percentage of the original unit cost the unit will be offered at
      * @return the name of the unit that has been added to the market, or null if none were added
      */
-    public @Nullable String addSingleUnit(final Campaign campaign, final UnitMarketType market,
-                                          final int unitType, final UnitGeneratorParameters parameters,
-                                          final int percent) {
+    protected @Nullable String addSingleUnit(final Campaign campaign, final UnitMarketType market,
+                                             final int unitType, final UnitGeneratorParameters parameters,
+                                             final int percent) {
         final MechSummary mechSummary = campaign.getUnitGenerator().generate(parameters);
-        return (mechSummary == null) ? null : addSingleUnit(market, unitType, mechSummary, percent);
+        return (mechSummary == null) ? null : addSingleUnit(campaign, market, unitType, mechSummary, percent);
     }
 
     /**
+     * @param campaign the campaign to use to generate the offer
      * @param market the market type the unit is being offered in
      * @param unitType the unit type of the generated unit
      * @param mechSummary the generated mech summary
      * @param percent the percentage of the original unit cost the unit will be offered at
      * @return the name of the unit that has been added to the market
      */
-    public String addSingleUnit(final UnitMarketType market, final int unitType,
-                                final MechSummary mechSummary, final int percent) {
-        getOffers().add(new UnitMarketOffer(market, unitType, mechSummary, percent));
+    protected String addSingleUnit(final Campaign campaign, final UnitMarketType market,
+                                   final int unitType, final MechSummary mechSummary,
+                                   final int percent) {
+        getOffers().add(new UnitMarketOffer(market, unitType, mechSummary, percent,
+                generateTransitDuration(campaign)));
         return mechSummary.getName();
     }
 
@@ -174,8 +179,17 @@ public abstract class AbstractUnitMarket implements Serializable {
      * @param faction the faction to generate the weight for
      * @return the generated weight
      */
-    public abstract int generateWeight(final Campaign campaign, final int unitType,
-                                       final Faction faction);
+    protected abstract int generateWeight(final Campaign campaign, final int unitType,
+                                          final Faction faction);
+
+    /**
+     * @param campaign the campaign to use to generate the transit duration
+     * @return the generated transit duration
+     */
+    protected int generateTransitDuration(final Campaign campaign) {
+        return campaign.getCampaignOptions().getInstantUnitMarketDelivery() ? 0
+                : campaign.calculatePartTransitTime(Compute.d6(2) - 2);
+    }
 
     /**
      * @param campaign the campaign to write the refresh report to
@@ -193,7 +207,7 @@ public abstract class AbstractUnitMarket implements Serializable {
      * removes unit offers
      * @param campaign the campaign to use in determining the offers to remove
      */
-    public abstract void removeUnitOffers(final Campaign campaign);
+    protected abstract void removeUnitOffers(final Campaign campaign);
     //endregion Offer Removal
     //endregion Process New Day
 
@@ -226,8 +240,10 @@ public abstract class AbstractUnitMarket implements Serializable {
      * This method fills the market based on the supplied XML node. The market is initialized as
      * empty before this is called.
      * @param wn the node to fill the market from
+     * @param campaign the campaign the market is being parsed as part of
+     * @param version the version of the market being parsed
      */
-    public void fillFromXML(final Node wn) {
+    public void fillFromXML(final Node wn, final Campaign campaign, final Version version) {
         try {
             final NodeList nl = wn.getChildNodes();
             for (int x = 0; x < nl.getLength(); x++) {
@@ -235,7 +251,7 @@ public abstract class AbstractUnitMarket implements Serializable {
                 if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
                 }
-                parseXMLNode(wn2);
+                parseXMLNode(wn2, campaign, version);
             }
         } catch (Exception e) {
             MekHQ.getLogger().error("Failed to parse Unit Market, keeping currently parsed market", e);
@@ -246,10 +262,12 @@ public abstract class AbstractUnitMarket implements Serializable {
      * This is meant to be overridden so that a market can have additional elements added to it,
      * albeit with this called by super.parseXMLNode(wn) first.
      * @param wn the node to parse from XML
+     * @param campaign the campaign the market is being parsed as part of
+     * @param version the version of the market being parsed
      */
-    protected void parseXMLNode(final Node wn) {
+    protected void parseXMLNode(final Node wn, final Campaign campaign, final Version version) {
         if (wn.getNodeName().equalsIgnoreCase("offer")) {
-            getOffers().add(UnitMarketOffer.generateInstanceFromXML(wn));
+            getOffers().add(UnitMarketOffer.generateInstanceFromXML(wn, campaign, version));
         }
     }
     //endregion File I/O
