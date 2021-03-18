@@ -80,30 +80,29 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                 null, IUnitRating.DRAGOON_F, 7);
 
         if (contract != null) {
+            final Faction employer = contract.getEmployerFaction();
             addOffers(campaign, Compute.d6() - 3, UnitMarketType.EMPLOYER, UnitType.MEK,
-                    contract.getEmployerFaction(), IUnitRating.DRAGOON_D, 7);
+                    employer, IUnitRating.DRAGOON_D, 7);
             addOffers(campaign, Compute.d6() - 2, UnitMarketType.EMPLOYER, UnitType.TANK,
-                    contract.getEmployerFaction(), IUnitRating.DRAGOON_D, 7);
+                    employer, IUnitRating.DRAGOON_D, 7);
             addOffers(campaign, Compute.d6() - 3, UnitMarketType.EMPLOYER, UnitType.AERO,
-                    contract.getEmployerFaction(), IUnitRating.DRAGOON_D, 7);
+                    employer, IUnitRating.DRAGOON_D, 7);
         }
 
         if (!campaign.getFaction().isClan()) {
+            final Faction mercenaryFaction = Factions.getInstance().getFaction("MERC");
             addOffers(campaign, Compute.d6(3) - 9, UnitMarketType.MERCENARY,
-                    UnitType.MEK, Factions.getInstance().getFaction("MERC"),
-                    IUnitRating.DRAGOON_C, 5);
+                    UnitType.MEK, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
             addOffers(campaign, Compute.d6(3) - 6, UnitMarketType.MERCENARY,
-                    UnitType.TANK, Factions.getInstance().getFaction("MERC"),
-                    IUnitRating.DRAGOON_C, 5);
+                    UnitType.TANK, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
             addOffers(campaign, Compute.d6(3) - 9, UnitMarketType.MERCENARY,
-                    UnitType.AERO, Factions.getInstance().getFaction("MERC"),
-                    IUnitRating.DRAGOON_C, 5);
+                    UnitType.AERO, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
         }
 
         if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
             final Faction faction = Utilities.getRandomItem(campaign.getCurrentSystem()
                     .getFactionSet(campaign.getLocalDate()));
-            if ((faction != null) && (campaign.getFaction().isClan() || !faction.isClan())) {
+            if (campaign.getFaction().isClan() || (((faction != null)) && !faction.isClan())) {
                 addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.MEK,
                         faction, IUnitRating.DRAGOON_A, 6);
                 addOffers(campaign, Compute.d6() - 2, UnitMarketType.FACTORY, UnitType.TANK,
