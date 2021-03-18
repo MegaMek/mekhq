@@ -1074,8 +1074,16 @@ public class StratconRulesManager {
         MekHQ.registerHandler(this);
     }
 
+    /**
+     * Event handler for the new day event.
+     */
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
+    	// don't do any of this if StratCon isn't turned on
+    	if (!ev.getCampaign().getCampaignOptions().getUseStratCon()) {
+    		return;
+    	}
+    	
         boolean isMonday = ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY;
 
 

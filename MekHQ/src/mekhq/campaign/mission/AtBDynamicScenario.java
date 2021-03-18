@@ -259,6 +259,17 @@ public class AtBDynamicScenario extends AtBScenario {
         effectiveOpforQuality = qualityLevel;
     }
 
+    /**
+     * This is used to indicate that player forces have been assigned to this scenario
+     * and that AtBDynamicScenarioFactory.finalizeScenario() has been called on this scenario to
+     * generate opposing forces and their bots, apply any present scenario modifiers, 
+     * set up deployment turns, calculate which units belong to which objectives, and many other things.
+     * 
+     * Further "post-force-generation" modifiers can be applied to this scenario, but calling 
+     * finalizeScenario() on it again will lead to "unsupported" behavior.
+     * 
+     * Can be called as a short hand way of telling "is this scenario ready to play".
+     */
     public boolean isFinalized() {
         return finalized;
     }

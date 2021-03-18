@@ -19,6 +19,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -281,6 +282,10 @@ public class StratconTab extends CampaignGuiTab {
                 TrackDropdownItem otherTDI = (TrackDropdownItem) other;
                 return otherTDI.contract.equals(this.contract) && otherTDI.track.equals(this.track);
             }
+        }
+        
+        public int hashCode() {
+            return Objects.hash(this.contract, this.track);
         }
     }
 }

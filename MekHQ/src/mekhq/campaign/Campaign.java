@@ -262,7 +262,6 @@ public class Campaign implements Serializable, ITechManager {
     private LocalDate shipSearchStart; //AtB
     private int shipSearchType;
     private String shipSearchResult; //AtB
-    private StratconRulesManager stratconRulesManager; // AtB
     private LocalDate shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
@@ -491,7 +490,7 @@ public class Campaign implements Serializable, ITechManager {
     public int getFatigueLevel() {
         return fatigueLevel;
     }
-    
+
     /**
      * Initializes the unit generator based on the method chosen in campaignOptions.
      * Called when the unit generator is first used or when the method has been
@@ -541,19 +540,6 @@ public class Campaign implements Serializable, ITechManager {
             atbConfig = AtBConfiguration.loadFromXml();
         }
         return atbConfig;
-    }
-
-    public boolean stratconRulesManagerInitialized() {
-        return stratconRulesManager != null;
-    }
-    
-    public void initStratcon() {
-        stratconRulesManager = new StratconRulesManager();
-        stratconRulesManager.startup();
-    }
-    
-    public void shutdownStratcon() {
-        stratconRulesManager.shutdown();
     }
     
     //region Ship Search
@@ -6763,7 +6749,6 @@ public class Campaign implements Serializable, ITechManager {
         RandomFactionGenerator.getInstance().dispose();
         RandomUnitGenerator.getInstance().dispose();
         atbEventProcessor.shutdown();
-        stratconRulesManager.shutdown();
     }
 
     public boolean checkOverDueLoans() {

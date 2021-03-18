@@ -18,6 +18,7 @@ public class ScenarioMapParameters implements Cloneable {
         LowAtmosphere
     }
     
+    @Override
     public ScenarioMapParameters clone() {
         ScenarioMapParameters clone = new ScenarioMapParameters();
         clone.allowedTerrainTypes = new ArrayList<>(allowedTerrainTypes);

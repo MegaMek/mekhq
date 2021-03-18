@@ -15,8 +15,6 @@
 package mekhq.gui.stratcon;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 import javax.swing.DefaultListModel;
 
@@ -32,7 +30,6 @@ public class ScenarioWizardLanceModel extends DefaultListModel<Force> {
      * Constructor - sometimes, you have a list of force IDs.
      */
     public ScenarioWizardLanceModel(Campaign campaign, Collection<Integer> forceIDs) {
-        super();
         for (int forceID : forceIDs) {
             super.addElement(campaign.getForce(forceID));
         }
