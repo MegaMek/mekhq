@@ -880,6 +880,20 @@ public class MassRepairSalvageDialog extends JDialog {
     }
 
     private void btnStartMassRepairActionPerformed(ActionEvent evt) {
+        // Not enough Astechs to run the tech teams
+        if (campaignGUI.getCampaign().getAstechNeed() > 0) {
+            int savePrompt = JOptionPane.showConfirmDialog(null,
+                    resources.getString("NotEnoughAstechs.error"),
+                    resources.getString("NotEnoughAstechs.errorTitle"),
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.ERROR_MESSAGE);
+            if (savePrompt != JOptionPane.YES_OPTION) {
+                return;
+            } else {
+                campaignGUI.getCampaign().fillAstechPool();
+            }
+        }
+
         if (getMode().isUnits()) {
             int[] selectedRows = unitTable.getSelectedRows();
 

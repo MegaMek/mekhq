@@ -791,12 +791,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthAstechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
         miFullStrengthAstechs.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthAstechs.addActionListener(evt -> {
-            int need = (getCampaign().getTechs().size() * 6) - getCampaign().getNumberAstechs();
-            if (need > 0) {
-                getCampaign().increaseAstechPool(need);
-            }
-        });
+        miFullStrengthAstechs.addActionListener(evt -> getCampaign().fillAstechPool());
         menuAstechPool.add(miFullStrengthAstechs);
 
         JMenuItem miFireAllAstechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
@@ -840,12 +835,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
         miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthMedics.addActionListener(evt -> {
-            int need = (getCampaign().getDoctors().size() * 4) - getCampaign().getNumberMedics();
-            if (need > 0) {
-                getCampaign().increaseMedicPool(need);
-            }
-        });
+        miFullStrengthMedics.addActionListener(evt -> getCampaign().fillMedicPool());
         menuMedicPool.add(miFullStrengthMedics);
 
         JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
