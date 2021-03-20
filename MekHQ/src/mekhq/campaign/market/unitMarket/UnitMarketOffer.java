@@ -34,6 +34,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+
 public class UnitMarketOffer {
     //region Variable Declarations
     private UnitMarketType marketType;
