@@ -90,7 +90,7 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
             int weightClass;
             do {
                 weightClass = AtBMonthlyUnitMarket.getRandomWeight(campaign, UnitType.MEK, contract.getEmployerFaction());
-            } while (weightClass == EntityWeightClass.WEIGHT_ASSAULT);
+            } while (weightClass >= EntityWeightClass.WEIGHT_ASSAULT);
             getAlliesPlayer().add(getEntity(contract.getEmployerCode(), contract.getAllySkill(),
                     contract.getAllyQuality(), UnitType.MEK, weightClass, campaign));
         }

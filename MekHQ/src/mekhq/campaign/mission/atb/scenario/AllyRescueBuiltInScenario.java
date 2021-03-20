@@ -112,7 +112,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
             int weightClass;
             do {
                 weightClass = AtBMonthlyUnitMarket.getRandomWeight(campaign, UnitType.MEK, contract.getEmployerFaction());
-            } while (weightClass == EntityWeightClass.WEIGHT_ASSAULT);
+            } while (weightClass >= EntityWeightClass.WEIGHT_ASSAULT);
             otherForce.add(getEntity(contract.getEmployerCode(), contract.getAllySkill(),
                     contract.getAllyQuality(), UnitType.MEK, weightClass, campaign));
         }
@@ -123,7 +123,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
             int weightClass;
             do {
                 weightClass = AtBMonthlyUnitMarket.getRandomWeight(campaign, UnitType.MEK, contract.getEnemy());
-            } while (weightClass == EntityWeightClass.WEIGHT_LIGHT);
+            } while (weightClass <= EntityWeightClass.WEIGHT_LIGHT);
             enemyEntities.add(getEntity(contract.getEnemyCode(), contract.getEnemySkill(),
                     contract.getEnemyQuality(), UnitType.MEK, weightClass, campaign));
         }
