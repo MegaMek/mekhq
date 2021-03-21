@@ -32,9 +32,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
+import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -53,12 +56,13 @@ import mekhq.campaign.parts.Part;
 public class Faction {
     private String shortName;
     private String fullName;
-    private NavigableMap<Integer,String> nameChanges = new TreeMap<>();
+    private NavigableMap<Integer, String> nameChanges = new TreeMap<>();
     private String[] altNames;
+    private String[] alternativeFactionCodes;
     private Color color;
     private String nameGenerator;
     private String startingPlanet;
-    private NavigableMap<LocalDate,String> planetChanges = new TreeMap<>();
+    private NavigableMap<LocalDate, String> planetChanges = new TreeMap<>();
     private int[] eraMods;
     private Integer id;
     private Set<Tag> tags;
@@ -96,6 +100,19 @@ public class Faction {
         }
     }
 
+    public @Nullable String[] getAlternativeFactionCodes() {
+        return alternativeFactionCodes;
+    }
+
+    public Optional<String> getRandomAlternativeFactionCode() {
+        return (getAlternativeFactionCodes() == null) ? Optional.empty()
+            : Optional.of(getAlternativeFactionCodes()[Compute.randomInt(getAlternativeFactionCodes().length)]);
+    }
+
+    public void setAlternativeFactionCodes(final String... alternativeFactionCodes) {
+        this.alternativeFactionCodes = alternativeFactionCodes;
+    }
+
     public Color getColor() {
         return color;
     }
@@ -110,6 +127,10 @@ public class Faction {
 
     public boolean isPeriphery() {
         return is(Tag.PERIPHERY);
+    }
+
+    public boolean isDeepPeriphery() {
+        return is(Tag.DEEP_PERIPHERY);
     }
 
     public String getNameGenerator() {
@@ -253,6 +274,8 @@ public class Faction {
                 retVal.shortName = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("fullname")) {
                 retVal.fullName = wn2.getTextContent();
+            } else if (wn2.getNodeName().equalsIgnoreCase("alternativeFactionCodes")) {
+                retVal.setAlternativeFactionCodes(wn2.getTextContent().trim().split(","));
             } else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
                 retVal.nameGenerator = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {

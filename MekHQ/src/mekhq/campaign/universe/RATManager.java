@@ -63,13 +63,10 @@ import mekhq.campaign.event.OptionsChangedEvent;
  *
  */
 public class RATManager extends AbstractUnitGenerator implements IUnitGenerator {
-
-    private static final String ALT_FACTION = "data/universe/altfactions.xml";
     private static final String RATINFO_DIR = "data/universe/ratdata";
     // allRATs.get(collectionName).get(era); eras are sorted from latest to earliest
     private Map<String,LinkedHashMap<Integer,List<RAT>>> allRATs;
     private ArrayList<String> selectedCollections;
-    private Map<String,List<String>> altFactions;
 
     private static Map<String,List<Integer>> allCollections = null;
     private static Map<String,String> fileNames = new HashMap<>();
@@ -79,7 +76,6 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
     public RATManager() {
         allRATs = new HashMap<>();
         selectedCollections = new ArrayList<>();
-        loadAltFactions();
         MekHQ.registerHandler(this);
     }
 
@@ -209,42 +205,6 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
     }
 
     /**
-     * Loads a list of alternate factions to check when the desired one cannot be found in a given
-     * RAT before checking generic ones.
-     */
-    private void loadAltFactions() {
-        altFactions = new HashMap<>();
-
-        File f = new File(ALT_FACTION);
-
-        Document xmlDoc;
-        DocumentBuilder db;
-
-        try (FileInputStream fis = new FileInputStream(f)) {
-            db = MekHqXmlUtil.newSafeDocumentBuilder();
-            xmlDoc = db.parse(fis);
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(this, "While loading altFactions: ", ex);
-            return;
-        }
-
-        Element elem = xmlDoc.getDocumentElement();
-        NodeList nl = elem.getChildNodes();
-        elem.normalize();
-
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node node = nl.item(i);
-            if (node.getNodeName().equals("faction") && node.getAttributes().getNamedItem("key") != null) {
-                String key = node.getAttributes().getNamedItem("key").getTextContent();
-                altFactions.putIfAbsent(key, new ArrayList<>());
-                for (String alt : node.getTextContent().split(",")) {
-                    altFactions.get(key).add(alt);
-                }
-            }
-        }
-    }
-
-    /**
      *
      * @return A map of all collections available with a list of eras included
      */
@@ -363,27 +323,27 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         return null;
     }
 
-    private List<String> factionTree(String faction) {
-        List<String> retVal = new ArrayList<>();
-        retVal.add(faction);
-        if (faction.contains(".")) {
-            faction = faction.split("\\.")[0];
-            retVal.add(faction);
+    private List<String> factionTree(String factionCode) {
+        List<String> factionTree = new ArrayList<>();
+        factionTree.add(factionCode);
+        if (factionCode.contains(".")) {
+            factionCode = factionCode.split("\\.")[0];
+            factionTree.add(factionCode);
         }
-        if (altFactions.containsKey(faction)) {
-            List<String> alts = new ArrayList<>(altFactions.get(faction));
-            while (alts.size() > 0) {
-                int index = Compute.randomInt(alts.size());
-                retVal.add(alts.get(index));
-                alts.remove(index);
+
+        final Faction faction = Factions.getInstance().getFaction(factionCode);
+        if (faction.getAlternativeFactionCodes() != null) {
+            final List<String> alternativeFactionCodes = Arrays.asList(faction.getAlternativeFactionCodes());
+            while (!alternativeFactionCodes.isEmpty()) {
+                factionTree.add(alternativeFactionCodes.remove(Compute.randomInt(alternativeFactionCodes.size())));
             }
         }
-        Faction f = Factions.getInstance().getFaction(faction);
-        if (f.isPeriphery()) {
-            retVal.add("Periphery");
+
+        if (faction.isPeriphery()) {
+            factionTree.add("Periphery");
         }
-        retVal.add(f.isClan()? "Clan" : "General");
-        return retVal;
+        factionTree.add(faction.isClan()? "Clan" : "General");
+        return factionTree;
     }
 
     /* (non-Javadoc)

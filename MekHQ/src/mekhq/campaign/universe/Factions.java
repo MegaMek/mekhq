@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.universe;
 
 import java.io.FileInputStream;
@@ -55,11 +54,11 @@ public class Factions {
 
     private RATGenerator ratGenerator;
 
-    public Factions() {
+    private Factions() {
         this(RATGenerator.getInstance());
     }
 
-    public Factions(RATGenerator ratGenerator) {
+    private Factions(final RATGenerator ratGenerator) {
         this.ratGenerator = Objects.requireNonNull(ratGenerator);
     }
 
@@ -128,21 +127,21 @@ public class Factions {
     /**
      * Helper function that gets the faction record for the specified faction, or a
      * fallback general faction record. Useful for RAT generator activity.
-     * 
+     *
      * @param faction The faction whose MegaMek faction record to retrieve.
      * @return Found faction record or null.
      */
     public FactionRecord getFactionRecordOrFallback(String faction) {
-        FactionRecord fRec = ratGenerator.getFaction(faction);
+        FactionRecord fRec = getRATGenerator().getFaction(faction);
         if (fRec == null) {
             Faction f = getFaction(faction);
             if (f != null) {
                 if (f.isPeriphery()) {
-                    fRec = ratGenerator.getFaction("Periphery");
+                    fRec = getRATGenerator().getFaction("Periphery");
                 } else if (f.isClan()) {
-                    fRec = ratGenerator.getFaction("CLAN");
+                    fRec = getRATGenerator().getFaction("CLAN");
                 } else {
-                    fRec = ratGenerator.getFaction("IS");
+                    fRec = getRATGenerator().getFaction("IS");
                 }
             }
 
@@ -161,13 +160,13 @@ public class Factions {
 
     /**
      * Loads the default Factions data.
-     * 
+     *
      * @throws DOMException
      * @throws ParserConfigurationException
      * @throws IOException
      * @throws SAXException
      */
-    public static Factions loadDefault() 
+    public static Factions loadDefault()
             throws DOMException, SAXException, IOException, ParserConfigurationException {
         MekHQ.getLogger().info("Starting load of faction data from XML...");
 
@@ -180,9 +179,9 @@ public class Factions {
 
     /**
      * Loads Factions data from a file.
-     * 
+     *
      * @param factionsPath The path to the XML file containing Factions data.
-     * 
+     *
      * @throws DOMException
      * @throws ParserConfigurationException
      * @throws IOException

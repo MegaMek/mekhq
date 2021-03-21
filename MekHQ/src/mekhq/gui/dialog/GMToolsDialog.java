@@ -680,16 +680,15 @@ public class GMToolsDialog extends JDialog {
      * faction.
      */
     private int findInitialSelectedFaction(List<FactionChoice> factionChoices) {
-        String factionId = (getPerson() != null)
-                ? getPerson().getOriginFaction().getShortName()
-                : getGUI().getCampaign().getFactionCode();
-        if ((factionId == null) || factionId.isEmpty()) {
+        final Faction faction = (getPerson() != null)
+                ? getPerson().getOriginFaction() : getGUI().getCampaign().getFaction();
+        if (faction == null) {
             return 0;
         }
 
         int index = 0;
         for (FactionChoice factionChoice : factionChoices) {
-            if (factionChoice.id.equalsIgnoreCase(factionId)) {
+            if (factionChoice.getFaction().equals(faction)) {
                 return index;
             }
 
@@ -820,7 +819,7 @@ public class GMToolsDialog extends JDialog {
                     (!campaign.getCampaignOptions().limitByYear() || (targetYear > ms.getYear()))
                             && (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
                             && (ms.isClan() || campaign.getCampaignOptions().allowISPurchases());
-            MechSummary ms = ug.generate(((FactionChoice) Objects.requireNonNull(factionPicker.getSelectedItem())).id,
+            MechSummary ms = ug.generate(((FactionChoice) Objects.requireNonNull(factionPicker.getSelectedItem())).getFaction().getShortName(),
                     unitType, unitWeight, targetYear, unitQuality, test);
             if (ms != null) {
                 unitPicked.setText(ms.getName());
@@ -866,7 +865,8 @@ public class GMToolsDialog extends JDialog {
         if (ethnicCode == 0) {
             name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
                     (Gender) genderPicker.getSelectedItem(), clannerPicker.isSelected(),
-                    ((FactionChoice) Objects.requireNonNull(nameGeneratorFactionPicker.getSelectedItem())).id);
+                    ((FactionChoice) Objects.requireNonNull(nameGeneratorFactionPicker.getSelectedItem()))
+                            .getFaction().getShortName());
         } else {
             name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplitWithEthnicCode(
                     (Gender) genderPicker.getSelectedItem(), clannerPicker.isSelected(), ethnicCode);
@@ -987,15 +987,19 @@ public class GMToolsDialog extends JDialog {
     //endregion ActionEvent Handlers
 
     private static class FactionChoice {
+        private final Faction faction;
         public final String name;
-        public final String id;
 
         private final String displayName;
 
         public FactionChoice(Faction faction, int year) {
-            id = faction.getShortName();
+            this.faction = faction;
             name = faction.getFullName(year);
-            displayName = String.format("%s [%s]", name, id);
+            displayName = String.format("%s [%s]", name, getFaction().getShortName());
+        }
+
+        public Faction getFaction() {
+            return faction;
         }
 
         @Override
