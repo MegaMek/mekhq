@@ -21,9 +21,7 @@ package mekhq.campaign.universe;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +48,7 @@ public class Factions {
 
     private Map<String, Faction> factions = new HashMap<>();
     private Map<Integer, Faction> factionIdMap = new HashMap<>();
-    private List<String> choosableFactionCodes = Collections.singletonList("MERC");
+    private final List<Faction> choosableFactions = new ArrayList<>();
 
     private RATGenerator ratGenerator;
 
@@ -82,14 +80,8 @@ public class Factions {
         this.ratGenerator = Objects.requireNonNull(ratGenerator);
     }
 
-    public List<String> getChoosableFactionCodes() {
-        return choosableFactionCodes;
-    }
-
-    public void setChoosableFactionCodes(String... choosableFactionCodes) {
-        if (choosableFactionCodes.length > 0) {
-            this.choosableFactionCodes = Arrays.asList(choosableFactionCodes);
-        }
+    public List<Faction> getChoosableFactions() {
+        return choosableFactions;
     }
 
     public Collection<Faction> getFactions() {
@@ -219,16 +211,16 @@ public class Factions {
             int xc = wn.getNodeType();
 
             if (xc == Node.ELEMENT_NODE) {
-                // This is what we really care about.
-                // All the meat of our document is in this node type, at this
-                // level.
-                // Okay, so what element is it?
                 String xn = wn.getNodeName();
 
                 if (xn.equalsIgnoreCase("faction")) {
-                    Faction f = Faction.getFactionFromXML(wn);
-                    if (!retVal.factions.containsKey(f.getShortName())) {
-                        retVal.factions.put(f.getShortName(), f);
+                    Faction faction = Faction.getFactionFromXML(wn);
+                    if (!retVal.factions.containsKey(faction.getShortName())) {
+                        retVal.factions.put(faction.getShortName(), faction);
+
+                        if (faction.isPlayable()) {
+                            retVal.getChoosableFactions().add(faction);
+                        }
                         if (null != f.getId()) {
                             if (!retVal.factionIdMap.containsKey(f.getId())) {
                                 retVal.factionIdMap.put(f.getId(), f);
@@ -242,10 +234,8 @@ public class Factions {
                     } else {
                         MekHQ.getLogger().error(
                                 String.format("Faction code \"%s\" already used for faction %s, can't re-use it for %s",
-                                        f.getShortName(), retVal.factions.get(f.getShortName()).getFullName(0), f.getFullName(0)));
+                                        faction.getShortName(), retVal.factions.get(faction.getShortName()).getFullName(0), faction.getFullName(0)));
                     }
-                } else if (xn.equalsIgnoreCase("choosableFactionCodes")) {
-                    retVal.setChoosableFactionCodes(wn.getTextContent().split(","));
                 }
             }
         }

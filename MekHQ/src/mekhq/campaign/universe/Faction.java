@@ -65,6 +65,7 @@ public class Faction {
     private NavigableMap<LocalDate, String> planetChanges = new TreeMap<>();
     private int[] eraMods;
     private Integer id;
+    private boolean playable;
     private Set<Tag> tags;
     // Start and end years (inclusive)
     private int start;
@@ -82,6 +83,7 @@ public class Faction {
         color = Color.LIGHT_GRAY;
         startingPlanet = "Terra";
         eraMods = null;
+        setPlayable(false);
         tags = EnumSet.noneOf(Faction.Tag.class);
         start = 0;
         end = 9999;
@@ -217,7 +219,15 @@ public class Faction {
         return factionMod;
     }
 
-    public boolean is(Faction.Tag tag) {
+    public boolean isPlayable() {
+        return playable;
+    }
+
+    public void setPlayable(final boolean playable) {
+        this.playable = playable;
+    }
+
+    public boolean is(Tag tag) {
         return tags.contains(tag);
     }
 
@@ -278,18 +288,6 @@ public class Faction {
                 retVal.setAlternativeFactionCodes(wn2.getTextContent().trim().split(","));
             } else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
                 retVal.nameGenerator = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.tags.add(Tag.CLAN);
-                } else {
-                    retVal.tags.remove(Tag.CLAN);
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("periphery")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.tags.add(Tag.PERIPHERY);
-                } else {
-                    retVal.tags.remove(Tag.PERIPHERY);
-                }
             } else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
                 retVal.startingPlanet = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("changePlanet")) {
@@ -317,10 +315,12 @@ public class Faction {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
                 retVal.id = Integer.valueOf(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
-                retVal.start = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("playable")) {
+                retVal.setPlayable(true);
             } else if (wn2.getNodeName().equalsIgnoreCase("currencyCode")) {
                 retVal.currencyCode = wn2.getTextContent();
+            } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
+                retVal.start = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("end")) {
                 retVal.end = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("tags")) {
