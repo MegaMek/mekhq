@@ -28,7 +28,7 @@ playable - if this is present the faction is playable
 tags - a comma-separated list of tags. Currently recognised tags: "is", "periphery", "deep periphery", "clan", "pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos"
 start - the founding date of the faction
 end - the date the faction ceases to exist
-successor - unimplemented tag that will be used to change factions in the future when the faction ends
+successor - unimplemented tag
  -->
 <factions>
     <!-- Early spaceflight factions -->
@@ -140,12 +140,12 @@ successor - unimplemented tag that will be used to change factions in the future
     <faction>
         <shortname>LA</shortname>
         <fullname>Lyran Commonwealth</fullname>
+        <altNamesByYear year='3058'>Lyran Alliance</altNamesByYear>
+        <altNamesByYear year='3085'>Lyran Commonwealth</altNamesByYear>
         <startingPlanet>Tharkad</startingPlanet>
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>LA</nameGenerator>
         <colorRGB>0,124,186</colorRGB>
-        <altNamesByYear year='3058'>Lyran Alliance</altNamesByYear>
-        <altNamesByYear year='3085'>Lyran Commonwealth</altNamesByYear>
 		<playable/>
         <tags>is,major</tags>
         <start>2340</start>
@@ -420,10 +420,10 @@ successor - unimplemented tag that will be used to change factions in the future
     <faction>
         <shortname>RWR</shortname>
         <fullname>Rim Worlds Republic</fullname>
+        <altNamesByYear year='2767'>Amaris Empire</altNamesByYear>
         <startingPlanet>Apollo</startingPlanet>
         <eraMods>1,1,1,0,0,0,0,0,0</eraMods>
         <colorRGB>232,202,173</colorRGB>
-        <altNamesByYear year='2767'>Amaris Empire</altNamesByYear>
 		<playable/>
         <tags>periphery</tags>
         <start>2250</start>
@@ -560,7 +560,6 @@ successor - unimplemented tag that will be used to change factions in the future
         <startingPlanet>Circinus</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>198,36,58</colorRGB>
-		<playable/>
         <tags>periphery</tags>
         <start>2785</start>
         <end>3081</end>
@@ -646,12 +645,12 @@ successor - unimplemented tag that will be used to change factions in the future
     <faction>
         <shortname>CGB</shortname>
         <fullname>Clan Ghost Bear</fullname>
+        <altNamesByYear year='3060'>Ghost Bear Dominion</altNamesByYear>
         <startingPlanet>Arcadia (Clan)</startingPlanet>
         <changePlanet year='3060'>Alshain</changePlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>188,222,235</colorRGB>
-        <altNamesByYear year='3060'>Ghost Bear Dominion</altNamesByYear>
 		<playable/>
         <tags>clan,major</tags>
         <start>2807</start>
@@ -660,8 +659,8 @@ successor - unimplemented tag that will be used to change factions in the future
     <faction>
         <shortname>CGS</shortname>
         <fullname>Clan Goliath Scorpion</fullname>
-        <startingPlanet>Roche</startingPlanet>
         <altNamesByYear year='3080'>Escorpión Imperio</altNamesByYear>
+        <startingPlanet>Roche</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>238,232,170</colorRGB>
@@ -746,11 +745,11 @@ successor - unimplemented tag that will be used to change factions in the future
     <faction>
         <shortname>CSR</shortname>
         <fullname>Clan Snow Raven</fullname>
+        <altNamesByYear year='3083'>Raven Alliance</altNamesByYear>
         <startingPlanet>Circe</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>135,206,235</colorRGB>
-        <altNamesByYear year='3083'>Raven Alliance</altNamesByYear>
 		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
@@ -1731,13 +1730,13 @@ successor - unimplemented tag that will be used to change factions in the future
     <faction>
         <shortname>CCon</shortname>
         <fullname>Coreward Confederacy</fullname>
-        <startingPlanet>RWR Outpost #27</startingPlanet>
-        <eraMods>3,3,1,3,3,3,3,3,3</eraMods>
         <altNamesByYear year='2371'>Autocracy of New Virginia</altNamesByYear>
         <altNamesByYear year='2400'>Virginian Union</altNamesByYear>
         <altNamesByYear year='2700'>Rim Worlds Republic Outpost #27</altNamesByYear>
         <altNamesByYear year='2798'>Virginian Union</altNamesByYear>
         <altNamesByYear year='2816'>Coreward Confederacy</altNamesByYear>
+        <startingPlanet>RWR Outpost #27</startingPlanet>
+        <eraMods>3,3,1,3,3,3,3,3,3</eraMods>
         <colorRGB>255,0,0</colorRGB>
         <tags>deep_periphery</tags>
         <start>2371</start>
@@ -1806,11 +1805,11 @@ successor - unimplemented tag that will be used to change factions in the future
     <faction>
         <shortname>ARC</shortname>
         <fullname>Aurigan Coalition</fullname>
+        <altNamesByYear year='3022'>Arano Restoration</altNamesByYear>
+        <altNamesByYear year='3026'>Aurigan Coalition</altNamesByYear>
         <startingPlanet>Coromodir</startingPlanet>
         <changePlanet year="3022">New Abilene</changePlanet>
         <changePlanet year="3026">Coromodir</changePlanet>
-        <altNamesByYear year='3022'>Arano Restoration</altNamesByYear>
-        <altNamesByYear year='3026'>Aurigan Coalition</altNamesByYear>
         <colorRGB>255,36,0</colorRGB>
 		<playable/>
         <tags>periphery,minor</tags>
