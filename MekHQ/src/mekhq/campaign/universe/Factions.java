@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,13 +44,16 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 
 public class Factions {
+    //region Variable Declarations
     private static Factions instance;
 
     private Map<String, Faction> factions = new HashMap<>();
     private final List<Faction> choosableFactions = new ArrayList<>();
 
     private RATGenerator ratGenerator;
+    //endregion Variable Declarations
 
+    //region Constructors
     private Factions() {
         this(RATGenerator.getInstance());
     }
@@ -58,6 +61,7 @@ public class Factions {
     private Factions(final RATGenerator ratGenerator) {
         this.ratGenerator = Objects.requireNonNull(ratGenerator);
     }
+    //endregion Constructors
 
     public static Factions getInstance() {
         if (instance == null) {
@@ -98,10 +102,6 @@ public class Factions {
         } else {
             return factions.getOrDefault(sname, defaultFaction);
         }
-    }
-
-    public Faction getFactionFromFullName(String fname, int year) {
-        return getFactionFromFullNameAndYear(fname, year);
     }
 
     public Faction getFactionFromFullNameAndYear(String fname, int year) {

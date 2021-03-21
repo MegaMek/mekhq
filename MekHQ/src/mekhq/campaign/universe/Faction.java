@@ -1,8 +1,8 @@
 /*
  * Faction.java
  *
- * Copyright (C) 2009-2016 - The MegaMek Team. All Rights Reserved.
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,50 +32,46 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
-import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Part;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Faction {
+    //region Variable Declarations
     private String shortName;
     private String fullName;
     private NavigableMap<Integer, String> nameChanges = new TreeMap<>();
     private String[] altNames;
     private String[] alternativeFactionCodes;
-    private Color color;
-    private String nameGenerator;
     private String startingPlanet;
     private NavigableMap<LocalDate, String> planetChanges = new TreeMap<>();
+    private String nameGenerator;
     private int[] eraMods;
+    private Color color;
+    private String currencyCode = ""; // Currency of the faction, if any
     private boolean playable;
     private Set<Tag> tags;
-    // Start and end years (inclusive)
-    private int start;
-    private int end;
-    private String currencyCode = ""; // Currency of the faction, if any
+    private int start; // Start year (inclusive)
+    private int end; // End year (inclusive)
+    //endregion Variable Declarations
 
+    //region Constructors
     public Faction() {
         this("???", "Unknown");
     }
 
-    public Faction(String shortName, String fullName) {
+    public Faction(final String shortName, final String fullName) {
         this.shortName = shortName;
         this.fullName = fullName;
         nameGenerator = "General";
@@ -87,6 +83,7 @@ public class Faction {
         start = 0;
         end = 9999;
     }
+    //endregion Constructors
 
     public String getShortName() {
         return shortName;
@@ -103,11 +100,6 @@ public class Faction {
 
     public @Nullable String[] getAlternativeFactionCodes() {
         return alternativeFactionCodes;
-    }
-
-    public Optional<String> getRandomAlternativeFactionCode() {
-        return (getAlternativeFactionCodes() == null) ? Optional.empty()
-            : Optional.of(getAlternativeFactionCodes()[Compute.randomInt(getAlternativeFactionCodes().length)]);
     }
 
     public void setAlternativeFactionCodes(final String... alternativeFactionCodes) {
@@ -138,13 +130,9 @@ public class Faction {
         return nameGenerator;
     }
 
-    public String getStartingPlanet(LocalDate year) {
-        Map.Entry<LocalDate, String> change = planetChanges.floorEntry(year);
-        if (null == change) {
-            return startingPlanet;
-        } else {
-            return change.getValue();
-        }
+    public String getStartingPlanet(final LocalDate year) {
+        final Map.Entry<LocalDate, String> change = planetChanges.floorEntry(year);
+        return (change == null) ? startingPlanet : change.getValue();
     }
 
     public int getEraMod(int year) {
@@ -182,42 +170,6 @@ public class Faction {
         }
     }
 
-    public int getTechMod(Part part, Campaign campaign) {
-        int currentYear = campaign.getGameYear();
-
-        //TODO: This seems hacky - we shouldn't hardcode in universe details
-        //like this
-        int factionMod = 0;
-        if ((part.getTechBase() == Part.T_CLAN) && !isClan()) {
-            // Availability of clan tech for IS
-            if (currentYear < 3050) {
-                // Impossible to buy before clan invasion
-                factionMod = 12;
-            } else if (currentYear <= 3052) {
-                // Between begining of clan invasiuon and tukayyid, very very hard to buy
-                factionMod = 5;
-            } else if (currentYear <= 3060) {
-                // Between tukayyid and great refusal, very hard to buy
-                factionMod = 4;
-            } else {
-                // After great refusal, hard to buy
-                factionMod = 3;
-            }
-        } else if ((part.getTechBase() == Part.T_IS) && isPeriphery()) {
-            // Availability of high tech rating equipment in low tech areas (periphery)
-            switch (part.getTechRating()) {
-                case EquipmentType.RATING_E:
-                    factionMod += 1;
-                    break;
-                case EquipmentType.RATING_F:
-                    factionMod += 2;
-                    break;
-            }
-        }
-
-        return factionMod;
-    }
-
     public boolean isPlayable() {
         return playable;
     }
@@ -234,39 +186,20 @@ public class Faction {
         return (year >= start) && (year <= end);
     }
 
-    public boolean validIn(LocalDate time) {
-        return validIn(time.getYear());
-    }
-
     public boolean validBetween(int startYear, int endYear) {
         return (startYear <= end) && (endYear >= start);
     }
 
     public int getStartYear() {
-        return this.start;
+        return start;
     }
 
     public int getEndYear() {
-        return this.end;
+        return end;
     }
 
     public String getCurrencyCode() {
-        return this.currencyCode;
-    }
-
-    public boolean hasName(String name) {
-        if (name.equals(fullName)
-                || nameChanges.values().stream().anyMatch(n -> n.equals(name))) {
-            return true;
-        }
-        if ((altNames != null) && (altNames.length > 0)) {
-            for (String altName : altNames) {
-                if (name.equals(altName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return currencyCode;
     }
 
     public static Faction getFactionFromXML(Node wn) throws DOMException {
@@ -279,27 +212,27 @@ public class Faction {
                 retVal.shortName = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("fullname")) {
                 retVal.fullName = wn2.getTextContent();
+            } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByYear")) {
+                int year = Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent());
+                retVal.nameChanges.put(year, wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
+                retVal.altNames = wn2.getTextContent().split(",", 0);
             } else if (wn2.getNodeName().equalsIgnoreCase("alternativeFactionCodes")) {
                 retVal.setAlternativeFactionCodes(wn2.getTextContent().trim().split(","));
-            } else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
-                retVal.nameGenerator = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
                 retVal.startingPlanet = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("changePlanet")) {
                 retVal.planetChanges.put(
                         MekHqXmlUtil.parseDate(wn2.getAttributes().getNamedItem("year").getTextContent().trim()),
                         wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByYear")) {
-                int year = Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent());
-                retVal.nameChanges.put(year, wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
-                retVal.altNames = wn2.getTextContent().split(",", 0);
             } else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
                 retVal.eraMods = new int[] {0,0,0,0,0,0,0,0,0};
                 String[] values = wn2.getTextContent().split(",", -2);
                 for (int i = 0; i < values.length; i++) {
                     retVal.eraMods[i] = Integer.parseInt(values[i]);
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
+                retVal.nameGenerator = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("colorRGB")) {
                 String[] values = wn2.getTextContent().split(",");
                 if (values.length == 3) {
@@ -308,17 +241,17 @@ public class Faction {
                     int colorBlue = Integer.parseInt(values[2]);
                     retVal.color = new Color(colorRed, colorGreen, colorBlue);
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("playable")) {
-                retVal.setPlayable(true);
             } else if (wn2.getNodeName().equalsIgnoreCase("currencyCode")) {
                 retVal.currencyCode = wn2.getTextContent();
+            } else if (wn2.getNodeName().equalsIgnoreCase("playable")) {
+                retVal.setPlayable(true);
+            } else if (wn2.getNodeName().equalsIgnoreCase("tags")) {
+                Arrays.stream(wn2.getTextContent().split(",")).map(tag -> tag.toUpperCase(Locale.ROOT))
+                        .map(Tag::valueOf).forEach(tag -> retVal.tags.add(tag));
             } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
                 retVal.start = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("end")) {
                 retVal.end = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("tags")) {
-                Arrays.stream(wn2.getTextContent().split(",")).map(tag -> tag.toUpperCase(Locale.ROOT))
-                    .map(Tag::valueOf).forEach(tag -> retVal.tags.add(tag));
             }
         }
 
