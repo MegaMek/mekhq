@@ -73,18 +73,17 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>TH</shortname>
-        <id>18</id>
         <fullname>Terran Hegemony</fullname>
 		<alternativeFactionCodes>SL</alternativeFactionCodes>
         <startingPlanet>Terra</startingPlanet>
         <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
         <colorRGB>255,255,255</colorRGB>
-		</playable>
+		<playable/>
         <tags>is,super</tags>
         <start>2315</start>
         <end>2790</end>
     </faction>
-        <faction>
+    <faction>
         <shortname>AE</shortname>
         <fullname>Amaris Empire</fullname>
         <startingPlanet>Terra</startingPlanet>
@@ -104,56 +103,51 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     <!-- Major Inner Sphere Factions -->
     <faction>
         <shortname>CC</shortname>
-        <id>1</id>
         <fullname>Capellan Confederation</fullname>
         <startingPlanet>Sian</startingPlanet>
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>CC</nameGenerator>
         <colorRGB>0,156,85</colorRGB>
-		</playable>
+		<playable/>
         <tags>is,major</tags>
         <start>2367</start>
     </faction>
     <faction>
         <shortname>DC</shortname>
-        <id>2</id>
         <fullname>Draconis Combine</fullname>
         <startingPlanet>New Samarkand</startingPlanet>
         <changePlanet year='2619'>Luthien</changePlanet>>
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <nameGenerator>DC</nameGenerator>
         <colorRGB>234,45,46</colorRGB>
-		</playable>
+		<playable/>
         <tags>is,major</tags>
         <start>2319</start>
     </faction>
     <faction>
         <shortname>FS</shortname>
-        <id>3</id>
         <fullname>Federated Suns</fullname>
         <startingPlanet>New Avalon</startingPlanet>
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <nameGenerator>FS</nameGenerator>
         <colorRGB>248,212,44</colorRGB>
-		</playable>
+		<playable/>
         <tags>is,major</tags>
         <start>2317</start>
     </faction>
     <faction>
         <shortname>FWL</shortname>
-        <id>4</id>
         <fullname>Free Worlds League</fullname>
         <startingPlanet>Atreus (FWL)</startingPlanet>
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
         <colorRGB>165,94,160</colorRGB>
-		</playable>
+		<playable/>
         <tags>is,major</tags>
         <start>2271</start>
     </faction>
     <faction>
         <shortname>LA</shortname>
-        <id>5</id>
         <fullname>Lyran Commonwealth</fullname>
         <startingPlanet>Tharkad</startingPlanet>
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
@@ -161,7 +155,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <colorRGB>0,124,186</colorRGB>
         <altNamesByYear year='3058'>Lyran Alliance</altNamesByYear>
         <altNamesByYear year='3085'>Lyran Commonwealth</altNamesByYear>
-		</playable>
+		<playable/>
         <tags>is,major</tags>
         <start>2340</start>
     </faction>
@@ -434,20 +428,18 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>RWR</shortname>
-        <id>19</id>
         <fullname>Rim Worlds Republic</fullname>
         <startingPlanet>Apollo</startingPlanet>
         <eraMods>1,1,1,0,0,0,0,0,0</eraMods>
         <colorRGB>232,202,173</colorRGB>
         <altNamesByYear year='2767'>Amaris Empire</altNamesByYear>
-		</playable>
+		<playable/>
         <tags>periphery</tags>
         <start>2250</start>
         <end>2779</end>
     </faction>
     <faction>
         <shortname>RPG</shortname>
-        <id>19</id>
         <fullname>Rim Provisional Government</fullname>
         <startingPlanet>Apollo</startingPlanet>
         <eraMods>1,1,1,0,0,0,0,0,0</eraMods>
@@ -469,35 +461,32 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>TC</shortname>
-        <id>14</id>
         <fullname>Taurian Concordat</fullname>
         <startingPlanet>Taurus</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>179,62,38</colorRGB>
-		</playable>
+		<playable/>
         <tags>periphery</tags>
         <start>2335</start>
     </faction>
     <faction>
         <shortname>MOC</shortname>
-        <id>12</id>
         <fullname>Magistracy of Canopus</fullname>
         <startingPlanet>Canopus IV</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,1</eraMods>
         <colorRGB>57,158,145</colorRGB>
-		</playable>
+		<playable/>
         <tags>periphery</tags>
         <start>2530</start>
     </faction>
     <faction>
         <shortname>OA</shortname>
-        <id>13</id>
         <fullname>Outworlds Alliance</fullname>
         <altNamesByYear year='3083'>Raven Alliance</altNamesByYear>
         <startingPlanet>Alpheratz</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>210,190,153</colorRGB>
-		</playable>
+		<playable/>
         <tags>periphery</tags>
         <start>2413</start>
         <end>3083</end>
@@ -516,7 +505,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>ARDC</shortname>
-        <id>17</id>
         <fullname>Arc-Royal Defense Cordon</fullname>
 		<alternativeFactionCodes>MERC,LA</alternativeFactionCodes>
         <startingPlanet>Arc-Royal</startingPlanet>
@@ -554,7 +542,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <startingPlanet>Erod's Escape</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>0,128,128</colorRGB>
-		</playable>
+		<playable/>
         <tags>periphery</tags>
         <start>2253</start> 
         <!-- Per Reunification War PDF, Protectorate existed prior to the Concordat, changing start from 3066 to 2253 per that source -->
@@ -568,7 +556,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>CM</shortname>
-        <id>16</id>
         <fullname>Chaos March</fullname>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <colorRGB>169,169,169</colorRGB>
@@ -582,7 +569,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <startingPlanet>Circinus</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>198,36,58</colorRGB>
-		</playable>
+		<playable/>
         <tags>periphery</tags>
         <start>2785</start>
         <end>3081</end>
@@ -594,7 +581,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>255,99,71</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>3085</end>
@@ -616,7 +603,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>147,112,219</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
     </faction>
@@ -627,7 +614,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>0,0,205</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
     </faction>
@@ -641,7 +628,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>CDS</shortname>
-        <id>26</id>
         <fullname>Clan Sea Fox</fullname>
         <altNamesByYear year='2984'>Clan Diamond Shark</altNamesByYear>
         <altNamesByYear year='3100'>Clan Sea Fox</altNamesByYear>
@@ -650,7 +636,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>0,255,255</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
     </faction>
@@ -661,14 +647,13 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>165,42,42</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>3073</end>
     </faction>
     <faction>
         <shortname>CGB</shortname>
-        <id>23</id>
         <fullname>Clan Ghost Bear</fullname>
         <startingPlanet>Arcadia (Clan)</startingPlanet>
         <changePlanet year='3060'>Alshain</changePlanet>
@@ -676,7 +661,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>188,222,235</colorRGB>
         <altNamesByYear year='3060'>Ghost Bear Dominion</altNamesByYear>
-		</playable>
+		<playable/>
         <tags>clan,major</tags>
         <start>2807</start>
         <end>3103</end>
@@ -689,14 +674,13 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>238,232,170</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>3080</end>
     </faction>
     <faction>
         <shortname>CHH</shortname>
-        <id>28</id>
         <fullname>Clan Hell's Horses</fullname>
         <!--Original data shows CHH back on Niles during the Jihad, but I am unable to find data for that -->
         <startingPlanet>Niles (Clan)</startingPlanet>
@@ -704,7 +688,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>241,168,110</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
     </faction>
@@ -715,21 +699,20 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>248,248,255</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>3074</end>
     </faction>
     <faction>
         <shortname>CJF</shortname>
-        <id>22</id>
         <fullname>Clan Jade Falcon</fullname>
         <startingPlanet>Ironhold</startingPlanet>
         <changePlanet year='3052'>Sudeten</changePlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>172,208,115</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,major</tags>
         <start>2807</start>
     </faction>
@@ -745,28 +728,26 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>CNC</shortname>
-        <id>25</id>
         <fullname>Clan Nova Cat</fullname>
         <startingPlanet>Barcella</startingPlanet>
         <changePlanet year='3057'>Irece</changePlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>245,255,250</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>3143</end>
     </faction>
     <faction>
         <shortname>CSJ</shortname>
-        <id>24</id>
         <fullname>Clan Smoke Jaguar</fullname>
         <startingPlanet>Huntress</startingPlanet>
         <changePlanet year='3052'>Luzerne</changePlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>152,164,129</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>3060</end>
@@ -779,7 +760,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>135,206,235</colorRGB>
         <altNamesByYear year='3083'>Raven Alliance</altNamesByYear>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>3083</end>
@@ -791,19 +772,18 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>218,165,32</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
     </faction>
     <faction>
         <shortname>CSV</shortname>
-        <id>27</id>
         <fullname>Clan Steel Viper</fullname>
         <startingPlanet>Homer</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>127,255,0</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>3075</end>
@@ -831,14 +811,13 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>CW</shortname>
-        <id>21</id>
         <fullname>Clan Wolf</fullname>
         <startingPlanet>Tranquil</startingPlanet>
         <changePlanet year='3052'>Tamar</changePlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>207,114,58</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,major</tags>
         <start>2807</start>
         <end>3142</end>
@@ -876,13 +855,12 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>CS</shortname>
-        <id>8</id>
         <fullname>ComStar</fullname>
         <startingPlanet>Terra</startingPlanet>
         <changePlanet year='3059'>Tukayyid</changePlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <colorRGB>255,250,240</colorRGB>
-		</playable>
+		<playable/>
         <tags>is,inactive,major</tags>
         <start>2788</start>
     </faction>
@@ -988,13 +966,12 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>FC</shortname>
-        <id>6</id>
         <fullname>Federated Commonwealth</fullname>
 		<alternativeFactionCodes>FS,LA</alternativeFactionCodes>
         <startingPlanet>New Avalon</startingPlanet>
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <colorRGB>248,212,44</colorRGB>
-		</playable>
+		<playable/>
         <tags>is,super</tags>
     </faction>
     <faction>
@@ -1010,14 +987,13 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>FRR</shortname>
-        <id>10</id>
         <fullname>Free Rasalhague Republic</fullname>
         <startingPlanet>Rasalhague</startingPlanet>
         <changePlanet year='3052'>Orestes</changePlanet>
         <eraMods>0,0,0,0,0,0,2,1,0</eraMods>
         <nameGenerator>FRR</nameGenerator>
         <colorRGB>116,171,206</colorRGB>
-		</playable>
+		<playable/>
         <tags>is,minor</tags>
         <start>3034</start>
         <end>3103</end>
@@ -1058,7 +1034,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <startingPlanet>Bremen (HL)</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>219,112,147</colorRGB>
-		</playable>
+		<playable/>
         <tags>deep_periphery</tags>
         <start>2891</start>
     </faction>
@@ -1074,7 +1050,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>PIND</shortname>
-        <id>20</id>
         <fullname>Independent (Periphery)</fullname>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>190,190,190</colorRGB>
@@ -1082,7 +1057,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>IND</shortname>
-        <id>29</id>
         <fullname>Independent</fullname>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>210,210,210</colorRGB>
@@ -1147,12 +1121,11 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>MH</shortname>
-        <id>15</id>
         <fullname>Marian Hegemony</fullname>
         <startingPlanet>Alphard (MH)</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>236,136,65</colorRGB>
-		</playable>
+		<playable/>
         <tags>periphery</tags>
         <start>2920</start>
     </faction>
@@ -1181,7 +1154,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>MERC</shortname>
-        <id>0</id>
         <fullname>Mercenary</fullname>
         <startingPlanet>Solaris</startingPlanet>
         <changePlanet year='2789'>Galatea</changePlanet>
@@ -1189,7 +1161,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <changePlanet year='3067'>Galatea</changePlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>169,169,169</colorRGB>
-		</playable>
+		<playable/>
         <tags>merc</tags>
     </faction>
     <faction>
@@ -1238,7 +1210,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <startingPlanet>Asturias</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>0,255,0</colorRGB>
-		</playable>
+		<playable/>
         <tags>deep_periphery</tags>
         <start>2392</start>
         <end>3080</end>
@@ -1316,7 +1288,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <eraMods>0,0,0,0,0,0,2,1,0</eraMods>
         <nameGenerator>FRR</nameGenerator>
         <colorRGB>188,222,235</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,is,minor</tags>
         <start>3103</start>
     </faction>
@@ -1327,7 +1299,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <startingPlanet>Alpheratz</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>25,120,110</colorRGB>
-		</playable>
+		<playable/>
         <tags>clan,periphery</tags>
         <start>3083</start>
     </faction>
@@ -1356,12 +1328,11 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>ROS</shortname>
-        <id>7</id>
         <fullname>Republic of the Sphere</fullname>
         <startingPlanet>Terra</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <colorRGB>207,119,57</colorRGB>
-		</playable>
+		<playable/>
         <tags>is,major</tags>
         <start>3081</start>
     </faction>
@@ -1452,14 +1423,13 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>SIC</shortname>
-        <id>11</id>
         <fullname>St. Ives Compact</fullname>
 		<alternativeFactionCodes>CC</alternativeFactionCodes>
         <startingPlanet>St. Ives</startingPlanet>
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>CC</nameGenerator>
         <colorRGB>188,223,186</colorRGB>
-		</playable>
+		<playable/>
         <tags>is,minor</tags>
         <start>3029</start>
         <end>3063</end>
@@ -1470,7 +1440,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <startingPlanet>Terra</startingPlanet>
         <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
         <colorRGB>176,196,222</colorRGB>
-		</playable>
+		<playable/>
         <tags>is,super</tags>
         <start>2570</start>
         <end>2781</end>
@@ -1580,13 +1550,12 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
     </faction>
     <faction>
         <shortname>WOB</shortname>
-        <id>9</id>
         <fullname>Word of Blake</fullname>
 		<alternativeFactionCodes>CS</alternativeFactionCodes>
         <startingPlanet>Terra</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,1,1</eraMods>
         <colorRGB>205,192,176</colorRGB>
-		</playable>
+		<playable/>
         <tags>is,minor</tags>
         <start>3052</start>
     </faction>
@@ -1728,7 +1697,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <fullname>Pirate</fullname>
         <eraMods>2,2,2,2,2,2,2,2,2</eraMods>
         <colorRGB>128,40,0</colorRGB>
-		</playable>
+		<playable/>
         <tags>pirate</tags>
     </faction>
     <faction>
@@ -1852,7 +1821,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <altNamesByYear year='3022'>Arano Restoration</altNamesByYear>
         <altNamesByYear year='3026'>Aurigan Coalition</altNamesByYear>
         <colorRGB>255,36,0</colorRGB>
-		</playable>
+		<playable/>
         <tags>periphery,minor</tags>
         <start>2910</start>
     </faction>

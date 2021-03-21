@@ -64,7 +64,6 @@ public class Faction {
     private String startingPlanet;
     private NavigableMap<LocalDate, String> planetChanges = new TreeMap<>();
     private int[] eraMods;
-    private Integer id;
     private boolean playable;
     private Set<Tag> tags;
     // Start and end years (inclusive)
@@ -243,10 +242,6 @@ public class Faction {
         return (startYear <= end) && (endYear >= start);
     }
 
-    public Integer getId() {
-        return id;
-    }
-
     public int getStartYear() {
         return this.start;
     }
@@ -313,8 +308,6 @@ public class Faction {
                     int colorBlue = Integer.parseInt(values[2]);
                     retVal.color = new Color(colorRed, colorGreen, colorBlue);
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                retVal.id = Integer.valueOf(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("playable")) {
                 retVal.setPlayable(true);
             } else if (wn2.getNodeName().equalsIgnoreCase("currencyCode")) {

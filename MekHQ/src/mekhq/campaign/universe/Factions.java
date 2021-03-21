@@ -47,7 +47,6 @@ public class Factions {
     private static Factions instance;
 
     private Map<String, Faction> factions = new HashMap<>();
-    private Map<Integer, Faction> factionIdMap = new HashMap<>();
     private final List<Faction> choosableFactions = new ArrayList<>();
 
     private RATGenerator ratGenerator;
@@ -145,11 +144,6 @@ public class Factions {
         return fRec;
     }
 
-    public String getFactionCode(int faction) {
-        Faction f = factionIdMap.get(faction);
-        return (null != f) ? f.getShortName() : "IND";
-    }
-
     /**
      * Loads the default Factions data.
      *
@@ -220,16 +214,6 @@ public class Factions {
 
                         if (faction.isPlayable()) {
                             retVal.getChoosableFactions().add(faction);
-                        }
-                        if (null != f.getId()) {
-                            if (!retVal.factionIdMap.containsKey(f.getId())) {
-                                retVal.factionIdMap.put(f.getId(), f);
-                            } else {
-                                MekHQ.getLogger().error(
-                                        String.format("Faction id \"%d\" already used for faction %s, can't re-use it for %s",
-                                                f.getId(), retVal.factionIdMap.get(f.getId()).getFullName(0),
-                                                f.getFullName(0)));
-                            }
                         }
                     } else {
                         MekHQ.getLogger().error(
