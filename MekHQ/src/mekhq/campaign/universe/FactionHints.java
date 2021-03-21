@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,7 +20,6 @@ package mekhq.campaign.universe;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,9 +45,8 @@ import mekhq.MekHqXmlUtil;
  */
 public class FactionHints {
 
-    private static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml"; //$NON-NLS-1$
+    private static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml"; // TODO : remove inline file
 
-    private final Set<Faction> deepPeriphery;
     private final Set<Faction> neutralFactions;
     private final Set<Faction> majorPowers;
 
@@ -62,7 +60,6 @@ public class FactionHints {
      * Protected constructor that initializes empty data structures.
      */
     protected FactionHints() {
-        deepPeriphery = new HashSet<>();
         neutralFactions = new HashSet<>();
         majorPowers = new HashSet<>();
         wars = new HashMap<>();
@@ -85,8 +82,8 @@ public class FactionHints {
     private void loadData() {
         try {
             loadFactionHints();
-        } catch (DOMException | ParseException e) {
-            MekHQ.getLogger().error(getClass(), "loadData()", e); //$NON-NLS-1$
+        } catch (DOMException e) {
+            MekHQ.getLogger().error(e);
         }
     }
 
@@ -110,14 +107,6 @@ public class FactionHints {
      */
     public boolean isISMajorPower(Faction f) {
         return majorPowers.contains(f);
-    }
-
-    /**
-     * @param f The input faction
-     * @return  Whether the faction is located in the deep periphery
-     */
-    public boolean isDeepPeriphery(Faction f) {
-        return deepPeriphery.contains(f);
     }
 
     /**
@@ -371,26 +360,6 @@ public class FactionHints {
     }
 
     /**
-     * Adds faction to set of deep periphery powers
-     * @param f
-     */
-    protected void addDeepPeripheryFaction(Faction f) {
-        if (null != f) {
-            deepPeriphery.add(f);
-        }
-    }
-
-    /**
-     * Adds faction to set of major powers
-     * @param f
-     */
-    protected void addMajorPower(Faction f) {
-        if (null != f) {
-            majorPowers.add(f);
-        }
-    }
-
-    /**
      * Adds faction to list of non-combatants
      * @param f
      */
@@ -447,11 +416,8 @@ public class FactionHints {
         }
     }
 
-    private void loadFactionHints() throws DOMException, ParseException {
-        final String METHOD_NAME = "loadFactionHints()"; //$NON-NLS-1$
-
-        MekHQ.getLogger().info(getClass(), METHOD_NAME,
-                "Starting load of faction hint data from XML..."); //$NON-NLS-1$
+    private void loadFactionHints() throws DOMException {
+        MekHQ.getLogger().info("Starting load of faction hint data from XML...");
         Document xmlDoc;
 
         try (InputStream is = new FileInputStream(FACTION_HINTS_FILE)) {
@@ -459,7 +425,7 @@ public class FactionHints {
 
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(ex);
             return;
         }
 
@@ -483,18 +449,7 @@ public class FactionHints {
                         neutralFactions.add(f);
                         addNeutralExceptions(f, wn);
                     } else {
-                        MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                "Invalid faction code in factionhints.xml: " + fKey); //$NON-NLS-1$
-                    }
-                } else if (nodeName.equals("deepPeriphery")) {
-                    for (String fKey : wn.getTextContent().trim().split(",")) {
-                        Faction f = Factions.getInstance().getFaction(fKey);
-                        if (null != f) {
-                            deepPeriphery.add(f);
-                        } else {
-                            MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                    "Invalid faction code in factionhints.xml: " + fKey); //$NON-NLS-1$
-                        }
+                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + fKey);
                     }
                 } else if (nodeName.equals("majorPowers")) {
                     for (String fKey : wn.getTextContent().trim().split(",")) {
@@ -502,8 +457,7 @@ public class FactionHints {
                         if (null != f) {
                             majorPowers.add(f);
                         } else {
-                            MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                    "Invalid faction code in factionhints.xml: " + fKey); //$NON-NLS-1$
+                            MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + fKey);
                         }
                     }
                 } else if (nodeName.equals("rivals")) {
@@ -546,8 +500,7 @@ public class FactionHints {
                     if ((null != outer) && (null != inner)) {
                         addContainedFaction(outer, inner, start, end, fraction, opponents);
                     } else {
-                        MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                "Invalid faction code in factionhints.xml: " + outer + "/" + inner); //$NON-NLS-1$
+                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + outer + "/" + inner);
                     }
                 }
             }

@@ -23,7 +23,6 @@ War, alliance, and rivals nodes each have optional name, start, and end attribut
 There are also some minor tags that appear only at the beginning of the file that are used in contract generation.
 -->
 <factionHints>
- <deepPeriphery>HL,CI,NC,UC,KE,JF,TD,</deepPeriphery>
  <majorPowers>CC,DC,FS,FWL,LA,FC,TH</majorPowers>
  <neutral faction="CS">
  	<exceptions>PIR,TD,GV,MV,BoS,MM,WOB,IND,PIND</exceptions>

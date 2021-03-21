@@ -345,7 +345,7 @@ public class Faction {
 
     public enum Tag {
         /** Inner sphere */
-        IS, PERIPHERY, CLAN,
+        IS, PERIPHERY, DEEP_PERIPHERY, CLAN,
         /** A bunch of dirty pirates */
         PIRATE,
         /** Major mercenary bands */

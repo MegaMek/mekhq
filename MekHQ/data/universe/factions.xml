@@ -34,8 +34,7 @@ nameGenerator - The name of the faction name generator that should be used for t
                 left out, then this defaults to "General."
 colorRGB - a comma-separated 3-item list defining the RGB codes for the color used on the map
            for this faction. Defaults to light gray if missing.
-tags - a comma-separated list of tags. Currently recognised tags: "is", "periphery", "clan",
-    "pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos"
+tags - a comma-separated list of tags. Currently recognised tags: "is", "periphery", "deep periphery", "clan", "pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos"
  -->
 <factions>
     <choosableFactionCodes>MERC,CC,DC,FS,FWL,LA,FC,ROS,CS,WOB,FRR,SIC,MOC,MH,OA,TC,SL,CDS,CGB,CHH,CJF,CNC,CSJ,CSV,CSR,CW,CBS,CCC,CCO,CFM,CGS,CIH,CSA,TH,RWR,CIR,JF,PIR,NIOPS,CDP,HL,NC,RD,ARC</choosableFactionCodes>
@@ -547,7 +546,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <fullname>Chainelane Isles</fullname>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>255,80,93</colorRGB>
-        <tags>is,minor</tags>
+        <tags>deep_periphery,minor</tags>
     </faction>
     <faction>
         <shortname>CM</shortname>
@@ -939,7 +938,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <startingPlanet>Granda</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>238,232,170</colorRGB>
-        <tags>clan,periphery</tags>
+        <tags>clan,deep_periphery</tags>
         <start>3080</start>
     </faction>
     <faction>
@@ -1008,7 +1007,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <startingPlanet>Bremen (HL)</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>219,112,147</colorRGB>
-        <tags>periphery</tags>
+        <tags>deep_periphery</tags>
         <start>2891</start>
     </faction>
     <faction>
@@ -1044,14 +1043,14 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <nameGenerator>FRR</nameGenerator>
         <colorRGB>153,50,204</colorRGB>
-        <tags>is,minor</tags>
+        <tags>deep_periphery,minor</tags>
     </faction>
     <faction>
         <shortname>KE</shortname>
         <fullname>Khwarazm Empire</fullname>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>80,80,80</colorRGB>
-        <tags>periphery</tags>
+        <tags>deep_periphery</tags>
     </faction>
     <faction>
         <shortname>KP</shortname>
@@ -1182,7 +1181,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <startingPlanet>Asturias</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>0,255,0</colorRGB>
-        <tags>periphery</tags>
+        <tags>deep_periphery</tags>
         <start>2392</start>
         <end>3080</end>
     </faction>
@@ -1647,7 +1646,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <startingPlanet>Granada</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>0,255,0</colorRGB>
-        <tags>periphery</tags>
+        <tags>deep_periphery</tags>
         <start>2830</start>
     </faction>
     <faction>
@@ -1673,7 +1672,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <startingPlanet>Thala</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>153,50,204</colorRGB>
-        <tags>periphery</tags>
+        <tags>deep_periphery</tags>
         <start>2245</start>
     </faction>
     <faction>
@@ -1687,7 +1686,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <altNamesByYear year='2798'>Virginian Union</altNamesByYear>
         <altNamesByYear year='2816'>Coreward Confederacy</altNamesByYear>
         <colorRGB>255,0,0</colorRGB>
-        <tags>periphery</tags>
+        <tags>deep_periphery</tags>
         <start>2371</start>
         <end>3075</end>
     </faction>
@@ -1718,7 +1717,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
         <fullname>New Delphi Compact</fullname>
         <startingPlanet>New Delphi</startingPlanet>
         <colorRGB>127,151,139</colorRGB>
-        <tags>periphery</tags>
+        <tags>deep_periphery</tags>
         <start>2602</start>
     </faction>
     <faction>
