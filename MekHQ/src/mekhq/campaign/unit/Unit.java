@@ -265,7 +265,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //one gets some of the same things set
         if (null != this.entity) {
             en.setId(this.entity.getId());
-            en.duplicateMarker = this.entity.duplicateMarker;
+            en.setDuplicateMarker(this.entity.getDuplicateMarker());
+            en.generateShortName();
+            en.generateDisplayName();
         }
         this.entity = en;
     }
@@ -4921,8 +4923,24 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return en.getDamageLevel(false);
     }
 
-    public void resetParts() {
-        parts = new ArrayList<>();
+    /**
+     * Removes all of the parts from a unit.
+     * 
+     * NOTE: this puts the unit in an inconsistent state, and
+     *       the unit should not be used until its parts have
+     *       been re-assigned.
+     * 
+     */
+    public void removeParts() {
+        for (Part part : parts) {
+            part.setUnit(null);
+
+            if (campaign != null) {
+                campaign.getWarehouse().removePart(part);
+            }
+        }
+
+        parts.clear();
     }
 
     /**
