@@ -158,7 +158,7 @@ public class ContractMarket implements Serializable {
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
         if (((method == ContractMarketMethod.ATB_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1))
                 || newCampaign) {
-			Contract[] list = contracts.toArray(new Contract[contracts.size()]);
+			Contract[] list = contracts.toArray(new Contract[0]);
 			for (Contract c : list) {
 				removeContract(c);
 			}
@@ -173,9 +173,8 @@ public class ContractMarket implements Serializable {
 
 			Set<Faction> currentFactions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
 			boolean inMinorFaction = true;
-			for (Faction f : currentFactions) {
-				if (RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(f)
-                        || f.isClan()) {
+			for (final Faction faction : currentFactions) {
+				if (faction.isMajorOrSuperPower() || faction.isClan()) {
 					inMinorFaction = false;
 					break;
 				}

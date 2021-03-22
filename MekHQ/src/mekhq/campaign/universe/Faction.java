@@ -110,22 +110,6 @@ public class Faction {
         return color;
     }
 
-    public boolean isClan() {
-        return is(Tag.CLAN);
-    }
-
-    public boolean isComStar() {
-        return "CS".equals(shortName);
-    }
-
-    public boolean isPeriphery() {
-        return is(Tag.PERIPHERY);
-    }
-
-    public boolean isDeepPeriphery() {
-        return is(Tag.DEEP_PERIPHERY);
-    }
-
     public String getNameGenerator() {
         return nameGenerator;
     }
@@ -201,6 +185,86 @@ public class Faction {
     public String getCurrencyCode() {
         return currencyCode;
     }
+
+    //region Checks
+    public boolean isMercenary() {
+        return is(Tag.MERC);
+    }
+
+    public boolean isPirate() {
+        return is(Tag.PIRATE);
+    }
+
+    public boolean isRebel() {
+        return is(Tag.REBEL);
+    }
+
+    public boolean isRebelOrPirate() {
+        return isRebel() || isPirate();
+    }
+
+    public boolean isComStar() {
+        return "CS".equals(getShortName());
+    }
+
+    public boolean isWoB() {
+        return "WOB".equals(getShortName());
+    }
+
+    public boolean isComStarOrWoB() {
+        return isComStar() || isWoB();
+    }
+
+    public boolean isClan() {
+        return is(Tag.CLAN);
+    }
+
+    public boolean isInnerSphere() {
+        return is(Tag.IS);
+    }
+
+    public boolean isPeriphery() {
+        return is(Tag.PERIPHERY);
+    }
+
+    public boolean isDeepPeriphery() {
+        return is(Tag.DEEP_PERIPHERY);
+    }
+
+    public boolean isIndependent() {
+        return "IND".equals(getShortName()) || "PIND".equals(getShortName());
+    }
+
+    public boolean isInactive() {
+        return is(Tag.INACTIVE);
+    }
+
+    //region Power Checks
+    public boolean isSuperPower() {
+        return is(Tag.SUPER);
+    }
+
+    public boolean isMajorOrSuperPower() {
+        return isMajorPower() || isSuperPower();
+    }
+
+    public boolean isISMajorOrSuperPower() {
+        return isInnerSphere() && isMajorOrSuperPower();
+    }
+
+    public boolean isMajorPower() {
+        return is(Tag.MAJOR);
+    }
+
+    public boolean isMinorPower() {
+        return is(Tag.MINOR);
+    }
+
+    public boolean isSmall() {
+        return is(Tag.SMALL);
+    }
+    //endregion Power Checks
+    //endregion Checks
 
     public static Faction getFactionFromXML(Node wn) throws DOMException {
         Faction retVal = new Faction();

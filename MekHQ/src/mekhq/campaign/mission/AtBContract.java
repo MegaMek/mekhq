@@ -344,12 +344,7 @@ public class AtBContract extends Contract implements Serializable {
 
     public static boolean isMinorPower(String fName) {
         Faction faction = Factions.getInstance().getFaction(fName);
-        if (null != faction) {
-            return !RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(faction) &&
-                    !faction.isClan();
-        } else {
-            return false;
-        }
+        return (faction != null) && !faction.isISMajorOrSuperPower() && !faction.isClan();
     }
 
     public void calculatePaymentMultiplier(Campaign campaign) {
@@ -401,12 +396,9 @@ public class AtBContract extends Contract implements Serializable {
         }
 
         Faction employer = Factions.getInstance().getFaction(employerCode);
-        if ((null != employer)
-                && (RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(employer)
-                || employer.isClan())) {
+        if (employer.isISMajorOrSuperPower() || employer.isClan()) {
             multiplier *= 1.2;
-        } else if (enemyCode.equals("IND") ||
-                enemyCode.equals("PIND")) {
+        } else if (enemyCode.equals("IND") || enemyCode.equals("PIND")) {
             multiplier *= 1.0;
         } else {
             multiplier *= 1.1;

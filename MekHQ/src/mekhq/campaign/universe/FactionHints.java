@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 
@@ -48,7 +49,6 @@ public class FactionHints {
     private static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml"; // TODO : remove inline file
 
     private final Set<Faction> neutralFactions;
-    private final Set<Faction> majorPowers;
 
     private final Map<Faction, Map<Faction, List<FactionHint>>> wars;
     private final Map<Faction, Map<Faction, List<FactionHint>>> alliances;
@@ -61,7 +61,6 @@ public class FactionHints {
      */
     protected FactionHints() {
         neutralFactions = new HashSet<>();
-        majorPowers = new HashSet<>();
         wars = new HashMap<>();
         alliances = new HashMap<>();
         rivals = new HashMap<>();
@@ -95,18 +94,7 @@ public class FactionHints {
      * @return  Whether the faction is not a true faction
      */
     public static boolean isEmptyFaction(Faction f) {
-        return (f.getShortName().equals("ABN")
-                || f.getShortName().equals("UND")
-                || f.getShortName().equals("NONE"));
-    }
-
-    /**
-     * @param f The input faction
-     * @return  Whether the faction is considered a major Inner Sphere
-     *          power for purposes of contract generation
-     */
-    public boolean isISMajorPower(Faction f) {
-        return majorPowers.contains(f);
+        return Stream.of("ABN", "UND", "NONE").anyMatch(s -> f.getShortName().equals(s));
     }
 
     /**
@@ -450,15 +438,6 @@ public class FactionHints {
                         addNeutralExceptions(f, wn);
                     } else {
                         MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + fKey);
-                    }
-                } else if (nodeName.equals("majorPowers")) {
-                    for (String fKey : wn.getTextContent().trim().split(",")) {
-                        Faction f = Factions.getInstance().getFaction(fKey);
-                        if (null != f) {
-                            majorPowers.add(f);
-                        } else {
-                            MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + fKey);
-                        }
                     }
                 } else if (nodeName.equals("rivals")) {
                     setFactionHint(rivals, wn);
