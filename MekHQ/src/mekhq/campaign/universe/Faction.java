@@ -235,10 +235,6 @@ public class Faction {
         return "IND".equals(getShortName()) || "PIND".equals(getShortName());
     }
 
-    public boolean isInactive() {
-        return is(Tag.INACTIVE);
-    }
-
     //region Power Checks
     public boolean isSuperPower() {
         return is(Tag.SUPER);

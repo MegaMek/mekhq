@@ -351,8 +351,7 @@ public class ContractMarket implements Serializable {
         }
         contract.setEmployerCode(employer, campaign.getGameYear());
         contract.setMissionType(findAtBMissionType(unitRatingMod,
-                RandomFactionGenerator.getInstance().getFactionHints()
-                        .isISMajorPower(Factions.getInstance().getFaction(contract.getEmployerCode()))));
+                Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
 
         if (contract.getMissionType() == AtBContract.MT_PIRATEHUNTING) {
             contract.setEnemyCode("PIR");
@@ -439,8 +438,7 @@ public class ContractMarket implements Serializable {
         AtBContract contract = new AtBContract("New Subcontract");
         contract.setEmployerCode(parent.getEmployerCode(), campaign.getGameYear());
         contract.setMissionType(findAtBMissionType(unitRatingMod,
-                RandomFactionGenerator.getInstance().getFactionHints()
-                    .isISMajorPower(Factions.getInstance().getFaction(contract.getEmployerCode()))));
+                Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
 
         if (contract.getMissionType() == AtBContract.MT_PIRATEHUNTING)
             contract.setEnemyCode("PIR");
@@ -735,8 +733,7 @@ public class ContractMarket implements Serializable {
             mods.mods[i] += missionMods[contract.getMissionType()][i];
         }
 
-        if (RandomFactionGenerator.getInstance().getFactionHints()
-                .isISMajorPower(Factions.getInstance().getFaction(contract.getEmployerCode()))) {
+        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()) {
             mods.mods[CLAUSE_SALVAGE] += -1;
             mods.mods[CLAUSE_TRANSPORT] += 1;
         }
