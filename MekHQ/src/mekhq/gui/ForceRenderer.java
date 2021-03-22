@@ -90,10 +90,10 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 if (entity.calculateFreeC3Nodes() >= 5) {
                     c3network += Messages.getString("ChatLounge.C3iNone");
                 } else {
-                    c3network += c3network += Messages.getString("ChatLounge.C3iNetwork")
+                    c3network += Messages.getString("ChatLounge.C3iNetwork")
                             + entity.getC3NetId();
                     if (entity.calculateFreeC3Nodes() > 0) {
-                        c3network += Messages.getString("ChatLounge.C3Nodes",
+                        c3network += Messages.getString("ChatLounge.C3iNodes",
                                 entity.calculateFreeC3Nodes());
                     }
                 }

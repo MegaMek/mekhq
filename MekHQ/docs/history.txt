@@ -12,6 +12,13 @@ VERSION HISTORY:
 + PR #2379: Repair Bay: Adding part name to the report when GM repairing
 + PR #2337: Shopping List No Longer Writes to XML While Empty
 + Issue #2459: Only calculate weight if EquipmertPart has a type
++ PR #2465: Change source and target compatibility to Java 11
++ Issue #2458: MRMS Astech Requirement Checks
++ PR #2473: Better GM unit restore
++ PR #2475: Use the correct resource string for free C3i Nodes on TOE
++ Issue #2456: Incorrect Financial Export Date, Two Force Icon NPEs, Unit Market NPE
++ Issue #2469: Fixing Award Log Edit NPEs
++ Issue MegaMek/megamek#2597: Use MM's new UnitNameTracker for name collisions
 
 0.48.0 (Stable) - (2021-03-05 1530 UT
 + Issue #2427: Exception during maintenance on a new day breaks MekHQ
